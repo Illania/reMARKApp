@@ -1,0 +1,140 @@
+﻿//
+// Project: Mark5.Mobile.Common
+// File: FoldersManager.cs
+// Author: Bartosz Cichecki <bgc@nordic-it.com>
+//
+// Copyright (c) 2016 Nordic IT
+//
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Mark5.Mobile.Common.DataAccess;
+using Mark5.Mobile.Common.Extensions;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Converters;
+using Mark5.Mobile.Common.Storage;
+using Mark5.ServiceReference.AppService;
+using DataContract = Mark5.ServiceReference.DataContract;
+
+namespace Mark5.Mobile.Common.Managers
+{
+
+    class FoldersManager : AbstractManager, IFoldersManager
+    {
+
+        readonly IFoldersDataAccess foldersDataAccess;
+
+        public FoldersManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy, IFoldersDataAccess foldersDataAccess)
+            : base(connectionInfo, appServiceProxy)
+        {
+            this.foldersDataAccess = foldersDataAccess;
+        }
+
+        public async Task<List<Folder>> GetFoldersAsync(ModuleType moduleType, Folder parentFolder = null, int depth = 2, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var foldersResult = await AppServiceProxy.GetFoldersAsync(new DataContract.GetFoldersParameters
+                {
+                    Token = Token,
+                    ModuleType = moduleType.ConvertEnum<DataContract.ModuleType>(),
+                    FolderId = parentFolder?.Id ?? -1,
+                    Depth = depth
+                });
+
+                var folders = foldersResult.Folders.WhereNotNull().Select(f => f.Convert()).ToList();
+                ProcessFolders(folders, parentFolder);
+
+                await foldersDataAccess.InsertOrReplaceRecursively(moduleType, folders, parentFolder);
+
+                return folders;
+            }
+
+            if (sourceType == SourceType.Local)
+            {
+                return await foldersDataAccess.GetRecursively(moduleType, parentFolder, depth);
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task<List<Folder>> GetFavoriteFoldersAsync(ModuleType module, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Remote)
+            {
+                throw new ArgumentException("Invalid sourceType provided.");
+            }
+
+            var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
+
+            List<Folder> moduleFavoriteFolders;
+            if (!favoriteFolders.TryGetValue(module, out moduleFavoriteFolders))
+            {
+                return new List<Folder>();
+            }
+
+            return moduleFavoriteFolders;
+        }
+
+        public async Task AddFavoriteFolderAsync(ModuleType module, Folder folder, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Remote)
+            {
+                throw new ArgumentException("Invalid sourceType provided.");
+            }
+
+            var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
+
+            List<Folder> moduleFavoriteFolders;
+            if (!favoriteFolders.TryGetValue(module, out moduleFavoriteFolders))
+            {
+                moduleFavoriteFolders = new List<Folder>();
+                favoriteFolders[module] = moduleFavoriteFolders;
+            }
+
+            moduleFavoriteFolders.Add(folder.ShallowCopy());
+
+            await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
+        }
+
+        public async Task RemoveFavoriteFolderAsync(ModuleType module, Folder folder, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Remote)
+            {
+                throw new ArgumentException("Invalid sourceType provided.");
+            }
+
+            var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
+
+            List<Folder> moduleFavoriteFolders;
+            if (!favoriteFolders.TryGetValue(module, out moduleFavoriteFolders))
+            {
+                moduleFavoriteFolders = new List<Folder>();
+                favoriteFolders[module] = moduleFavoriteFolders;
+            }
+
+            moduleFavoriteFolders.RemoveAll(f => f.Id == folder.Id);
+
+            await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
+        }
+
+        #region Helper methods
+
+        void ProcessFolders(List<Folder> folders, Folder parentFolder)
+        {
+            foreach (var folder in folders)
+            {
+                folder.ParentFolderId = parentFolder?.Id ?? 0;
+                if (folder.HasSubFolders && folder.SubFolders.Count > 0)
+                {
+                    ProcessFolders(folder.SubFolders, folder);
+                }
+            }
+        }
+
+        #endregion
+
+    }
+}
+
