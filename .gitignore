@@ -2,3 +2,5 @@
 .vs
 MARK5.userprefs
 packages
+obj
+bin
