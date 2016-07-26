@@ -40,6 +40,10 @@ namespace Mark5.Mobile.Common.DataAccess
         Task SaveDefaultTemplateAsync(DocumentCreationModeFlag creationModeFlag, Template template);
 
         Task<Template> GetDefaultTemplateAsync(DocumentCreationModeFlag creationModeFlag);
+
+        Task SaveRecentAddressesAsync(List<RecentAddress> recentAddresses);
+
+        Task<List<RecentAddress>> GetRecentAddressesAsync();
     }
 }
 

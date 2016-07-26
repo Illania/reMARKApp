@@ -13,7 +13,7 @@ namespace Mark5.Mobile.Common.Model
     public class CalendarResource
     {
 
-        public int Id { get; set; }
+        public int Id { get; set; } = -1;
 
         public Guid Guid { get; set; }
 

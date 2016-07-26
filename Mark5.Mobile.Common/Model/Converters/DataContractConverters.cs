@@ -423,6 +423,16 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
+        public static RecentAddress Convert(this DataContract.RecentAddress ra)
+        {
+            return new RecentAddress
+            {
+                Name = ra.Name,
+                AddressType = ra.AddressType.ConvertEnum<DocumentAddressType>(),
+                Address = ra.Address
+            };
+        }
+
         public static SavedSearch Convert(this DataContract.SavedSearch ss)
         {
             return new SavedSearch

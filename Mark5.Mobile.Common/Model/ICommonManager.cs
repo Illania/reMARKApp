@@ -5,11 +5,14 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
+
 namespace Mark5.Mobile.Common.Model
 {
+
     public interface ICommonManager
     {
+
+
     }
 }
 

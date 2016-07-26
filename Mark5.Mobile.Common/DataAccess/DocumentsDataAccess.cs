@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -250,6 +251,27 @@ namespace Mark5.Mobile.Common.DataAccess
             });
 
             return template;
+        }
+
+        public async Task SaveRecentAddressesAsync(List<RecentAddress> recentAddresses)
+        {
+            await documentsDatabase.RunInConnectionAsync(c =>
+            {
+                c.DeleteAll<RecentAddress>();
+                c.InsertAll(recentAddresses);
+            });
+        }
+
+        public async Task<List<RecentAddress>> GetRecentAddressesAsync()
+        {
+            List<RecentAddress> recentAddresses = null;
+
+            await documentsDatabase.RunInConnectionAsync(c =>
+            {
+                recentAddresses = c.Table<RecentAddress>().ToList();
+            });
+
+            return recentAddresses;
         }
     }
 }

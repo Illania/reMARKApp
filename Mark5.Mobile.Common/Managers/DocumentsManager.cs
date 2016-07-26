@@ -225,6 +225,30 @@ namespace Mark5.Mobile.Common.Managers
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
+
+        public async Task<List<RecentAddress>> GetRecentAddressesAsync(SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.GetRecentAddressesAsync(new DataContract.GetRecentAddressesParameters
+                {
+                    Token = Token
+                });
+
+                var recentAddresses = result.RecentAddresses.WhereNotNull().Select(ra => ra.Convert()).ToList();
+
+                await documentsDataAccess.SaveRecentAddressesAsync(recentAddresses);
+
+                return recentAddresses;
+            }
+
+            if (sourceType == SourceType.Local)
+            {
+                return await documentsDataAccess.GetRecentAddressesAsync();
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
     }
 }
 

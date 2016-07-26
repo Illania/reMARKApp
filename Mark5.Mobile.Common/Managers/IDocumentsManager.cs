@@ -32,6 +32,8 @@ namespace Mark5.Mobile.Common.Managers
         Task<Template> GetTemplateAsync(int templateId, SourceType sourceType = SourceType.Auto);
 
         Task<Template> GetDefaultTemplateAsync(DocumentCreationModeFlag creationModeFlag, SourceType sourceType = SourceType.Auto);
+
+        Task<List<RecentAddress>> GetRecentAddressesAsync(SourceType sourceType = SourceType.Auto);
     }
 }
 

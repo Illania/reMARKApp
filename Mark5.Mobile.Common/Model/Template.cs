@@ -15,8 +15,8 @@ namespace Mark5.Mobile.Common.Model
     public class Template
     {
 
-        [Column("Id")]
-        public int Id { get; set; }
+        [Column("Id"), PrimaryKey]
+        public int Id { get; set; } = -1;
 
         [Column("Guid")]
         public Guid Guid { get; set; }

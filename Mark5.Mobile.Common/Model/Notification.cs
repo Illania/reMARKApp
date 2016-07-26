@@ -15,7 +15,10 @@ namespace Mark5.Mobile.Common.Model
     public class Notification
     {
 
-        [Column("Guid"), Unique]
+        [Column("Id"), PrimaryKey, AutoIncrement]
+        public int Id { get; set; } = -1;
+
+        [Column("Guid")]
         public Guid Guid { get; set; }
 
         [Column("Title")]
