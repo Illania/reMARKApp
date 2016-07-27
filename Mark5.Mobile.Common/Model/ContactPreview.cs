@@ -17,6 +17,24 @@ namespace Mark5.Mobile.Common.Model
     {
 
         [Ignore]
+        public override ObjectType ObjectType
+        {
+            get
+            {
+                return ObjectType.Contact;
+            }
+        }
+
+        [Ignore]
+        public override ModuleType ModuleType
+        {
+            get
+            {
+                return ModuleType.Contacts;
+            }
+        }
+
+        [Ignore]
         public int RowId { get; set; } = -1;
 
         [Column("Name")]
@@ -33,6 +51,9 @@ namespace Mark5.Mobile.Common.Model
 
         [Column("Type")]
         public ContactType Type { get; set; }
+
+        [Column("CommentsCount")]
+        public int CommentsCount { get; set; }
 
         List<Category> categories;
 

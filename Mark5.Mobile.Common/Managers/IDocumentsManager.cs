@@ -34,6 +34,12 @@ namespace Mark5.Mobile.Common.Managers
         Task<Template> GetDefaultTemplateAsync(DocumentCreationModeFlag creationModeFlag, SourceType sourceType = SourceType.Auto);
 
         Task<List<RecentAddress>> GetRecentAddressesAsync(SourceType sourceType = SourceType.Auto);
+
+        Task<Comment> AddComment(Document document, string content, SourceType sourceType = SourceType.Auto);
+
+        Task<bool> EditComment(Document document, Comment comment, SourceType sourceType = SourceType.Auto);
+
+        Task DeleteComment(Document document, Comment comment, SourceType sourceType = SourceType.Auto);
     }
 }
 

@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -107,6 +108,92 @@ namespace Mark5.Mobile.Common.DataAccess
             });
 
             return contact;
+        }
+
+        public async Task AddCommentAsync(Contact contact, Comment comment)
+        {
+            await contactsDatabase.RunInConnectionAsync(c =>
+            {
+                var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsBytes)}\" " +
+                                $"from \"{nameof(Contact)}\" " +
+                                $"where \"{nameof(Contact.Id)}\" = @contactId");
+                cmd.Bind("@contactId", contact.Id);
+                var result = cmd.ExecuteQuery<CommentsValue>();
+
+                if (result == null || result.Count < 1)
+                {
+                    throw new DataNotFoundException("Contact could not be found.");
+                }
+
+                var comments = result.First().Comments;
+
+                comments.Add(comment);
+
+                cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " +
+                                      $"set \"{nameof(Contact.CommentsBytes)}\" = @commentsBytes " +
+                                      $"where \"{nameof(Contact.Id)}\" = contactId");
+                cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
+                cmd.Bind("@contactId", contact.Id);
+                cmd.ExecuteNonQuery();
+            });
+        }
+
+        public async Task EditCommentAsync(Contact contact, Comment comment)
+        {
+            await contactsDatabase.RunInConnectionAsync(c =>
+            {
+                var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsBytes)}\" " +
+                                $"from \"{nameof(Contact)}\" " +
+                                $"where \"{nameof(Contact.Id)}\" = @contactId");
+                cmd.Bind("@contactId", contact.Id);
+                var result = cmd.ExecuteQuery<CommentsValue>();
+
+                if (result == null || result.Count < 1)
+                {
+                    throw new DataNotFoundException("Contact could not be found.");
+                }
+
+                var comments = result.First().Comments;
+
+                comments.RemoveAll(cm => cm.Id == comment.Id);
+                comments.Add(comment);
+                comments = comments.OrderBy(cm => cm.DateAdded).ToList();
+
+                cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " +
+                                      $"set \"{nameof(Contact.CommentsBytes)}\" = @commentsBytes " +
+                                      $"where \"{nameof(Contact.Id)}\" = contactId");
+                cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
+                cmd.Bind("@contactId", contact.Id);
+                cmd.ExecuteNonQuery();
+            });
+        }
+
+        public async Task DeleteCommentAsync(Contact contact, Comment comment)
+        {
+            await contactsDatabase.RunInConnectionAsync(c =>
+            {
+                var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsBytes)}\" " +
+                                $"from \"{nameof(Contact)}\" " +
+                                $"where \"{nameof(Contact.Id)}\" = @contactId");
+                cmd.Bind("@contactId", contact.Id);
+                var result = cmd.ExecuteQuery<CommentsValue>();
+
+                if (result == null || result.Count < 1)
+                {
+                    throw new DataNotFoundException("Contact could not be found.");
+                }
+
+                var comments = result.First().Comments;
+
+                comments.RemoveAll(cm => cm.Id == comment.Id);
+
+                cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " +
+                                      $"set \"{nameof(Contact.CommentsBytes)}\" = @commentsBytes " +
+                                      $"where \"{nameof(Contact.Id)}\" = contactId");
+                cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
+                cmd.Bind("@contactId", contact.Id);
+                cmd.ExecuteNonQuery();
+            });
         }
     }
 }

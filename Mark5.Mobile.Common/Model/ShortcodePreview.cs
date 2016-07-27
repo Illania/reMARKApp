@@ -15,6 +15,24 @@ namespace Mark5.Mobile.Common.Model
     {
 
         [Ignore]
+        public override ObjectType ObjectType
+        {
+            get
+            {
+                return ObjectType.Shortcode;
+            }
+        }
+
+        [Ignore]
+        public override ModuleType ModuleType
+        {
+            get
+            {
+                return ModuleType.Shortcodes;
+            }
+        }
+
+        [Ignore]
         public int RowId { get; set; }
 
         [Column("Name")]

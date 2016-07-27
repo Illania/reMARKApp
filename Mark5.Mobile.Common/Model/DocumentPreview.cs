@@ -17,6 +17,24 @@ namespace Mark5.Mobile.Common.Model
     public class DocumentPreview : BusinessEntityPreview
     {
 
+        [Ignore]
+        public override ObjectType ObjectType
+        {
+            get
+            {
+                return ObjectType.Document;
+            }
+        }
+
+        [Ignore]
+        public override ModuleType ModuleType
+        {
+            get
+            {
+                return ModuleType.Documents;
+            }
+        }
+
         [Column("ReferenceNumber")]
         public string ReferenceNumber { get; set; }
 

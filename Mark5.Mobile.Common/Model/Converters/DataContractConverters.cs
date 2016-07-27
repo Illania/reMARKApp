@@ -149,6 +149,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 result.ResponsibleUserIds.AddRange(c.ResponsibleUserIds);
             if (c.ResponsibleUsers != null)
                 result.ResponsibleUsers.Union(c.ResponsibleUsers);
+            if (c.Comments != null)
+                result.Comments.AddRange(c.Comments.WhereNotNull().Select(Convert));
             return result;
         }
 
@@ -164,7 +166,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 CompanyName = cp.CompanyName,
                 ShortId = cp.ShortId,
                 Type = cp.Type.ConvertEnum<ContactType>(),
-                PrimaryAddress = cp.PrimaryAddress?.Convert()
+                PrimaryAddress = cp.PrimaryAddress?.Convert(),
+                CommentsCount = cp.CommentsCount
             };
             if (cp.Categories != null)
                 result.Categories.AddRange(cp.Categories.WhereNotNull().Select(Convert));

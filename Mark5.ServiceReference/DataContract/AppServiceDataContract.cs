@@ -859,6 +859,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "PhysicalAddresses", Order = 0)]
         public List<PhysicalAddress> PhysicalAddresses { get; set; } = new List<PhysicalAddress>();
+
+        [DataMember(Name = "Comments", Order = 0)]
+        public List<Comment> Comments { get; set; } = new List<Comment>();
     }
 
     [DataContract(Name = "ContactPreview", Namespace = "com.nordic-it.appservice.v3")]
@@ -894,6 +897,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "PrimaryAddress", Order = 0)]
         public CommunicationAddress PrimaryAddress { get; set; }
+
+        [DataMember(Name = "CommentsCount", Order = 0)]
+        public int CommentsCount { get; set; }
     }
 
     [DataContract(Name = "PhysicalAddress", Namespace = "com.nordic-it.appservice.v3")]
@@ -2243,6 +2249,9 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "AddCommentResult", Namespace = "com.nordic-it.appservice.v3")]
     public class AddCommentResult
     {
+
+        [DataMember(Name = "Comment", Order = 0)]
+        public Comment Comment { get; set; }
     }
 
     [DataContract(Name = "EditCommentParameters", Namespace = "com.nordic-it.appservice.v3")]

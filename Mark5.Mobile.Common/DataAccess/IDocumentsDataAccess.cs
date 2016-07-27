@@ -44,6 +44,12 @@ namespace Mark5.Mobile.Common.DataAccess
         Task SaveRecentAddressesAsync(List<RecentAddress> recentAddresses);
 
         Task<List<RecentAddress>> GetRecentAddressesAsync();
+
+        Task AddCommentAsync(Document document, Comment comment);
+
+        Task EditCommentAsync(Document document, Comment comment);
+
+        Task DeleteCommentAsync(Document document, Comment comment);
     }
 }
 

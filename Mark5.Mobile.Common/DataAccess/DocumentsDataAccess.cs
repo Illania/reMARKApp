@@ -273,6 +273,93 @@ namespace Mark5.Mobile.Common.DataAccess
 
             return recentAddresses;
         }
+
+        public async Task AddCommentAsync(Document document, Comment comment)
+        {
+            await documentsDatabase.RunInConnectionAsync(c =>
+            {
+                var cmd = c.CreateCommand($"select \"{nameof(Document.CommentsBytes)}\" " +
+                                $"from \"{nameof(Document)}\" " +
+                                $"where \"{nameof(Document.Id)}\" = @documentId");
+                cmd.Bind("@documentId", document.Id);
+                var result = cmd.ExecuteQuery<CommentsValue>();
+
+                if (result == null || result.Count < 1)
+                {
+                    throw new DataNotFoundException("Document could not be found.");
+                }
+
+                var comments = result.First().Comments;
+
+                comments.Add(comment);
+                comments = comments.OrderBy(cm => cm.DateAdded).ToList();
+
+                cmd = c.CreateCommand($"update \"{nameof(Document)}\" " +
+                                      $"set \"{nameof(Document.CommentsBytes)}\" = @commentsBytes " +
+                                      $"where \"{nameof(Document.Id)}\" = documentId");
+                cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
+                cmd.Bind("@documentId", document.Id);
+                cmd.ExecuteNonQuery();
+            });
+        }
+
+        public async Task EditCommentAsync(Document document, Comment comment)
+        {
+            await documentsDatabase.RunInConnectionAsync(c =>
+            {
+                var cmd = c.CreateCommand($"select \"{nameof(Document.CommentsBytes)}\" " +
+                                $"from \"{nameof(Document)}\" " +
+                                $"where \"{nameof(Document.Id)}\" = @documentId");
+                cmd.Bind("@documentId", document.Id);
+                var result = cmd.ExecuteQuery<CommentsValue>();
+
+                if (result == null || result.Count < 1)
+                {
+                    throw new DataNotFoundException("Document could not be found.");
+                }
+
+                var comments = result.First().Comments;
+
+                comments.RemoveAll(cm => cm.Id == comment.Id);
+                comments.Add(comment);
+                comments = comments.OrderBy(cm => cm.DateAdded).ToList();
+
+                cmd = c.CreateCommand($"update \"{nameof(Document)}\" " +
+                                      $"set \"{nameof(Document.CommentsBytes)}\" = @commentsBytes " +
+                                      $"where \"{nameof(Document.Id)}\" = documentId");
+                cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
+                cmd.Bind("@documentId", document.Id);
+                cmd.ExecuteNonQuery();
+            });
+        }
+
+        public async Task DeleteCommentAsync(Document document, Comment comment)
+        {
+            await documentsDatabase.RunInConnectionAsync(c =>
+            {
+                var cmd = c.CreateCommand($"select \"{nameof(Document.CommentsBytes)}\" " +
+                                $"from \"{nameof(Document)}\" " +
+                                $"where \"{nameof(Document.Id)}\" = @documentId");
+                cmd.Bind("@documentId", document.Id);
+                var result = cmd.ExecuteQuery<CommentsValue>();
+
+                if (result == null || result.Count < 1)
+                {
+                    throw new DataNotFoundException("Document could not be found.");
+                }
+
+                var comments = result.First().Comments;
+
+                comments.RemoveAll(cm => cm.Id == comment.Id);
+
+                cmd = c.CreateCommand($"update \"{nameof(Document)}\" " +
+                                      $"set \"{nameof(Document.CommentsBytes)}\" = @commentsBytes " +
+                                      $"where \"{nameof(Document.Id)}\" = documentId");
+                cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
+                cmd.Bind("@documentId", document.Id);
+                cmd.ExecuteNonQuery();
+            });
+        }
     }
 }
 

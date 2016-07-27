@@ -168,6 +168,26 @@ namespace Mark5.Mobile.Common.Model
             }
         }
 
+        List<Comment> comments;
+
+        [Ignore]
+        public List<Comment> Comments
+        {
+            get
+            {
+                if (comments == null)
+                {
+                    comments = new List<Comment>();
+                }
+
+                return comments;
+            }
+            set
+            {
+                comments = value;
+            }
+        }
+
         #region Serialization
 
         [Column("PrimaryPersonBytes")]
@@ -245,6 +265,19 @@ namespace Mark5.Mobile.Common.Model
             set
             {
                 PhysicalAddresses = SerializationUtils.DeserializeFromByteArray<List<PhysicalAddress>>(value);
+            }
+        }
+
+        [Column("CommentsBytes")]
+        public byte[] CommentsBytes
+        {
+            get
+            {
+                return SerializationUtils.SerializeToByteArray(Comments);
+            }
+            set
+            {
+                Comments = SerializationUtils.DeserializeFromByteArray<List<Comment>>(value);
             }
         }
 

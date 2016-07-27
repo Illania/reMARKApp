@@ -146,6 +146,7 @@
     <Compile Include="DataAccess\NotificationsDataAccess.cs" />
     <Compile Include="Model\NotificationSettings.cs" />
     <Compile Include="Model\ICommonManager.cs" />
+    <Compile Include="Model\CommentsValue.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

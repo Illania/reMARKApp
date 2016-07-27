@@ -18,6 +18,12 @@ namespace Mark5.Mobile.Common.Managers
         Task<List<ContactPreview>> GetContactPreviewsAsync(Folder folder, int startRowId = -1, int maxItems = 500, SourceType sourceType = SourceType.Auto);
 
         Task<Contact> GetContactAsync(Folder folder, int contactId, SourceType sourceType = SourceType.Auto);
+
+        Task<Comment> AddComment(Contact contact, string content, SourceType sourceType = SourceType.Auto);
+
+        Task<bool> EditComment(Contact contact, Comment comment, SourceType sourceType = SourceType.Auto);
+
+        Task DeleteComment(Contact contact, Comment comment, SourceType sourceType = SourceType.Auto);
     }
 }
 

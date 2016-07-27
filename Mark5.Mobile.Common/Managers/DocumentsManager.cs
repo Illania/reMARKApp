@@ -249,6 +249,72 @@ namespace Mark5.Mobile.Common.Managers
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
+
+        public async Task<Comment> AddComment(Document document, string content, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.AddCommentAsync(new DataContract.AddCommentParameters
+                {
+                    Token = Token,
+                    ObjectId = document.Id,
+                    ObjectType = DataContract.ObjectType.Document,
+                    Content = content
+                });
+
+                var comment = result.Comment.Convert();
+
+                await documentsDataAccess.AddCommentAsync(document, comment);
+
+                return comment;
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task<bool> EditComment(Document document, Comment comment, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.EditCommentAsync(new DataContract.EditCommentParameters
+                {
+                    Token = Token,
+                    CommentId = comment.Id,
+                    ObjectId = document.Id,
+                    ObjectType = DataContract.ObjectType.Document,
+                    Content = comment.Content
+                });
+
+                var editSuccess = result.EditSuccess;
+
+                if (editSuccess)
+                {
+                    await documentsDataAccess.AddCommentAsync(document, comment);
+                }
+
+                return editSuccess;
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task DeleteComment(Document document, Comment comment, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.DeleteCommentAsync(new DataContract.DeleteCommentParameters
+                {
+                    Token = Token,
+                    CommentId = comment.Id,
+                    ObjectId = document.Id,
+                    ObjectType = DataContract.ObjectType.Document
+                });
+
+                await documentsDataAccess.DeleteCommentAsync(document, comment);
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
     }
 }
 

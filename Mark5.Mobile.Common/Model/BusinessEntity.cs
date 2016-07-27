@@ -21,16 +21,10 @@ namespace Mark5.Mobile.Common.Model
         public Guid Guid { get; set; }
 
         [Ignore]
-        public abstract ObjectType ObjectType
-        {
-            get;
-        }
+        public abstract ObjectType ObjectType { get; }
 
         [Ignore]
-        public abstract ModuleType ModuleType
-        {
-            get;
-        }
+        public abstract ModuleType ModuleType { get; }
     }
 }
 
