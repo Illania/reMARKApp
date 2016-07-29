@@ -90,7 +90,7 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task SetDocumentsReadStatusAsync(DocumentPreview[] documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto)
+        public async Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Local)
             {
@@ -107,7 +107,7 @@ namespace Mark5.Mobile.Common.Managers
             await documentsDataAccess.SetDocumentPreviewsReadStatusAsync(documentPreviews, isRead);
         }
 
-        public async Task SetDocumentPriorityAsync(DocumentPreview[] documentPreviews, Priority priority, SourceType sourceType = SourceType.Auto)
+        public async Task SetDocumentPriorityAsync(List<DocumentPreview> documentPreviews, Priority priority, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Local)
             {
@@ -124,7 +124,7 @@ namespace Mark5.Mobile.Common.Managers
             await documentsDataAccess.SetDocumentPreviewsPriorityAsync(documentPreviews, priority);
         }
 
-        public async Task MoveToSpamAsync(DocumentPreview[] documentPreviews, SourceType sourceType = SourceType.Auto)
+        public async Task MoveToSpamAsync(List<DocumentPreview> documentPreviews, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Local)
             {

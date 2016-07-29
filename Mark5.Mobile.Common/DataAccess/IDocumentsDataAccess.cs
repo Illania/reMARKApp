@@ -23,11 +23,11 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task<Document> GetDocumentAsync(int documentId);
 
-        Task SetDocumentPreviewsReadStatusAsync(DocumentPreview[] documentPreviews, bool isRead);
+        Task SetDocumentPreviewsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead);
 
-        Task SetDocumentPreviewsPriorityAsync(DocumentPreview[] documentPreviews, Priority priority);
+        Task SetDocumentPreviewsPriorityAsync(List<DocumentPreview> documentPreviews, Priority priority);
 
-        Task DeleteDocumentPreviewsAndDocumentsAsync(DocumentPreview[] documentPreviews);
+        Task DeleteDocumentPreviewsAndDocumentsAsync(List<DocumentPreview> documentPreviews);
 
         Task SaveTemplatePreviewsAsync(List<TemplatePreview> templatePreviews);
 

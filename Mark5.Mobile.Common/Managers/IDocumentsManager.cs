@@ -19,11 +19,11 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<Document> GetDocumentAsync(Folder folder, int documentId, DocumentBodyTypeRequest bodyType, SourceType sourceType = SourceType.Auto);
 
-        Task SetDocumentsReadStatusAsync(DocumentPreview[] documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto);
+        Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto);
 
-        Task SetDocumentPriorityAsync(DocumentPreview[] documentPreviews, Priority priority, SourceType sourceType = SourceType.Auto);
+        Task SetDocumentPriorityAsync(List<DocumentPreview> documentPreviews, Priority priority, SourceType sourceType = SourceType.Auto);
 
-        Task MoveToSpamAsync(DocumentPreview[] documentPreviews, SourceType sourceType = SourceType.Auto);
+        Task MoveToSpamAsync(List<DocumentPreview> documentPreviews, SourceType sourceType = SourceType.Auto);
 
         Task<List<TemplatePreview>> GetTemplatePreviewsAsync(SourceType sourceType = SourceType.Auto);
 

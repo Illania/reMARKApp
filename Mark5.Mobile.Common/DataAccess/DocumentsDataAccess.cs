@@ -110,7 +110,7 @@ namespace Mark5.Mobile.Common.DataAccess
             return document;
         }
 
-        public async Task SetDocumentPreviewsReadStatusAsync(DocumentPreview[] documentPreviews, bool isRead)
+        public async Task SetDocumentPreviewsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead)
         {
             await documentsDatabase.RunInConnectionAsync(c =>
             {
@@ -129,7 +129,7 @@ namespace Mark5.Mobile.Common.DataAccess
             });
         }
 
-        public async Task SetDocumentPreviewsPriorityAsync(DocumentPreview[] documentPreviews, Priority priority)
+        public async Task SetDocumentPreviewsPriorityAsync(List<DocumentPreview> documentPreviews, Priority priority)
         {
             await documentsDatabase.RunInConnectionAsync(c =>
             {
@@ -146,7 +146,7 @@ namespace Mark5.Mobile.Common.DataAccess
             });
         }
 
-        public async Task DeleteDocumentPreviewsAndDocumentsAsync(DocumentPreview[] documentPreviews)
+        public async Task DeleteDocumentPreviewsAndDocumentsAsync(List<DocumentPreview> documentPreviews)
         {
             var ids = documentPreviews.Select(dp => dp.Id).Distinct().ToList();
 
