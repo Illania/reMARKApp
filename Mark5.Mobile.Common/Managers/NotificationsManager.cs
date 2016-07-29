@@ -105,6 +105,8 @@ namespace Mark5.Mobile.Common.Managers
                     favoriteFolder.Subscribed = enabled;
                 }
                 await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
+
+                return;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
@@ -154,6 +156,8 @@ namespace Mark5.Mobile.Common.Managers
                 var notificationSettings = await FileSystemStorage.GetNotificationSettingsAsync() ?? new NotificationSettings();
                 notificationSettings.CalendarNotificationsEnabled = enabled;
                 await FileSystemStorage.SaveNotificationSettingsAsync(notificationSettings);
+
+                return;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
@@ -203,6 +207,8 @@ namespace Mark5.Mobile.Common.Managers
                 var notificationSettings = await FileSystemStorage.GetNotificationSettingsAsync() ?? new NotificationSettings();
                 notificationSettings.SoundName = soundName;
                 await FileSystemStorage.SaveNotificationSettingsAsync(notificationSettings);
+
+                return;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
@@ -229,6 +235,8 @@ namespace Mark5.Mobile.Common.Managers
                 await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
 
                 await FileSystemStorage.SaveNotificationSettingsAsync(new NotificationSettings());
+
+                return;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");

@@ -130,6 +130,7 @@ namespace Mark5.Mobile.Common.Managers
             {
                 throw new ArgumentException("Invalid sourceType provided.");
             }
+
             await AppServiceProxy.MoveToSpamAsync(new DataContract.MoveToSpamParameters
             {
                 Token = Token,
@@ -277,6 +278,8 @@ namespace Mark5.Mobile.Common.Managers
                 });
 
                 await documentsDataAccess.SetCategoriesAsync(documentPreview, categories);
+
+                return;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
@@ -334,7 +337,7 @@ namespace Mark5.Mobile.Common.Managers
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
-                var result = await AppServiceProxy.DeleteCommentAsync(new DataContract.DeleteCommentParameters
+                await AppServiceProxy.DeleteCommentAsync(new DataContract.DeleteCommentParameters
                 {
                     Token = Token,
                     CommentId = comment.Id,
@@ -343,6 +346,8 @@ namespace Mark5.Mobile.Common.Managers
                 });
 
                 await documentsDataAccess.DeleteCommentAsync(document, comment);
+
+                return;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");

@@ -70,6 +70,67 @@ namespace Mark5.Mobile.Common.Managers
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
+
+        Task CopyToFolder(List<IBusinessEntity> businessEntity, Folder folder, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        Task MoveToFolder(List<IBusinessEntity> businessEntity, Folder fromFolder, Folder toFolder, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        Task CopyToWorktray(List<BusinessEntity> businessEntity, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        Task CopyToUserWorktray(List<BusinessEntity> businessEntity, SystemUser systemUser, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+
+        Task RemoveFromFolder(List<BusinessEntity> businessEntity, Folder folder, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        Task Delete(List<BusinessEntity> businessEntity, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
     }
 }
 

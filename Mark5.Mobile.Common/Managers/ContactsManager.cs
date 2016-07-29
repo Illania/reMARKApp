@@ -122,6 +122,8 @@ namespace Mark5.Mobile.Common.Managers
                 });
 
                 await contactsDataAccess.SetCategoriesAsync(contactPreview, categories);
+
+                return;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
@@ -179,7 +181,7 @@ namespace Mark5.Mobile.Common.Managers
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
-                var result = await AppServiceProxy.DeleteCommentAsync(new DataContract.DeleteCommentParameters
+                await AppServiceProxy.DeleteCommentAsync(new DataContract.DeleteCommentParameters
                 {
                     Token = Token,
                     CommentId = comment.Id,
@@ -188,6 +190,8 @@ namespace Mark5.Mobile.Common.Managers
                 });
 
                 await contactsDataAccess.DeleteCommentAsync(contact, comment);
+
+                return;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
