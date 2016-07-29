@@ -23,6 +23,12 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task<Contact> GetContactAsync(int contactId);
 
+        Task SaveAllCategories(List<Category> categories);
+
+        Task<List<Category>> GetAllCategoriesAsync();
+
+        Task SetCategoriesAsync(ContactPreview contactPreview, List<Category> categories);
+
         Task AddCommentAsync(Contact contact, Comment comment);
 
         Task EditCommentAsync(Contact contact, Comment comment);

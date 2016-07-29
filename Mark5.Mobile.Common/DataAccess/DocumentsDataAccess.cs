@@ -146,8 +146,10 @@ namespace Mark5.Mobile.Common.DataAccess
             });
         }
 
-        public async Task DeleteDocumentPreviewsAndDocumentsAsync(int[] ids)
+        public async Task DeleteDocumentPreviewsAndDocumentsAsync(DocumentPreview[] documentPreviews)
         {
+            var ids = documentPreviews.Select(dp => dp.Id).Distinct().ToList();
+
             await documentsDatabase.RunInConnectionAsync(c =>
             {
                 c.Table<FolderDocumentLink>().Delete(fdl => ids.Contains(fdl.DocumentId));
@@ -274,6 +276,40 @@ namespace Mark5.Mobile.Common.DataAccess
             return recentAddresses;
         }
 
+        public async Task SaveAllCategories(List<Category> categories)
+        {
+            await documentsDatabase.RunInConnectionAsync(c =>
+            {
+                c.DeleteAll<Category>();
+                c.InsertAll(categories);
+            });
+        }
+
+        public async Task<List<Category>> GetAllCategoriesAsync()
+        {
+            List<Category> categories = null;
+
+            await documentsDatabase.RunInConnectionAsync(c =>
+            {
+                categories = c.Table<Category>().ToList();
+            });
+
+            return categories;
+        }
+
+        public async Task SetCategoriesAsync(DocumentPreview documentPreview, List<Category> categories)
+        {
+            await documentsDatabase.RunInConnectionAsync(c =>
+            {
+                var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
+                                      $"set \"{nameof(DocumentPreview.CategoriesBytes)}\" = @categoriesBytes " +
+                                      $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
+                cmd.Bind("@categoriesBytes", new CategoriesValue { Categories = categories }.CategoriesBytes);
+                cmd.Bind("@documentPreviewId", documentPreview.Id);
+                cmd.ExecuteNonQuery();
+            });
+        }
+
         public async Task AddCommentAsync(Document document, Comment comment)
         {
             await documentsDatabase.RunInConnectionAsync(c =>
@@ -296,8 +332,15 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 cmd = c.CreateCommand($"update \"{nameof(Document)}\" " +
                                       $"set \"{nameof(Document.CommentsBytes)}\" = @commentsBytes " +
-                                      $"where \"{nameof(Document.Id)}\" = documentId");
+                                      $"where \"{nameof(Document.Id)}\" = @documentId");
                 cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
+                cmd.Bind("@documentId", document.Id);
+                cmd.ExecuteNonQuery();
+
+                cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
+                                      $"set \"{nameof(DocumentPreview.CommentsCount)}\" = @commentsCount " +
+                                      $"where \"{nameof(DocumentPreview.Id)}\" = @documentId");
+                cmd.Bind("@commentsCount", comments.Count);
                 cmd.Bind("@documentId", document.Id);
                 cmd.ExecuteNonQuery();
             });
@@ -326,7 +369,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 cmd = c.CreateCommand($"update \"{nameof(Document)}\" " +
                                       $"set \"{nameof(Document.CommentsBytes)}\" = @commentsBytes " +
-                                      $"where \"{nameof(Document.Id)}\" = documentId");
+                                      $"where \"{nameof(Document.Id)}\" = @documentId");
                 cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
                 cmd.Bind("@documentId", document.Id);
                 cmd.ExecuteNonQuery();
@@ -354,8 +397,15 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 cmd = c.CreateCommand($"update \"{nameof(Document)}\" " +
                                       $"set \"{nameof(Document.CommentsBytes)}\" = @commentsBytes " +
-                                      $"where \"{nameof(Document.Id)}\" = documentId");
+                                      $"where \"{nameof(Document.Id)}\" = @documentId");
                 cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
+                cmd.Bind("@documentId", document.Id);
+                cmd.ExecuteNonQuery();
+
+                cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
+                                      $"set \"{nameof(DocumentPreview.CommentsCount)}\" = @commentsCount " +
+                                      $"where \"{nameof(DocumentPreview.Id)}\" = @documentId");
+                cmd.Bind("@commentsCount", comments.Count);
                 cmd.Bind("@documentId", document.Id);
                 cmd.ExecuteNonQuery();
             });

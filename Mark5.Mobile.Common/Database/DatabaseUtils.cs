@@ -109,7 +109,7 @@ namespace Mark5.Mobile.Common.Database
             {
                 c.CreateCommand("VACUUM;").ExecuteNonQuery();
             });
-            await DatabaseConnectionProvider.CommonDatabase.RunInConnectionAsync(c =>
+            await DatabaseConnectionProvider.SystemDatabase.RunInConnectionAsync(c =>
             {
                 c.CreateCommand("VACUUM;").ExecuteNonQuery();
             });

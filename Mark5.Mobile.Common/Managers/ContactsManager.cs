@@ -84,6 +84,49 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        public async Task<List<Category>> GetAllCategoriesAsync(SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.GetAllCategoriesAsync(new DataContract.GetAllCategoriesParameters
+                {
+                    Token = Token,
+                    ObjectType = DataContract.ObjectType.Contact,
+                });
+
+                var categories = result.Categories.WhereNotNull().Select(c => c.Convert()).ToList();
+
+                await contactsDataAccess.SaveAllCategories(categories);
+
+                return categories;
+            }
+
+            if (sourceType == SourceType.Local)
+            {
+                return await contactsDataAccess.GetAllCategoriesAsync();
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task SetCategoriesAsync(ContactPreview contactPreview, List<Category> categories, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                await AppServiceProxy.SetCategoriesAsync(new DataContract.SetCategoriesParameters
+                {
+                    Token = Token,
+                    ObjectId = contactPreview.Id,
+                    ObjectType = DataContract.ObjectType.Document,
+                    CategoryIds = categories.Select(c => c.Id).ToArray()
+                });
+
+                await contactsDataAccess.SetCategoriesAsync(contactPreview, categories);
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
         public async Task<Comment> AddComment(Contact contact, string content, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)

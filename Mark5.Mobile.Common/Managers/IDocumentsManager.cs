@@ -25,8 +25,6 @@ namespace Mark5.Mobile.Common.Managers
 
         Task MoveToSpamAsync(DocumentPreview[] documentPreviews, SourceType sourceType = SourceType.Auto);
 
-        Task MoveToSpamAsync(Document[] documents, SourceType sourceType = SourceType.Auto);
-
         Task<List<TemplatePreview>> GetTemplatePreviewsAsync(SourceType sourceType = SourceType.Auto);
 
         Task<Template> GetTemplateAsync(int templateId, SourceType sourceType = SourceType.Auto);
@@ -34,6 +32,10 @@ namespace Mark5.Mobile.Common.Managers
         Task<Template> GetDefaultTemplateAsync(DocumentCreationModeFlag creationModeFlag, SourceType sourceType = SourceType.Auto);
 
         Task<List<RecentAddress>> GetRecentAddressesAsync(SourceType sourceType = SourceType.Auto);
+
+        Task<List<Category>> GetAllCategoriesAsync(SourceType sourceType = SourceType.Auto);
+
+        Task SetCategoriesAsync(DocumentPreview documentPreview, List<Category> categories, SourceType sourceType = SourceType.Auto);
 
         Task<Comment> AddComment(Document document, string content, SourceType sourceType = SourceType.Auto);
 

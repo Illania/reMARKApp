@@ -70,7 +70,7 @@ namespace Mark5.Mobile.Common.Database
             }
         }
 
-        public static DatabaseConnectionProvider CommonDatabase
+        public static DatabaseConnectionProvider SystemDatabase
         {
             get
             {
@@ -79,7 +79,7 @@ namespace Mark5.Mobile.Common.Database
                     throw new InvalidOperationException("Data and/or cache folder is not configured.");
                 }
 
-                return commonDatabase.Value;
+                return systemDatabase.Value;
             }
         }
 
@@ -87,7 +87,7 @@ namespace Mark5.Mobile.Common.Database
         static readonly Lazy<DatabaseConnectionProvider> contactsDatabase = new Lazy<DatabaseConnectionProvider>(() => new DatabaseConnectionProvider("contacts.sqlite3"), LazyThreadSafetyMode.ExecutionAndPublication);
         static readonly Lazy<DatabaseConnectionProvider> shortcodesDatabase = new Lazy<DatabaseConnectionProvider>(() => new DatabaseConnectionProvider("shortcodes.sqlite3"), LazyThreadSafetyMode.ExecutionAndPublication);
         static readonly Lazy<DatabaseConnectionProvider> calendarDatabase = new Lazy<DatabaseConnectionProvider>(() => new DatabaseConnectionProvider("calendar.sqlite3"), LazyThreadSafetyMode.ExecutionAndPublication);
-        static readonly Lazy<DatabaseConnectionProvider> commonDatabase = new Lazy<DatabaseConnectionProvider>(() => new DatabaseConnectionProvider("common.sqlite3"), LazyThreadSafetyMode.ExecutionAndPublication);
+        static readonly Lazy<DatabaseConnectionProvider> systemDatabase = new Lazy<DatabaseConnectionProvider>(() => new DatabaseConnectionProvider("system.sqlite3"), LazyThreadSafetyMode.ExecutionAndPublication);
 
         public static DatabaseConnectionProvider DatabaseForModuleType(ModuleType moduleType)
         {
@@ -102,7 +102,7 @@ namespace Mark5.Mobile.Common.Database
                 case ModuleType.Calendar:
                     return CalendarDatabase;
                 default:
-                    return CommonDatabase;
+                    return SystemDatabase;
             }
         }
 

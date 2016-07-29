@@ -147,6 +147,9 @@
     <Compile Include="Model\NotificationSettings.cs" />
     <Compile Include="Model\ICommonManager.cs" />
     <Compile Include="Model\CommentsValue.cs" />
+    <Compile Include="Managers\CommonActionsManager.cs" />
+    <Compile Include="Managers\ICommonActionsManager.cs" />
+    <Compile Include="Model\CategoriesValue.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

@@ -126,28 +126,17 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task MoveToSpamAsync(DocumentPreview[] documentPreviews, SourceType sourceType = SourceType.Auto)
         {
-            await MoveToSpamAsync(documentPreviews.Select(dp => dp.Id).ToArray(), sourceType);
-        }
-
-        public async Task MoveToSpamAsync(Document[] documents, SourceType sourceType = SourceType.Auto)
-        {
-            await MoveToSpamAsync(documents.Select(dp => dp.Id).ToArray(), sourceType);
-        }
-
-        async Task MoveToSpamAsync(int[] ids, SourceType sourceType)
-        {
             if (sourceType == SourceType.Local)
             {
                 throw new ArgumentException("Invalid sourceType provided.");
             }
-
             await AppServiceProxy.MoveToSpamAsync(new DataContract.MoveToSpamParameters
             {
                 Token = Token,
-                DocumentIds = ids
+                DocumentIds = documentPreviews.Select(dp => dp.Id).ToArray()
             });
 
-            await documentsDataAccess.DeleteDocumentPreviewsAndDocumentsAsync(ids);
+            await documentsDataAccess.DeleteDocumentPreviewsAndDocumentsAsync(documentPreviews);
         }
 
         public async Task<List<TemplatePreview>> GetTemplatePreviewsAsync(SourceType sourceType = SourceType.Auto)
@@ -245,6 +234,49 @@ namespace Mark5.Mobile.Common.Managers
             if (sourceType == SourceType.Local)
             {
                 return await documentsDataAccess.GetRecentAddressesAsync();
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task<List<Category>> GetAllCategoriesAsync(SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.GetAllCategoriesAsync(new DataContract.GetAllCategoriesParameters
+                {
+                    Token = Token,
+                    ObjectType = DataContract.ObjectType.Document,
+                });
+
+                var categories = result.Categories.WhereNotNull().Select(c => c.Convert()).ToList();
+
+                await documentsDataAccess.SaveAllCategories(categories);
+
+                return categories;
+            }
+
+            if (sourceType == SourceType.Local)
+            {
+                return await documentsDataAccess.GetAllCategoriesAsync();
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task SetCategoriesAsync(DocumentPreview documentPreview, List<Category> categories, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                await AppServiceProxy.SetCategoriesAsync(new DataContract.SetCategoriesParameters
+                {
+                    Token = Token,
+                    ObjectId = documentPreview.Id,
+                    ObjectType = DataContract.ObjectType.Document,
+                    CategoryIds = categories.Select(c => c.Id).ToArray()
+                });
+
+                await documentsDataAccess.SetCategoriesAsync(documentPreview, categories);
             }
 
             throw new ArgumentException("Invalid sourceType provided.");

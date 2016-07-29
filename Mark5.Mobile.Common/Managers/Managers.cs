@@ -65,12 +65,19 @@ namespace Mark5.Mobile.Common.Managers
             private set;
         }
 
+        public static ICommonActionsManager CommonActionsManager
+        {
+            get;
+            private set;
+        }
+
         public static void Initialize(ConnectionInfo connectionInfo)
         {
             if (connectionInfo == null)
             {
                 throw new ArgumentNullException(nameof(connectionInfo));
             }
+
             if (!connectionInfo.Authenticated)
             {
                 throw new ArgumentException("Connection info is not authenticated.");
@@ -84,7 +91,7 @@ namespace Mark5.Mobile.Common.Managers
             var contactsDataAccess = new ContactsDataAccess(DatabaseConnectionProvider.ContactsDatabase);
             var shortcodesDataAccess = new ShortcodesDataAccess(DatabaseConnectionProvider.ShortcodesDatabase);
             var calendarDataAccess = new CalendarDataAccess(DatabaseConnectionProvider.CalendarDatabase);
-            var notificationsDataAccess = new NotificationsDataAccess(DatabaseConnectionProvider.CommonDatabase);
+            var notificationsDataAccess = new NotificationsDataAccess(DatabaseConnectionProvider.SystemDatabase);
 
             FoldersManager = new FoldersManager(connectionInfo, appServiceProxy, foldersDataAccess);
             DocumentsManager = new DocumentsManager(connectionInfo, appServiceProxy, fileTransferServiceProxy, documentsDataAccess);
@@ -94,6 +101,7 @@ namespace Mark5.Mobile.Common.Managers
             SearchManager = new SearchManager(connectionInfo, appServiceProxy);
             NotificationsManager = new NotificationsManager(connectionInfo, appServiceProxy, foldersDataAccess, notificationsDataAccess);
             SystemManager = new SystemManager(connectionInfo, appServiceProxy);
+            CommonActionsManager = new CommonActionsManager(connectionInfo, appServiceProxy, documentsDataAccess, contactsDataAccess, shortcodesDataAccess, calendarDataAccess);
         }
     }
 }

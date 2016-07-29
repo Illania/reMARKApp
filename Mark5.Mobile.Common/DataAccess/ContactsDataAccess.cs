@@ -110,6 +110,40 @@ namespace Mark5.Mobile.Common.DataAccess
             return contact;
         }
 
+        public async Task SaveAllCategories(List<Category> categories)
+        {
+            await contactsDatabase.RunInConnectionAsync(c =>
+            {
+                c.DeleteAll<Category>();
+                c.InsertAll(categories);
+            });
+        }
+
+        public async Task<List<Category>> GetAllCategoriesAsync()
+        {
+            List<Category> categories = null;
+
+            await contactsDatabase.RunInConnectionAsync(c =>
+            {
+                categories = c.Table<Category>().ToList();
+            });
+
+            return categories;
+        }
+
+        public async Task SetCategoriesAsync(ContactPreview contactPreview, List<Category> categories)
+        {
+            await contactsDatabase.RunInConnectionAsync(c =>
+            {
+                var cmd = c.CreateCommand($"update \"{nameof(ContactPreview)}\" " +
+                                      $"set \"{nameof(ContactPreview.CategoriesBytes)}\" = @categoriesBytes " +
+                                      $"where \"{nameof(ContactPreview.Id)}\" = @contactPreviewId");
+                cmd.Bind("@categoriesBytes", new CategoriesValue { Categories = categories }.CategoriesBytes);
+                cmd.Bind("@contactPreviewId", contactPreview.Id);
+                cmd.ExecuteNonQuery();
+            });
+        }
+
         public async Task AddCommentAsync(Contact contact, Comment comment)
         {
             await contactsDatabase.RunInConnectionAsync(c =>
@@ -131,8 +165,15 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " +
                                       $"set \"{nameof(Contact.CommentsBytes)}\" = @commentsBytes " +
-                                      $"where \"{nameof(Contact.Id)}\" = contactId");
+                                      $"where \"{nameof(Contact.Id)}\" = @contactId");
                 cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
+                cmd.Bind("@contactId", contact.Id);
+                cmd.ExecuteNonQuery();
+
+                cmd = c.CreateCommand($"update \"{nameof(ContactPreview)}\" " +
+                                      $"set \"{nameof(ContactPreview.CommentsCount)}\" = @commentsCount " +
+                                      $"where \"{nameof(ContactPreview.Id)}\" = @contactId");
+                cmd.Bind("@commentsCount", comments.Count);
                 cmd.Bind("@contactId", contact.Id);
                 cmd.ExecuteNonQuery();
             });
@@ -161,7 +202,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " +
                                       $"set \"{nameof(Contact.CommentsBytes)}\" = @commentsBytes " +
-                                      $"where \"{nameof(Contact.Id)}\" = contactId");
+                                      $"where \"{nameof(Contact.Id)}\" = @contactId");
                 cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
                 cmd.Bind("@contactId", contact.Id);
                 cmd.ExecuteNonQuery();
@@ -189,8 +230,15 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " +
                                       $"set \"{nameof(Contact.CommentsBytes)}\" = @commentsBytes " +
-                                      $"where \"{nameof(Contact.Id)}\" = contactId");
+                                      $"where \"{nameof(Contact.Id)}\" = @contactId");
                 cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
+                cmd.Bind("@contactId", contact.Id);
+                cmd.ExecuteNonQuery();
+
+                cmd = c.CreateCommand($"update \"{nameof(ContactPreview)}\" " +
+                                      $"set \"{nameof(ContactPreview.CommentsCount)}\" = @commentsCount " +
+                                      $"where \"{nameof(ContactPreview.Id)}\" = @contactId");
+                cmd.Bind("@commentsCount", comments.Count);
                 cmd.Bind("@contactId", contact.Id);
                 cmd.ExecuteNonQuery();
             });

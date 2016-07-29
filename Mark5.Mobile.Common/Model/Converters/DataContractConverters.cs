@@ -368,6 +368,51 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
+        public static ObjectAction Convert(this DataContract.ObjectAction oa)
+        {
+            return new ObjectAction
+            {
+                Id = oa.Id,
+                Description = oa.Description,
+                ActionTime = DateTime.SpecifyKind(oa.ActionTime, DateTimeKind.Utc),
+                ActionType = oa.ActionType,
+                ActionTypeId = oa.ActionTypeId,
+                ActionTypeGid = oa.ActionTypeGid,
+                UserId = oa.UserId,
+                Username = oa.Username
+            };
+        }
+
+        public static ObjectLink Convert(this DataContract.ObjectLink ol)
+        {
+            return new ObjectLink
+            {
+                FromObjectId = ol.FromObjectId,
+                FromObjectType = ol.FromObjectType.ConvertEnum<ObjectType>(),
+                ToObjectId = ol.ToObjectId,
+                ToObjectType = ol.ToObjectType.ConvertEnum<ObjectType>(),
+                Description = ol.Description,
+                IsReverse = ol.IsReverse,
+                TypeInfo = ol.TypeInfo?.Convert()
+            };
+        }
+
+        public static ObjectLinkTypeInfo Convert(this DataContract.ObjectLinkTypeInfo olti)
+        {
+            return new ObjectLinkTypeInfo
+            {
+                Id = olti.Id,
+                Guid = olti.Guid,
+                DescriptionAction = olti.DescriptionAction,
+                DescriptionActionReverse = olti.DescriptionActionReverse,
+                DescriptionSimple = olti.DescriptionSimple,
+                DescriptionComplex = olti.DescriptionComplex,
+                DescriptionComplexReverse = olti.DescriptionComplexReverse,
+                FromType = olti.FromType.ConvertEnum<ObjectType>(),
+                ToType = olti.ToType.ConvertEnum<ObjectType>()
+            };
+        }
+
         public static OptionalParameters Convert(this DataContract.OptionalParameters p)
         {
             var ceop = p as DataContract.CalendarEventOptionalParameters;

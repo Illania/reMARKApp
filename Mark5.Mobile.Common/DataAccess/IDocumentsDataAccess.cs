@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task SetDocumentPreviewsPriorityAsync(DocumentPreview[] documentPreviews, Priority priority);
 
-        Task DeleteDocumentPreviewsAndDocumentsAsync(int[] ids);
+        Task DeleteDocumentPreviewsAndDocumentsAsync(DocumentPreview[] documentPreviews);
 
         Task SaveTemplatePreviewsAsync(List<TemplatePreview> templatePreviews);
 
@@ -44,6 +44,12 @@ namespace Mark5.Mobile.Common.DataAccess
         Task SaveRecentAddressesAsync(List<RecentAddress> recentAddresses);
 
         Task<List<RecentAddress>> GetRecentAddressesAsync();
+
+        Task SaveAllCategories(List<Category> categories);
+
+        Task<List<Category>> GetAllCategoriesAsync();
+
+        Task SetCategoriesAsync(DocumentPreview documentPreview, List<Category> categories);
 
         Task AddCommentAsync(Document document, Comment comment);
 
