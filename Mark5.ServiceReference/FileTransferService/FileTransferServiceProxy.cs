@@ -59,11 +59,6 @@ namespace Mark5.ServiceReference.FileTransferService
         {
             try
             {
-                if (req == null)
-                {
-                    throw new ArgumentNullException(nameof(req));
-                }
-
                 var result = await endpointUrl
                     .AppendPathSegment(Segments.Version)
                     .WithHeader(Headers.Token, req.Token)
@@ -88,11 +83,6 @@ namespace Mark5.ServiceReference.FileTransferService
         {
             try
             {
-                if (req == null)
-                {
-                    throw new ArgumentNullException(nameof(req));
-                }
-
                 var res = await endpointUrl
                     .AppendPathSegment(Segments.Attachment)
                     .AppendPathSegment(req.Id)
@@ -139,11 +129,6 @@ namespace Mark5.ServiceReference.FileTransferService
         {
             try
             {
-                if (req == null)
-                {
-                    throw new ArgumentNullException(nameof(req));
-                }
-
                 req.Stream.Position = 0;
                 var res = await endpointUrl
                     .AppendPathSegments(Segments.Temporary, Segments.Attachment)
