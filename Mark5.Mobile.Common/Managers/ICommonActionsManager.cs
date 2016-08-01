@@ -26,7 +26,7 @@ namespace Mark5.Mobile.Common.Managers
 
         Task CopyToWorktray(List<BusinessEntity> businessEntity, SourceType sourceType = SourceType.Auto);
 
-        Task CopyToUserWorktray(List<BusinessEntity> businessEntity, SystemUser systemUser, SourceType sourceType = SourceType.Auto);
+        Task CopyToUserWorktray(List<BusinessEntity> businessEntity, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto);
 
         Task RemoveFromFolder(List<BusinessEntity> businessEntity, Folder folder, SourceType sourceType = SourceType.Auto);
 
