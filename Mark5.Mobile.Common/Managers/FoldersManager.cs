@@ -61,62 +61,66 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<List<Folder>> GetFavoriteFoldersAsync(ModuleType module, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Local)
             {
-                throw new ArgumentException("Invalid sourceType provided.");
+                var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
+
+                List<Folder> moduleFavoriteFolders;
+                if (!favoriteFolders.TryGetValue(module, out moduleFavoriteFolders))
+                {
+                    return new List<Folder>();
+                }
+
+                return moduleFavoriteFolders;
             }
 
-            var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
-
-            List<Folder> moduleFavoriteFolders;
-            if (!favoriteFolders.TryGetValue(module, out moduleFavoriteFolders))
-            {
-                return new List<Folder>();
-            }
-
-            return moduleFavoriteFolders;
+            throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task AddFavoriteFolderAsync(ModuleType module, Folder folder, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Local)
             {
-                throw new ArgumentException("Invalid sourceType provided.");
+                var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
+
+                List<Folder> moduleFavoriteFolders;
+                if (!favoriteFolders.TryGetValue(module, out moduleFavoriteFolders))
+                {
+                    moduleFavoriteFolders = new List<Folder>();
+                    favoriteFolders[module] = moduleFavoriteFolders;
+                }
+
+                moduleFavoriteFolders.Add(folder.ShallowCopy());
+
+                await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
+
+                return;
             }
 
-            var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
-
-            List<Folder> moduleFavoriteFolders;
-            if (!favoriteFolders.TryGetValue(module, out moduleFavoriteFolders))
-            {
-                moduleFavoriteFolders = new List<Folder>();
-                favoriteFolders[module] = moduleFavoriteFolders;
-            }
-
-            moduleFavoriteFolders.Add(folder.ShallowCopy());
-
-            await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
+            throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task RemoveFavoriteFolderAsync(ModuleType module, Folder folder, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Local)
             {
-                throw new ArgumentException("Invalid sourceType provided.");
+                var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
+
+                List<Folder> moduleFavoriteFolders;
+                if (!favoriteFolders.TryGetValue(module, out moduleFavoriteFolders))
+                {
+                    moduleFavoriteFolders = new List<Folder>();
+                    favoriteFolders[module] = moduleFavoriteFolders;
+                }
+
+                moduleFavoriteFolders.RemoveAll(f => f.Id == folder.Id);
+
+                await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
+
+                return;
             }
 
-            var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
-
-            List<Folder> moduleFavoriteFolders;
-            if (!favoriteFolders.TryGetValue(module, out moduleFavoriteFolders))
-            {
-                moduleFavoriteFolders = new List<Folder>();
-                favoriteFolders[module] = moduleFavoriteFolders;
-            }
-
-            moduleFavoriteFolders.RemoveAll(f => f.Id == folder.Id);
-
-            await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
+            throw new ArgumentException("Invalid sourceType provided.");
         }
 
         #region Helper methods

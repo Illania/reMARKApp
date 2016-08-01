@@ -92,52 +92,57 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Local)
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
-                throw new ArgumentException("Invalid sourceType provided.");
+                await AppServiceProxy.SetDocumentsReadStatusAsync(new DataContract.SetDocumentsReadStatusParameters
+                {
+                    Token = Token,
+                    DocumentIds = documentPreviews.Select(dp => dp.Id).ToArray(),
+                    IsRead = isRead
+                });
+
+                await documentsDataAccess.SetDocumentPreviewsReadStatusAsync(documentPreviews, isRead);
+
+                return;
             }
 
-            await AppServiceProxy.SetDocumentsReadStatusAsync(new DataContract.SetDocumentsReadStatusParameters
-            {
-                Token = Token,
-                DocumentIds = documentPreviews.Select(dp => dp.Id).ToArray(),
-                IsRead = isRead
-            });
-
-            await documentsDataAccess.SetDocumentPreviewsReadStatusAsync(documentPreviews, isRead);
+            throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task SetDocumentPriorityAsync(List<DocumentPreview> documentPreviews, Priority priority, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Local)
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
-                throw new ArgumentException("Invalid sourceType provided.");
+                await AppServiceProxy.SetDocumentPriorityAsync(new DataContract.SetDocumentPriorityParameters
+                {
+                    Token = Token,
+                    DocumentIds = documentPreviews.Select(dp => dp.Id).ToArray(),
+                    Priority = priority.ConvertEnum<DataContract.Priority>()
+                });
+
+                await documentsDataAccess.SetDocumentPreviewsPriorityAsync(documentPreviews, priority);
+
+                return;
             }
 
-            await AppServiceProxy.SetDocumentPriorityAsync(new DataContract.SetDocumentPriorityParameters
-            {
-                Token = Token,
-                DocumentIds = documentPreviews.Select(dp => dp.Id).ToArray(),
-                Priority = priority.ConvertEnum<DataContract.Priority>()
-            });
-
-            await documentsDataAccess.SetDocumentPreviewsPriorityAsync(documentPreviews, priority);
+            throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task MoveToSpamAsync(List<DocumentPreview> documentPreviews, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Local)
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
-                throw new ArgumentException("Invalid sourceType provided.");
+                await AppServiceProxy.MoveToSpamAsync(new DataContract.MoveToSpamParameters
+                {
+                    Token = Token,
+                    DocumentIds = documentPreviews.Select(dp => dp.Id).ToArray()
+                });
+
+                await documentsDataAccess.DeleteAsync(documentPreviews);
+
+                return;
             }
-
-            await AppServiceProxy.MoveToSpamAsync(new DataContract.MoveToSpamParameters
-            {
-                Token = Token,
-                DocumentIds = documentPreviews.Select(dp => dp.Id).ToArray()
-            });
-
-            await documentsDataAccess.DeleteDocumentPreviewsAndDocumentsAsync(documentPreviews);
+            throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<List<TemplatePreview>> GetTemplatePreviewsAsync(SourceType sourceType = SourceType.Auto)

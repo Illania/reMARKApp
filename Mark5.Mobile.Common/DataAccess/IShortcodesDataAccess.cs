@@ -22,6 +22,14 @@ namespace Mark5.Mobile.Common.DataAccess
         Task SaveShortcodeAsync(Shortcode shortocode);
 
         Task<Shortcode> GetShortcodeAsync(int shortcodeId);
+
+        Task RemoveFromFolderAsync(List<ShortcodePreview> shortcodePreviews, Folder folder);
+
+        Task RemoveFromFolderAsync(List<Shortcode> shortocode, Folder folder);
+
+        Task DeleteAsync(List<ShortcodePreview> shortcodePreviews);
+
+        Task DeleteAsync(List<Shortcode> shortocode);
     }
 }
 

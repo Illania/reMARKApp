@@ -20,17 +20,17 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<List<ObjectLink>> GetObjectLinksAsync(IBusinessEntity businessEntity, SourceType sourceType = SourceType.Auto);
 
-        Task CopyToFolder(List<IBusinessEntity> businessEntity, Folder folder, SourceType sourceType = SourceType.Auto);
+        Task CopyToFolder(List<IBusinessEntity> businessEntities, Folder folder, SourceType sourceType = SourceType.Auto);
 
-        Task MoveToFolder(List<IBusinessEntity> businessEntity, Folder fromFolder, Folder toFolder, SourceType sourceType = SourceType.Auto);
+        Task MoveToFolder(List<IBusinessEntity> businessEntities, Folder fromFolder, Folder toFolder, SourceType sourceType = SourceType.Auto);
 
-        Task CopyToWorktray(List<BusinessEntity> businessEntity, SourceType sourceType = SourceType.Auto);
+        Task CopyToWorktray(List<BusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto);
 
-        Task CopyToUserWorktray(List<BusinessEntity> businessEntity, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto);
+        Task CopyToUserWorktray(List<BusinessEntity> businessEntities, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto);
 
-        Task RemoveFromFolder(List<BusinessEntity> businessEntity, Folder folder, SourceType sourceType = SourceType.Auto);
+        Task RemoveFromFolder(List<BusinessEntity> businessEntities, Folder folder, SourceType sourceType = SourceType.Auto);
 
-        Task Delete(List<BusinessEntity> businessEntity, SourceType sourceType = SourceType.Auto);
+        Task Delete(List<BusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto);
     }
 }
 

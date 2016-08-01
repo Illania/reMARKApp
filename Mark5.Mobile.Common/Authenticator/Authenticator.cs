@@ -38,7 +38,7 @@ namespace Mark5.Mobile.Common.Authenticator
                 Password = password,
                 DeviceType = deviceType.ConvertEnum<DataContract.DeviceType>(),
                 FriendlyDeviceName = friendlyDeviceName,
-                InstallationId = installationId,
+                InstallationId = installationId
             }, ct);
 
             var connectionInfo = new ConnectionInfo

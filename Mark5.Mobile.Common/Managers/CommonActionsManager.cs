@@ -71,99 +71,219 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task CopyToFolder(List<IBusinessEntity> businessEntity, Folder folder, SourceType sourceType = SourceType.Auto)
+        public async Task CopyToFolder(List<IBusinessEntity> businessEntities, Folder folder, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
                 await AppServiceProxy.FileToFolderAsync(new DataContract.FileToFolderParameters
                 {
                     Token = Token,
-                    ObjectIds = businessEntity.Select(be => be.Id).ToArray(),
-                    ObjectType = businessEntity.First().ObjectType.ConvertEnum<DataContract.ObjectType>(),
+                    ObjectIds = businessEntities.Select(be => be.Id).ToArray(),
+                    ObjectType = businessEntities.First().ObjectType.ConvertEnum<DataContract.ObjectType>(),
                     ToFolderId = folder.Id,
                     Move = false
                 });
+
+                return;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task MoveToFolder(List<IBusinessEntity> businessEntity, Folder fromFolder, Folder toFolder, SourceType sourceType = SourceType.Auto)
+        public async Task MoveToFolder(List<IBusinessEntity> businessEntities, Folder fromFolder, Folder toFolder, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
                 await AppServiceProxy.FileToFolderAsync(new DataContract.FileToFolderParameters
                 {
                     Token = Token,
-                    ObjectIds = businessEntity.Select(be => be.Id).ToArray(),
-                    ObjectType = businessEntity.First().ObjectType.ConvertEnum<DataContract.ObjectType>(),
+                    ObjectIds = businessEntities.Select(be => be.Id).ToArray(),
+                    ObjectType = businessEntities.First().ObjectType.ConvertEnum<DataContract.ObjectType>(),
                     FromFolderId = fromFolder.Id,
                     ToFolderId = toFolder.Id,
                     Move = true
                 });
+
+                var documentPreviews = businessEntities.OfType<DocumentPreview>();
+                if (documentPreviews.Any())
+                {
+                    await documentsDataAccess.RemoveFromFolderAsync(documentPreviews.ToList(), fromFolder);
+                }
+
+                var documents = businessEntities.OfType<Document>();
+                if (documents.Any())
+                {
+                    await documentsDataAccess.RemoveFromFolderAsync(documents.ToList(), fromFolder);
+                }
+
+                var contactPreviews = businessEntities.OfType<ContactPreview>();
+                if (contactPreviews.Any())
+                {
+                    await contactsDataAccess.RemoveFromFolderAsync(contactPreviews.ToList(), fromFolder);
+                }
+
+                var contacts = businessEntities.OfType<Contact>();
+                if (contacts.Any())
+                {
+                    await contactsDataAccess.RemoveFromFolderAsync(contacts.ToList(), fromFolder);
+                }
+
+                var shortcodePreviews = businessEntities.OfType<ShortcodePreview>();
+                if (shortcodePreviews.Any())
+                {
+                    await shortcodesDataAccess.RemoveFromFolderAsync(shortcodePreviews.ToList(), fromFolder);
+                }
+
+                var shortcodes = businessEntities.OfType<Shortcode>();
+                if (shortcodes.Any())
+                {
+                    await shortcodesDataAccess.RemoveFromFolderAsync(shortcodes.ToList(), fromFolder);
+                }
+
+                return;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task CopyToWorktray(List<BusinessEntity> businessEntity, SourceType sourceType = SourceType.Auto)
+        public async Task CopyToWorktray(List<BusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
                 await AppServiceProxy.CopyToWorktrayAsync(new DataContract.CopyToWorktrayParameters
                 {
                     Token = Token,
-                    ObjectIds = businessEntity.Select(be => be.Id).ToArray(),
-                    ObjectType = businessEntity.First().ObjectType.ConvertEnum<DataContract.ObjectType>()
+                    ObjectIds = businessEntities.Select(be => be.Id).ToArray(),
+                    ObjectType = businessEntities.First().ObjectType.ConvertEnum<DataContract.ObjectType>()
                 });
+
+                return;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task CopyToUserWorktray(List<BusinessEntity> businessEntity, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto)
+        public async Task CopyToUserWorktray(List<BusinessEntity> businessEntities, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
                 await AppServiceProxy.CopyToWorktrayAsync(new DataContract.CopyToWorktrayParameters
                 {
                     Token = Token,
-                    ObjectIds = businessEntity.Select(be => be.Id).ToArray(),
-                    ObjectType = businessEntity.First().ObjectType.ConvertEnum<DataContract.ObjectType>(),
+                    ObjectIds = businessEntities.Select(be => be.Id).ToArray(),
+                    ObjectType = businessEntities.First().ObjectType.ConvertEnum<DataContract.ObjectType>(),
                     UserIds = systemUsers.Select(su => su.Id).ToArray(),
                     Comment = comment
                 });
+
+                return;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task RemoveFromFolder(List<BusinessEntity> businessEntity, Folder folder, SourceType sourceType = SourceType.Auto)
+        public async Task RemoveFromFolder(List<BusinessEntity> businessEntities, Folder folder, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
                 await AppServiceProxy.RemoveFromFolderAsync(new DataContract.RemoveFromFolderParameters
                 {
                     Token = Token,
-                    ObjectIds = businessEntity.Select(be => be.Id).ToArray(),
-                    ObjectType = businessEntity.First().ObjectType.ConvertEnum<DataContract.ObjectType>(),
+                    ObjectIds = businessEntities.Select(be => be.Id).ToArray(),
+                    ObjectType = businessEntities.First().ObjectType.ConvertEnum<DataContract.ObjectType>(),
                     FolderId = folder.Id
                 });
+
+                var documentPreviews = businessEntities.OfType<DocumentPreview>();
+                if (documentPreviews.Any())
+                {
+                    await documentsDataAccess.RemoveFromFolderAsync(documentPreviews.ToList(), folder);
+                }
+
+                var documents = businessEntities.OfType<Document>();
+                if (documents.Any())
+                {
+                    await documentsDataAccess.RemoveFromFolderAsync(documents.ToList(), folder);
+                }
+
+                var contactPreviews = businessEntities.OfType<ContactPreview>();
+                if (contactPreviews.Any())
+                {
+                    await contactsDataAccess.RemoveFromFolderAsync(contactPreviews.ToList(), folder);
+                }
+
+                var contacts = businessEntities.OfType<Contact>();
+                if (contacts.Any())
+                {
+                    await contactsDataAccess.RemoveFromFolderAsync(contacts.ToList(), folder);
+                }
+
+                var shortcodePreviews = businessEntities.OfType<ShortcodePreview>();
+                if (shortcodePreviews.Any())
+                {
+                    await shortcodesDataAccess.RemoveFromFolderAsync(shortcodePreviews.ToList(), folder);
+                }
+
+                var shortcodes = businessEntities.OfType<Shortcode>();
+                if (shortcodes.Any())
+                {
+                    await shortcodesDataAccess.RemoveFromFolderAsync(shortcodes.ToList(), folder);
+                }
+
+                return;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task Delete(List<BusinessEntity> businessEntity, SourceType sourceType = SourceType.Auto)
+        public async Task Delete(List<BusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
                 await AppServiceProxy.DeleteAsync(new DataContract.DeleteParameters
                 {
                     Token = Token,
-                    ObjectIds = businessEntity.Select(be => be.Id).ToArray(),
-                    ObjectType = businessEntity.First().ObjectType.ConvertEnum<DataContract.ObjectType>()
+                    ObjectIds = businessEntities.Select(be => be.Id).ToArray(),
+                    ObjectType = businessEntities.First().ObjectType.ConvertEnum<DataContract.ObjectType>()
                 });
+
+                var documentPreviews = businessEntities.OfType<DocumentPreview>();
+                if (documentPreviews.Any())
+                {
+                    await documentsDataAccess.DeleteAsync(documentPreviews.ToList());
+                }
+
+                var documents = businessEntities.OfType<Document>();
+                if (documents.Any())
+                {
+                    await documentsDataAccess.DeleteAsync(documents.ToList());
+                }
+
+                var contactPreviews = businessEntities.OfType<ContactPreview>();
+                if (contactPreviews.Any())
+                {
+                    await contactsDataAccess.DeleteAsync(contactPreviews.ToList());
+                }
+
+                var contacts = businessEntities.OfType<Contact>();
+                if (contacts.Any())
+                {
+                    await contactsDataAccess.DeleteAsync(contacts.ToList());
+                }
+
+                var shortcodePreviews = businessEntities.OfType<ShortcodePreview>();
+                if (shortcodePreviews.Any())
+                {
+                    await shortcodesDataAccess.DeleteAsync(shortcodePreviews.ToList());
+                }
+
+                var shortcodes = businessEntities.OfType<Shortcode>();
+                if (shortcodes.Any())
+                {
+                    await shortcodesDataAccess.DeleteAsync(shortcodes.ToList());
+                }
+
+                return;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");

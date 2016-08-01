@@ -107,6 +107,57 @@ namespace Mark5.Mobile.Common.DataAccess
 
             return shortcode;
         }
+        public async Task RemoveFromFolderAsync(List<ShortcodePreview> shortcodePreviews, Folder folder)
+        {
+            var ids = shortcodePreviews.Select(sp => sp.Id).Distinct().ToList();
+            await RemoveFromFolderAsync(ids, folder.Id);
+        }
+
+        public async Task RemoveFromFolderAsync(List<Shortcode> shortcodes, Folder folder)
+        {
+            var ids = shortcodes.Select(s => s.Id).Distinct().ToList();
+            await RemoveFromFolderAsync(ids, folder.Id);
+        }
+
+        async Task RemoveFromFolderAsync(List<int> ids, int folderId)
+        {
+            await shortcodesDatabase.RunInConnectionAsync(c =>
+            {
+                foreach (var id in ids)
+                {
+                    var linksCount = c.Table<FolderShortcodeLink>().Count(fdl => fdl.ShortcodeId == id);
+                    if (linksCount == 1)
+                    {
+                        c.Table<ShortcodePreview>().Delete(sp => sp.Id == id);
+                        c.Table<Shortcode>().Delete(s => s.Id == id);
+                    }
+
+                    c.Table<FolderShortcodeLink>().Delete(fsl => fsl.ShortcodeId == id && fsl.FolderId == folderId);
+                }
+            });
+        }
+
+        public async Task DeleteAsync(List<ShortcodePreview> shortcodePreviews)
+        {
+            var ids = shortcodePreviews.Select(sp => sp.Id).Distinct().ToList();
+            await DeleteAsync(ids);
+        }
+
+        public async Task DeleteAsync(List<Shortcode> shortcodes)
+        {
+            var ids = shortcodes.Select(s => s.Id).Distinct().ToList();
+            await DeleteAsync(ids);
+        }
+
+        async Task DeleteAsync(List<int> ids)
+        {
+            await shortcodesDatabase.RunInConnectionAsync(c =>
+            {
+                c.Table<FolderShortcodeLink>().Delete(fsl => ids.Contains(fsl.ShortcodeId));
+                c.Table<ShortcodePreview>().Delete(sp => ids.Contains(sp.Id));
+                c.Table<Shortcode>().Delete(s => ids.Contains(s.Id));
+            });
+        }
     }
 }
 

@@ -23,6 +23,14 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task<Contact> GetContactAsync(int contactId);
 
+        Task RemoveFromFolderAsync(List<ContactPreview> contactPreviews, Folder folder);
+
+        Task RemoveFromFolderAsync(List<Contact> contacts, Folder folder);
+
+        Task DeleteAsync(List<ContactPreview> contactPreviews);
+
+        Task DeleteAsync(List<Contact> contacts);
+
         Task SaveAllCategories(List<Category> categories);
 
         Task<List<Category>> GetAllCategoriesAsync();

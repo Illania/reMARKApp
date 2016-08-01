@@ -27,7 +27,13 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task SetDocumentPreviewsPriorityAsync(List<DocumentPreview> documentPreviews, Priority priority);
 
-        Task DeleteDocumentPreviewsAndDocumentsAsync(List<DocumentPreview> documentPreviews);
+        Task RemoveFromFolderAsync(List<DocumentPreview> documentPreviews, Folder folder);
+
+        Task RemoveFromFolderAsync(List<Document> documents, Folder folder);
+
+        Task DeleteAsync(List<DocumentPreview> documentPreviews);
+
+        Task DeleteAsync(List<Document> documents);
 
         Task SaveTemplatePreviewsAsync(List<TemplatePreview> templatePreviews);
 

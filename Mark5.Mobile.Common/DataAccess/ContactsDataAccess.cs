@@ -110,6 +110,58 @@ namespace Mark5.Mobile.Common.DataAccess
             return contact;
         }
 
+        public async Task RemoveFromFolderAsync(List<ContactPreview> contactPreviews, Folder folder)
+        {
+            var ids = contactPreviews.Select(cp => cp.Id).Distinct().ToList();
+            await RemoveFromFolderAsync(ids, folder.Id);
+        }
+
+        public async Task RemoveFromFolderAsync(List<Contact> contacts, Folder folder)
+        {
+            var ids = contacts.Select(c => c.Id).Distinct().ToList();
+            await RemoveFromFolderAsync(ids, folder.Id);
+        }
+
+        async Task RemoveFromFolderAsync(List<int> ids, int folderId)
+        {
+            await contactsDatabase.RunInConnectionAsync(c =>
+            {
+                foreach (var id in ids)
+                {
+                    var linksCount = c.Table<FolderContactLink>().Count(fdl => fdl.ContactId == id);
+                    if (linksCount == 1)
+                    {
+                        c.Table<ContactPreview>().Delete(cp => cp.Id == id);
+                        c.Table<Contact>().Delete(ct => ct.Id == id);
+                    }
+
+                    c.Table<FolderContactLink>().Delete(fcl => fcl.ContactId == id && fcl.FolderId == folderId);
+                }
+            });
+        }
+
+        public async Task DeleteAsync(List<ContactPreview> contactPreviews)
+        {
+            var ids = contactPreviews.Select(cp => cp.Id).Distinct().ToList();
+            await DeleteAsync(ids);
+        }
+
+        public async Task DeleteAsync(List<Contact> contacts)
+        {
+            var ids = contacts.Select(c => c.Id).Distinct().ToList();
+            await DeleteAsync(ids);
+        }
+
+        async Task DeleteAsync(List<int> ids)
+        {
+            await contactsDatabase.RunInConnectionAsync(c =>
+            {
+                c.Table<FolderContactLink>().Delete(fcl => ids.Contains(fcl.ContactId));
+                c.Table<ContactPreview>().Delete(cp => ids.Contains(cp.Id));
+                c.Table<Contact>().Delete(ct => ids.Contains(ct.Id));
+            });
+        }
+
         public async Task SaveAllCategories(List<Category> categories)
         {
             await contactsDatabase.RunInConnectionAsync(c =>

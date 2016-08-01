@@ -5,7 +5,6 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -146,10 +145,50 @@ namespace Mark5.Mobile.Common.DataAccess
             });
         }
 
-        public async Task DeleteDocumentPreviewsAndDocumentsAsync(List<DocumentPreview> documentPreviews)
+        public async Task RemoveFromFolderAsync(List<DocumentPreview> documentPreviews, Folder folder)
         {
             var ids = documentPreviews.Select(dp => dp.Id).Distinct().ToList();
+            await RemoveFromFolderAsync(ids, folder.Id);
+        }
 
+        public async Task RemoveFromFolderAsync(List<Document> documents, Folder folder)
+        {
+            var ids = documents.Select(d => d.Id).Distinct().ToList();
+            await RemoveFromFolderAsync(ids, folder.Id);
+        }
+
+        async Task RemoveFromFolderAsync(List<int> ids, int folderId)
+        {
+            await documentsDatabase.RunInConnectionAsync(c =>
+            {
+                foreach (var id in ids)
+                {
+                    var linksCount = c.Table<FolderDocumentLink>().Count(fdl => fdl.DocumentId == id);
+                    if (linksCount == 1)
+                    {
+                        c.Table<DocumentPreview>().Delete(dp => dp.Id == id);
+                        c.Table<Document>().Delete(d => d.Id == id);
+                    }
+
+                    c.Table<FolderDocumentLink>().Delete(fdl => fdl.DocumentId == id && fdl.FolderId == folderId);
+                }
+            });
+        }
+
+        public async Task DeleteAsync(List<DocumentPreview> documentPreviews)
+        {
+            var ids = documentPreviews.Select(dp => dp.Id).Distinct().ToList();
+            await DeleteAsync(ids);
+        }
+
+        public async Task DeleteAsync(List<Document> documents)
+        {
+            var ids = documents.Select(d => d.Id).Distinct().ToList();
+            await DeleteAsync(ids);
+        }
+
+        async Task DeleteAsync(List<int> ids)
+        {
             await documentsDatabase.RunInConnectionAsync(c =>
             {
                 c.Table<FolderDocumentLink>().Delete(fdl => ids.Contains(fdl.DocumentId));

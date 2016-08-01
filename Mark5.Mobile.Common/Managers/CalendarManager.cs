@@ -14,7 +14,6 @@ namespace Mark5.Mobile.Common.Managers
     class CalendarManager : AbstractManager, ICalendarManager
     {
 
-        readonly IFoldersDataAccess foldersDataAccess;
         readonly ICalendarDataAccess calendarDataAccess;
 
         public CalendarManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy, ICalendarDataAccess calendarDataAccess)
