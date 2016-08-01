@@ -74,27 +74,41 @@ namespace Mark5.Mobile.Common.DataAccess
 
         public async Task SetSubscribed(ModuleType moduleType, List<Folder> folders, bool subscribed)
         {
-            await databaseForModuleType(moduleType).RunInConnectionAsync(c =>
-            {
-                var cmd = c.CreateCommand($"update \"{nameof(Folder)}\"" +
-                                          $"set \"{nameof(Folder.Subscribed)}\" = @subscribed" +
-                                          $"where \"{nameof(Folder.Id)}\" in ({string.Join(",", folders.Select(f => f.Id))})");
-                cmd.Bind("@subscribed", subscribed);
-                cmd.ExecuteNonQuery();
-            });
-        }
-
-        public async Task SetAllSubscribed(bool subscribed)
-        {
-            foreach (var moduleType in new[] { ModuleType.Documents, ModuleType.Contacts, ModuleType.Shortcodes })
+            try
             {
                 await databaseForModuleType(moduleType).RunInConnectionAsync(c =>
                 {
                     var cmd = c.CreateCommand($"update \"{nameof(Folder)}\"" +
-                                              $"set \"{nameof(Folder.Subscribed)}\" = @subscribed");
-                    cmd.Bind("@subscribed", false);
+                                              $"set \"{nameof(Folder.Subscribed)}\" = @subscribed" +
+                                              $"where \"{nameof(Folder.Id)}\" in ({string.Join(",", folders.Select(f => f.Id))})");
+                    cmd.Bind("@subscribed", subscribed);
                     cmd.ExecuteNonQuery();
                 });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error setting folders as subscribed.", ex);
+            }
+        }
+
+        public async Task SetAllSubscribed(bool subscribed)
+        {
+            try
+            {
+                foreach (var moduleType in new[] { ModuleType.Documents, ModuleType.Contacts, ModuleType.Shortcodes })
+                {
+                    await databaseForModuleType(moduleType).RunInConnectionAsync(c =>
+                    {
+                        var cmd = c.CreateCommand($"update \"{nameof(Folder)}\"" +
+                                                  $"set \"{nameof(Folder.Subscribed)}\" = @subscribed");
+                        cmd.Bind("@subscribed", false);
+                        cmd.ExecuteNonQuery();
+                    });
+                }
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error setting all folders as subscribed.", ex);
             }
         }
 

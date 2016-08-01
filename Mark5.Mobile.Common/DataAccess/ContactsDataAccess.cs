@@ -29,85 +29,113 @@ namespace Mark5.Mobile.Common.DataAccess
 
         public async Task SaveContactPreviewsAsync(Folder folder, List<ContactPreview> contactPreviews, bool clean)
         {
-            await contactsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var contactPreviewIds = contactPreviews.Select(cp => cp.Id).ToList();
-
-                if (clean)
+                await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    c.Table<FolderContactLink>()
-                     .Delete(fdl => fdl.FolderId == folder.Id && contactPreviewIds.Contains(fdl.ContactId));
-                }
+                    var contactPreviewIds = contactPreviews.Select(cp => cp.Id).ToList();
 
-                c.InsertOrReplace(contactPreviews.Select(cp => new FolderContactLink { FolderId = folder.Id, ContactId = cp.Id }));
-                c.InsertOrReplace(contactPreviews);
-            });
+                    if (clean)
+                    {
+                        c.Table<FolderContactLink>()
+                         .Delete(fdl => fdl.FolderId == folder.Id && contactPreviewIds.Contains(fdl.ContactId));
+                    }
+
+                    c.InsertOrReplace(contactPreviews.Select(cp => new FolderContactLink { FolderId = folder.Id, ContactId = cp.Id }));
+                    c.InsertOrReplace(contactPreviews);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error inserting contacts.", ex);
+            }
         }
         public async Task<List<ContactPreview>> GetContactPreviewsAsync(Folder folder, int startRowId, int maxItems)
         {
-            List<ContactPreview> contactPreviews = null;
-
-            await contactsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var query = c.Table<FolderContactLink>()
-                             .Where(fdl => fdl.FolderId == folder.Id)
-                             .Join(c.Table<ContactPreview>(), fdl => fdl.ContactId, cp => cp.Id, (fdl, cp) => cp)
-                             .OrderBy(cp => cp.Name);
+                List<ContactPreview> contactPreviews = null;
 
-                if (startRowId > 0)
+                await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    query = query.Skip(startRowId);
-                }
+                    var query = c.Table<FolderContactLink>()
+                                 .Where(fdl => fdl.FolderId == folder.Id)
+                                 .Join(c.Table<ContactPreview>(), fdl => fdl.ContactId, cp => cp.Id, (fdl, cp) => cp)
+                                 .OrderBy(cp => cp.Name);
 
-                if (maxItems > 0)
-                {
-                    query = query.Take(maxItems);
-                }
+                    if (startRowId > 0)
+                    {
+                        query = query.Skip(startRowId);
+                    }
 
-                var result = query.ToList();
+                    if (maxItems > 0)
+                    {
+                        query = query.Take(maxItems);
+                    }
 
-                if (result == null || result.Count < 1)
-                {
-                    throw new DataNotFoundException("Contact previews could not be found.");
-                }
+                    var result = query.ToList();
 
-                startRowId = startRowId < 1 ? 1 : startRowId;
-                foreach (var contactPreview in contactPreviews)
-                {
-                    contactPreview.RowId = startRowId++;
-                }
+                    if (result == null || result.Count < 1)
+                    {
+                        throw new DataNotFoundException("Contact previews could not be found.");
+                    }
 
-                contactPreviews = result;
-            });
+                    startRowId = startRowId < 1 ? 1 : startRowId;
+                    foreach (var contactPreview in contactPreviews)
+                    {
+                        contactPreview.RowId = startRowId++;
+                    }
 
-            return contactPreviews;
+                    contactPreviews = result;
+                });
+
+                return contactPreviews;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting contacts.", ex);
+            }
         }
 
         public async Task SaveContactAsync(Contact contact)
         {
-            await contactsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                c.InsertOrReplace(contact);
-            });
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    c.InsertOrReplace(contact);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error saving contact.", ex);
+            }
         }
 
         public async Task<Contact> GetContactAsync(int contactId)
         {
-            Contact contact = null;
-
-            await contactsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var result = c.Find<Contact>(contactId);
+                Contact contact = null;
 
-                if (result == null)
+                await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    throw new DataNotFoundException("Contact could not be found.");
-                }
+                    var result = c.Find<Contact>(contactId);
 
-                contact = result;
-            });
+                    if (result == null)
+                    {
+                        throw new DataNotFoundException("Contact could not be found.");
+                    }
 
-            return contact;
+                    contact = result;
+                });
+
+                return contact;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting contact.", ex);
+            }
         }
 
         public async Task RemoveFromFolderAsync(List<ContactPreview> contactPreviews, Folder folder)
@@ -124,20 +152,27 @@ namespace Mark5.Mobile.Common.DataAccess
 
         async Task RemoveFromFolderAsync(List<int> ids, int folderId)
         {
-            await contactsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                foreach (var id in ids)
+                await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var linksCount = c.Table<FolderContactLink>().Count(fdl => fdl.ContactId == id);
-                    if (linksCount == 1)
+                    foreach (var id in ids)
                     {
-                        c.Table<ContactPreview>().Delete(cp => cp.Id == id);
-                        c.Table<Contact>().Delete(ct => ct.Id == id);
-                    }
+                        var linksCount = c.Table<FolderContactLink>().Count(fdl => fdl.ContactId == id);
+                        if (linksCount == 1)
+                        {
+                            c.Table<ContactPreview>().Delete(cp => cp.Id == id);
+                            c.Table<Contact>().Delete(ct => ct.Id == id);
+                        }
 
-                    c.Table<FolderContactLink>().Delete(fcl => fcl.ContactId == id && fcl.FolderId == folderId);
-                }
-            });
+                        c.Table<FolderContactLink>().Delete(fcl => fcl.ContactId == id && fcl.FolderId == folderId);
+                    }
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error removing contacts from folders.", ex);
+            }
         }
 
         public async Task DeleteAsync(List<ContactPreview> contactPreviews)
@@ -154,146 +189,195 @@ namespace Mark5.Mobile.Common.DataAccess
 
         async Task DeleteAsync(List<int> ids)
         {
-            await contactsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                c.Table<FolderContactLink>().Delete(fcl => ids.Contains(fcl.ContactId));
-                c.Table<ContactPreview>().Delete(cp => ids.Contains(cp.Id));
-                c.Table<Contact>().Delete(ct => ids.Contains(ct.Id));
-            });
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    c.Table<FolderContactLink>().Delete(fcl => ids.Contains(fcl.ContactId));
+                    c.Table<ContactPreview>().Delete(cp => ids.Contains(cp.Id));
+                    c.Table<Contact>().Delete(ct => ids.Contains(ct.Id));
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error deleting contacts.", ex);
+            }
         }
 
         public async Task SaveAllCategories(List<Category> categories)
         {
-            await contactsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                c.DeleteAll<Category>();
-                c.InsertAll(categories);
-            });
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    c.DeleteAll<Category>();
+                    c.InsertAll(categories);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error saving categories.", ex);
+            }
         }
 
         public async Task<List<Category>> GetAllCategoriesAsync()
         {
-            List<Category> categories = null;
-
-            await contactsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                categories = c.Table<Category>().ToList();
-            });
+                List<Category> categories = null;
 
-            return categories;
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    categories = c.Table<Category>().ToList();
+                });
+
+                return categories;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting categories.", ex);
+            }
         }
 
         public async Task SetCategoriesAsync(ContactPreview contactPreview, List<Category> categories)
         {
-            await contactsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var cmd = c.CreateCommand($"update \"{nameof(ContactPreview)}\" " +
-                                      $"set \"{nameof(ContactPreview.CategoriesBytes)}\" = @categoriesBytes " +
-                                      $"where \"{nameof(ContactPreview.Id)}\" = @contactPreviewId");
-                cmd.Bind("@categoriesBytes", new CategoriesValue { Categories = categories }.CategoriesBytes);
-                cmd.Bind("@contactPreviewId", contactPreview.Id);
-                cmd.ExecuteNonQuery();
-            });
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    var cmd = c.CreateCommand($"update \"{nameof(ContactPreview)}\" " +
+                                              $"set \"{nameof(ContactPreview.CategoriesBytes)}\" = @categoriesBytes " +
+                                              $"where \"{nameof(ContactPreview.Id)}\" = @contactPreviewId");
+                    cmd.Bind("@categoriesBytes", new CategoriesValue { Categories = categories }.CategoriesBytes);
+                    cmd.Bind("@contactPreviewId", contactPreview.Id);
+                    cmd.ExecuteNonQuery();
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error setting categories.", ex);
+            }
         }
 
         public async Task AddCommentAsync(Contact contact, Comment comment)
         {
-            await contactsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsBytes)}\" " +
-                                $"from \"{nameof(Contact)}\" " +
-                                $"where \"{nameof(Contact.Id)}\" = @contactId");
-                cmd.Bind("@contactId", contact.Id);
-                var result = cmd.ExecuteQuery<CommentsValue>();
-
-                if (result == null || result.Count < 1)
+                await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    throw new DataNotFoundException("Contact could not be found.");
-                }
+                    var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsBytes)}\" " +
+                                              $"from \"{nameof(Contact)}\" " +
+                                              $"where \"{nameof(Contact.Id)}\" = @contactId");
+                    cmd.Bind("@contactId", contact.Id);
+                    var result = cmd.ExecuteQuery<CommentsValue>();
 
-                var comments = result.First().Comments;
+                    if (result == null || result.Count < 1)
+                    {
+                        return;
+                    }
 
-                comments.Add(comment);
+                    var comments = result.First().Comments;
 
-                cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " +
-                                      $"set \"{nameof(Contact.CommentsBytes)}\" = @commentsBytes " +
-                                      $"where \"{nameof(Contact.Id)}\" = @contactId");
-                cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
-                cmd.Bind("@contactId", contact.Id);
-                cmd.ExecuteNonQuery();
+                    comments.Add(comment);
 
-                cmd = c.CreateCommand($"update \"{nameof(ContactPreview)}\" " +
-                                      $"set \"{nameof(ContactPreview.CommentsCount)}\" = @commentsCount " +
-                                      $"where \"{nameof(ContactPreview.Id)}\" = @contactId");
-                cmd.Bind("@commentsCount", comments.Count);
-                cmd.Bind("@contactId", contact.Id);
-                cmd.ExecuteNonQuery();
-            });
+                    cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " +
+                                          $"set \"{nameof(Contact.CommentsBytes)}\" = @commentsBytes " +
+                                          $"where \"{nameof(Contact.Id)}\" = @contactId");
+                    cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
+                    cmd.Bind("@contactId", contact.Id);
+                    cmd.ExecuteNonQuery();
+
+                    cmd = c.CreateCommand($"update \"{nameof(ContactPreview)}\" " +
+                                          $"set \"{nameof(ContactPreview.CommentsCount)}\" = @commentsCount " +
+                                          $"where \"{nameof(ContactPreview.Id)}\" = @contactId");
+                    cmd.Bind("@commentsCount", comments.Count);
+                    cmd.Bind("@contactId", contact.Id);
+                    cmd.ExecuteNonQuery();
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error adding comment.", ex);
+            }
         }
 
         public async Task EditCommentAsync(Contact contact, Comment comment)
         {
-            await contactsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsBytes)}\" " +
-                                $"from \"{nameof(Contact)}\" " +
-                                $"where \"{nameof(Contact.Id)}\" = @contactId");
-                cmd.Bind("@contactId", contact.Id);
-                var result = cmd.ExecuteQuery<CommentsValue>();
-
-                if (result == null || result.Count < 1)
+                await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    throw new DataNotFoundException("Contact could not be found.");
-                }
+                    var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsBytes)}\" " +
+                                    $"from \"{nameof(Contact)}\" " +
+                                    $"where \"{nameof(Contact.Id)}\" = @contactId");
+                    cmd.Bind("@contactId", contact.Id);
+                    var result = cmd.ExecuteQuery<CommentsValue>();
 
-                var comments = result.First().Comments;
+                    if (result == null || result.Count < 1)
+                    {
+                        return;
+                    }
 
-                comments.RemoveAll(cm => cm.Id == comment.Id);
-                comments.Add(comment);
-                comments = comments.OrderBy(cm => cm.DateAdded).ToList();
+                    var comments = result.First().Comments;
 
-                cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " +
-                                      $"set \"{nameof(Contact.CommentsBytes)}\" = @commentsBytes " +
-                                      $"where \"{nameof(Contact.Id)}\" = @contactId");
-                cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
-                cmd.Bind("@contactId", contact.Id);
-                cmd.ExecuteNonQuery();
-            });
+                    comments.RemoveAll(cm => cm.Id == comment.Id);
+                    comments.Add(comment);
+                    comments = comments.OrderBy(cm => cm.DateAdded).ToList();
+
+                    cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " +
+                                          $"set \"{nameof(Contact.CommentsBytes)}\" = @commentsBytes " +
+                                          $"where \"{nameof(Contact.Id)}\" = @contactId");
+                    cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
+                    cmd.Bind("@contactId", contact.Id);
+                    cmd.ExecuteNonQuery();
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error editting comment.", ex);
+            }
         }
 
         public async Task DeleteCommentAsync(Contact contact, Comment comment)
         {
-            await contactsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsBytes)}\" " +
-                                $"from \"{nameof(Contact)}\" " +
-                                $"where \"{nameof(Contact.Id)}\" = @contactId");
-                cmd.Bind("@contactId", contact.Id);
-                var result = cmd.ExecuteQuery<CommentsValue>();
-
-                if (result == null || result.Count < 1)
+                await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    throw new DataNotFoundException("Contact could not be found.");
-                }
+                    var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsBytes)}\" " +
+                                    $"from \"{nameof(Contact)}\" " +
+                                    $"where \"{nameof(Contact.Id)}\" = @contactId");
+                    cmd.Bind("@contactId", contact.Id);
+                    var result = cmd.ExecuteQuery<CommentsValue>();
 
-                var comments = result.First().Comments;
+                    if (result == null || result.Count < 1)
+                    {
+                        return;
+                    }
 
-                comments.RemoveAll(cm => cm.Id == comment.Id);
+                    var comments = result.First().Comments;
 
-                cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " +
-                                      $"set \"{nameof(Contact.CommentsBytes)}\" = @commentsBytes " +
-                                      $"where \"{nameof(Contact.Id)}\" = @contactId");
-                cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
-                cmd.Bind("@contactId", contact.Id);
-                cmd.ExecuteNonQuery();
+                    comments.RemoveAll(cm => cm.Id == comment.Id);
 
-                cmd = c.CreateCommand($"update \"{nameof(ContactPreview)}\" " +
-                                      $"set \"{nameof(ContactPreview.CommentsCount)}\" = @commentsCount " +
-                                      $"where \"{nameof(ContactPreview.Id)}\" = @contactId");
-                cmd.Bind("@commentsCount", comments.Count);
-                cmd.Bind("@contactId", contact.Id);
-                cmd.ExecuteNonQuery();
-            });
+                    cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " +
+                                          $"set \"{nameof(Contact.CommentsBytes)}\" = @commentsBytes " +
+                                          $"where \"{nameof(Contact.Id)}\" = @contactId");
+                    cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
+                    cmd.Bind("@contactId", contact.Id);
+                    cmd.ExecuteNonQuery();
+
+                    cmd = c.CreateCommand($"update \"{nameof(ContactPreview)}\" " +
+                                          $"set \"{nameof(ContactPreview.CommentsCount)}\" = @commentsCount " +
+                                          $"where \"{nameof(ContactPreview.Id)}\" = @contactId");
+                    cmd.Bind("@commentsCount", comments.Count);
+                    cmd.Bind("@contactId", contact.Id);
+                    cmd.ExecuteNonQuery();
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error deleting comment.", ex);
+            }
         }
     }
 }

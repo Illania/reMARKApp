@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,121 +29,163 @@ namespace Mark5.Mobile.Common.DataAccess
 
         public async Task SaveDocumentPreviewsAsync(Folder folder, List<DocumentPreview> documentPreviews, bool clean)
         {
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var documentPreviewIds = documentPreviews.Select(dp => dp.Id).ToList();
-
-                if (clean)
+                await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    c.Table<FolderDocumentLink>()
-                     .Delete(fdl => fdl.FolderId == folder.Id && documentPreviewIds.Contains(fdl.DocumentId));
-                }
+                    var documentPreviewIds = documentPreviews.Select(dp => dp.Id).ToList();
 
-                c.InsertOrReplace(documentPreviews.Select(dp => new FolderDocumentLink { FolderId = folder.Id, DocumentId = dp.Id }));
-                c.InsertOrReplace(documentPreviews);
-            });
+                    if (clean)
+                    {
+                        c.Table<FolderDocumentLink>()
+                         .Delete(fdl => fdl.FolderId == folder.Id && documentPreviewIds.Contains(fdl.DocumentId));
+                    }
+
+                    c.InsertOrReplace(documentPreviews.Select(dp => new FolderDocumentLink { FolderId = folder.Id, DocumentId = dp.Id }));
+                    c.InsertOrReplace(documentPreviews);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error saving document previews.", ex);
+            }
         }
 
         public async Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId = -1, int endId = -1, int maxItems = 500)
         {
-            List<DocumentPreview> documentPreviews = null;
-
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var query = c.Table<FolderDocumentLink>()
-                             .Where(fdl => fdl.FolderId == folder.Id)
-                             .Join(c.Table<DocumentPreview>(), fdl => fdl.DocumentId, dp => dp.Id, (fdl, dp) => dp)
-                             .OrderByDescending(dp => dp.Id);
+                List<DocumentPreview> documentPreviews = null;
 
-                if (startId > 0)
+                await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    query = query.Where(dp => dp.Id < startId);
-                }
+                    var query = c.Table<FolderDocumentLink>()
+                                 .Where(fdl => fdl.FolderId == folder.Id)
+                                 .Join(c.Table<DocumentPreview>(), fdl => fdl.DocumentId, dp => dp.Id, (fdl, dp) => dp)
+                                 .OrderByDescending(dp => dp.Id);
 
-                if (endId > 0)
-                {
-                    query = query.Where(dp => dp.Id > endId);
-                }
+                    if (startId > 0)
+                    {
+                        query = query.Where(dp => dp.Id < startId);
+                    }
 
-                if (maxItems > 0)
-                {
-                    query = query.Take(maxItems);
-                }
+                    if (endId > 0)
+                    {
+                        query = query.Where(dp => dp.Id > endId);
+                    }
 
-                var result = query.ToList();
+                    if (maxItems > 0)
+                    {
+                        query = query.Take(maxItems);
+                    }
 
-                if (result == null || result.Count < 1)
-                {
-                    throw new DataNotFoundException("Document previews could not be found.");
-                }
+                    var result = query.ToList();
 
-                documentPreviews = result;
-            });
+                    if (result == null || result.Count < 1)
+                    {
+                        throw new DataNotFoundException("Document previews could not be found.");
+                    }
 
-            return documentPreviews;
+                    documentPreviews = result;
+                });
+
+                return documentPreviews;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting documents.", ex);
+            }
         }
 
         public async Task SaveDocumentAsync(Document document)
         {
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                c.InsertOrReplace(document);
-            });
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    c.InsertOrReplace(document);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error saving document.", ex);
+            }
         }
 
         public async Task<Document> GetDocumentAsync(int documentId)
         {
-            Document document = null;
-
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var result = c.Find<Document>(documentId);
+                Document document = null;
 
-                if (result == null)
+                await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    throw new DataNotFoundException("Document could not be found.");
-                }
+                    var result = c.Find<Document>(documentId);
 
-                document = result;
-            });
+                    if (result == null)
+                    {
+                        throw new DataNotFoundException("Document could not be found.");
+                    }
 
-            return document;
+                    document = result;
+                });
+
+                return document;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting document.", ex);
+            }
         }
 
         public async Task SetDocumentPreviewsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead)
         {
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                foreach (var documentPreview in documentPreviews)
+                await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
-                                              $"set \"{nameof(DocumentPreview.IsReadByCurrent)}\" = @isReadByCurrent " +
-                                              $"   and \"{nameof(DocumentPreview.IsReadByAnyone)}\" = @isReadByAnyone " +
-                                              $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
-                    cmd.Bind("@isReadByCurrent", isRead);
-                    cmd.Bind("@isReadByAnyone", documentPreview.IsReadByAnyone || isRead);
-                    cmd.Bind("@documentPreviewId", documentPreview.Id);
+                    foreach (var documentPreview in documentPreviews)
+                    {
+                        var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
+                                                  $"set \"{nameof(DocumentPreview.IsReadByCurrent)}\" = @isReadByCurrent " +
+                                                  $"   and \"{nameof(DocumentPreview.IsReadByAnyone)}\" = @isReadByAnyone " +
+                                                  $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
+                        cmd.Bind("@isReadByCurrent", isRead);
+                        cmd.Bind("@isReadByAnyone", documentPreview.IsReadByAnyone || isRead);
+                        cmd.Bind("@documentPreviewId", documentPreview.Id);
 
-                    cmd.ExecuteNonQuery();
-                }
-            });
+                        cmd.ExecuteNonQuery();
+                    }
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error setting documents read status.", ex);
+            }
         }
 
         public async Task SetDocumentPreviewsPriorityAsync(List<DocumentPreview> documentPreviews, Priority priority)
         {
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                foreach (var documentPreview in documentPreviews)
+                await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
-                                              $"set \"{nameof(DocumentPreview.Priority)}\" = @priority " +
-                                              $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
-                    cmd.Bind("@priority", priority);
-                    cmd.Bind("@documentPreviewId", documentPreview.Id);
+                    foreach (var documentPreview in documentPreviews)
+                    {
+                        var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
+                                                  $"set \"{nameof(DocumentPreview.Priority)}\" = @priority " +
+                                                  $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
+                        cmd.Bind("@priority", priority);
+                        cmd.Bind("@documentPreviewId", documentPreview.Id);
 
-                    cmd.ExecuteNonQuery();
-                }
-            });
+                        cmd.ExecuteNonQuery();
+                    }
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error setting documents priority.", ex);
+            }
         }
 
         public async Task RemoveFromFolderAsync(List<DocumentPreview> documentPreviews, Folder folder)
@@ -159,20 +202,27 @@ namespace Mark5.Mobile.Common.DataAccess
 
         async Task RemoveFromFolderAsync(List<int> ids, int folderId)
         {
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                foreach (var id in ids)
+                await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var linksCount = c.Table<FolderDocumentLink>().Count(fdl => fdl.DocumentId == id);
-                    if (linksCount == 1)
+                    foreach (var id in ids)
                     {
-                        c.Table<DocumentPreview>().Delete(dp => dp.Id == id);
-                        c.Table<Document>().Delete(d => d.Id == id);
-                    }
+                        var linksCount = c.Table<FolderDocumentLink>().Count(fdl => fdl.DocumentId == id);
+                        if (linksCount == 1)
+                        {
+                            c.Table<DocumentPreview>().Delete(dp => dp.Id == id);
+                            c.Table<Document>().Delete(d => d.Id == id);
+                        }
 
-                    c.Table<FolderDocumentLink>().Delete(fdl => fdl.DocumentId == id && fdl.FolderId == folderId);
-                }
-            });
+                        c.Table<FolderDocumentLink>().Delete(fdl => fdl.DocumentId == id && fdl.FolderId == folderId);
+                    }
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error removing documents from folder.", ex);
+            }
         }
 
         public async Task DeleteAsync(List<DocumentPreview> documentPreviews)
@@ -189,265 +239,370 @@ namespace Mark5.Mobile.Common.DataAccess
 
         async Task DeleteAsync(List<int> ids)
         {
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                c.Table<FolderDocumentLink>().Delete(fdl => ids.Contains(fdl.DocumentId));
-                c.Table<DocumentPreview>().Delete(dp => ids.Contains(dp.Id));
-                c.Table<Document>().Delete(d => ids.Contains(d.Id));
-            });
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    c.Table<FolderDocumentLink>().Delete(fdl => ids.Contains(fdl.DocumentId));
+                    c.Table<DocumentPreview>().Delete(dp => ids.Contains(dp.Id));
+                    c.Table<Document>().Delete(d => ids.Contains(d.Id));
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error deleting documents.", ex);
+            }
         }
 
         public async Task SaveTemplatePreviewsAsync(List<TemplatePreview> templatePreviews)
         {
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                c.DeleteAll<TemplatePreview>();
-                c.InsertAll(templatePreviews);
-            });
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    c.DeleteAll<TemplatePreview>();
+                    c.InsertAll(templatePreviews);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error saving templates.", ex);
+            }
         }
 
         public async Task<List<TemplatePreview>> GetTemplatePreviewsAsync()
         {
-            List<TemplatePreview> templatePreviews = null;
-
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var result = c.Table<TemplatePreview>().ToList();
+                List<TemplatePreview> templatePreviews = null;
 
-                if (result == null || result.Count < 1)
+                await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    throw new DataNotFoundException("Template previews could not be found.");
-                }
+                    var result = c.Table<TemplatePreview>().ToList();
 
-                templatePreviews = result;
-            });
+                    if (result == null || result.Count < 1)
+                    {
+                        throw new DataNotFoundException("Template previews could not be found.");
+                    }
 
-            return templatePreviews;
+                    templatePreviews = result;
+                });
+
+                return templatePreviews;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting templates.", ex);
+            }
         }
 
         public async Task SaveTemplateAsync(Template template)
         {
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                c.InsertOrReplace(template);
-            });
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    c.InsertOrReplace(template);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error saving templates.", ex);
+            }
         }
 
         public async Task<Template> GetTemplateAsync(int templateId)
         {
-            Template template = null;
-
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var result = c.Find<Template>(templateId);
+                Template template = null;
 
-                if (result == null)
+                await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    throw new DataNotFoundException("Template could not be found.");
-                }
+                    var result = c.Find<Template>(templateId);
 
-                template = result;
-            });
+                    if (result == null)
+                    {
+                        throw new DataNotFoundException("Template could not be found.");
+                    }
 
-            return template;
+                    template = result;
+                });
+
+                return template;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting template.", ex);
+            }
         }
 
         public async Task SaveDefaultTemplateAsync(DocumentCreationModeFlag creationModeFlag, Template template)
         {
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                c.InsertOrReplace(new DefaultTemplateInfo { CreationModeFlag = creationModeFlag, Available = template != null, TemplateId = template?.Id ?? -1 });
-
-                if (template != null)
+                await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    c.InsertOrReplace(template);
-                }
-            });
+                    c.InsertOrReplace(new DefaultTemplateInfo { CreationModeFlag = creationModeFlag, Available = template != null, TemplateId = template?.Id ?? -1 });
+
+                    if (template != null)
+                    {
+                        c.InsertOrReplace(template);
+                    }
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error saving default template.", ex);
+            }
         }
 
         public async Task<Template> GetDefaultTemplateAsync(DocumentCreationModeFlag creationModeFlag)
         {
-            Template template = null;
-
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var info = c.Find<DefaultTemplateInfo>(creationModeFlag);
+                Template template = null;
 
-                if (info == null)
+                await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    throw new DataNotFoundException("Default template info could not be found.");
-                }
+                    var info = c.Find<DefaultTemplateInfo>(creationModeFlag);
 
-                if (info.Available)
-                {
-                    var result = c.Find<Template>(info.TemplateId);
-
-                    if (result == null)
+                    if (info == null)
                     {
-                        throw new DataNotFoundException("Default template could not be found.");
+                        throw new DataNotFoundException("Default template info could not be found.");
                     }
 
-                    template = result;
-                }
-            });
+                    if (info.Available)
+                    {
+                        var result = c.Find<Template>(info.TemplateId);
 
-            return template;
+                        if (result == null)
+                        {
+                            throw new DataNotFoundException("Default template could not be found.");
+                        }
+
+                        template = result;
+                    }
+                });
+
+                return template;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting default template.", ex);
+            }
         }
 
         public async Task SaveRecentAddressesAsync(List<RecentAddress> recentAddresses)
         {
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                c.DeleteAll<RecentAddress>();
-                c.InsertAll(recentAddresses);
-            });
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    c.DeleteAll<RecentAddress>();
+                    c.InsertAll(recentAddresses);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error saving recent addresses.", ex);
+            }
         }
 
         public async Task<List<RecentAddress>> GetRecentAddressesAsync()
         {
-            List<RecentAddress> recentAddresses = null;
-
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                recentAddresses = c.Table<RecentAddress>().ToList();
-            });
+                List<RecentAddress> recentAddresses = null;
 
-            return recentAddresses;
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    recentAddresses = c.Table<RecentAddress>().ToList();
+                });
+
+                return recentAddresses;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting recent addresses.", ex);
+            }
         }
 
         public async Task SaveAllCategories(List<Category> categories)
         {
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                c.DeleteAll<Category>();
-                c.InsertAll(categories);
-            });
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    c.DeleteAll<Category>();
+                    c.InsertAll(categories);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error saving categories.", ex);
+            }
         }
 
         public async Task<List<Category>> GetAllCategoriesAsync()
         {
-            List<Category> categories = null;
-
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                categories = c.Table<Category>().ToList();
-            });
+                List<Category> categories = null;
 
-            return categories;
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    categories = c.Table<Category>().ToList();
+                });
+
+                return categories;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting categories.", ex);
+            }
         }
 
         public async Task SetCategoriesAsync(DocumentPreview documentPreview, List<Category> categories)
         {
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
-                                      $"set \"{nameof(DocumentPreview.CategoriesBytes)}\" = @categoriesBytes " +
-                                      $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
-                cmd.Bind("@categoriesBytes", new CategoriesValue { Categories = categories }.CategoriesBytes);
-                cmd.Bind("@documentPreviewId", documentPreview.Id);
-                cmd.ExecuteNonQuery();
-            });
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
+                                              $"set \"{nameof(DocumentPreview.CategoriesBytes)}\" = @categoriesBytes " +
+                                              $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
+                    cmd.Bind("@categoriesBytes", new CategoriesValue { Categories = categories }.CategoriesBytes);
+                    cmd.Bind("@documentPreviewId", documentPreview.Id);
+                    cmd.ExecuteNonQuery();
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error setting categories.", ex);
+            }
         }
 
         public async Task AddCommentAsync(Document document, Comment comment)
         {
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var cmd = c.CreateCommand($"select \"{nameof(Document.CommentsBytes)}\" " +
-                                $"from \"{nameof(Document)}\" " +
-                                $"where \"{nameof(Document.Id)}\" = @documentId");
-                cmd.Bind("@documentId", document.Id);
-                var result = cmd.ExecuteQuery<CommentsValue>();
-
-                if (result == null || result.Count < 1)
+                await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    throw new DataNotFoundException("Document could not be found.");
-                }
+                    var cmd = c.CreateCommand($"select \"{nameof(Document.CommentsBytes)}\" " +
+                                    $"from \"{nameof(Document)}\" " +
+                                    $"where \"{nameof(Document.Id)}\" = @documentId");
+                    cmd.Bind("@documentId", document.Id);
+                    var result = cmd.ExecuteQuery<CommentsValue>();
 
-                var comments = result.First().Comments;
+                    if (result == null || result.Count < 1)
+                    {
+                        return;
+                    }
 
-                comments.Add(comment);
-                comments = comments.OrderBy(cm => cm.DateAdded).ToList();
+                    var comments = result.First().Comments;
 
-                cmd = c.CreateCommand($"update \"{nameof(Document)}\" " +
-                                      $"set \"{nameof(Document.CommentsBytes)}\" = @commentsBytes " +
-                                      $"where \"{nameof(Document.Id)}\" = @documentId");
-                cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
-                cmd.Bind("@documentId", document.Id);
-                cmd.ExecuteNonQuery();
+                    comments.Add(comment);
+                    comments = comments.OrderBy(cm => cm.DateAdded).ToList();
 
-                cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
-                                      $"set \"{nameof(DocumentPreview.CommentsCount)}\" = @commentsCount " +
-                                      $"where \"{nameof(DocumentPreview.Id)}\" = @documentId");
-                cmd.Bind("@commentsCount", comments.Count);
-                cmd.Bind("@documentId", document.Id);
-                cmd.ExecuteNonQuery();
-            });
+                    cmd = c.CreateCommand($"update \"{nameof(Document)}\" " +
+                                          $"set \"{nameof(Document.CommentsBytes)}\" = @commentsBytes " +
+                                          $"where \"{nameof(Document.Id)}\" = @documentId");
+                    cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
+                    cmd.Bind("@documentId", document.Id);
+                    cmd.ExecuteNonQuery();
+
+                    cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
+                                          $"set \"{nameof(DocumentPreview.CommentsCount)}\" = @commentsCount " +
+                                          $"where \"{nameof(DocumentPreview.Id)}\" = @documentId");
+                    cmd.Bind("@commentsCount", comments.Count);
+                    cmd.Bind("@documentId", document.Id);
+                    cmd.ExecuteNonQuery();
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error adding comment.", ex);
+            }
         }
 
         public async Task EditCommentAsync(Document document, Comment comment)
         {
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var cmd = c.CreateCommand($"select \"{nameof(Document.CommentsBytes)}\" " +
-                                $"from \"{nameof(Document)}\" " +
-                                $"where \"{nameof(Document.Id)}\" = @documentId");
-                cmd.Bind("@documentId", document.Id);
-                var result = cmd.ExecuteQuery<CommentsValue>();
-
-                if (result == null || result.Count < 1)
+                await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    throw new DataNotFoundException("Document could not be found.");
-                }
+                    var cmd = c.CreateCommand($"select \"{nameof(Document.CommentsBytes)}\" " +
+                                    $"from \"{nameof(Document)}\" " +
+                                    $"where \"{nameof(Document.Id)}\" = @documentId");
+                    cmd.Bind("@documentId", document.Id);
+                    var result = cmd.ExecuteQuery<CommentsValue>();
 
-                var comments = result.First().Comments;
+                    if (result == null || result.Count < 1)
+                    {
+                        return;
+                    }
 
-                comments.RemoveAll(cm => cm.Id == comment.Id);
-                comments.Add(comment);
-                comments = comments.OrderBy(cm => cm.DateAdded).ToList();
+                    var comments = result.First().Comments;
 
-                cmd = c.CreateCommand($"update \"{nameof(Document)}\" " +
-                                      $"set \"{nameof(Document.CommentsBytes)}\" = @commentsBytes " +
-                                      $"where \"{nameof(Document.Id)}\" = @documentId");
-                cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
-                cmd.Bind("@documentId", document.Id);
-                cmd.ExecuteNonQuery();
-            });
+                    comments.RemoveAll(cm => cm.Id == comment.Id);
+                    comments.Add(comment);
+                    comments = comments.OrderBy(cm => cm.DateAdded).ToList();
+
+                    cmd = c.CreateCommand($"update \"{nameof(Document)}\" " +
+                                          $"set \"{nameof(Document.CommentsBytes)}\" = @commentsBytes " +
+                                          $"where \"{nameof(Document.Id)}\" = @documentId");
+                    cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
+                    cmd.Bind("@documentId", document.Id);
+                    cmd.ExecuteNonQuery();
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error editing comment.", ex);
+            }
         }
 
         public async Task DeleteCommentAsync(Document document, Comment comment)
         {
-            await documentsDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var cmd = c.CreateCommand($"select \"{nameof(Document.CommentsBytes)}\" " +
-                                $"from \"{nameof(Document)}\" " +
-                                $"where \"{nameof(Document.Id)}\" = @documentId");
-                cmd.Bind("@documentId", document.Id);
-                var result = cmd.ExecuteQuery<CommentsValue>();
-
-                if (result == null || result.Count < 1)
+                await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    throw new DataNotFoundException("Document could not be found.");
-                }
+                    var cmd = c.CreateCommand($"select \"{nameof(Document.CommentsBytes)}\" " +
+                                              $"from \"{nameof(Document)}\" " +
+                                              $"where \"{nameof(Document.Id)}\" = @documentId");
+                    cmd.Bind("@documentId", document.Id);
+                    var result = cmd.ExecuteQuery<CommentsValue>();
 
-                var comments = result.First().Comments;
+                    if (result == null || result.Count < 1)
+                    {
+                        return;
+                    }
 
-                comments.RemoveAll(cm => cm.Id == comment.Id);
+                    var comments = result.First().Comments;
 
-                cmd = c.CreateCommand($"update \"{nameof(Document)}\" " +
-                                      $"set \"{nameof(Document.CommentsBytes)}\" = @commentsBytes " +
-                                      $"where \"{nameof(Document.Id)}\" = @documentId");
-                cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
-                cmd.Bind("@documentId", document.Id);
-                cmd.ExecuteNonQuery();
+                    comments.RemoveAll(cm => cm.Id == comment.Id);
 
-                cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
-                                      $"set \"{nameof(DocumentPreview.CommentsCount)}\" = @commentsCount " +
-                                      $"where \"{nameof(DocumentPreview.Id)}\" = @documentId");
-                cmd.Bind("@commentsCount", comments.Count);
-                cmd.Bind("@documentId", document.Id);
-                cmd.ExecuteNonQuery();
-            });
+                    cmd = c.CreateCommand($"update \"{nameof(Document)}\" " +
+                                          $"set \"{nameof(Document.CommentsBytes)}\" = @commentsBytes " +
+                                          $"where \"{nameof(Document.Id)}\" = @documentId");
+                    cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
+                    cmd.Bind("@documentId", document.Id);
+                    cmd.ExecuteNonQuery();
+
+                    cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
+                                          $"set \"{nameof(DocumentPreview.CommentsCount)}\" = @commentsCount " +
+                                          $"where \"{nameof(DocumentPreview.Id)}\" = @documentId");
+                    cmd.Bind("@commentsCount", comments.Count);
+                    cmd.Bind("@documentId", document.Id);
+                    cmd.ExecuteNonQuery();
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error deleting comment.", ex);
+            }
         }
     }
 }

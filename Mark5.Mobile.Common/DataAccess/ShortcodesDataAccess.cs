@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,85 +28,113 @@ namespace Mark5.Mobile.Common.DataAccess
         }
         public async Task SaveShortcodePreviewsAsync(Folder folder, List<ShortcodePreview> shortcodePreviews, bool clean)
         {
-            await shortcodesDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var shortcodePreviewIds = shortcodePreviews.Select(cp => cp.Id).ToList();
-
-                if (clean)
+                await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
-                    c.Table<FolderShortcodeLink>()
-                     .Delete(fdl => fdl.FolderId == folder.Id && shortcodePreviewIds.Contains(fdl.ShortcodeId));
-                }
+                    var shortcodePreviewIds = shortcodePreviews.Select(cp => cp.Id).ToList();
 
-                c.InsertOrReplace(shortcodePreviews.Select(cp => new FolderShortcodeLink { FolderId = folder.Id, ShortcodeId = cp.Id }));
-                c.InsertOrReplace(shortcodePreviews);
-            });
+                    if (clean)
+                    {
+                        c.Table<FolderShortcodeLink>()
+                         .Delete(fdl => fdl.FolderId == folder.Id && shortcodePreviewIds.Contains(fdl.ShortcodeId));
+                    }
+
+                    c.InsertOrReplace(shortcodePreviews.Select(cp => new FolderShortcodeLink { FolderId = folder.Id, ShortcodeId = cp.Id }));
+                    c.InsertOrReplace(shortcodePreviews);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error saving shortcodes.", ex);
+            }
         }
         public async Task<List<ShortcodePreview>> GetShortcodePreviewsAsync(Folder folder, int startRowId, int maxItems)
         {
-            List<ShortcodePreview> shortcodePreviews = null;
-
-            await shortcodesDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var query = c.Table<FolderShortcodeLink>()
-                             .Where(fdl => fdl.FolderId == folder.Id)
-                             .Join(c.Table<ShortcodePreview>(), fdl => fdl.ShortcodeId, cp => cp.Id, (fdl, cp) => cp)
-                             .OrderBy(cp => cp.Name);
+                List<ShortcodePreview> shortcodePreviews = null;
 
-                if (startRowId > 0)
+                await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
-                    query = query.Skip(startRowId);
-                }
+                    var query = c.Table<FolderShortcodeLink>()
+                                 .Where(fdl => fdl.FolderId == folder.Id)
+                                 .Join(c.Table<ShortcodePreview>(), fdl => fdl.ShortcodeId, cp => cp.Id, (fdl, cp) => cp)
+                                 .OrderBy(cp => cp.Name);
 
-                if (maxItems > 0)
-                {
-                    query = query.Take(maxItems);
-                }
+                    if (startRowId > 0)
+                    {
+                        query = query.Skip(startRowId);
+                    }
 
-                var result = query.ToList();
+                    if (maxItems > 0)
+                    {
+                        query = query.Take(maxItems);
+                    }
 
-                if (result == null || result.Count < 1)
-                {
-                    throw new DataNotFoundException("Shortcode previews could not be found.");
-                }
+                    var result = query.ToList();
 
-                startRowId = startRowId < 1 ? 1 : startRowId;
-                foreach (var shortcodePreview in shortcodePreviews)
-                {
-                    shortcodePreview.RowId = startRowId++;
-                }
+                    if (result == null || result.Count < 1)
+                    {
+                        throw new DataNotFoundException("Shortcode previews could not be found.");
+                    }
 
-                shortcodePreviews = result;
-            });
+                    startRowId = startRowId < 1 ? 1 : startRowId;
+                    foreach (var shortcodePreview in shortcodePreviews)
+                    {
+                        shortcodePreview.RowId = startRowId++;
+                    }
 
-            return shortcodePreviews;
+                    shortcodePreviews = result;
+                });
+
+                return shortcodePreviews;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting shortcodes.", ex);
+            }
         }
 
         public async Task SaveShortcodeAsync(Shortcode shortcode)
         {
-            await shortcodesDatabase.RunInConnectionAsync(c =>
+            try
             {
-                c.InsertOrReplace(shortcode);
-            });
+                await shortcodesDatabase.RunInConnectionAsync(c =>
+                {
+                    c.InsertOrReplace(shortcode);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error saving shortcode.", ex);
+            }
         }
 
         public async Task<Shortcode> GetShortcodeAsync(int shortcodeId)
         {
-            Shortcode shortcode = null;
-
-            await shortcodesDatabase.RunInConnectionAsync(c =>
+            try
             {
-                var result = c.Find<Shortcode>(shortcodeId);
+                Shortcode shortcode = null;
 
-                if (result == null)
+                await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
-                    throw new DataNotFoundException("Shortcode could not be found.");
-                }
+                    var result = c.Find<Shortcode>(shortcodeId);
 
-                shortcode = result;
-            });
+                    if (result == null)
+                    {
+                        throw new DataNotFoundException("Shortcode could not be found.");
+                    }
 
-            return shortcode;
+                    shortcode = result;
+                });
+
+                return shortcode;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting shortcode.", ex);
+            }
         }
         public async Task RemoveFromFolderAsync(List<ShortcodePreview> shortcodePreviews, Folder folder)
         {
@@ -121,20 +150,27 @@ namespace Mark5.Mobile.Common.DataAccess
 
         async Task RemoveFromFolderAsync(List<int> ids, int folderId)
         {
-            await shortcodesDatabase.RunInConnectionAsync(c =>
+            try
             {
-                foreach (var id in ids)
+                await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
-                    var linksCount = c.Table<FolderShortcodeLink>().Count(fdl => fdl.ShortcodeId == id);
-                    if (linksCount == 1)
+                    foreach (var id in ids)
                     {
-                        c.Table<ShortcodePreview>().Delete(sp => sp.Id == id);
-                        c.Table<Shortcode>().Delete(s => s.Id == id);
-                    }
+                        var linksCount = c.Table<FolderShortcodeLink>().Count(fdl => fdl.ShortcodeId == id);
+                        if (linksCount == 1)
+                        {
+                            c.Table<ShortcodePreview>().Delete(sp => sp.Id == id);
+                            c.Table<Shortcode>().Delete(s => s.Id == id);
+                        }
 
-                    c.Table<FolderShortcodeLink>().Delete(fsl => fsl.ShortcodeId == id && fsl.FolderId == folderId);
-                }
-            });
+                        c.Table<FolderShortcodeLink>().Delete(fsl => fsl.ShortcodeId == id && fsl.FolderId == folderId);
+                    }
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error removing shortcodes from folder.", ex);
+            }
         }
 
         public async Task DeleteAsync(List<ShortcodePreview> shortcodePreviews)
@@ -151,12 +187,19 @@ namespace Mark5.Mobile.Common.DataAccess
 
         async Task DeleteAsync(List<int> ids)
         {
-            await shortcodesDatabase.RunInConnectionAsync(c =>
+            try
             {
-                c.Table<FolderShortcodeLink>().Delete(fsl => ids.Contains(fsl.ShortcodeId));
-                c.Table<ShortcodePreview>().Delete(sp => ids.Contains(sp.Id));
-                c.Table<Shortcode>().Delete(s => ids.Contains(s.Id));
-            });
+                await shortcodesDatabase.RunInConnectionAsync(c =>
+                {
+                    c.Table<FolderShortcodeLink>().Delete(fsl => ids.Contains(fsl.ShortcodeId));
+                    c.Table<ShortcodePreview>().Delete(sp => ids.Contains(sp.Id));
+                    c.Table<Shortcode>().Delete(s => ids.Contains(s.Id));
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error deleting shortcodes.", ex);
+            }
         }
     }
 }

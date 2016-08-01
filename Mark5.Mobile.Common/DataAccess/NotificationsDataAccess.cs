@@ -8,10 +8,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Model;
-using System.Linq;
 
 namespace Mark5.Mobile.Common.DataAccess
 {
@@ -28,23 +29,37 @@ namespace Mark5.Mobile.Common.DataAccess
 
         public async Task SaveNotifications(List<Notification> notifications)
         {
-            await commonDatabase.RunInConnectionAsync(c =>
+            try
             {
-                c.DeleteAll<Notification>();
-                c.InsertAll(notifications);
-            });
+                await commonDatabase.RunInConnectionAsync(c =>
+                {
+                    c.DeleteAll<Notification>();
+                    c.InsertAll(notifications);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error saving notifications.", ex);
+            }
         }
 
         public async Task<List<Notification>> GetNotifications()
         {
-            List<Notification> notifications = null;
-
-            await commonDatabase.RunInConnectionAsync(c =>
+            try
             {
-                notifications = c.Table<Notification>().ToList();
-            });
+                List<Notification> notifications = null;
 
-            return notifications;
+                await commonDatabase.RunInConnectionAsync(c =>
+                {
+                    notifications = c.Table<Notification>().ToList();
+                });
+
+                return notifications;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting notifications.", ex);
+            }
         }
     }
 }
