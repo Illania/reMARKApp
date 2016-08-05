@@ -30,6 +30,8 @@ namespace Mark5.Mobile.Common.Managers
         Task SetNotificationsSoundAsync(DeviceType deviceType, string pushToken, string soundName, SourceType sourceType = default(SourceType));
 
         Task ClearAllNotificationSettingsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = default(SourceType));
+
+        Task<object> GetRemoteObjectAsync(Notification notification, SourceType sourceType = default(SourceType));
     }
 }
 

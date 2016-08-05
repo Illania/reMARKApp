@@ -86,7 +86,6 @@
     <Compile Include="Model\ObjectAction.cs" />
     <Compile Include="Model\ObjectLink.cs" />
     <Compile Include="Model\ObjectLinkTypeInfo.cs" />
-    <Compile Include="Managers\ISystemManager.cs" />
     <Compile Include="Managers\SystemManager.cs" />
     <Compile Include="Managers\Managers.cs" />
     <Compile Include="Authenticator\Authenticator.cs" />
@@ -96,7 +95,6 @@
     <Compile Include="Managers\AbstractManager.cs" />
     <Compile Include="Database\DatabaseConnectionProvider.cs" />
     <Compile Include="Model\Converters\DataContractConverters.cs" />
-    <Compile Include="Managers\IFoldersManager.cs" />
     <Compile Include="Managers\FoldersManager.cs" />
     <Compile Include="Database\DatabaseUtils.cs" />
     <Compile Include="Model\Containers\ContactContainer.cs" />
@@ -119,25 +117,19 @@
     <Compile Include="Model\Links\FolderCalendarAppointmentLink.cs" />
     <Compile Include="Model\Links\FolderCalendarTaskLink.cs" />
     <Compile Include="Managers\DocumentsManager.cs" />
-    <Compile Include="Managers\IDocumentsManager.cs" />
     <Compile Include="DataAccess\IContactsDataAccess.cs" />
     <Compile Include="DataAccess\ContactsDataAccess.cs" />
     <Compile Include="DataAccess\IShortcodesDataAccess.cs" />
     <Compile Include="DataAccess\ShortcodesDataAccess.cs" />
     <Compile Include="DataAccess\ICalendarDataAccess.cs" />
     <Compile Include="DataAccess\CalendarDataAccess.cs" />
-    <Compile Include="Managers\IContactsManager.cs" />
     <Compile Include="Managers\ContactsManager.cs" />
-    <Compile Include="Managers\IShortcodesManager.cs" />
     <Compile Include="Managers\ShortcodesManager.cs" />
-    <Compile Include="Managers\ICalendarManager.cs" />
     <Compile Include="Managers\CalendarManager.cs" />
-    <Compile Include="Managers\INotificationsManager.cs" />
     <Compile Include="Managers\NotificationsManager.cs" />
     <Compile Include="Model\SystemUsersDepartments.cs" />
     <Compile Include="Model\DefaultTemplateInfo.cs" />
     <Compile Include="Model\IdValue.cs" />
-    <Compile Include="Managers\ISearchManager.cs" />
     <Compile Include="Managers\SearchManager.cs" />
     <Compile Include="Model\SearchDocumentsResult.cs" />
     <Compile Include="Model\SearchContactsResult.cs" />
@@ -148,8 +140,19 @@
     <Compile Include="Model\ICommonManager.cs" />
     <Compile Include="Model\CommentsValue.cs" />
     <Compile Include="Managers\CommonActionsManager.cs" />
-    <Compile Include="Managers\ICommonActionsManager.cs" />
     <Compile Include="Model\CategoriesValue.cs" />
+    <Compile Include="Managers\Interfaces\ICalendarManager.cs" />
+    <Compile Include="Managers\Interfaces\ICommonActionsManager.cs" />
+    <Compile Include="Managers\Interfaces\IContactsManager.cs" />
+    <Compile Include="Managers\Interfaces\IDocumentsManager.cs" />
+    <Compile Include="Managers\Interfaces\IFoldersManager.cs" />
+    <Compile Include="Managers\Interfaces\INotificationsManager.cs" />
+    <Compile Include="Managers\Interfaces\ISearchManager.cs" />
+    <Compile Include="Managers\Interfaces\IShortcodesManager.cs" />
+    <Compile Include="Managers\Interfaces\ISystemManager.cs" />
+    <Compile Include="Model\SearchCalendarTasksResult.cs" />
+    <Compile Include="Model\SearchCalendarAppointmentsResult.cs" />
+    <Compile Include="Model\Attachment.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />
@@ -165,6 +168,7 @@
     <Folder Include="DataAccess\Exceptions\" />
     <Folder Include="Extensions\" />
     <Folder Include="Model\Links\" />
+    <Folder Include="Managers\Interfaces\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PCLStorage">

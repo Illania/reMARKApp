@@ -90,6 +90,38 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+
+        public async Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
+                                            DateTime sendOn, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.SendDocumentAsync(new DataContract.SendDocumentParameters
+                {
+                    Token = Token,
+                    Document = document.Convert(),
+                    DocumentPreview = documentPreview.Convert(),
+                    CreationModeFlag = flag.ConvertEnum<DataContract.DocumentCreationModeFlag>(),
+                    PreceedingDocumentId = precedingDocumentId,
+                    PreceedingDocumentFolderId = precedingDocumentFolderId,
+                    SendOn = sendOn.ConvertToUTC(),
+                    ConfirmRead = confirmRead,
+                    ConfirmDelivery = confirmDelivery,
+                    TemporaryAttachmentGuids = temporaryAttachmentGuids,
+                });
+
+                document.Id = result.Id;
+                document.Guid = result.Guid;
+                documentPreview.Id = result.Id;
+                documentPreview.Guid = result.Guid;
+                documentPreview.ReferenceNumber = result.ReferenceNumber;
+
+                return;
+            }
+
+            throw new ArgumentException("Invalid sourceType provided");
+        }
+
         public async Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
@@ -353,6 +385,69 @@ namespace Mark5.Mobile.Common.Managers
                 await documentsDataAccess.DeleteCommentAsync(document, comment);
 
                 return;
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task<Version> GetServiceVersionAsync(SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var result = await fileTransferServiceProxy.GetServiceVersionAsync(new DataContract.GetServiceVersionRequest
+                {
+                    Token = Token,
+                });
+
+                return result.Version;
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task<Attachment> GetAttachmentAsync(AttachmentDescription attachmentDescription, Document document, Folder folder, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var result = await fileTransferServiceProxy.GetAttachmentAsync(new DataContract.GetAttachmentRequest
+                {
+                    Token = Token,
+                    Id = attachmentDescription.Id,
+                    FolderId = folder.Id,
+                    DocumentId = document.Id,
+                });
+
+                return new Attachment
+                {
+                    Filename = result.Filename,
+                    Size = result.Size,
+                    Stream = result.Stream,
+                    Extension = result.Extension,
+                    Md5 = result.Md5,
+                };
+            }
+
+            if (sourceType == SourceType.Local)
+            {
+                //TODO implement retrieval from file system
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task<Guid> UploadTemporaryAttachmentAsync(Attachment attachment, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var result = await fileTransferServiceProxy.UploadTemporaryAttachmentAsync(new DataContract.UploadTemporaryAttachmentRequest()
+                {
+                    Token = Token,
+                    Extension = attachment.Extension,
+                    Filename = attachment.Filename,
+                    Stream = attachment.Stream,
+                });
+
+                return result.Guid;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");

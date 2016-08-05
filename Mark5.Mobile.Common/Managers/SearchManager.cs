@@ -125,6 +125,88 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+
+        public async Task<SearchCalendarTasksResult> SearchCalendarTasksAsync(SearchCalendarEventsCriteria criteria, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.SearchCalendarEventsAsync(new DataContract.SearchCalendarEventsParameters
+                {
+                    Type = DataContract.SearchCalendarEventsType.Tasks,
+                    SavedSearchFilterHash = criteria.SavedSearchFilterHash,
+                    InCalendarOfUserIds = criteria.InCalendarOfUserIds,
+                    Priority = criteria.Priority.ConvertEnum<DataContract.Priority>(),
+                    Subject = criteria.Subject,
+                    Description = criteria.Description,
+                    InGroupCalendarOfUserIds = criteria.InGroupCalendarOfUserIds,
+                    TaskCreatedByUserIds = criteria.TaskCreatedByUserIds,
+                    DelegatedToUserIds = criteria.DelegatedToUserIds,
+                    DelegatedToDepartmentIds = criteria.DelegatedToDepartmentIds,
+                    CalendarCategoryIds = criteria.CalendarCategoryIds,
+                    Location = criteria.Location,
+                    ParticipantUserIds = criteria.ParticipantUserIds,
+                    DateRange = {
+                        Enabled = criteria.DateRange?.Enabled ?? false,
+                        Start = criteria.DateRange?.Start ?? default(DateTime),
+                        End = criteria.DateRange?.End ?? default(DateTime),
+                    },
+                    FiledInFolderType = criteria.FiledInFolderType.ConvertEnum<DataContract.FiledInFolderType>(),
+                    FiledInFolderFolderType = criteria.FiledInFolderFolderType.ConvertEnum<DataContract.FiledInFolderFolderType>(),
+                    FiledInFolderIds = criteria.FiledInFolderIds,
+                });
+
+                return new SearchCalendarTasksResult
+                {
+                    SearchId = result.SearchId,
+                    CalendarTasks = result.CalendarTasks.WhereNotNull().Select(ct => ct.Convert()).ToList(),
+                };
+
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+
+        }
+
+        public async Task<SearchCalendarAppointmentsResult> SearchCalendarAppointmentsAsync(SearchCalendarEventsCriteria criteria, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.SearchCalendarEventsAsync(new DataContract.SearchCalendarEventsParameters
+                {
+                    Type = DataContract.SearchCalendarEventsType.Appointments,
+                    SavedSearchFilterHash = criteria.SavedSearchFilterHash,
+                    InCalendarOfUserIds = criteria.InCalendarOfUserIds,
+                    Priority = criteria.Priority.ConvertEnum<DataContract.Priority>(),
+                    Subject = criteria.Subject,
+                    Description = criteria.Description,
+                    InGroupCalendarOfUserIds = criteria.InGroupCalendarOfUserIds,
+                    TaskCreatedByUserIds = criteria.TaskCreatedByUserIds,
+                    DelegatedToUserIds = criteria.DelegatedToUserIds,
+                    DelegatedToDepartmentIds = criteria.DelegatedToDepartmentIds,
+                    CalendarCategoryIds = criteria.CalendarCategoryIds,
+                    Location = criteria.Location,
+                    ParticipantUserIds = criteria.ParticipantUserIds,
+                    DateRange = {
+                        Enabled = criteria.DateRange?.Enabled ?? false,
+                        Start = criteria.DateRange?.Start ?? default(DateTime),
+                        End = criteria.DateRange?.End ?? default(DateTime),
+                    },
+                    FiledInFolderType = criteria.FiledInFolderType.ConvertEnum<DataContract.FiledInFolderType>(),
+                    FiledInFolderFolderType = criteria.FiledInFolderFolderType.ConvertEnum<DataContract.FiledInFolderFolderType>(),
+                    FiledInFolderIds = criteria.FiledInFolderIds,
+                });
+
+                return new SearchCalendarAppointmentsResult
+                {
+                    SearchId = result.SearchId,
+                    CalendarAppointments = result.CalendarAppointments.WhereNotNull().Select(ct => ct.Convert()).ToList(),
+                };
+
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
         public async Task<SearchShortcodesResult> SearchShortcodesAsync(SearchShortcodesCriteria criteria, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
@@ -205,6 +287,41 @@ namespace Mark5.Mobile.Common.Managers
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
+
+        public async Task<CalendarTask> GetCalendarTaskAsync(int searchId, int taskId, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.GetCalendarTaskAsync(new DataContract.GetCalendarTaskParameters
+                {
+                    Token = Token,
+                    FolderId = searchId,
+                    CalendarTaskId = taskId,
+                });
+
+                return result.CalendarTask.Convert();
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task<CalendarAppointment> GetCalendarAppointmentAsync(int searchId, int appointmentId, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.GetCalendarAppointmentAsync(new DataContract.GetCalendarAppointmentParameters
+                {
+                    Token = Token,
+                    FolderId = searchId,
+                    CalendarAppointmentId = appointmentId,
+                });
+
+                return result.CalendarAppointment.Convert();
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
     }
 }
 

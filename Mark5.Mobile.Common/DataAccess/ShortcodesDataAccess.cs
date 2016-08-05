@@ -32,12 +32,10 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
-                    var shortcodePreviewIds = shortcodePreviews.Select(cp => cp.Id).ToList();
-
                     if (clean)
                     {
                         c.Table<FolderShortcodeLink>()
-                         .Delete(fdl => fdl.FolderId == folder.Id && shortcodePreviewIds.Contains(fdl.ShortcodeId));
+                         .Delete(fdl => fdl.FolderId == folder.Id);
                     }
 
                     c.InsertOrReplace(shortcodePreviews.Select(cp => new FolderShortcodeLink { FolderId = folder.Id, ShortcodeId = cp.Id }));

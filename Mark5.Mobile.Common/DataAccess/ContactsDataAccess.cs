@@ -33,12 +33,10 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var contactPreviewIds = contactPreviews.Select(cp => cp.Id).ToList();
-
                     if (clean)
                     {
                         c.Table<FolderContactLink>()
-                         .Delete(fdl => fdl.FolderId == folder.Id && contactPreviewIds.Contains(fdl.ContactId));
+                         .Delete(fdl => fdl.FolderId == folder.Id);
                     }
 
                     c.InsertOrReplace(contactPreviews.Select(cp => new FolderContactLink { FolderId = folder.Id, ContactId = cp.Id }));

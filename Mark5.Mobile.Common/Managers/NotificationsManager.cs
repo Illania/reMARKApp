@@ -16,6 +16,7 @@ using Mark5.Mobile.Common.Model.Converters;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 using Mark5.Mobile.Common.Storage;
+using Mark5.Mobile.Common.Model.Containers;
 
 namespace Mark5.Mobile.Common.Managers
 {
@@ -237,6 +238,78 @@ namespace Mark5.Mobile.Common.Managers
                 await FileSystemStorage.SaveNotificationSettingsAsync(new NotificationSettings());
 
                 return;
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task<object> GetRemoteObjectAsync(Notification notification, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var objectId = notification.ObjectId;
+                var folderId = notification.FolderId;
+
+                if (notification.ObjectType == ObjectType.Document)
+                {
+                    var result = await AppServiceProxy.GetDocumentAsync(new DataContract.GetDocumentParameters
+                    {
+                        Token = Token,
+                        FolderId = folderId,
+                        DocumentId = objectId,
+                        BodyRequest = DataContract.DocumentBodyTypeRequest.None, //TODO Think
+                        IncludePreview = true
+                    });
+
+                    return new DocumentContainer(result.DocumentPreview.Convert(), result.Document.Convert());
+                }
+                else if (notification.ObjectType == ObjectType.Contact)
+                {
+                    var result = await AppServiceProxy.GetContactAsync(new DataContract.GetContactParameters
+                    {
+                        Token = Token,
+                        FolderId = folderId,
+                        ContactId = objectId,
+                        IncludePreview = true
+                    });
+
+                    return new ContactContainer(result.ContactPreview.Convert(), result.Contact.Convert());
+                }
+                else if (notification.ObjectType == ObjectType.Shortcode)
+                {
+                    var result = await AppServiceProxy.GetShortcodeAsync(new DataContract.GetShortcodeParameters
+                    {
+                        Token = Token,
+                        FolderId = folderId,
+                        ShortcodeId = objectId,
+                        IncludePreview = true
+                    });
+
+                    return new ShortcodeContainer(result.ShortcodePreview.Convert(), result.Shortcode.Convert());
+                }
+                else if (notification.ObjectType == ObjectType.CalendarTask)
+                {
+                    var result = await AppServiceProxy.GetCalendarTaskAsync(new DataContract.GetCalendarTaskParameters
+                    {
+                        Token = Token,
+                        FolderId = folderId,
+                        CalendarTaskId = objectId
+                    });
+
+                    return result.CalendarTask.Convert();
+                }
+                else if (notification.ObjectType == ObjectType.CalendarAppointment)
+                {
+                    var result = await AppServiceProxy.GetCalendarAppointmentAsync(new DataContract.GetCalendarAppointmentParameters
+                    {
+                        Token = Token,
+                        FolderId = folderId,
+                        CalendarAppointmentId = objectId,
+                    });
+
+                    return result.CalendarAppointment.Convert();
+                }
+
             }
 
             throw new ArgumentException("Invalid sourceType provided.");

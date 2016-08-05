@@ -23,11 +23,19 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<SearchShortcodesResult> SearchShortcodesAsync(SearchShortcodesCriteria criteria, SourceType sourceType = SourceType.Auto);
 
+        Task<SearchCalendarTasksResult> SearchCalendarTasksAsync(SearchCalendarEventsCriteria criteria, SourceType sourceType = SourceType.Auto);
+
+        Task<SearchCalendarAppointmentsResult> SearchCalendarAppointmentsAsync(SearchCalendarEventsCriteria criteria, SourceType sourceType = SourceType.Auto);
+
         Task<Document> GetDocumentAsync(int searchId, int documentId, DocumentBodyTypeRequest bodyType, SourceType sourceType = SourceType.Auto);
 
         Task<Contact> GetContactAsync(int searchId, int contactId, SourceType sourceType = SourceType.Auto);
 
         Task<Shortcode> GetShortcodeAsync(int searchId, int shortcodeId, SourceType sourceType = SourceType.Auto);
+
+        Task<CalendarTask> GetCalendarTaskAsync(int searchId, int taskId, SourceType sourceType = SourceType.Auto);
+
+        Task<CalendarAppointment> GetCalendarAppointmentAsync(int searchId, int appointmentId, SourceType sourceType = SourceType.Auto);
 
     }
 }

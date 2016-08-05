@@ -7,6 +7,8 @@
 //
 using System;
 using System.Collections.Generic;
+using Mark5.Mobile.Common.Utilities;
+using SQLite;
 
 namespace Mark5.Mobile.Common.Model
 {
@@ -14,6 +16,7 @@ namespace Mark5.Mobile.Common.Model
     public class CalendarTask : BusinessEntity
     {
 
+        [Ignore]
         public override ObjectType ObjectType
         {
             get
@@ -22,6 +25,7 @@ namespace Mark5.Mobile.Common.Model
             }
         }
 
+        [Ignore]
         public override ModuleType ModuleType
         {
             get
@@ -30,40 +34,57 @@ namespace Mark5.Mobile.Common.Model
             }
         }
 
+        [Column("Subject")]
         public string Subject { get; set; }
 
+        [Column("StartDate")]
         public DateTime StartDate { get; set; }
 
+        [Column("EndDate")]
         public DateTime EndDate { get; set; }
 
+        [Column("Private")]
         public bool Private { get; set; }
 
+        [Column("Status")]
         public TaskStatus Status { get; set; }
 
+        [Column("CreatorId")]
         public int CreatorId { get; set; } = -1;
 
+        [Column("Creator")]
         public string Creator { get; set; }
 
+        [Column("Priority")]
         public Priority Priority { get; set; }
 
+        [Column("Type")]
         public CalendarOccurenceType Type { get; set; }
 
+        [Column("ReminderDate")]
         public DateTime ReminderDate { get; set; }
 
+        [Column("SnoozeDelay")]
         public long SnoozeDelay { get; set; } = -1;
 
+        [Column("PercentComplete")]
         public int PercentComplete { get; set; }
 
+        [Column("LinkedObjectType")]
         public ObjectType LinkedObjectType { get; set; }
 
+        [Column("LinkedObjectId")]
         public int LinkedObjectId { get; set; } = -1;
 
+        [Column("DelegatorId")]
         public int DelegatorId { get; set; } = -1;
 
+        [Column("Delegator")]
         public string Delegator { get; set; }
 
         List<int> userIds;
 
+        [Ignore]
         public List<int> UserIds
         {
             get
@@ -83,6 +104,7 @@ namespace Mark5.Mobile.Common.Model
 
         Dictionary<int, string> users;
 
+        [Ignore]
         public Dictionary<int, string> Users
         {
             get
@@ -102,6 +124,7 @@ namespace Mark5.Mobile.Common.Model
 
         List<int> departmentIds;
 
+        [Ignore]
         public List<int> DepartmentIds
         {
             get
@@ -121,6 +144,7 @@ namespace Mark5.Mobile.Common.Model
 
         Dictionary<int, string> departments;
 
+        [Ignore]
         public Dictionary<int, string> Departments
         {
             get
@@ -138,7 +162,69 @@ namespace Mark5.Mobile.Common.Model
             }
         }
 
+        [Column("DelegationStatus")]
         public DelegationStatus DelegationStatus { get; set; }
+
+        #region Serialization
+
+        [Column("UserIdsBytes")]
+        public byte[] UserIdsBytes
+        {
+            get
+            {
+                return SerializationUtils.SerializeToByteArray(UserIds);
+            }
+            set
+            {
+                UserIds = SerializationUtils.DeserializeFromByteArray<List<int>>(value);
+            }
+        }
+
+        [Column("UsersBytes")]
+        public byte[] UsersBytes
+        {
+            get
+            {
+                return SerializationUtils.SerializeToByteArray(Users);
+            }
+            set
+            {
+                Users = SerializationUtils.DeserializeFromByteArray<Dictionary<int, string>>(value);
+            }
+        }
+
+        [Column("DepartmentIdsBytes")]
+        public byte[] DepartmentIdsBytes
+        {
+            get
+            {
+                return SerializationUtils.SerializeToByteArray(DepartmentIds);
+            }
+            set
+            {
+                DepartmentIds = SerializationUtils.DeserializeFromByteArray<List<int>>(value);
+            }
+        }
+
+        [Column("DepartmentsBytes")]
+        public byte[] DepartmentsBytes
+        {
+            get
+            {
+                return SerializationUtils.SerializeToByteArray(Departments);
+            }
+            set
+            {
+                Departments = SerializationUtils.DeserializeFromByteArray<Dictionary<int, string>>(value);
+            }
+        }
+
+        #endregion
+
+        public override string ToString()
+        {
+            return string.Format("[CalendarTask: Subject={0}, StartDate={1}, EndDate={2}, Status={3}]", Subject, StartDate, EndDate, Status);
+        }
     }
 }
 

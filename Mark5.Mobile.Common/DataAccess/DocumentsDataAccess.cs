@@ -33,12 +33,10 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var documentPreviewIds = documentPreviews.Select(dp => dp.Id).ToList();
-
                     if (clean)
                     {
                         c.Table<FolderDocumentLink>()
-                         .Delete(fdl => fdl.FolderId == folder.Id && documentPreviewIds.Contains(fdl.DocumentId));
+                         .Delete(fdl => fdl.FolderId == folder.Id);
                     }
 
                     c.InsertOrReplace(documentPreviews.Select(dp => new FolderDocumentLink { FolderId = folder.Id, DocumentId = dp.Id }));

@@ -140,13 +140,25 @@ namespace Mark5.Mobile.Common.Managers
                     await shortcodesDataAccess.RemoveFromFolderAsync(shortcodes.ToList(), fromFolder);
                 }
 
+                var appointments = businessEntities.OfType<CalendarAppointment>();
+                if (appointments.Any())
+                {
+                    await calendarDataAccess.RemoveFromFolderAsync(appointments.ToList(), fromFolder);
+                }
+
+                var tasks = businessEntities.OfType<CalendarTask>();
+                if (tasks.Any())
+                {
+                    await calendarDataAccess.RemoveFromFolderAsync(tasks.ToList(), fromFolder);
+                }
+
                 return;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task CopyToWorktray(List<BusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto)
+        public async Task CopyToWorktray(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
@@ -163,7 +175,7 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task CopyToUserWorktray(List<BusinessEntity> businessEntities, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto)
+        public async Task CopyToUserWorktray(List<IBusinessEntity> businessEntities, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
@@ -182,7 +194,7 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task RemoveFromFolder(List<BusinessEntity> businessEntities, Folder folder, SourceType sourceType = SourceType.Auto)
+        public async Task RemoveFromFolder(List<IBusinessEntity> businessEntities, Folder folder, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
@@ -230,13 +242,25 @@ namespace Mark5.Mobile.Common.Managers
                     await shortcodesDataAccess.RemoveFromFolderAsync(shortcodes.ToList(), folder);
                 }
 
+                var appointments = businessEntities.OfType<CalendarAppointment>();
+                if (appointments.Any())
+                {
+                    await calendarDataAccess.RemoveFromFolderAsync(appointments.ToList(), folder);
+                }
+
+                var tasks = businessEntities.OfType<CalendarTask>();
+                if (tasks.Any())
+                {
+                    await calendarDataAccess.RemoveFromFolderAsync(tasks.ToList(), folder);
+                }
+
                 return;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task Delete(List<BusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto)
+        public async Task Delete(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
@@ -283,6 +307,17 @@ namespace Mark5.Mobile.Common.Managers
                     await shortcodesDataAccess.DeleteAsync(shortcodes.ToList());
                 }
 
+                var appointments = businessEntities.OfType<CalendarAppointment>();
+                if (appointments.Any())
+                {
+                    await calendarDataAccess.DeleteAsync(appointments.ToList());
+                }
+
+                var tasks = businessEntities.OfType<CalendarTask>();
+                if (tasks.Any())
+                {
+                    await calendarDataAccess.DeleteAsync(tasks.ToList());
+                }
                 return;
             }
 

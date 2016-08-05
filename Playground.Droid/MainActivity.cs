@@ -60,6 +60,7 @@ namespace Playground.Droid
                 {
                     var auth = AuthenticatorFactory.Create();
 
+
                     var result = await auth.AuthenticateAsync("mark5", "mark5", false, "192.168.75.135", 8093, DeviceType.Android, "test", "test");
 
                     Managers.Initialize(result);
@@ -76,7 +77,8 @@ namespace Playground.Droid
                 }
                 catch (AppServiceException ex)
                 {
-                    Log.Info("M5", ex.Message + "   " + ex.Detail?.Code + "   " + ex.Detail?.DiagnosticInformation);
+                    var text = ex.Message + "   " + ex.Detail?.Code + "   " + ex.Detail?.DiagnosticInformation;
+                    Log.Info("M5", text);
                 }
                 catch (Exception ex)
                 {

@@ -84,6 +84,30 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        public async Task<bool> CreteOrUpdateContactAsync(Contact contact, ContactPreview contactPreview, int parentObjectId, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.CreateOrUpdateContactAsync(new DataContract.CreateOrUpdateContactParameters
+                {
+                    Token = Token,
+                    Contact = contact.Convert(),
+                    ContactPreview = contactPreview.Convert(),
+                    ParentObjectId = parentObjectId,
+                });
+
+                contact.Id = result.Id;
+                contact.Guid = result.Guid;
+
+                contactPreview.Id = result.Id;
+                contactPreview.Guid = result.Guid;
+
+                return result.Updated;
+            }
+
+            throw new ArgumentException("Invalid sourceType provided");
+        }
+
         public async Task<List<Category>> GetAllCategoriesAsync(SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
@@ -196,6 +220,7 @@ namespace Mark5.Mobile.Common.Managers
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
+
     }
 }
 

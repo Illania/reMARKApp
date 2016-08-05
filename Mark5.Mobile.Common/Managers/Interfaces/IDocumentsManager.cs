@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
@@ -18,6 +19,9 @@ namespace Mark5.Mobile.Common.Managers
         Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId = -1, int endId = -1, int maxItems = 500, SourceType sourceType = SourceType.Auto);
 
         Task<Document> GetDocumentAsync(Folder folder, int documentId, DocumentBodyTypeRequest bodyType, SourceType sourceType = SourceType.Auto);
+
+        Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
+                               DateTime sendOn, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto);
 
         Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto);
 
@@ -42,6 +46,13 @@ namespace Mark5.Mobile.Common.Managers
         Task<bool> EditComment(Document document, Comment comment, SourceType sourceType = SourceType.Auto);
 
         Task DeleteComment(Document document, Comment comment, SourceType sourceType = SourceType.Auto);
+
+        Task<Version> GetServiceVersionAsync(SourceType sourceType = SourceType.Auto);
+
+        Task<Attachment> GetAttachmentAsync(AttachmentDescription attachmentDescription, Document document, Folder folder, SourceType sourceType = SourceType.Auto);
+
+        Task<Guid> UploadTemporaryAttachmentAsync(Attachment attachment, SourceType sourceType = SourceType.Auto);
+
     }
 }
 

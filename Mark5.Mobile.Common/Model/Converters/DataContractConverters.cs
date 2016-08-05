@@ -7,7 +7,6 @@
 //
 using System;
 using System.Linq;
-using System.Reflection;
 using Mark5.Mobile.Common.Extensions;
 using DataContract = Mark5.ServiceReference.DataContract;
 using System.Collections.Generic;
@@ -20,13 +19,8 @@ namespace Mark5.Mobile.Common.Model.Converters
 
         #region Enums
 
-        public static T ConvertEnum<T>(this object obj) where T : struct
+        public static T ConvertEnum<T>(this Enum obj) where T : struct
         {
-            if (obj == null || !obj.GetType().GetTypeInfo().IsEnum)
-            {
-                throw new ArgumentException("Parameter must be an enum!");
-            }
-
             return (T)Enum.Parse(typeof(T), obj.ToString());
         }
 
@@ -40,8 +34,75 @@ namespace Mark5.Mobile.Common.Model.Converters
             {
                 Id = ad.Id,
                 Name = ad.Name,
-                SizeInBytes = ad.SizeInBytes
+                SizeInBytes = ad.SizeInBytes,
             };
+        }
+
+        public static CalendarAppointment Convert(this DataContract.CalendarAppointment ca)
+        {
+            var result = new CalendarAppointment
+            {
+                Id = ca.Id,
+                Guid = ca.Guid,
+                Subject = ca.Subject,
+                Location = ca.Location,
+                StartDate = DateTime.SpecifyKind(ca.StartDate, DateTimeKind.Utc),
+                EndDate = DateTime.SpecifyKind(ca.EndDate, DateTimeKind.Utc),
+                AllDay = ca.AllDay,
+                Private = ca.Private,
+                Category = ca.Category?.Convert(),
+                Status = ca.Status.ConvertEnum<AppointmentStatus>(),
+                CreatorId = ca.CreatorId,
+                Creator = ca.Creator,
+                Priority = ca.Priority.ConvertEnum<Priority>(),
+                Type = ca.Type.ConvertEnum<CalendarOccurenceType>(),
+                ReminderDate = DateTime.SpecifyKind(ca.ReminderDate, DateTimeKind.Utc),
+                SnoozeDelay = ca.SnoozeDelay,
+            };
+
+            if (ca.Resources != null)
+                result.Resources.AddRange(ca.Resources.WhereNotNull().Select(Convert));
+            if (ca.Participants != null)
+                result.Participants.AddRange(ca.Participants.WhereNotNull().Select(Convert));
+
+            return result;
+        }
+
+        public static CalendarTask Convert(this DataContract.CalendarTask ca)
+        {
+            var result = new CalendarTask
+            {
+                Id = ca.Id,
+                Guid = ca.Guid,
+                Subject = ca.Subject,
+                StartDate = DateTime.SpecifyKind(ca.StartDate, DateTimeKind.Utc),
+                EndDate = DateTime.SpecifyKind(ca.EndDate, DateTimeKind.Utc),
+                Private = ca.Private,
+                Status = ca.Status.ConvertEnum<TaskStatus>(),
+                CreatorId = ca.CreatorId,
+                Creator = ca.Creator,
+                Priority = ca.Priority.ConvertEnum<Priority>(),
+                Type = ca.Type.ConvertEnum<CalendarOccurenceType>(),
+                ReminderDate = DateTime.SpecifyKind(ca.ReminderDate, DateTimeKind.Utc),
+                SnoozeDelay = ca.SnoozeDelay,
+                PercentComplete = ca.PercentComplete,
+                LinkedObjectId = ca.ObjectId,
+                LinkedObjectType = ca.ObjectType.ConvertEnum<ObjectType>(),
+                DelegatorId = ca.DelegatorId,
+                Delegator = ca.Delegator,
+                DelegationStatus = ca.DelegationStatus.ConvertEnum<DelegationStatus>(),
+            };
+
+            if (ca.UserIds != null)
+                result.UserIds.AddRange(ca.UserIds);
+            if (ca.Users != null)
+                result.Users.Union(ca.Users);
+            if (ca.DepartmentIds != null)
+                result.DepartmentIds.AddRange(ca.DepartmentIds);
+            if (ca.Departments != null)
+                result.Departments.Union(ca.Departments);
+
+            return result;
         }
 
         public static CalendarCategory Convert(this DataContract.CalendarCategory cc)
@@ -428,6 +489,19 @@ namespace Mark5.Mobile.Common.Model.Converters
             return null;
         }
 
+        public static Participant Convert(this DataContract.Participant p)
+        {
+            return new Participant
+            {
+                Id = p.Id,
+                Presence = p.Presence.ConvertEnum<ParticipantPresenence>(),
+                Type = p.Type.ConvertEnum<ParticipantType>(),
+                Status = p.Status.ConvertEnum<ParticipantStatus>(),
+                CN = p.CN,
+                Customer = p.Customer,
+                Note = p.Note,
+            };
+        }
 
         public static Permissions Convert(this DataContract.Permissions p)
         {
@@ -602,7 +676,317 @@ namespace Mark5.Mobile.Common.Model.Converters
 
         #region Model to DataContract
 
+        public static DataContract.Document Convert(this Document doc)
+        {
+            return new DataContract.Document
+            {
+                Id = doc.Id,
+                Guid = doc.Guid,
+                Lines = doc.Lines.Select(Convert).ToList(),
+                HtmlBody = doc.HtmlBody,
+                PlainTextBody = doc.PlainTextBody,
+                ReadByUserIds = doc.ReadByUserIds,
+                ReadByUserNames = doc.ReadByUserNames,
+                Attachments = doc.Attachments.Select(Convert).ToList(),
+                Comments = doc.Comments.Select(Convert).ToList(),
+                ExtraFields = doc.ExtraFields.ToDictionary(kv => kv.Key.Convert(), kv => kv.Value),
+                IsEncrypted = doc.IsEncrypted,
+            };
+
+        }
+
+        public static DataContract.DocumentPreview Convert(this DocumentPreview dp)
+        {
+            return new DataContract.DocumentPreview
+            {
+                Id = dp.Id,
+                Guid = dp.Guid,
+                ReferenceNumber = dp.ReferenceNumber,
+                Addresses = dp.Addresses.Select(a => a.Convert()).ToList(),
+                Subject = dp.Subject,
+                Preview = dp.Preview,
+                Direction = dp.Direction.ConvertEnum<DataContract.DocumentDirection>(),
+                Priority = dp.Priority.ConvertEnum<DataContract.Priority>(),
+                IsReadByAnyone = dp.IsReadByAnyone,
+                IsReadByCurrent = dp.IsReadByCurrent,
+                CommentsCount = dp.CommentsCount,
+                AttachmentsCount = dp.AttachmentsCount,
+                Categories = dp.Categories.Select(c => c.Convert()).ToList(),
+                DateReceived = DateTime.UtcNow,
+                CreatorId = dp.CreatorId,
+                Creator = dp.Creator
+            };
+        }
+
+        public static DataContract.Category Convert(this Category c)
+        {
+            return new DataContract.Category
+            {
+                Id = c.Id,
+                Guid = c.Guid,
+                Name = c.Name,
+                Description = c.Description,
+                HexColor = c.HexColor,
+            };
+        }
+
+        public static DataContract.Contact Convert(this Contact c)
+        {
+            return new DataContract.Contact
+            {
+                Id = c.Id,
+                Guid = c.Guid,
+                FirstName = c.FirstName,
+                Patronymic = c.Patronymic,
+                LastName = c.LastName,
+                Position = c.Position,
+                WebPageAddress = c.WebPageAddress,
+                Account = c.Account,
+                Vat = c.Vat,
+                BirthDate = c.BirthDate.ConvertToUTC(),
+                Ledger = c.Ledger,
+                PrimaryPerson = c.PrimaryPerson.Convert(),
+                Children = c.Children.Select(ch => ch.Convert()).ToList(),
+                ResponsibleUsers = c.ResponsibleUsers,
+                ResponsibleUserIds = c.ResponsibleUserIds,
+                PreferrableType = c.PreferrableType.ConvertEnum<DataContract.CommunicationAddressType>(),
+                CommunicationAddresses = c.CommunicationAddresses.Select(ca => ca.Convert()).ToList(),
+                PhysicalAddresses = c.PhysicalAddresses.Select(pa => pa.Convert()).ToList(),
+                Comments = c.Comments.Select(co => co.Convert()).ToList(),
+            };
+        }
+
+        public static DataContract.ContactPreview Convert(this ContactPreview cp)
+        {
+            return new DataContract.ContactPreview
+            {
+                Id = cp.Id,
+                Guid = cp.Guid,
+                RowId = cp.RowId,
+                Name = cp.Name,
+                CompanyName = cp.CompanyName,
+                ShortId = cp.ShortId,
+                Description = cp.Description,
+                Type = cp.Type.ConvertEnum<DataContract.ContactType>(),
+                Categories = cp.Categories.Select(ca => ca.Convert()).ToList(),
+                PrimaryAddress = cp.PrimaryAddress.Convert(),
+                CommentsCount = cp.CommentsCount,
+            };
+        }
+
+        public static DataContract.CalendarAppointment Convert(this CalendarAppointment ca)
+        {
+            return new DataContract.CalendarAppointment
+            {
+                Id = ca.Id,
+                Guid = ca.Guid,
+                Subject = ca.Subject,
+                Location = ca.Location,
+                StartDate = ca.StartDate.ConvertToUTC(),
+                EndDate = ca.EndDate.ConvertToUTC(),
+                AllDay = ca.AllDay,
+                Private = ca.Private,
+                Category = ca.Category?.Convert(),
+                Status = ca.Status.ConvertEnum<DataContract.AppointmentStatus>(),
+                CreatorId = ca.CreatorId,
+                Creator = ca.Creator,
+                Priority = ca.Priority.ConvertEnum<DataContract.Priority>(),
+                Type = ca.Type.ConvertEnum<DataContract.CalendarOccurenceType>(),
+                ReminderDate = ca.ReminderDate.ConvertToUTC(),
+                SnoozeDelay = ca.SnoozeDelay,
+                Resources = ca.Resources.Select(r => r.Convert()).ToList(),
+                Participants = ca.Participants.Select(p => p.Convert()).ToList(),
+            };
+        }
+
+        public static DataContract.CalendarTask Convert(this CalendarTask ca)
+        {
+            return new DataContract.CalendarTask
+            {
+                Id = ca.Id,
+                Guid = ca.Guid,
+                Subject = ca.Subject,
+                StartDate = ca.StartDate.ConvertToUTC(),
+                EndDate = ca.EndDate.ConvertToUTC(),
+                Private = ca.Private,
+                Status = ca.Status.ConvertEnum<DataContract.TaskStatus>(),
+                CreatorId = ca.CreatorId,
+                Creator = ca.Creator,
+                Priority = ca.Priority.ConvertEnum<DataContract.Priority>(),
+                Type = ca.Type.ConvertEnum<DataContract.CalendarOccurenceType>(),
+                ReminderDate = ca.ReminderDate.ConvertToUTC(),
+                SnoozeDelay = ca.SnoozeDelay,
+                PercentComplete = ca.PercentComplete,
+                ObjectId = ca.LinkedObjectId,
+                ObjectType = ca.LinkedObjectType.ConvertEnum<DataContract.ObjectType>(),
+                DelegatorId = ca.DelegatorId,
+                Delegator = ca.Delegator,
+                DelegationStatus = ca.DelegationStatus.ConvertEnum<DataContract.DelegationStatus>(),
+                UserIds = ca.UserIds,
+                Users = ca.Users,
+                DepartmentIds = ca.DepartmentIds,
+                Departments = ca.Departments,
+            };
+        }
+
+        public static DataContract.CalendarResource Convert(this CalendarResource cr)
+        {
+            return new DataContract.CalendarResource
+            {
+                ColorHex = cr.ColorHex,
+                Guid = cr.Guid,
+                Id = cr.Id,
+                Name = cr.Name,
+                Shared = cr.Shared
+            };
+        }
+
+        public static DataContract.Participant Convert(this Participant p)
+        {
+            return new DataContract.Participant
+            {
+                Id = p.Id,
+                Presence = p.Presence.ConvertEnum<DataContract.ParticipantPresenence>(),
+                Type = p.Type.ConvertEnum<DataContract.ParticipantType>(),
+                Status = p.Status.ConvertEnum<DataContract.ParticipantStatus>(),
+                CN = p.CN,
+                Customer = p.Customer,
+                Note = p.Note,
+            };
+        }
+
+        public static DataContract.CommunicationAddress Convert(this CommunicationAddress ca)
+        {
+            return new DataContract.CommunicationAddress
+            {
+                Type = ca.Type.ConvertEnum<DataContract.CommunicationAddressType>(),
+                Description = ca.Description,
+                Address = ca.Address,
+                IsPrimary = ca.IsPrimary,
+            };
+        }
+
+        public static DataContract.PhysicalAddress Convert(this PhysicalAddress pa)
+        {
+            return new DataContract.PhysicalAddress
+            {
+                Type = pa.Type.Convert(),
+                Country = pa.Country.Convert(),
+                Street = pa.Street,
+                ZipCode = pa.ZipCode,
+                Area = pa.Area,
+                City = pa.City,
+            };
+        }
+
+        public static DataContract.PhysicalAddressType Convert(this PhysicalAddressType pat)
+        {
+            return new DataContract.PhysicalAddressType
+            {
+                Id = pat.Id,
+                Name = pat.Name,
+                Description = pat.Description,
+            };
+        }
+
+        public static DataContract.CountryInfo Convert(this CountryInfo ci)
+        {
+            return new DataContract.CountryInfo
+            {
+                Id = ci.Id,
+                FaxPrefix = ci.FaxPrefix,
+                TelexPrefix = ci.TelexPrefix,
+                CCode = ci.CCode,
+                CCode3 = ci.CCode3,
+                Name = ci.Name,
+            };
+        }
+
+        public static DataContract.Comment Convert(this Comment c)
+        {
+            return new DataContract.Comment
+            {
+                Id = c.Id,
+                Guid = c.Guid,
+                Content = c.Content,
+                DateAdded = c.DateAdded.ConvertToUTC(),
+                ParentId = c.ParentId,
+                ParentTypeId = c.ParentTypeId,
+                UserId = c.UserId,
+                UserName = c.UserName
+            };
+        }
+
+        public static DataContract.Line Convert(this Line line)
+        {
+            return new DataContract.Line
+            {
+                Guid = line.Guid,
+                Name = line.Name,
+                FromAddress = line.FromAddress,
+            };
+        }
+
+        public static DataContract.AttachmentDescription Convert(this AttachmentDescription ad)
+        {
+            return new DataContract.AttachmentDescription
+            {
+                Id = ad.Id,
+                Name = ad.Name,
+                SizeInBytes = ad.SizeInBytes
+            };
+        }
+
+        public static DataContract.CalendarCategory Convert(this CalendarCategory cc)
+        {
+            return new DataContract.CalendarCategory
+            {
+                Id = cc.Id,
+                Guid = cc.Guid,
+                Name = cc.Name,
+                Description = cc.Description,
+                ColorHex = cc.ColorHex,
+                Type = cc.Type.ConvertEnum<DataContract.CalendarCategoryType>(),
+                SubType = cc.SubType.ConvertEnum<DataContract.CalendarCategorySubType>()
+            };
+        }
+
+        public static DataContract.DocumentAddress Convert(this DocumentAddress da)
+        {
+            return new DataContract.DocumentAddress
+            {
+                Name = da.Name,
+                Type = da.Type.ConvertEnum<DataContract.CommunicationAddressType>(),
+                AddressType = da.AddressType.ConvertEnum<DataContract.DocumentAddressType>(),
+                Address = da.Address,
+                FullAddress = da.FullAddress,
+            };
+        }
+
+        public static DataContract.DocumentExtraFieldInfo Convert(this DocumentExtraFieldInfo defi)
+        {
+            return new DataContract.DocumentExtraFieldInfo
+            {
+                Id = defi.Id,
+                Name = defi.Name
+            };
+        }
+
         #endregion
+
+        public static DateTime ConvertToUTC(this DateTime dt)
+        {
+            if (dt.Kind == DateTimeKind.Unspecified)
+            {
+                return DateTime.SpecifyKind(dt, DateTimeKind.Utc);
+            }
+            if (dt.Kind == DateTimeKind.Local)
+            {
+                return dt.ToUniversalTime();
+            }
+
+            return dt;
+        }
 
     }
 }
