@@ -48,7 +48,7 @@ namespace Playground.Droid
                 }
             });
 
-            SetContentView(Resource.Layout.Main);
+            SetContentView(Resource.Layout.AltMain);
 
             var button = FindViewById<Button>(Resource.Id.myButton);
 
