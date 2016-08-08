@@ -20,6 +20,8 @@ namespace Mark5.Mobile.Common
 
         public static IFolder DatabaseFolder { get; set; }
 
+        public static IFolder AttachmentsFolder { get; set; }
+
         public static IReachabilityService ReachabilityService { get; set; }
     }
 }

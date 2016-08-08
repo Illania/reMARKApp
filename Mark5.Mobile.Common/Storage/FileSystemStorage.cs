@@ -7,6 +7,7 @@
 //
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
@@ -123,6 +124,32 @@ namespace Mark5.Mobile.Common.Storage
             await SaveAsync(notificationSettings, Filenames.NotificationSettings, ct);
         }
 
+        #region Attachments
+
+        public static async Task SaveAttachmentAsync(AttachmentDescription attachmentDescription, Stream attachmentStream, CancellationToken ct = default(CancellationToken))
+        {
+            var filename = $"{attachmentDescription.Id}_{attachmentDescription.Name}";
+
+            var fileExists = await CommonConfig.AttachmentsFolder.CheckExistsAsync(filename);
+            if (fileExists == ExistenceCheckResult.FileExists)
+            {
+                return; //TODO check logic
+            }
+
+            var file = await CommonConfig.AttachmentsFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting, ct);
+            using (var fileStream = await file.OpenAsync(FileAccess.ReadAndWrite))
+            {
+                await attachmentStream.CopyToAsync(fileStream);
+            }
+        }
+
+        public static async Task GetAttachmentsAsync(AttachmentDescription attachmentDescription, CancellationToken ct = default(CancellationToken))
+        {
+            //TODO What we return here? Probably it depends on the platform
+        }
+
+        #endregion
+
         #endregion
 
         #region Private methods
@@ -160,7 +187,7 @@ namespace Mark5.Mobile.Common.Storage
                 await semaphores[filename].WaitAsync();
 
                 var fileExists = await CommonConfig.DataFolder.CheckExistsAsync(filename, ct);
-                if (fileExists == ExistenceCheckResult.FileExists)
+                if (fileExists != ExistenceCheckResult.FileExists)
                 {
                     await CommonConfig.DataFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting, ct);
                 }
