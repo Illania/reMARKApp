@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -126,26 +127,44 @@ namespace Mark5.Mobile.Common.Storage
 
         #region Attachments
 
-        public static async Task SaveAttachmentAsync(AttachmentDescription attachmentDescription, Stream attachmentStream, CancellationToken ct = default(CancellationToken))
+        public static async Task<string> SaveAttachmentAsync(AttachmentDescription attachmentDescription, Stream attachmentStream, CancellationToken ct = default(CancellationToken))
         {
-            var filename = $"{attachmentDescription.Id}_{attachmentDescription.Name}";
-
-            var fileExists = await CommonConfig.AttachmentsFolder.CheckExistsAsync(filename);
-            if (fileExists == ExistenceCheckResult.FileExists)
+            var path = await CheckAttachmentsExistsAsync(attachmentDescription);
+            if (!string.IsNullOrEmpty(path))
             {
-                return; //TODO check logic
+                return path;
             }
 
-            var file = await CommonConfig.AttachmentsFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting, ct);
+            var file = await CommonConfig.AttachmentsFolder.CreateFileAsync(GetAttachmentFilename(attachmentDescription), CreationCollisionOption.ReplaceExisting, ct);
             using (var fileStream = await file.OpenAsync(FileAccess.ReadAndWrite))
             {
                 await attachmentStream.CopyToAsync(fileStream);
             }
+
+            return file.Path;
+        }
+
+        public static async Task<string> CheckAttachmentsExistsAsync(AttachmentDescription attachmentDescription)
+        {
+            var filename = GetAttachmentFilename(attachmentDescription);
+
+            var fileExists = await CommonConfig.AttachmentsFolder.CheckExistsAsync(filename);
+            if (fileExists == ExistenceCheckResult.FileExists)
+            {
+                return PortablePath.Combine(CommonConfig.AttachmentsFolder.Path, filename);
+            }
+
+            return string.Empty;
         }
 
         public static async Task GetAttachmentsAsync(AttachmentDescription attachmentDescription, CancellationToken ct = default(CancellationToken))
         {
             //TODO What we return here? Probably it depends on the platform
+        }
+
+        static string GetAttachmentFilename(AttachmentDescription attachmentDescription)
+        {
+            return $"{attachmentDescription.Id}_{attachmentDescription.Name}";
         }
 
         #endregion

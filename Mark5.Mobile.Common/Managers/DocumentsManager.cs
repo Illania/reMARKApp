@@ -13,6 +13,7 @@ using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Converters;
+using Mark5.Mobile.Common.Storage;
 using Mark5.ServiceReference.AppService;
 using Mark5.ServiceReference.FileTransferService;
 using DataContract = Mark5.ServiceReference.DataContract;
@@ -405,7 +406,7 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<Attachment> GetAttachmentAsync(AttachmentDescription attachmentDescription, Document document, Folder folder, SourceType sourceType = SourceType.Auto)
+        public async Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, Document document, Folder folder, bool checkMD5 = false, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
@@ -417,19 +418,14 @@ namespace Mark5.Mobile.Common.Managers
                     DocumentId = document.Id,
                 });
 
-                return new Attachment
-                {
-                    Filename = result.Filename,
-                    Size = result.Size,
-                    Stream = result.Stream,
-                    Extension = result.Extension,
-                    Md5 = result.Md5,
-                };
+                var path = await FileSystemStorage.SaveAttachmentAsync(attachmentDescription, result.Stream);
+                return path;
             }
 
             if (sourceType == SourceType.Local)
             {
-                //TODO implement retrieval from file system
+                var path = await FileSystemStorage.CheckAttachmentsExistsAsync(attachmentDescription);
+                return path;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");

@@ -49,7 +49,7 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<Version> GetServiceVersionAsync(SourceType sourceType = SourceType.Auto);
 
-        Task<Attachment> GetAttachmentAsync(AttachmentDescription attachmentDescription, Document document, Folder folder, SourceType sourceType = SourceType.Auto);
+        Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, Document document, Folder folder, bool checkMD5 = false, SourceType sourceType = SourceType.Auto);
 
         Task<Guid> UploadTemporaryAttachmentAsync(Attachment attachment, SourceType sourceType = SourceType.Auto);
 
