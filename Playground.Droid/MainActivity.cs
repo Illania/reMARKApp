@@ -88,13 +88,13 @@ namespace Playground.Droid
                     {
                         Id = -10,
                     };
-                    var document = await Managers.DocumentsManager.GetDocumentAsync(folder, 1925, DocumentBodyTypeRequest.None);
+                    var document = await Managers.DocumentsManager.GetDocumentAsync(folder, 2537, DocumentBodyTypeRequest.None);
 
                     var attachmentDescription = document.Attachments[0];
 
                     var result5 = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, folder, false);
 
-
+                    textView.Text = result5;
                 }
                 catch (AppServiceException ex)
                 {
@@ -105,6 +105,7 @@ namespace Playground.Droid
                 {
                     Log.Info("M5", ex.ToString());
                     textView.Text = ex.ToString();
+                    throw;
                 }
 
                 button.Enabled = true;
