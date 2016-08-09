@@ -12,8 +12,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Flurl;
-using Flurl.Http;
 using Mark5.ServiceReference.DataContract;
 using Mark5.ServiceReference.Exceptions;
 using Newtonsoft.Json;
@@ -42,14 +40,6 @@ namespace Mark5.ServiceReference.FileTransferService
 
         readonly string endpointUrl;
 
-        static FileTransferServiceProxy()
-        {
-            FlurlHttp.Configure(c =>
-           {
-               c.DefaultTimeout = new TimeSpan(0, 0, 15);
-           });
-        }
-
         public FileTransferServiceProxy(bool ssl, string hostname, int port)
         {
             endpointUrl = $"{(ssl ? "https" : "http")}://{hostname}:{port}/fts3";
@@ -59,15 +49,20 @@ namespace Mark5.ServiceReference.FileTransferService
         {
             try
             {
-                var result = await endpointUrl
-                    .AppendPathSegment(Segments.Version)
-                    .WithHeader(Headers.Token, req.Token)
-                    .GetJsonAsync<Version>(ct);
-
-                return new GetServiceVersionResponse
+                using (var client = new HttpClient())
                 {
-                    Version = result
-                };
+                    var uri = (new Uri(endpointUrl)).AppendPathSegment(Segments.Version);
+                    var request = new HttpRequestMessage(HttpMethod.Get, uri);
+                    request.Headers.Add(Headers.Token, req.Token);
+                    var res = await client.SendAsync(request, ct);
+                    var version = JsonConvert.DeserializeObject<Version>(await res.Content.ReadAsStringAsync());
+
+                    return new GetServiceVersionResponse
+                    {
+                        Version = version
+                    };
+                }
+
             }
             catch (OperationCanceledException)
             {
@@ -77,43 +72,51 @@ namespace Mark5.ServiceReference.FileTransferService
             {
                 throw new FileTransferServiceException(ex);
             }
+
         }
 
-        public async Task<GetAttachmentResponse> GetAttachmentAsync(GetAttachmentRequest req, CancellationToken ct = default(CancellationToken))
+        public async Task<GetAttachmentResponse> GetAttachmentAsync(GetAttachmentRequest req, Func<Stream, Task> saveHandler, CancellationToken ct = default(CancellationToken))
         {
             try
             {
-                var res = await endpointUrl
-                    .AppendPathSegment(Segments.Attachment)
-                    .AppendPathSegment(req.Id)
-                    .SetQueryParam("folderId", req.FolderId).SetQueryParam("documentId", req.DocumentId)
-                    .WithHeader(Headers.Token, req.Token)
-                    .GetAsync(ct);
-
-                var result = new GetAttachmentResponse();
-
-                IEnumerable<string> headers;
-
-                if (res.Headers.TryGetValues(Headers.Filename, out headers))
+                using (var client = new HttpClient())
                 {
-                    result.Filename = headers.FirstOrDefault();
-                }
-                if (res.Headers.TryGetValues(Headers.Extension, out headers))
-                {
-                    result.Extension = headers.FirstOrDefault();
-                }
-                if (res.Headers.TryGetValues(Headers.ContentLength, out headers))
-                {
-                    result.Size = Convert.ToInt32(headers.FirstOrDefault() ?? "- 1");
-                }
-                if (res.Headers.TryGetValues(Headers.Md5, out headers))
-                {
-                    result.Md5 = headers.FirstOrDefault();
+                    var uri = (new Uri(endpointUrl)).AppendPathSegment(Segments.Attachment)
+                                    .AppendPathSegment(req.Id)
+                                    .SetQueryParam("folderId", req.FolderId)
+                                    .SetQueryParam("documentId", req.DocumentId);
+                    var request = new HttpRequestMessage(HttpMethod.Get, uri);
+                    request.Headers.Add(Headers.Token, req.Token);
+                    var res = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
+
+                    var result = new GetAttachmentResponse();
+
+                    IEnumerable<string> headers;
+
+                    if (res.Headers.TryGetValues(Headers.Filename, out headers))
+                    {
+                        result.Filename = headers.FirstOrDefault();
+                    }
+                    if (res.Headers.TryGetValues(Headers.Extension, out headers))
+                    {
+                        result.Extension = headers.FirstOrDefault();
+                    }
+                    if (res.Headers.TryGetValues(Headers.ContentLength, out headers))
+                    {
+                        result.Size = Convert.ToInt32(headers.FirstOrDefault() ?? "- 1");
+                    }
+                    if (res.Headers.TryGetValues(Headers.Md5, out headers))
+                    {
+                        result.Md5 = headers.FirstOrDefault();
+                    }
+
+                    using (var stream = await res.Content.ReadAsStreamAsync())
+                    {
+                        await saveHandler(stream);
+                    }
+                    return result;
                 }
 
-                result.Stream = await res.Content.ReadAsStreamAsync();
-
-                return result;
             }
             catch (OperationCanceledException)
             {
@@ -129,25 +132,32 @@ namespace Mark5.ServiceReference.FileTransferService
         {
             try
             {
-                req.Stream.Position = 0;
-                var res = await endpointUrl
-                    .AppendPathSegments(Segments.Temporary, Segments.Attachment)
-                    .WithHeader(Headers.Token, req.Token)
-                    .WithHeader(Headers.Filename, req.Filename)
-                    .WithHeader(Headers.Extension, req.Extension)
-                    .SendAsync(HttpMethod.Post, new StreamContent(req.Stream), ct).ConfigureAwait(false);
-
-                Guid guid;
-                using (var tr = new StreamReader(await res.Content.ReadAsStreamAsync()))
-                using (var jr = new JsonTextReader(tr))
+                using (var client = new HttpClient())
                 {
-                    guid = JsonSerializer.Create().Deserialize<Guid>(jr);
+                    req.Stream.Position = 0;
+
+                    var uri = (new Uri(endpointUrl)).AppendPathSegment(Segments.Temporary)
+                                                    .AppendPathSegment(Segments.Attachment);
+                    var request = new HttpRequestMessage(HttpMethod.Post, uri);
+                    request.Headers.Add(Headers.Token, req.Token);
+                    request.Headers.Add(Headers.Filename, req.Filename);
+                    request.Headers.Add(Headers.Extension, req.Extension);
+                    request.Content = new StreamContent(req.Stream);
+                    var res = await client.SendAsync(request, ct);
+
+                    Guid guid;
+                    using (var tr = new StreamReader(await res.Content.ReadAsStreamAsync()))
+                    using (var jr = new JsonTextReader(tr))
+                    {
+                        guid = JsonSerializer.Create().Deserialize<Guid>(jr);
+                    }
+
+                    return new UploadTemporaryAttachmentResponse
+                    {
+                        Guid = guid
+                    };
                 }
 
-                return new UploadTemporaryAttachmentResponse
-                {
-                    Guid = guid
-                };
             }
             catch (OperationCanceledException)
             {
@@ -159,5 +169,42 @@ namespace Mark5.ServiceReference.FileTransferService
             }
         }
     }
+
+    public static class UriExtensions
+    {
+        public static Uri AppendPathSegment(this Uri uri, object segment)
+        {
+            var builder = new UriBuilder(uri);
+
+            if (builder.Path != null && builder.Path.Length > 1)
+            {
+                builder.Path = builder.Path.Substring(1) + "/" + segment;
+            }
+            else
+            {
+                builder.Query = segment.ToString();
+            }
+
+            return builder.Uri;
+        }
+
+        public static Uri SetQueryParam(this Uri uri, string name, object value)
+        {
+            var builder = new UriBuilder(uri);
+            string queryToAppend = $"{name}={value}";
+
+            if (builder.Query != null && builder.Query.Length > 1)
+            {
+                builder.Query = builder.Query.Substring(1) + "&" + queryToAppend;
+            }
+            else
+            {
+                builder.Query = queryToAppend;
+            }
+
+            return builder.Uri;
+        }
+    }
 }
+
 

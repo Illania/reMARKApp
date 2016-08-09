@@ -7,6 +7,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
@@ -410,15 +411,15 @@ namespace Mark5.Mobile.Common.Managers
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
-                var result = await fileTransferServiceProxy.GetAttachmentAsync(new DataContract.GetAttachmentRequest
+                string path = string.Empty;
+                await fileTransferServiceProxy.GetAttachmentAsync(new DataContract.GetAttachmentRequest
                 {
                     Token = Token,
                     Id = attachmentDescription.Id,
                     FolderId = folder.Id,
                     DocumentId = document.Id,
-                });
+                }, async (Stream arg) => { path = await FileSystemStorage.SaveAttachmentAsync(attachmentDescription, arg); });
 
-                var path = await FileSystemStorage.SaveAttachmentAsync(attachmentDescription, result.Stream);
                 return path;
             }
 

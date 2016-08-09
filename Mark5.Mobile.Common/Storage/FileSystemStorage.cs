@@ -157,11 +157,6 @@ namespace Mark5.Mobile.Common.Storage
             return string.Empty;
         }
 
-        public static async Task GetAttachmentsAsync(AttachmentDescription attachmentDescription, CancellationToken ct = default(CancellationToken))
-        {
-            //TODO What we return here? Probably it depends on the platform
-        }
-
         static string GetAttachmentFilename(AttachmentDescription attachmentDescription)
         {
             return $"{attachmentDescription.Id}_{attachmentDescription.Name}";
