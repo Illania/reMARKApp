@@ -51,7 +51,7 @@ namespace Mark5.ServiceReference.FileTransferService
             {
                 using (var client = new HttpClient())
                 {
-                    var uri = (new Uri(endpointUrl)).AppendPathSegment(Segments.Version);
+                    var uri = (new Uri(endpointUrl)).AppendPathSegments(Segments.Version);
                     var request = new HttpRequestMessage(HttpMethod.Get, uri);
                     request.Headers.Add(Headers.Token, req.Token);
                     var res = await client.SendAsync(request, ct);
@@ -81,8 +81,7 @@ namespace Mark5.ServiceReference.FileTransferService
             {
                 using (var client = new HttpClient())
                 {
-                    var uri = (new Uri(endpointUrl)).AppendPathSegment(Segments.Attachment)
-                                    .AppendPathSegment(req.Id)
+                    var uri = (new Uri(endpointUrl)).AppendPathSegments(Segments.Attachment, req.Id)
                                     .SetQueryParam("folderId", req.FolderId)
                                     .SetQueryParam("documentId", req.DocumentId);
                     var request = new HttpRequestMessage(HttpMethod.Get, uri);
@@ -136,8 +135,7 @@ namespace Mark5.ServiceReference.FileTransferService
                 {
                     req.Stream.Position = 0;
 
-                    var uri = (new Uri(endpointUrl)).AppendPathSegment(Segments.Temporary)
-                                                    .AppendPathSegment(Segments.Attachment);
+                    var uri = (new Uri(endpointUrl)).AppendPathSegments(Segments.Temporary, Segments.Attachment);
                     var request = new HttpRequestMessage(HttpMethod.Post, uri);
                     request.Headers.Add(Headers.Token, req.Token);
                     request.Headers.Add(Headers.Filename, req.Filename);
@@ -172,7 +170,16 @@ namespace Mark5.ServiceReference.FileTransferService
 
     public static class UriExtensions
     {
-        public static Uri AppendPathSegment(this Uri uri, object segment)
+        public static Uri AppendPathSegments(this Uri uri, params object[] segments)
+        {
+            foreach (var segment in segments)
+            {
+                uri = uri.AppendPathSegment(segment);
+            }
+            return uri;
+        }
+
+        static Uri AppendPathSegment(this Uri uri, object segment)
         {
             var builder = new UriBuilder(uri);
 
