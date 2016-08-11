@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 
@@ -15,7 +16,7 @@ namespace Mark5.Mobile.Common.Managers
 
     public interface IContactsManager
     {
-        Task GetAllContactPreviewsAsync(Folder folder, Action<List<ContactPreview>> handler, SourceType sourceType = SourceType.Auto);
+        Task GetAllContactPreviewsAsync(Folder folder, Action<List<ContactPreview>> handler, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto);
 
         Task<List<ContactPreview>> GetContactPreviewsAsync(Folder folder, int startRowId = -1, int maxItems = 500, SourceType sourceType = SourceType.Auto);
 
