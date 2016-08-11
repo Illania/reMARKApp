@@ -153,6 +153,7 @@
     <Compile Include="Model\SearchCalendarTasksResult.cs" />
     <Compile Include="Model\SearchCalendarAppointmentsResult.cs" />
     <Compile Include="Model\Attachment.cs" />
+    <Compile Include="Extensions\SQLiteConnectionExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

@@ -38,8 +38,8 @@ namespace Mark5.Mobile.Common.DataAccess
                          .Delete(fdl => fdl.FolderId == folder.Id);
                     }
 
-                    c.InsertOrReplace(shortcodePreviews.Select(cp => new FolderShortcodeLink { FolderId = folder.Id, ShortcodeId = cp.Id }));
-                    c.InsertOrReplace(shortcodePreviews);
+                    c.InsertOrReplaceAll(shortcodePreviews.Select(cp => new FolderShortcodeLink { FolderId = folder.Id, ShortcodeId = cp.Id }));
+                    c.InsertOrReplaceAll(shortcodePreviews);
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))

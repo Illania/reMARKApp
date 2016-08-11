@@ -39,8 +39,8 @@ namespace Mark5.Mobile.Common.DataAccess
                          .Delete(fdl => fdl.FolderId == folder.Id);
                     }
 
-                    c.InsertOrReplace(contactPreviews.Select(cp => new FolderContactLink { FolderId = folder.Id, ContactId = cp.Id }));
-                    c.InsertOrReplace(contactPreviews);
+                    c.InsertOrReplaceAll(contactPreviews.Select(cp => new FolderContactLink { FolderId = folder.Id, ContactId = cp.Id }));
+                    c.InsertOrReplaceAll(contactPreviews);
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))

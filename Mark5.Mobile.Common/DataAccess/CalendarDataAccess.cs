@@ -201,8 +201,8 @@ namespace Mark5.Mobile.Common.DataAccess
                          .Delete(fdl => fdl.FolderId == folder.Id);
                     }
 
-                    c.InsertOrReplace(calendarAppointments.Select(ca => new FolderCalendarAppointmentLink { FolderId = folder.Id, CalendarAppointmentId = ca.Id }));
-                    c.InsertOrReplace(calendarAppointments);
+                    c.InsertOrReplaceAll(calendarAppointments.Select(ca => new FolderCalendarAppointmentLink { FolderId = folder.Id, CalendarAppointmentId = ca.Id }));
+                    c.InsertOrReplaceAll(calendarAppointments);
 
                 });
             }
@@ -224,8 +224,8 @@ namespace Mark5.Mobile.Common.DataAccess
                          .Delete(fdl => fdl.FolderId == folder.Id);
                     }
 
-                    c.InsertOrReplace(calendarTasks.Select(ct => new FolderCalendarTaskLink { FolderId = folder.Id, CalendarTaskId = ct.Id }));
-                    c.InsertOrReplace(calendarTasks);
+                    c.InsertOrReplaceAll(calendarTasks.Select(ct => new FolderCalendarTaskLink { FolderId = folder.Id, CalendarTaskId = ct.Id }));
+                    c.InsertOrReplaceAll(calendarTasks);
 
                 });
             }

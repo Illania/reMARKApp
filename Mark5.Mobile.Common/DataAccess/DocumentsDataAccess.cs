@@ -39,8 +39,8 @@ namespace Mark5.Mobile.Common.DataAccess
                          .Delete(fdl => fdl.FolderId == folder.Id);
                     }
 
-                    c.InsertOrReplace(documentPreviews.Select(dp => new FolderDocumentLink { FolderId = folder.Id, DocumentId = dp.Id }));
-                    c.InsertOrReplace(documentPreviews);
+                    c.InsertOrReplaceAll(documentPreviews.Select(dp => new FolderDocumentLink { FolderId = folder.Id, DocumentId = dp.Id }));
+                    c.InsertOrReplaceAll(documentPreviews);
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
