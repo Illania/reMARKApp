@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Common.Managers
 
     class ContactsManager : AbstractManager, IContactsManager
     {
-        const int NumberOfContactsToFetch = 10;
+        const int NumberOfContactsToFetchPerCall = 10;
 
         readonly IContactsDataAccess contactsDataAccess;
 
@@ -45,7 +45,7 @@ namespace Mark5.Mobile.Common.Managers
 
                 var contactPreviews = result.ContactPreviews.WhereNotNull().OrderBy(cp => cp.RowId).Select(cp => cp.Convert()).ToList();
 
-                await contactsDataAccess.SaveContactPreviewsAsync(folder, contactPreviews, startRowId == -1);
+                await contactsDataAccess.SaveContactPreviewsAsync(folder, contactPreviews, startRowId <= 0);
 
                 return contactPreviews;
             }
@@ -64,11 +64,11 @@ namespace Mark5.Mobile.Common.Managers
             var stopLoop = false;
             do
             {
-                var previews = await GetContactPreviewsAsync(folder, startId, NumberOfContactsToFetch, sourceType);
+                var previews = await GetContactPreviewsAsync(folder, startId, NumberOfContactsToFetchPerCall, sourceType);
                 handler(previews);
 
-                startId += NumberOfContactsToFetch;
-                stopLoop = previews.Count < NumberOfContactsToFetch;
+                startId += NumberOfContactsToFetchPerCall;
+                stopLoop = previews.Count < NumberOfContactsToFetchPerCall;
 
             } while (!stopLoop);
         }
