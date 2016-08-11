@@ -21,6 +21,7 @@ namespace Mark5.Mobile.Common.Managers
 
     class ContactsManager : AbstractManager, IContactsManager
     {
+        const int NumberOfContactsToFetch = 10;
 
         readonly IContactsDataAccess contactsDataAccess;
 
@@ -55,6 +56,21 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task GetAllContactPreviewsAsync(Folder folder, Action<List<ContactPreview>> handler, SourceType sourceType = SourceType.Auto)
+        {
+            var startId = 0;
+            var stopLoop = false;
+            do
+            {
+                var previews = await GetContactPreviewsAsync(folder, startId, NumberOfContactsToFetch, sourceType);
+                handler(previews);
+
+                startId += NumberOfContactsToFetch;
+                stopLoop = previews.Count < NumberOfContactsToFetch;
+
+            } while (!stopLoop);
         }
 
         public async Task<Contact> GetContactAsync(Folder folder, int contactId, SourceType sourceType = SourceType.Auto)
