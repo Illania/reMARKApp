@@ -36,7 +36,7 @@ namespace Mark5.Mobile.Common.Database
                 c.CreateTable<Contact>();
                 c.CreateTable<Category>();
             });
-            await DatabaseConnectionProvider.ShortcodesDatabase.RunInConnectionAsync(c =>
+            await DatabaseConnectionProvider.ShortcodesDatabase.RunInConnectionAsync(c => //TODO initialize common database (notification)
             {
                 c.CreateTable<Folder>();
                 c.CreateTable<FolderShortcodeLink>();
