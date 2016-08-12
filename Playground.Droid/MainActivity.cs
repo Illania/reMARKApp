@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ namespace Playground.Droid
     [Activity(Label = "Playground.Droid", MainLauncher = true, Icon = "@mipmap/icon")]
     public class MainActivity : Activity
     {
-
+        TextView textView;
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -60,7 +61,7 @@ namespace Playground.Droid
             SetContentView(Resource.Layout.AltMain);
 
             var button = FindViewById<Button>(Resource.Id.myButton);
-            var textView = FindViewById<TextView>(Resource.Id.myTextView);
+            textView = FindViewById<TextView>(Resource.Id.myTextView);
 
             button.Click += async (sender, e) =>
             {
@@ -88,17 +89,14 @@ namespace Playground.Droid
                     {
                         Id = -10,
                     };
-                    var document = await Managers.DocumentsManager.GetDocumentAsync(folder, 2537, DocumentBodyTypeRequest.None);
 
-                    var attachmentDescription = document.Attachments[0];
+                    await Managers.ContactsManager.GetAllContactPreviewsAsync(folder, Handler);
 
-                    var result5 = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, folder, false);
-
-                    textView.Text = result5;
                 }
                 catch (AppServiceException ex)
                 {
                     var text = ex.Message + "   " + ex.Detail?.Code + "   " + ex.Detail?.DiagnosticInformation;
+                    textView.Text = "APP SERVICE EXCEPTION: " + ex;
                     Log.Info("M5", text);
                 }
                 catch (Exception ex)
@@ -110,6 +108,18 @@ namespace Playground.Droid
 
                 button.Enabled = true;
             };
+        }
+
+        void Handler(List<ContactPreview> contactPreviews)
+        {
+            RunOnUiThread(() =>
+            {
+                foreach (var item in contactPreviews)
+                {
+                    textView.Text += $"{System.Environment.NewLine}{item.Name}";
+                }
+                textView.Text += $"{System.Environment.NewLine}";
+            });
         }
     }
 }

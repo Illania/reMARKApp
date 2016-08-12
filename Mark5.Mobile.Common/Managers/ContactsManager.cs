@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Extensions;
@@ -21,6 +22,7 @@ namespace Mark5.Mobile.Common.Managers
 
     class ContactsManager : AbstractManager, IContactsManager
     {
+        const int NumberOfContactsToFetchPerCall = 250;
 
         readonly IContactsDataAccess contactsDataAccess;
 
@@ -44,7 +46,7 @@ namespace Mark5.Mobile.Common.Managers
 
                 var contactPreviews = result.ContactPreviews.WhereNotNull().OrderBy(cp => cp.RowId).Select(cp => cp.Convert()).ToList();
 
-                await contactsDataAccess.SaveContactPreviewsAsync(folder, contactPreviews, startRowId == -1);
+                await contactsDataAccess.SaveContactPreviewsAsync(folder, contactPreviews, startRowId <= 0);
 
                 return contactPreviews;
             }
@@ -55,6 +57,21 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task GetAllContactPreviewsAsync(Folder folder, Action<List<ContactPreview>> handler, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
+        {
+            var startId = 0;
+            var stopLoop = false;
+
+            while (!stopLoop && !ct.IsCancellationRequested)
+            {
+                var previews = await GetContactPreviewsAsync(folder, startId, NumberOfContactsToFetchPerCall, sourceType);
+                handler(previews);
+
+                startId += NumberOfContactsToFetchPerCall;
+                stopLoop = previews.Count < NumberOfContactsToFetchPerCall;
+            }
         }
 
         public async Task<Contact> GetContactAsync(Folder folder, int contactId, SourceType sourceType = SourceType.Auto)
