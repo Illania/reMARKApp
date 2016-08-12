@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Extensions;
@@ -21,7 +22,7 @@ namespace Mark5.Mobile.Common.Managers
 
     class ShortcodesManager : AbstractManager, IShortcodesManager
     {
-
+        const int NumbeOfShortcodesToFetchPerCall = 250;
         readonly IShortcodesDataAccess shortcodesDataAccess;
 
         public ShortcodesManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy, IShortcodesDataAccess shortcodesDataAccess)
@@ -55,6 +56,21 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task GetAllShortcodePreviewsAsync(Folder folder, Action<List<ShortcodePreview>> handler, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
+        {
+            var startId = 0;
+            var stopLoop = false;
+
+            while (!stopLoop && !ct.IsCancellationRequested)
+            {
+                var previews = await GetShortcodePreviewsAsync(folder, startId, NumbeOfShortcodesToFetchPerCall, sourceType);
+                handler(previews);
+
+                startId += NumbeOfShortcodesToFetchPerCall;
+                stopLoop = previews.Count < NumbeOfShortcodesToFetchPerCall;
+            }
         }
 
         public async Task<Shortcode> GetShortcodeAsync(Folder folder, int shortcodeId, SourceType sourceType = SourceType.Auto)
