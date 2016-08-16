@@ -22,6 +22,8 @@ namespace Mark5.Mobile.Common
 
         public static IFolder AttachmentsFolder { get; set; }
 
+        public static IFolder OutgoingFolder { get; set; }
+
         public static IReachabilityService ReachabilityService { get; set; }
     }
 }

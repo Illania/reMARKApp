@@ -11,6 +11,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using PCLStorage;
@@ -29,6 +30,12 @@ namespace Mark5.Mobile.Common.Storage
             public const string SystemUserDepartments = "systemUserDepartments.json";
             public const string FavoriteFolders = "favoriteFolders.json";
             public const string NotificationSettings = "notificationSettings.json";
+
+            public const string OutgoingDocument = "document.json";
+            public const string OutgoingDocumentPreview = "documentPreview.json";
+            public const string OutgoingInfo = "info.json";
+            public const string OugoingLock = ".lock";
+            public const string OutgoingFailed = ".failed";
         }
 
         static readonly IDictionary<string, SemaphoreSlim> semaphores = new Dictionary<string, SemaphoreSlim>
@@ -124,6 +131,63 @@ namespace Mark5.Mobile.Common.Storage
         {
             await SaveAsync(notificationSettings, Filenames.NotificationSettings, ct);
         }
+
+        #region OutgoingDocuments
+
+        public static async Task SaveOutgoingDocumentAsync(OutgoingDocumentInfo outgoingDocumentInfo, Document document, DocumentPreview documentPreview)
+        {
+            var outgoingDocumentFolder = await GetOutgoingFolder(outgoingDocumentInfo.Identifier.ToString());
+
+            var documentFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingDocument, CreationCollisionOption.ReplaceExisting);
+            await documentFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(document));
+
+            var documentPreviewFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingDocumentPreview, CreationCollisionOption.ReplaceExisting);
+            await documentPreviewFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(documentPreview));
+            //TODO need to put those names in constants
+            var infoFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingInfo, CreationCollisionOption.ReplaceExisting);
+            await infoFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(outgoingDocumentInfo));
+        }
+
+        public static async Task<IEnumerable<OutgoingDocumentContainer>> GetAvailableOutgoingDocumentContainers()
+        {
+            var folders = await CommonConfig.OutgoingFolder.GetFoldersAsync();
+            var containers = new List<OutgoingDocumentContainer>();
+            foreach (var folder in folders)
+            {
+                var isLocked = (await folder.CheckExistsAsync(Filenames.OugoingLock)) == ExistenceCheckResult.FileExists;
+                var isFailed = (await folder.CheckExistsAsync(Filenames.OutgoingFailed)) == ExistenceCheckResult.FileExists;
+                var isReady = (await folder.CheckExistsAsync(Filenames.OutgoingInfo)) == ExistenceCheckResult.FileExists;
+                if (isReady && !isLocked && !isFailed)
+                {
+                    var documentFile = await folder.GetFileAsync(Filenames.OutgoingDocument);
+                    var document = await SerializationUtils.DeserializeAsync<Document>(await documentFile.ReadAllTextAsync());
+
+                    var documentPreviewFile = await folder.GetFileAsync(Filenames.OutgoingDocumentPreview);
+                    var documentPreview = await SerializationUtils.DeserializeAsync<DocumentPreview>(await documentPreviewFile.ReadAllTextAsync());
+
+                    var infoFile = await folder.GetFileAsync(Filenames.OutgoingInfo);
+                    var info = await SerializationUtils.DeserializeAsync<OutgoingDocumentInfo>(await infoFile.ReadAllTextAsync());
+
+                    var container = new OutgoingDocumentContainer
+                    {
+                        Document = document,
+                        DocumentPreview = documentPreview,
+                        Info = info,
+                    };
+
+                    containers.Add(container);
+                }
+            }
+
+            return containers;
+        }
+
+        static async Task<IFolder> GetOutgoingFolder(string identifier)
+        {
+            return await CommonConfig.OutgoingFolder.CreateFolderAsync(identifier, CreationCollisionOption.OpenIfExists);
+        }
+
+        #endregion
 
         #region Attachments
 
