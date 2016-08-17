@@ -53,6 +53,8 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<Guid> UploadTemporaryAttachmentAsync(Attachment attachment, SourceType sourceType = SourceType.Auto);
 
+        event EventHandler SavedDocumentsForSending;
+
     }
 }
 

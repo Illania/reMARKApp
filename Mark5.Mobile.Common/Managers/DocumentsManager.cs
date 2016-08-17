@@ -28,6 +28,8 @@ namespace Mark5.Mobile.Common.Managers
         readonly IFileTransferServiceProxy fileTransferServiceProxy;
         readonly IDocumentsDataAccess documentsDataAccess;
 
+        public event EventHandler SavedDocumentsForSending = delegate { };
+
         public DocumentsManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy, IFileTransferServiceProxy fileTransferServiceProxy, IDocumentsDataAccess documentsDataAccess)
             : base(connectionInfo, appServiceProxy)
         {
@@ -124,7 +126,6 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided");
         }
 
-        //TODO to finish
         public async Task InserDocumentInOutgoingAsync(Guid guid, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
                                                        DateTime sendOn, bool confirmRead, bool confirmDelivery, SourceType sourceType = SourceType.Auto)
         {
@@ -140,7 +141,7 @@ namespace Mark5.Mobile.Common.Managers
             };
 
             await FileSystemStorage.SaveOutgoingDocumentAsync(outgoingDocumentInfo, document, documentPreview);
-            OutgoingDocumentsManager.SharedInstance.DocumentsArrived();
+            SavedDocumentsForSending(this, EventArgs.Empty);
         }
 
         public async Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Storage;
 
 namespace Mark5.Mobile.Common
 {
@@ -13,6 +14,9 @@ namespace Mark5.Mobile.Common
         bool initialized;
         CancellationTokenSource cts;
         Task sendTask;
+
+        public event EventHandler<OutgoingDocumentContainer> DocumentSendingSuccessful = delegate { };
+        public event EventHandler<OutgoingDocumentContainer> DocumentSendingFailed = delegate { };
 
         public static OutgoingDocumentsManager SharedInstance
         {
@@ -44,12 +48,16 @@ namespace Mark5.Mobile.Common
         {
         }
 
-        public void DocumentsArrived()
+        async void DocumentsManager_SavedDocumentForSending(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            await RetrieveOutgoingFromStorage();
         }
 
-        //TODO I'm also considering that the unlocking of a document will be notified to the queue, so we can just skip a file if needed
+        async Task RetrieveOutgoingFromStorage()
+        {
+            var containers = await FileSystemStorage.GetAvailableOutgoingDocumentContainersAsync();
+            AddToQueue(containers);
+        }
 
         void AddToQueue(OutgoingDocumentContainer container)
         {
@@ -64,19 +72,24 @@ namespace Mark5.Mobile.Common
             }
         }
 
-        public void Initialize()
+        public async Task Initialize()
         {
-            //Need to recover things from filesystem, and put in the queue
-            //Need to hook up on reachability change events
+            // TODO Need to hook up on reachability change events
+
+            await RetrieveOutgoingFromStorage();
+
+            Managers.Managers.DocumentsManager.SavedDocumentsForSending += DocumentsManager_SavedDocumentForSending;  //TODO when do we unsubscribe?
+            //Should this be notified by the document manager or the storage?
+            //The same thing for the unlocked
 
             initialized = true;
         }
 
-        public void Start()
+        public async Task Start()
         {
             if (!initialized)
             {
-                Initialize();
+                await Initialize();
             }
 
             if (sendTask != null)
@@ -88,12 +101,14 @@ namespace Mark5.Mobile.Common
 
             sendTask = Task.Run(async () => await SendAction()).ContinueWith((t) =>
             {
+                sendTask = null;
+
                 if (t.IsFaulted)
                 {
                     //TODO need to log the exception
+                    //and call Start again?
                 }
 
-                sendTask = null;
             });
         }
 
@@ -115,12 +130,42 @@ namespace Mark5.Mobile.Common
                 OutgoingDocumentContainer container;
                 queue.TryTake(out container, -1, cts.Token);
 
-                //DO something with files
+                var document = container.Document;
+                var documentPreview = container.DocumentPreview;
+                var info = container.Info;
 
-                //If successful, need to delete document folder
-                //If not, need to save the "failed" status (probably we need to save the exception or something)
+                if (await FileSystemStorage.IsOutgoingDocumentLocked(info.Identifier))
+                {
+                    continue;
+                }
 
-                //Send notification that a certain document was sent
+                bool sendSuccessful = false;
+                try
+                {
+                    var attachmentGuids = new List<Guid>();
+                    foreach (var attachmentDescription in document.Attachments)
+                    {
+                        var attachment = await FileSystemStorage.GetOutgoingDocumentAttachmentAsync(info.Identifier, attachmentDescription);
+                        var attachmentGuid = await Managers.Managers.DocumentsManager.UploadTemporaryAttachmentAsync(attachment);
+                        attachmentGuids.Add(attachmentGuid);
+                    }
+
+                    await Managers.Managers.DocumentsManager.SendDocumentAsync(document, documentPreview, info.Flag, info.PrecedingDocumentId, info.PrecedingDocumentFolderId, info.SendOn,
+                                                                               info.ConfirmRead, info.ConfirmDelivery, attachmentGuids);
+
+                    sendSuccessful = true;
+                }
+                catch (Exception ex)
+                {
+                    await FileSystemStorage.SetOutgoingDocumentToFailedAsync(info.Identifier, ex);
+                    DocumentSendingFailed(this, container);
+                }
+
+                if (sendSuccessful)
+                {
+                    await FileSystemStorage.DeleteOutgoingDocumentFolderAsync(info.Identifier);
+                    DocumentSendingSuccessful(this, container);
+                }
 
 
             }

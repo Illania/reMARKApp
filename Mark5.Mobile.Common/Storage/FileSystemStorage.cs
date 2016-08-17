@@ -11,7 +11,6 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using PCLStorage;
@@ -136,19 +135,19 @@ namespace Mark5.Mobile.Common.Storage
 
         public static async Task SaveOutgoingDocumentAsync(OutgoingDocumentInfo outgoingDocumentInfo, Document document, DocumentPreview documentPreview)
         {
-            var outgoingDocumentFolder = await GetOutgoingFolder(outgoingDocumentInfo.Identifier.ToString());
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(outgoingDocumentInfo.Identifier);
 
             var documentFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingDocument, CreationCollisionOption.ReplaceExisting);
             await documentFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(document));
 
             var documentPreviewFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingDocumentPreview, CreationCollisionOption.ReplaceExisting);
             await documentPreviewFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(documentPreview));
-            //TODO need to put those names in constants
+
             var infoFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingInfo, CreationCollisionOption.ReplaceExisting);
             await infoFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(outgoingDocumentInfo));
         }
 
-        public static async Task<IEnumerable<OutgoingDocumentContainer>> GetAvailableOutgoingDocumentContainers()
+        public static async Task<IEnumerable<OutgoingDocumentContainer>> GetAvailableOutgoingDocumentContainersAsync()
         {
             var folders = await CommonConfig.OutgoingFolder.GetFoldersAsync();
             var containers = new List<OutgoingDocumentContainer>();
@@ -182,9 +181,61 @@ namespace Mark5.Mobile.Common.Storage
             return containers;
         }
 
-        static async Task<IFolder> GetOutgoingFolder(string identifier)
+        static async Task<IFolder> GetOutgoingFolderAsync(Guid identifier)
         {
-            return await CommonConfig.OutgoingFolder.CreateFolderAsync(identifier, CreationCollisionOption.OpenIfExists);
+            return await CommonConfig.OutgoingFolder.CreateFolderAsync(identifier.ToString(), CreationCollisionOption.OpenIfExists);
+        }
+
+        public static async Task DeleteOutgoingDocumentFolderAsync(Guid identifier)
+        {
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(identifier);
+            await outgoingDocumentFolder.DeleteAsync();
+        }
+
+        public static async Task<Attachment> GetOutgoingDocumentAttachmentAsync(Guid identifier, AttachmentDescription attachmentDescription)
+        {
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(identifier);
+            var attachmentExists = await outgoingDocumentFolder.CheckExistsAsync(attachmentDescription.Name);
+            if (attachmentExists != ExistenceCheckResult.FileExists)
+            {
+                throw new FileNotFoundException();
+            }
+
+            var attachment = new Attachment();
+            attachment.Size = (int)attachmentDescription.SizeInBytes; //TODO check this
+            attachment.Extension = Path.GetExtension(attachmentDescription.Name);
+            attachment.Filename = Path.GetFileNameWithoutExtension(attachmentDescription.Name);
+            attachment.Stream = await (await outgoingDocumentFolder.GetFileAsync(attachmentDescription.Name)).OpenAsync(FileAccess.Read);
+
+            return attachment;
+        }
+
+        public static async Task SetOutgoingDocumentToFailedAsync(Guid identifier, Exception ex)
+        {
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(identifier);
+            var failedFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingFailed, CreationCollisionOption.ReplaceExisting);
+            await failedFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(ex));
+        }
+
+        //TODO more errors...?
+
+        public static async Task LockOutgoingDocumentAsync(Guid identifier)
+        {
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(identifier);
+            await outgoingDocumentFolder.CreateFileAsync(Filenames.OugoingLock, CreationCollisionOption.ReplaceExisting);
+        }
+
+        public static async Task UnlockOutgoingDocumentAsync(Guid identifier)
+        {
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(identifier);
+            var lockFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OugoingLock, CreationCollisionOption.OpenIfExists);
+            await lockFile.DeleteAsync();
+        }
+
+        public static async Task<bool> IsOutgoingDocumentLocked(Guid identifier)
+        {
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(identifier);
+            return (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OugoingLock)) == ExistenceCheckResult.FileExists;
         }
 
         #endregion
