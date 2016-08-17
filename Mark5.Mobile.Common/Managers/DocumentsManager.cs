@@ -27,14 +27,15 @@ namespace Mark5.Mobile.Common.Managers
 
         readonly IFileTransferServiceProxy fileTransferServiceProxy;
         readonly IDocumentsDataAccess documentsDataAccess;
+        readonly IOutgoingDocumentsManager outgoingDocumentsManager;
 
-        public event EventHandler SavedDocumentsForSending = delegate { };
-
-        public DocumentsManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy, IFileTransferServiceProxy fileTransferServiceProxy, IDocumentsDataAccess documentsDataAccess)
+        public DocumentsManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy, IFileTransferServiceProxy fileTransferServiceProxy, IDocumentsDataAccess documentsDataAccess,
+                                IOutgoingDocumentsManager outgoingDocumentsManager)
             : base(connectionInfo, appServiceProxy)
         {
             this.fileTransferServiceProxy = fileTransferServiceProxy;
             this.documentsDataAccess = documentsDataAccess;
+            this.outgoingDocumentsManager = outgoingDocumentsManager;
         }
 
         public async Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId = -1, int endId = -1, int maxItems = 500, SourceType sourceType = SourceType.Auto)
@@ -96,7 +97,7 @@ namespace Mark5.Mobile.Common.Managers
 
 
         public async Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
-                                            DateTime sendOn, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto)
+                                           DateTime sendOn, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
@@ -126,7 +127,7 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided");
         }
 
-        public async Task InserDocumentInOutgoingAsync(Guid guid, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
+        public async Task InserDocumentInOutgoingAsync(Guid identifier, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
                                                        DateTime sendOn, bool confirmRead, bool confirmDelivery, SourceType sourceType = SourceType.Auto)
         {
             var outgoingDocumentInfo = new OutgoingDocumentInfo
@@ -137,11 +138,11 @@ namespace Mark5.Mobile.Common.Managers
                 SendOn = sendOn,
                 ConfirmRead = confirmRead,
                 ConfirmDelivery = confirmDelivery,
-                Identifier = guid,
+                Identifier = identifier,
             };
 
             await FileSystemStorage.SaveOutgoingDocumentAsync(outgoingDocumentInfo, document, documentPreview);
-            SavedDocumentsForSending(this, EventArgs.Empty);
+            outgoingDocumentsManager.Notify(identifier);
         }
 
         public async Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto)

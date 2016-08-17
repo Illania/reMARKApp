@@ -35,6 +35,7 @@ namespace Mark5.Mobile.Common.Storage
             public const string OutgoingInfo = "info.json";
             public const string OugoingLock = ".lock";
             public const string OutgoingFailed = ".failed";
+            public const string OutgoingAttachmentFolder = "attachment";
         }
 
         static readonly IDictionary<string, SemaphoreSlim> semaphores = new Dictionary<string, SemaphoreSlim>
@@ -147,43 +148,65 @@ namespace Mark5.Mobile.Common.Storage
             await infoFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(outgoingDocumentInfo));
         }
 
-        public static async Task<IEnumerable<OutgoingDocumentContainer>> GetAvailableOutgoingDocumentContainersAsync()
+        public static async Task<OutgoingDocumentContainer> GetOutgoingDocumentContainerAsync(Guid identifier)
         {
-            var folders = await CommonConfig.OutgoingFolder.GetFoldersAsync();
-            var containers = new List<OutgoingDocumentContainer>();
-            foreach (var folder in folders)
+            if (!await OutgoingFolderExistsAsync(identifier) || !await OutgoingDocumentAvailableAsync(identifier))
             {
-                var isLocked = (await folder.CheckExistsAsync(Filenames.OugoingLock)) == ExistenceCheckResult.FileExists;
-                var isFailed = (await folder.CheckExistsAsync(Filenames.OutgoingFailed)) == ExistenceCheckResult.FileExists;
-                var isReady = (await folder.CheckExistsAsync(Filenames.OutgoingInfo)) == ExistenceCheckResult.FileExists;
-                if (isReady && !isLocked && !isFailed)
-                {
-                    var documentFile = await folder.GetFileAsync(Filenames.OutgoingDocument);
-                    var document = await SerializationUtils.DeserializeAsync<Document>(await documentFile.ReadAllTextAsync());
-
-                    var documentPreviewFile = await folder.GetFileAsync(Filenames.OutgoingDocumentPreview);
-                    var documentPreview = await SerializationUtils.DeserializeAsync<DocumentPreview>(await documentPreviewFile.ReadAllTextAsync());
-
-                    var infoFile = await folder.GetFileAsync(Filenames.OutgoingInfo);
-                    var info = await SerializationUtils.DeserializeAsync<OutgoingDocumentInfo>(await infoFile.ReadAllTextAsync());
-
-                    var container = new OutgoingDocumentContainer
-                    {
-                        Document = document,
-                        DocumentPreview = documentPreview,
-                        Info = info,
-                    };
-
-                    containers.Add(container);
-                }
+                return null;
             }
 
-            return containers;
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(identifier);
+
+            var documentFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingDocument);
+            var document = await SerializationUtils.DeserializeAsync<Document>(await documentFile.ReadAllTextAsync());
+
+            var documentPreviewFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingDocumentPreview);
+            var documentPreview = await SerializationUtils.DeserializeAsync<DocumentPreview>(await documentPreviewFile.ReadAllTextAsync());
+
+            var infoFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingInfo);
+            var info = await SerializationUtils.DeserializeAsync<OutgoingDocumentInfo>(await infoFile.ReadAllTextAsync());
+
+            return new OutgoingDocumentContainer
+            {
+                Document = document,
+                DocumentPreview = documentPreview,
+                Info = info,
+            };
+        }
+
+        static async Task<bool> OutgoingDocumentAvailableAsync(Guid identifier)
+        {
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(identifier);
+            var isLocked = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OugoingLock)) == ExistenceCheckResult.FileExists;
+            var isFailed = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed)) == ExistenceCheckResult.FileExists;
+            var isReady = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingInfo)) == ExistenceCheckResult.FileExists;
+
+            return isReady && !isLocked && !isFailed;
+        }
+
+        public static async Task<IEnumerable<Guid>> GetOutgoingDocumentIdentifiersAsync()
+        {
+            var identifiers = new List<Guid>();
+            foreach (var folder in await CommonConfig.OutgoingFolder.GetFoldersAsync())
+            {
+                identifiers.Add(new Guid(folder.Name));
+            }
+            return identifiers;
         }
 
         static async Task<IFolder> GetOutgoingFolderAsync(Guid identifier)
         {
             return await CommonConfig.OutgoingFolder.CreateFolderAsync(identifier.ToString(), CreationCollisionOption.OpenIfExists);
+        }
+
+        static async Task<IFolder> GetOutgoingAttachmentsFolderAsync(Guid identifier)
+        {
+            return await (await GetOutgoingFolderAsync(identifier)).CreateFolderAsync(Filenames.OutgoingAttachmentFolder, CreationCollisionOption.OpenIfExists);
+        }
+
+        static async Task<bool> OutgoingFolderExistsAsync(Guid identifier)
+        {
+            return await CommonConfig.OutgoingFolder.CheckExistsAsync(identifier.ToString()) == ExistenceCheckResult.FolderExists;
         }
 
         public static async Task DeleteOutgoingDocumentFolderAsync(Guid identifier)
@@ -192,22 +215,21 @@ namespace Mark5.Mobile.Common.Storage
             await outgoingDocumentFolder.DeleteAsync();
         }
 
-        public static async Task<Attachment> GetOutgoingDocumentAttachmentAsync(Guid identifier, AttachmentDescription attachmentDescription)
+        public static async Task<IEnumerable<Attachment>> GetOutgoingDocumentAttachmentsAsync(Guid identifier)
         {
-            var outgoingDocumentFolder = await GetOutgoingFolderAsync(identifier);
-            var attachmentExists = await outgoingDocumentFolder.CheckExistsAsync(attachmentDescription.Name);
-            if (attachmentExists != ExistenceCheckResult.FileExists)
+            var attachmentsFolder = await GetOutgoingAttachmentsFolderAsync(identifier);
+            var attachments = new List<Attachment>();
+            foreach (var item in await attachmentsFolder.GetFilesAsync())
             {
-                throw new FileNotFoundException();
+                var attachment = new Attachment();
+                attachment.Stream = await item.OpenAsync(FileAccess.Read);
+                attachment.Size = (int)attachment.Stream.Length; //TODO check this
+                attachment.Extension = Path.GetExtension(item.Name);
+                attachment.Filename = Path.GetFileNameWithoutExtension(item.Name);
+                attachments.Add(attachment);
             }
 
-            var attachment = new Attachment();
-            attachment.Size = (int)attachmentDescription.SizeInBytes; //TODO check this
-            attachment.Extension = Path.GetExtension(attachmentDescription.Name);
-            attachment.Filename = Path.GetFileNameWithoutExtension(attachmentDescription.Name);
-            attachment.Stream = await (await outgoingDocumentFolder.GetFileAsync(attachmentDescription.Name)).OpenAsync(FileAccess.Read);
-
-            return attachment;
+            return attachments;
         }
 
         public static async Task SetOutgoingDocumentToFailedAsync(Guid identifier, Exception ex)
@@ -218,6 +240,8 @@ namespace Mark5.Mobile.Common.Storage
         }
 
         //TODO more errors...?
+
+        //TODO probably we need something to re
 
         public static async Task LockOutgoingDocumentAsync(Guid identifier)
         {
@@ -232,7 +256,8 @@ namespace Mark5.Mobile.Common.Storage
             await lockFile.DeleteAsync();
         }
 
-        public static async Task<bool> IsOutgoingDocumentLocked(Guid identifier)
+        //TODO probably needs to be removed
+        static async Task<bool> IsOutgoingDocumentLocked(Guid identifier)
         {
             var outgoingDocumentFolder = await GetOutgoingFolderAsync(identifier);
             return (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OugoingLock)) == ExistenceCheckResult.FileExists;
