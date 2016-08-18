@@ -14,7 +14,7 @@ namespace Mark5.Mobile.Common.Managers
         Task sendTask;
 
         bool active;
-        bool subscribed
+        bool subscribed;
 
         public event EventHandler<OutgoingDocumentContainer> DocumentSendingSuccessful = delegate { };
         public event EventHandler<OutgoingDocumentContainer> DocumentSendingFailed = delegate { };
