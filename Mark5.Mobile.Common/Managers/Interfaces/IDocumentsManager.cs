@@ -24,7 +24,7 @@ namespace Mark5.Mobile.Common.Managers
                                DateTime sendOn, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto);
 
         Task InserDocumentInOutgoingAsync(Guid identifier, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
-                                               DateTime sendOn, bool confirmRead, bool confirmDelivery, SourceType sourceType = SourceType.Auto)
+                                          DateTime sendOn, bool confirmRead, bool confirmDelivery, SourceType sourceType = SourceType.Auto);
 
         Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto);
 

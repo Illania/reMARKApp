@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,6 +17,11 @@ using PCLStorage;
 
 namespace Playground.Droid
 {
+
+    public class CrossPlatformConcurrentQueue<T> : BlockingCollection<T>, ICrossPlatformConcurrentQueue<T>
+    {
+    }
+
     [Activity(Label = "Playground.Droid", MainLauncher = true, Icon = "@mipmap/icon")]
     public class MainActivity : Activity
     {
@@ -39,6 +45,7 @@ namespace Playground.Droid
                 CommonConfig.CacheFolder = cacheFolder;
                 CommonConfig.DatabaseFolder = dbFolder;
                 CommonConfig.AttachmentsFolder = attachmentsFolder;
+                CommonConfig.BlockingQueue = typeof(CrossPlatformConcurrentQueue<>);
 
                 try
                 {
@@ -71,7 +78,7 @@ namespace Playground.Droid
 
                     textView.Text = result.Authenticated ? "Is Authenticated" : "Not Authneticated";
 
-                    Managers.Initialize(result);
+                    Managers.Initialize(result, null);
 
                     var result2 = await Managers.SystemManager.GetSystemSettingsAsync();
 

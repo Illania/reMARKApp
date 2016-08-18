@@ -15,7 +15,7 @@ using Mark5.Mobile.Common.Services;
 namespace Mark5.Mobile.Common.Managers
 {
 
-    public static class Managers
+    public static class Managers //TODO rename
     {
 
         public static IFoldersManager FoldersManager
@@ -78,11 +78,16 @@ namespace Mark5.Mobile.Common.Managers
             private set;
         }
 
-        public static void Initialize(ConnectionInfo connectionInfo, IReachabilityService reachabilityService)
+        public static void Initialize(ConnectionInfo connectionInfo, IReachabilityService reachabilityService) //TODO remove
         {
             if (connectionInfo == null)
             {
                 throw new ArgumentNullException(nameof(connectionInfo));
+            }
+
+            if (reachabilityService == null)
+            {
+                throw new ArgumentNullException(nameof(reachabilityService));
             }
 
             if (!connectionInfo.Authenticated)
@@ -100,10 +105,9 @@ namespace Mark5.Mobile.Common.Managers
             var calendarDataAccess = new CalendarDataAccess(DatabaseConnectionProvider.CalendarDatabase);
             var notificationsDataAccess = new NotificationsDataAccess(DatabaseConnectionProvider.SystemDatabase);
 
-            OutgoingDocumentsManager = new OutgoingDocumentsManager(reachabilityService);
-
+            OutgoingDocumentsManager = new OutgoingDocumentsManager();
             FoldersManager = new FoldersManager(connectionInfo, appServiceProxy, foldersDataAccess);
-            DocumentsManager = new DocumentsManager(connectionInfo, appServiceProxy, fileTransferServiceProxy, documentsDataAccess, OutgoingDocumentsManager);
+            DocumentsManager = new DocumentsManager(connectionInfo, appServiceProxy, fileTransferServiceProxy, documentsDataAccess);
             ContactsManager = new ContactsManager(connectionInfo, appServiceProxy, contactsDataAccess);
             ShortcodesManager = new ShortcodesManager(connectionInfo, appServiceProxy, shortcodesDataAccess);
             CalendarManager = new CalendarManager(connectionInfo, appServiceProxy, calendarDataAccess);

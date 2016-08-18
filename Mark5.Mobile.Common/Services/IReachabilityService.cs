@@ -16,7 +16,6 @@ namespace Mark5.Mobile.Common.Services
         Task<bool> IsServiceReachable();
 
         event EventHandler<ReachabilityChangedEventArgs> ReachabilityChanged;
-
     }
 
     public class ReachabilityChangedEventArgs : EventArgs

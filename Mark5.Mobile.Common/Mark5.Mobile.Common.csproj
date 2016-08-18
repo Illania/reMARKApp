@@ -158,6 +158,7 @@
     <Compile Include="Utilities\CrossPlatformCollections\ICrossPlatformConcurrentQueue.cs" />
     <Compile Include="Model\Support\OutgoingDocumentInfo.cs" />
     <Compile Include="Managers\Interfaces\IOutgoingDocumentsManager.cs" />
+    <Compile Include="Utilities\CrossPlatformCollections\CrossPlatoformCollectionsExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

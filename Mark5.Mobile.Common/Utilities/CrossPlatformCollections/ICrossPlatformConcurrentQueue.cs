@@ -11,11 +11,9 @@ namespace Mark5.Mobile.Common
             get;
         }
 
-        bool TryTake(out T result, int millisecondsTimeout, CancellationToken cancellationToken);
+        bool TryTake(out T result, int millisecondsTimeout = -1, CancellationToken cancellationToken = default(CancellationToken));
 
         bool TryAdd(T item);
-
-        void Clear();
     }
 }
 

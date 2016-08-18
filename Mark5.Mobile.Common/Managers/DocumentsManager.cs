@@ -27,15 +27,12 @@ namespace Mark5.Mobile.Common.Managers
 
         readonly IFileTransferServiceProxy fileTransferServiceProxy;
         readonly IDocumentsDataAccess documentsDataAccess;
-        readonly IOutgoingDocumentsManager outgoingDocumentsManager;
 
-        public DocumentsManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy, IFileTransferServiceProxy fileTransferServiceProxy, IDocumentsDataAccess documentsDataAccess,
-                                IOutgoingDocumentsManager outgoingDocumentsManager)
+        public DocumentsManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy, IFileTransferServiceProxy fileTransferServiceProxy, IDocumentsDataAccess documentsDataAccess)
             : base(connectionInfo, appServiceProxy)
         {
             this.fileTransferServiceProxy = fileTransferServiceProxy;
             this.documentsDataAccess = documentsDataAccess;
-            this.outgoingDocumentsManager = outgoingDocumentsManager;
         }
 
         public async Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId = -1, int endId = -1, int maxItems = 500, SourceType sourceType = SourceType.Auto)
@@ -142,7 +139,7 @@ namespace Mark5.Mobile.Common.Managers
             };
 
             await FileSystemStorage.SaveOutgoingDocumentAsync(outgoingDocumentInfo, document, documentPreview);
-            outgoingDocumentsManager.Notify(identifier);
+            Managers.OutgoingDocumentsManager.Notify(identifier);
         }
 
         public async Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto)

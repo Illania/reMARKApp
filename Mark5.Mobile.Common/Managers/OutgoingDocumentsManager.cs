@@ -6,40 +6,33 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Services;
 using Mark5.Mobile.Common.Storage;
 
-namespace Mark5.Mobile.Common
+namespace Mark5.Mobile.Common.Managers
 {
     public class OutgoingDocumentsManager : IOutgoingDocumentsManager
     {
-        readonly IReachabilityService reachabilityService;
-
         CancellationTokenSource cts;
         Task sendTask;
+
+        bool active;
+        bool subscribed
 
         public event EventHandler<OutgoingDocumentContainer> DocumentSendingSuccessful = delegate { };
         public event EventHandler<OutgoingDocumentContainer> DocumentSendingFailed = delegate { };
 
-        ICrossPlatformConcurrentQueue<Guid> queue;
-        public ICrossPlatformConcurrentQueue<Guid> Queue
+        readonly ICrossPlatformConcurrentQueue<Guid> queue;
+
+        public OutgoingDocumentsManager()
         {
-            set
-            {
-                if (queue != null)
-                {
-                    throw new InvalidOperationException("Queue has already been set!");
-                }
-
-                queue = value;
-            }
+            Type[] typeArgs = { typeof(Guid) };
+            this.queue = (ICrossPlatformConcurrentQueue<Guid>)Activator.CreateInstance(CommonConfig.BlockingQueue.MakeGenericType(typeArgs));
         }
-
-        public OutgoingDocumentsManager(IReachabilityService reachabilityService)
-        {
-            this.reachabilityService = reachabilityService;
-            reachabilityService.ReachabilityChanged += ReachabilityChanged;
-        }
-
 
         #region Public methods
+
+        public bool IsRunning()
+        {
+            return sendTask != null;
+        }
 
         public void Notify(Guid identifier)
         {
@@ -48,31 +41,31 @@ namespace Mark5.Mobile.Common
 
         public async Task Start()
         {
-            if (sendTask != null)
+            active = true;
+
+            if (!subscribed)
             {
-                return;
+                CommonConfig.ReachabilityService.ReachabilityChanged += ReachabilityChanged;
+                subscribed = true;
             }
 
-            if (!await reachabilityService.IsServiceReachable())
-            {
-                return;
-            }
-
-            sendTask = Task.Run(async () => await SendAction()).ContinueWith(async (t) =>
-           {
-               sendTask = null;
-
-               if (t.IsFaulted)
-               {
-                   //TODO need to log the exception
-
-                   await Start();
-               }
-
-           });
+            await StartSendTask();
         }
 
         public async Task Stop()
+        {
+            await StopSendTask();
+
+            if (subscribed)
+            {
+                CommonConfig.ReachabilityService.ReachabilityChanged -= ReachabilityChanged;
+                subscribed = false;
+            }
+
+            active = false;
+        }
+
+        async Task StopSendTask()
         {
             if (cts != null)
             {
@@ -80,7 +73,33 @@ namespace Mark5.Mobile.Common
                 cts = null;
             }
 
+            await sendTask;
+
             sendTask = null;
+        }
+
+        async Task StartSendTask()
+        {
+            if (sendTask != null)
+            {
+                return;
+            }
+
+            if (!await CommonConfig.ReachabilityService.IsServiceReachable())
+            {
+                return;
+            }
+
+            sendTask = Task.Run(async () => await SendAction()).ContinueWith(async (t) =>
+            {
+                sendTask = null;
+
+                if (t.IsFaulted)
+                {
+                    await Start();
+                }
+
+            });
         }
 
         #endregion
@@ -89,54 +108,63 @@ namespace Mark5.Mobile.Common
 
         async Task SendAction()
         {
-            queue.Clear();
-            await RetrieveOutgoingFromStorage();
-
-            while (cts.IsCancellationRequested)
+            try
             {
-                Guid identifier;
-                queue.TryTake(out identifier, -1, cts.Token);
+                queue.Clear();
+                await RetrieveOutgoingFromStorage();
 
-                var container = await FileSystemStorage.GetOutgoingDocumentContainerAsync(identifier);
-
-                if (container == null)
+                while (cts.IsCancellationRequested)
                 {
-                    continue;
-                }
+                    Guid identifier;
+                    queue.TryTake(out identifier, -1, cts.Token);
 
-                var document = container.Document;
-                var documentPreview = container.DocumentPreview;
-                var info = container.Info;
+                    var container = await FileSystemStorage.GetOutgoingDocumentContainerAsync(identifier);
 
-                bool sendSuccessful = false;
-                try
-                {
-                    var attachmentGuids = new List<Guid>();
-
-                    foreach (var attachment in await FileSystemStorage.GetOutgoingDocumentAttachmentsAsync(identifier))
+                    if (container == null)
                     {
-                        var attachmentGuid = await Managers.Managers.DocumentsManager.UploadTemporaryAttachmentAsync(attachment);
-                        attachmentGuids.Add(attachmentGuid);
+                        continue;
                     }
 
-                    await Managers.Managers.DocumentsManager.SendDocumentAsync(document, documentPreview, info.Flag, info.PrecedingDocumentId,
-                                                                               info.PrecedingDocumentFolderId, info.SendOn,
-                                                                               info.ConfirmRead, info.ConfirmDelivery, attachmentGuids);
+                    var document = container.Document;
+                    var documentPreview = container.DocumentPreview;
+                    var info = container.Info;
 
-                    sendSuccessful = true;
-                }
-                catch (Exception ex)
-                {
-                    await FileSystemStorage.SetOutgoingDocumentToFailedAsync(info.Identifier, ex);
-                    DocumentSendingFailed(this, container);
+                    bool sendSuccessful = false;
+                    try
+                    {
+                        var attachmentGuids = new List<Guid>();
+
+                        foreach (var attachment in await FileSystemStorage.GetOutgoingDocumentAttachmentsAsync(identifier))
+                        {
+                            var attachmentGuid = await Managers.DocumentsManager.UploadTemporaryAttachmentAsync(attachment);
+                            attachmentGuids.Add(attachmentGuid);
+                        }
+
+                        await Managers.DocumentsManager.SendDocumentAsync(document, documentPreview, info.Flag, info.PrecedingDocumentId,
+                                                                                   info.PrecedingDocumentFolderId, info.SendOn,
+                                                                                   info.ConfirmRead, info.ConfirmDelivery, attachmentGuids);
+
+                        sendSuccessful = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        await FileSystemStorage.SetOutgoingDocumentToFailedAsync(info.Identifier, ex);
+                        DocumentSendingFailed(this, container);
+                    }
+
+                    if (sendSuccessful)
+                    {
+                        await FileSystemStorage.DeleteOutgoingDocumentFolderAsync(info.Identifier);
+                        DocumentSendingSuccessful(this, container);
+                    }
+
                 }
 
-                if (sendSuccessful)
-                {
-                    await FileSystemStorage.DeleteOutgoingDocumentFolderAsync(info.Identifier);
-                    DocumentSendingSuccessful(this, container);
-                }
-
+            }
+            catch (Exception ex)
+            {
+                //TODO need to log the exception
+                throw ex;
             }
         }
 
@@ -146,13 +174,18 @@ namespace Mark5.Mobile.Common
 
         async void ReachabilityChanged(object sender, ReachabilityChangedEventArgs e)
         {
+            if (!active)
+            {
+                return;
+            }
+
             if (e.IsReachable)
             {
-                await Start();
+                await StartSendTask();
             }
             else
             {
-                await Stop();
+                await StopSendTask();
             }
         }
 
@@ -178,9 +211,6 @@ namespace Mark5.Mobile.Common
         {
             queue.TryAdd(identifier);
         }
-
-        //TODO From a search, it seems there is no pcl ready library for blocking collections
-        //TODO need to hook up on reachability later
 
         #endregion
 

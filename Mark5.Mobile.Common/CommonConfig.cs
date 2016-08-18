@@ -7,6 +7,7 @@
 //
 using PCLStorage;
 using Mark5.Mobile.Common.Services;
+using System;
 
 namespace Mark5.Mobile.Common
 {
@@ -25,6 +26,8 @@ namespace Mark5.Mobile.Common
         public static IFolder OutgoingFolder { get; set; }
 
         public static IReachabilityService ReachabilityService { get; set; }
+
+        public static Type BlockingQueue { get; set; }
     }
 }
 
