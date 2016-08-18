@@ -194,11 +194,6 @@ namespace Mark5.Mobile.Common.Storage
             return identifiers;
         }
 
-        static async Task<IFolder> GetOutgoingFolderAsync(Guid identifier)
-        {
-            return await CommonConfig.OutgoingFolder.CreateFolderAsync(identifier.ToString(), CreationCollisionOption.OpenIfExists);
-        }
-
         static async Task<IFolder> GetOutgoingAttachmentsFolderAsync(Guid identifier)
         {
             return await (await GetOutgoingFolderAsync(identifier)).CreateFolderAsync(Filenames.OutgoingAttachmentFolder, CreationCollisionOption.OpenIfExists);
@@ -239,10 +234,6 @@ namespace Mark5.Mobile.Common.Storage
             await failedFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(ex));
         }
 
-        //TODO more errors...?
-
-        //TODO probably we need something to re
-
         public static async Task LockOutgoingDocumentAsync(Guid identifier)
         {
             var outgoingDocumentFolder = await GetOutgoingFolderAsync(identifier);
@@ -256,11 +247,9 @@ namespace Mark5.Mobile.Common.Storage
             await lockFile.DeleteAsync();
         }
 
-        //TODO probably needs to be removed
-        static async Task<bool> IsOutgoingDocumentLocked(Guid identifier)
+        static async Task<IFolder> GetOutgoingFolderAsync(Guid identifier)
         {
-            var outgoingDocumentFolder = await GetOutgoingFolderAsync(identifier);
-            return (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OugoingLock)) == ExistenceCheckResult.FileExists;
+            return await CommonConfig.OutgoingFolder.CreateFolderAsync(identifier.ToString(), CreationCollisionOption.OpenIfExists);
         }
 
         #endregion

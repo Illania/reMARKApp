@@ -64,6 +64,26 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        public async Task LockOutgoingDocumentAsync(Guid identifier, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Local || sourceType == SourceType.Auto)
+            {
+                await FileSystemStorage.LockOutgoingDocumentAsync(identifier);
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task UnlockOutgoingDocumentAsync(Guid identifier, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Local || sourceType == SourceType.Auto)
+            {
+                await FileSystemStorage.UnlockOutgoingDocumentAsync(identifier);
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
         public async Task<Document> GetDocumentAsync(Folder folder, int documentId, DocumentBodyTypeRequest bodyType, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
