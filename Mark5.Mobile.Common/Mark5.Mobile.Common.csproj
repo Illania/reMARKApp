@@ -154,6 +154,10 @@
     <Compile Include="Model\SearchCalendarAppointmentsResult.cs" />
     <Compile Include="Model\Attachment.cs" />
     <Compile Include="Extensions\SQLiteConnectionExtensions.cs" />
+    <Compile Include="Tester\ITester.cs" />
+    <Compile Include="Tester\Tester.cs" />
+    <Compile Include="Tester\TesterFactory.cs" />
+    <Compile Include="Utilities\TaskExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />
@@ -170,6 +174,7 @@
     <Folder Include="Extensions\" />
     <Folder Include="Model\Links\" />
     <Folder Include="Managers\Interfaces\" />
+    <Folder Include="Tester\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PCLStorage">
