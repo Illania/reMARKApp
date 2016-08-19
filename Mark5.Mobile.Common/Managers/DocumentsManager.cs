@@ -92,9 +92,8 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-
         public async Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
-                                            DateTime sendOn, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto)
+                                           DateTime sendOn, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
@@ -122,6 +121,44 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             throw new ArgumentException("Invalid sourceType provided");
+        }
+
+        public async Task InserDocumentInOutgoingAsync(Guid id, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
+                                                       DateTime sendOn, bool confirmRead, bool confirmDelivery, SourceType sourceType = SourceType.Auto)
+        {
+            var outgoingDocumentInfo = new OutgoingDocumentInfo
+            {
+                Flag = flag,
+                PrecedingDocumentId = precedingDocumentId,
+                PrecedingDocumentFolderId = precedingDocumentFolderId,
+                SendOn = sendOn,
+                ConfirmRead = confirmRead,
+                ConfirmDelivery = confirmDelivery,
+                Identifier = id,
+            };
+
+            await FileSystemStorage.SaveOutgoingDocumentAsync(outgoingDocumentInfo, document, documentPreview);
+            Managers.OutgoingDocumentsManager.Notify(id);
+        }
+
+        public async Task LockOutgoingDocumentAsync(Guid id, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Local || sourceType == SourceType.Auto)
+            {
+                await FileSystemStorage.LockOutgoingDocumentAsync(id);
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task UnlockOutgoingDocumentAsync(Guid id, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Local || sourceType == SourceType.Auto)
+            {
+                await FileSystemStorage.UnlockOutgoingDocumentAsync(id);
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto)
@@ -450,5 +487,6 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
     }
+
 }
 

@@ -154,6 +154,12 @@
     <Compile Include="Model\SearchCalendarAppointmentsResult.cs" />
     <Compile Include="Model\Attachment.cs" />
     <Compile Include="Extensions\SQLiteConnectionExtensions.cs" />
+    <Compile Include="Managers\OutgoingDocumentsManager.cs" />
+    <Compile Include="Utilities\CrossPlatformCollections\ICrossPlatformConcurrentQueue.cs" />
+    <Compile Include="Model\Support\OutgoingDocumentInfo.cs" />
+    <Compile Include="Managers\Interfaces\IOutgoingDocumentsManager.cs" />
+    <Compile Include="Utilities\CrossPlatformCollections\CrossPlatoformCollectionsExtensions.cs" />
+    <Compile Include="Model\Support\OutgoingDocumentContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />
@@ -170,6 +176,8 @@
     <Folder Include="Extensions\" />
     <Folder Include="Model\Links\" />
     <Folder Include="Managers\Interfaces\" />
+    <Folder Include="Utilities\CrossPlatformCollections\" />
+    <Folder Include="Model\Support\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PCLStorage">

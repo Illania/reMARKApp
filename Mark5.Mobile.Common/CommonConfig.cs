@@ -5,8 +5,9 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using PCLStorage;
+using System;
 using Mark5.Mobile.Common.Services;
+using PCLStorage;
 
 namespace Mark5.Mobile.Common
 {
@@ -22,7 +23,11 @@ namespace Mark5.Mobile.Common
 
         public static IFolder AttachmentsFolder { get; set; }
 
+        public static IFolder OutgoingFolder { get; set; }
+
         public static IReachabilityService ReachabilityService { get; set; }
+
+        public static Type BlockingQueue { get; set; }
     }
 }
 
