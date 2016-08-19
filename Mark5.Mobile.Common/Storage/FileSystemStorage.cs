@@ -148,14 +148,14 @@ namespace Mark5.Mobile.Common.Storage
             await infoFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(outgoingDocumentInfo));
         }
 
-        public static async Task<OutgoingDocumentContainer> GetOutgoingDocumentContainerAsync(Guid identifier)
+        public static async Task<OutgoingDocumentContainer> GetOutgoingDocumentContainerAsync(Guid id)
         {
-            if (!await OutgoingFolderExistsAsync(identifier) || !await OutgoingDocumentAvailableAsync(identifier))
+            if (!await OutgoingFolderExistsAsync(id) || !await OutgoingDocumentAvailableAsync(id))
             {
                 return null;
             }
 
-            var outgoingDocumentFolder = await GetOutgoingFolderAsync(identifier);
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
 
             var documentFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingDocument);
             var document = await SerializationUtils.DeserializeAsync<Document>(await documentFile.ReadAllTextAsync());
@@ -174,9 +174,9 @@ namespace Mark5.Mobile.Common.Storage
             };
         }
 
-        static async Task<bool> OutgoingDocumentAvailableAsync(Guid identifier)
+        static async Task<bool> OutgoingDocumentAvailableAsync(Guid id)
         {
-            var outgoingDocumentFolder = await GetOutgoingFolderAsync(identifier);
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
             var isLocked = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OugoingLock)) == ExistenceCheckResult.FileExists;
             var isFailed = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed)) == ExistenceCheckResult.FileExists;
             var isReady = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingInfo)) == ExistenceCheckResult.FileExists;
@@ -194,25 +194,25 @@ namespace Mark5.Mobile.Common.Storage
             return identifiers;
         }
 
-        static async Task<IFolder> GetOutgoingAttachmentsFolderAsync(Guid identifier)
+        static async Task<IFolder> GetOutgoingAttachmentsFolderAsync(Guid id)
         {
-            return await (await GetOutgoingFolderAsync(identifier)).CreateFolderAsync(Filenames.OutgoingAttachmentFolder, CreationCollisionOption.OpenIfExists);
+            return await (await GetOutgoingFolderAsync(id)).CreateFolderAsync(Filenames.OutgoingAttachmentFolder, CreationCollisionOption.OpenIfExists);
         }
 
-        static async Task<bool> OutgoingFolderExistsAsync(Guid identifier)
+        static async Task<bool> OutgoingFolderExistsAsync(Guid id)
         {
-            return await CommonConfig.OutgoingFolder.CheckExistsAsync(identifier.ToString()) == ExistenceCheckResult.FolderExists;
+            return await CommonConfig.OutgoingFolder.CheckExistsAsync(id.ToString()) == ExistenceCheckResult.FolderExists;
         }
 
-        public static async Task DeleteOutgoingDocumentFolderAsync(Guid identifier)
+        public static async Task DeleteOutgoingDocumentFolderAsync(Guid id)
         {
-            var outgoingDocumentFolder = await GetOutgoingFolderAsync(identifier);
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
             await outgoingDocumentFolder.DeleteAsync();
         }
 
-        public static async Task<IEnumerable<Attachment>> GetOutgoingDocumentAttachmentsAsync(Guid identifier)
+        public static async Task<IEnumerable<Attachment>> GetOutgoingDocumentAttachmentsAsync(Guid id)
         {
-            var attachmentsFolder = await GetOutgoingAttachmentsFolderAsync(identifier);
+            var attachmentsFolder = await GetOutgoingAttachmentsFolderAsync(id);
             var attachments = new List<Attachment>();
             foreach (var item in await attachmentsFolder.GetFilesAsync())
             {
@@ -227,29 +227,29 @@ namespace Mark5.Mobile.Common.Storage
             return attachments;
         }
 
-        public static async Task SetOutgoingDocumentToFailedAsync(Guid identifier, Exception ex)
+        public static async Task SetOutgoingDocumentToFailedAsync(Guid id, Exception ex)
         {
-            var outgoingDocumentFolder = await GetOutgoingFolderAsync(identifier);
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
             var failedFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingFailed, CreationCollisionOption.ReplaceExisting);
             await failedFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(ex));
         }
 
-        public static async Task LockOutgoingDocumentAsync(Guid identifier)
+        public static async Task LockOutgoingDocumentAsync(Guid id)
         {
-            var outgoingDocumentFolder = await GetOutgoingFolderAsync(identifier);
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
             await outgoingDocumentFolder.CreateFileAsync(Filenames.OugoingLock, CreationCollisionOption.ReplaceExisting);
         }
 
-        public static async Task UnlockOutgoingDocumentAsync(Guid identifier)
+        public static async Task UnlockOutgoingDocumentAsync(Guid id)
         {
-            var outgoingDocumentFolder = await GetOutgoingFolderAsync(identifier);
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
             var lockFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OugoingLock, CreationCollisionOption.OpenIfExists);
             await lockFile.DeleteAsync();
         }
 
-        static async Task<IFolder> GetOutgoingFolderAsync(Guid identifier)
+        static async Task<IFolder> GetOutgoingFolderAsync(Guid id)
         {
-            return await CommonConfig.OutgoingFolder.CreateFolderAsync(identifier.ToString(), CreationCollisionOption.OpenIfExists);
+            return await CommonConfig.OutgoingFolder.CreateFolderAsync(id.ToString(), CreationCollisionOption.OpenIfExists);
         }
 
         #endregion

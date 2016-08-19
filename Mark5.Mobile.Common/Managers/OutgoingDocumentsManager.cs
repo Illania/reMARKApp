@@ -16,6 +16,8 @@ namespace Mark5.Mobile.Common.Managers
         bool active;
         bool subscribed;
 
+        SemaphoreSlim semaphore;
+
         public event EventHandler<OutgoingDocumentContainer> DocumentSendingSuccessful = delegate { };
         public event EventHandler<OutgoingDocumentContainer> DocumentSendingFailed = delegate { };
 
@@ -23,15 +25,23 @@ namespace Mark5.Mobile.Common.Managers
 
         public OutgoingDocumentsManager()
         {
-            Type[] typeArgs = { typeof(Guid) };
-            this.queue = (ICrossPlatformConcurrentQueue<Guid>)Activator.CreateInstance(CommonConfig.BlockingQueue.MakeGenericType(typeArgs));
+            queue = (ICrossPlatformConcurrentQueue<Guid>)Activator.CreateInstance(CommonConfig.BlockingQueue.MakeGenericType(new Type[] { typeof(Guid) }));
+            semaphore = new SemaphoreSlim(1);
         }
 
         #region Public methods
 
-        public bool IsRunning()
+        public async Task<bool> IsRunning()
         {
-            return sendTask != null;
+            try
+            {
+                await semaphore.WaitAsync();
+                return sendTask != null;
+            }
+            finally
+            {
+                semaphore.Release();
+            }
         }
 
         public void Notify(Guid identifier)
@@ -41,28 +51,45 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task Start()
         {
-            active = true;
-
-            if (!subscribed)
+            try
             {
-                CommonConfig.ReachabilityService.ReachabilityChanged += ReachabilityChanged;
-                subscribed = true;
-            }
+                await semaphore.WaitAsync();
 
-            await StartSendTask();
+                active = true;
+
+                if (!subscribed)
+                {
+                    CommonConfig.ReachabilityService.ReachabilityChanged += ReachabilityChanged;
+                    subscribed = true;
+                }
+
+                await StartSendTask();
+            }
+            finally
+            {
+                semaphore.Release();
+            }
         }
 
         public async Task Stop()
         {
-            await StopSendTask();
-
-            if (subscribed)
+            try
             {
-                CommonConfig.ReachabilityService.ReachabilityChanged -= ReachabilityChanged;
-                subscribed = false;
-            }
+                await semaphore.WaitAsync();
+                await StopSendTask();
 
-            active = false;
+                if (subscribed)
+                {
+                    CommonConfig.ReachabilityService.ReachabilityChanged -= ReachabilityChanged;
+                    subscribed = false;
+                }
+
+                active = false;
+            }
+            finally
+            {
+                semaphore.Release();
+            }
         }
 
         async Task StopSendTask()
@@ -74,7 +101,6 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             await sendTask;
-
             sendTask = null;
         }
 
@@ -89,6 +115,8 @@ namespace Mark5.Mobile.Common.Managers
             {
                 return;
             }
+
+            cts = new CancellationTokenSource();
 
             sendTask = Task.Run(async () => await SendAction()).ContinueWith(async (t) =>
             {

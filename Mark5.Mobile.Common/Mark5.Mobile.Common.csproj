@@ -159,6 +159,7 @@
     <Compile Include="Model\Support\OutgoingDocumentInfo.cs" />
     <Compile Include="Managers\Interfaces\IOutgoingDocumentsManager.cs" />
     <Compile Include="Utilities\CrossPlatformCollections\CrossPlatoformCollectionsExtensions.cs" />
+    <Compile Include="Model\Support\OutgoingDocumentContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

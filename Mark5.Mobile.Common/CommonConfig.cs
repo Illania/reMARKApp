@@ -5,9 +5,9 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using PCLStorage;
-using Mark5.Mobile.Common.Services;
 using System;
+using Mark5.Mobile.Common.Services;
+using PCLStorage;
 
 namespace Mark5.Mobile.Common
 {

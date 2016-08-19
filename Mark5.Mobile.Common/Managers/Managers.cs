@@ -7,15 +7,14 @@
 //
 using System;
 using Mark5.Mobile.Common.DataAccess;
+using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Model;
 using Mark5.ServiceReference;
-using Mark5.Mobile.Common.Database;
-using Mark5.Mobile.Common.Services;
 
 namespace Mark5.Mobile.Common.Managers
 {
 
-    public static class Managers //TODO rename
+    public static class Managers
     {
 
         public static IFoldersManager FoldersManager
@@ -78,16 +77,11 @@ namespace Mark5.Mobile.Common.Managers
             private set;
         }
 
-        public static void Initialize(ConnectionInfo connectionInfo, IReachabilityService reachabilityService) //TODO remove
+        public static void Initialize(ConnectionInfo connectionInfo)
         {
             if (connectionInfo == null)
             {
                 throw new ArgumentNullException(nameof(connectionInfo));
-            }
-
-            if (reachabilityService == null)
-            {
-                throw new ArgumentNullException(nameof(reachabilityService));
             }
 
             if (!connectionInfo.Authenticated)

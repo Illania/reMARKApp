@@ -78,7 +78,7 @@ namespace Playground.Droid
 
                     textView.Text = result.Authenticated ? "Is Authenticated" : "Not Authneticated";
 
-                    Managers.Initialize(result, null);
+                    Managers.Initialize(result);
 
                     var result2 = await Managers.SystemManager.GetSystemSettingsAsync();
 
