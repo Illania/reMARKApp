@@ -59,7 +59,7 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task GetAllContactPreviewsAsync(Folder folder, Action<List<ContactPreview>> handler, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
+        public async Task GetAllContactPreviewsAsync(Folder folder, Func<List<ContactPreview>, Task> handler, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
         {
             var startId = 0;
             var stopLoop = false;
@@ -67,7 +67,7 @@ namespace Mark5.Mobile.Common.Managers
             while (!stopLoop && !ct.IsCancellationRequested)
             {
                 var previews = await GetContactPreviewsAsync(folder, startId, NumberOfContactsToFetchPerCall, sourceType);
-                handler(previews);
+                await handler(previews);
 
                 startId += NumberOfContactsToFetchPerCall;
                 stopLoop = previews.Count < NumberOfContactsToFetchPerCall;

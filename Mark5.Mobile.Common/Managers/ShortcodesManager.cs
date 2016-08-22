@@ -58,7 +58,7 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task GetAllShortcodePreviewsAsync(Folder folder, Action<List<ShortcodePreview>> handler, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
+        public async Task GetAllShortcodePreviewsAsync(Folder folder, Func<List<ShortcodePreview>, Task> handler, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
         {
             var startId = 0;
             var stopLoop = false;
@@ -66,7 +66,7 @@ namespace Mark5.Mobile.Common.Managers
             while (!stopLoop && !ct.IsCancellationRequested)
             {
                 var previews = await GetShortcodePreviewsAsync(folder, startId, NumbeOfShortcodesToFetchPerCall, sourceType);
-                handler(previews);
+                await handler(previews);
 
                 startId += NumbeOfShortcodesToFetchPerCall;
                 stopLoop = previews.Count < NumbeOfShortcodesToFetchPerCall;

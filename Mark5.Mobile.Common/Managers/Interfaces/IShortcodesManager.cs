@@ -17,7 +17,7 @@ namespace Mark5.Mobile.Common.Managers
 
     public interface IShortcodesManager
     {
-        Task GetAllShortcodePreviewsAsync(Folder folder, Action<List<ShortcodePreview>> handler, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto);
+        Task GetAllShortcodePreviewsAsync(Folder folder, Func<List<ShortcodePreview>, Task> handler, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto);
 
         Task<List<ShortcodePreview>> GetShortcodePreviewsAsync(Folder folder, int startRowId = -1, int maxItems = 500, SourceType sourceType = SourceType.Auto);
 

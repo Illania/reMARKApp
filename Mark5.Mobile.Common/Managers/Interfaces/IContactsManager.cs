@@ -16,7 +16,7 @@ namespace Mark5.Mobile.Common.Managers
 
     public interface IContactsManager
     {
-        Task GetAllContactPreviewsAsync(Folder folder, Action<List<ContactPreview>> handler, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto);
+        Task GetAllContactPreviewsAsync(Folder folder, Func<List<ContactPreview>, Task> handler, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto);
 
         Task<List<ContactPreview>> GetContactPreviewsAsync(Folder folder, int startRowId = -1, int maxItems = 500, SourceType sourceType = SourceType.Auto);
 
