@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<style name="mark5" parent="Theme.AppCompat.Light.NoActionBar">
+		<item name="colorPrimary">@color/darkerblue</item>
+		<item name="colorPrimaryDark">@color/darkerblue</item>
+		<item name="colorAccent">@color/brown</item>
+		<item name="colorButtonNormal">@color/lightbrown</item>
+		<item name="colorControlHighlight">@color/brown</item>
+		<item name="actionBarItemBackground">@color/darkblue</item>
+		<item name="actionModeBackground">@color/darkblue</item>
+	</style>
+</resources>

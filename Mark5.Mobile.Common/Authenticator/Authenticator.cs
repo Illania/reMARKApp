@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Common.Authenticator
 
         public async Task<bool> IsAuthenticatedAsync(CancellationToken ct = default(CancellationToken))
         {
-            return (await GetConnectionInfoAsync(ct)).Authenticated;
+            return (await GetConnectionInfoAsync(ct))?.Authenticated ?? false;
         }
 
         public async Task<ConnectionInfo> GetConnectionInfoAsync(CancellationToken ct = default(CancellationToken))
@@ -40,6 +40,11 @@ namespace Mark5.Mobile.Common.Authenticator
                 FriendlyDeviceName = friendlyDeviceName,
                 InstallationId = installationId
             }, ct);
+
+            if (ct.IsCancellationRequested)
+            {
+                return null;
+            }
 
             var connectionInfo = new ConnectionInfo
             {

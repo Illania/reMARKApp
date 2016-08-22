@@ -19,16 +19,16 @@ using Xamarin;
 
 namespace Mark5.Mobile.Droid
 {
-    [Application]
+
+    [Application(Theme = "@style/mark5")]
     public class Mark5Application : Application
     {
 
         public Mark5Application(IntPtr javaReference, JniHandleOwnership transfer)
             : base(javaReference, transfer)
         {
-            int workerThreads, completionPortThreads;
-            ThreadPool.GetMinThreads(out workerThreads, out completionPortThreads);
-            ThreadPool.SetMinThreads(workerThreads * 10, completionPortThreads * 10);
+            ThreadPool.SetMinThreads(25, 25);
+            ThreadPool.SetMaxThreads(100, 100);
         }
 
         public override void OnCreate()
@@ -41,29 +41,35 @@ namespace Mark5.Mobile.Droid
             Insights.Initialize(Insights.DebugModeKey, Context, true);
 #endif
 
-            Insights.Track($"[{nameof(Mark5Application.OnCreate)}] Creating application...");
+            Insights.Track($"[{nameof(Mark5Application.OnCreate)}]");
 
             Task.Run(async () =>
             {
-                var mainFolder = FileSystem.Current.LocalStorage;
-                var dataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "data"), CreationCollisionOption.OpenIfExists);
-                var cacheFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("..", "cache"), CreationCollisionOption.OpenIfExists);
-                var dbFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "db"), CreationCollisionOption.OpenIfExists);
-                var attachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "att"), CreationCollisionOption.OpenIfExists);
+                try
+                {
+                    var mainFolder = FileSystem.Current.LocalStorage;
+                    var dataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "data"), CreationCollisionOption.OpenIfExists);
+                    var cacheFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("..", "cache"), CreationCollisionOption.OpenIfExists);
+                    var dbFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "db"), CreationCollisionOption.OpenIfExists);
+                    var attachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "att"), CreationCollisionOption.OpenIfExists);
 
-                CommonConfig.DataFolder = dataFolder;
-                CommonConfig.CacheFolder = cacheFolder;
-                CommonConfig.DatabaseFolder = dbFolder;
-                CommonConfig.AttachmentsFolder = attachmentsFolder;
-                CommonConfig.ReachabilityService = new ReachabilityService();
+                    CommonConfig.DataFolder = dataFolder;
+                    CommonConfig.CacheFolder = cacheFolder;
+                    CommonConfig.DatabaseFolder = dbFolder;
+                    CommonConfig.AttachmentsFolder = attachmentsFolder;
+                    CommonConfig.Logger = new SimpleLogger();
+                    CommonConfig.ReachabilityService = new ReachabilityService();
 
-                await DatabaseUtils.InitializeDatabases();
+                    await DatabaseUtils.InitializeDatabases();
 
-                PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();
-                PlatformConfig.ReachabilityBroadcastReceiver = new ReachabilityBroadcastReceiver();
+                    PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();
+                    PlatformConfig.ReachabilityBroadcastReceiver = new ReachabilityBroadcastReceiver();
+                }
+                catch (Exception e)
+                {
+                    Insights.Report(e, Insights.Severity.Critical);
+                }
             }).Wait();
-
-            Insights.Track($"[{nameof(Mark5Application.OnCreate)}] Created created application.");
         }
     }
 }

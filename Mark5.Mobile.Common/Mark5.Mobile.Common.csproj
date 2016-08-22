@@ -158,6 +158,9 @@
     <Compile Include="Tester\Tester.cs" />
     <Compile Include="Tester\TesterFactory.cs" />
     <Compile Include="Utilities\TaskExtensions.cs" />
+    <Compile Include="Utilities\AbstractLogger.cs" />
+    <Compile Include="Utilities\ILogger.cs" />
+    <Compile Include="Utilities\Validator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

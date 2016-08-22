@@ -7,6 +7,7 @@
 //
 using PCLStorage;
 using Mark5.Mobile.Common.Services;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Common
 {
@@ -21,6 +22,8 @@ namespace Mark5.Mobile.Common
         public static IFolder DatabaseFolder { get; set; }
 
         public static IFolder AttachmentsFolder { get; set; }
+
+        public static ILogger Logger { get; set; }
 
         public static IReachabilityService ReachabilityService { get; set; }
     }
