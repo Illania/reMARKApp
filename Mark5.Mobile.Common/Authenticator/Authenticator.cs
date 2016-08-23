@@ -29,9 +29,9 @@ namespace Mark5.Mobile.Common.Authenticator
             return await FileSystemStorage.GetConnectionInfoAsync(ct);
         }
 
-        public async Task<ConnectionInfo> AuthenticateAsync(string username, string password, bool ssl, string hostname, int port, DeviceType deviceType, string installationId, string friendlyDeviceName, CancellationToken ct = default(CancellationToken))
+        public async Task<ConnectionInfo> AuthenticateAsync(string username, string password, SslMode sslMode, string hostname, int port, DeviceType deviceType, string installationId, string friendlyDeviceName, CancellationToken ct = default(CancellationToken))
         {
-            var proxy = AppServiceProxyFactory.Create(ssl, hostname, port);
+            var proxy = AppServiceProxyFactory.Create(sslMode != SslMode.Off, hostname, port);
             var result = await proxy.AuthenticateAsync(new DataContract.AuthenticationParameters
             {
                 Username = username,
@@ -52,7 +52,7 @@ namespace Mark5.Mobile.Common.Authenticator
                 Username = username,
                 Hostname = hostname,
                 Port = port,
-                Ssl = ssl,
+                SslMode = sslMode,
                 InstallationId = installationId,
                 DeviceType = deviceType,
                 FriendlyDeviceName = friendlyDeviceName,

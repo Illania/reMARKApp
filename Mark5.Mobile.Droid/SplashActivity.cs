@@ -18,6 +18,7 @@ using Android.Support.V7.App;
 
 namespace Mark5.Mobile.Droid
 {
+
     [Activity(Label = "MARK5",
               MainLauncher = true,
               Icon = "@mipmap/icon",
@@ -32,7 +33,7 @@ namespace Mark5.Mobile.Droid
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.Splash);
 
-            Insights.Track($"[{nameof(SplashActivity.OnCreate)}]");
+            Insights.Track($"Creating Splash activity...");
 
             Task.Run(async () =>
             {

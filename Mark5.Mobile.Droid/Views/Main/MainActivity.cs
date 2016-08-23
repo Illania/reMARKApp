@@ -13,7 +13,7 @@ using Xamarin;
 namespace Mark5.Mobile.Droid.Views.Main
 {
 
-    [Activity(Label = "MARK5")]
+    [Activity]
     public class MainActivity : AppCompatActivity
     {
 

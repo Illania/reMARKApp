@@ -7,6 +7,7 @@
 //
 using System.Threading;
 using System.Threading.Tasks;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Storage;
 using Mark5.ServiceReference;
 using DataContract = Mark5.ServiceReference.DataContract;
@@ -33,7 +34,7 @@ namespace Mark5.Mobile.Common.Tester
 
                 var ci = await FileSystemStorage.GetConnectionInfoAsync(ct);
 
-                var proxy = AppServiceProxyFactory.Create(ci.Ssl, ci.Hostname, ci.Port);
+                var proxy = AppServiceProxyFactory.Create(ci.SslMode != SslMode.Off, ci.Hostname, ci.Port);
                 await proxy.TestAsync(new DataContract.TestParameters());
 
                 return true;

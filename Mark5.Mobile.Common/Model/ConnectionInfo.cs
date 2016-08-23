@@ -20,7 +20,7 @@ namespace Mark5.Mobile.Common.Model
 
         public int Port { get; set; }
 
-        public bool Ssl { get; set; }
+        public SslMode SslMode { get; set; }
 
         public DeviceType DeviceType { get; set; }
 

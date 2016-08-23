@@ -41,7 +41,7 @@ namespace Mark5.Mobile.Droid
             Insights.Initialize(Insights.DebugModeKey, Context, true);
 #endif
 
-            Insights.Track($"[{nameof(Mark5Application.OnCreate)}]");
+            Insights.Track($"Creating Mark5 application...");
 
             Task.Run(async () =>
             {
@@ -70,6 +70,8 @@ namespace Mark5.Mobile.Droid
                     Insights.Report(e, Insights.Severity.Critical);
                 }
             }).Wait();
+
+            Insights.Track("Created Mark5 application.");
         }
     }
 }

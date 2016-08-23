@@ -21,7 +21,7 @@ using Xamarin;
 namespace Mark5.Mobile.Droid.Views.Login
 {
 
-    [Activity(Label = "MARK5", NoHistory = true)]
+    [Activity]
     public class LoginActivity : AppCompatActivity
     {
 
@@ -29,6 +29,7 @@ namespace Mark5.Mobile.Droid.Views.Login
         AppCompatEditText passwordEditText;
         AppCompatEditText hostnameEditText;
         AppCompatEditText portEditText;
+        AppCompatSpinner sslSpinner;
         AppCompatButton loginButton;
 
         IAuthenticator authenticator;
@@ -37,7 +38,7 @@ namespace Mark5.Mobile.Droid.Views.Login
         {
             base.OnCreate(savedInstanceState);
 
-            Title = "Log in";
+            Title = "MARK5";
             SetContentView(Resource.Layout.Login);
 
             var toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
@@ -51,6 +52,10 @@ namespace Mark5.Mobile.Droid.Views.Login
             hostnameEditText.TextChanged += (sender, e) => hostnameEditText.Error = null;
             portEditText = FindViewById<AppCompatEditText>(Resource.Id.port_edit_text);
             portEditText.TextChanged += (sender, e) => portEditText.Error = null;
+            sslSpinner = FindViewById<AppCompatSpinner>(Resource.Id.ssl_spinner);
+            var sslSpinnerAdapter = Android.Widget.ArrayAdapter.CreateFromResource(this, Resource.Array.ssl_modes, Android.Resource.Layout.SimpleSpinnerItem);
+            sslSpinnerAdapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
+            sslSpinner.Adapter = sslSpinnerAdapter;
             loginButton = FindViewById<AppCompatButton>(Resource.Id.login_button);
             loginButton.Enabled = false;
             loginButton.Click += LoginButton_Click;
@@ -67,6 +72,7 @@ namespace Mark5.Mobile.Droid.Views.Login
                 passwordEditText.Text = string.Empty;
                 hostnameEditText.Text = ci?.Hostname;
                 portEditText.Text = ci?.Port.ToString();
+                sslSpinner.SetSelection((int?)ci?.SslMode ?? 0);
 
                 loginButton.Enabled = true;
             });
@@ -74,7 +80,6 @@ namespace Mark5.Mobile.Droid.Views.Login
 
         async void LoginButton_Click(object sender, EventArgs e)
         {
-
             var username = usernameEditText.Text;
             var password = passwordEditText.Text;
             var hostname = hostnameEditText.Text;
@@ -109,9 +114,10 @@ namespace Mark5.Mobile.Droid.Views.Login
 
             try
             {
-                //await authenticator.AuthenticateAsync(username, password, true, hostname, int.Parse(port), DeviceType.Android, "test", "test");
+                await authenticator.AuthenticateAsync(username, password, SslMode.On, hostname, int.Parse(port), DeviceType.Android, "test", "test");
 
                 StartActivity(new Intent(this, typeof(MainActivity)));
+                Finish();
             }
             catch (Exception ex)
             {

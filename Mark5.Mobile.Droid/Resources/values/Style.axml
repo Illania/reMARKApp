@@ -8,5 +8,6 @@
 		<item name="colorControlHighlight">@color/brown</item>
 		<item name="actionBarItemBackground">@color/darkblue</item>
 		<item name="actionModeBackground">@color/darkblue</item>
+		<item name="android:spinnerStyle">@style/Widget.AppCompat.Spinner.Underlined</item>
 	</style>
 </resources>

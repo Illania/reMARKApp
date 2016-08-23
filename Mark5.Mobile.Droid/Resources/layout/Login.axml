@@ -69,11 +69,17 @@
                     android:singleLine="true"
                     android:inputType="numberDecimal" />
             </android.support.design.widget.TextInputLayout>
+            <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/ssl_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp" />
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/login_button"
                 android:text="Log in"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:elevation="1dp"
                 android:theme="@style/Widget.AppCompat.Button.Colored" />
         </LinearLayout>
