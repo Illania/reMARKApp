@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -33,8 +34,6 @@ namespace Mark5.Mobile.Droid.Views.Splash
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.Splash);
-
-            Insights.Track($"Creating Splash activity...");
         }
 
         protected override void OnResume()
@@ -43,10 +42,10 @@ namespace Mark5.Mobile.Droid.Views.Splash
 
             Task.Run(async () =>
             {
-                var auth = AuthenticatorFactory.Create();
-                if (await auth.IsAuthenticatedAsync())
+                var authenticator = AuthenticatorFactory.Create();
+                if (await authenticator.IsAuthenticatedAsync())
                 {
-                    var ci = await auth.GetConnectionInfoAsync();
+                    var ci = await authenticator.GetConnectionInfoAsync();
 
                     switch (ci.SslMode)
                     {
@@ -60,6 +59,15 @@ namespace Mark5.Mobile.Droid.Views.Splash
 
                     Managers.Initialize(ci);
                     PlatformConfig.ReachabilityBroadcastReceiver.Register();
+
+                    var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+
+                    Insights.Identify($"{ci.Username}@{ci.SslMode},{ci.Hostname}:{ci.Port}", new Dictionary<string, string>
+                    {
+                        [Insights.Traits.FirstName] = ss?.UserInfo?.User?.FirstName,
+                        [Insights.Traits.LastName] = ss?.UserInfo?.User?.LastName,
+                        ["System Administrator"] = (ss?.UserInfo?.IsSystemAdministrator ?? false) ? "Yes" : "No"
+                    });
 
                     StartActivity(new Intent(this, typeof(MainActivity)));
                 }

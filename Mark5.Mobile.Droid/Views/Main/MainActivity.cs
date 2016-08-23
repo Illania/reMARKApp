@@ -20,9 +20,9 @@ namespace Mark5.Mobile.Droid.Views.Main
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.Main);
 
-            Insights.Track($"[{nameof(MainActivity.OnCreate)}]");
+            Title = "MARK5";
+            SetContentView(Resource.Layout.Main);
         }
     }
 }

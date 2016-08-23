@@ -24,11 +24,6 @@ namespace Mark5.Mobile.Common.Authenticator
             return (await GetConnectionInfoAsync(ct))?.Authenticated ?? false;
         }
 
-        public async Task<ConnectionInfo> GetConnectionInfoAsync(CancellationToken ct = default(CancellationToken))
-        {
-            return await FileSystemStorage.GetConnectionInfoAsync(ct);
-        }
-
         public async Task<ConnectionInfo> AuthenticateAsync(string username, string password, SslMode sslMode, string hostname, int port, CancellationToken ct = default(CancellationToken))
         {
             var deviceType = CommonConfig.DeviceInfoProvider.GetDeviceType();
@@ -45,11 +40,6 @@ namespace Mark5.Mobile.Common.Authenticator
                 InstallationId = deviceId
             }, ct);
 
-            if (ct.IsCancellationRequested)
-            {
-                return null;
-            }
-
             var connectionInfo = new ConnectionInfo
             {
                 Token = result.Token,
@@ -63,9 +53,17 @@ namespace Mark5.Mobile.Common.Authenticator
                 Authenticated = true
             };
 
-            await FileSystemStorage.SaveConnectionInfoAsync(connectionInfo, ct);
-
             return connectionInfo;
+        }
+
+        public async Task<ConnectionInfo> GetConnectionInfoAsync(CancellationToken ct = default(CancellationToken))
+        {
+            return await FileSystemStorage.GetConnectionInfoAsync(ct);
+        }
+
+        public async Task SaveConnectionInfoAsync(ConnectionInfo connectionInfo, CancellationToken ct = default(CancellationToken))
+        {
+            await FileSystemStorage.SaveConnectionInfoAsync(connectionInfo, ct);
         }
     }
 }

@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -20,9 +21,6 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Views.Common;
 using Mark5.Mobile.Droid.Views.Main;
 using Xamarin;
-using Android.Support.V4.View;
-using Android.Views;
-using Android.Animation;
 
 namespace Mark5.Mobile.Droid.Views.Login
 {
@@ -68,8 +66,6 @@ namespace Mark5.Mobile.Droid.Views.Login
 
             authenticator = AuthenticatorFactory.Create();
 
-            Insights.Track($"[{nameof(LoginActivity.OnCreate)}]");
-
             Task.Run(async () =>
             {
                 var ci = await authenticator.GetConnectionInfoAsync();
@@ -86,74 +82,83 @@ namespace Mark5.Mobile.Droid.Views.Login
 
         async void LoginButton_Click(object sender, EventArgs e)
         {
-            var username = usernameEditText.Text;
-            var password = passwordEditText.Text;
-            var hostname = hostnameEditText.Text;
-            var port = portEditText.Text;
-            var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
-
-            var errors = false;
-            if (!Validator.IsUsernameValid(username))
-            {
-                usernameEditText.Error = "Username is not valid.";
-                errors = true;
-            }
-            if (!Validator.IsPasswordValid(password))
-            {
-                passwordEditText.Error = "Password is not valid.";
-                errors = true;
-            }
-            if (!Validator.IsHostNameValid(hostname))
-            {
-                hostnameEditText.Error = "Hostname is not valid.";
-                errors = true;
-            }
-            if (!Validator.IsPortValid(port))
-            {
-                portEditText.Error = "Port is not valid.";
-                errors = true;
-            }
-
-            if (errors)
-            {
-                return;
-            }
-
-            if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialog(this, "Warning", "You chose to accept certificates. This may decrease security of the connection. Do you want to continue?"))
-            {
-                return;
-            }
-            if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialog(this, "Warning", "You chose to turn off SSL. Connection will be unsecure. Do you want to continue?"))
-            {
-                return;
-            }
-
-            switch (sslMode)
-            {
-                case SslMode.AllowSelfSigned:
-                    PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
-                    break;
-                default:
-                    PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
-                    break;
-            }
-
             try
             {
+                var username = usernameEditText.Text;
+                var password = passwordEditText.Text;
+                var hostname = hostnameEditText.Text;
+                var port = portEditText.Text;
+                var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
+
+                var errors = false;
+                if (!Validator.IsUsernameValid(username))
+                {
+                    usernameEditText.Error = "Username is not valid.";
+                    errors = true;
+                }
+                if (!Validator.IsPasswordValid(password))
+                {
+                    passwordEditText.Error = "Password is not valid.";
+                    errors = true;
+                }
+                if (!Validator.IsHostNameValid(hostname))
+                {
+                    hostnameEditText.Error = "Hostname is not valid.";
+                    errors = true;
+                }
+                if (!Validator.IsPortValid(port))
+                {
+                    portEditText.Error = "Port is not valid.";
+                    errors = true;
+                }
+
+                if (errors)
+                {
+                    return;
+                }
+
+                if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialog(this, "Warning", "You chose to accept certificates. This may decrease security of the connection. Do you want to continue?"))
+                {
+                    return;
+                }
+                if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialog(this, "Warning", "You chose to turn off SSL. Connection will be unsecure. Do you want to continue?"))
+                {
+                    return;
+                }
+
+                switch (sslMode)
+                {
+                    case SslMode.AllowSelfSigned:
+                        PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
+                        break;
+                    default:
+                        PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
+                        break;
+                }
+
                 var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port));
 
                 Managers.Initialize(ci);
                 PlatformConfig.ReachabilityBroadcastReceiver.Register();
 
-                await Managers.SystemManager.GetSystemSettingsAsync();
+                var ss = await Managers.SystemManager.GetSystemSettingsAsync();
+
+                Insights.Identify($"{ci.Username}@{ci.SslMode},{ci.Hostname}:{ci.Port}", new Dictionary<string, string>
+                {
+                    [Insights.Traits.FirstName] = ss?.UserInfo?.User?.FirstName,
+                    [Insights.Traits.LastName] = ss?.UserInfo?.User?.LastName,
+                    ["System Administrator"] = (ss?.UserInfo?.IsSystemAdministrator ?? false) ? "Yes" : "No"
+                });
+
+                await authenticator.SaveConnectionInfoAsync(ci);
+
+                StartActivity(new Intent(this, typeof(MainActivity)));
+                Finish();
             }
             catch (Exception ex)
             {
-                return;
+                await Dialogs.ShowConfirmDialog(this, "Error", ex.Message);
             }
-
-            StartActivity(new Intent(this, typeof(MainActivity)));
-            Finish();
         }
     }
 }
