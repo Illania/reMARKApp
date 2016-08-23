@@ -19,5 +19,27 @@ namespace Mark5.Mobile.Common
             }
         }
     }
+
+    public class ShortcodeDownloadInfo : DownloadItemInfo
+    {
+        public override ObjectType Type
+        {
+            get
+            {
+                return ObjectType.Shortcode;
+            }
+        }
+    }
+
+    public class DocumentDownloadInfo : DownloadItemInfo
+    {
+        public override ObjectType Type
+        {
+            get
+            {
+                return ObjectType.Document;
+            }
+        }
+    }
 }
 

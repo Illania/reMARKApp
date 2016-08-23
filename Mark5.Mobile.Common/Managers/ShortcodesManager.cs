@@ -73,14 +73,14 @@ namespace Mark5.Mobile.Common.Managers
             }
         }
 
-        public async Task<Shortcode> GetShortcodeAsync(Folder folder, int shortcodeId, SourceType sourceType = SourceType.Auto)
+        public async Task<Shortcode> GetShortcodeAsync(int folderId, int shortcodeId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
                 var result = await AppServiceProxy.GetShortcodeAsync(new DataContract.GetShortcodeParameters
                 {
                     Token = Token,
-                    FolderId = folder.Id,
+                    FolderId = folderId,
                     ShortcodeId = shortcodeId,
                     IncludePreview = false
                 });
@@ -98,6 +98,11 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task<Shortcode> GetShortcodeAsync(Folder folder, int shortcodeId, SourceType sourceType = SourceType.Auto)
+        {
+            return await GetShortcodeAsync(folder.Id, shortcodeId, sourceType);
         }
     }
 }

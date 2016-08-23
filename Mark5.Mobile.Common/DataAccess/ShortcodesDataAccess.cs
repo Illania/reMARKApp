@@ -199,6 +199,53 @@ namespace Mark5.Mobile.Common.DataAccess
                 throw new DataAccessException("Error deleting shortcodes.", ex);
             }
         }
+
+        public async Task<IEnumerable<ShortcodeDownloadInfo>> GetUnsavedShortcodesIds(int? folderId)
+        {
+            try
+            {
+                var infos = new List<ShortcodeDownloadInfo>();
+
+                await shortcodesDatabase.RunInConnectionAsync(c =>
+                {
+
+                    var queryString = $"select * from {nameof(FolderShortcodeLink)} where  {nameof(FolderShortcodeLink.ShortcodeId)}  " +
+                        $" not in (select {nameof(Shortcode.Id)} from {nameof(Shortcode)})" +
+                        $"{ (folderId.HasValue ? $"and { nameof(FolderShortcodeLink.FolderId)} = ? " : "")}";
+
+                    var result = c.Query<FolderShortcodeLink>(queryString, folderId.Value);
+
+                    infos = result.Select(fcl => new ShortcodeDownloadInfo { FolderId = fcl.FolderId, Id = fcl.ShortcodeId }).ToList();
+                });
+
+                return infos;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error while getting not cached shortcodes.", ex);
+            }
+        }
+
+        public async Task<bool> IsShortcodeCached(int shortcodeId)
+        {
+            try
+            {
+                bool found = false;
+
+                await shortcodesDatabase.RunInConnectionAsync(c =>
+                {
+                    var result = c.Find<Shortcode>(shortcodeId);
+
+                    found = result != null;
+                });
+
+                return found;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error while checking shortcode existence.", ex);
+            }
+        }
     }
 }
 

@@ -54,12 +54,13 @@ namespace Mark5.Mobile.Common
             switch (objectType)
             {
                 case ObjectType.Document:
+                    await AddPendingDocumentsToQueue(folderId);
                     break;
                 case ObjectType.Contact:
-                    var result = await contactsDataAccess.GetUnsavedContactIds(folderId);
-                    AddToQueue(result);
+                    await AddPendingContactsToQueue(folderId);
                     break;
                 case ObjectType.Shortcode:
+                    await AddPendingShortcodesToQueue(folderId);
                     break;
                 default:
                     throw new ArgumentException("Provided object type is not supported");
@@ -171,13 +172,13 @@ namespace Mark5.Mobile.Common
                     switch (itemInfo.Type)
                     {
                         case ObjectType.Document:
-                            await HandleDocument(itemInfo);
+                            await HandleDocumentDownload(itemInfo);
                             break;
                         case ObjectType.Contact:
-                            await HandleContact(itemInfo);
+                            await HandleContactDownload(itemInfo);
                             break;
                         case ObjectType.Shortcode:
-                            await HandleShortcode(itemInfo);
+                            await HandleShortcodeDownload(itemInfo);
                             break;
                         default:
                             throw new ArgumentException("Object type not supported");
@@ -190,6 +191,35 @@ namespace Mark5.Mobile.Common
                 //TODO log exception
                 throw ex;
             }
+        }
+
+        #endregion
+
+        #region Download handlers
+
+        async Task HandleDocumentDownload(DownloadItemInfo itemInfo)
+        {
+            throw new NotImplementedException();
+        }
+
+        async Task HandleContactDownload(DownloadItemInfo itemInfo)
+        {
+            if (await contactsDataAccess.IsContactCached(itemInfo.Id))
+            {
+                return;
+            }
+
+            await Managers.Managers.ContactsManager.GetContactAsync(itemInfo.FolderId, itemInfo.Id);
+        }
+
+        async Task HandleShortcodeDownload(DownloadItemInfo itemInfo)
+        {
+            if (await shortcodesDataAccess.IsShortcodeCached(itemInfo.Id))
+            {
+                return;
+            }
+
+            await Managers.Managers.ShortcodesManager.GetShortcodeAsync(itemInfo.FolderId, itemInfo.Id);
         }
 
         #endregion
@@ -209,30 +239,27 @@ namespace Mark5.Mobile.Common
             queue.TryAdd(identifier);
         }
 
-        async Task HandleDocument(DownloadItemInfo itemInfo)
+        async Task AddPendingContactsToQueue(int? folderId = null)
         {
-            throw new NotImplementedException();
+            AddToQueue(await contactsDataAccess.GetUnsavedContactsIds(folderId));
         }
 
-        async Task HandleContact(DownloadItemInfo itemInfo)
+        async Task AddPendingShortcodesToQueue(int? folderId = null)
         {
-            if (await contactsDataAccess.IsContactCached(itemInfo.Id))
-            {
-                return;
-            }
+            AddToQueue(await shortcodesDataAccess.GetUnsavedShortcodesIds(folderId));
 
-            await Managers.Managers.ContactsManager.GetContactAsync(itemInfo.FolderId, itemInfo.Id);
         }
 
-        async Task HandleShortcode(DownloadItemInfo itemInfo)
+        async Task AddPendingDocumentsToQueue(int? folderId = null)
         {
-            throw new NotImplementedException();
+
         }
 
         async Task RetrievePendingFromStorage()
         {
-            //TODO need to retrieve all the info for objects that have not been downloaded
-            //and insert it into queuec
+            await AddPendingDocumentsToQueue();
+            await AddPendingContactsToQueue();
+            await AddPendingShortcodesToQueue();
         }
 
         #endregion
