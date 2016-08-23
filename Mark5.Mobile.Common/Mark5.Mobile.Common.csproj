@@ -161,6 +161,7 @@
     <Compile Include="Utilities\AbstractLogger.cs" />
     <Compile Include="Utilities\ILogger.cs" />
     <Compile Include="Utilities\Validator.cs" />
+    <Compile Include="Utilities\IDeviceInfoProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

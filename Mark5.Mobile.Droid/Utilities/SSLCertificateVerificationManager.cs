@@ -8,6 +8,7 @@
 using System;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -15,17 +16,19 @@ namespace Mark5.Mobile.Droid.Utilities
     public class SSLCertificateVerificationManager
     {
 
+        readonly RemoteCertificateValidationCallback callback = (sender, certificate, chain, sslPolicyErrors) =>
+        {
+            var certificate2 = new X509Certificate2(certificate);
+            var now = DateTime.Now;
+            var valid = true;
+            valid &= certificate2.NotAfter > now;
+            valid &= certificate2.NotBefore < now;
+            return valid;
+        };
+
         public void EnableSelfSignedCertificates()
         {
-            ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
-            {
-                var certificate2 = new X509Certificate2(certificate);
-                var now = DateTime.Now;
-                var valid = true;
-                valid &= certificate2.NotAfter > now;
-                valid &= certificate2.NotBefore < now;
-                return valid;
-            };
+            ServicePointManager.ServerCertificateValidationCallback = callback;
         }
 
         public void DisableSelfSignedCertificates()

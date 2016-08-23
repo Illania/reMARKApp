@@ -4,10 +4,18 @@
 		<item name="colorPrimary">@color/darkerblue</item>
 		<item name="colorPrimaryDark">@color/darkerblue</item>
 		<item name="colorAccent">@color/brown</item>
-		<item name="colorButtonNormal">@color/lightbrown</item>
+		<item name="colorButtonNormal">@color/lightgray</item>
 		<item name="colorControlHighlight">@color/brown</item>
 		<item name="actionBarItemBackground">@color/darkblue</item>
 		<item name="actionModeBackground">@color/darkblue</item>
-		<item name="android:spinnerStyle">@style/Widget.AppCompat.Spinner.Underlined</item>
+		<item name="spinnerStyle">@style/mark5spinner</item>
+		<item name="alertDialogTheme">@style/mark5dialog</item>
+	</style>
+	<style name="mark5spinner" parent="Widget.AppCompat.Spinner.Underlined">
+	</style>
+	<style name="mark5dialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+		<item name="colorAccent">@color/brown</item>
+		<item name="android:textColorPrimary">@color/black</item>
+		<item name="android:background">@color/white</item>
 	</style>
 </resources>

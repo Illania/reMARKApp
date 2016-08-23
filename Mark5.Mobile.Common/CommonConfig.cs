@@ -26,6 +26,8 @@ namespace Mark5.Mobile.Common
         public static ILogger Logger { get; set; }
 
         public static IReachabilityService ReachabilityService { get; set; }
+
+        public static IDeviceInfoProvider DeviceInfoProvider { get; set; }
     }
 }
 

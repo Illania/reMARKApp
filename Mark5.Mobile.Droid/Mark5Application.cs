@@ -59,6 +59,7 @@ namespace Mark5.Mobile.Droid
                     CommonConfig.AttachmentsFolder = attachmentsFolder;
                     CommonConfig.Logger = new SimpleLogger();
                     CommonConfig.ReachabilityService = new ReachabilityService();
+                    CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
 
                     await DatabaseUtils.InitializeDatabases();
 

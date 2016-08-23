@@ -10,19 +10,20 @@ using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
-using Mark5.Mobile.Common.Authenticator;
-using Mark5.Mobile.Droid.Views.Login;
-using Xamarin;
-using Mark5.Mobile.Droid.Views.Main;
 using Android.Support.V7.App;
+using Mark5.Mobile.Common.Authenticator;
+using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Views.Login;
+using Mark5.Mobile.Droid.Views.Main;
+using Xamarin;
 
-namespace Mark5.Mobile.Droid
+namespace Mark5.Mobile.Droid.Views.Splash
 {
 
     [Activity(Label = "MARK5",
               MainLauncher = true,
               Icon = "@mipmap/icon",
-              NoHistory = true,
               ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation,
               ScreenOrientation = ScreenOrientation.Portrait)]
     public class SplashActivity : AppCompatActivity
@@ -34,17 +35,40 @@ namespace Mark5.Mobile.Droid
             SetContentView(Resource.Layout.Splash);
 
             Insights.Track($"Creating Splash activity...");
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
 
             Task.Run(async () =>
             {
-                if (await AuthenticatorFactory.Create().IsAuthenticatedAsync())
+                var auth = AuthenticatorFactory.Create();
+                if (await auth.IsAuthenticatedAsync())
                 {
+                    var ci = await auth.GetConnectionInfoAsync();
+
+                    switch (ci.SslMode)
+                    {
+                        case SslMode.AllowSelfSigned:
+                            PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
+                            break;
+                        default:
+                            PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
+                            break;
+                    }
+
+                    Managers.Initialize(ci);
+                    PlatformConfig.ReachabilityBroadcastReceiver.Register();
+
                     StartActivity(new Intent(this, typeof(MainActivity)));
                 }
                 else
                 {
                     StartActivity(new Intent(this, typeof(LoginActivity)));
                 }
+
+                Finish();
             });
         }
     }

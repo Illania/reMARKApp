@@ -29,16 +29,20 @@ namespace Mark5.Mobile.Common.Authenticator
             return await FileSystemStorage.GetConnectionInfoAsync(ct);
         }
 
-        public async Task<ConnectionInfo> AuthenticateAsync(string username, string password, SslMode sslMode, string hostname, int port, DeviceType deviceType, string installationId, string friendlyDeviceName, CancellationToken ct = default(CancellationToken))
+        public async Task<ConnectionInfo> AuthenticateAsync(string username, string password, SslMode sslMode, string hostname, int port, CancellationToken ct = default(CancellationToken))
         {
+            var deviceType = CommonConfig.DeviceInfoProvider.GetDeviceType();
+            var deviceName = CommonConfig.DeviceInfoProvider.GetDeviceName();
+            var deviceId = CommonConfig.DeviceInfoProvider.GetDeviceId();
+
             var proxy = AppServiceProxyFactory.Create(sslMode != SslMode.Off, hostname, port);
             var result = await proxy.AuthenticateAsync(new DataContract.AuthenticationParameters
             {
                 Username = username,
                 Password = password,
                 DeviceType = deviceType.ConvertEnum<DataContract.DeviceType>(),
-                FriendlyDeviceName = friendlyDeviceName,
-                InstallationId = installationId
+                FriendlyDeviceName = deviceName,
+                InstallationId = deviceId
             }, ct);
 
             if (ct.IsCancellationRequested)
@@ -53,9 +57,9 @@ namespace Mark5.Mobile.Common.Authenticator
                 Hostname = hostname,
                 Port = port,
                 SslMode = sslMode,
-                InstallationId = installationId,
                 DeviceType = deviceType,
-                FriendlyDeviceName = friendlyDeviceName,
+                FriendlyDeviceName = deviceName,
+                InstallationId = deviceId,
                 Authenticated = true
             };
 

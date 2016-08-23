@@ -1522,14 +1522,14 @@ namespace Mark5.Mobile.Droid
 			// aapt resource value: 0x7f0a0049
 			public const int common_plus_signin_btn_text_light_pressed = 2131361865;
 			
-			// aapt resource value: 0x7f0a005b
-			public const int darkGrey = 2131361883;
-			
 			// aapt resource value: 0x7f0a0057
 			public const int darkblue = 2131361879;
 			
 			// aapt resource value: 0x7f0a0058
 			public const int darkerblue = 2131361880;
+			
+			// aapt resource value: 0x7f0a005b
+			public const int darkgray = 2131361883;
 			
 			// aapt resource value: 0x7f0a0000
 			public const int design_fab_shadow_end_color = 2131361792;
@@ -1591,14 +1591,14 @@ namespace Mark5.Mobile.Droid
 			// aapt resource value: 0x7f0a0025
 			public const int hint_foreground_material_light = 2131361829;
 			
-			// aapt resource value: 0x7f0a005a
-			public const int lightGrey = 2131361882;
-			
 			// aapt resource value: 0x7f0a0055
 			public const int lightblue = 2131361877;
 			
 			// aapt resource value: 0x7f0a005d
 			public const int lightbrown = 2131361885;
+			
+			// aapt resource value: 0x7f0a005a
+			public const int lightgray = 2131361882;
 			
 			// aapt resource value: 0x7f0a0026
 			public const int material_blue_grey_800 = 2131361830;
@@ -2431,8 +2431,8 @@ namespace Mark5.Mobile.Droid
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f0b0088
-			public const int action0 = 2131427464;
+			// aapt resource value: 0x7f0b0089
+			public const int action0 = 2131427465;
 			
 			// aapt resource value: 0x7f0b0065
 			public const int action_bar = 2131427429;
@@ -2458,8 +2458,8 @@ namespace Mark5.Mobile.Droid
 			// aapt resource value: 0x7f0b0066
 			public const int action_context_bar = 2131427430;
 			
-			// aapt resource value: 0x7f0b008c
-			public const int action_divider = 2131427468;
+			// aapt resource value: 0x7f0b008d
+			public const int action_divider = 2131427469;
 			
 			// aapt resource value: 0x7f0b0004
 			public const int action_menu_divider = 2131427332;
@@ -2503,8 +2503,8 @@ namespace Mark5.Mobile.Droid
 			// aapt resource value: 0x7f0b004f
 			public const int buttonPanel = 2131427407;
 			
-			// aapt resource value: 0x7f0b0089
-			public const int cancel_action = 2131427465;
+			// aapt resource value: 0x7f0b008a
+			public const int cancel_action = 2131427466;
 			
 			// aapt resource value: 0x7f0b0015
 			public const int center = 2131427349;
@@ -2518,8 +2518,8 @@ namespace Mark5.Mobile.Droid
 			// aapt resource value: 0x7f0b005d
 			public const int checkbox = 2131427421;
 			
-			// aapt resource value: 0x7f0b008f
-			public const int chronometer = 2131427471;
+			// aapt resource value: 0x7f0b0090
+			public const int chronometer = 2131427472;
 			
 			// aapt resource value: 0x7f0b001e
 			public const int clip_horizontal = 2131427358;
@@ -2575,8 +2575,8 @@ namespace Mark5.Mobile.Droid
 			// aapt resource value: 0x7f0b0018
 			public const int end = 2131427352;
 			
-			// aapt resource value: 0x7f0b0094
-			public const int end_padder = 2131427476;
+			// aapt resource value: 0x7f0b0095
+			public const int end_padder = 2131427477;
 			
 			// aapt resource value: 0x7f0b000c
 			public const int enterAlways = 2131427340;
@@ -2614,17 +2614,17 @@ namespace Mark5.Mobile.Droid
 			// aapt resource value: 0x7f0b0029
 			public const int homeAsUp = 2131427369;
 			
-			// aapt resource value: 0x7f0b0083
-			public const int hostname_edit_text = 2131427459;
+			// aapt resource value: 0x7f0b0084
+			public const int hostname_edit_text = 2131427460;
 			
-			// aapt resource value: 0x7f0b0082
-			public const int hostname_text_input_layout = 2131427458;
+			// aapt resource value: 0x7f0b0083
+			public const int hostname_text_input_layout = 2131427459;
 			
 			// aapt resource value: 0x7f0b004d
 			public const int icon = 2131427405;
 			
-			// aapt resource value: 0x7f0b0095
-			public const int icon_frame = 2131427477;
+			// aapt resource value: 0x7f0b0096
+			public const int icon_frame = 2131427478;
 			
 			// aapt resource value: 0x7f0b003b
 			public const int icon_only = 2131427387;
@@ -2635,8 +2635,8 @@ namespace Mark5.Mobile.Droid
 			// aapt resource value: 0x7f0b004a
 			public const int image = 2131427402;
 			
-			// aapt resource value: 0x7f0b0093
-			public const int info = 2131427475;
+			// aapt resource value: 0x7f0b0094
+			public const int info = 2131427476;
 			
 			// aapt resource value: 0x7f0b0001
 			public const int item_touch_helper_previous_elevation = 2131427329;
@@ -2647,32 +2647,35 @@ namespace Mark5.Mobile.Droid
 			// aapt resource value: 0x7f0b0040
 			public const int light = 2131427392;
 			
-			// aapt resource value: 0x7f0b008d
-			public const int line1 = 2131427469;
+			// aapt resource value: 0x7f0b008e
+			public const int line1 = 2131427470;
 			
-			// aapt resource value: 0x7f0b0091
-			public const int line3 = 2131427473;
+			// aapt resource value: 0x7f0b0092
+			public const int line3 = 2131427474;
 			
-			// aapt resource value: 0x7f0b0097
-			public const int list = 2131427479;
+			// aapt resource value: 0x7f0b0098
+			public const int list = 2131427480;
 			
 			// aapt resource value: 0x7f0b0026
 			public const int listMode = 2131427366;
 			
-			// aapt resource value: 0x7f0b0096
-			public const int list_container = 2131427478;
+			// aapt resource value: 0x7f0b0097
+			public const int list_container = 2131427479;
 			
 			// aapt resource value: 0x7f0b004c
 			public const int list_item = 2131427404;
 			
-			// aapt resource value: 0x7f0b0087
-			public const int login_button = 2131427463;
+			// aapt resource value: 0x7f0b0088
+			public const int login_button = 2131427464;
+			
+			// aapt resource value: 0x7f0b007e
+			public const int login_form = 2131427454;
 			
 			// aapt resource value: 0x7f0b0043
 			public const int marquee = 2131427395;
 			
-			// aapt resource value: 0x7f0b008b
-			public const int media_actions = 2131427467;
+			// aapt resource value: 0x7f0b008c
+			public const int media_actions = 2131427468;
 			
 			// aapt resource value: 0x7f0b0035
 			public const int middle = 2131427381;
@@ -2701,20 +2704,20 @@ namespace Mark5.Mobile.Droid
 			// aapt resource value: 0x7f0b0051
 			public const int parentPanel = 2131427409;
 			
-			// aapt resource value: 0x7f0b0081
-			public const int password_edit_text = 2131427457;
+			// aapt resource value: 0x7f0b0082
+			public const int password_edit_text = 2131427458;
 			
-			// aapt resource value: 0x7f0b0080
-			public const int password_text_input_layout = 2131427456;
+			// aapt resource value: 0x7f0b0081
+			public const int password_text_input_layout = 2131427457;
 			
 			// aapt resource value: 0x7f0b0013
 			public const int pin = 2131427347;
 			
-			// aapt resource value: 0x7f0b0085
-			public const int port_edit_text = 2131427461;
+			// aapt resource value: 0x7f0b0086
+			public const int port_edit_text = 2131427462;
 			
-			// aapt resource value: 0x7f0b0084
-			public const int port_text_input_layout = 2131427460;
+			// aapt resource value: 0x7f0b0085
+			public const int port_text_input_layout = 2131427461;
 			
 			// aapt resource value: 0x7f0b0007
 			public const int progress_circular = 2131427335;
@@ -2803,8 +2806,8 @@ namespace Mark5.Mobile.Droid
 			// aapt resource value: 0x7f0b0050
 			public const int spacer = 2131427408;
 			
-			// aapt resource value: 0x7f0b0099
-			public const int splashText = 2131427481;
+			// aapt resource value: 0x7f0b009a
+			public const int splashText = 2131427482;
 			
 			// aapt resource value: 0x7f0b0009
 			public const int split_action_bar = 2131427337;
@@ -2818,8 +2821,8 @@ namespace Mark5.Mobile.Droid
 			// aapt resource value: 0x7f0b0033
 			public const int src_over = 2131427379;
 			
-			// aapt resource value: 0x7f0b0086
-			public const int ssl_spinner = 2131427462;
+			// aapt resource value: 0x7f0b0087
+			public const int ssl_spinner = 2131427463;
 			
 			// aapt resource value: 0x7f0b003c
 			public const int standard = 2131427388;
@@ -2827,29 +2830,29 @@ namespace Mark5.Mobile.Droid
 			// aapt resource value: 0x7f0b001c
 			public const int start = 2131427356;
 			
-			// aapt resource value: 0x7f0b008a
-			public const int status_bar_latest_event_content = 2131427466;
+			// aapt resource value: 0x7f0b008b
+			public const int status_bar_latest_event_content = 2131427467;
 			
 			// aapt resource value: 0x7f0b0070
 			public const int submit_area = 2131427440;
 			
-			// aapt resource value: 0x7f0b0098
-			public const int switchWidget = 2131427480;
+			// aapt resource value: 0x7f0b0099
+			public const int switchWidget = 2131427481;
 			
 			// aapt resource value: 0x7f0b0027
 			public const int tabMode = 2131427367;
 			
-			// aapt resource value: 0x7f0b0092
-			public const int text = 2131427474;
+			// aapt resource value: 0x7f0b0093
+			public const int text = 2131427475;
 			
-			// aapt resource value: 0x7f0b0090
-			public const int text2 = 2131427472;
+			// aapt resource value: 0x7f0b0091
+			public const int text2 = 2131427473;
 			
 			// aapt resource value: 0x7f0b0058
 			public const int textSpacerNoButtons = 2131427416;
 			
-			// aapt resource value: 0x7f0b008e
-			public const int time = 2131427470;
+			// aapt resource value: 0x7f0b008f
+			public const int time = 2131427471;
 			
 			// aapt resource value: 0x7f0b004e
 			public const int title = 2131427406;
@@ -2875,11 +2878,11 @@ namespace Mark5.Mobile.Droid
 			// aapt resource value: 0x7f0b002d
 			public const int useLogo = 2131427373;
 			
-			// aapt resource value: 0x7f0b007f
-			public const int username_edit_text = 2131427455;
+			// aapt resource value: 0x7f0b0080
+			public const int username_edit_text = 2131427456;
 			
-			// aapt resource value: 0x7f0b007e
-			public const int username_text_input_layout = 2131427454;
+			// aapt resource value: 0x7f0b007f
+			public const int username_text_input_layout = 2131427455;
 			
 			// aapt resource value: 0x7f0b0000
 			public const int view_offset_helper = 2131427328;
@@ -4409,6 +4412,12 @@ namespace Mark5.Mobile.Droid
 			
 			// aapt resource value: 0x7f060162
 			public const int mark5 = 2131100002;
+			
+			// aapt resource value: 0x7f060164
+			public const int mark5dialog = 2131100004;
+			
+			// aapt resource value: 0x7f060163
+			public const int mark5spinner = 2131100003;
 			
 			static Style()
 			{

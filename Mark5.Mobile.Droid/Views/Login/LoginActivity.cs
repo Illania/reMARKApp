@@ -10,13 +10,19 @@ using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.OS;
+using Android.Support.Design.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common.Authenticator;
+using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Views.Common;
 using Mark5.Mobile.Droid.Views.Main;
 using Xamarin;
+using Android.Support.V4.View;
+using Android.Views;
+using Android.Animation;
 
 namespace Mark5.Mobile.Droid.Views.Login
 {
@@ -25,10 +31,10 @@ namespace Mark5.Mobile.Droid.Views.Login
     public class LoginActivity : AppCompatActivity
     {
 
-        AppCompatEditText usernameEditText;
-        AppCompatEditText passwordEditText;
-        AppCompatEditText hostnameEditText;
-        AppCompatEditText portEditText;
+        TextInputEditText usernameEditText;
+        TextInputEditText passwordEditText;
+        TextInputEditText hostnameEditText;
+        TextInputEditText portEditText;
         AppCompatSpinner sslSpinner;
         AppCompatButton loginButton;
 
@@ -44,13 +50,13 @@ namespace Mark5.Mobile.Droid.Views.Login
             var toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);
 
-            usernameEditText = FindViewById<AppCompatEditText>(Resource.Id.username_edit_text);
+            usernameEditText = FindViewById<TextInputEditText>(Resource.Id.username_edit_text);
             usernameEditText.TextChanged += (sender, e) => usernameEditText.Error = null;
-            passwordEditText = FindViewById<AppCompatEditText>(Resource.Id.password_edit_text);
+            passwordEditText = FindViewById<TextInputEditText>(Resource.Id.password_edit_text);
             passwordEditText.TextChanged += (sender, e) => passwordEditText.Error = null;
-            hostnameEditText = FindViewById<AppCompatEditText>(Resource.Id.hostname_edit_text);
+            hostnameEditText = FindViewById<TextInputEditText>(Resource.Id.hostname_edit_text);
             hostnameEditText.TextChanged += (sender, e) => hostnameEditText.Error = null;
-            portEditText = FindViewById<AppCompatEditText>(Resource.Id.port_edit_text);
+            portEditText = FindViewById<TextInputEditText>(Resource.Id.port_edit_text);
             portEditText.TextChanged += (sender, e) => portEditText.Error = null;
             sslSpinner = FindViewById<AppCompatSpinner>(Resource.Id.ssl_spinner);
             var sslSpinnerAdapter = Android.Widget.ArrayAdapter.CreateFromResource(this, Resource.Array.ssl_modes, Android.Resource.Layout.SimpleSpinnerItem);
@@ -84,6 +90,7 @@ namespace Mark5.Mobile.Droid.Views.Login
             var password = passwordEditText.Text;
             var hostname = hostnameEditText.Text;
             var port = portEditText.Text;
+            var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
 
             var errors = false;
             if (!Validator.IsUsernameValid(username))
@@ -112,17 +119,41 @@ namespace Mark5.Mobile.Droid.Views.Login
                 return;
             }
 
+            if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialog(this, "Warning", "You chose to accept certificates. This may decrease security of the connection. Do you want to continue?"))
+            {
+                return;
+            }
+            if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialog(this, "Warning", "You chose to turn off SSL. Connection will be unsecure. Do you want to continue?"))
+            {
+                return;
+            }
+
+            switch (sslMode)
+            {
+                case SslMode.AllowSelfSigned:
+                    PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
+                    break;
+                default:
+                    PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
+                    break;
+            }
+
             try
             {
-                await authenticator.AuthenticateAsync(username, password, SslMode.On, hostname, int.Parse(port), DeviceType.Android, "test", "test");
+                var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port));
 
-                StartActivity(new Intent(this, typeof(MainActivity)));
-                Finish();
+                Managers.Initialize(ci);
+                PlatformConfig.ReachabilityBroadcastReceiver.Register();
+
+                await Managers.SystemManager.GetSystemSettingsAsync();
             }
             catch (Exception ex)
             {
-
+                return;
             }
+
+            StartActivity(new Intent(this, typeof(MainActivity)));
+            Finish();
         }
     }
 }

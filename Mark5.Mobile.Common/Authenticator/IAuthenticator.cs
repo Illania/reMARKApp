@@ -19,7 +19,7 @@ namespace Mark5.Mobile.Common.Authenticator
 
         Task<ConnectionInfo> GetConnectionInfoAsync(CancellationToken ct = default(CancellationToken));
 
-        Task<ConnectionInfo> AuthenticateAsync(string username, string password, SslMode sslMode, string hostname, int port, DeviceType deviceType, string installationId, string friendlyDeviceName, CancellationToken ct = default(CancellationToken));
+        Task<ConnectionInfo> AuthenticateAsync(string username, string password, SslMode sslMode, string hostname, int port, CancellationToken ct = default(CancellationToken));
     }
 }
 
