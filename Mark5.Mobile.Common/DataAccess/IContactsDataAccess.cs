@@ -42,6 +42,10 @@ namespace Mark5.Mobile.Common.DataAccess
         Task EditCommentAsync(Contact contact, Comment comment);
 
         Task DeleteCommentAsync(Contact contact, Comment comment);
+
+        Task<IEnumerable<ContactDownloadInfo>> GetUnsavedContactIds(int? folderId);
+
+        Task<bool> IsContactCached(int id);
     }
 }
 

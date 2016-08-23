@@ -106,7 +106,7 @@ namespace Mark5.Mobile.Common.Managers
             var notificationsDataAccess = new NotificationsDataAccess(DatabaseConnectionProvider.SystemDatabase);
 
             OutgoingDocumentsManager = new OutgoingDocumentsManager();
-            DownloadManager = new DownloadManager();
+            DownloadManager = new DownloadManager(documentsDataAccess, contactsDataAccess, shortcodesDataAccess);
             FoldersManager = new FoldersManager(connectionInfo, appServiceProxy, foldersDataAccess);
             DocumentsManager = new DocumentsManager(connectionInfo, appServiceProxy, fileTransferServiceProxy, documentsDataAccess);
             ContactsManager = new ContactsManager(connectionInfo, appServiceProxy, contactsDataAccess);

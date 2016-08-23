@@ -162,6 +162,7 @@
     <Compile Include="Model\Support\OutgoingDocumentContainer.cs" />
     <Compile Include="Managers\DownloadManager.cs" />
     <Compile Include="Managers\Interfaces\IDownloadManager.cs" />
+    <Compile Include="Model\Support\DownloadItemInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

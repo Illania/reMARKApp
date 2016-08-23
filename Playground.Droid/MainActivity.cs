@@ -115,7 +115,7 @@ namespace Playground.Droid
             };
         }
 
-        void Handler(List<ContactPreview> contactPreviews)
+        async Task Handler(List<ContactPreview> contactPreviews)
         {
             RunOnUiThread(() =>
             {

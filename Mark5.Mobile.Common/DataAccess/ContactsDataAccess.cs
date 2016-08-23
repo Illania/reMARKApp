@@ -377,6 +377,53 @@ namespace Mark5.Mobile.Common.DataAccess
                 throw new DataAccessException("Error deleting comment.", ex);
             }
         }
+
+        public async Task<IEnumerable<ContactDownloadInfo>> GetUnsavedContactIds(int? folderId)
+        {
+            try
+            {
+                var infos = new List<ContactDownloadInfo>();
+
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+
+                    var queryString = $"select * from {nameof(FolderContactLink)} where  {nameof(FolderContactLink.ContactId)}  " +
+                        " not in (select {nameof(Contact.Id)} from {nameof(Contact)})" +
+                        $"{ (folderId.HasValue ? $"and { nameof(FolderContactLink.FolderId)} = ? " : "")}";
+
+                    var result = c.Query<FolderContactLink>(queryString, folderId.Value);
+
+                    infos = result.Select(fcl => new ContactDownloadInfo { FolderId = fcl.FolderId, Id = fcl.ContactId }).ToList();
+                });
+
+                return infos;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error while getting not cached contacts.", ex);
+            }
+        }
+
+        public async Task<bool> IsContactCached(int contactId)
+        {
+            try
+            {
+                bool found = false;
+
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    var result = c.Find<Contact>(contactId);
+
+                    found = result != null;
+                });
+
+                return found;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error while checking contact existence.", ex);
+            }
+        }
     }
 }
 

@@ -22,6 +22,8 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<Contact> GetContactAsync(Folder folder, int contactId, SourceType sourceType = SourceType.Auto);
 
+        Task<Contact> GetContactAsync(int folderId, int contactId, SourceType sourceType = SourceType.Auto);
+
         Task<bool> CreteOrUpdateContactAsync(Contact contact, ContactPreview contactPreview, int parentObjectId, SourceType sourceType = SourceType.Auto);
 
         Task<List<Category>> GetAllCategoriesAsync(SourceType sourceType = SourceType.Auto);

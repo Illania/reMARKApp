@@ -74,14 +74,14 @@ namespace Mark5.Mobile.Common.Managers
             }
         }
 
-        public async Task<Contact> GetContactAsync(Folder folder, int contactId, SourceType sourceType = SourceType.Auto)
+        public async Task<Contact> GetContactAsync(int folderId, int contactId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
                 var result = await AppServiceProxy.GetContactAsync(new DataContract.GetContactParameters
                 {
                     Token = Token,
-                    FolderId = folder.Id,
+                    FolderId = folderId,
                     ContactId = contactId,
                     IncludePreview = false
                 });
@@ -99,6 +99,12 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+
+        public async Task<Contact> GetContactAsync(Folder folder, int contactId, SourceType sourceType = SourceType.Auto)
+        {
+            return await GetContactAsync(folder.Id, contactId, sourceType);
         }
 
         public async Task<bool> CreteOrUpdateContactAsync(Contact contact, ContactPreview contactPreview, int parentObjectId, SourceType sourceType = SourceType.Auto)

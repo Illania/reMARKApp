@@ -8,7 +8,7 @@ using Mark5.Mobile.Common.Storage;
 
 namespace Mark5.Mobile.Common.Managers
 {
-    public class OutgoingDocumentsManager : IOutgoingDocumentsManager
+    class OutgoingDocumentsManager : IOutgoingDocumentsManager
     {
         CancellationTokenSource cts;
         Task sendTask;
@@ -92,17 +92,9 @@ namespace Mark5.Mobile.Common.Managers
             }
         }
 
-        async Task StopSendTask()
-        {
-            if (cts != null)
-            {
-                cts.Cancel();
-                cts = null;
-            }
+        #endregion
 
-            await sendTask;
-            sendTask = null;
-        }
+        #region Private methods
 
         async Task StartSendTask()
         {
@@ -130,6 +122,28 @@ namespace Mark5.Mobile.Common.Managers
             });
         }
 
+        async Task StopSendTask()
+        {
+            try
+            {
+                await semaphore.WaitAsync();
+
+                if (cts != null)
+                {
+                    cts.Cancel();
+                    cts = null;
+                }
+
+                await sendTask;
+                sendTask = null;
+
+            }
+            finally
+            {
+                semaphore.Release();
+            }
+        }
+
         #endregion
 
         #region Send Action
@@ -141,7 +155,7 @@ namespace Mark5.Mobile.Common.Managers
                 queue.Clear();
                 await RetrieveOutgoingFromStorage();
 
-                while (cts.IsCancellationRequested)
+                while (!cts.IsCancellationRequested)
                 {
                     Guid identifier;
                     queue.TryTake(out identifier, -1, cts.Token);
