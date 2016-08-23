@@ -378,7 +378,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<IEnumerable<ContactDownloadInfo>> GetUnsavedContactIds(int? folderId)
+        public async Task<IEnumerable<ContactDownloadInfo>> GetUnsavedContactsIds(int? folderId)
         {
             try
             {
@@ -388,7 +388,7 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
 
                     var queryString = $"select * from {nameof(FolderContactLink)} where  {nameof(FolderContactLink.ContactId)}  " +
-                        " not in (select {nameof(Contact.Id)} from {nameof(Contact)})" +
+                        $" not in (select {nameof(Contact.Id)} from {nameof(Contact)})" +
                         $"{ (folderId.HasValue ? $"and { nameof(FolderContactLink.FolderId)} = ? " : "")}";
 
                     var result = c.Query<FolderContactLink>(queryString, folderId.Value);
