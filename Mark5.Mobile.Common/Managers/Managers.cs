@@ -7,9 +7,9 @@
 //
 using System;
 using Mark5.Mobile.Common.DataAccess;
+using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Model;
 using Mark5.ServiceReference;
-using Mark5.Mobile.Common.Database;
 
 namespace Mark5.Mobile.Common.Managers
 {
@@ -71,6 +71,12 @@ namespace Mark5.Mobile.Common.Managers
             private set;
         }
 
+        public static IOutgoingDocumentsManager OutgoingDocumentsManager
+        {
+            get;
+            private set;
+        }
+
         public static void Initialize(ConnectionInfo connectionInfo)
         {
             if (connectionInfo == null)
@@ -93,6 +99,7 @@ namespace Mark5.Mobile.Common.Managers
             var calendarDataAccess = new CalendarDataAccess(DatabaseConnectionProvider.CalendarDatabase);
             var notificationsDataAccess = new NotificationsDataAccess(DatabaseConnectionProvider.SystemDatabase);
 
+            OutgoingDocumentsManager = new OutgoingDocumentsManager();
             FoldersManager = new FoldersManager(connectionInfo, appServiceProxy, foldersDataAccess);
             DocumentsManager = new DocumentsManager(connectionInfo, appServiceProxy, fileTransferServiceProxy, documentsDataAccess);
             ContactsManager = new ContactsManager(connectionInfo, appServiceProxy, contactsDataAccess);

@@ -29,6 +29,13 @@ namespace Mark5.Mobile.Common.Storage
             public const string SystemUserDepartments = "systemUserDepartments.json";
             public const string FavoriteFolders = "favoriteFolders.json";
             public const string NotificationSettings = "notificationSettings.json";
+
+            public const string OutgoingDocument = "document.json";
+            public const string OutgoingDocumentPreview = "documentPreview.json";
+            public const string OutgoingInfo = "info.json";
+            public const string OugoingLock = ".lock";
+            public const string OutgoingFailed = ".failed";
+            public const string OutgoingAttachmentFolder = "attachment";
         }
 
         static readonly IDictionary<string, SemaphoreSlim> semaphores = new Dictionary<string, SemaphoreSlim>
@@ -124,6 +131,128 @@ namespace Mark5.Mobile.Common.Storage
         {
             await SaveAsync(notificationSettings, Filenames.NotificationSettings, ct);
         }
+
+        #region OutgoingDocuments
+
+        public static async Task SaveOutgoingDocumentAsync(OutgoingDocumentInfo outgoingDocumentInfo, Document document, DocumentPreview documentPreview)
+        {
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(outgoingDocumentInfo.Identifier);
+
+            var documentFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingDocument, CreationCollisionOption.ReplaceExisting);
+            await documentFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(document));
+
+            var documentPreviewFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingDocumentPreview, CreationCollisionOption.ReplaceExisting);
+            await documentPreviewFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(documentPreview));
+
+            var infoFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingInfo, CreationCollisionOption.ReplaceExisting);
+            await infoFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(outgoingDocumentInfo));
+        }
+
+        public static async Task<OutgoingDocumentContainer> GetOutgoingDocumentContainerAsync(Guid id)
+        {
+            if (!await OutgoingFolderExistsAsync(id) || !await OutgoingDocumentAvailableAsync(id))
+            {
+                return null;
+            }
+
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
+
+            var documentFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingDocument);
+            var document = await SerializationUtils.DeserializeAsync<Document>(await documentFile.ReadAllTextAsync());
+
+            var documentPreviewFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingDocumentPreview);
+            var documentPreview = await SerializationUtils.DeserializeAsync<DocumentPreview>(await documentPreviewFile.ReadAllTextAsync());
+
+            var infoFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingInfo);
+            var info = await SerializationUtils.DeserializeAsync<OutgoingDocumentInfo>(await infoFile.ReadAllTextAsync());
+
+            return new OutgoingDocumentContainer
+            {
+                Document = document,
+                DocumentPreview = documentPreview,
+                Info = info,
+            };
+        }
+
+        static async Task<bool> OutgoingDocumentAvailableAsync(Guid id)
+        {
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
+            var isLocked = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OugoingLock)) == ExistenceCheckResult.FileExists;
+            var isFailed = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed)) == ExistenceCheckResult.FileExists;
+            var isReady = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingInfo)) == ExistenceCheckResult.FileExists;
+
+            return isReady && !isLocked && !isFailed;
+        }
+
+        public static async Task<IEnumerable<Guid>> GetOutgoingDocumentIdentifiersAsync()
+        {
+            var identifiers = new List<Guid>();
+            foreach (var folder in await CommonConfig.OutgoingFolder.GetFoldersAsync())
+            {
+                identifiers.Add(new Guid(folder.Name));
+            }
+            return identifiers;
+        }
+
+        static async Task<IFolder> GetOutgoingAttachmentsFolderAsync(Guid id)
+        {
+            return await (await GetOutgoingFolderAsync(id)).CreateFolderAsync(Filenames.OutgoingAttachmentFolder, CreationCollisionOption.OpenIfExists);
+        }
+
+        static async Task<bool> OutgoingFolderExistsAsync(Guid id)
+        {
+            return await CommonConfig.OutgoingFolder.CheckExistsAsync(id.ToString()) == ExistenceCheckResult.FolderExists;
+        }
+
+        public static async Task DeleteOutgoingDocumentFolderAsync(Guid id)
+        {
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
+            await outgoingDocumentFolder.DeleteAsync();
+        }
+
+        public static async Task<IEnumerable<Attachment>> GetOutgoingDocumentAttachmentsAsync(Guid id)
+        {
+            var attachmentsFolder = await GetOutgoingAttachmentsFolderAsync(id);
+            var attachments = new List<Attachment>();
+            foreach (var item in await attachmentsFolder.GetFilesAsync())
+            {
+                var attachment = new Attachment();
+                attachment.Stream = await item.OpenAsync(FileAccess.Read);
+                attachment.Size = (int)attachment.Stream.Length; //TODO check this
+                attachment.Extension = Path.GetExtension(item.Name);
+                attachment.Filename = Path.GetFileNameWithoutExtension(item.Name);
+                attachments.Add(attachment);
+            }
+
+            return attachments;
+        }
+
+        public static async Task SetOutgoingDocumentToFailedAsync(Guid id, Exception ex)
+        {
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
+            var failedFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingFailed, CreationCollisionOption.ReplaceExisting);
+            await failedFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(ex));
+        }
+
+        public static async Task LockOutgoingDocumentAsync(Guid id)
+        {
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
+            await outgoingDocumentFolder.CreateFileAsync(Filenames.OugoingLock, CreationCollisionOption.ReplaceExisting);
+        }
+
+        public static async Task UnlockOutgoingDocumentAsync(Guid id)
+        {
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
+            var lockFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OugoingLock, CreationCollisionOption.OpenIfExists);
+            await lockFile.DeleteAsync();
+        }
+
+        static async Task<IFolder> GetOutgoingFolderAsync(Guid id)
+        {
+            return await CommonConfig.OutgoingFolder.CreateFolderAsync(id.ToString(), CreationCollisionOption.OpenIfExists);
+        }
+
+        #endregion
 
         #region Attachments
 

@@ -15,6 +15,8 @@ namespace Mark5.Mobile.Common.Services
     public interface IReachabilityService
     {
 
+        bool IsReachable { get; }
+
         event EventHandler RefreshingReachability;
 
         event EventHandler<ReachabilityRefershedEventArgs> ReachabilityRefreshed;

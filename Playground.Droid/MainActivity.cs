@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
@@ -12,12 +12,16 @@ using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.Converters;
 using Mark5.ServiceReference.Exceptions;
 using PCLStorage;
 
 namespace Playground.Droid
 {
+
+    public class CrossPlatformConcurrentQueue<T> : BlockingCollection<T>, ICrossPlatformConcurrentQueue<T>
+    {
+    }
+
     [Activity(Label = "Playground.Droid", MainLauncher = true, Icon = "@mipmap/icon")]
     public class MainActivity : Activity
     {
@@ -41,6 +45,7 @@ namespace Playground.Droid
                 CommonConfig.CacheFolder = cacheFolder;
                 CommonConfig.DatabaseFolder = dbFolder;
                 CommonConfig.AttachmentsFolder = attachmentsFolder;
+                CommonConfig.BlockingQueue = typeof(CrossPlatformConcurrentQueue<>);
 
                 try
                 {
@@ -69,7 +74,7 @@ namespace Playground.Droid
                 {
                     var auth = AuthenticatorFactory.Create();
 
-                    var result = await auth.AuthenticateAsync("mark5", "mark5", SslMode.Off, "192.168.75.51", 8093, DeviceType.Android, "test", "test");
+                    var result = await auth.AuthenticateAsync("mark5", "mark5", SslMode.Off, "192.168.75.51", 8093);
 
                     textView.Text = result.Authenticated ? "Is Authenticated" : "Not Authneticated";
 

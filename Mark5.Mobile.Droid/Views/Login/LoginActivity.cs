@@ -82,8 +82,6 @@ namespace Mark5.Mobile.Droid.Views.Login
 
         async void LoginButton_Click(object sender, EventArgs e)
         {
-            var dismissAction = Dialogs.ShowProgressDialog(this);
-
             try
             {
                 var username = usernameEditText.Text;
@@ -161,7 +159,6 @@ namespace Mark5.Mobile.Droid.Views.Login
             }
             catch (Exception ex)
             {
-                dismissAction();
                 await Dialogs.ShowConfirmDialogAsync(this, "Error", ex.Message);
 
                 loginButton.Enabled = true;

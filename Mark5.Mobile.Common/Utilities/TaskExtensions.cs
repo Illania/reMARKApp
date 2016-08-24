@@ -5,7 +5,6 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
 using System.Threading.Tasks;
 
 namespace Mark5.Mobile.Common.Utilities
@@ -20,9 +19,8 @@ namespace Mark5.Mobile.Common.Utilities
             {
                 await task.ConfigureAwait(false);
             }
-            catch (Exception e)
+            catch
             {
-                // TODO log errors
             }
         }
     }

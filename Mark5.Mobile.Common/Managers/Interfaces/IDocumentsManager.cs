@@ -23,6 +23,13 @@ namespace Mark5.Mobile.Common.Managers
         Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
                                DateTime sendOn, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto);
 
+        Task InserDocumentInOutgoingAsync(Guid identifier, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
+                                          DateTime sendOn, bool confirmRead, bool confirmDelivery, SourceType sourceType = SourceType.Auto);
+
+        Task LockOutgoingDocumentAsync(Guid identifier, SourceType sourceType = SourceType.Auto);
+
+        Task UnlockOutgoingDocumentAsync(Guid identifier, SourceType sourceType = SourceType.Auto);
+
         Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto);
 
         Task SetDocumentPriorityAsync(List<DocumentPreview> documentPreviews, Priority priority, SourceType sourceType = SourceType.Auto);
