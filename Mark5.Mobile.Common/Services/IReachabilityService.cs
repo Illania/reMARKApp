@@ -19,12 +19,12 @@ namespace Mark5.Mobile.Common.Services
 
         event EventHandler RefreshingReachability;
 
-        event EventHandler<ReachabilityRefershedEventArgs> ReachabilityRefreshed;
+        event EventHandler<ReachabilityRefreshedEventArgs> ReachabilityRefreshed;
 
         Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.Service, CancellationToken ct = default(CancellationToken));
     }
 
-    public class ReachabilityRefershedEventArgs : EventArgs
+    public class ReachabilityRefreshedEventArgs : EventArgs
     {
 
         public bool Changed
@@ -39,7 +39,7 @@ namespace Mark5.Mobile.Common.Services
             private set;
         }
 
-        public ReachabilityRefershedEventArgs(bool changed, bool isReachable)
+        public ReachabilityRefreshedEventArgs(bool changed, bool isReachable)
         {
             Changed = changed;
             IsReachable = isReachable;

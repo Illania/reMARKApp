@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Droid.Services
 
         public event EventHandler RefreshingReachability = delegate { };
 
-        public event EventHandler<ReachabilityRefershedEventArgs> ReachabilityRefreshed = delegate { };
+        public event EventHandler<ReachabilityRefreshedEventArgs> ReachabilityRefreshed = delegate { };
 
         bool lastResult;
 
@@ -62,7 +62,7 @@ namespace Mark5.Mobile.Droid.Services
                 result &= await CheckWithService(ct);
             }
 
-            ReachabilityRefreshed(this, new ReachabilityRefershedEventArgs(lastResult != result, result));
+            ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(lastResult != result, result));
 
             lastResult = result;
 

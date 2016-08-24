@@ -200,7 +200,7 @@ namespace Mark5.Mobile.Common.Managers
 
         #region Reachability Changes
 
-        async void ReachabilityRefreshed(object sender, ReachabilityRefershedEventArgs e)
+        async void ReachabilityRefreshed(object sender, ReachabilityRefreshedEventArgs e)
         {
             if (!active)
             {
