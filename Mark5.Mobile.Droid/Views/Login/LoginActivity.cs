@@ -82,6 +82,8 @@ namespace Mark5.Mobile.Droid.Views.Login
 
         async void LoginButton_Click(object sender, EventArgs e)
         {
+            var dismissAction = Dialogs.ShowProgressDialog(this);
+
             try
             {
                 var username = usernameEditText.Text;
@@ -117,11 +119,13 @@ namespace Mark5.Mobile.Droid.Views.Login
                     return;
                 }
 
-                if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialog(this, "Warning", "You chose to accept certificates. This may decrease security of the connection. Do you want to continue?"))
+                loginButton.Enabled = false;
+
+                if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialogAsync(this, "Warning", "You chose to accept certificates. This may decrease security of the connection. Do you want to continue?"))
                 {
                     return;
                 }
-                if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialog(this, "Warning", "You chose to turn off SSL. Connection will be unsecure. Do you want to continue?"))
+                if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialogAsync(this, "Warning", "You chose to turn off SSL. Connection will be unsecure. Do you want to continue?"))
                 {
                     return;
                 }
@@ -157,7 +161,10 @@ namespace Mark5.Mobile.Droid.Views.Login
             }
             catch (Exception ex)
             {
-                await Dialogs.ShowConfirmDialog(this, "Error", ex.Message);
+                dismissAction();
+                await Dialogs.ShowConfirmDialogAsync(this, "Error", ex.Message);
+
+                loginButton.Enabled = true;
             }
         }
     }

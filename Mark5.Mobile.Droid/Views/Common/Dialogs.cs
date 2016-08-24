@@ -8,6 +8,8 @@
 using System.Threading.Tasks;
 using Android.Support.V7.App;
 using Android.Content;
+using Android.Views;
+using System;
 
 namespace Mark5.Mobile.Droid.Views.Common
 {
@@ -15,7 +17,7 @@ namespace Mark5.Mobile.Droid.Views.Common
     public static class Dialogs
     {
 
-        public static Task<bool> ShowYesNoDialog(Context context, int titleId, int messageId)
+        public static Task<bool> ShowYesNoDialogAsync(Context context, int titleId, int messageId)
         {
             var tcs = new TaskCompletionSource<bool>();
             var b = new AlertDialog.Builder(context);
@@ -27,7 +29,7 @@ namespace Mark5.Mobile.Droid.Views.Common
             return tcs.Task;
         }
 
-        public static Task<bool> ShowYesNoDialog(Context context, string title, string message)
+        public static Task<bool> ShowYesNoDialogAsync(Context context, string title, string message)
         {
             var tcs = new TaskCompletionSource<bool>();
             var b = new AlertDialog.Builder(context);
@@ -39,7 +41,7 @@ namespace Mark5.Mobile.Droid.Views.Common
             return tcs.Task;
         }
 
-        public static Task ShowConfirmDialog(Context context, int titleId, int messageId)
+        public static Task ShowConfirmDialogAsync(Context context, int titleId, int messageId)
         {
             var tcs = new TaskCompletionSource<bool>();
             var b = new AlertDialog.Builder(context);
@@ -50,7 +52,7 @@ namespace Mark5.Mobile.Droid.Views.Common
             return tcs.Task;
         }
 
-        public static Task ShowConfirmDialog(Context context, string title, string message)
+        public static Task ShowConfirmDialogAsync(Context context, string title, string message)
         {
             var tcs = new TaskCompletionSource<bool>();
             var b = new AlertDialog.Builder(context);
