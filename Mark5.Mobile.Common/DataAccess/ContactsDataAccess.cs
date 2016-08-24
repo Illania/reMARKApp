@@ -377,6 +377,30 @@ namespace Mark5.Mobile.Common.DataAccess
                 throw new DataAccessException("Error deleting comment.", ex);
             }
         }
+
+        public async Task RemoveOrphans()
+        {
+            try
+            {
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    var innerSelectQueryText = $"select {nameof(FolderContactLink.ContactId)} from {nameof(FolderContactLink)}";
+
+                    var outerDeleteQueryPreview = $"delete from {nameof(ContactPreview)} where {nameof(ContactPreview.Id)} not in ({innerSelectQueryText}) ";
+                    var cmd = c.CreateCommand(outerDeleteQueryPreview);
+                    cmd.ExecuteNonQuery();
+
+                    var outerDeleteQueryContact = $"delete from {nameof(Contact)} where {nameof(Contact.Id)} not in ({innerSelectQueryText}) ";
+                    var cmd2 = c.CreateCommand(outerDeleteQueryContact);
+                    cmd2.ExecuteNonQuery();
+                });
+
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error removing orphan contacts and contact previews.", ex);
+            }
+        }
     }
 }
 

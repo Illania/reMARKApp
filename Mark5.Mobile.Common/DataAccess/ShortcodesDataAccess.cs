@@ -199,6 +199,30 @@ namespace Mark5.Mobile.Common.DataAccess
                 throw new DataAccessException("Error deleting shortcodes.", ex);
             }
         }
+
+        public async Task RemoveOrphans()
+        {
+            try
+            {
+                await shortcodesDatabase.RunInConnectionAsync(c =>
+                {
+                    var innerSelectQueryText = $"select {nameof(FolderShortcodeLink.ShortcodeId)} from {nameof(FolderShortcodeLink)}";
+
+                    var outerDeleteQueryPreview = $"delete from {nameof(ShortcodePreview)} where {nameof(ShortcodePreview.Id)} not in ({innerSelectQueryText}) ";
+                    var cmd = c.CreateCommand(outerDeleteQueryPreview);
+                    cmd.ExecuteNonQuery();
+
+                    var outerDeleteQueryContact = $"delete from {nameof(Shortcode)} where {nameof(Shortcode.Id)} not in ({innerSelectQueryText}) ";
+                    var cmd2 = c.CreateCommand(outerDeleteQueryContact);
+                    cmd2.ExecuteNonQuery();
+                });
+
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error removing orphan shortcodes and shortcode previews.", ex);
+            }
+        }
     }
 }
 

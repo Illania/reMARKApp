@@ -30,6 +30,9 @@ namespace Mark5.Mobile.Common.DataAccess
         Task DeleteAsync(List<ShortcodePreview> shortcodePreviews);
 
         Task DeleteAsync(List<Shortcode> shortocode);
+
+        Task RemoveOrphans();
+
     }
 }
 
