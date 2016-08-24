@@ -94,16 +94,15 @@ namespace Mark5.Mobile.Common
             try
             {
                 await semaphore.WaitAsync();
+                await StopSendTask();
 
-                if (cts != null)
+                if (subscribed)
                 {
-                    cts.Cancel();
-                    cts = null;
+                    CommonConfig.ReachabilityService.ReachabilityChanged -= ReachabilityChanged;
+                    subscribed = false;
                 }
 
-                await downloadTask;
-                downloadTask = null;
-
+                active = false;
             }
             finally
             {
