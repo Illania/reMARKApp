@@ -59,11 +59,11 @@ namespace Mark5.Mobile.Common.Managers
 
                 if (!subscribed)
                 {
-                    CommonConfig.ReachabilityService.ReachabilityChanged += ReachabilityChanged;
+                    CommonConfig.ReachabilityService.ReachabilityRefreshed += ReachabilityRefreshed;
                     subscribed = true;
                 }
 
-                await StartSendTask();
+                StartSendTask();
             }
             finally
             {
@@ -80,7 +80,7 @@ namespace Mark5.Mobile.Common.Managers
 
                 if (subscribed)
                 {
-                    CommonConfig.ReachabilityService.ReachabilityChanged -= ReachabilityChanged;
+                    CommonConfig.ReachabilityService.ReachabilityRefreshed -= ReachabilityRefreshed;
                     subscribed = false;
                 }
 
@@ -104,14 +104,14 @@ namespace Mark5.Mobile.Common.Managers
             sendTask = null;
         }
 
-        async Task StartSendTask()
+        void StartSendTask()
         {
             if (sendTask != null)
             {
                 return;
             }
 
-            if (!await CommonConfig.ReachabilityService.IsServiceReachable())
+            if (!CommonConfig.ReachabilityService.IsReachable)
             {
                 return;
             }
@@ -200,7 +200,7 @@ namespace Mark5.Mobile.Common.Managers
 
         #region Reachability Changes
 
-        async void ReachabilityChanged(object sender, ReachabilityChangedEventArgs e)
+        async void ReachabilityRefreshed(object sender, ReachabilityRefreshedEventArgs e)
         {
             if (!active)
             {
@@ -209,7 +209,7 @@ namespace Mark5.Mobile.Common.Managers
 
             if (e.IsReachable)
             {
-                await StartSendTask();
+                StartSendTask();
             }
             else
             {

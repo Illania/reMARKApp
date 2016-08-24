@@ -74,7 +74,7 @@ namespace Playground.Droid
                 {
                     var auth = AuthenticatorFactory.Create();
 
-                    var result = await auth.AuthenticateAsync("mark5", "mark5", false, "192.168.75.51", 8093, DeviceType.Android, "test", "test");
+                    var result = await auth.AuthenticateAsync("mark5", "mark5", SslMode.Off, "192.168.75.51", 8093);
 
                     textView.Text = result.Authenticated ? "Is Authenticated" : "Not Authneticated";
 

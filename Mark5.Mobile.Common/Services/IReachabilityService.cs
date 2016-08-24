@@ -6,20 +6,32 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Mark5.Mobile.Common.Services
 {
+
     public interface IReachabilityService
     {
 
-        Task<bool> IsServiceReachable();
+        bool IsReachable { get; }
 
-        event EventHandler<ReachabilityChangedEventArgs> ReachabilityChanged;
+        event EventHandler RefreshingReachability;
+
+        event EventHandler<ReachabilityRefreshedEventArgs> ReachabilityRefreshed;
+
+        Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.Service, CancellationToken ct = default(CancellationToken));
     }
 
-    public class ReachabilityChangedEventArgs : EventArgs
+    public class ReachabilityRefreshedEventArgs : EventArgs
     {
+
+        public bool Changed
+        {
+            get;
+            private set;
+        }
 
         public bool IsReachable
         {
@@ -27,18 +39,19 @@ namespace Mark5.Mobile.Common.Services
             private set;
         }
 
-        public bool WasReachable
+        public ReachabilityRefreshedEventArgs(bool changed, bool isReachable)
         {
-            get;
-            private set;
-        }
-
-        public ReachabilityChangedEventArgs(bool isReachable, bool wasReachable)
-        {
+            Changed = changed;
             IsReachable = isReachable;
-            WasReachable = wasReachable;
         }
     }
-}
 
+    [Flags]
+    public enum ReachabilityMode
+    {
+        NetworkAvailability = 1,
+        Google = 2,
+        Service = 4
+    }
+}
 

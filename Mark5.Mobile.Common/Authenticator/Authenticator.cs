@@ -21,24 +21,23 @@ namespace Mark5.Mobile.Common.Authenticator
 
         public async Task<bool> IsAuthenticatedAsync(CancellationToken ct = default(CancellationToken))
         {
-            return (await GetConnectionInfoAsync(ct)).Authenticated;
+            return (await GetConnectionInfoAsync(ct))?.Authenticated ?? false;
         }
 
-        public async Task<ConnectionInfo> GetConnectionInfoAsync(CancellationToken ct = default(CancellationToken))
+        public async Task<ConnectionInfo> AuthenticateAsync(string username, string password, SslMode sslMode, string hostname, int port, CancellationToken ct = default(CancellationToken))
         {
-            return await FileSystemStorage.GetConnectionInfoAsync(ct);
-        }
+            var deviceType = CommonConfig.DeviceInfoProvider.GetDeviceType();
+            var deviceName = CommonConfig.DeviceInfoProvider.GetDeviceName();
+            var deviceId = CommonConfig.DeviceInfoProvider.GetDeviceId();
 
-        public async Task<ConnectionInfo> AuthenticateAsync(string username, string password, bool ssl, string hostname, int port, DeviceType deviceType, string installationId, string friendlyDeviceName, CancellationToken ct = default(CancellationToken))
-        {
-            var proxy = AppServiceProxyFactory.Create(ssl, hostname, port);
+            var proxy = AppServiceProxyFactory.Create(sslMode != SslMode.Off, hostname, port);
             var result = await proxy.AuthenticateAsync(new DataContract.AuthenticationParameters
             {
                 Username = username,
                 Password = password,
                 DeviceType = deviceType.ConvertEnum<DataContract.DeviceType>(),
-                FriendlyDeviceName = friendlyDeviceName,
-                InstallationId = installationId
+                FriendlyDeviceName = deviceName,
+                InstallationId = deviceId
             }, ct);
 
             var connectionInfo = new ConnectionInfo
@@ -47,16 +46,24 @@ namespace Mark5.Mobile.Common.Authenticator
                 Username = username,
                 Hostname = hostname,
                 Port = port,
-                Ssl = ssl,
-                InstallationId = installationId,
+                SslMode = sslMode,
                 DeviceType = deviceType,
-                FriendlyDeviceName = friendlyDeviceName,
+                FriendlyDeviceName = deviceName,
+                InstallationId = deviceId,
                 Authenticated = true
             };
 
-            await FileSystemStorage.SaveConnectionInfoAsync(connectionInfo, ct);
-
             return connectionInfo;
+        }
+
+        public async Task<ConnectionInfo> GetConnectionInfoAsync(CancellationToken ct = default(CancellationToken))
+        {
+            return await FileSystemStorage.GetConnectionInfoAsync(ct);
+        }
+
+        public async Task SaveConnectionInfoAsync(ConnectionInfo connectionInfo, CancellationToken ct = default(CancellationToken))
+        {
+            await FileSystemStorage.SaveConnectionInfoAsync(connectionInfo, ct);
         }
     }
 }
