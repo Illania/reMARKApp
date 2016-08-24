@@ -66,12 +66,17 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<Document> GetDocumentAsync(Folder folder, int documentId, DocumentBodyTypeRequest bodyType, SourceType sourceType = SourceType.Auto)
         {
+            return await GetDocumentAsync(folder.Id, documentId, bodyType, sourceType);
+        }
+
+        public async Task<Document> GetDocumentAsync(int folderId, int documentId, DocumentBodyTypeRequest bodyType, SourceType sourceType = SourceType.Auto)
+        {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
                 var result = await AppServiceProxy.GetDocumentAsync(new DataContract.GetDocumentParameters
                 {
                     Token = Token,
-                    FolderId = folder.Id,
+                    FolderId = folderId,
                     DocumentId = documentId,
                     BodyRequest = bodyType.ConvertEnum<DataContract.DocumentBodyTypeRequest>(),
                     IncludePreview = false

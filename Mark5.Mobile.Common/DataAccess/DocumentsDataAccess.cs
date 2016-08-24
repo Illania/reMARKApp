@@ -602,6 +602,52 @@ namespace Mark5.Mobile.Common.DataAccess
                 throw new DataAccessException("Error deleting comment.", ex);
             }
         }
+
+        public async Task<IEnumerable<DocumentDownloadInfo>> GetUnsavedDocumentsIds(int? folderId)
+        {
+            try
+            {
+                var infos = new List<DocumentDownloadInfo>();
+
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    var queryString = $"select * from {nameof(FolderDocumentLink)} where  {nameof(FolderDocumentLink.DocumentId)}  " +
+                        $" not in (select {nameof(Document.Id)} from {nameof(Document)})" +
+                        $"{ (folderId.HasValue ? $"and { nameof(FolderDocumentLink.FolderId)} = ? " : "")}";
+
+                    var result = c.Query<FolderDocumentLink>(queryString, folderId.Value);
+
+                    infos = result.Select(fcl => new DocumentDownloadInfo { FolderId = fcl.FolderId, Id = fcl.DocumentId }).ToList();
+                });
+
+                return infos;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error while getting not cached documents.", ex);
+            }
+        }
+
+        public async Task<bool> IsDocumentCached(int documentId)
+        {
+            try
+            {
+                bool found = false;
+
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    var result = c.Find<Document>(documentId);
+
+                    found = result != null;
+                });
+
+                return found;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error while checking document existence.", ex);
+            }
+        }
     }
 }
 

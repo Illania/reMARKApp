@@ -199,7 +199,12 @@ namespace Mark5.Mobile.Common
 
         async Task HandleDocumentDownload(DownloadItemInfo itemInfo)
         {
-            throw new NotImplementedException();
+            if (await documentsDataAccess.IsDocumentCached(itemInfo.Id))
+            {
+                return;
+            }
+
+            await Managers.Managers.DocumentsManager.GetDocumentAsync(itemInfo.FolderId, itemInfo.Id, DocumentBodyTypeRequest.HtmlOnly); //TODO which body type?
         }
 
         async Task HandleContactDownload(DownloadItemInfo itemInfo)
@@ -252,12 +257,12 @@ namespace Mark5.Mobile.Common
 
         async Task AddPendingDocumentsToQueue(int? folderId = null)
         {
-
+            AddToQueue(await documentsDataAccess.GetUnsavedDocumentsIds(folderId));
         }
 
         async Task RetrievePendingFromStorage()
         {
-            await AddPendingDocumentsToQueue();
+            await AddPendingDocumentsToQueue(); //TODO later we need to retrieve only the ones for the folder marked as offline
             await AddPendingContactsToQueue();
             await AddPendingShortcodesToQueue();
         }
