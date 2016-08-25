@@ -62,6 +62,8 @@ namespace Mark5.Mobile.Common.DataAccess
         Task EditCommentAsync(Document document, Comment comment);
 
         Task DeleteCommentAsync(Document document, Comment comment);
+
+        Task RemoveOrphans();
     }
 }
 

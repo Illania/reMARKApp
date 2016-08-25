@@ -323,7 +323,31 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
+        public async Task RemoveOrphans()
+        {
+            try
+            {
+                await calendarDatabase.RunInConnectionAsync(c =>
+                {
+                    var innerSelectQueryTextTask = $"select {nameof(FolderCalendarTaskLink.CalendarTaskId)} from {nameof(FolderCalendarTaskLink)}";
 
+                    var outerDeleteQueryTask = $"delete from {nameof(CalendarTask)} where {nameof(CalendarTask.Id)} not in ({innerSelectQueryTextTask}) ";
+                    var cmd = c.CreateCommand(outerDeleteQueryTask);
+                    cmd.ExecuteNonQuery();
+
+                    var innerSelectQueryTextAppointment = $"select {nameof(FolderCalendarAppointmentLink.CalendarAppointmentId)} from {nameof(FolderCalendarAppointmentLink)}";
+
+                    var outerDeleteQueryAppointment = $"delete from {nameof(CalendarAppointment)} where {nameof(CalendarAppointment.Id)} not in ({innerSelectQueryTextAppointment}) ";
+                    var cmd2 = c.CreateCommand(outerDeleteQueryAppointment);
+                    cmd2.ExecuteNonQuery();
+                });
+
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error removing orphan tasks and appointments.", ex);
+            }
+        }
     }
 }
 

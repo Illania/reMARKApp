@@ -12,7 +12,7 @@ using Mark5.Mobile.Common.Model;
 namespace Mark5.Mobile.Common.DataAccess
 {
 
-    interface IContactsDataAccess
+    public interface IContactsDataAccess
     {
 
         Task SaveContactPreviewsAsync(Folder folder, List<ContactPreview> contactPreviews, bool clean);
@@ -42,6 +42,9 @@ namespace Mark5.Mobile.Common.DataAccess
         Task EditCommentAsync(Contact contact, Comment comment);
 
         Task DeleteCommentAsync(Contact contact, Comment comment);
+
+        Task RemoveOrphans();
+
     }
 }
 
