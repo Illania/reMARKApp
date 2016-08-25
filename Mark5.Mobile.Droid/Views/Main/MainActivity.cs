@@ -8,7 +8,6 @@
 using Android.App;
 using Android.OS;
 using Android.Support.V7.App;
-using Xamarin;
 
 namespace Mark5.Mobile.Droid.Views.Main
 {
@@ -21,7 +20,7 @@ namespace Mark5.Mobile.Droid.Views.Main
         {
             base.OnCreate(savedInstanceState);
 
-            Title = "MARK5";
+            SetTitle(Resource.String.app_name);
             SetContentView(Resource.Layout.Main);
         }
     }

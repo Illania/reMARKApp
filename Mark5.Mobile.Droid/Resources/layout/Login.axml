@@ -31,7 +31,7 @@
                     android:id="@+id/username_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Username"
+                    android:hint="@string/username"
                     android:singleLine="true"
                     android:inputType="textNoSuggestions" />
             </android.support.design.widget.TextInputLayout>
@@ -43,7 +43,7 @@
                     android:id="@+id/password_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Password"
+                    android:hint="@string/password"
                     android:singleLine="true"
                     android:inputType="textPassword" />
             </android.support.design.widget.TextInputLayout>
@@ -55,7 +55,7 @@
                     android:id="@+id/hostname_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Hostname"
+                    android:hint="@string/hostname"
                     android:singleLine="true"
                     android:inputType="textNoSuggestions" />
             </android.support.design.widget.TextInputLayout>
@@ -67,7 +67,7 @@
                     android:id="@+id/port_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Port"
+                    android:hint="@string/port"
                     android:singleLine="true"
                     android:inputType="numberDecimal" />
             </android.support.design.widget.TextInputLayout>
@@ -75,11 +75,10 @@
                 android:id="@+id/ssl_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="SSL"
                 android:layout_marginTop="10dp" />
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/login_button"
-                android:text="Log in"
+                android:text="@string/login"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"

@@ -3326,14 +3326,62 @@ namespace Mark5.Mobile.Droid
 			// aapt resource value: 0x7f070034
 			public const int common_signin_button_text_long = 2131165236;
 			
+			// aapt resource value: 0x7f07003b
+			public const int error = 2131165243;
+			
+			// aapt resource value: 0x7f070046
+			public const int hostname = 2131165254;
+			
+			// aapt resource value: 0x7f070047
+			public const int hostname_invalid = 2131165255;
+			
+			// aapt resource value: 0x7f07004a
+			public const int login = 2131165258;
+			
+			// aapt resource value: 0x7f07003e
+			public const int no = 2131165246;
+			
+			// aapt resource value: 0x7f07003f
+			public const int ok = 2131165247;
+			
+			// aapt resource value: 0x7f070045
+			public const int passowrd_invalid = 2131165253;
+			
+			// aapt resource value: 0x7f070044
+			public const int password = 2131165252;
+			
+			// aapt resource value: 0x7f070048
+			public const int port = 2131165256;
+			
+			// aapt resource value: 0x7f070049
+			public const int port_invalid = 2131165257;
+			
+			// aapt resource value: 0x7f070040
+			public const int ssl_accept_selfsigned_warning = 2131165248;
+			
+			// aapt resource value: 0x7f070041
+			public const int ssl_off_warning = 2131165249;
+			
 			// aapt resource value: 0x7f070018
 			public const int status_bar_notification_info_overflow = 2131165208;
+			
+			// aapt resource value: 0x7f070042
+			public const int username = 2131165250;
+			
+			// aapt resource value: 0x7f070043
+			public const int username_invalid = 2131165251;
 			
 			// aapt resource value: 0x7f070000
 			public const int v7_preference_off = 2131165184;
 			
 			// aapt resource value: 0x7f070001
 			public const int v7_preference_on = 2131165185;
+			
+			// aapt resource value: 0x7f07003c
+			public const int warning = 2131165244;
+			
+			// aapt resource value: 0x7f07003d
+			public const int yes = 2131165245;
 			
 			static String()
 			{

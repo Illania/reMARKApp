@@ -42,7 +42,7 @@ namespace Mark5.Mobile.Droid.Views.Login
         {
             base.OnCreate(savedInstanceState);
 
-            Title = "MARK5";
+            SetTitle(Resource.String.app_name);
             SetContentView(Resource.Layout.Login);
 
             var toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
@@ -93,22 +93,22 @@ namespace Mark5.Mobile.Droid.Views.Login
                 var errors = false;
                 if (!Validator.IsUsernameValid(username))
                 {
-                    usernameEditText.Error = "Username is not valid.";
+                    usernameEditText.Error = GetText(Resource.String.username_invalid);
                     errors = true;
                 }
                 if (!Validator.IsPasswordValid(password))
                 {
-                    passwordEditText.Error = "Password is not valid.";
+                    passwordEditText.Error = GetText(Resource.String.passowrd_invalid);
                     errors = true;
                 }
                 if (!Validator.IsHostNameValid(hostname))
                 {
-                    hostnameEditText.Error = "Hostname is not valid.";
+                    hostnameEditText.Error = GetText(Resource.String.hostname_invalid);
                     errors = true;
                 }
                 if (!Validator.IsPortValid(port))
                 {
-                    portEditText.Error = "Port is not valid.";
+                    portEditText.Error = GetText(Resource.String.port_invalid);
                     errors = true;
                 }
 
@@ -119,11 +119,11 @@ namespace Mark5.Mobile.Droid.Views.Login
 
                 loginButton.Enabled = false;
 
-                if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialogAsync(this, "Warning", "You chose to accept certificates. This may decrease security of the connection. Do you want to continue?"))
+                if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_accept_selfsigned_warning))
                 {
                     return;
                 }
-                if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialogAsync(this, "Warning", "You chose to turn off SSL. Connection will be unsecure. Do you want to continue?"))
+                if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_off_warning))
                 {
                     return;
                 }
@@ -159,7 +159,7 @@ namespace Mark5.Mobile.Droid.Views.Login
             }
             catch (Exception ex)
             {
-                await Dialogs.ShowConfirmDialogAsync(this, "Error", ex.Message);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
 
                 loginButton.Enabled = true;
             }

@@ -5,11 +5,10 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System.Threading.Tasks;
-using Android.Support.V7.App;
-using Android.Content;
-using Android.Views;
 using System;
+using System.Threading.Tasks;
+using Android.Content;
+using Android.Support.V7.App;
 
 namespace Mark5.Mobile.Droid.Views.Common
 {
@@ -23,20 +22,8 @@ namespace Mark5.Mobile.Droid.Views.Common
             var b = new AlertDialog.Builder(context);
             b.SetTitle(titleId);
             b.SetMessage(messageId);
-            b.SetPositiveButton("Yes", (sender, e) => tcs.SetResult(true));
-            b.SetNegativeButton("No", (sender, e) => tcs.SetResult(false));
-            b.Show();
-            return tcs.Task;
-        }
-
-        public static Task<bool> ShowYesNoDialogAsync(Context context, string title, string message)
-        {
-            var tcs = new TaskCompletionSource<bool>();
-            var b = new AlertDialog.Builder(context);
-            b.SetTitle(title);
-            b.SetMessage(message);
-            b.SetPositiveButton("Yes", (sender, e) => tcs.SetResult(true));
-            b.SetNegativeButton("No", (sender, e) => tcs.SetResult(false));
+            b.SetPositiveButton(Resource.String.yes, (sender, e) => tcs.SetResult(true));
+            b.SetNegativeButton(Resource.String.no, (sender, e) => tcs.SetResult(false));
             b.Show();
             return tcs.Task;
         }
@@ -47,18 +34,18 @@ namespace Mark5.Mobile.Droid.Views.Common
             var b = new AlertDialog.Builder(context);
             b.SetTitle(titleId);
             b.SetMessage(messageId);
-            b.SetPositiveButton("OK", (sender, e) => tcs.SetResult(true));
+            b.SetPositiveButton(Resource.String.ok, (sender, e) => tcs.SetResult(true));
             b.Show();
             return tcs.Task;
         }
 
-        public static Task ShowConfirmDialogAsync(Context context, string title, string message)
+        public static Task ShowErrorDialogAsync(Context context, Exception ex)
         {
             var tcs = new TaskCompletionSource<bool>();
             var b = new AlertDialog.Builder(context);
-            b.SetTitle(title);
-            b.SetMessage(message);
-            b.SetPositiveButton("OK", (sender, e) => tcs.SetResult(true));
+            b.SetTitle(Resource.String.error);
+            b.SetMessage(ex.Message);
+            b.SetPositiveButton(Resource.String.ok, (sender, e) => tcs.SetResult(true));
             b.Show();
             return tcs.Task;
         }
