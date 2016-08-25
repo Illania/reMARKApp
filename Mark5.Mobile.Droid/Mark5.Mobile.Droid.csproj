@@ -118,7 +118,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ReachabilityService.cs" />
     <Compile Include="Services\ReachabilityBroadcastReceiver.cs" />
@@ -131,6 +130,7 @@
     <Compile Include="Utilities\DeviceInfoProvider.cs" />
     <Compile Include="Views\Login\LoginActivity.cs" />
     <Compile Include="Views\Splash\SplashActivity.cs" />
+    <Compile Include="Resources\Resource.designer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
