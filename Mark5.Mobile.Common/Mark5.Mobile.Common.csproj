@@ -160,8 +160,8 @@
     <Compile Include="Managers\Interfaces\IOutgoingDocumentsManager.cs" />
     <Compile Include="Utilities\CrossPlatformCollections\CrossPlatoformCollectionsExtensions.cs" />
     <Compile Include="Model\Support\OutgoingDocumentContainer.cs" />
-    <Compile Include="Managers\CleaningManager.cs" />
-    <Compile Include="Managers\Interfaces\ICleaningManager.cs" />
+    <Compile Include="Managers\CleanUpManager.cs" />
+    <Compile Include="Managers\Interfaces\CleanUpManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

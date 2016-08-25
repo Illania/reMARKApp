@@ -77,7 +77,7 @@ namespace Mark5.Mobile.Common.Managers
             private set;
         }
 
-        public static ICleaningManager CleaningManager
+        public static ICleanUpManager CleanUpManager
         {
             get;
             private set;
@@ -115,7 +115,7 @@ namespace Mark5.Mobile.Common.Managers
             NotificationsManager = new NotificationsManager(connectionInfo, appServiceProxy, foldersDataAccess, notificationsDataAccess);
             SystemManager = new SystemManager(connectionInfo, appServiceProxy);
             CommonActionsManager = new CommonActionsManager(connectionInfo, appServiceProxy, documentsDataAccess, contactsDataAccess, shortcodesDataAccess, calendarDataAccess);
-            CleaningManager = new CleaningManager(documentsDataAccess, contactsDataAccess, shortcodesDataAccess, calendarDataAccess);
+            CleanUpManager = new CleanUpManager(documentsDataAccess, contactsDataAccess, shortcodesDataAccess, calendarDataAccess);
         }
     }
 }
