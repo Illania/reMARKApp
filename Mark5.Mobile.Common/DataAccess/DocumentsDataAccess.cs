@@ -611,9 +611,9 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
+                    var folderCondition = folderId.HasValue ? $"and { nameof(FolderDocumentLink.FolderId)} = ? " : "";
                     var queryString = $"select * from {nameof(FolderDocumentLink)} where  {nameof(FolderDocumentLink.DocumentId)}  " +
-                        $" not in (select {nameof(Document.Id)} from {nameof(Document)})" +
-                        $"{ (folderId.HasValue ? $"and { nameof(FolderDocumentLink.FolderId)} = ? " : "")}";
+                        $" not in (select {nameof(Document.Id)} from {nameof(Document)}) {folderCondition}";
 
                     var result = c.Query<FolderDocumentLink>(queryString, folderId.Value);
 
@@ -636,9 +636,10 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var result = c.Find<Document>(documentId);
+                    var query = $"select count(*) from {nameof(Document)} where {nameof(Document.Id)} = ?  ";
+                    var result = c.ExecuteScalar<int>(query, documentId);
 
-                    found = result != null;
+                    found = result >= 1;
                 });
 
                 return found;

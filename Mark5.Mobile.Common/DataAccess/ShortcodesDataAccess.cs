@@ -209,9 +209,9 @@ namespace Mark5.Mobile.Common.DataAccess
                 await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
 
+                    var folderCondition = folderId.HasValue ? $"and { nameof(FolderShortcodeLink.FolderId)} = ? " : "";
                     var queryString = $"select * from {nameof(FolderShortcodeLink)} where  {nameof(FolderShortcodeLink.ShortcodeId)}  " +
-                        $" not in (select {nameof(Shortcode.Id)} from {nameof(Shortcode)})" +
-                        $"{ (folderId.HasValue ? $"and { nameof(FolderShortcodeLink.FolderId)} = ? " : "")}";
+                        $" not in (select {nameof(Shortcode.Id)} from {nameof(Shortcode)}) {folderCondition}";
 
                     var result = c.Query<FolderShortcodeLink>(queryString, folderId.Value);
 
@@ -234,9 +234,10 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
-                    var result = c.Find<Shortcode>(shortcodeId);
+                    var query = $"select count(*) from {nameof(Shortcode)} where {nameof(Shortcode.Id)} = ?  ";
+                    var result = c.ExecuteScalar<int>(query, shortcodeId);
 
-                    found = result != null;
+                    found = result >= 1;
                 });
 
                 return found;

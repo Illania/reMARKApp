@@ -386,10 +386,10 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-
+                    var folderCondition = folderId.HasValue ? $"and { nameof(FolderContactLink.FolderId)} = ? " : "";
                     var queryString = $"select * from {nameof(FolderContactLink)} where  {nameof(FolderContactLink.ContactId)}  " +
-                        $" not in (select {nameof(Contact.Id)} from {nameof(Contact)})" +
-                        $"{ (folderId.HasValue ? $"and { nameof(FolderContactLink.FolderId)} = ? " : "")}";
+                        $" not in (select {nameof(Contact.Id)} from {nameof(Contact)}) {folderCondition}";
+
 
                     var result = c.Query<FolderContactLink>(queryString, folderId.Value);
 
@@ -412,9 +412,10 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var result = c.Find<Contact>(contactId);
+                    var query = $"select count(*) from {nameof(Contact)} where {nameof(Contact.Id)} = ?  ";
+                    var result = c.ExecuteScalar<int>(query, contactId);
 
-                    found = result != null;
+                    found = result >= 1;
                 });
 
                 return found;
