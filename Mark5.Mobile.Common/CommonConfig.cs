@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: CommonConfig.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -7,6 +7,7 @@
 //
 using System;
 using Mark5.Mobile.Common.Services;
+using Mark5.Mobile.Common.Utilities;
 using PCLStorage;
 
 namespace Mark5.Mobile.Common
@@ -25,7 +26,11 @@ namespace Mark5.Mobile.Common
 
         public static IFolder OutgoingFolder { get; set; }
 
+        public static ILogger Logger { get; set; }
+
         public static IReachabilityService ReachabilityService { get; set; }
+
+        public static IDeviceInfoProvider DeviceInfoProvider { get; set; }
 
         public static Type BlockingQueue { get; set; }
     }

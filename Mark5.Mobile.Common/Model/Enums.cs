@@ -355,5 +355,16 @@ namespace Mark5.Mobile.Common.Model
 
     #endregion
 
+    #region Other
+
+    public enum SslMode
+    {
+        On,
+        AllowSelfSigned,
+        Off
+    }
+
+    #endregion
+
 }
 

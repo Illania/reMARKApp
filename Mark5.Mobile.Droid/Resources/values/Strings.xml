@@ -1,5 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, Click Me!</string>
-    <string name="app_name">MARK5</string>
+	<string name="app_name">MARK5</string>
+	<string-array name="ssl_modes">
+		<item>SSL Enabled</item>
+		<item>SSL Enabled (allow self-signed)</item>
+		<item>SSL Disabled</item>
+	</string-array>
 </resources>

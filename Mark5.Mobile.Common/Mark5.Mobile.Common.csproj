@@ -162,6 +162,14 @@
     <Compile Include="Model\Support\OutgoingDocumentContainer.cs" />
     <Compile Include="Managers\CleanUpManager.cs" />
     <Compile Include="Managers\Interfaces\CleanUpManager.cs" />
+    <Compile Include="Tester\ITester.cs" />
+    <Compile Include="Tester\Tester.cs" />
+    <Compile Include="Tester\TesterFactory.cs" />
+    <Compile Include="Utilities\TaskExtensions.cs" />
+    <Compile Include="Utilities\AbstractLogger.cs" />
+    <Compile Include="Utilities\ILogger.cs" />
+    <Compile Include="Utilities\Validator.cs" />
+    <Compile Include="Utilities\IDeviceInfoProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />
@@ -180,6 +188,7 @@
     <Folder Include="Managers\Interfaces\" />
     <Folder Include="Utilities\CrossPlatformCollections\" />
     <Folder Include="Model\Support\" />
+    <Folder Include="Tester\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PCLStorage">
