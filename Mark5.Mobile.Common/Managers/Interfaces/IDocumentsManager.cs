@@ -20,6 +20,8 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<Document> GetDocumentAsync(Folder folder, int documentId, DocumentBodyTypeRequest bodyType, SourceType sourceType = SourceType.Auto);
 
+        Task<Document> GetDocumentAsync(int folderId, int documentId, DocumentBodyTypeRequest bodyType, SourceType sourceType = SourceType.Auto);
+
         Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
                                DateTime sendOn, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto);
 

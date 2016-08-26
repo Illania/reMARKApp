@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: DocumentsDataAccess.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -600,6 +600,75 @@ namespace Mark5.Mobile.Common.DataAccess
             catch (Exception ex) when (!(ex is DataAccessException))
             {
                 throw new DataAccessException("Error deleting comment.", ex);
+            }
+        }
+
+        public async Task<IEnumerable<int>> GetPendingFolders()
+        {
+            try
+            {
+                var fIds = new List<int>();
+
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    var queryString = $"select {nameof(FolderDocumentLink.FolderId)} from {nameof(FolderDocumentLink)} where  {nameof(FolderDocumentLink.DocumentId)}  " +
+                        $" not in (select {nameof(Document.Id)} from {nameof(Document)})";
+
+                    var result = c.Query<int>(queryString);
+
+                    fIds = result.ToList();
+                });
+
+                return fIds;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error while getting pending folder ids for documents.", ex);
+            }
+        }
+
+        public async Task<bool> IsDocumentCached(int documentId)
+        {
+            try
+            {
+                bool found = false;
+
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    var result = c.Table<Document>().Count(d => d.Id == documentId);
+                    found = result >= 1;
+                });
+
+                return found;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error while checking document existence.", ex);
+            }
+        }
+
+        public async Task<IEnumerable<int>> GetPendingDocumentsId(int folderId)
+        {
+            try
+            {
+                var documentIds = new List<int>();
+
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    var folderCondition = $"{ nameof(FolderDocumentLink.FolderId)} = ? ";
+                    var inCondition = $"{ nameof(FolderDocumentLink.DocumentId) }   not in (select { nameof(Document.Id)}   from { nameof(Document)})";
+                    var queryString = $"select {nameof(FolderDocumentLink.DocumentId)} from {nameof(FolderDocumentLink)} " +
+                        $"where {folderCondition} and {inCondition}";
+
+                    var result = c.Query<int>(queryString, folderId);
+                    documentIds = result.ToList();
+                });
+
+                return documentIds;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error while getting pending document ids.", ex);
             }
         }
 

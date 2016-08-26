@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: ContactsDataAccess.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -375,6 +375,75 @@ namespace Mark5.Mobile.Common.DataAccess
             catch (Exception ex) when (!(ex is DataAccessException))
             {
                 throw new DataAccessException("Error deleting comment.", ex);
+            }
+        }
+
+        public async Task<IEnumerable<int>> GetPendingFolders()
+        {
+            try
+            {
+                var fIds = new List<int>();
+
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    var queryString = $"select {nameof(FolderContactLink.FolderId)} from {nameof(FolderContactLink)} where  {nameof(FolderContactLink.ContactId)}  " +
+                        $" not in (select {nameof(Contact.Id)} from {nameof(Contact)})";
+
+                    var result = c.Query<int>(queryString);
+
+                    fIds = result.ToList();
+                });
+
+                return fIds;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error while getting pending folders id for contacts.", ex);
+            }
+        }
+
+        public async Task<bool> IsContactCached(int contactId)
+        {
+            try
+            {
+                bool found = false;
+
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    var result = c.Table<Contact>().Count(co => co.Id == contactId);
+                    found = result >= 1;
+                });
+
+                return found;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error while checking contact existence.", ex);
+            }
+        }
+
+        public async Task<IEnumerable<int>> GetPendingContactsId(int folderId)
+        {
+            try
+            {
+                var contactsId = new List<int>();
+
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    var folderCondition = $"{ nameof(FolderContactLink.FolderId)} = ? ";
+                    var inCondition = $"{ nameof(FolderContactLink.ContactId) }   not in (select { nameof(Contact.Id)}   from { nameof(Contact)})";
+                    var queryString = $"select {nameof(FolderContactLink.ContactId)} from {nameof(FolderContactLink)} " +
+                        $"where {folderCondition} and {inCondition}";
+
+                    var result = c.Query<int>(queryString, folderId);
+                    contactsId = result.ToList();
+                });
+
+                return contactsId;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error while getting pending contacts id.", ex);
             }
         }
 

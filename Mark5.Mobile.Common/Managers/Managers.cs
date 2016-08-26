@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: Managers.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -77,6 +77,12 @@ namespace Mark5.Mobile.Common.Managers
             private set;
         }
 
+        public static IDownloadManager DownloadManager
+        {
+            get;
+            private set;
+        }
+
         public static ICleanUpManager CleanUpManager
         {
             get;
@@ -106,6 +112,7 @@ namespace Mark5.Mobile.Common.Managers
             var notificationsDataAccess = new NotificationsDataAccess(DatabaseConnectionProvider.SystemDatabase);
 
             OutgoingDocumentsManager = new OutgoingDocumentsManager();
+            DownloadManager = new DownloadManager(documentsDataAccess, contactsDataAccess, shortcodesDataAccess);
             FoldersManager = new FoldersManager(connectionInfo, appServiceProxy, foldersDataAccess);
             DocumentsManager = new DocumentsManager(connectionInfo, appServiceProxy, fileTransferServiceProxy, documentsDataAccess);
             ContactsManager = new ContactsManager(connectionInfo, appServiceProxy, contactsDataAccess);

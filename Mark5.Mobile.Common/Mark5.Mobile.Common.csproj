@@ -160,6 +160,10 @@
     <Compile Include="Managers\Interfaces\IOutgoingDocumentsManager.cs" />
     <Compile Include="Utilities\CrossPlatformCollections\CrossPlatoformCollectionsExtensions.cs" />
     <Compile Include="Model\Support\OutgoingDocumentContainer.cs" />
+    <Compile Include="Managers\DownloadManager.cs" />
+    <Compile Include="Managers\Interfaces\IDownloadManager.cs" />
+    <Compile Include="Model\Support\DownloadItemInfo.cs" />
+    <Compile Include="Model\Support\DownloadPolicy.cs" />
     <Compile Include="Managers\CleanUpManager.cs" />
     <Compile Include="Managers\Interfaces\CleanUpManager.cs" />
     <Compile Include="Tester\ITester.cs" />

@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: IShortcodesDataAccess.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -30,6 +30,12 @@ namespace Mark5.Mobile.Common.DataAccess
         Task DeleteAsync(List<ShortcodePreview> shortcodePreviews);
 
         Task DeleteAsync(List<Shortcode> shortocode);
+
+        Task<IEnumerable<int>> GetPendingFolders();
+
+        Task<IEnumerable<int>> GetPendingShortcodesId(int folderId);
+
+        Task<bool> IsShortcodeCached(int shortcodeId);
 
         Task RemoveOrphans();
 

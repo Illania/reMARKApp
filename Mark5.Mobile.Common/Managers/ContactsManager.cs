@@ -59,7 +59,7 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task GetAllContactPreviewsAsync(Folder folder, Action<List<ContactPreview>> handler, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
+        public async Task GetAllContactPreviewsAsync(Folder folder, Func<List<ContactPreview>, Task> handler, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
         {
             var startId = 0;
             var stopLoop = false;
@@ -67,21 +67,21 @@ namespace Mark5.Mobile.Common.Managers
             while (!stopLoop && !ct.IsCancellationRequested)
             {
                 var previews = await GetContactPreviewsAsync(folder, startId, NumberOfContactsToFetchPerCall, sourceType);
-                handler(previews);
+                await handler(previews);
 
                 startId += NumberOfContactsToFetchPerCall;
                 stopLoop = previews.Count < NumberOfContactsToFetchPerCall;
             }
         }
 
-        public async Task<Contact> GetContactAsync(Folder folder, int contactId, SourceType sourceType = SourceType.Auto)
+        public async Task<Contact> GetContactAsync(int folderId, int contactId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
                 var result = await AppServiceProxy.GetContactAsync(new DataContract.GetContactParameters
                 {
                     Token = Token,
-                    FolderId = folder.Id,
+                    FolderId = folderId,
                     ContactId = contactId,
                     IncludePreview = false
                 });
@@ -99,6 +99,12 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+
+        public async Task<Contact> GetContactAsync(Folder folder, int contactId, SourceType sourceType = SourceType.Auto)
+        {
+            return await GetContactAsync(folder.Id, contactId, sourceType);
         }
 
         public async Task<bool> CreteOrUpdateContactAsync(Contact contact, ContactPreview contactPreview, int parentObjectId, SourceType sourceType = SourceType.Auto)

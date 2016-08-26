@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: IDocumentsDataAccess.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -62,6 +62,12 @@ namespace Mark5.Mobile.Common.DataAccess
         Task EditCommentAsync(Document document, Comment comment);
 
         Task DeleteCommentAsync(Document document, Comment comment);
+
+        Task<IEnumerable<int>> GetPendingFolders();
+
+        Task<IEnumerable<int>> GetPendingDocumentsId(int folderId);
+
+        Task<bool> IsDocumentCached(int id);
 
         Task RemoveOrphans();
     }
