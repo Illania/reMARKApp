@@ -319,19 +319,37 @@ namespace Mark5.Mobile.Common
         async Task AddPendingDocumentFoldersToQueue()
         {
             var folderIds = await documentsDataAccess.GetPendingFolders();
-            AddToQueue(folderIds.Select(id => new DocumentDownloadInfo { FolderId = id }));
+            foreach (var id in folderIds)
+            {
+                if (ShouldBeDownloaded(ObjectType.Document, id))
+                {
+                    AddToQueue(new DocumentDownloadInfo { FolderId = id });
+                }
+            }
         }
 
         async Task AddPendingContactFoldersToQueue()
         {
             var folderIds = await contactsDataAccess.GetPendingFolders();
-            AddToQueue(folderIds.Select(id => new ContactDownloadInfo { FolderId = id }));
+            foreach (var id in folderIds)
+            {
+                if (ShouldBeDownloaded(ObjectType.Contact, id))
+                {
+                    AddToQueue(new ContactDownloadInfo { FolderId = id });
+                }
+            }
         }
 
         async Task AddPendingShortcodeFoldersToQueue()
         {
             var folderIds = await shortcodesDataAccess.GetPendingFolders();
-            AddToQueue(folderIds.Select(id => new ShortcodeDownloadInfo { FolderId = id }));
+            foreach (var id in folderIds)
+            {
+                if (ShouldBeDownloaded(ObjectType.Shortcode, id))
+                {
+                    AddToQueue(new ShortcodeDownloadInfo { FolderId = id });
+                }
+            }
         }
 
         async Task RetrievePendingFromStorage()
