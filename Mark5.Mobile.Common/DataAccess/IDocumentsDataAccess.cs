@@ -63,7 +63,9 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task DeleteCommentAsync(Document document, Comment comment);
 
-        Task<IEnumerable<DocumentDownloadInfo>> GetUnsavedDocumentsIds(int? folderId);
+        Task<IEnumerable<int>> GetPendingFolders();
+
+        Task<IEnumerable<int>> GetPendingDocumentsId(int folderId);
 
         Task<bool> IsDocumentCached(int id);
     }

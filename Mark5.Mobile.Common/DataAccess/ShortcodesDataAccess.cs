@@ -200,29 +200,27 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<IEnumerable<ShortcodeDownloadInfo>> GetUnsavedShortcodesIds(int? folderId)
+        public async Task<IEnumerable<int>> GetPendingFolders()
         {
             try
             {
-                var infos = new List<ShortcodeDownloadInfo>();
+                var fIds = new List<int>();
 
                 await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
+                    var queryString = $"select {nameof(FolderShortcodeLink.FolderId)} from {nameof(FolderShortcodeLink)} where  {nameof(FolderShortcodeLink.ShortcodeId)}  " +
+                        $" not in (select {nameof(Shortcode.Id)} from {nameof(Shortcode)})";
 
-                    var folderCondition = folderId.HasValue ? $"and { nameof(FolderShortcodeLink.FolderId)} = ? " : "";
-                    var queryString = $"select * from {nameof(FolderShortcodeLink)} where  {nameof(FolderShortcodeLink.ShortcodeId)}  " +
-                        $" not in (select {nameof(Shortcode.Id)} from {nameof(Shortcode)}) {folderCondition}";
+                    var result = c.Query<int>(queryString);
 
-                    var result = c.Query<FolderShortcodeLink>(queryString, folderId.Value);
-
-                    infos = result.Select(fcl => new ShortcodeDownloadInfo { FolderId = fcl.FolderId, Id = fcl.ShortcodeId }).ToList();
+                    fIds = result.ToList();
                 });
 
-                return infos;
+                return fIds;
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
-                throw new DataAccessException("Error while getting not cached shortcodes.", ex);
+                throw new DataAccessException("Error while getting pending folders for shortcode.", ex);
             }
         }
 
@@ -234,8 +232,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
-                    var query = $"select count(*) from {nameof(Shortcode)} where {nameof(Shortcode.Id)} = ?  ";
-                    var result = c.ExecuteScalar<int>(query, shortcodeId);
+                    var result = c.Table<Shortcode>().Count(s => s.Id == shortcodeId);
 
                     found = result >= 1;
                 });
@@ -245,6 +242,31 @@ namespace Mark5.Mobile.Common.DataAccess
             catch (Exception ex) when (!(ex is DataAccessException))
             {
                 throw new DataAccessException("Error while checking shortcode existence.", ex);
+            }
+        }
+
+        public async Task<IEnumerable<int>> GetPendingShortcodesId(int folderId)
+        {
+            try
+            {
+                var shortcodesId = new List<int>();
+
+                await shortcodesDatabase.RunInConnectionAsync(c =>
+                {
+                    var folderCondition = $"{ nameof(FolderShortcodeLink.FolderId)} = ? ";
+                    var inCondition = $"{ nameof(FolderShortcodeLink.ShortcodeId) }   not in (select { nameof(Shortcode.Id)}   from { nameof(Shortcode)})";
+                    var queryString = $"select {nameof(FolderShortcodeLink.ShortcodeId)} from {nameof(FolderShortcodeLink)} " +
+                        $"where {folderCondition} and {inCondition}";
+
+                    var result = c.Query<int>(queryString, folderId);
+                    shortcodesId = result.ToList();
+                });
+
+                return shortcodesId;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error while getting pending shortcodes id.", ex);
             }
         }
     }

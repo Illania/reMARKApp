@@ -7,6 +7,8 @@ namespace Mark5.Mobile.Common
     {
         void Notify(Guid identifier);
 
+        Task<bool> IsRunning();
+
         Task Start();
 
         Task Stop();

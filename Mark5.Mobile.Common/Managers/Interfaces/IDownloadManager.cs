@@ -1,8 +1,17 @@
-﻿using System;
+﻿using System.Threading.Tasks;
+using Mark5.Mobile.Common.Model;
+
 namespace Mark5.Mobile.Common
 {
     public interface IDownloadManager
     {
+        void Notify(ObjectType objectType, int folderId);
+
+        Task<bool> IsRunning();
+
+        Task Start();
+
+        Task Stop();
     }
 }
 

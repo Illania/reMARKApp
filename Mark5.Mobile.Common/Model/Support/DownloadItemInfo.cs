@@ -2,9 +2,8 @@
 
 namespace Mark5.Mobile.Common
 {
-    public class DownloadItemInfo //TODO find a better name
+    public abstract class DownloadItemInfo
     {
-        public int Id { get; set; }
         public int FolderId { get; set; }
         virtual public ObjectType Type { get; set; }
     }

@@ -31,7 +31,9 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task DeleteAsync(List<Shortcode> shortocode);
 
-        Task<IEnumerable<ShortcodeDownloadInfo>> GetUnsavedShortcodesIds(int? folderId);
+        Task<IEnumerable<int>> GetPendingFolders();
+
+        Task<IEnumerable<int>> GetPendingShortcodesId(int folderId);
 
         Task<bool> IsShortcodeCached(int shortcodeId);
     }

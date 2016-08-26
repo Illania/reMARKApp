@@ -378,29 +378,27 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<IEnumerable<ContactDownloadInfo>> GetUnsavedContactsIds(int? folderId)
+        public async Task<IEnumerable<int>> GetPendingFolders()
         {
             try
             {
-                var infos = new List<ContactDownloadInfo>();
+                var fIds = new List<int>();
 
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var folderCondition = folderId.HasValue ? $"and { nameof(FolderContactLink.FolderId)} = ? " : "";
-                    var queryString = $"select * from {nameof(FolderContactLink)} where  {nameof(FolderContactLink.ContactId)}  " +
-                        $" not in (select {nameof(Contact.Id)} from {nameof(Contact)}) {folderCondition}";
+                    var queryString = $"select {nameof(FolderContactLink.FolderId)} from {nameof(FolderContactLink)} where  {nameof(FolderContactLink.ContactId)}  " +
+                        $" not in (select {nameof(Contact.Id)} from {nameof(Contact)})";
 
+                    var result = c.Query<int>(queryString);
 
-                    var result = c.Query<FolderContactLink>(queryString, folderId.Value);
-
-                    infos = result.Select(fcl => new ContactDownloadInfo { FolderId = fcl.FolderId, Id = fcl.ContactId }).ToList();
+                    fIds = result.ToList();
                 });
 
-                return infos;
+                return fIds;
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
-                throw new DataAccessException("Error while getting not cached contacts.", ex);
+                throw new DataAccessException("Error while getting pending folders id for contacts.", ex);
             }
         }
 
@@ -412,9 +410,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var query = $"select count(*) from {nameof(Contact)} where {nameof(Contact.Id)} = ?  ";
-                    var result = c.ExecuteScalar<int>(query, contactId);
-
+                    var result = c.Table<Contact>().Count(co => co.Id == contactId);
                     found = result >= 1;
                 });
 
@@ -423,6 +419,31 @@ namespace Mark5.Mobile.Common.DataAccess
             catch (Exception ex) when (!(ex is DataAccessException))
             {
                 throw new DataAccessException("Error while checking contact existence.", ex);
+            }
+        }
+
+        public async Task<IEnumerable<int>> GetPendingContactsId(int folderId)
+        {
+            try
+            {
+                var contactsId = new List<int>();
+
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    var folderCondition = $"{ nameof(FolderContactLink.FolderId)} = ? ";
+                    var inCondition = $"{ nameof(FolderContactLink.ContactId) }   not in (select { nameof(Contact.Id)}   from { nameof(Contact)})";
+                    var queryString = $"select {nameof(FolderContactLink.ContactId)} from {nameof(FolderContactLink)} " +
+                        $"where {folderCondition} and {inCondition}";
+
+                    var result = c.Query<int>(queryString, folderId);
+                    contactsId = result.ToList();
+                });
+
+                return contactsId;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error while getting pending contacts id.", ex);
             }
         }
     }

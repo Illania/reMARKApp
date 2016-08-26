@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
@@ -23,6 +24,10 @@ namespace Mark5.Mobile.Common
         readonly IContactsDataAccess contactsDataAccess;
         readonly IShortcodesDataAccess shortcodesDataAccess;
         readonly IDocumentsDataAccess documentsDataAccess;
+
+        DocumentBodyTypeRequest documentBodyTypeRequest; //TODO need to go in interface
+        Dictionary<ObjectType, bool> folderSettingTypes;
+        Dictionary<ObjectType, List<int>> offlineFoldersId; //TODO need to go in interface
 
         public DownloadManager(IDocumentsDataAccess documentsDataAccess, IContactsDataAccess contactsDataAccess, IShortcodesDataAccess shortcodesDataAccess)
         {
@@ -49,22 +54,47 @@ namespace Mark5.Mobile.Common
             }
         }
 
-        public async void Notify(ObjectType objectType, int? folderId = null)
+        public void Notify(ObjectType objectType, int folderId)
         {
+            if (!ShouldBeDownloaded(objectType, folderId))
+            {
+                return;
+            }
+
             switch (objectType)
             {
                 case ObjectType.Document:
-                    await AddPendingDocumentsToQueue(folderId);
+                    AddToQueue(new DocumentDownloadInfo { FolderId = folderId });
                     break;
                 case ObjectType.Contact:
-                    await AddPendingContactsToQueue(folderId);
+                    AddToQueue(new ContactDownloadInfo { FolderId = folderId });
                     break;
                 case ObjectType.Shortcode:
-                    await AddPendingShortcodesToQueue(folderId);
+                    AddToQueue(new ShortcodeDownloadInfo { FolderId = folderId });
                     break;
                 default:
                     throw new ArgumentException("Provided object type is not supported");
             }
+        }
+
+        bool ShouldBeDownloaded(ObjectType objectType, int folderId) //TODO need a better name
+        {
+            if (!folderSettingTypes.ContainsKey(objectType))
+            {
+                return false;
+            }
+
+            if (!folderSettingTypes[objectType]) //TODO See if we can make it nicer
+            {
+                return true;
+            }
+
+            if (folderSettingTypes[objectType] && offlineFoldersId[objectType].Contains(folderId))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public async Task Start()
@@ -165,19 +195,24 @@ namespace Mark5.Mobile.Common
 
                 while (!cts.IsCancellationRequested)
                 {
-                    DownloadItemInfo itemInfo;
-                    queue.TryTake(out itemInfo, -1, cts.Token);
+                    DownloadItemInfo downloadInfo;
+                    queue.TryTake(out downloadInfo, -1, cts.Token);
 
-                    switch (itemInfo.Type)
+                    if (!ShouldBeDownloaded(downloadInfo.Type, downloadInfo.FolderId))
+                    {
+                        continue;
+                    }
+
+                    switch (downloadInfo.Type)
                     {
                         case ObjectType.Document:
-                            await HandleDocumentDownload(itemInfo);
+                            await HandleDocumentsDownload(downloadInfo);
                             break;
                         case ObjectType.Contact:
-                            await HandleContactDownload(itemInfo);
+                            await HandleContactsDownload(downloadInfo);
                             break;
                         case ObjectType.Shortcode:
-                            await HandleShortcodeDownload(itemInfo);
+                            await HandleShortcodesDownload(downloadInfo);
                             break;
                         default:
                             throw new ArgumentException("Object type not supported");
@@ -196,34 +231,64 @@ namespace Mark5.Mobile.Common
 
         #region Download handlers
 
-        async Task HandleDocumentDownload(DownloadItemInfo itemInfo)
+        async Task HandleDocumentsDownload(DownloadItemInfo itemInfo)
         {
-            if (await documentsDataAccess.IsDocumentCached(itemInfo.Id))
-            {
-                return;
-            }
+            var documentIds = await documentsDataAccess.GetPendingDocumentsId(itemInfo.FolderId);
 
-            await Managers.Managers.DocumentsManager.GetDocumentAsync(itemInfo.FolderId, itemInfo.Id, DocumentBodyTypeRequest.HtmlOnly); //TODO which body type?
+            foreach (var documentId in documentIds)
+            {
+                if (!ShouldBeDownloaded(itemInfo.Type, itemInfo.FolderId)) //TODO necessary to have this check here?
+                {
+                    return;
+                }
+
+                if (await documentsDataAccess.IsDocumentCached(documentId))
+                {
+                    continue;
+                }
+
+                await Managers.Managers.DocumentsManager.GetDocumentAsync(itemInfo.FolderId, documentId, documentBodyTypeRequest);
+            }
         }
 
-        async Task HandleContactDownload(DownloadItemInfo itemInfo)
+        async Task HandleContactsDownload(DownloadItemInfo itemInfo)
         {
-            if (await contactsDataAccess.IsContactCached(itemInfo.Id))
-            {
-                return;
-            }
+            var contactIds = await contactsDataAccess.GetPendingContactsId(itemInfo.FolderId);
 
-            await Managers.Managers.ContactsManager.GetContactAsync(itemInfo.FolderId, itemInfo.Id);
+            foreach (var contactId in contactIds)
+            {
+                if (!ShouldBeDownloaded(itemInfo.Type, itemInfo.FolderId))
+                {
+                    return;
+                }
+
+                if (await contactsDataAccess.IsContactCached(contactId))
+                {
+                    continue;
+                }
+
+                await Managers.Managers.ContactsManager.GetContactAsync(itemInfo.FolderId, contactId);
+            }
         }
 
-        async Task HandleShortcodeDownload(DownloadItemInfo itemInfo)
+        async Task HandleShortcodesDownload(DownloadItemInfo itemInfo)
         {
-            if (await shortcodesDataAccess.IsShortcodeCached(itemInfo.Id))
-            {
-                return;
-            }
+            var shortcodeIds = await shortcodesDataAccess.GetPendingShortcodesId(itemInfo.FolderId);
 
-            await Managers.Managers.ShortcodesManager.GetShortcodeAsync(itemInfo.FolderId, itemInfo.Id);
+            foreach (var shosrtcodeId in shortcodeIds)
+            {
+                if (!ShouldBeDownloaded(itemInfo.Type, itemInfo.FolderId))
+                {
+                    return;
+                }
+
+                if (await shortcodesDataAccess.IsShortcodeCached(shosrtcodeId))
+                {
+                    continue;
+                }
+
+                await Managers.Managers.ShortcodesManager.GetShortcodeAsync(itemInfo.FolderId, shosrtcodeId);
+            }
         }
 
         #endregion
@@ -243,27 +308,30 @@ namespace Mark5.Mobile.Common
             queue.TryAdd(identifier);
         }
 
-        async Task AddPendingContactsToQueue(int? folderId = null)
+        async Task AddPendingDocumentFoldersToQueue()
         {
-            AddToQueue(await contactsDataAccess.GetUnsavedContactsIds(folderId));
+            var folderIds = await documentsDataAccess.GetPendingFolders();
+            AddToQueue(folderIds.Select(id => new DocumentDownloadInfo { FolderId = id }));
         }
 
-        async Task AddPendingShortcodesToQueue(int? folderId = null)
+        async Task AddPendingContactFoldersToQueue()
         {
-            AddToQueue(await shortcodesDataAccess.GetUnsavedShortcodesIds(folderId));
-
+            var folderIds = await contactsDataAccess.GetPendingFolders();
+            AddToQueue(folderIds.Select(id => new ContactDownloadInfo { FolderId = id }));
         }
 
-        async Task AddPendingDocumentsToQueue(int? folderId = null)
+        async Task AddPendingShortcodeFoldersToQueue()
         {
-            AddToQueue(await documentsDataAccess.GetUnsavedDocumentsIds(folderId));
+            var folderIds = await shortcodesDataAccess.GetPendingFolders();
+            AddToQueue(folderIds.Select(id => new ShortcodeDownloadInfo { FolderId = id }));
         }
+
 
         async Task RetrievePendingFromStorage()
         {
-            await AddPendingDocumentsToQueue(); //TODO later we need to retrieve only the ones for the folder marked as offline
-            await AddPendingContactsToQueue();
-            await AddPendingShortcodesToQueue();
+            await AddPendingDocumentFoldersToQueue(); //TODO This needs to be re-done
+            await AddPendingContactFoldersToQueue();
+            await AddPendingShortcodeFoldersToQueue();
         }
 
         #endregion
