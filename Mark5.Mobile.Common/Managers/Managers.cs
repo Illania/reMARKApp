@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: Managers.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -83,6 +83,12 @@ namespace Mark5.Mobile.Common.Managers
             private set;
         }
 
+        public static ICleanUpManager CleanUpManager
+        {
+            get;
+            private set;
+        }
+
         public static void Initialize(ConnectionInfo connectionInfo)
         {
             if (connectionInfo == null)
@@ -95,8 +101,8 @@ namespace Mark5.Mobile.Common.Managers
                 throw new ArgumentException("Connection info is not authenticated.");
             }
 
-            var appServiceProxy = AppServiceProxyFactory.Create(connectionInfo.Ssl, connectionInfo.Hostname, connectionInfo.Port);
-            var fileTransferServiceProxy = FileTransferServiceProxyFactory.Create(connectionInfo.Ssl, connectionInfo.Hostname, connectionInfo.Port);
+            var appServiceProxy = AppServiceProxyFactory.Create(connectionInfo.SslMode != SslMode.Off, connectionInfo.Hostname, connectionInfo.Port);
+            var fileTransferServiceProxy = FileTransferServiceProxyFactory.Create(connectionInfo.SslMode != SslMode.Off, connectionInfo.Hostname, connectionInfo.Port);
 
             var foldersDataAccess = new FoldersDataAccess(DatabaseConnectionProvider.DatabaseForModuleType);
             var documentsDataAccess = new DocumentsDataAccess(DatabaseConnectionProvider.DocumentsDatabase);
@@ -116,6 +122,7 @@ namespace Mark5.Mobile.Common.Managers
             NotificationsManager = new NotificationsManager(connectionInfo, appServiceProxy, foldersDataAccess, notificationsDataAccess);
             SystemManager = new SystemManager(connectionInfo, appServiceProxy);
             CommonActionsManager = new CommonActionsManager(connectionInfo, appServiceProxy, documentsDataAccess, contactsDataAccess, shortcodesDataAccess, calendarDataAccess);
+            CleanUpManager = new CleanUpManager(documentsDataAccess, contactsDataAccess, shortcodesDataAccess, calendarDataAccess);
         }
     }
 }

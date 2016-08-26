@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: IDocumentsDataAccess.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -68,6 +68,8 @@ namespace Mark5.Mobile.Common.DataAccess
         Task<IEnumerable<int>> GetPendingDocumentsId(int folderId);
 
         Task<bool> IsDocumentCached(int id);
+
+        Task RemoveOrphans();
     }
 }
 

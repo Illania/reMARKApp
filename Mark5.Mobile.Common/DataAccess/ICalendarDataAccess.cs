@@ -40,6 +40,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task DeleteAsync(List<CalendarTask> tasks);
 
+        Task RemoveOrphans();
     }
 }
 

@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: DocumentsDataAccess.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -669,6 +669,30 @@ namespace Mark5.Mobile.Common.DataAccess
             catch (Exception ex) when (!(ex is DataAccessException))
             {
                 throw new DataAccessException("Error while getting pending document ids.", ex);
+            }
+        }
+
+        public async Task RemoveOrphans()
+        {
+            try
+            {
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    var innerSelectQueryText = $"select {nameof(FolderDocumentLink.DocumentId)} from {nameof(FolderDocumentLink)}";
+
+                    var outerDeleteQueryPreview = $"delete from {nameof(DocumentPreview)} where {nameof(DocumentPreview.Id)} not in ({innerSelectQueryText}) ";
+                    var cmd = c.CreateCommand(outerDeleteQueryPreview);
+                    cmd.ExecuteNonQuery();
+
+                    var outerDeleteQueryContact = $"delete from {nameof(Document)} where {nameof(Document.Id)} not in ({innerSelectQueryText}) ";
+                    var cmd2 = c.CreateCommand(outerDeleteQueryContact);
+                    cmd2.ExecuteNonQuery();
+                });
+
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error removing orphan documents and document previews.", ex);
             }
         }
     }

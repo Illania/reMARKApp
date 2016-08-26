@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: IContactsDataAccess.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -11,7 +11,6 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.DataAccess
 {
-
     interface IContactsDataAccess
     {
 
@@ -48,6 +47,8 @@ namespace Mark5.Mobile.Common.DataAccess
         Task<IEnumerable<int>> GetPendingContactsId(int folderId);
 
         Task<bool> IsContactCached(int contactId);
+
+        Task RemoveOrphans();
 
     }
 }
