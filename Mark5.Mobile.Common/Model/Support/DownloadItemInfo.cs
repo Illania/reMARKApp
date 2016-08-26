@@ -2,13 +2,13 @@
 
 namespace Mark5.Mobile.Common
 {
-    public abstract class DownloadItemInfo
+    abstract class DownloadItemInfo
     {
         public int FolderId { get; set; }
         virtual public ObjectType Type { get; set; }
     }
 
-    public class ContactDownloadInfo : DownloadItemInfo
+    class ContactDownloadInfo : DownloadItemInfo
     {
         public override ObjectType Type
         {
@@ -19,7 +19,7 @@ namespace Mark5.Mobile.Common
         }
     }
 
-    public class ShortcodeDownloadInfo : DownloadItemInfo
+    class ShortcodeDownloadInfo : DownloadItemInfo
     {
         public override ObjectType Type
         {
@@ -30,7 +30,7 @@ namespace Mark5.Mobile.Common
         }
     }
 
-    public class DocumentDownloadInfo : DownloadItemInfo
+    class DocumentDownloadInfo : DownloadItemInfo
     {
         public override ObjectType Type
         {

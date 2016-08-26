@@ -230,7 +230,10 @@ namespace Mark5.Mobile.Common
             }
             catch (Exception ex)
             {
-                //TODO log exception
+                if (CommonConfig.Logger.IsErrorEnabled())
+                {
+                    CommonConfig.Logger.Error("Error in download action for DownloadManager", ex);
+                }
                 throw ex;
             }
         }
@@ -245,7 +248,7 @@ namespace Mark5.Mobile.Common
 
             foreach (var documentId in documentIds)
             {
-                if (!ShouldBeDownloaded(itemInfo.Type, itemInfo.FolderId)) //TODO necessary to have this check here?
+                if (!ShouldBeDownloaded(itemInfo.Type, itemInfo.FolderId))
                 {
                     return;
                 }

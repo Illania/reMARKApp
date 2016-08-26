@@ -257,7 +257,7 @@ namespace Mark5.Mobile.Common.Managers
                         Token = Token,
                         FolderId = folderId,
                         DocumentId = objectId,
-                        BodyRequest = DataContract.DocumentBodyTypeRequest.None, //TODO Think
+                        BodyRequest = DataContract.DocumentBodyTypeRequest.None, //TODO Probably we'll need to take this from settings
                         IncludePreview = true
                     });
 

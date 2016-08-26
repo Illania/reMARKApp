@@ -4,8 +4,8 @@ namespace Mark5.Mobile.Common
 {
     public class DownloadPolicy
     {
-        public bool GlobalSettingPolicy;
-        public List<int> AvailableFoldersId;
+        public bool GlobalSettingPolicy { get; set; }
+        public List<int> AvailableFoldersId { get; set; }
     }
 }
 

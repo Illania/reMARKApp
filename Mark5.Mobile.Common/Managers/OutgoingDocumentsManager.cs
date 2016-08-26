@@ -205,7 +205,10 @@ namespace Mark5.Mobile.Common.Managers
             }
             catch (Exception ex)
             {
-                //TODO need to log the exception
+                if (CommonConfig.Logger.IsErrorEnabled())
+                {
+                    CommonConfig.Logger.Error("Error in send action for for OutgoingDocumentManager", ex);
+                }
                 throw ex;
             }
         }
