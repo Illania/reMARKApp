@@ -334,14 +334,25 @@ namespace Mark5.Mobile.Common
             AddToQueue(folderIds.Select(id => new ShortcodeDownloadInfo { FolderId = id }));
         }
 
-
         async Task RetrievePendingFromStorage()
         {
-
-
-            await AddPendingDocumentFoldersToQueue(); //TODO This needs to be re-done
-            await AddPendingContactFoldersToQueue();
-            await AddPendingShortcodeFoldersToQueue();
+            foreach (var objectType in DownloadPolicies.Keys)
+            {
+                switch (objectType)
+                {
+                    case ObjectType.Document:
+                        await AddPendingDocumentFoldersToQueue();
+                        break;
+                    case ObjectType.Contact:
+                        await AddPendingContactFoldersToQueue();
+                        break;
+                    case ObjectType.Shortcode:
+                        await AddPendingShortcodeFoldersToQueue();
+                        break;
+                    default:
+                        throw new ArgumentException("Object type not valid");
+                }
+            }
         }
 
         #endregion
