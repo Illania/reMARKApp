@@ -51,7 +51,6 @@ namespace Mark5.Mobile.Common
                         break;
                     default:
                         throw new ArgumentException("Module not supported");
-                        break;
                 }
             }
 
