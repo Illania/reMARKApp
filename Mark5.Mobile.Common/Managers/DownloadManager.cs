@@ -25,9 +25,17 @@ namespace Mark5.Mobile.Common
         readonly IShortcodesDataAccess shortcodesDataAccess;
         readonly IDocumentsDataAccess documentsDataAccess;
 
-        DocumentBodyTypeRequest documentBodyTypeRequest; //TODO need to go in interface
-        Dictionary<ObjectType, bool> folderSettingTypes;
-        Dictionary<ObjectType, List<int>> offlineFoldersId; //TODO need to go in interface
+        public DocumentBodyTypeRequest DocumentBodyTypeRequest
+        {
+            get;
+            set;
+        }
+
+        public Dictionary<ObjectType, DownloadPolicy> DownloadPolicies
+        {
+            get;
+            set;
+        }
 
         public DownloadManager(IDocumentsDataAccess documentsDataAccess, IContactsDataAccess contactsDataAccess, IShortcodesDataAccess shortcodesDataAccess)
         {
@@ -77,19 +85,19 @@ namespace Mark5.Mobile.Common
             }
         }
 
-        bool ShouldBeDownloaded(ObjectType objectType, int folderId) //TODO need a better name
+        bool ShouldBeDownloaded(ObjectType objectType, int folderId)
         {
-            if (!folderSettingTypes.ContainsKey(objectType))
+            if (!DownloadPolicies.ContainsKey(objectType))
             {
                 return false;
             }
 
-            if (!folderSettingTypes[objectType]) //TODO See if we can make it nicer
+            if (DownloadPolicies[objectType].GlobalSettingPolicy)
             {
                 return true;
             }
 
-            if (folderSettingTypes[objectType] && offlineFoldersId[objectType].Contains(folderId))
+            if (DownloadPolicies[objectType].AvailableFoldersId.Contains(folderId))
             {
                 return true;
             }
@@ -247,7 +255,7 @@ namespace Mark5.Mobile.Common
                     continue;
                 }
 
-                await Managers.Managers.DocumentsManager.GetDocumentAsync(itemInfo.FolderId, documentId, documentBodyTypeRequest);
+                await Managers.Managers.DocumentsManager.GetDocumentAsync(itemInfo.FolderId, documentId, DocumentBodyTypeRequest);
             }
         }
 
@@ -329,6 +337,8 @@ namespace Mark5.Mobile.Common
 
         async Task RetrievePendingFromStorage()
         {
+
+
             await AddPendingDocumentFoldersToQueue(); //TODO This needs to be re-done
             await AddPendingContactFoldersToQueue();
             await AddPendingShortcodeFoldersToQueue();

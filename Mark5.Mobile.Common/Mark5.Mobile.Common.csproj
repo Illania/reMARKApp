@@ -163,6 +163,7 @@
     <Compile Include="Managers\DownloadManager.cs" />
     <Compile Include="Managers\Interfaces\IDownloadManager.cs" />
     <Compile Include="Model\Support\DownloadItemInfo.cs" />
+    <Compile Include="Model\Support\DownloadPolicy.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />
