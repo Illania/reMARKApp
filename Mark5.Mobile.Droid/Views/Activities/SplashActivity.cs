@@ -12,6 +12,7 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.App;
+using Android.Views;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
@@ -33,6 +34,11 @@ namespace Mark5.Mobile.Droid.Views.Activity
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_splash);
+
+            var uiOptions = (int)Window.DecorView.SystemUiVisibility;
+            uiOptions |= (int)SystemUiFlags.Immersive;
+            uiOptions |= (int)SystemUiFlags.HideNavigation;
+            Window.DecorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
         }
 
         protected override void OnResume()
