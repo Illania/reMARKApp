@@ -42,7 +42,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
             base.OnCreate(savedInstanceState);
 
             SetTitle(Resource.String.app_name);
-            SetContentView(Resource.Layout.Login);
+            SetContentView(Resource.Layout.activity_login);
 
             var toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);

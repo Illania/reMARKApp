@@ -22,7 +22,8 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
     [Activity(Label = "MARK5",
               MainLauncher = true,
-              Icon = "@mipmap/icon",
+              Icon = "@mipmap/ic_icon",
+              Theme = "@style/mark5Splash",
               ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation,
               ScreenOrientation = ScreenOrientation.Portrait)]
     public class SplashActivity : AppCompatActivity
@@ -31,7 +32,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.Splash);
+            SetContentView(Resource.Layout.activity_splash);
         }
 
         protected override void OnResume()

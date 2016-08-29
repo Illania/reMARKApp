@@ -24,4 +24,6 @@
 	<string name="login">Log in</string>
 	<string name="logging_in">Logging in</string>
 	<string name="please_wait">Please wait</string>
+	<string name="open_drawer">Open navigation drawer</string>
+	<string name="close_drawer">Close navigation drawer</string>
 </resources>
