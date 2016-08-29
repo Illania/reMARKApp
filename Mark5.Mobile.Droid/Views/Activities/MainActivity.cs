@@ -12,7 +12,6 @@ using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
-using Android.Views;
 
 namespace Mark5.Mobile.Droid.Views.Activity
 {
