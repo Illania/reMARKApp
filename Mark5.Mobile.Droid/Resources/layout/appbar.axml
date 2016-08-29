@@ -7,4 +7,6 @@
     android:fitsSystemWindows="true">
     <include
         layout="@layout/appbar_raw" />
+    <include
+        layout="@layout/content_placeholder" />
 </android.support.design.widget.CoordinatorLayout>

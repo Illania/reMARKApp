@@ -189,6 +189,7 @@
     <AndroidResource Include="Resources\mipmap-xxxhdpi\nav_calendar.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\nav_search.png" />
     <AndroidResource Include="Resources\color\drawer_item_icon.xml" />
+    <AndroidResource Include="Resources\layout\content_placeholder.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
