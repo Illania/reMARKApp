@@ -7,8 +7,8 @@
 //
 using System;
 using System.Threading.Tasks;
+using AFollestad.MaterialDialogs;
 using Android.Content;
-using Android.Support.V7.App;
 
 namespace Mark5.Mobile.Droid.Views.Common
 {
@@ -19,35 +19,69 @@ namespace Mark5.Mobile.Droid.Views.Common
         public static Task<bool> ShowYesNoDialogAsync(Context context, int titleId, int messageId)
         {
             var tcs = new TaskCompletionSource<bool>();
-            var b = new AlertDialog.Builder(context);
-            b.SetTitle(titleId);
-            b.SetMessage(messageId);
-            b.SetPositiveButton(Resource.String.yes, (sender, e) => tcs.SetResult(true));
-            b.SetNegativeButton(Resource.String.no, (sender, e) => tcs.SetResult(false));
-            b.Show();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(titleId);
+            builder.Content(messageId);
+            builder.PositiveText(Resource.String.yes);
+            builder.NegativeText(Resource.String.no);
+            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
+            builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(false)));
+            builder.Show();
             return tcs.Task;
         }
 
         public static Task ShowConfirmDialogAsync(Context context, int titleId, int messageId)
         {
             var tcs = new TaskCompletionSource<bool>();
-            var b = new AlertDialog.Builder(context);
-            b.SetTitle(titleId);
-            b.SetMessage(messageId);
-            b.SetPositiveButton(Resource.String.ok, (sender, e) => tcs.SetResult(true));
-            b.Show();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(titleId);
+            builder.Content(messageId);
+            builder.PositiveText(Resource.String.ok);
+            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
+            builder.Show();
             return tcs.Task;
+        }
+
+        public static Action ShowInfiniteProgressDialog(Context context, int titleId, int messageId)
+        {
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(titleId);
+            builder.Content(messageId);
+            builder.Progress(true, -1);
+            builder.Cancelable(false);
+            var dialog = builder.Show();
+            return dialog.Dismiss;
         }
 
         public static Task ShowErrorDialogAsync(Context context, Exception ex)
         {
             var tcs = new TaskCompletionSource<bool>();
-            var b = new AlertDialog.Builder(context);
-            b.SetTitle(Resource.String.error);
-            b.SetMessage(ex.Message);
-            b.SetPositiveButton(Resource.String.ok, (sender, e) => tcs.SetResult(true));
-            b.Show();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(Resource.String.error);
+            builder.Content(ex.Message);
+            builder.PositiveText(Resource.String.ok);
+            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
+            builder.Show();
             return tcs.Task;
+        }
+
+        class SingleButtonCallback : Java.Lang.Object, MaterialDialog.ISingleButtonCallback
+        {
+
+            readonly Action action;
+
+            public SingleButtonCallback(Action action)
+            {
+                this.action = action;
+            }
+
+            public void OnClick(MaterialDialog p0, DialogAction p1)
+            {
+                if (action != null)
+                {
+                    action();
+                }
+            }
         }
     }
 }

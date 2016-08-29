@@ -9,7 +9,7 @@ using Android.App;
 using Android.OS;
 using Android.Support.V7.App;
 
-namespace Mark5.Mobile.Droid.Views.Main
+namespace Mark5.Mobile.Droid.Views.Activity
 {
 
     [Activity]

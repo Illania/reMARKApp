@@ -19,10 +19,9 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Views.Common;
-using Mark5.Mobile.Droid.Views.Main;
 using Xamarin;
 
-namespace Mark5.Mobile.Droid.Views.Login
+namespace Mark5.Mobile.Droid.Views.Activity
 {
 
     [Activity]
@@ -82,6 +81,8 @@ namespace Mark5.Mobile.Droid.Views.Login
 
         async void LoginButton_Click(object sender, EventArgs e)
         {
+            Action dismissAction = null;
+
             try
             {
                 var username = usernameEditText.Text;
@@ -116,9 +117,6 @@ namespace Mark5.Mobile.Droid.Views.Login
                 {
                     return;
                 }
-
-                loginButton.Enabled = false;
-
                 if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_accept_selfsigned_warning))
                 {
                     return;
@@ -127,6 +125,8 @@ namespace Mark5.Mobile.Droid.Views.Login
                 {
                     return;
                 }
+
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.logging_in, Resource.String.please_wait);
 
                 switch (sslMode)
                 {
@@ -159,9 +159,12 @@ namespace Mark5.Mobile.Droid.Views.Login
             }
             catch (Exception ex)
             {
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                if (dismissAction != null)
+                {
+                    dismissAction();
+                }
 
-                loginButton.Enabled = true;
+                await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
     }

@@ -12,13 +12,14 @@ using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.PortableCollections;
 using Mark5.ServiceReference.Exceptions;
 using PCLStorage;
 
 namespace Playground.Droid
 {
 
-    public class CrossPlatformConcurrentQueue<T> : BlockingCollection<T>, ICrossPlatformConcurrentQueue<T>
+    public class CrossPlatformConcurrentQueue<T> : BlockingCollection<T>, IPortableConcurrentQueue<T>
     {
     }
 
@@ -45,7 +46,7 @@ namespace Playground.Droid
                 CommonConfig.CacheFolder = cacheFolder;
                 CommonConfig.DatabaseFolder = dbFolder;
                 CommonConfig.AttachmentsFolder = attachmentsFolder;
-                CommonConfig.BlockingQueue = typeof(CrossPlatformConcurrentQueue<>);
+                CommonConfig.ConcurrentQueueType = typeof(CrossPlatformConcurrentQueue<>);
 
                 try
                 {

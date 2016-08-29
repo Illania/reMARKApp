@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.PortableCollections;
 using Mark5.Mobile.Common.Services;
 
 namespace Mark5.Mobile.Common
 {
     class DownloadManager : IDownloadManager
     {
-        readonly ICrossPlatformConcurrentQueue<DownloadItemInfo> queue;
+        readonly IPortableConcurrentQueue<DownloadItemInfo> queue;
 
         CancellationTokenSource cts;
         Task downloadTask;
@@ -43,7 +43,7 @@ namespace Mark5.Mobile.Common
             this.shortcodesDataAccess = shortcodesDataAccess;
             this.documentsDataAccess = documentsDataAccess;
 
-            queue = (ICrossPlatformConcurrentQueue<DownloadItemInfo>)Activator.CreateInstance(CommonConfig.BlockingQueue.MakeGenericType(new Type[] { typeof(DownloadItemInfo) }));
+            queue = (IPortableConcurrentQueue<DownloadItemInfo>)Activator.CreateInstance(CommonConfig.ConcurrentQueueType.MakeGenericType(new Type[] { typeof(DownloadItemInfo) }));
             semaphore = new SemaphoreSlim(1);
         }
 

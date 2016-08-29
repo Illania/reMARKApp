@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 
-namespace Mark5.Mobile.Common
+namespace Mark5.Mobile.Common.PortableCollections
 {
-    public interface ICrossPlatformConcurrentQueue<T> : IEnumerable<T>
+
+    public interface IPortableConcurrentQueue<T> : IEnumerable<T>
     {
 
         int Count { get; }

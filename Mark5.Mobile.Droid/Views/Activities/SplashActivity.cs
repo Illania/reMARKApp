@@ -15,11 +15,9 @@ using Android.Support.V7.App;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Views.Login;
-using Mark5.Mobile.Droid.Views.Main;
 using Xamarin;
 
-namespace Mark5.Mobile.Droid.Views.Splash
+namespace Mark5.Mobile.Droid.Views.Activity
 {
 
     [Activity(Label = "MARK5",

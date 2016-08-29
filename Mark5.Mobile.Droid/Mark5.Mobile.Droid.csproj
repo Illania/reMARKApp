@@ -131,12 +131,13 @@
     <Compile Include="Mark5Application.cs" />
     <Compile Include="Utilities\SSLCertificateVerificationManager.cs" />
     <Compile Include="Utilities\SimpleLogger.cs" />
-    <Compile Include="Views\Main\MainActivity.cs" />
     <Compile Include="Views\Common\Dialogs.cs" />
     <Compile Include="Utilities\DeviceInfoProvider.cs" />
-    <Compile Include="Views\Login\LoginActivity.cs" />
-    <Compile Include="Views\Splash\SplashActivity.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
+    <Compile Include="Views\Activities\LoginActivity.cs" />
+    <Compile Include="Views\Activities\MainActivity.cs" />
+    <Compile Include="Views\Activities\SplashActivity.cs" />
+    <Compile Include="Utilities\PortableConcurrentQueue.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -163,10 +164,9 @@
     <Folder Include="Services\" />
     <Folder Include="Utilities\" />
     <Folder Include="Views\" />
-    <Folder Include="Views\Login\" />
-    <Folder Include="Views\Main\" />
     <Folder Include="Views\Common\" />
-    <Folder Include="Views\Splash\" />
+    <Folder Include="Views\Activities\" />
+    <Folder Include="Views\Fragments\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">

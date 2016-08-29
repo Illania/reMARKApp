@@ -58,6 +58,7 @@ namespace Mark5.Mobile.Droid
                     CommonConfig.Logger = new SimpleLogger();
                     CommonConfig.ReachabilityService = new ReachabilityService();
                     CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
+                    CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
 
                     await DatabaseUtils.InitializeDatabases();
 

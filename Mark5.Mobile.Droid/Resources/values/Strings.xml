@@ -22,4 +22,6 @@
 		<item>SSL Disabled</item>
 	</string-array>
 	<string name="login">Log in</string>
+	<string name="logging_in">Logging in</string>
+	<string name="please_wait">Please wait</string>
 </resources>
