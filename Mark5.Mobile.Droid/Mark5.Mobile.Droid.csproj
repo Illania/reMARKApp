@@ -138,6 +138,7 @@
     <Compile Include="Views\Activities\MainActivity.cs" />
     <Compile Include="Views\Activities\SplashActivity.cs" />
     <Compile Include="Utilities\PortableConcurrentQueue.cs" />
+    <Compile Include="Utilities\Ui.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

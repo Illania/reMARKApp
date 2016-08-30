@@ -18,8 +18,10 @@ using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Views.Common;
 using Xamarin;
+using System.Threading;
 
 namespace Mark5.Mobile.Droid.Views.Activity
 {
@@ -69,13 +71,16 @@ namespace Mark5.Mobile.Droid.Views.Activity
             {
                 var ci = await authenticator.GetConnectionInfoAsync();
 
-                usernameEditText.Text = ci?.Username;
-                passwordEditText.Text = string.Empty;
-                hostnameEditText.Text = ci?.Hostname;
-                portEditText.Text = ci?.Port.ToString();
-                sslSpinner.SetSelection((int?)ci?.SslMode ?? 0);
+                Ui.RunOnUiThread(this, () =>
+                {
+                    usernameEditText.Text = ci?.Username;
+                    passwordEditText.Text = string.Empty;
+                    hostnameEditText.Text = ci?.Hostname;
+                    portEditText.Text = ci?.Port.ToString();
+                    sslSpinner.SetSelection((int?)ci?.SslMode ?? 0);
 
-                loginButton.Enabled = true;
+                    loginButton.Enabled = true;
+                });
             });
         }
 
@@ -85,11 +90,17 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
             try
             {
-                var username = usernameEditText.Text;
-                var password = passwordEditText.Text;
-                var hostname = hostnameEditText.Text;
-                var port = portEditText.Text;
-                var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
+                //var username = usernameEditText.Text;
+                //var password = passwordEditText.Text;
+                //var hostname = hostnameEditText.Text;
+                //var port = portEditText.Text;
+                //var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
+
+                var username = "bgc";
+                var password = "Bgc2014!";
+                var hostname = "192.168.75.44";
+                var port = "8096";
+                var sslMode = SslMode.AllowSelfSigned;
 
                 var errors = false;
                 if (!Validator.IsUsernameValid(username))

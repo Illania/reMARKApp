@@ -28,12 +28,7 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<SystemSettings> GetSystemSettingsAsync(SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Local)
-            {
-                return await FileSystemStorage.GetSystemSettingsAsync();
-            }
-
-            if (sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
                 var systemSettingsResult = await AppServiceProxy.GetSystemSettingsAsync(new DataContract.GetSystemSettingsParameters
                 {
@@ -55,17 +50,17 @@ namespace Mark5.Mobile.Common.Managers
                 return result;
             }
 
+            if (sourceType == SourceType.Local)
+            {
+                return await FileSystemStorage.GetSystemSettingsAsync();
+            }
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<SystemUsersDepartments> GetSystemUsersDepartmentsAsync(SourceType sourceType = SourceType.Local)
+        public async Task<SystemUsersDepartments> GetSystemUsersDepartmentsAsync(SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Local)
-            {
-                return await FileSystemStorage.GetSystemUsersDepartmentsAsync();
-            }
-
-            if (sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
                 var systemSettingsResult = await AppServiceProxy.GetSystemUsersAsync(new DataContract.GetSystemUsersParameters
                 {
@@ -79,6 +74,11 @@ namespace Mark5.Mobile.Common.Managers
                 await FileSystemStorage.SaveSystemUsersDepartmentsAsync(result);
 
                 return result;
+            }
+
+            if (sourceType == SourceType.Local)
+            {
+                return await FileSystemStorage.GetSystemUsersDepartmentsAsync();
             }
 
             throw new ArgumentException("Invalid sourceType provided.");

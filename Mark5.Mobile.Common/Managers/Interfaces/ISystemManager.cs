@@ -14,9 +14,9 @@ namespace Mark5.Mobile.Common.Managers
     public interface ISystemManager
     {
 
-        Task<SystemSettings> GetSystemSettingsAsync(SourceType sourceType = SourceType.Local);
+        Task<SystemSettings> GetSystemSettingsAsync(SourceType sourceType = SourceType.Auto);
 
-        Task<SystemUsersDepartments> GetSystemUsersDepartmentsAsync(SourceType sourceType = SourceType.Local);
+        Task<SystemUsersDepartments> GetSystemUsersDepartmentsAsync(SourceType sourceType = SourceType.Auto);
     }
 }
 

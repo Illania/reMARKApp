@@ -6,8 +6,8 @@
 	<string name="yes">Yes</string>
 	<string name="no">No</string>
 	<string name="ok">OK</string>
-	<string name="ssl_accept_selfsigned_warning">You chose to accept certificates. This may decrease security of the connection. Do you want to continue?</string>
-	<string name="ssl_off_warning">You chose to turn off SSL. Connection will be unsecure. Do you want to continue?</string>
+	<string name="cancel">Cancel</string>
+	<string name="please_wait">Please wait...</string>
 	<string name="username">Username</string>
 	<string name="username_invalid">Username is not valid.</string>
 	<string name="password">Password</string>
@@ -22,8 +22,9 @@
 		<item>SSL Disabled</item>
 	</string-array>
 	<string name="login">Log in</string>
+	<string name="ssl_accept_selfsigned_warning">You chose to accept certificates. This may decrease security of the connection. Do you want to continue?</string>
+	<string name="ssl_off_warning">You chose to turn off SSL. Connection will be unsecure. Do you want to continue?</string>
 	<string name="logging_in">Logging in</string>
-	<string name="please_wait">Please wait</string>
 	<string name="open_drawer">Open navigation drawer</string>
 	<string name="close_drawer">Close navigation drawer</string>
 	<string name="search">Search</string>

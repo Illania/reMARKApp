@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System.Threading.Tasks;
 using Android.App;
 using Android.OS;
 using Android.Support.Design.Widget;
@@ -12,6 +13,10 @@ using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
+using Mark5.Mobile.Common.Authenticator;
+using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Views.Activity
 {
@@ -40,6 +45,22 @@ namespace Mark5.Mobile.Droid.Views.Activity
             {
                 drawer.CloseDrawer(GravityCompat.Start);
             };
+
+            Task.Run(async () =>
+            {
+                var authenticator = AuthenticatorFactory.Create();
+                var ci = await authenticator.GetConnectionInfoAsync();
+                var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+
+                Ui.RunOnUiThread(this, () =>
+                {
+                    var headerTitle = FindViewById<AppCompatTextView>(Resource.Id.nav_header_title);
+                    var headerSubtitle = FindViewById<AppCompatTextView>(Resource.Id.nav_header_subtitle);
+
+                    headerTitle.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
+                    headerSubtitle.Text = $"{ci?.Username}";
+                });
+            });
         }
 
         public override void OnBackPressed()

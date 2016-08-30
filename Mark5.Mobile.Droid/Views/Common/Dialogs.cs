@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using AFollestad.MaterialDialogs;
 using Android.Content;
+using System.Threading;
 
 namespace Mark5.Mobile.Droid.Views.Common
 {
@@ -42,13 +43,20 @@ namespace Mark5.Mobile.Droid.Views.Common
             return tcs.Task;
         }
 
-        public static Action ShowInfiniteProgressDialog(Context context, int titleId, int messageId)
+        public static Action ShowInfiniteProgressDialog(Context context, int titleId, int messageId, CancellationTokenSource cts = null)
         {
             var builder = new MaterialDialog.Builder(context);
             builder.Title(titleId);
             builder.Content(messageId);
             builder.Progress(true, -1);
             builder.Cancelable(false);
+
+            if (cts != null)
+            {
+                builder.PositiveText(Resource.String.cancel);
+                builder.OnPositive(new SingleButtonCallback(cts.Cancel));
+            }
+
             var dialog = builder.Show();
             return dialog.Dismiss;
         }
