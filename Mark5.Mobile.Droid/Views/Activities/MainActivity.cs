@@ -65,7 +65,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
                     var headerSubtitle = FindViewById<AppCompatTextView>(Resource.Id.nav_header_subtitle);
 
                     headerTitle.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
-                    headerSubtitle.Text = $"{ci?.Username}";
+                    headerSubtitle.Text = $"{ci?.Username}@{ci?.Hostname}:{ci?.Port}";
                 });
             });
         }

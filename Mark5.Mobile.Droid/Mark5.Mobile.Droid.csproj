@@ -196,6 +196,11 @@
     <AndroidResource Include="Resources\color\drawer_item_icon.xml" />
     <AndroidResource Include="Resources\layout\content_placeholder.xml" />
     <AndroidResource Include="Resources\values-v21\style.axml" />
+    <AndroidResource Include="Resources\mipmap-hdpi\logo.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\logo.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\logo.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\logo.png" />
+    <AndroidResource Include="Resources\mipmap\menu_background.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
