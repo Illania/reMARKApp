@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
     <include
-        layout="@layout/appbar_raw" />
+        layout="@layout/appbar" />
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/login_form"
         android:minWidth="25px"

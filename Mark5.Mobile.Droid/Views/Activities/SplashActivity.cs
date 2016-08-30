@@ -11,13 +11,12 @@ using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
-using Android.Support.V7.App;
 using Android.Views;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Xamarin;
-using UK.CO.Chrisjenx.Calligraphy;
+using Mark5.Mobile.Droid.Views.Common;
 
 namespace Mark5.Mobile.Droid.Views.Activity
 {
@@ -28,13 +27,8 @@ namespace Mark5.Mobile.Droid.Views.Activity
               Theme = "@style/mark5Splash",
               ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation,
               ScreenOrientation = ScreenOrientation.Portrait)]
-    public class SplashActivity : AppCompatActivity
+    public class SplashActivity : BaseAppCompatActivity
     {
-
-        protected override void AttachBaseContext(Context @base)
-        {
-            base.AttachBaseContext(CalligraphyContextWrapper.Wrap(@base));
-        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -80,11 +74,11 @@ namespace Mark5.Mobile.Droid.Views.Activity
                         ["System Administrator"] = (ss?.UserInfo?.IsSystemAdministrator ?? false) ? "Yes" : "No"
                     });
 
-                    StartActivity(new Intent(this, typeof(MainActivity)));
+                    RunOnUiThreadIfNecessary(() => StartActivity(new Intent(this, typeof(MainActivity))));
                 }
                 else
                 {
-                    StartActivity(new Intent(this, typeof(LoginActivity)));
+                    RunOnUiThreadIfNecessary(() => StartActivity(new Intent(this, typeof(LoginActivity))));
                 }
 
                 Finish();

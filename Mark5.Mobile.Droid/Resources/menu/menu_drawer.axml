@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-	<group android:id="@+id/navigation_group_search" android:checkableBehavior="single">
-		<item android:id="@+id/navigation_search" android:title="@string/search" android:icon="@mipmap/nav_search" />
+	<group android:id="@+id/nav_group_search" android:checkableBehavior="single">
+		<item android:id="@+id/nav_search" android:title="@string/search" android:icon="@mipmap/nav_search" />
 	</group>
-	<group android:id="@+id/navigation_group_modules" android:checkableBehavior="single">
-		<item android:id="@+id/navigation_documents" android:title="@string/documents" android:checked="true" android:icon="@mipmap/nav_documents" />
-		<item android:id="@+id/navigation_contacts" android:title="@string/contacts" android:icon="@mipmap/nav_contacts" />
-		<item android:id="@+id/navigation_shortcodes" android:title="@string/shortcodes" android:icon="@mipmap/nav_shortcodes" />
-		<item android:id="@+id/navigation_calendar" android:title="@string/calendar" android:icon="@mipmap/nav_calendar" />
+	<group android:id="@+id/nav_group_modules" android:checkableBehavior="single">
+		<item android:id="@+id/nav_documents" android:title="@string/documents" android:icon="@mipmap/nav_documents" />
+		<item android:id="@+id/nav_contacts" android:title="@string/contacts" android:icon="@mipmap/nav_contacts" />
+		<item android:id="@+id/nav_shortcodes" android:title="@string/shortcodes" android:icon="@mipmap/nav_shortcodes" />
+		<item android:id="@+id/nav_calendar" android:title="@string/calendar" android:icon="@mipmap/nav_calendar" />
 	</group>
-	<group android:id="@+id/navigation_group_settings" android:checkableBehavior="single">
-		<item android:id="@+id/navigation_settings" android:title="@string/settings" android:icon="@mipmap/nav_settings" />
+	<group android:id="@+id/nav_group_settings" android:checkableBehavior="single">
+		<item android:id="@+id/nav_settings" android:title="@string/settings" android:icon="@mipmap/nav_settings" />
 	</group>
 </menu>

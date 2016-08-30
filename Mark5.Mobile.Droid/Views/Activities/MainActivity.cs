@@ -14,23 +14,26 @@ using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
+using Android.Views;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Utilities;
-using UK.CO.Chrisjenx.Calligraphy;
+using Mark5.Mobile.Droid.Views.Common;
+using Mark5.Mobile.Droid.Views.Fragments;
 
 namespace Mark5.Mobile.Droid.Views.Activity
 {
 
     [Activity]
-    public class MainActivity : AppCompatActivity
+    public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener
     {
 
-        protected override void AttachBaseContext(Context @base)
-        {
-            base.AttachBaseContext(CalligraphyContextWrapper.Wrap(@base));
-        }
+        Toolbar toolbar;
+        DrawerLayout drawer;
+        ActionBarDrawerToggle drawerToggle;
+        NavigationView navigationView;
+
+        IMenuItem lastSelectedItem;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -39,19 +42,20 @@ namespace Mark5.Mobile.Droid.Views.Activity
             SetTitle(Resource.String.app_name);
             SetContentView(Resource.Layout.activity_main);
 
-            var toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
+            toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);
 
-            var drawer = FindViewById<DrawerLayout>(Resource.Id.drawer_layout);
-            var toggle = new ActionBarDrawerToggle(this, drawer, toolbar, Resource.String.open_drawer, Resource.String.close_drawer);
-            drawer.AddDrawerListener(toggle);
-            toggle.SyncState();
+            drawer = FindViewById<DrawerLayout>(Resource.Id.drawer_layout);
+            drawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, Resource.String.open_drawer, Resource.String.close_drawer);
+            drawer.AddDrawerListener(drawerToggle);
+            drawerToggle.SyncState();
 
-            var navigationView = FindViewById<NavigationView>(Resource.Id.navigation_view);
-            navigationView.NavigationItemSelected += (sender, e) =>
-            {
-                drawer.CloseDrawer(GravityCompat.Start);
-            };
+            navigationView = FindViewById<NavigationView>(Resource.Id.navigation_view);
+            navigationView.SetNavigationItemSelectedListener(this);
+
+            var initialMenuItem = navigationView.Menu.FindItem(Resource.Id.nav_documents);
+            initialMenuItem.SetChecked(true);
+            OnNavigationItemSelected(initialMenuItem);
 
             Task.Run(async () =>
             {
@@ -59,7 +63,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
                 var ci = await authenticator.GetConnectionInfoAsync();
                 var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
 
-                Ui.RunOnUiThread(this, () =>
+                RunOnUiThreadIfNecessary(() =>
                 {
                     var headerTitle = FindViewById<AppCompatTextView>(Resource.Id.nav_header_title);
                     var headerSubtitle = FindViewById<AppCompatTextView>(Resource.Id.nav_header_subtitle);
@@ -72,7 +76,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
         public override void OnBackPressed()
         {
-            var drawer = FindViewById<DrawerLayout>(Resource.Id.drawer_layout);
             if (drawer.IsDrawerOpen(GravityCompat.Start))
             {
                 drawer.CloseDrawer(GravityCompat.Start);
@@ -81,6 +84,27 @@ namespace Mark5.Mobile.Droid.Views.Activity
             {
                 base.OnBackPressed();
             }
+        }
+
+        public bool OnNavigationItemSelected(IMenuItem menuItem)
+        {
+            if (lastSelectedItem != menuItem)
+            {
+                lastSelectedItem = menuItem;
+
+                var foldersListFragment = new FoldersListFragment
+                {
+                    Text = menuItem.ItemId,
+                    Arguments = Intent.Extras
+                };
+
+                var ft = SupportFragmentManager.BeginTransaction();
+                ft.Replace(Resource.Id.fragment_container, foldersListFragment);
+                ft.Commit();
+            }
+
+            drawer.CloseDrawer(GravityCompat.Start);
+            return true;
         }
     }
 }

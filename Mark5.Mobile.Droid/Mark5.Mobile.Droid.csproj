@@ -138,10 +138,11 @@
     <Compile Include="Utilities\DeviceInfoProvider.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Views\Activities\LoginActivity.cs" />
-    <Compile Include="Views\Activities\MainActivity.cs" />
     <Compile Include="Views\Activities\SplashActivity.cs" />
     <Compile Include="Utilities\PortableConcurrentQueue.cs" />
-    <Compile Include="Utilities\Ui.cs" />
+    <Compile Include="Views\Fragments\FoldersListFragment.cs" />
+    <Compile Include="Views\Activities\MainActivity.cs" />
+    <Compile Include="Views\Common\BaseAppCompatActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -160,8 +161,8 @@
     <AndroidResource Include="Resources\layout\drawer_header.axml" />
     <AndroidResource Include="Resources\values\dimens.axml" />
     <AndroidResource Include="Resources\menu\menu_drawer.axml" />
+    <AndroidResource Include="Resources\layout\base_layout.axml" />
     <AndroidResource Include="Resources\layout\appbar.axml" />
-    <AndroidResource Include="Resources\layout\appbar_raw.axml" />
     <AndroidResource Include="Resources\color\drawer_item.xml" />
     <AndroidResource Include="Resources\color\drawer_item_background.xml" />
     <AndroidResource Include="Resources\mipmap\background.png" />
@@ -194,13 +195,13 @@
     <AndroidResource Include="Resources\mipmap-xxxhdpi\nav_calendar.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\nav_search.png" />
     <AndroidResource Include="Resources\color\drawer_item_icon.xml" />
-    <AndroidResource Include="Resources\layout\content_placeholder.xml" />
     <AndroidResource Include="Resources\values-v21\style.axml" />
     <AndroidResource Include="Resources\mipmap-hdpi\logo.png" />
     <AndroidResource Include="Resources\mipmap-xhdpi\logo.png" />
     <AndroidResource Include="Resources\mipmap-xxhdpi\logo.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\logo.png" />
     <AndroidResource Include="Resources\mipmap\menu_background.png" />
+    <AndroidResource Include="Resources\layout\fragment_list_folders.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

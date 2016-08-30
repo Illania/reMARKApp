@@ -12,22 +12,19 @@ using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Support.Design.Widget;
-using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Views.Common;
-using UK.CO.Chrisjenx.Calligraphy;
 using Xamarin;
 
 namespace Mark5.Mobile.Droid.Views.Activity
 {
 
     [Activity]
-    public class LoginActivity : AppCompatActivity
+    public class LoginActivity : BaseAppCompatActivity
     {
 
         TextInputEditText usernameEditText;
@@ -38,11 +35,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
         AppCompatButton loginButton;
 
         IAuthenticator authenticator;
-
-        protected override void AttachBaseContext(Context @base)
-        {
-            base.AttachBaseContext(CalligraphyContextWrapper.Wrap(@base));
-        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -76,7 +68,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
             {
                 var ci = await authenticator.GetConnectionInfoAsync();
 
-                Ui.RunOnUiThread(this, () =>
+                RunOnUiThreadIfNecessary(() =>
                 {
                     usernameEditText.Text = ci?.Username;
                     passwordEditText.Text = string.Empty;
