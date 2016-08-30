@@ -191,6 +191,7 @@
     <AndroidResource Include="Resources\mipmap-xxxhdpi\nav_search.png" />
     <AndroidResource Include="Resources\color\drawer_item_icon.xml" />
     <AndroidResource Include="Resources\layout\content_placeholder.xml" />
+    <AndroidResource Include="Resources\values-v21\style.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
@@ -206,6 +207,7 @@
     <Folder Include="Resources\mipmap-xhdpi\" />
     <Folder Include="Resources\mipmap-xxhdpi\" />
     <Folder Include="Resources\mipmap-xxxhdpi\" />
+    <Folder Include="Resources\values-v21\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
