@@ -20,8 +20,8 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Views.Common;
+using UK.CO.Chrisjenx.Calligraphy;
 using Xamarin;
-using System.Threading;
 
 namespace Mark5.Mobile.Droid.Views.Activity
 {
@@ -38,6 +38,11 @@ namespace Mark5.Mobile.Droid.Views.Activity
         AppCompatButton loginButton;
 
         IAuthenticator authenticator;
+
+        protected override void AttachBaseContext(Context @base)
+        {
+            base.AttachBaseContext(CalligraphyContextWrapper.Wrap(@base));
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {

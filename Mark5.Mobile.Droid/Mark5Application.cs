@@ -16,6 +16,7 @@ using Mark5.Mobile.Droid.Services;
 using Mark5.Mobile.Droid.Utilities;
 using PCLStorage;
 using Xamarin;
+using UK.CO.Chrisjenx.Calligraphy;
 
 namespace Mark5.Mobile.Droid
 {
@@ -34,6 +35,8 @@ namespace Mark5.Mobile.Droid
         public override void OnCreate()
         {
             base.OnCreate();
+
+            CalligraphyConfig.InitDefault(new CalligraphyConfig.Builder().SetDefaultFontPath("fonts/Avenir-Book.ttf").Build());
 
 #if RELEASE
             Insights.Initialize("9797448a2139873ddf4487f52d80128bbbf8933a", Context, true);

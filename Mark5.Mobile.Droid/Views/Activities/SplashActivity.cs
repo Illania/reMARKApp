@@ -17,6 +17,7 @@ using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Xamarin;
+using UK.CO.Chrisjenx.Calligraphy;
 
 namespace Mark5.Mobile.Droid.Views.Activity
 {
@@ -29,6 +30,11 @@ namespace Mark5.Mobile.Droid.Views.Activity
               ScreenOrientation = ScreenOrientation.Portrait)]
     public class SplashActivity : AppCompatActivity
     {
+
+        protected override void AttachBaseContext(Context @base)
+        {
+            base.AttachBaseContext(CalligraphyContextWrapper.Wrap(@base));
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {

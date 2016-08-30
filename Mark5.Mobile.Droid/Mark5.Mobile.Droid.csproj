@@ -122,6 +122,9 @@
     <Reference Include="materialprogressbar">
       <HintPath>..\lib\materialprogressbar.dll</HintPath>
     </Reference>
+    <Reference Include="caligraphy_bindings">
+      <HintPath>..\lib\caligraphy_bindings.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -145,6 +148,7 @@
     <None Include="Properties\AndroidManifest.xml" />
     <None Include="Assets\AboutAssets.txt" />
     <None Include="packages.config" />
+    <None Include="Assets\fonts\Avenir-Heavy.ttf" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\activity_splash.axml" />
@@ -208,12 +212,16 @@
     <Folder Include="Resources\mipmap-xxhdpi\" />
     <Folder Include="Resources\mipmap-xxxhdpi\" />
     <Folder Include="Resources\values-v21\" />
+    <Folder Include="Assets\fonts\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
       <Project>{32ACF699-5511-485F-B54B-5BFDB3D337AE}</Project>
       <Name>Mark5.Mobile.Common</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\fonts\Avenir-Book.ttf" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Xamarin.GooglePlayServices.Basement.29.0.0.2\build\Xamarin.GooglePlayServices.Basement.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Basement.29.0.0.2\build\Xamarin.GooglePlayServices.Basement.targets')" />

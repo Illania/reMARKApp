@@ -7,6 +7,7 @@
 //
 using System.Threading.Tasks;
 using Android.App;
+using Android.Content;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.View;
@@ -17,6 +18,7 @@ using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
+using UK.CO.Chrisjenx.Calligraphy;
 
 namespace Mark5.Mobile.Droid.Views.Activity
 {
@@ -24,6 +26,11 @@ namespace Mark5.Mobile.Droid.Views.Activity
     [Activity]
     public class MainActivity : AppCompatActivity
     {
+
+        protected override void AttachBaseContext(Context @base)
+        {
+            base.AttachBaseContext(CalligraphyContextWrapper.Wrap(@base));
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
