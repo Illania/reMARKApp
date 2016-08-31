@@ -122,6 +122,9 @@
     <Reference Include="materialprogressbar">
       <HintPath>..\lib\materialprogressbar.dll</HintPath>
     </Reference>
+    <Reference Include="caligraphy_bindings">
+      <HintPath>..\lib\caligraphy_bindings.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -131,48 +134,103 @@
     <Compile Include="Mark5Application.cs" />
     <Compile Include="Utilities\SSLCertificateVerificationManager.cs" />
     <Compile Include="Utilities\SimpleLogger.cs" />
-    <Compile Include="Views\Main\MainActivity.cs" />
     <Compile Include="Views\Common\Dialogs.cs" />
     <Compile Include="Utilities\DeviceInfoProvider.cs" />
-    <Compile Include="Views\Login\LoginActivity.cs" />
-    <Compile Include="Views\Splash\SplashActivity.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
+    <Compile Include="Views\Activities\LoginActivity.cs" />
+    <Compile Include="Views\Activities\SplashActivity.cs" />
+    <Compile Include="Utilities\PortableConcurrentQueue.cs" />
+    <Compile Include="Views\Fragments\FoldersListFragment.cs" />
+    <Compile Include="Views\Activities\MainActivity.cs" />
+    <Compile Include="Views\Common\BaseAppCompatActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
     <None Include="Properties\AndroidManifest.xml" />
     <None Include="Assets\AboutAssets.txt" />
     <None Include="packages.config" />
+    <None Include="Assets\fonts\Avenir-Heavy.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\Splash.axml" />
-    <AndroidResource Include="Resources\values\Strings.xml" />
-    <AndroidResource Include="Resources\mipmap-hdpi\Icon.png" />
-    <AndroidResource Include="Resources\mipmap-mdpi\Icon.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\Icon.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\Icon.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\Icon.png" />
-    <AndroidResource Include="Resources\values\Style.axml" />
-    <AndroidResource Include="Resources\layout\Login.axml" />
-    <AndroidResource Include="Resources\layout\Main.axml" />
-    <AndroidResource Include="Resources\values\Color.axml" />
-    <AndroidResource Include="Resources\layout\Common_Toolbar.axml" />
+    <AndroidResource Include="Resources\layout\activity_splash.axml" />
+    <AndroidResource Include="Resources\values\strings.xml" />
+    <AndroidResource Include="Resources\values\style.axml" />
+    <AndroidResource Include="Resources\layout\activity_login.axml" />
+    <AndroidResource Include="Resources\layout\activity_main.axml" />
+    <AndroidResource Include="Resources\values\color.axml" />
+    <AndroidResource Include="Resources\layout\drawer_header.axml" />
+    <AndroidResource Include="Resources\values\dimens.axml" />
+    <AndroidResource Include="Resources\menu\menu_drawer.axml" />
+    <AndroidResource Include="Resources\layout\base_layout.axml" />
+    <AndroidResource Include="Resources\layout\appbar.axml" />
+    <AndroidResource Include="Resources\color\drawer_item.xml" />
+    <AndroidResource Include="Resources\color\drawer_item_background.xml" />
+    <AndroidResource Include="Resources\mipmap\background.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\nav_contacts.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\nav_documents.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\nav_shortcodes.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\nav_settings.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\nav_calendar.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\nav_search.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\ic_icon.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\ic_icon.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\ic_icon.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_icon.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\nav_shortcodes.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\nav_settings.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\nav_documents.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\nav_contacts.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\nav_search.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\nav_calendar.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\nav_contacts.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\nav_documents.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\nav_settings.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\nav_shortcodes.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\nav_contacts.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\nav_documents.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\nav_settings.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\nav_shortcodes.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\nav_calendar.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\nav_search.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\nav_calendar.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\nav_search.png" />
+    <AndroidResource Include="Resources\color\drawer_item_icon.xml" />
+    <AndroidResource Include="Resources\values-v21\style.axml" />
+    <AndroidResource Include="Resources\mipmap-hdpi\logo.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\logo.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\logo.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\logo.png" />
+    <AndroidResource Include="Resources\layout\fragment_list_folders.axml" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\drawer_header_background.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\drawer_header_background.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\drawer_header_background.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\drawer_header_background.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
     <Folder Include="Services\" />
     <Folder Include="Utilities\" />
     <Folder Include="Views\" />
-    <Folder Include="Views\Login\" />
-    <Folder Include="Views\Main\" />
     <Folder Include="Views\Common\" />
-    <Folder Include="Views\Splash\" />
+    <Folder Include="Views\Activities\" />
+    <Folder Include="Views\Fragments\" />
+    <Folder Include="Resources\menu\" />
+    <Folder Include="Resources\color\" />
+    <Folder Include="Resources\mipmap\" />
+    <Folder Include="Resources\mipmap-xhdpi\" />
+    <Folder Include="Resources\mipmap-xxhdpi\" />
+    <Folder Include="Resources\mipmap-xxxhdpi\" />
+    <Folder Include="Resources\values-v21\" />
+    <Folder Include="Assets\fonts\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
       <Project>{32ACF699-5511-485F-B54B-5BFDB3D337AE}</Project>
       <Name>Mark5.Mobile.Common</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\fonts\Avenir-Book.ttf" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Xamarin.GooglePlayServices.Basement.29.0.0.2\build\Xamarin.GooglePlayServices.Basement.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Basement.29.0.0.2\build\Xamarin.GooglePlayServices.Basement.targets')" />

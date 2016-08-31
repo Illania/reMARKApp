@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<style name="mark5" parent="Theme.AppCompat.Light.NoActionBar">
+		<item name="colorPrimary">@color/darkerblue</item>
+		<item name="colorPrimaryDark">@color/darkerblue</item>
+		<item name="colorAccent">@color/brown</item>
+		<item name="colorButtonNormal">@color/lightgray</item>
+		<item name="colorControlHighlight">@color/brown</item>
+		<item name="actionBarItemBackground">@color/darkblue</item>
+		<item name="actionModeBackground">@color/darkblue</item>
+		<item name="spinnerStyle">@style/mark5spinner</item>
+	</style>
+	<style name="mark5Splash" parent="mark5">
+		<item name="android:windowFullscreen">true</item>
+		<item name="android:windowContentOverlay">@null</item>
+		<item name="android:windowBackground">@mipmap/background</item>
+		<item name="windowNoTitle">true</item>
+		<item name="windowActionBar">false</item>
+	</style>
+	<style name="mark5spinner" parent="Widget.AppCompat.Spinner.Underlined" />
+	<style name="mark5appbaroverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+	<style name="mark5popupoverlay" parent="ThemeOverlay.AppCompat.Light" />
+	<style name="mark5navheaderoverlay" parent="ThemeOverlay.AppCompat.Dark" />
+</resources>

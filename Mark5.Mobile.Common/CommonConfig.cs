@@ -32,7 +32,7 @@ namespace Mark5.Mobile.Common
 
         public static IDeviceInfoProvider DeviceInfoProvider { get; set; }
 
-        public static Type BlockingQueue { get; set; }
+        public static Type ConcurrentQueueType { get; set; }
     }
 }
 

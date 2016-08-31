@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.PortableCollections;
 using Mark5.Mobile.Common.Services;
 using Mark5.Mobile.Common.Storage;
 
@@ -21,11 +22,11 @@ namespace Mark5.Mobile.Common.Managers
         public event EventHandler<OutgoingDocumentContainer> DocumentSendingSuccessful = delegate { };
         public event EventHandler<OutgoingDocumentContainer> DocumentSendingFailed = delegate { };
 
-        readonly ICrossPlatformConcurrentQueue<Guid> queue;
+        readonly IPortableConcurrentQueue<Guid> queue;
 
         public OutgoingDocumentsManager()
         {
-            queue = (ICrossPlatformConcurrentQueue<Guid>)Activator.CreateInstance(CommonConfig.BlockingQueue.MakeGenericType(new Type[] { typeof(Guid) }));
+            queue = (IPortableConcurrentQueue<Guid>)Activator.CreateInstance(CommonConfig.ConcurrentQueueType.MakeGenericType(new Type[] { typeof(Guid) }));
             semaphore = new SemaphoreSlim(1);
         }
 
