@@ -94,7 +94,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
                 var foldersListFragment = new FoldersListFragment
                 {
-                    Text = menuItem.ItemId,
                     Arguments = Intent.Extras
                 };
 

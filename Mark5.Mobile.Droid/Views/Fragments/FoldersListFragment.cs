@@ -7,21 +7,14 @@
 //
 using Android.OS;
 using Android.Support.V4.App;
+using Android.Support.V4.View;
 using Android.Views;
-using Android.Widget;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
 
     public class FoldersListFragment : Fragment
     {
-
-        public int Text
-        {
-            get;
-            set;
-        }
-
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             return inflater.Inflate(Resource.Layout.fragment_list_folders, container, false);
@@ -31,8 +24,33 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             base.OnStart();
 
-            var text = Activity.FindViewById<TextView>(Resource.Id.text);
-            text.Text = Text.ToString();
+            var viewPager = Activity.FindViewById<ViewPager>(Resource.Id.folderPager);
+            var adapter = new MyAdapter(Activity.SupportFragmentManager);
+            viewPager.Adapter = adapter;
+        }
+
+    }
+
+    class MyAdapter : FragmentStatePagerAdapter
+    {
+        int numItems = 99;
+
+        public MyAdapter(FragmentManager fm) : base(fm)
+        {
+        }
+
+        public override int Count
+        {
+            get
+            {
+                return numItems;
+            }
+        }
+
+        public override Fragment GetItem(int position)
+        {
+            var internalFragment = InternalFragment.Create(position);
+            return internalFragment;
         }
     }
 }
