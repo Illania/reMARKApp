@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<android.support.v7.preference.PreferenceCategory android:key="pref_key_cat_documents" android:title="@string/pref_cat_documents">
+		<android.support.v7.preference.ListPreference android:key="pref_key_documents_to_load" android:title="@string/pref_documents_to_load_title" android:summary="@string/pref_documents_to_load_summary" android:dialogTitle="@string/pref_documents_to_load_title" android:entries="@array/pref_documents_to_load_entries" android:entryValues="@array/pref_documents_to_load_entryvalues" android:defaultValue="@string/pref_documents_to_load_default" />
+		<android.support.v7.preference.ListPreference android:key="pref_key_documents_mark_as_read" android:title="@string/pref_documents_mark_as_read_title" android:summary="@string/pref_documents_mark_as_read_summary" android:dialogTitle="@string/pref_documents_mark_as_read_dialog_title" android:entries="@array/pref_documents_mark_as_read_entries" android:entryValues="@array/pref_documents_mark_as_read_entryvalues" android:defaultValue="@string/pref_documents_mark_as_read_default" />
+		<android.support.v7.preference.CheckBoxPreference android:key="pref_key_documents_large_attachment_warn" android:title="@string/pref_documents_large_attachment_warn_title" android:summary="@string/pref_documents_large_attachment_warn_summary" android:defaultValue="true" />
+		<android.support.v7.preference.Preference android:key="pref_key_documents_view_options" android:title="@string/pref_documents_view_options_title" android:summary="@string/pref_documents_view_options_summary" />
+	</android.support.v7.preference.PreferenceCategory>
+	<android.support.v7.preference.PreferenceCategory android:key="pref_key_cat_contacts" android:title="@string/pref_cat_contacts">
+		<android.support.v7.preference.CheckBoxPreference android:key="pref_key_contacts_synchronised" android:title="@string/pref_contacts_synchronised_title" android:summary="@string/pref_contacts_synchronised_summary" android:defaultValue="false" />
+		<android.support.v7.preference.Preference android:key="pref_key_contacts_view_options" android:title="@string/pref_contacts_view_options_title" android:summary="@string/pref_contacts_view_options_summary" />
+	</android.support.v7.preference.PreferenceCategory>
+	<android.support.v7.preference.PreferenceCategory android:key="pref_key_cat_shortcodes" android:title="@string/pref_cat_shortcodes">
+		<android.support.v7.preference.CheckBoxPreference android:key="pref_key_shortcodes_synchronised" android:title="@string/pref_shortcodes_synchronised_title" android:summary="@string/pref_shortcodes_synchronised_summary" android:defaultValue="false" />
+	</android.support.v7.preference.PreferenceCategory>
+	<android.support.v7.preference.PreferenceCategory android:key="pref_key_cat_compose" android:title="@string/pref_cat_compose">
+		<android.support.v7.preference.CheckBoxPreference android:key="pref_key_compose_remove_line" android:title="@string/pref_compose_remove_line_title" android:summary="@string/pref_compose_remove_line_summary" android:defaultValue="false" />
+		<android.support.v7.preference.ListPreference android:key="pref_key_compose_template_mode" android:title="@string/pref_compose_template_mode_title" android:summary="@string/pref_compose_template_mode_summary" android:dialogTitle="@string/pref_compose_template_mode_title" android:entries="@array/pref_compose_template_mode_entries" android:entryValues="@array/pref_compose_template_mode_entryvalues" android:defaultValue="@string/pref_compose_template_mode_default" />
+		<android.support.v7.preference.EditTextPreference android:key="pref_key_compose_template_local" android:title="@string/pref_compose_template_local_title" android:summary="@string/pref_compose_template_local_summary" android:dialogTitle="@string/pref_compose_template_local_title" android:defaultValue="@string/pref_compose_template_local_default" />
+	</android.support.v7.preference.PreferenceCategory>
+	<android.support.v7.preference.PreferenceCategory android:key="pref_key_cat_cache" android:title="@string/pref_cat_cache">
+		<android.support.v7.preference.ListPreference android:key="pref_key_cache_auto_clean" android:title="@string/pref_cache_auto_clean_title" android:summary="@string/pref_cache_auto_clean_summary" android:dialogTitle="@string/pref_cache_auto_clean_dialog_title" android:entries="@array/pref_cache_auto_clean_entries" android:entryValues="@array/pref_cache_auto_clean_entryvalues" android:defaultValue="@string/pref_cache_auto_clean_default" />
+		<android.support.v7.preference.Preference android:key="pref_key_cache_clean_now" android:title="@string/pref_cache_clean_now_title" android:summary="@string/pref_cache_clean_now_summary" />
+	</android.support.v7.preference.PreferenceCategory>
+	<android.support.v7.preference.PreferenceCategory android:key="pref_key_cat_advanced" android:title="@string/pref_cat_advanced">
+		<android.support.v7.preference.Preference android:key="pref_key_advanced_send_feedback" android:title="@string/pref_advanced_send_feedback_title" android:summary="@string/pref_advanced_send_feedback_summary" />
+		<android.support.v7.preference.CheckBoxPreference android:key="pref_key_advanced_enable_reporting" android:title="@string/pref_advanced_enable_reporting_title" android:summary="@string/pref_advanced_enable_reporting_summary" android:defaultValue="true" />
+		<android.support.v7.preference.Preference android:key="pref_key_advanced_logout" android:title="@string/pref_advanced_logout_title" android:summary="@string/pref_advanced_logout_summary" />
+	</android.support.v7.preference.PreferenceCategory>
+	<android.support.v7.preference.PreferenceCategory android:key="pref_key_cat_about" android:title="@string/pref_cat_about">
+		<android.support.v7.preference.Preference android:key="pref_key_about_version" android:title="@string/pref_about_version_title" />
+	</android.support.v7.preference.PreferenceCategory>
+</android.support.v7.preference.PreferenceScreen>

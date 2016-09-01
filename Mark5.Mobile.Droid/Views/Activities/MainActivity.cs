@@ -7,7 +7,6 @@
 //
 using System.Threading.Tasks;
 using Android.App;
-using Android.Content;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.View;
@@ -92,11 +91,11 @@ namespace Mark5.Mobile.Droid.Views.Activity
             {
                 lastSelectedItem = menuItem;
 
-                var foldersListFragment = new FoldersListFragment
-                {
-                    Text = menuItem.ItemId,
-                    Arguments = Intent.Extras
-                };
+                var foldersListFragment = new PreferenceFragment();//new FoldersListFragment
+                //{
+                //    Text = menuItem.ItemId,
+                //    Arguments = Intent.Extras
+                //};
 
                 var ft = SupportFragmentManager.BeginTransaction();
                 ft.Replace(Resource.Id.fragment_container, foldersListFragment);

@@ -143,17 +143,17 @@
     <Compile Include="Views\Fragments\FoldersListFragment.cs" />
     <Compile Include="Views\Activities\MainActivity.cs" />
     <Compile Include="Views\Common\BaseAppCompatActivity.cs" />
+    <Compile Include="Views\Fragments\PreferenceFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
     <None Include="Properties\AndroidManifest.xml" />
     <None Include="Assets\AboutAssets.txt" />
     <None Include="packages.config" />
-    <None Include="Assets\fonts\Avenir-Heavy.ttf" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\activity_splash.axml" />
-    <AndroidResource Include="Resources\values\strings.xml" />
+    <AndroidResource Include="Resources\values\strings.axml" />
     <AndroidResource Include="Resources\values\style.axml" />
     <AndroidResource Include="Resources\layout\activity_login.axml" />
     <AndroidResource Include="Resources\layout\activity_main.axml" />
@@ -205,6 +205,8 @@
     <AndroidResource Include="Resources\mipmap-xxhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\mipmap-xhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\mipmap-hdpi\drawer_header_background.png" />
+    <AndroidResource Include="Resources\xml\preferences.axml" />
+    <AndroidResource Include="Resources\values\strings-preferences.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
@@ -222,6 +224,7 @@
     <Folder Include="Resources\mipmap-xxxhdpi\" />
     <Folder Include="Resources\values-v21\" />
     <Folder Include="Assets\fonts\" />
+    <Folder Include="Resources\xml\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
@@ -231,6 +234,7 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidAsset Include="Assets\fonts\Avenir-Book.ttf" />
+    <AndroidAsset Include="Assets\fonts\Avenir-Heavy.ttf" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Xamarin.GooglePlayServices.Basement.29.0.0.2\build\Xamarin.GooglePlayServices.Basement.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Basement.29.0.0.2\build\Xamarin.GooglePlayServices.Basement.targets')" />
