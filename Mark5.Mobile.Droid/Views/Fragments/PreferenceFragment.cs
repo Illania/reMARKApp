@@ -5,11 +5,9 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
 using Android.OS;
 using Android.Support.V4.App;
 using Android.Support.V7.Preferences;
-using Android.Transitions;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
