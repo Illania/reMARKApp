@@ -5,52 +5,49 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using Android.OS;
+using Android.Support.V4.App;
 using Android.Support.V7.Preferences;
-using AFollestad.MaterialDialogs;
-using Java.Lang;
+using Android.Transitions;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
 
-    public class PreferenceFragment : PreferenceFragmentCompat
+    public class PreferenceFragment : PreferenceFragmentCompat, PreferenceFragmentCompat.IOnPreferenceStartScreenCallback
     {
 
-        const string PrefKeyDocumentsViewOptions = "pref_key_documents_view_options";
-        const string PrefKeyContactsViewOptions = "pref_key_contacts_view_options";
+        public override Fragment CallbackFragment
+        {
+            get
+            {
+                return this;
+            }
+        }
 
         public override void OnCreatePreferences(Bundle savedInstanceState, string rootKey)
         {
-            AddPreferencesFromResource(Resource.Xml.preferences);
+            SetPreferencesFromResource(Resource.Xml.preferences, rootKey);
         }
 
-        public override bool OnPreferenceTreeClick(Preference preference)
+        public override void OnNavigateToScreen(PreferenceScreen preferenceScreen)
         {
-            var handled = base.OnPreferenceTreeClick(preference);
-
-            if (!handled && preference.Key == FindPreference(PrefKeyDocumentsViewOptions)?.Key)
-            {
-
-
-                handled = true;
-            }
-            if (!handled && preference.Key == FindPreference(PrefKeyContactsViewOptions)?.Key)
-            {
-
-
-                handled = true;
-            }
-
-            return handled;
+            base.OnNavigateToScreen(preferenceScreen);
         }
 
-        class MultiChoiceCallback : Java.Lang.Object, MaterialDialog.IListCallbackMultiChoice
+        public bool OnPreferenceStartScreen(PreferenceFragmentCompat caller, PreferenceScreen pref)
         {
-
-            public bool OnSelection(MaterialDialog p0, Integer[] p1, ICharSequence[] p2)
+            var args = new Bundle();
+            args.PutString(ArgPreferenceRoot, pref.Key);
+            var ft = Activity.SupportFragmentManager.BeginTransaction();
+            ft.SetTransition(FragmentTransaction.TransitFragmentOpen);
+            ft.Replace(Resource.Id.fragment_container, new PreferenceFragment
             {
-                return true;
-            }
+                Arguments = args
+            });
+            ft.AddToBackStack(pref.Key);
+            ft.Commit();
+            return true;
         }
     }
 }
