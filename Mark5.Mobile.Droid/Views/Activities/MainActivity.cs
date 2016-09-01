@@ -65,7 +65,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
                 RunOnUiThreadIfNecessary(() =>
                 {
-                    var headerTitle = FindViewById<AppCompatTextView>(Resource.Id.nav_header_title);
+                    var headerTitle = FindViewById<AppCompatTextView>(Resource.Id.nav_header_title); //TODO sometimes the header title is null
                     var headerSubtitle = FindViewById<AppCompatTextView>(Resource.Id.nav_header_subtitle);
 
                     headerTitle.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";

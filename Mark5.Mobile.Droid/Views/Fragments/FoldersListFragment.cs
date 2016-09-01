@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using Android.OS;
+using Android.Support.Design.Widget;
 using Android.Support.V4.App;
 using Android.Support.V4.View;
 using Android.Views;
@@ -24,9 +25,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             base.OnStart();
 
-            var viewPager = Activity.FindViewById<ViewPager>(Resource.Id.folderPager);
+            var viewPager = View.FindViewById<ViewPager>(Resource.Id.folderPager);
             var adapter = new MyAdapter(Activity.SupportFragmentManager);
             viewPager.Adapter = adapter;
+
+            var tabLayout = View.FindViewById<TabLayout>(Resource.Id.tab);
+            tabLayout.SetupWithViewPager(viewPager);
         }
 
     }
@@ -49,8 +53,13 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override Fragment GetItem(int position)
         {
-            var internalFragment = InternalFragment.Create(position);
+            var internalFragment = FoldersListInternalFragment.Create(position);
             return internalFragment;
+        }
+
+        public override Java.Lang.ICharSequence GetPageTitleFormatted(int position)
+        {
+            return new Java.Lang.String(position.ToString());
         }
     }
 }
