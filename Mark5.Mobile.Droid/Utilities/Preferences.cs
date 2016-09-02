@@ -20,7 +20,6 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public Preferences()
         {
-            PreferenceManager.SetDefaultValues(Application.Context, Resource.Xml.preferences, true);
             sp = PreferenceManager.GetDefaultSharedPreferences(Application.Context);
         }
 
@@ -139,6 +138,14 @@ namespace Mark5.Mobile.Droid.Utilities
                 var e = sp.Edit();
                 e.PutBoolean(Application.Context.GetString(Resource.String.pref_key_cache_clear), value);
                 e.Commit();
+            }
+        }
+
+        public bool EnableReporting
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_advanced_enable_reporting), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_advanced_enable_reporting_default));
             }
         }
     }

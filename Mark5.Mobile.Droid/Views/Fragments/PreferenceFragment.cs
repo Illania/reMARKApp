@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using Android.Content;
 using Android.OS;
 using Android.Support.V4.App;
 using Android.Support.V7.App;
@@ -12,11 +13,13 @@ using Android.Support.V7.Preferences;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Views.Common;
+using Xamarin;
+using Android.Provider;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
 
-    public class PreferenceFragment : PreferenceFragmentCompat, PreferenceFragmentCompat.IOnPreferenceStartScreenCallback
+    public class PreferenceFragment : PreferenceFragmentCompat, PreferenceFragmentCompat.IOnPreferenceStartScreenCallback, ISharedPreferencesOnSharedPreferenceChangeListener
     {
 
         public override Fragment CallbackFragment
@@ -31,7 +34,16 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             base.OnResume();
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = PreferenceScreen.Title; ;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = PreferenceScreen.Title;
+
+            PreferenceManager.SharedPreferences.RegisterOnSharedPreferenceChangeListener(this);
+        }
+
+        public override void OnPause()
+        {
+            base.OnPause();
+
+            PreferenceManager.SharedPreferences.UnregisterOnSharedPreferenceChangeListener(this);
         }
 
         public override void OnCreatePreferences(Bundle savedInstanceState, string rootKey)
@@ -49,14 +61,19 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             if (preference.Key == GetString(Resource.String.pref_key_advanced_logout))
             {
-                Dialogs.ShowYesNoDialog(Activity, Resource.String.dialog_logout_title, Resource.String.dialog_logout_content, () =>
-                {
-                    Integration.ClearDataAndStop();
-                });
+                Dialogs.ShowYesNoDialog(Activity, Resource.String.dialog_logout_title, Resource.String.dialog_logout_content, Integration.ClearDataAndStop);
                 return true;
             }
 
             return base.OnPreferenceTreeClick(preference);
+        }
+
+        public void OnSharedPreferenceChanged(ISharedPreferences sharedPreferences, string key)
+        {
+            if (key == GetString(Resource.String.pref_key_advanced_enable_reporting))
+            {
+                Insights.DisableCollection = !PlatformConfig.Preferences.EnableReporting;
+            }
         }
 
         public override void OnNavigateToScreen(PreferenceScreen preferenceScreen)

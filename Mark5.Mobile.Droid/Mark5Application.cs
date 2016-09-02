@@ -68,6 +68,8 @@ namespace Mark5.Mobile.Droid
                     PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();
                     PlatformConfig.ReachabilityBroadcastReceiver = new ReachabilityBroadcastReceiver();
                     PlatformConfig.Preferences = new Preferences();
+
+                    Insights.DisableCollection = !PlatformConfig.Preferences.EnableReporting;
                 }
                 catch (Exception e)
                 {
