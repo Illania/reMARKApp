@@ -87,17 +87,11 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
             try
             {
-                //var username = usernameEditText.Text;
-                //var password = passwordEditText.Text;
-                //var hostname = hostnameEditText.Text;
-                //var port = portEditText.Text;
-                //var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
-
-                var username = "bgc";
-                var password = "Bgc2014!";
-                var hostname = "192.168.75.44";
-                var port = "8096";
-                var sslMode = SslMode.AllowSelfSigned;
+                var username = usernameEditText.Text;
+                var password = passwordEditText.Text;
+                var hostname = hostnameEditText.Text;
+                var port = portEditText.Text;
+                var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
 
                 var errors = false;
                 if (!Validator.IsUsernameValid(username))

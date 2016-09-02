@@ -147,6 +147,8 @@
     <Compile Include="Views\Activities\MainActivity.cs" />
     <Compile Include="Views\Common\BaseAppCompatActivity.cs" />
     <Compile Include="Views\Fragments\PreferenceFragment.cs" />
+    <Compile Include="Utilities\Preferences.cs" />
+    <Compile Include="Utilities\Integration.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -210,6 +212,7 @@
     <AndroidResource Include="Resources\mipmap-hdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\xml\preferences.axml" />
     <AndroidResource Include="Resources\values\strings-preferences.axml" />
+    <AndroidResource Include="Resources\values\values-preferences.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

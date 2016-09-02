@@ -19,13 +19,13 @@ namespace Mark5.Mobile.Droid.Views.Common
 
         #region Awaitable dialogs
 
-        public static Task<bool> ShowYesNoDialogAsync(Context context, int titleId, int messageId)
+        public static Task<bool> ShowYesNoDialogAsync(Context context, int titleId, int contentId)
         {
             var tcs = new TaskCompletionSource<bool>();
             var builder = new MaterialDialog.Builder(context);
             builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
             builder.Title(titleId);
-            builder.Content(messageId);
+            builder.Content(contentId);
             builder.PositiveText(Resource.String.yes);
             builder.NegativeText(Resource.String.no);
             builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
@@ -34,13 +34,13 @@ namespace Mark5.Mobile.Droid.Views.Common
             return tcs.Task;
         }
 
-        public static Task ShowConfirmDialogAsync(Context context, int titleId, int messageId)
+        public static Task ShowConfirmDialogAsync(Context context, int titleId, int contentId)
         {
             var tcs = new TaskCompletionSource<bool>();
             var builder = new MaterialDialog.Builder(context);
             builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
             builder.Title(titleId);
-            builder.Content(messageId);
+            builder.Content(contentId);
             builder.PositiveText(Resource.String.ok);
             builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
             builder.Show();
@@ -64,12 +64,28 @@ namespace Mark5.Mobile.Droid.Views.Common
 
         #region Non-awaitable dialogs
 
-        public static Action ShowInfiniteProgressDialog(Context context, int titleId, int messageId, CancellationTokenSource cts = null)
+        public static void ShowYesNoDialog(Context context, int titleId, int contentId, Action positiveAction, Action negativeAction = null)
         {
             var builder = new MaterialDialog.Builder(context);
             builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
             builder.Title(titleId);
-            builder.Content(messageId);
+            builder.Content(contentId);
+            builder.PositiveText(Resource.String.yes);
+            builder.NegativeText(Resource.String.no);
+            builder.OnPositive(new SingleButtonCallback(positiveAction));
+            if (negativeAction != null)
+            {
+                builder.OnNegative(new SingleButtonCallback(positiveAction));
+            }
+            builder.Show();
+        }
+
+        public static Action ShowInfiniteProgressDialog(Context context, int titleId, int contentId, CancellationTokenSource cts = null)
+        {
+            var builder = new MaterialDialog.Builder(context);
+            builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
+            builder.Title(titleId);
+            builder.Content(contentId);
             builder.Progress(true, -1);
             builder.Cancelable(false);
 

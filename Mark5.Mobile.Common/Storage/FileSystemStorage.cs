@@ -348,56 +348,6 @@ namespace Mark5.Mobile.Common.Storage
 
         #endregion
 
-        #region Reset
-
-        static async Task ResetFileStorage()
-        {
-            var connectionInfo = await GetConnectionInfoAsync();
-            connectionInfo.Authenticated = false;
-            connectionInfo.Token = null;
-            await SaveConnectionInfoAsync(connectionInfo);
-
-            objectCache.Clear();
-
-            var filesToRemove = new List<IFile>();
-            var foldersToRemove = new List<IFolder>();
-
-            var foldersToClear = new List<IFolder> {CommonConfig.AttachmentsFolder, CommonConfig.OutgoingFolder,
-                                                                CommonConfig.CacheFolder};
-            //If Attachments and Outgoing are subfolders of Cache, that's not necessary
-
-            foreach (var folderToClear in foldersToClear)
-            {
-                filesToRemove.AddRange(await folderToClear.GetFilesAsync());
-                foldersToRemove.AddRange(await folderToClear.GetFoldersAsync());
-            }
-
-            var filenames = new List<string>{Filenames.SystemSettings, Filenames.SystemUserDepartments,
-                                                      Filenames.NotificationSettings};
-
-            foreach (var filename in filenames)
-            {
-                var fileExists = await CommonConfig.DataFolder.CheckExistsAsync(filename);
-                if (fileExists == ExistenceCheckResult.FileExists)
-                {
-                    filesToRemove.Add(await CommonConfig.DataFolder.GetFileAsync(filename));
-                }
-            }
-
-            foreach (var file in filesToRemove)
-            {
-                await file.DeleteAsync();
-            }
-
-            foreach (var folder in foldersToRemove)
-            {
-                await folder.DeleteAsync();
-            }
-        }
-
-
-        #endregion  
-
     }
 }
 

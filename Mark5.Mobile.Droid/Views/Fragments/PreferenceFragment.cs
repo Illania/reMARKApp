@@ -10,14 +10,14 @@ using Android.Support.V4.App;
 using Android.Support.V7.App;
 using Android.Support.V7.Preferences;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Droid.Utilities;
+using Mark5.Mobile.Droid.Views.Common;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
 
     public class PreferenceFragment : PreferenceFragmentCompat, PreferenceFragmentCompat.IOnPreferenceStartScreenCallback
     {
-
-        const string PrefKeyAboutVersion = "pref_key_about_version";
 
         public override Fragment CallbackFragment
         {
@@ -38,11 +38,25 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             SetPreferencesFromResource(Resource.Xml.preferences, rootKey);
 
-            var versionPreference = FindPreference(PrefKeyAboutVersion);
+            var versionPreference = FindPreference(GetString(Resource.String.pref_key_about_version));
             if (versionPreference != null)
             {
                 versionPreference.Summary = CommonConfig.DeviceInfoProvider.GetAppVersionString();
             }
+        }
+
+        public override bool OnPreferenceTreeClick(Preference preference)
+        {
+            if (preference.Key == GetString(Resource.String.pref_key_advanced_logout))
+            {
+                Dialogs.ShowYesNoDialog(Activity, Resource.String.dialog_logout_title, Resource.String.dialog_logout_content, () =>
+                {
+                    Integration.ClearDataAndStop();
+                });
+                return true;
+            }
+
+            return base.OnPreferenceTreeClick(preference);
         }
 
         public override void OnNavigateToScreen(PreferenceScreen preferenceScreen)
