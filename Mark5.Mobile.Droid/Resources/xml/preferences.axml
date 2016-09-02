@@ -37,7 +37,7 @@
 	</android.support.v7.preference.PreferenceCategory>
 	<android.support.v7.preference.PreferenceCategory android:key="@string/pref_key_cat_cache" android:title="@string/pref_cat_cache">
 		<android.support.v7.preference.ListPreference android:key="@string/pref_key_cache_auto_clean" android:title="@string/pref_cache_auto_clean_title" android:summary="@string/pref_cache_auto_clean_summary" android:dialogTitle="@string/pref_cache_auto_clean_dialog_title" android:entries="@array/pref_cache_auto_clean_entries" android:entryValues="@array/pref_cache_auto_clean_entryvalues" android:defaultValue="@string/pref_cache_auto_clean_default" />
-		<android.support.v7.preference.Preference android:key="@string/pref_key_cache_clean_now" android:title="@string/pref_cache_clean_now_title" android:summary="@string/pref_cache_clean_now_summary" />
+		<android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_cache_clear" android:title="@string/pref_cache_clear_title" android:summaryOn="@string/pref_cache_clear_summary_on" android:summaryOff="@string/pref_cache_clear_summary_off" android:defaultValue="@bool/pref_cache_clear_default" />
 	</android.support.v7.preference.PreferenceCategory>
 	<android.support.v7.preference.PreferenceCategory android:key="@string/pref_key_cat_advanced" android:title="@string/pref_cat_advanced">
 		<android.support.v7.preference.Preference android:key="@string/pref_key_advanced_send_feedback" android:title="@string/pref_advanced_send_feedback_title" android:summary="@string/pref_advanced_send_feedback_summary" />

@@ -127,6 +127,20 @@ namespace Mark5.Mobile.Droid.Utilities
                 return int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_cache_auto_clean), Application.Context.Resources.GetString(Resource.String.pref_cache_auto_clean_default)));
             }
         }
+
+        public bool ClearCache
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_cache_clear), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_cache_clear_default));
+            }
+            set
+            {
+                var e = sp.Edit();
+                e.PutBoolean(Application.Context.GetString(Resource.String.pref_key_cache_clear), value);
+                e.Commit();
+            }
+        }
     }
 }
 

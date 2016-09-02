@@ -70,5 +70,6 @@
 		<item>14</item>
 	</string-array>
 	<string name="pref_cache_auto_clean_default">7</string>
+	<bool name="pref_cache_clear_default">false</bool>
 	<bool name="pref_advanced_enable_reporting_default">true</bool>
 </resources>
