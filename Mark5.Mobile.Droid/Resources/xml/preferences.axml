@@ -1,16 +1,29 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" android:title="@string/settings">
 	<android.support.v7.preference.PreferenceCategory android:key="pref_key_cat_documents" android:title="@string/pref_cat_documents">
 		<android.support.v7.preference.ListPreference android:key="pref_key_documents_to_load" android:title="@string/pref_documents_to_load_title" android:summary="@string/pref_documents_to_load_summary" android:dialogTitle="@string/pref_documents_to_load_title" android:entries="@array/pref_documents_to_load_entries" android:entryValues="@array/pref_documents_to_load_entryvalues" android:defaultValue="@string/pref_documents_to_load_default" />
 		<android.support.v7.preference.ListPreference android:key="pref_key_documents_mark_as_read" android:title="@string/pref_documents_mark_as_read_title" android:summary="@string/pref_documents_mark_as_read_summary" android:dialogTitle="@string/pref_documents_mark_as_read_dialog_title" android:entries="@array/pref_documents_mark_as_read_entries" android:entryValues="@array/pref_documents_mark_as_read_entryvalues" android:defaultValue="@string/pref_documents_mark_as_read_default" />
 		<android.support.v7.preference.CheckBoxPreference android:key="pref_key_documents_large_attachment_warn" android:title="@string/pref_documents_large_attachment_warn_title" android:summary="@string/pref_documents_large_attachment_warn_summary" android:defaultValue="true" />
 		<android.support.v7.preference.PreferenceScreen android:key="pref_key_documents_view_options" android:title="@string/pref_documents_view_options_title" android:summary="@string/pref_documents_view_options_summary">
-			<android.support.v7.preference.CheckBoxPreference android:key="pref_key_documents_large_attachment_warn2" android:title="@string/pref_documents_large_attachment_warn_title" android:summary="@string/pref_documents_large_attachment_warn_summary" android:defaultValue="true" />
+			<android.support.v7.preference.CheckBoxPreference android:key="pref_key_documents_sub_priority" android:title="@string/pref_documents_sub_priority" android:defaultValue="true" />
+			<android.support.v7.preference.CheckBoxPreference android:key="pref_key_documents_sub_reference_number" android:title="@string/pref_documents_sub_reference_number" android:defaultValue="true" />
+			<android.support.v7.preference.CheckBoxPreference android:key="pref_key_documents_sub_read_by" android:title="@string/pref_documents_sub_read_by" android:defaultValue="true" />
+			<android.support.v7.preference.CheckBoxPreference android:key="pref_key_documents_sub_creator" android:title="@string/pref_documents_sub_creator" android:defaultValue="true" />
+			<android.support.v7.preference.CheckBoxPreference android:key="pref_key_documents_sub_originator" android:title="@string/pref_documents_sub_originator" android:defaultValue="true" />
 		</android.support.v7.preference.PreferenceScreen>
 	</android.support.v7.preference.PreferenceCategory>
 	<android.support.v7.preference.PreferenceCategory android:key="pref_key_cat_contacts" android:title="@string/pref_cat_contacts">
 		<android.support.v7.preference.CheckBoxPreference android:key="pref_key_contacts_synchronised" android:title="@string/pref_contacts_synchronised_title" android:summary="@string/pref_contacts_synchronised_summary" android:defaultValue="false" />
 		<android.support.v7.preference.PreferenceScreen android:key="pref_key_contacts_view_options" android:title="@string/pref_contacts_view_options_title" android:summary="@string/pref_contacts_view_options_summary">
+			<android.support.v7.preference.CheckBoxPreference android:key="pref_key_contacts_sub_comm_fax" android:title="@string/pref_contacts_sub_comm_fax" android:defaultValue="true" />
+			<android.support.v7.preference.CheckBoxPreference android:key="pref_key_contacts_sub_comm_telex" android:title="@string/pref_contacts_sub_comm_telex" android:defaultValue="true" />
+			<android.support.v7.preference.CheckBoxPreference android:key="pref_key_contacts_sub_comm_im" android:title="@string/pref_contacts_sub_comm_im" android:defaultValue="true" />
+			<android.support.v7.preference.CheckBoxPreference android:key="pref_key_contacts_sub_comm_internal" android:title="@string/pref_contacts_sub_comm_internal" android:defaultValue="true" />
+			<android.support.v7.preference.CheckBoxPreference android:key="pref_key_contacts_sub_comm_other" android:title="@string/pref_contacts_sub_comm_other" android:defaultValue="true" />
+			<android.support.v7.preference.CheckBoxPreference android:key="pref_key_contacts_sub_address" android:title="@string/pref_contacts_sub_address" android:defaultValue="true" />
+			<android.support.v7.preference.CheckBoxPreference android:key="pref_key_contacts_sub_birthdate" android:title="@string/pref_contacts_sub_birthdate" android:defaultValue="true" />
+			<android.support.v7.preference.CheckBoxPreference android:key="pref_key_contacts_sub_account" android:title="@string/pref_contacts_sub_account" android:defaultValue="true" />
+			<android.support.v7.preference.CheckBoxPreference android:key="pref_key_contacts_sub_vat" android:title="@string/pref_contacts_sub_vat" android:defaultValue="true" />
 		</android.support.v7.preference.PreferenceScreen>
 	</android.support.v7.preference.PreferenceCategory>
 	<android.support.v7.preference.PreferenceCategory android:key="pref_key_cat_shortcodes" android:title="@string/pref_cat_shortcodes">

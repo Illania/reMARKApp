@@ -91,4 +91,18 @@
 	<string name="pref_advanced_logout_title">Log out</string>
 	<string name="pref_advanced_logout_summary">Log out from MARK5. MARK5 needs to restart after this operation and all personal settings will be lost.</string>
 	<string name="pref_about_version_title">Version</string>
+	<string name="pref_documents_sub_priority">Priority</string>
+	<string name="pref_documents_sub_reference_number">Reference number</string>
+	<string name="pref_documents_sub_read_by">Read by</string>
+	<string name="pref_documents_sub_creator">Creator</string>
+	<string name="pref_documents_sub_originator">Originator</string>
+	<string name="pref_contacts_sub_comm_fax">Communication: Fax numbers</string>
+	<string name="pref_contacts_sub_comm_telex">Communication: Telex numbers</string>
+	<string name="pref_contacts_sub_comm_im">Communication: IM</string>
+	<string name="pref_contacts_sub_comm_internal">Communication: Internal</string>
+	<string name="pref_contacts_sub_comm_other">Communication: Other</string>
+	<string name="pref_contacts_sub_address">Addresses</string>
+	<string name="pref_contacts_sub_birthdate">Birthdate</string>
+	<string name="pref_contacts_sub_account">Account</string>
+	<string name="pref_contacts_sub_vat">VAT number</string>
 </resources>

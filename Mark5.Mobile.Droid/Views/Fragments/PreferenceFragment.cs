@@ -7,13 +7,17 @@
 //
 using Android.OS;
 using Android.Support.V4.App;
+using Android.Support.V7.App;
 using Android.Support.V7.Preferences;
+using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
 
     public class PreferenceFragment : PreferenceFragmentCompat, PreferenceFragmentCompat.IOnPreferenceStartScreenCallback
     {
+
+        const string PrefKeyAboutVersion = "pref_key_about_version";
 
         public override Fragment CallbackFragment
         {
@@ -23,9 +27,22 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
         }
 
+        public override void OnResume()
+        {
+            base.OnResume();
+
+            ((AppCompatActivity)Activity).SupportActionBar.Title = PreferenceScreen.Title; ;
+        }
+
         public override void OnCreatePreferences(Bundle savedInstanceState, string rootKey)
         {
             SetPreferencesFromResource(Resource.Xml.preferences, rootKey);
+
+            var versionPreference = FindPreference(PrefKeyAboutVersion);
+            if (versionPreference != null)
+            {
+                versionPreference.Summary = CommonConfig.DeviceInfoProvider.GetAppVersionString();
+            }
         }
 
         public override void OnNavigateToScreen(PreferenceScreen preferenceScreen)
