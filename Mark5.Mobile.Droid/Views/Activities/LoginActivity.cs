@@ -93,11 +93,11 @@ namespace Mark5.Mobile.Droid.Views.Activity
                 //var port = portEditText.Text;
                 //var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
 
-                var username = "bgc";
-                var password = "Bgc2014!";
-                var hostname = "192.168.75.44";
-                var port = "8096";
-                var sslMode = SslMode.AllowSelfSigned;
+                var username = "mark5";
+                var password = "mark5";
+                var hostname = "192.168.75.51";
+                var port = "8093";
+                var sslMode = SslMode.Off;
 
                 var errors = false;
                 if (!Validator.IsUsernameValid(username))

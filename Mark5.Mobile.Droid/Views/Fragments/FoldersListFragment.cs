@@ -6,25 +6,20 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
-using Android.Content;
+using System.Collections.Generic;
 using Android.OS;
-using Android.Support.Design.Widget;
 using Android.Support.V4.App;
-using Android.Support.V4.View;
+using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
 
     public class FoldersListFragment : Fragment
     {
-        public int Val
-        {
-            get;
-            set;
-        }
-
         public IFoldersListFragmentSelectedListener Listener
         {
             get
@@ -38,50 +33,41 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
         }
 
+        FolderListAdapter adapter;
+        RecyclerView recyclerView;
+
         IFoldersListFragmentSelectedListener listener;
 
         public static FoldersListFragment Create(int val)
         {
             var fragment = new FoldersListFragment();
-            var args = new Bundle();
-            args.PutInt("val", val);
-            fragment.Arguments = args;
             return fragment;
         }
 
         public override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-
-            if (savedInstanceState != null)
-            {
-                Val = savedInstanceState.GetInt("val");
-            }
-            if (Arguments != null)
-            {
-                Val = Arguments.GetInt("val");
-            }
+            adapter = new FolderListAdapter(Activity);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            return inflater.Inflate(Resource.Layout.fragment_list_folders, container, false);
+            var rootView = inflater.Inflate(Resource.Layout.fragment_list_folders, container, false);
+
+            recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.folderRecyclerView);
+            recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
+            recyclerView.SetAdapter(adapter);
+            recyclerView.HasFixedSize = true;
+
+            return rootView;
         }
 
-        public override void OnStart()
+        public async override void OnStart()
         {
             base.OnStart();
 
-            var text = View.FindViewById<TextView>(Resource.Id.textView1);
-            text.Text = Val.ToString();
-            var button = View.FindViewById<Button>(Resource.Id.button1);
-            button.Click += Button_Click;
-        }
-
-        void Button_Click(object sender, EventArgs e)
-        {
-            Listener.OpenNext(Val + 1);
-
+            var folders = await Managers.FoldersManager.GetFoldersAsync(ModuleType.Documents);
+            adapter.Refresh(folders);
         }
 
         public interface IFoldersListFragmentSelectedListener
@@ -89,18 +75,72 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             void OpenNext(int val);
         }
 
-        public override void OnStop()
-        {
-            base.OnStop();
-        }
-
         public override void OnSaveInstanceState(Bundle outState)
         {
             base.OnSaveInstanceState(outState);
 
-            outState.PutInt("val", Val);
+            //TODO to be completed
+        }
+    }
+
+    class FolderListAdapter : RecyclerView.Adapter
+    {
+        readonly Android.App.Activity activity;
+        List<Folder> folders = new List<Folder>();
+
+        public FolderListAdapter(Android.App.Activity activity)
+        {
+            this.activity = activity;
         }
 
+        public override int ItemCount
+        {
+            get
+            {
+                return folders.Count;
+            }
+        }
+
+        public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
+        {
+            var fh = holder as FolderViewHolder;
+
+            var folder = folders[position];
+
+            fh.FolderName.Text = folder.Name;
+
+            fh.ExpandIcon.Visibility = folder.HasSubFolders ? ViewStates.Visible : ViewStates.Invisible;
+        }
+
+        public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
+        {
+            // Inflate the CardView for the photo:
+            View itemView = LayoutInflater.From(parent.Context).
+                                          Inflate(Resource.Layout.folder_list_item, parent, false);
+
+            // Create a ViewHolder to hold view references inside the CardView:
+            var vh = new FolderViewHolder(itemView);
+            return vh;
+        }
+
+        public void Refresh(List<Folder> folders)
+        {
+            this.folders.AddRange(folders);
+            NotifyDataSetChanged();
+        }
+    }
+
+    class FolderViewHolder : RecyclerView.ViewHolder
+    {
+        public ImageView ExpandIcon { get; private set; }
+        public TextView FolderName { get; private set; }
+
+        public FolderViewHolder(View itemView) : base(itemView)
+        {
+            // Locate and cache view references:
+            ExpandIcon = itemView.FindViewById<ImageView>(Resource.Id.expandIcon);
+            FolderName = itemView.FindViewById<TextView>(Resource.Id.folderName);
+        }
     }
 
 

@@ -205,6 +205,7 @@
     <AndroidResource Include="Resources\mipmap-xxhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\mipmap-xhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\mipmap-hdpi\drawer_header_background.png" />
+    <AndroidResource Include="Resources\layout\folder_list_item.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
