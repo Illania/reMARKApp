@@ -143,7 +143,6 @@
     <Compile Include="Views\Fragments\FoldersListFragment.cs" />
     <Compile Include="Views\Activities\MainActivity.cs" />
     <Compile Include="Views\Common\BaseAppCompatActivity.cs" />
-    <Compile Include="Views\Fragments\internalFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -206,7 +205,6 @@
     <AndroidResource Include="Resources\mipmap-xxhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\mipmap-xhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\mipmap-hdpi\drawer_header_background.png" />
-    <AndroidResource Include="Resources\layout\fragment_list_folders_internal.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
