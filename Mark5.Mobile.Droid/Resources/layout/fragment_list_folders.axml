@@ -5,16 +5,17 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground"
     android:fitsSystemWindows="false">
-    <android.support.design.widget.TabLayout
-        android:id="@+id/tab"
+    <TextView
+        android:text="Large Text"
+        android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:tabMode="scrollable"
-        app:tabGravity="fill"
-        style="@style/mark5tab" />
-    <android.support.v4.view.ViewPager
-        android:id="@+id/folderPager"
+        android:id="@+id/textView1" />
+    <Button
+        android:text="Button"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:id="@+id/button1" />
 </LinearLayout>

@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -25,7 +26,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
 {
 
     [Activity]
-    public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener
+    public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FoldersListFragment.IFoldersListFragmentSelectedListener
     {
 
         Toolbar toolbar;
@@ -34,6 +35,8 @@ namespace Mark5.Mobile.Droid.Views.Activity
         NavigationView navigationView;
 
         IMenuItem lastSelectedItem;
+
+        const string MenuItemId = "menuItemId";
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -53,9 +56,12 @@ namespace Mark5.Mobile.Droid.Views.Activity
             navigationView = FindViewById<NavigationView>(Resource.Id.navigation_view);
             navigationView.SetNavigationItemSelectedListener(this);
 
-            var initialMenuItem = navigationView.Menu.FindItem(Resource.Id.nav_documents);
-            initialMenuItem.SetChecked(true);
-            OnNavigationItemSelected(initialMenuItem);
+            if (savedInstanceState == null)
+            {
+                var initialMenuItem = navigationView.Menu.FindItem(Resource.Id.nav_documents);
+                initialMenuItem.SetChecked(true);
+                OnNavigationItemSelected(initialMenuItem);
+            }
 
             Task.Run(async () =>
             {
@@ -92,18 +98,45 @@ namespace Mark5.Mobile.Droid.Views.Activity
             {
                 lastSelectedItem = menuItem;
 
-                var foldersListFragment = new FoldersListFragment
-                {
-                    Arguments = Intent.Extras
-                };
+                var foldersListFragment = FoldersListFragment.Create(0);
+                foldersListFragment.Listener = this;
 
                 var ft = SupportFragmentManager.BeginTransaction();
-                ft.Replace(Resource.Id.fragment_container, foldersListFragment);
+                ft.Replace(Resource.Id.fragment_container, foldersListFragment, "0");
                 ft.Commit();
             }
 
             drawer.CloseDrawer(GravityCompat.Start);
             return true;
+        }
+
+        public void OpenNext(int val)
+        {
+            var foldersListFragment = FoldersListFragment.Create(val);
+            foldersListFragment.Listener = this;
+
+            var ft = SupportFragmentManager.BeginTransaction();
+            ft.Replace(Resource.Id.fragment_container, foldersListFragment, val.ToString()); //The tag here can be used to identify the fragment
+            ft.SetTransition((int)FragmentTransit.FragmentOpen);
+            ft.AddToBackStack(null);
+            ft.Commit();
+        }
+
+        protected override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            outState.PutInt(MenuItemId, lastSelectedItem.ItemId);
+
+        }
+
+        protected override void OnRestoreInstanceState(Bundle savedInstanceState)
+        {
+            base.OnRestoreInstanceState(savedInstanceState);
+
+            var menuItemId = savedInstanceState.GetInt(MenuItemId);
+            var menuItem = navigationView.Menu.FindItem(menuItemId);
+            lastSelectedItem = menuItem;
         }
     }
 }
