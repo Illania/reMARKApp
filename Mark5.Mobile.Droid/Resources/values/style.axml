@@ -29,4 +29,5 @@
 	<style name="mark5dialog" parent="Theme.AppCompat.Light.Dialog.Alert">
 		<item name="colorAccent">@color/brown</item>
 	</style>
+	<style name="hockey" parent="android:Theme.DeviceDefault.Light.DarkActionBar" />
 </resources>

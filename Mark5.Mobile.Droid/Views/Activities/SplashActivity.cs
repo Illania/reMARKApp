@@ -5,17 +5,16 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Views;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Xamarin;
 using Mark5.Mobile.Droid.Views.Common;
 
 namespace Mark5.Mobile.Droid.Views.Activity
@@ -63,16 +62,21 @@ namespace Mark5.Mobile.Droid.Views.Activity
                     }
 
                     Managers.Initialize(ci);
-                    PlatformConfig.ReachabilityBroadcastReceiver.Register();
-
-                    var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
-
-                    Insights.Identify($"{ci.Username}@{ci.SslMode},{ci.Hostname}:{ci.Port}", new Dictionary<string, string>
+                    Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
+                    Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                    var policies = Managers.DownloadManager.DownloadPolicies;
+                    policies[ObjectType.Document] = new DownloadFoldersPolicy();
+                    if (PlatformConfig.Preferences.SynchroniseContacts)
                     {
-                        [Insights.Traits.FirstName] = ss?.UserInfo?.User?.FirstName,
-                        [Insights.Traits.LastName] = ss?.UserInfo?.User?.LastName,
-                        ["System Administrator"] = (ss?.UserInfo?.IsSystemAdministrator ?? false) ? "Yes" : "No"
-                    });
+                        policies[ObjectType.Contact] = new DownloadAllPolicy();
+                    }
+                    if (PlatformConfig.Preferences.SynchroniseShortcodes)
+                    {
+                        policies[ObjectType.Shortcode] = new DownloadAllPolicy();
+                    }
+                    await Managers.DownloadManager.Start();
+                    await Managers.OutgoingDocumentsManager.Start();
+                    PlatformConfig.ReachabilityBroadcastReceiver.Register();
 
                     RunOnUiThreadIfNecessary(() => StartActivity(new Intent(this, typeof(MainActivity))));
                 }

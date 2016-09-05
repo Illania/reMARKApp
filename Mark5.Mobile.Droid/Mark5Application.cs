@@ -15,8 +15,8 @@ using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Droid.Services;
 using Mark5.Mobile.Droid.Utilities;
 using PCLStorage;
-using Xamarin;
 using UK.CO.Chrisjenx.Calligraphy;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid
 {
@@ -38,43 +38,27 @@ namespace Mark5.Mobile.Droid
 
             CalligraphyConfig.InitDefault(new CalligraphyConfig.Builder().SetDefaultFontPath("fonts/Avenir-Book.ttf").Build());
 
-#if RELEASE
-            Insights.Initialize("9797448a2139873ddf4487f52d80128bbbf8933a", Context, true);
-#else
-            Insights.Initialize(Insights.DebugModeKey, Context, true);
-#endif
-
             Task.Run(async () =>
             {
-                try
-                {
-                    var mainFolder = FileSystem.Current.LocalStorage;
-                    var dataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "data"), CreationCollisionOption.OpenIfExists);
-                    var cacheFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("..", "cache"), CreationCollisionOption.OpenIfExists);
-                    var dbFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "db"), CreationCollisionOption.OpenIfExists);
-                    var attachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "att"), CreationCollisionOption.OpenIfExists);
+                var mainFolder = FileSystem.Current.LocalStorage;
 
-                    CommonConfig.DataFolder = dataFolder;
-                    CommonConfig.CacheFolder = cacheFolder;
-                    CommonConfig.DatabaseFolder = dbFolder;
-                    CommonConfig.AttachmentsFolder = attachmentsFolder;
-                    CommonConfig.Logger = new SimpleLogger();
-                    CommonConfig.ReachabilityService = new ReachabilityService();
-                    CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
-                    CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
+                CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "data"), CreationCollisionOption.OpenIfExists); ;
+                CommonConfig.OutgoingFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "out"), CreationCollisionOption.OpenIfExists); ;
+                CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "db"), CreationCollisionOption.OpenIfExists); ;
+                CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "att"), CreationCollisionOption.OpenIfExists); ;
+                CommonConfig.CacheFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("..", "cache"), CreationCollisionOption.OpenIfExists); ;
+                CommonConfig.Logger = new SimpleLogger();
+                CommonConfig.ReachabilityService = new ReachabilityService();
+                CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
+                CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
 
-                    await DatabaseUtils.InitializeDatabases();
+                CommonConfig.Logger.Level = LogLevel.INFO;
 
-                    PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();
-                    PlatformConfig.ReachabilityBroadcastReceiver = new ReachabilityBroadcastReceiver();
-                    PlatformConfig.Preferences = new Preferences();
+                await DatabaseUtils.InitializeDatabases();
 
-                    Insights.DisableCollection = !PlatformConfig.Preferences.EnableReporting;
-                }
-                catch (Exception e)
-                {
-                    Insights.Report(e, Insights.Severity.Critical);
-                }
+                PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();
+                PlatformConfig.ReachabilityBroadcastReceiver = new ReachabilityBroadcastReceiver();
+                PlatformConfig.Preferences = new Preferences();
             }).Wait();
         }
     }

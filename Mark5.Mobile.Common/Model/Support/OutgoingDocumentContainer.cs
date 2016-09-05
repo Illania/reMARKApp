@@ -1,5 +1,6 @@
 ﻿namespace Mark5.Mobile.Common.Model
 {
+
     public class OutgoingDocumentContainer
     {
         public Document Document { get; set; }

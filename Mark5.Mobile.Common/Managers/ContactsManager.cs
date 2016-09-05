@@ -22,7 +22,8 @@ namespace Mark5.Mobile.Common.Managers
 
     class ContactsManager : AbstractManager, IContactsManager
     {
-        const int NumberOfContactsToFetchPerCall = 250;
+
+        public int MaxToFetch { get; set; } = 250;
 
         readonly IContactsDataAccess contactsDataAccess;
 
@@ -32,7 +33,7 @@ namespace Mark5.Mobile.Common.Managers
             this.contactsDataAccess = contactsDataAccess;
         }
 
-        public async Task<List<ContactPreview>> GetContactPreviewsAsync(Folder folder, int startRowId = -1, int maxItems = 500, SourceType sourceType = SourceType.Auto)
+        public async Task<List<ContactPreview>> GetContactPreviewsAsync(Folder folder, int startRowId = -1, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
@@ -41,7 +42,7 @@ namespace Mark5.Mobile.Common.Managers
                     Token = Token,
                     FolderId = folder.Id,
                     StartRowId = startRowId,
-                    MaxToFetch = maxItems
+                    MaxToFetch = MaxToFetch
                 });
 
                 var contactPreviews = result.ContactPreviews.WhereNotNull().OrderBy(cp => cp.RowId).Select(cp => cp.Convert()).ToList();
@@ -53,7 +54,7 @@ namespace Mark5.Mobile.Common.Managers
 
             if (sourceType == SourceType.Local)
             {
-                return await contactsDataAccess.GetContactPreviewsAsync(folder, startRowId, maxItems);
+                return await contactsDataAccess.GetContactPreviewsAsync(folder, startRowId, MaxToFetch);
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
@@ -66,11 +67,11 @@ namespace Mark5.Mobile.Common.Managers
 
             while (!stopLoop && !ct.IsCancellationRequested)
             {
-                var previews = await GetContactPreviewsAsync(folder, startId, NumberOfContactsToFetchPerCall, sourceType);
+                var previews = await GetContactPreviewsAsync(folder, startId, sourceType);
                 await handler(previews);
 
-                startId += NumberOfContactsToFetchPerCall;
-                stopLoop = previews.Count < NumberOfContactsToFetchPerCall;
+                startId += MaxToFetch;
+                stopLoop = previews.Count < MaxToFetch;
             }
         }
 

@@ -10,11 +10,13 @@ using Android.OS;
 using Android.Support.V4.App;
 using Android.Support.V7.App;
 using Android.Support.V7.Preferences;
+using HockeyApp.Android;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Views.Common;
-using Xamarin;
 using Android.Provider;
+using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
@@ -59,6 +61,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override bool OnPreferenceTreeClick(Preference preference)
         {
+            if (preference.Key == GetString(Resource.String.pref_key_advanced_send_feedback))
+            {
+                FeedbackManager.ShowFeedbackActivity(Activity);
+                return true;
+            }
+
             if (preference.Key == GetString(Resource.String.pref_key_advanced_logout))
             {
                 Dialogs.ShowYesNoDialog(Activity, Resource.String.dialog_logout_title, Resource.String.dialog_logout_content, Integration.ClearDataAndStop);
@@ -70,9 +78,35 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public void OnSharedPreferenceChanged(ISharedPreferences sharedPreferences, string key)
         {
-            if (key == GetString(Resource.String.pref_key_advanced_enable_reporting))
+            if (key == GetString(Resource.String.pref_key_documents_to_load))
             {
-                Insights.DisableCollection = !PlatformConfig.Preferences.EnableReporting;
+                Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
+            }
+            if (key == GetString(Resource.String.pref_key_documents_download_as_plaintext))
+            {
+                Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+            }
+            if (key == GetString(Resource.String.pref_key_contacts_synchronised))
+            {
+                if (PlatformConfig.Preferences.SynchroniseContacts)
+                {
+                    Managers.DownloadManager.DownloadPolicies[ObjectType.Contact] = new DownloadAllPolicy();
+                }
+                else
+                {
+                    Managers.DownloadManager.DownloadPolicies.Remove(ObjectType.Contact);
+                }
+            }
+            if (key == GetString(Resource.String.pref_key_shortcodes_synchronised))
+            {
+                if (PlatformConfig.Preferences.SynchroniseShortcodes)
+                {
+                    Managers.DownloadManager.DownloadPolicies[ObjectType.Shortcode] = new DownloadAllPolicy();
+                }
+                else
+                {
+                    Managers.DownloadManager.DownloadPolicies.Remove(ObjectType.Shortcode);
+                }
             }
         }
 

@@ -132,6 +132,8 @@ namespace Mark5.Mobile.Common.Storage
             await SaveAsync(notificationSettings, Filenames.NotificationSettings, ct);
         }
 
+        #endregion
+
         #region OutgoingDocuments
 
         public static async Task SaveOutgoingDocumentAsync(OutgoingDocumentInfo outgoingDocumentInfo, Document document, DocumentPreview documentPreview)
@@ -293,7 +295,6 @@ namespace Mark5.Mobile.Common.Storage
 
         #endregion
 
-        #endregion
 
         #region Private methods
 

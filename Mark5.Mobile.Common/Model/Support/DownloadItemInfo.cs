@@ -2,6 +2,7 @@
 
 namespace Mark5.Mobile.Common
 {
+
     abstract class DownloadItemInfo
     {
         public int FolderId { get; set; }

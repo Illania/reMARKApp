@@ -2,10 +2,19 @@
 
 namespace Mark5.Mobile.Common
 {
-    public class DownloadPolicy
+
+    public abstract class DownloadPolicy
     {
-        public bool GlobalSettingPolicy { get; set; }
-        public List<int> AvailableFoldersId { get; set; }
+    }
+
+    public class DownloadAllPolicy : DownloadPolicy
+    {
+    }
+
+    public class DownloadFoldersPolicy : DownloadPolicy
+    {
+
+        public List<int> FolderIds { get; } = new List<int>();
     }
 }
 

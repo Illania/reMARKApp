@@ -200,9 +200,7 @@ namespace Mark5.Mobile.Common.Managers
                         await FileSystemStorage.DeleteOutgoingDocumentFolderAsync(info.Identifier);
                         DocumentSendingSuccessful(this, container);
                     }
-
                 }
-
             }
             catch (Exception ex)
             {
