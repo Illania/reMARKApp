@@ -102,11 +102,11 @@ namespace Mark5.Mobile.Droid.Views.Activity
             {
                 lastSelectedItem = menuItem;
 
-                var foldersListFragment = new PreferenceFragment();//new FoldersListFragment
-                //{
-                //    Text = menuItem.ItemId,
-                //    Arguments = Intent.Extras
-                //};
+                var foldersListFragment = new FoldersListFragment
+                {
+                    Text = menuItem.ItemId,
+                    Arguments = Intent.Extras
+                };
 
                 var ft = SupportFragmentManager.BeginTransaction();
                 ft.Replace(Resource.Id.fragment_container, foldersListFragment);
