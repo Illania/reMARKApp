@@ -7,126 +7,229 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Android.OS;
 using Android.Support.V4.App;
+using Android.Support.V4.Widget;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
 
     public class FoldersListFragment : Fragment
     {
-        public IFoldersListFragmentSelectedListener Listener
-        {
-            get
-            {
-                return listener;
-            }
-
-            set
-            {
-                listener = value;
-            }
-        }
+        ModuleType moduleType;
+        Folder currentFolder;
 
         FolderListAdapter adapter;
         RecyclerView recyclerView;
+        ProgressBar progressBar;
+        SwipeRefreshLayout refreshLayout;
+        List<Folder> savedFoldersInView = new List<Folder>();
+        View rootView;
 
-        IFoldersListFragmentSelectedListener listener;
+        const string ModuleTypeBundleString = "moduleTypeBundleString";
+        const string CurrentFolderBundleString = "currentFolderBundleString";
+        const string FoldersListBundleString = "foldersListBundleString";
 
-        public static FoldersListFragment Create(int val)
+
+        public static FoldersListFragment Create(ModuleType moduleType, Folder currentFolder)
         {
             var fragment = new FoldersListFragment();
+            var arguments = new Bundle();
+
+            arguments.PutString(ModuleTypeBundleString, SerializationUtils.Serialize(moduleType));
+            arguments.PutString(CurrentFolderBundleString, SerializationUtils.Serialize(currentFolder));
+            fragment.Arguments = arguments;
+
             return fragment;
         }
 
         public override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            adapter = new FolderListAdapter(Activity);
+            RestoreState(savedInstanceState);
+        }
+
+        void RestoreState(Bundle savedInstanceState)
+        {
+            if (Arguments != null)
+            {
+                moduleType = SerializationUtils.Deserialize<ModuleType>(Arguments.GetString(ModuleTypeBundleString));
+                currentFolder = SerializationUtils.Deserialize<Folder>(Arguments.GetString(CurrentFolderBundleString));
+            }
+            if (savedInstanceState != null)
+            {
+                savedFoldersInView = SerializationUtils.Deserialize<List<Folder>>(savedInstanceState.GetString(FoldersListBundleString));
+            }
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            var rootView = inflater.Inflate(Resource.Layout.fragment_list_folders, container, false);
+            if (rootView != null)
+            {
+                return rootView;
+            }
+
+            rootView = inflater.Inflate(Resource.Layout.fragment_list_folders, container, false);
+
+            refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout); //TODO need to set the 
+            refreshLayout.Post(() => refreshLayout.Refreshing = true);
+
+            //TODO ask Bartosz if we should keep the refreshlayout ot the progress bar
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.folderRecyclerView);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
-            recyclerView.SetAdapter(adapter);
             recyclerView.HasFixedSize = true;
+
+            adapter = new FolderListAdapter(recyclerView);
+            adapter.expandIconClicked += Adapter_ExpandIconClicked;
+            adapter.folderNameClicked += Adapter_FolderNameClicked;
+
+            recyclerView.SetAdapter(adapter);
+            //recyclerView.Visibility = ViewStates.Gone;
+
+            progressBar = rootView.FindViewById<ProgressBar>(Resource.Id.progressBar);
+            progressBar.Visibility = ViewStates.Gone;
 
             return rootView;
         }
+
+        public override void OnActivityCreated(Bundle savedInstanceState)
+        {
+            base.OnActivityCreated(savedInstanceState);
+
+            RestoreState(savedInstanceState); //This is called also the first time, even if it's not necessary (The arguments will be set in create)
+
+            if (savedFoldersInView != null && savedFoldersInView.Any())
+            {
+                adapter.Refresh(savedFoldersInView);
+            }
+
+            var subtitle = currentFolder != null ? currentFolder.Name : string.Empty;
+            (Activity as IFoldersListFragmentSelectedListener).SetTitles(moduleType.ToString(), subtitle);
+
+        }
+
+        void Adapter_ExpandIconClicked(object sender, Folder folder)
+        {
+            (Activity as IFoldersListFragmentSelectedListener).NavigateInFolder(moduleType, folder);
+        }
+
+        void Adapter_FolderNameClicked(object sender, Folder folder) //TODO need to give more meaningful names (the action, not the icon that was clicked)
+        {
+
+        }
+
+        bool started;
 
         public async override void OnStart()
         {
             base.OnStart();
 
-            var folders = await Managers.FoldersManager.GetFoldersAsync(ModuleType.Documents);
-            adapter.Refresh(folders);
-        }
+            if (!started)
+            {
+                recyclerView.Visibility = ViewStates.Gone;
+                //progressBar.Visibility = ViewStates.Visible;
 
-        public interface IFoldersListFragmentSelectedListener
-        {
-            void OpenNext(int val);
+                var folders = await Managers.FoldersManager.GetFoldersAsync(moduleType, currentFolder);
+                adapter.Refresh(folders);
+
+                recyclerView.Visibility = ViewStates.Visible;
+                //progressBar.Visibility = ViewStates.Gone;
+                refreshLayout.Refreshing = false;
+
+                started = true;
+            }
         }
 
         public override void OnSaveInstanceState(Bundle outState)
         {
             base.OnSaveInstanceState(outState);
-
-            //TODO to be completed
+            if (adapter != null)
+            {
+                outState.PutString(FoldersListBundleString, SerializationUtils.Serialize(adapter.foldersInView)); //TODO think it can be done in a more elegant way
+            }
+            else
+            {
+                outState.PutString(FoldersListBundleString, SerializationUtils.Serialize(savedFoldersInView)); //Adapter is null when we go to another folder, and rotate two times
+            }
         }
+
+        public interface IFoldersListFragmentSelectedListener
+        {
+            void NavigateInFolder(ModuleType moduleType, Folder folder);
+            void SetTitles(string title, string subtitle);
+        }
+
     }
 
     class FolderListAdapter : RecyclerView.Adapter
     {
-        readonly Android.App.Activity activity;
-        List<Folder> folders = new List<Folder>();
+        public readonly List<Folder> foldersInView = new List<Folder>();
+        readonly RecyclerView parentView;
 
-        public FolderListAdapter(Android.App.Activity activity)
+        public event EventHandler<Folder> expandIconClicked = delegate { };
+        public event EventHandler<Folder> folderNameClicked = delegate { };
+
+        public FolderListAdapter(RecyclerView parentRecyclerView)
         {
-            this.activity = activity;
+            this.parentView = parentRecyclerView;
         }
 
         public override int ItemCount
         {
             get
             {
-                return folders.Count;
+                return foldersInView.Count;
             }
         }
 
         public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
         {
+            //Binding of actual parameters, the view is already created
             var fh = holder as FolderViewHolder;
-
-            var folder = folders[position];
+            var folder = foldersInView[position];
 
             fh.FolderName.Text = folder.Name;
-
-            fh.ExpandIcon.Visibility = folder.HasSubFolders ? ViewStates.Visible : ViewStates.Invisible;
+            fh.ExpandIcon.Visibility = folder.HasSubFolders ? ViewStates.Visible : ViewStates.Gone;
         }
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
         {
-            // Inflate the CardView for the photo:
             View itemView = LayoutInflater.From(parent.Context).
                                           Inflate(Resource.Layout.folder_list_item, parent, false);
 
-            // Create a ViewHolder to hold view references inside the CardView:
-            var vh = new FolderViewHolder(itemView);
-            return vh;
+            var folderViewHolder = new FolderViewHolder(itemView);
+            folderViewHolder.expandIconClicked += FolderViewHolder_ExpandIconClicked;
+            folderViewHolder.folderNameClicked += FolderViewHolder_FolderNameClicked;
+            return folderViewHolder;
         }
 
         public void Refresh(List<Folder> folders)
         {
-            this.folders.AddRange(folders);
-            NotifyDataSetChanged();
+            foldersInView.Clear();
+            foldersInView.AddRange(folders); //TODO check this
+            NotifyDataSetChanged(); //TODO this can be more specific actually
+        }
+
+        void FolderViewHolder_ExpandIconClicked(object sender, View e)
+        {
+            var position = parentView.GetChildLayoutPosition(e);
+            var folder = foldersInView[position];
+            expandIconClicked(this, folder);
+        }
+
+        void FolderViewHolder_FolderNameClicked(object sender, View e)
+        {
+            var position = parentView.GetChildLayoutPosition(e);
+            var folder = foldersInView[position];
+            folderNameClicked(this, folder);
         }
     }
 
@@ -135,11 +238,17 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public ImageView ExpandIcon { get; private set; }
         public TextView FolderName { get; private set; }
 
+        public event EventHandler<View> expandIconClicked = delegate { };
+        public event EventHandler<View> folderNameClicked = delegate { };
+        //TODO add context actions on long click
+
         public FolderViewHolder(View itemView) : base(itemView)
         {
-            // Locate and cache view references:
+            // Locate and cache view references
             ExpandIcon = itemView.FindViewById<ImageView>(Resource.Id.expandIcon);
+            ExpandIcon.Click += (sender, e) => { expandIconClicked(this, itemView); };
             FolderName = itemView.FindViewById<TextView>(Resource.Id.folderName);
+            FolderName.Click += (sender, e) => { folderNameClicked(this, itemView); };
         }
     }
 

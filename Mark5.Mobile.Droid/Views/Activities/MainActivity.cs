@@ -28,7 +28,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
     [Activity]
     public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FoldersListFragment.IFoldersListFragmentSelectedListener
     {
-
         Toolbar toolbar;
         DrawerLayout drawer;
         ActionBarDrawerToggle drawerToggle;
@@ -74,7 +73,8 @@ namespace Mark5.Mobile.Droid.Views.Activity
                     var headerTitle = FindViewById<AppCompatTextView>(Resource.Id.nav_header_title); //TODO sometimes the header title is null
                     var headerSubtitle = FindViewById<AppCompatTextView>(Resource.Id.nav_header_subtitle);
 
-                    headerTitle.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
+                    headerTitle.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}"; //TODO this should probably be passed as a bundle or something
+
                     headerSubtitle.Text = $"{ci?.Username}@{ci?.Hostname}:{ci?.Port}";
                 });
             });
@@ -98,8 +98,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
             {
                 lastSelectedItem = menuItem;
 
-                var foldersListFragment = FoldersListFragment.Create(0);
-                foldersListFragment.Listener = this;
+                var foldersListFragment = FoldersListFragment.Create(ModuleType.Documents, null);
 
                 var ft = SupportFragmentManager.BeginTransaction();
                 ft.Replace(Resource.Id.fragment_container, foldersListFragment, "0");
@@ -108,18 +107,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
             drawer.CloseDrawer(GravityCompat.Start);
             return true;
-        }
-
-        public void OpenNext(int val)
-        {
-            var foldersListFragment = FoldersListFragment.Create(val);
-            foldersListFragment.Listener = this;
-
-            var ft = SupportFragmentManager.BeginTransaction();
-            ft.Replace(Resource.Id.fragment_container, foldersListFragment, val.ToString()); //The tag here can be used to identify the fragment
-            ft.SetTransition((int)FragmentTransit.FragmentOpen);
-            ft.AddToBackStack(null);
-            ft.Commit();
         }
 
         protected override void OnSaveInstanceState(Bundle outState)
@@ -137,6 +124,23 @@ namespace Mark5.Mobile.Droid.Views.Activity
             var menuItemId = savedInstanceState.GetInt(MenuItemId);
             var menuItem = navigationView.Menu.FindItem(menuItemId);
             lastSelectedItem = menuItem;
+        }
+
+        void FoldersListFragment.IFoldersListFragmentSelectedListener.NavigateInFolder(ModuleType moduleType, Folder folder)
+        {
+            var foldersListFragment = FoldersListFragment.Create(moduleType, folder);
+
+            var ft = SupportFragmentManager.BeginTransaction();
+            ft.SetTransition((int)FragmentTransit.FragmentOpen);
+            ft.Replace(Resource.Id.fragment_container, foldersListFragment, folder.Id.ToString()); //TODO need to put a relevant tag
+            ft.AddToBackStack(null);
+            ft.Commit();
+        }
+
+        void FoldersListFragment.IFoldersListFragmentSelectedListener.SetTitles(string title, string subtitle)
+        {
+            SupportActionBar.Title = title;
+            SupportActionBar.Subtitle = subtitle;
         }
     }
 }
