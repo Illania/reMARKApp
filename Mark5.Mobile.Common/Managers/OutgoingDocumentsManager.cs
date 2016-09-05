@@ -9,8 +9,10 @@ using Mark5.Mobile.Common.Storage;
 
 namespace Mark5.Mobile.Common.Managers
 {
+
     class OutgoingDocumentsManager : IOutgoingDocumentsManager
     {
+
         CancellationTokenSource cts;
         Task sendTask;
 

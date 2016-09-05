@@ -117,7 +117,7 @@ namespace Mark5.Mobile.Common
                     subscribed = true;
                 }
 
-                StartSendTask();
+                StartDownloadTask();
             }
             finally
             {
@@ -130,7 +130,7 @@ namespace Mark5.Mobile.Common
             try
             {
                 await semaphore.WaitAsync();
-                await StopSendTask();
+                await StopDownloadTask();
 
                 if (subscribed)
                 {
@@ -150,7 +150,7 @@ namespace Mark5.Mobile.Common
 
         #region Private methods
 
-        void StartSendTask()
+        void StartDownloadTask()
         {
             if (downloadTask != null)
             {
@@ -176,7 +176,7 @@ namespace Mark5.Mobile.Common
             });
         }
 
-        async Task StopSendTask()
+        async Task StopDownloadTask()
         {
             if (cts != null)
             {
@@ -387,11 +387,11 @@ namespace Mark5.Mobile.Common
 
             if (e.IsReachable)
             {
-                StartSendTask();
+                StartDownloadTask();
             }
             else
             {
-                await StopSendTask();
+                await StopDownloadTask();
             }
         }
 
