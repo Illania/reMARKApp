@@ -17,12 +17,15 @@ namespace Mark5.Mobile.Droid.Views.Common
     public static class Dialogs
     {
 
-        public static Task<bool> ShowYesNoDialogAsync(Context context, int titleId, int messageId)
+        #region Awaitable dialogs
+
+        public static Task<bool> ShowYesNoDialogAsync(Context context, int titleId, int contentId)
         {
             var tcs = new TaskCompletionSource<bool>();
             var builder = new MaterialDialog.Builder(context);
+            builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
             builder.Title(titleId);
-            builder.Content(messageId);
+            builder.Content(contentId);
             builder.PositiveText(Resource.String.yes);
             builder.NegativeText(Resource.String.no);
             builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
@@ -31,23 +34,58 @@ namespace Mark5.Mobile.Droid.Views.Common
             return tcs.Task;
         }
 
-        public static Task ShowConfirmDialogAsync(Context context, int titleId, int messageId)
+        public static Task ShowConfirmDialogAsync(Context context, int titleId, int contentId)
         {
             var tcs = new TaskCompletionSource<bool>();
             var builder = new MaterialDialog.Builder(context);
+            builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
             builder.Title(titleId);
-            builder.Content(messageId);
+            builder.Content(contentId);
             builder.PositiveText(Resource.String.ok);
             builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
             builder.Show();
             return tcs.Task;
         }
 
-        public static Action ShowInfiniteProgressDialog(Context context, int titleId, int messageId, CancellationTokenSource cts = null)
+        public static Task ShowErrorDialogAsync(Context context, Exception ex)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
+            builder.Title(Resource.String.error);
+            builder.Content(ex.Message);
+            builder.PositiveText(Resource.String.ok);
+            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
+            builder.Show();
+            return tcs.Task;
+        }
+
+        #endregion
+
+        #region Non-awaitable dialogs
+
+        public static void ShowYesNoDialog(Context context, int titleId, int contentId, Action positiveAction, Action negativeAction = null)
         {
             var builder = new MaterialDialog.Builder(context);
+            builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
             builder.Title(titleId);
-            builder.Content(messageId);
+            builder.Content(contentId);
+            builder.PositiveText(Resource.String.yes);
+            builder.NegativeText(Resource.String.no);
+            builder.OnPositive(new SingleButtonCallback(positiveAction));
+            if (negativeAction != null)
+            {
+                builder.OnNegative(new SingleButtonCallback(positiveAction));
+            }
+            builder.Show();
+        }
+
+        public static Action ShowInfiniteProgressDialog(Context context, int titleId, int contentId, CancellationTokenSource cts = null)
+        {
+            var builder = new MaterialDialog.Builder(context);
+            builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
+            builder.Title(titleId);
+            builder.Content(contentId);
             builder.Progress(true, -1);
             builder.Cancelable(false);
 
@@ -61,17 +99,9 @@ namespace Mark5.Mobile.Droid.Views.Common
             return dialog.Dismiss;
         }
 
-        public static Task ShowErrorDialogAsync(Context context, Exception ex)
-        {
-            var tcs = new TaskCompletionSource<bool>();
-            var builder = new MaterialDialog.Builder(context);
-            builder.Title(Resource.String.error);
-            builder.Content(ex.Message);
-            builder.PositiveText(Resource.String.ok);
-            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
-            builder.Show();
-            return tcs.Task;
-        }
+        #endregion
+
+        #region Interface implementations
 
         class SingleButtonCallback : Java.Lang.Object, MaterialDialog.ISingleButtonCallback
         {
@@ -91,6 +121,8 @@ namespace Mark5.Mobile.Droid.Views.Common
                 }
             }
         }
+
+        #endregion
     }
 }
 

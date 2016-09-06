@@ -9,8 +9,10 @@ using Mark5.Mobile.Common.Storage;
 
 namespace Mark5.Mobile.Common.Managers
 {
+
     class OutgoingDocumentsManager : IOutgoingDocumentsManager
     {
+
         CancellationTokenSource cts;
         Task sendTask;
 
@@ -200,9 +202,7 @@ namespace Mark5.Mobile.Common.Managers
                         await FileSystemStorage.DeleteOutgoingDocumentFolderAsync(info.Identifier);
                         DocumentSendingSuccessful(this, container);
                     }
-
                 }
-
             }
             catch (Exception ex)
             {

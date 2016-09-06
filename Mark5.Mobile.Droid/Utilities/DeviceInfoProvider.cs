@@ -32,6 +32,13 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             return BluetoothAdapter.DefaultAdapter?.Name ?? Build.Manufacturer + " " + Build.Product + " (" + Build.Model + ")";
         }
+
+        public string GetAppVersionString()
+        {
+            var ctx = Application.Context;
+            var pi = ctx.PackageManager.GetPackageInfo(ctx.PackageName, 0);
+            return $"{pi.VersionName} ({pi.VersionCode})";
+        }
     }
 }
 

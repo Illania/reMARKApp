@@ -13,6 +13,7 @@ using Android.Content;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V7.Widget;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
@@ -87,17 +88,11 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
             try
             {
-                //var username = usernameEditText.Text;
-                //var password = passwordEditText.Text;
-                //var hostname = hostnameEditText.Text;
-                //var port = portEditText.Text;
-                //var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
-
-                var username = "bgc";
-                var password = "Bgc2014!";
-                var hostname = "192.168.75.44";
-                var port = "8096";
-                var sslMode = SslMode.AllowSelfSigned;
+                var username = usernameEditText.Text;
+                var password = passwordEditText.Text;
+                var hostname = hostnameEditText.Text;
+                var port = portEditText.Text;
+                var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
 
                 var errors = false;
                 if (!Validator.IsUsernameValid(username))
@@ -149,16 +144,23 @@ namespace Mark5.Mobile.Droid.Views.Activity
                 var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port));
 
                 Managers.Initialize(ci);
+                Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
+                Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                var policies = Managers.DownloadManager.DownloadPolicies;
+                policies[ObjectType.Document] = new DownloadFoldersPolicy();
+                if (PlatformConfig.Preferences.SynchroniseContacts)
+                {
+                    policies[ObjectType.Contact] = new DownloadAllPolicy();
+                }
+                if (PlatformConfig.Preferences.SynchroniseShortcodes)
+                {
+                    policies[ObjectType.Shortcode] = new DownloadAllPolicy();
+                }
+                await Managers.DownloadManager.Start();
+                await Managers.OutgoingDocumentsManager.Start();
                 PlatformConfig.ReachabilityBroadcastReceiver.Register();
 
-                var ss = await Managers.SystemManager.GetSystemSettingsAsync();
-
-                Insights.Identify($"{ci.Username}@{ci.SslMode},{ci.Hostname}:{ci.Port}", new Dictionary<string, string>
-                {
-                    [Insights.Traits.FirstName] = ss?.UserInfo?.User?.FirstName,
-                    [Insights.Traits.LastName] = ss?.UserInfo?.User?.LastName,
-                    ["System Administrator"] = (ss?.UserInfo?.IsSystemAdministrator ?? false) ? "Yes" : "No"
-                });
+                await Managers.SystemManager.GetSystemSettingsAsync();
 
                 await authenticator.SaveConnectionInfoAsync(ci);
 

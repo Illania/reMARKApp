@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<style name="mark5" parent="mark5.Base">
+	<style name="mark5" parent="mark5Base">
 	</style>
-	<style name="mark5.Base" parent="Theme.AppCompat.Light.NoActionBar">
+	<style name="mark5Base" parent="Theme.AppCompat.Light.NoActionBar">
 		<item name="colorPrimary">@color/darkerblue</item>
 		<item name="colorPrimaryDark">@color/darkerblue</item>
 		<item name="colorAccent">@color/brown</item>
@@ -11,6 +11,8 @@
 		<item name="actionBarItemBackground">@color/darkblue</item>
 		<item name="actionModeBackground">@color/darkblue</item>
 		<item name="spinnerStyle">@style/mark5spinner</item>
+		<item name="preferenceTheme">@style/mark5preference</item>
+		<item name="alertDialogTheme">@style/mark5dialog</item>
 	</style>
 	<style name="mark5Splash" parent="mark5">
 		<item name="android:windowFullscreen">true</item>
@@ -23,4 +25,9 @@
 	<style name="mark5appbaroverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 	<style name="mark5popupoverlay" parent="ThemeOverlay.AppCompat.Light" />
 	<style name="mark5navheaderoverlay" parent="ThemeOverlay.AppCompat.Dark" />
+	<style name="mark5preference" parent="PreferenceThemeOverlay.v14.Material" />
+	<style name="mark5dialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+		<item name="colorAccent">@color/brown</item>
+	</style>
+	<style name="hockey" parent="android:Theme.DeviceDefault.Light.DarkActionBar" />
 </resources>

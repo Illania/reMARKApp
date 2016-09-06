@@ -7,7 +7,6 @@
 //
 using System.Threading.Tasks;
 using Android.App;
-using Android.Content;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.View;
@@ -15,9 +14,11 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
+using HockeyApp.Android;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Utilities.Hockey;
 using Mark5.Mobile.Droid.Views.Common;
 using Mark5.Mobile.Droid.Views.Fragments;
 
@@ -72,6 +73,15 @@ namespace Mark5.Mobile.Droid.Views.Activity
                     headerSubtitle.Text = $"{ci?.Username}@{ci?.Hostname}:{ci?.Port}";
                 });
             });
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+
+            CrashManager.Register(this, "137e2a4fb6384cb3a51de617dd2f5999", new CustomCrashManagerListener());
+            FeedbackManager.Register(this, "137e2a4fb6384cb3a51de617dd2f5999", new CustomFeedbackManagerLister());
+            CrashManager.ResetAlwaysSend(new Java.Lang.Ref.WeakReference(this));
         }
 
         public override void OnBackPressed()

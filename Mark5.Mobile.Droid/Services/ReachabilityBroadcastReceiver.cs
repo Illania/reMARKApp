@@ -29,6 +29,7 @@ namespace Mark5.Mobile.Droid.Services
             registered = true;
 
             var intentFilter = new IntentFilter();
+            intentFilter.AddAction(ConnectivityManager.ConnectivityAction);
             Application.Context.RegisterReceiver(this, intentFilter);
         }
 
