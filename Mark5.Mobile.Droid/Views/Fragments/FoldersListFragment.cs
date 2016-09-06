@@ -72,7 +72,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             rootView = inflater.Inflate(Resource.Layout.fragment_list_folders, container, false);
 
-            refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout); //TODO need to set the 
+            refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
+            refreshLayout.Refresh += RefreshLayout_Refresh;
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.folderRecyclerView);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
@@ -91,7 +92,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             base.OnActivityCreated(savedInstanceState);
 
-            RecoverState(savedInstanceState); //This is called also the first time, even if it's not necessary (The arguments will be set in create)
+            RecoverState(savedInstanceState);
 
             if (savedFoldersInView != null && savedFoldersInView.Any())
             {
@@ -105,7 +106,11 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public async override void OnStart()
         {
             base.OnStart();
-            await RefreshData();
+
+            if (!restored)
+            {
+                await RefreshData();
+            }
         }
 
         public override void OnSaveInstanceState(Bundle outState)
@@ -113,12 +118,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             base.OnSaveInstanceState(outState);
             if (adapter != null)
             {
-                outState.PutString(FoldersListBundleString, SerializationUtils.Serialize(adapter.foldersInView)); //TODO think if it can be done in a more elegant way
+                outState.PutString(FoldersListBundleString, SerializationUtils.Serialize(adapter.foldersInView));
             }
-            else
-            {
-                outState.PutString(FoldersListBundleString, SerializationUtils.Serialize(savedFoldersInView)); //Adapter is null when we go to another folder, and rotate two times
-            }
+            //else
+            //{
+            //    outState.PutString(FoldersListBundleString, SerializationUtils.Serialize(savedFoldersInView)); //Adapter is null when we go to another folder, and rotate two times
+            //}
         }
 
         #endregion
@@ -127,17 +132,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         async Task RefreshData()
         {
-            if (!restored)
-            {
-                refreshLayout.Post(() => refreshLayout.Refreshing = true);
+            refreshLayout.Post(() => refreshLayout.Refreshing = true); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
 
-                //refreshLayout.Refreshing = true;
+            var folders = await Managers.FoldersManager.GetFoldersAsync(moduleType, currentFolder);
+            adapter.Refresh(folders);
 
-                var folders = await Managers.FoldersManager.GetFoldersAsync(moduleType, currentFolder);
-                adapter.Refresh(folders);
-
-                refreshLayout.Refreshing = false;
-            }
+            refreshLayout.Refreshing = false;
         }
 
         void RecoverState(Bundle savedInstanceState)
@@ -156,7 +156,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         #endregion
 
-        #region List item events
+        #region List item event handlers
 
         void Adapter_ExpandIconClicked(object sender, Folder folder)
         {
@@ -166,6 +166,15 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         void Adapter_FolderNameClicked(object sender, Folder folder) //TODO need to give more meaningful names (the action, not the icon that was clicked)
         {
 
+        }
+
+        #endregion
+
+        #region SwipeRefresLayout event handlers
+
+        async void RefreshLayout_Refresh(object sender, EventArgs e)
+        {
+            await RefreshData();
         }
 
         #endregion
