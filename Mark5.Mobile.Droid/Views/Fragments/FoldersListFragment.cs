@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Android.OS;
 using Android.Support.V4.App;
 using Android.Support.V4.Widget;
@@ -36,6 +37,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         const string CurrentFolderBundleString = "currentFolderBundleString";
         const string FoldersListBundleString = "foldersListBundleString";
 
+        bool restored;
+
+        #region Factory method
 
         public static FoldersListFragment Create(ModuleType moduleType, Folder currentFolder)
         {
@@ -49,23 +53,14 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return fragment;
         }
 
+        #endregion
+
+        #region Overrides
+
         public override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            RestoreState(savedInstanceState);
-        }
-
-        void RestoreState(Bundle savedInstanceState)
-        {
-            if (Arguments != null)
-            {
-                moduleType = SerializationUtils.Deserialize<ModuleType>(Arguments.GetString(ModuleTypeBundleString));
-                currentFolder = SerializationUtils.Deserialize<Folder>(Arguments.GetString(CurrentFolderBundleString));
-            }
-            if (savedInstanceState != null)
-            {
-                savedFoldersInView = SerializationUtils.Deserialize<List<Folder>>(savedInstanceState.GetString(FoldersListBundleString));
-            }
+            RecoverState(savedInstanceState);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -78,7 +73,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             rootView = inflater.Inflate(Resource.Layout.fragment_list_folders, container, false);
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout); //TODO need to set the 
-            refreshLayout.Post(() => refreshLayout.Refreshing = true);
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.folderRecyclerView);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
@@ -97,7 +91,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             base.OnActivityCreated(savedInstanceState);
 
-            RestoreState(savedInstanceState); //This is called also the first time, even if it's not necessary (The arguments will be set in create)
+            RecoverState(savedInstanceState); //This is called also the first time, even if it's not necessary (The arguments will be set in create)
 
             if (savedFoldersInView != null && savedFoldersInView.Any())
             {
@@ -106,8 +100,63 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             var subtitle = currentFolder != null ? currentFolder.Name : string.Empty;
             (Activity as IFoldersListFragmentSelectedListener).SetTitles(moduleType.ToString(), subtitle);
-
         }
+
+        public async override void OnStart()
+        {
+            base.OnStart();
+            await RefreshData();
+        }
+
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+            if (adapter != null)
+            {
+                outState.PutString(FoldersListBundleString, SerializationUtils.Serialize(adapter.foldersInView)); //TODO think if it can be done in a more elegant way
+            }
+            else
+            {
+                outState.PutString(FoldersListBundleString, SerializationUtils.Serialize(savedFoldersInView)); //Adapter is null when we go to another folder, and rotate two times
+            }
+        }
+
+        #endregion
+
+        #region Utility methods
+
+        async Task RefreshData()
+        {
+            if (!restored)
+            {
+                refreshLayout.Post(() => refreshLayout.Refreshing = true);
+
+                //refreshLayout.Refreshing = true;
+
+                var folders = await Managers.FoldersManager.GetFoldersAsync(moduleType, currentFolder);
+                adapter.Refresh(folders);
+
+                refreshLayout.Refreshing = false;
+            }
+        }
+
+        void RecoverState(Bundle savedInstanceState)
+        {
+            if (Arguments != null)
+            {
+                moduleType = SerializationUtils.Deserialize<ModuleType>(Arguments.GetString(ModuleTypeBundleString));
+                currentFolder = SerializationUtils.Deserialize<Folder>(Arguments.GetString(CurrentFolderBundleString));
+            }
+            if (savedInstanceState != null)
+            {
+                restored = true;
+                savedFoldersInView = SerializationUtils.Deserialize<List<Folder>>(savedInstanceState.GetString(FoldersListBundleString));
+            }
+        }
+
+        #endregion
+
+        #region List item events
 
         void Adapter_ExpandIconClicked(object sender, Folder folder)
         {
@@ -119,35 +168,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         }
 
-        bool started;
+        #endregion
 
-        public async override void OnStart()
-        {
-            base.OnStart();
-
-            if (!started)
-            {
-                var folders = await Managers.FoldersManager.GetFoldersAsync(moduleType, currentFolder);
-                adapter.Refresh(folders);
-
-                refreshLayout.Refreshing = false;
-
-                started = true;
-            }
-        }
-
-        public override void OnSaveInstanceState(Bundle outState)
-        {
-            base.OnSaveInstanceState(outState);
-            if (adapter != null)
-            {
-                outState.PutString(FoldersListBundleString, SerializationUtils.Serialize(adapter.foldersInView)); //TODO think it can be done in a more elegant way
-            }
-            else
-            {
-                outState.PutString(FoldersListBundleString, SerializationUtils.Serialize(savedFoldersInView)); //Adapter is null when we go to another folder, and rotate two times
-            }
-        }
+        #region Listener interface definition
 
         public interface IFoldersListFragmentSelectedListener
         {
@@ -155,6 +178,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             void SetTitles(string title, string subtitle);
         }
 
+        #endregion
     }
 
     class FolderListAdapter : RecyclerView.Adapter

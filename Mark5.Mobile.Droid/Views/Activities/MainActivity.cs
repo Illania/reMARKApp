@@ -132,7 +132,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
             var ft = SupportFragmentManager.BeginTransaction();
             ft.SetTransition((int)FragmentTransit.FragmentOpen);
-            ft.Replace(Resource.Id.fragment_container, foldersListFragment, folder.Id.ToString()); //TODO need to put a relevant tag
+            ft.Add(Resource.Id.fragment_container, foldersListFragment, folder.Id.ToString()); //TODO need to put a relevant tag, and decide if to use replace or add
             ft.AddToBackStack(null);
             ft.Commit();
         }
