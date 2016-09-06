@@ -28,7 +28,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         FolderListAdapter adapter;
         RecyclerView recyclerView;
-        ProgressBar progressBar;
         SwipeRefreshLayout refreshLayout;
         List<Folder> savedFoldersInView = new List<Folder>();
         View rootView;
@@ -81,8 +80,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout); //TODO need to set the 
             refreshLayout.Post(() => refreshLayout.Refreshing = true);
 
-            //TODO ask Bartosz if we should keep the refreshlayout ot the progress bar
-
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.folderRecyclerView);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.HasFixedSize = true;
@@ -92,10 +89,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             adapter.folderNameClicked += Adapter_FolderNameClicked;
 
             recyclerView.SetAdapter(adapter);
-            //recyclerView.Visibility = ViewStates.Gone;
-
-            progressBar = rootView.FindViewById<ProgressBar>(Resource.Id.progressBar);
-            progressBar.Visibility = ViewStates.Gone;
 
             return rootView;
         }
@@ -134,14 +127,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             if (!started)
             {
-                recyclerView.Visibility = ViewStates.Gone;
-                //progressBar.Visibility = ViewStates.Visible;
-
                 var folders = await Managers.FoldersManager.GetFoldersAsync(moduleType, currentFolder);
                 adapter.Refresh(folders);
 
-                recyclerView.Visibility = ViewStates.Visible;
-                //progressBar.Visibility = ViewStates.Gone;
                 refreshLayout.Refreshing = false;
 
                 started = true;
