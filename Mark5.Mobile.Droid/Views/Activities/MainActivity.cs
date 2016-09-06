@@ -5,10 +5,8 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
 using System.Threading.Tasks;
 using Android.App;
-using Android.Content;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.View;
@@ -35,13 +33,14 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
         IMenuItem lastSelectedItem;
 
-        const string MenuItemId = "menuItemId";
+        const string MenuItemIdBundleString = "menuItemId";
+        const string ActionBarTitleBundleString = "actionBarTitleBundleString";
+        const string ActionBarSubtitleBundleString = "actionBarSubtitleBundleString";
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
-            SetTitle(Resource.String.app_name);
             SetContentView(Resource.Layout.activity_main);
 
             toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
@@ -113,17 +112,21 @@ namespace Mark5.Mobile.Droid.Views.Activity
         {
             base.OnSaveInstanceState(outState);
 
-            outState.PutInt(MenuItemId, lastSelectedItem.ItemId);
-
+            outState.PutInt(MenuItemIdBundleString, lastSelectedItem.ItemId);
+            outState.PutString(ActionBarTitleBundleString, SupportActionBar.Title); //TODO need to investigate why the title is not saved after orientation changes
+            outState.PutString(ActionBarSubtitleBundleString, SupportActionBar.Subtitle);
         }
 
         protected override void OnRestoreInstanceState(Bundle savedInstanceState)
         {
             base.OnRestoreInstanceState(savedInstanceState);
 
-            var menuItemId = savedInstanceState.GetInt(MenuItemId);
+            var menuItemId = savedInstanceState.GetInt(MenuItemIdBundleString);
             var menuItem = navigationView.Menu.FindItem(menuItemId);
             lastSelectedItem = menuItem;
+
+            SupportActionBar.Title = savedInstanceState.GetString(ActionBarTitleBundleString);
+            SupportActionBar.Subtitle = savedInstanceState.GetString(ActionBarSubtitleBundleString);
         }
 
         void FoldersListFragment.IFoldersListFragmentSelectedListener.NavigateInFolder(ModuleType moduleType, Folder folder)
@@ -132,7 +135,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
             var ft = SupportFragmentManager.BeginTransaction();
             ft.SetTransition((int)FragmentTransit.FragmentOpen);
-            ft.Add(Resource.Id.fragment_container, foldersListFragment, folder.Id.ToString()); //TODO need to put a relevant tag, and decide if to use replace or add
+            ft.Replace(Resource.Id.fragment_container, foldersListFragment, folder.Id.ToString());
             ft.AddToBackStack(null);
             ft.Commit();
         }

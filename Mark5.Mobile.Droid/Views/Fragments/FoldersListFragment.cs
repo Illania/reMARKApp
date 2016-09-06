@@ -22,7 +22,7 @@ using Mark5.Mobile.Common.Utilities;
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
 
-    public class FoldersListFragment : Fragment
+    public class FoldersListFragment : Fragment, ActionMode.ICallback
     {
         ModuleType moduleType;
         Folder currentFolder;
@@ -99,14 +99,13 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 adapter.Refresh(savedFoldersInView);
             }
-
-            var subtitle = currentFolder != null ? currentFolder.Name : string.Empty;
-            (Activity as IFoldersListFragmentSelectedListener).SetTitles(moduleType.ToString(), subtitle);
         }
 
         public async override void OnStart()
         {
             base.OnStart();
+
+            SetTitles();
 
             if (!restored)
             {
@@ -149,6 +148,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
         }
 
+        void SetTitles()
+        {
+            var subtitle = currentFolder != null ? currentFolder.Name : string.Empty;
+            (Activity as IFoldersListFragmentSelectedListener).SetTitles(moduleType.ToString(), subtitle);
+        }
+
         #endregion
 
         #region List item event handlers
@@ -165,8 +170,59 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         void Adapter_ItemLongClicked(object sender, Folder folder)
         {
+            if (actionMode != null)
+            {
+                return;
+            }
+
             var itemView = sender as View;
             itemView.Selected = true;
+
+            actionMode = Activity.StartActionMode(this);
+        }
+
+        ActionMode actionMode;
+
+        bool ActionMode.ICallback.OnActionItemClicked(ActionMode mode, IMenuItem item)
+        {
+            switch (item.ItemId)
+            {
+                case 1:
+                    mode.Finish();
+                    return true;
+                case 2:
+                    mode.Finish();
+                    return true;
+                case 3:
+                    mode.Finish();
+                    return true;
+                default:
+                    return false;
+            }
+
+        }
+
+        bool ActionMode.ICallback.OnCreateActionMode(ActionMode mode, IMenu menu)
+        {
+            menu.Add(Menu.None, 1, Menu.None, "First").SetIcon(Resource.Drawable.abc_ic_menu_share_mtrl_alpha);
+            menu.Add(Menu.None, 2, Menu.None, "Second");
+            menu.Add(Menu.None, 3, Menu.None, "Third");
+            menu.Add(Menu.None, 4, Menu.None, "Four");
+            menu.Add(Menu.None, 5, Menu.None, "Five");
+            menu.Add(Menu.None, 6, Menu.None, "Seven").SetIcon(Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha);
+
+
+            return true;
+        }
+
+        void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
+        {
+            actionMode = null;
+        }
+
+        bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
+        {
+            return false;
         }
 
         #endregion
