@@ -82,6 +82,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             adapter = new FolderListAdapter(recyclerView);
             adapter.expandIconClicked += Adapter_ExpandIconClicked;
             adapter.folderNameClicked += Adapter_FolderNameClicked;
+            adapter.itemLongClicked += Adapter_ItemLongClicked;
 
             recyclerView.SetAdapter(adapter);
 
@@ -160,7 +161,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             (Activity as IFoldersListFragmentSelectedListener).NavigateInFolder(moduleType, folder);
         }
 
-        void Adapter_FolderNameClicked(object sender, Folder folder) //TODO need to give more meaningful names (the action, not the icon that was clicked)
+        void Adapter_FolderNameClicked(object sender, Folder folder)
+        {
+
+        }
+
+        void Adapter_ItemLongClicked(object sender, Folder folder)
         {
 
         }
@@ -194,6 +200,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public event EventHandler<Folder> expandIconClicked = delegate { };
         public event EventHandler<Folder> folderNameClicked = delegate { };
+        public event EventHandler<Folder> itemLongClicked = delegate { };
+
 
         public FolderListAdapter(RecyclerView parentRecyclerView)
         {
@@ -226,14 +234,15 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             var folderViewHolder = new FolderViewHolder(itemView);
             folderViewHolder.expandIconClicked += FolderViewHolder_ExpandIconClicked;
             folderViewHolder.folderNameClicked += FolderViewHolder_FolderNameClicked;
+            folderViewHolder.itemLongClicked += FolderViewHolder_ItemLongClicked;
             return folderViewHolder;
         }
 
         public void Refresh(List<Folder> folders)
         {
             foldersInView.Clear();
-            foldersInView.AddRange(folders); //TODO check this
-            NotifyDataSetChanged(); //TODO this can be more specific actually
+            foldersInView.AddRange(folders);
+            NotifyDataSetChanged();
         }
 
         void FolderViewHolder_ExpandIconClicked(object sender, View e)
@@ -249,6 +258,13 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             var folder = foldersInView[position];
             folderNameClicked(this, folder);
         }
+
+        void FolderViewHolder_ItemLongClicked(object sender, View e)
+        {
+            var position = parentView.GetChildLayoutPosition(e);
+            var folder = foldersInView[position];
+            itemLongClicked(this, folder);
+        }
     }
 
     class FolderViewHolder : RecyclerView.ViewHolder
@@ -258,7 +274,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public event EventHandler<View> expandIconClicked = delegate { };
         public event EventHandler<View> folderNameClicked = delegate { };
-        //TODO add context actions on long click
+        public event EventHandler<View> itemLongClicked = delegate { };
 
         public FolderViewHolder(View itemView) : base(itemView)
         {
@@ -267,6 +283,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             ExpandIcon.Click += (sender, e) => { expandIconClicked(this, itemView); };
             FolderName = itemView.FindViewById<TextView>(Resource.Id.folderName);
             FolderName.Click += (sender, e) => { folderNameClicked(this, itemView); };
+            itemView.LongClick += (sender, e) => itemLongClicked(this, itemView);
         }
     }
 
