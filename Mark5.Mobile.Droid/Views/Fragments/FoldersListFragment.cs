@@ -118,10 +118,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             base.OnSaveInstanceState(outState);
             var foldersToSave = adapter != null ? adapter.foldersInView : savedFoldersInView;
-            if (adapter != null)
-            {
-                outState.PutString(FoldersListBundleString, SerializationUtils.Serialize(foldersToSave));
-            }
+            outState.PutString(FoldersListBundleString, SerializationUtils.Serialize(foldersToSave));
         }
 
         #endregion
