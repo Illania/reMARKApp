@@ -278,12 +278,12 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     var innerSelectQueryText = $"select {nameof(FolderShortcodeLink.ShortcodeId)} from {nameof(FolderShortcodeLink)}";
 
-                    var outerDeleteQueryPreview = $"delete from {nameof(ShortcodePreview)} where {nameof(ShortcodePreview.Id)} not in ({innerSelectQueryText}) ";
-                    var cmd = c.CreateCommand(outerDeleteQueryPreview);
+                    var outerDeleteQueryShortcodePreview = $"delete from {nameof(ShortcodePreview)} where {nameof(ShortcodePreview.Id)} not in ({innerSelectQueryText}) ";
+                    var cmd = c.CreateCommand(outerDeleteQueryShortcodePreview);
                     cmd.ExecuteNonQuery();
 
-                    var outerDeleteQueryContact = $"delete from {nameof(Shortcode)} where {nameof(Shortcode.Id)} not in ({innerSelectQueryText}) ";
-                    var cmd2 = c.CreateCommand(outerDeleteQueryContact);
+                    var outerDeleteQueryShortcode = $"delete from {nameof(Shortcode)} where {nameof(Shortcode.Id)} not in ({innerSelectQueryText}) ";
+                    var cmd2 = c.CreateCommand(outerDeleteQueryShortcode);
                     cmd2.ExecuteNonQuery();
                 });
 

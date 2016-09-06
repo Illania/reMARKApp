@@ -13,6 +13,7 @@ using Android.OS;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
+using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Views.Common;
@@ -74,6 +75,18 @@ namespace Mark5.Mobile.Droid.Views.Activity
                     {
                         policies[ObjectType.Shortcode] = new DownloadAllPolicy();
                     }
+
+                    if (PlatformConfig.Preferences.ClearCache)
+                    {
+                        await DatabaseUtils.ResetDatabases();
+                        PlatformConfig.Preferences.ClearCache = false;
+                    }
+
+                    if (await Managers.CleanUpManager.IsCleanUpNecessary(PlatformConfig.Preferences.CleanCacheIntervalDays))
+                    {
+                        await Managers.CleanUpManager.CleanUp();
+                    }
+
                     await Managers.DownloadManager.Start();
                     await Managers.OutgoingDocumentsManager.Start();
                     PlatformConfig.ReachabilityBroadcastReceiver.Register();

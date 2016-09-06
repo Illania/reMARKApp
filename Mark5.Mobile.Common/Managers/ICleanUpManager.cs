@@ -8,7 +8,9 @@ namespace Mark5.Mobile.Common
     public interface ICleanUpManager
     {
 
-        Task RemoveOrphans(IEnumerable<ModuleType> modules = null);
+        Task<bool> IsCleanUpNecessary(int intervalDays);
+
+        Task CleanUp(IEnumerable<ModuleType> modules = null);
     }
 }
 
