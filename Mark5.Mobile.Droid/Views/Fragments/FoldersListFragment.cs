@@ -168,7 +168,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         void Adapter_ItemLongClicked(object sender, Folder folder)
         {
-
+            var itemView = sender as View;
+            itemView.Selected = true;
         }
 
         #endregion
@@ -201,7 +202,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public event EventHandler<Folder> expandIconClicked = delegate { };
         public event EventHandler<Folder> folderNameClicked = delegate { };
         public event EventHandler<Folder> itemLongClicked = delegate { };
-
 
         public FolderListAdapter(RecyclerView parentRecyclerView)
         {
@@ -245,25 +245,25 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             NotifyDataSetChanged();
         }
 
-        void FolderViewHolder_ExpandIconClicked(object sender, View e)
+        void FolderViewHolder_ExpandIconClicked(object sender, View view)
         {
-            var position = parentView.GetChildLayoutPosition(e);
+            var position = parentView.GetChildLayoutPosition(view);
             var folder = foldersInView[position];
-            expandIconClicked(this, folder);
+            expandIconClicked(view, folder);
         }
 
-        void FolderViewHolder_FolderNameClicked(object sender, View e)
+        void FolderViewHolder_FolderNameClicked(object sender, View view)
         {
-            var position = parentView.GetChildLayoutPosition(e);
+            var position = parentView.GetChildLayoutPosition(view);
             var folder = foldersInView[position];
-            folderNameClicked(this, folder);
+            folderNameClicked(view, folder);
         }
 
-        void FolderViewHolder_ItemLongClicked(object sender, View e)
+        void FolderViewHolder_ItemLongClicked(object sender, View view)
         {
-            var position = parentView.GetChildLayoutPosition(e);
+            var position = parentView.GetChildLayoutPosition(view);
             var folder = foldersInView[position];
-            itemLongClicked(this, folder);
+            itemLongClicked(view, folder);
         }
     }
 
@@ -282,7 +282,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             ExpandIcon = itemView.FindViewById<ImageView>(Resource.Id.expandIcon);
             ExpandIcon.Click += (sender, e) => { expandIconClicked(this, itemView); };
             FolderName = itemView.FindViewById<TextView>(Resource.Id.folderName);
-            FolderName.Click += (sender, e) => { folderNameClicked(this, itemView); };
+            itemView.Click += (sender, e) => { folderNameClicked(this, itemView); };
             itemView.LongClick += (sender, e) => itemLongClicked(this, itemView);
         }
     }
