@@ -74,6 +74,12 @@ namespace Mark5.Mobile.Droid.Views.Activity
                     {
                         policies[ObjectType.Shortcode] = new DownloadAllPolicy();
                     }
+
+                    if (await Managers.CleanUpManager.IsCleanUpNecessary(PlatformConfig.Preferences.CleanCacheIntervalDays))
+                    {
+                        await Managers.CleanUpManager.CleanUp();
+                    }
+
                     await Managers.DownloadManager.Start();
                     await Managers.OutgoingDocumentsManager.Start();
                     PlatformConfig.ReachabilityBroadcastReceiver.Register();

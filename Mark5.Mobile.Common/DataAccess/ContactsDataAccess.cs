@@ -455,8 +455,8 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     var innerSelectQueryText = $"select {nameof(FolderContactLink.ContactId)} from {nameof(FolderContactLink)}";
 
-                    var outerDeleteQueryPreview = $"delete from {nameof(ContactPreview)} where {nameof(ContactPreview.Id)} not in ({innerSelectQueryText}) ";
-                    var cmd = c.CreateCommand(outerDeleteQueryPreview);
+                    var outerDeleteQueryContactPreview = $"delete from {nameof(ContactPreview)} where {nameof(ContactPreview.Id)} not in ({innerSelectQueryText}) ";
+                    var cmd = c.CreateCommand(outerDeleteQueryContactPreview);
                     cmd.ExecuteNonQuery();
 
                     var outerDeleteQueryContact = $"delete from {nameof(Contact)} where {nameof(Contact.Id)} not in ({innerSelectQueryText}) ";

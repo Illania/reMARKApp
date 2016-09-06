@@ -29,6 +29,7 @@ namespace Mark5.Mobile.Common.Storage
             public const string SystemUserDepartments = "systemUserDepartments.json";
             public const string FavoriteFolders = "favoriteFolders.json";
             public const string NotificationSettings = "notificationSettings.json";
+            public const string LastCacheCleanUp = "lastCacheCleanUp.json";
 
             public const string OutgoingDocument = "document.json";
             public const string OutgoingDocumentPreview = "documentPreview.json";
@@ -45,7 +46,8 @@ namespace Mark5.Mobile.Common.Storage
             [Filenames.SystemSettings] = new SemaphoreSlim(1),
             [Filenames.SystemUserDepartments] = new SemaphoreSlim(1),
             [Filenames.FavoriteFolders] = new SemaphoreSlim(1),
-            [Filenames.NotificationSettings] = new SemaphoreSlim(1)
+            [Filenames.NotificationSettings] = new SemaphoreSlim(1),
+            [Filenames.LastCacheCleanUp] = new SemaphoreSlim(1)
         }.ToImmutableDictionary();
 
         static readonly IDictionary<string, object> objectCache = new Dictionary<string, object>();
@@ -130,6 +132,25 @@ namespace Mark5.Mobile.Common.Storage
         public static async Task SaveNotificationSettingsAsync(NotificationSettings notificationSettings, CancellationToken ct = default(CancellationToken))
         {
             await SaveAsync(notificationSettings, Filenames.NotificationSettings, ct);
+        }
+
+        #endregion
+
+        #region LastCacheCleanUp
+
+        public static async Task<DateTime> GetLastCacheCleanUpAsync(CancellationToken ct = default(CancellationToken))
+        {
+            var lastCacheCleanUpString = await GetAsync<string>(Filenames.LastCacheCleanUp, ct);
+            if (lastCacheCleanUpString == null)
+            {
+                return DateTime.SpecifyKind(default(DateTime), DateTimeKind.Utc);
+            }
+            return DateTime.SpecifyKind(Convert.ToDateTime(lastCacheCleanUpString), DateTimeKind.Utc);
+        }
+
+        public static async Task SaveLastCacheCleanUpAsync(DateTime lastCacheCleanUp, CancellationToken ct = default(CancellationToken))
+        {
+            await SaveAsync(lastCacheCleanUp.ToUniversalTime().ToString("s"), Filenames.LastCacheCleanUp, ct);
         }
 
         #endregion
@@ -294,7 +315,6 @@ namespace Mark5.Mobile.Common.Storage
         }
 
         #endregion
-
 
         #region Private methods
 
