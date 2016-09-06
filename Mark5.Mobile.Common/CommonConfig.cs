@@ -18,8 +18,6 @@ namespace Mark5.Mobile.Common
 
         public static IFolder DataFolder { get; set; }
 
-        public static IFolder CacheFolder { get; set; }
-
         public static IFolder DatabaseFolder { get; set; }
 
         public static IFolder AttachmentsFolder { get; set; }

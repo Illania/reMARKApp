@@ -437,21 +437,6 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<Version> GetServiceVersionAsync(SourceType sourceType = SourceType.Auto)
-        {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
-            {
-                var result = await fileTransferServiceProxy.GetServiceVersionAsync(new DataContract.GetServiceVersionRequest
-                {
-                    Token = Token,
-                });
-
-                return result.Version;
-            }
-
-            throw new ArgumentException("Invalid sourceType provided.");
-        }
-
         public async Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, Document document, Folder folder, bool checkMD5 = false, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
@@ -463,7 +448,7 @@ namespace Mark5.Mobile.Common.Managers
                     Id = attachmentDescription.Id,
                     FolderId = folder.Id,
                     DocumentId = document.Id,
-                }, async (Stream arg) => { path = await FileSystemStorage.SaveAttachmentAsync(attachmentDescription, arg); });
+                }, async stream => { path = await FileSystemStorage.SaveAttachmentAsync(attachmentDescription, stream); });
 
                 return path;
             }
@@ -481,7 +466,7 @@ namespace Mark5.Mobile.Common.Managers
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
-                var result = await fileTransferServiceProxy.UploadTemporaryAttachmentAsync(new DataContract.UploadTemporaryAttachmentRequest()
+                var result = await fileTransferServiceProxy.UploadTemporaryAttachmentAsync(new DataContract.UploadTemporaryAttachmentRequest
                 {
                     Token = Token,
                     Extension = attachment.Extension,
