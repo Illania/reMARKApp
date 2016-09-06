@@ -116,14 +116,11 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public override void OnSaveInstanceState(Bundle outState)
         {
             base.OnSaveInstanceState(outState);
+            var foldersToSave = adapter != null ? adapter.foldersInView : savedFoldersInView;
             if (adapter != null)
             {
-                outState.PutString(FoldersListBundleString, SerializationUtils.Serialize(adapter.foldersInView));
+                outState.PutString(FoldersListBundleString, SerializationUtils.Serialize(foldersToSave));
             }
-            //else
-            //{
-            //    outState.PutString(FoldersListBundleString, SerializationUtils.Serialize(savedFoldersInView)); //Adapter is null when we go to another folder, and rotate two times
-            //}
         }
 
         #endregion
