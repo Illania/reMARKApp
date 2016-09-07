@@ -96,11 +96,6 @@ namespace Mark5.Mobile.Common.Managers
                 throw new ArgumentNullException(nameof(connectionInfo));
             }
 
-            if (!connectionInfo.Authenticated)
-            {
-                throw new ArgumentException("Connection info is not authenticated.");
-            }
-
             var appServiceProxy = AppServiceProxyFactory.Create(connectionInfo.SslMode != SslMode.Off, connectionInfo.Hostname, connectionInfo.Port);
             var fileTransferServiceProxy = FileTransferServiceProxyFactory.Create(connectionInfo.SslMode != SslMode.Off, connectionInfo.Hostname, connectionInfo.Port);
 

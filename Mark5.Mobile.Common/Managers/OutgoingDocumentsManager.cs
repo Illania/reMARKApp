@@ -220,7 +220,7 @@ namespace Mark5.Mobile.Common.Managers
 
         async void ReachabilityRefreshed(object sender, ReachabilityRefreshedEventArgs e)
         {
-            if (!active)
+            if (!active || !e.Changed)
             {
                 return;
             }

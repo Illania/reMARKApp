@@ -12,7 +12,6 @@ using System.Text;
 using System.Threading;
 using Android.Util;
 using Mark5.Mobile.Common.Utilities;
-using Xamarin;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -32,19 +31,21 @@ namespace Mark5.Mobile.Droid.Utilities
             // Build message
             var logMessageBuilder = new StringBuilder();
             //logMessageBuilder.Append ("[").Append (DateTime.Now.ToString ("yyyy-MM-dd HH:mm:ss.ffff")).Append ("] ");
-            logMessageBuilder.Append(" [").Append(logLevel).Append("] ");
-            logMessageBuilder.Append(" [").Append(Thread.CurrentThread.ManagedThreadId).Append("] ");
-            logMessageBuilder.Append(" [").Append(GetStackInfo(4)).Append("] ");
+            //logMessageBuilder.Append("[").Append(logLevel).Append("] ");
+            logMessageBuilder.Append("[").Append(Thread.CurrentThread.ManagedThreadId).Append("] ");
+            logMessageBuilder.Append("[").Append(GetStackInfo(3)).Append("] ");
             logMessageBuilder.Append(message);
 
             if (includeStackTrace)
             {
+#pragma warning disable XS0001 // Find usages of mono todo items
                 logMessageBuilder.Append("\n Stacktrace: ").Append(new StackTrace(true));
+#pragma warning restore XS0001 // Find usages of mono todo items
             }
 
             if (exception != null)
             {
-                logMessageBuilder.Append(" Exception: ").Append(exception.Message).Append(" ").Append(exception.StackTrace);
+                logMessageBuilder.Append($"{exception.GetType()}: ").Append(exception.Message).Append(" ").Append(exception.StackTrace);
             }
 
             LogPriority priority = LogPriority.Info;

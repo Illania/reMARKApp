@@ -14,11 +14,10 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
-using HockeyApp.Android;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Utilities.Hockey;
 using Mark5.Mobile.Droid.Views.Common;
 using Mark5.Mobile.Droid.Views.Fragments;
 
@@ -54,6 +53,15 @@ namespace Mark5.Mobile.Droid.Views.Activity
             navigationView = FindViewById<NavigationView>(Resource.Id.navigation_view);
             navigationView.SetNavigationItemSelectedListener(this);
 
+            CommonConfig.Logger.Info($"Created {nameof(MainActivity)}");
+        }
+
+        protected override void OnStart()
+        {
+            base.OnStart();
+
+            CommonConfig.Logger.Info($"Starting {nameof(MainActivity)}...");
+
             var initialMenuItem = navigationView.Menu.FindItem(Resource.Id.nav_documents);
             initialMenuItem.SetChecked(true);
             OnNavigationItemSelected(initialMenuItem);
@@ -75,15 +83,8 @@ namespace Mark5.Mobile.Droid.Views.Activity
                 headerTitle.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
                 headerSubtitle.Text = $"{ci?.Username}@{ci?.Hostname}:{ci?.Port}";
             }, TaskScheduler.FromCurrentSynchronizationContext());
-        }
 
-        protected override void OnResume()
-        {
-            base.OnResume();
-
-            CrashManager.Register(this, "137e2a4fb6384cb3a51de617dd2f5999", new CustomCrashManagerListener());
-            FeedbackManager.Register(this, "137e2a4fb6384cb3a51de617dd2f5999", new CustomFeedbackManagerLister());
-            CrashManager.ResetAlwaysSend(new Java.Lang.Ref.WeakReference(this));
+            CommonConfig.Logger.Info($"Started {nameof(MainActivity)}");
         }
 
         public override void OnBackPressed()

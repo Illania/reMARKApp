@@ -51,7 +51,11 @@ namespace Mark5.Mobile.Droid
                 CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
                 CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
 
+#if !DEBUG
+                CommonConfig.Logger.Level = LogLevel.TRACE;
+#else
                 CommonConfig.Logger.Level = LogLevel.INFO;
+#endif
 
                 await DatabaseUtils.InitializeDatabases();
 
@@ -59,6 +63,15 @@ namespace Mark5.Mobile.Droid
                 PlatformConfig.ReachabilityBroadcastReceiver = new ReachabilityBroadcastReceiver();
                 PlatformConfig.Preferences = new Preferences();
             }).Wait();
+
+            CommonConfig.Logger.Info($"Initialized {nameof(Mark5Application)}");
+        }
+
+        public override void OnTerminate()
+        {
+            base.OnTerminate();
+
+            CommonConfig.Logger.Info($"Terminated {nameof(Mark5Application)}");
         }
     }
 }

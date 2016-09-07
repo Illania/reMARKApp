@@ -9,6 +9,7 @@ using System;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
+using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -28,11 +29,21 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void EnableSelfSignedCertificates()
         {
+            if (CommonConfig.Logger.IsInfoEnabled())
+            {
+                CommonConfig.Logger.Info("Enabling custom validation callback.");
+            }
+
             ServicePointManager.ServerCertificateValidationCallback = callback;
         }
 
         public void DisableSelfSignedCertificates()
         {
+            if (CommonConfig.Logger.IsInfoEnabled())
+            {
+                CommonConfig.Logger.Info("Disabling custom validation callback.");
+            }
+
             ServicePointManager.ServerCertificateValidationCallback = null;
         }
     }

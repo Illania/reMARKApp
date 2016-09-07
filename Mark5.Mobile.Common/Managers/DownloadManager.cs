@@ -224,7 +224,6 @@ namespace Mark5.Mobile.Common
                             throw new ArgumentException("Object type not supported");
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -380,7 +379,7 @@ namespace Mark5.Mobile.Common
 
         async void ReachabilityRefreshed(object sender, ReachabilityRefreshedEventArgs e)
         {
-            if (!active)
+            if (!active || !e.Changed)
             {
                 return;
             }
