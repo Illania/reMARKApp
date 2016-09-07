@@ -91,15 +91,22 @@ namespace Mark5.Mobile.Droid.Views.Activity
                     await Managers.OutgoingDocumentsManager.Start();
                     PlatformConfig.ReachabilityBroadcastReceiver.Register();
 
-                    RunOnUiThreadIfNecessary(() => StartActivity(new Intent(this, typeof(MainActivity))));
+                    return true;
+                }
+                return false;
+            }).ContinueWith(t =>
+            {
+                if (t.Result)
+                {
+                    StartActivity(new Intent(this, typeof(MainActivity)));
                 }
                 else
                 {
-                    RunOnUiThreadIfNecessary(() => StartActivity(new Intent(this, typeof(LoginActivity))));
+                    StartActivity(new Intent(this, typeof(LoginActivity)));
                 }
 
                 Finish();
-            });
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
     }
 }

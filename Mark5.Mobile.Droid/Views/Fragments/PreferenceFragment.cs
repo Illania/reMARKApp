@@ -13,10 +13,9 @@ using Android.Support.V7.Preferences;
 using HockeyApp.Android;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Views.Common;
-using Android.Provider;
-using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
@@ -108,11 +107,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                     Managers.DownloadManager.DownloadPolicies.Remove(ObjectType.Shortcode);
                 }
             }
-        }
-
-        public override void OnNavigateToScreen(PreferenceScreen preferenceScreen)
-        {
-            base.OnNavigateToScreen(preferenceScreen);
         }
 
         public bool OnPreferenceStartScreen(PreferenceFragmentCompat caller, PreferenceScreen pref)

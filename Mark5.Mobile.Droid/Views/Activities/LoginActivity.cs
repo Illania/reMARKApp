@@ -6,7 +6,6 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -19,7 +18,6 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Views.Common;
-using Xamarin;
 
 namespace Mark5.Mobile.Droid.Views.Activity
 {
@@ -67,19 +65,19 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
             Task.Run(async () =>
             {
-                var ci = await authenticator.GetConnectionInfoAsync();
+                return await authenticator.GetConnectionInfoAsync();
+            }).ContinueWith(t =>
+            {
+                var ci = t.Result;
 
-                RunOnUiThreadIfNecessary(() =>
-                {
-                    usernameEditText.Text = ci?.Username;
-                    passwordEditText.Text = string.Empty;
-                    hostnameEditText.Text = ci?.Hostname;
-                    portEditText.Text = ci?.Port.ToString();
-                    sslSpinner.SetSelection((int?)ci?.SslMode ?? 0);
+                usernameEditText.Text = ci?.Username;
+                passwordEditText.Text = string.Empty;
+                hostnameEditText.Text = ci?.Hostname;
+                portEditText.Text = ci?.Port.ToString();
+                sslSpinner.SetSelection((int?)ci?.SslMode ?? 0);
 
-                    loginButton.Enabled = true;
-                });
-            });
+                loginButton.Enabled = true;
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         async void LoginButton_Click(object sender, EventArgs e)
@@ -178,5 +176,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
             }
         }
     }
+
 }
 
