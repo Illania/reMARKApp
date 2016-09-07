@@ -206,6 +206,30 @@
     <AndroidResource Include="Resources\mipmap-xhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\mipmap-hdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\layout\folder_list_item.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder_outgoing.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder_spam.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder_outgoing.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder_spam.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder_outgoing.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder_spam.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_outgoing.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_spam.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\arrow_right.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\arrow_right.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\arrow_right.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\arrow_right.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

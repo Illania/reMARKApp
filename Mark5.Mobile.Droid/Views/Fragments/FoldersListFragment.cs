@@ -89,7 +89,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             recyclerView.HasFixedSize = true;
 
             adapter = new FolderListAdapter(recyclerView);
-            adapter.expandIconClicked += Adapter_ExpandIconClicked;
+            adapter.expandIconClicked += Adapter_ExpandClicked;
             adapter.itemClicked += Adapter_ItemClicked;
             adapter.itemLongClicked += Adapter_ItemLongClicked;
 
@@ -168,7 +168,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         #region List item event handlers
 
-        void Adapter_ExpandIconClicked(object sender, Folder folder)
+        void Adapter_ExpandClicked(object sender, Folder folder)
         {
             listener.NavigateInFolder(moduleType, folder);
         }
@@ -187,6 +187,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             var itemView = sender as View;
             itemView.Selected = true;
+            itemView.Activated = true;
 
             actionMode = Activity.StartActionMode(this);
         }
@@ -285,7 +286,23 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             var folder = foldersInView[position];
 
             fh.FolderName.Text = folder.Name;
-            fh.ExpandIcon.Visibility = folder.HasSubFolders ? ViewStates.Visible : ViewStates.Gone;
+            fh.ExpandButtonLayout.Visibility = folder.HasSubFolders ? ViewStates.Visible : ViewStates.Gone;
+            if (folder.InternalType == FolderInternalType.Worktray)
+            {
+                fh.FolderIcon.SetImageResource(Resource.Drawable.folder_worktray);
+            }
+            else if (folder.Type == FolderType.Spam)
+            {
+                fh.FolderIcon.SetImageResource(Resource.Drawable.folder_spam);
+            }
+            else if (folder.Type == FolderType.Draft)
+            {
+                fh.FolderIcon.SetImageResource(Resource.Drawable.folder_draft);
+            }
+            else
+            {
+                fh.FolderIcon.SetImageResource(Resource.Drawable.folder); //TODO need to add icon for local
+            }
         }
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -294,7 +311,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                                           Inflate(Resource.Layout.folder_list_item, parent, false);
 
             var folderViewHolder = new FolderViewHolder(itemView);
-            folderViewHolder.expandIconClicked += FolderViewHolder_ExpandIconClicked;
+            folderViewHolder.expandClicked += FolderViewHolder_ExpandClicked;
             folderViewHolder.itemClicked += FolderViewHolder_ItemClicked;
             folderViewHolder.itemLongClicked += FolderViewHolder_ItemLongClicked;
             return folderViewHolder;
@@ -307,7 +324,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             NotifyDataSetChanged();
         }
 
-        void FolderViewHolder_ExpandIconClicked(object sender, View view)
+        void FolderViewHolder_ExpandClicked(object sender, View view)
         {
             var position = parentView.GetChildLayoutPosition(view);
             var folder = foldersInView[position];
@@ -318,6 +335,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             var position = parentView.GetChildLayoutPosition(view);
             var folder = foldersInView[position];
+
             itemClicked(view, folder);
         }
 
@@ -331,19 +349,23 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
     class FolderViewHolder : RecyclerView.ViewHolder
     {
-        public ImageView ExpandIcon { get; private set; }
+        public LinearLayoutCompat ExpandButtonLayout { get; private set; }
         public TextView FolderName { get; private set; }
+        public ImageView FolderIcon { get; private set; }
 
-        public event EventHandler<View> expandIconClicked = delegate { };
+        public event EventHandler<View> expandClicked = delegate { };
         public event EventHandler<View> itemClicked = delegate { };
         public event EventHandler<View> itemLongClicked = delegate { };
 
-        public FolderViewHolder(View itemView) : base(itemView)
+        public FolderViewHolder(View itemView) : base(itemView) //TODO change names
         {
             // Locate and cache view references
-            ExpandIcon = itemView.FindViewById<ImageView>(Resource.Id.expandIcon);
-            ExpandIcon.Click += (sender, e) => { expandIconClicked(this, itemView); };
+            ExpandButtonLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.expandButtonLayout);
+            ExpandButtonLayout.Click += (sender, e) => { expandClicked(this, itemView); };
+
             FolderName = itemView.FindViewById<TextView>(Resource.Id.folderName);
+            FolderIcon = itemView.FindViewById<ImageView>(Resource.Id.folderIcon);
+
             itemView.Click += (sender, e) => { itemClicked(this, itemView); };
             itemView.LongClick += (sender, e) => itemLongClicked(this, itemView);
         }
