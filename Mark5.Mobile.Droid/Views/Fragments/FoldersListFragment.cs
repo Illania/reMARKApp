@@ -38,6 +38,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         const string FoldersListBundleString = "foldersListBundleString";
 
         bool restored;
+        bool refreshed;
+
+        IFoldersListFragmentSelectedListener listener;
 
         #region Factory method
 
@@ -56,6 +59,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         #endregion
 
         #region Overrides
+
+        public override void OnAttach(Android.Content.Context context)
+        {
+            base.OnAttach(context);
+            listener = context as IFoldersListFragmentSelectedListener;
+        }
 
         public override void OnCreate(Bundle savedInstanceState)
         {
@@ -81,7 +90,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             adapter = new FolderListAdapter(recyclerView);
             adapter.expandIconClicked += Adapter_ExpandIconClicked;
-            adapter.folderNameClicked += Adapter_FolderNameClicked;
+            adapter.itemClicked += Adapter_ItemClicked;
             adapter.itemLongClicked += Adapter_ItemLongClicked;
 
             recyclerView.SetAdapter(adapter);
@@ -107,7 +116,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             SetTitles();
 
-            if (!restored)
+            if (!restored & !refreshed)
             {
                 await RefreshData();
             }
@@ -132,6 +141,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             adapter.Refresh(folders);
 
             refreshLayout.Refreshing = false;
+            refreshed = true;
         }
 
         void RecoverState(Bundle savedInstanceState)
@@ -151,7 +161,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         void SetTitles()
         {
             var subtitle = currentFolder != null ? currentFolder.Name : string.Empty;
-            (Activity as IFoldersListFragmentSelectedListener).SetTitles(moduleType.ToString(), subtitle);
+            listener.SetTitles(moduleType.ToString(), subtitle);
         }
 
         #endregion
@@ -160,10 +170,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         void Adapter_ExpandIconClicked(object sender, Folder folder)
         {
-            (Activity as IFoldersListFragmentSelectedListener).NavigateInFolder(moduleType, folder);
+            listener.NavigateInFolder(moduleType, folder);
         }
 
-        void Adapter_FolderNameClicked(object sender, Folder folder)
+        void Adapter_ItemClicked(object sender, Folder folder)
         {
 
         }
@@ -205,12 +215,11 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         bool ActionMode.ICallback.OnCreateActionMode(ActionMode mode, IMenu menu)
         {
             menu.Add(Menu.None, 1, Menu.None, "First").SetIcon(Resource.Drawable.abc_ic_menu_share_mtrl_alpha);
+            menu.Add(Menu.None, 6, Menu.None, "Six").SetIcon(Resource.Drawable.abc_ic_menu_copy_mtrl_am_alpha);
             menu.Add(Menu.None, 2, Menu.None, "Second");
             menu.Add(Menu.None, 3, Menu.None, "Third");
             menu.Add(Menu.None, 4, Menu.None, "Four");
             menu.Add(Menu.None, 5, Menu.None, "Five");
-            menu.Add(Menu.None, 6, Menu.None, "Seven").SetIcon(Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha);
-
 
             return true;
         }
@@ -253,7 +262,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         readonly RecyclerView parentView;
 
         public event EventHandler<Folder> expandIconClicked = delegate { };
-        public event EventHandler<Folder> folderNameClicked = delegate { };
+        public event EventHandler<Folder> itemClicked = delegate { };
         public event EventHandler<Folder> itemLongClicked = delegate { };
 
         public FolderListAdapter(RecyclerView parentRecyclerView)
@@ -286,7 +295,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             var folderViewHolder = new FolderViewHolder(itemView);
             folderViewHolder.expandIconClicked += FolderViewHolder_ExpandIconClicked;
-            folderViewHolder.folderNameClicked += FolderViewHolder_FolderNameClicked;
+            folderViewHolder.itemClicked += FolderViewHolder_ItemClicked;
             folderViewHolder.itemLongClicked += FolderViewHolder_ItemLongClicked;
             return folderViewHolder;
         }
@@ -305,11 +314,11 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             expandIconClicked(view, folder);
         }
 
-        void FolderViewHolder_FolderNameClicked(object sender, View view)
+        void FolderViewHolder_ItemClicked(object sender, View view)
         {
             var position = parentView.GetChildLayoutPosition(view);
             var folder = foldersInView[position];
-            folderNameClicked(view, folder);
+            itemClicked(view, folder);
         }
 
         void FolderViewHolder_ItemLongClicked(object sender, View view)
@@ -326,7 +335,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public TextView FolderName { get; private set; }
 
         public event EventHandler<View> expandIconClicked = delegate { };
-        public event EventHandler<View> folderNameClicked = delegate { };
+        public event EventHandler<View> itemClicked = delegate { };
         public event EventHandler<View> itemLongClicked = delegate { };
 
         public FolderViewHolder(View itemView) : base(itemView)
@@ -335,7 +344,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             ExpandIcon = itemView.FindViewById<ImageView>(Resource.Id.expandIcon);
             ExpandIcon.Click += (sender, e) => { expandIconClicked(this, itemView); };
             FolderName = itemView.FindViewById<TextView>(Resource.Id.folderName);
-            itemView.Click += (sender, e) => { folderNameClicked(this, itemView); };
+            itemView.Click += (sender, e) => { itemClicked(this, itemView); };
             itemView.LongClick += (sender, e) => itemLongClicked(this, itemView);
         }
     }
