@@ -7,8 +7,8 @@
 //
 using System;
 using System.Net;
-using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.Droid.Utilities

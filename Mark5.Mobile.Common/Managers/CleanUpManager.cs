@@ -1,4 +1,11 @@
-﻿using System;
+﻿//
+// Project: Mark5.Mobile.Common
+// File: CleanUpManager.cs
+// Author: Ferdinando Papale <fp@nordic-it.com>
+//
+// Copyright (c) 2016 Nordic IT
+//
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;

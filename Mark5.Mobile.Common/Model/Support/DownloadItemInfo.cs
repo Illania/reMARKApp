@@ -1,16 +1,25 @@
-﻿using Mark5.Mobile.Common.Model;
+﻿//
+// Project: Mark5.Mobile.Common
+// File: DownloadItemInfo.cs
+// Author: Ferdinando Papale <fp@nordic-it.com>
+//
+// Copyright (c) 2016 Nordic IT
+//
+using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common
 {
 
     abstract class DownloadItemInfo
     {
+
         public int FolderId { get; set; }
         virtual public ObjectType Type { get; set; }
     }
 
     class ContactDownloadInfo : DownloadItemInfo
     {
+
         public override ObjectType Type
         {
             get
@@ -22,6 +31,7 @@ namespace Mark5.Mobile.Common
 
     class ShortcodeDownloadInfo : DownloadItemInfo
     {
+
         public override ObjectType Type
         {
             get
@@ -33,6 +43,7 @@ namespace Mark5.Mobile.Common
 
     class DocumentDownloadInfo : DownloadItemInfo
     {
+
         public override ObjectType Type
         {
             get

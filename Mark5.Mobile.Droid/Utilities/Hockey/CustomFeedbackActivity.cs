@@ -14,7 +14,6 @@ namespace Mark5.Mobile.Droid.Utilities.Hockey
     [Activity(Theme = "@style/hockey")]
     class CustomFeedbackActivity : FeedbackActivity
     {
-
     }
 }
 

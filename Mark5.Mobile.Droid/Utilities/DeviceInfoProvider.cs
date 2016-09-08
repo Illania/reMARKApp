@@ -6,11 +6,11 @@
 // Copyright (c) 2016 Nordic IT
 //
 using Android.App;
+using Android.Bluetooth;
 using Android.OS;
 using Android.Provider;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Model;
-using Android.Bluetooth;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Utilities
 {

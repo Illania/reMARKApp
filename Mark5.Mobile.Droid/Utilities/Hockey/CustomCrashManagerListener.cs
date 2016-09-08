@@ -49,7 +49,6 @@ namespace Mark5.Mobile.Droid.Utilities.Hockey
                 {
                     return "Descritpion unavailable." + e.Message;
                 }
-
             }
         }
     }

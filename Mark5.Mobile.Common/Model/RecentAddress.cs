@@ -5,7 +5,6 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-
 using SQLite;
 
 namespace Mark5.Mobile.Common.Model

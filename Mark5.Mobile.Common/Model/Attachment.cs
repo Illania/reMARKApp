@@ -1,4 +1,11 @@
-﻿using System.IO;
+﻿//
+// Project: Mark5.Mobile.Common
+// File: Attachment.cs
+// Author: Ferdinando Papale <fp@nordic-it.com>
+//
+// Copyright (c) 2016 Nordic IT
+//
+using System.IO;
 
 namespace Mark5.Mobile.Common
 {

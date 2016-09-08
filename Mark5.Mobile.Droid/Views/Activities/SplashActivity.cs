@@ -11,15 +11,15 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Views;
+using HockeyApp.Android;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Views.Common;
 using Mark5.Mobile.Droid.Services;
-using HockeyApp.Android;
 using Mark5.Mobile.Droid.Utilities.Hockey;
+using Mark5.Mobile.Droid.Views.Common;
 
 namespace Mark5.Mobile.Droid.Views.Activity
 {

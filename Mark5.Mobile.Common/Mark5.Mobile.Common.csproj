@@ -137,7 +137,6 @@
     <Compile Include="DataAccess\INotificationsDataAccess.cs" />
     <Compile Include="DataAccess\NotificationsDataAccess.cs" />
     <Compile Include="Model\NotificationSettings.cs" />
-    <Compile Include="Model\ICommonManager.cs" />
     <Compile Include="Model\CommentsValue.cs" />
     <Compile Include="Managers\CommonActionsManager.cs" />
     <Compile Include="Model\CategoriesValue.cs" />
@@ -148,7 +147,7 @@
     <Compile Include="Managers\OutgoingDocumentsManager.cs" />
     <Compile Include="Utilities\PortableCollections\IPortableConcurrentQueue.cs" />
     <Compile Include="Model\Support\OutgoingDocumentInfo.cs" />
-    <Compile Include="Utilities\PortableCollections\PortableCollectionsExtensions.cs" />
+    <Compile Include="Utilities\PortableCollections\CrossPlatformCollectionsExtensions.cs" />
     <Compile Include="Model\Support\OutgoingDocumentContainer.cs" />
     <Compile Include="Managers\DownloadManager.cs" />
     <Compile Include="Model\Support\DownloadItemInfo.cs" />

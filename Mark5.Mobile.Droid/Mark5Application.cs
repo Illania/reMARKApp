@@ -12,11 +12,11 @@ using Android.App;
 using Android.Runtime;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Database;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Services;
 using Mark5.Mobile.Droid.Utilities;
 using PCLStorage;
 using UK.CO.Chrisjenx.Calligraphy;
-using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid
 {
