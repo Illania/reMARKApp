@@ -210,7 +210,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 default:
                     return false;
             }
-
         }
 
         bool ActionMode.ICallback.OnCreateActionMode(ActionMode mode, IMenu menu)
@@ -369,6 +368,28 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             itemView.Click += (sender, e) => { itemClicked(this, itemView); };
             itemView.LongClick += (sender, e) => itemLongClicked(this, itemView);
         }
+    }
+
+    class FoldersListRetainStateFragment : Fragment
+    {
+        //The tag should be already there
+        public override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+            RetainInstance = true;
+        }
+
+        public static FoldersListRetainStateFragment FindOrCreate(FragmentManager fm, string tag)
+        {
+            var retainFragment = fm.FindFragmentByTag(tag);
+
+            if (retainFragment == null)
+            {
+                retainFragment = new FoldersListRetainStateFragment();
+                fm.BeginTransaction().Add(retainFragment, tag).CommitAllowingStateLoss(); //TODO check why we need this
+            }
+        }
+
     }
 
 
