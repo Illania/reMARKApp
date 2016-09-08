@@ -17,7 +17,8 @@
             android:layout_height="match_parent"
             android:padding="16dp"
             android:layout_weight="1"
-            android:layout_gravity="left">
+            android:layout_gravity="left"
+            android:id="@+id/folderNameLayout">
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
