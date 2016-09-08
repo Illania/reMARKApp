@@ -5,6 +5,8 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.OS;
@@ -34,8 +36,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
         IMenuItem lastSelectedItem;
 
         const string MenuItemIdBundleString = "menuItemId";
-        const string ActionBarTitleBundleString = "actionBarTitleBundleString";
-        const string ActionBarSubtitleBundleString = "actionBarSubtitleBundleString";
+        const string StatesBundleString = "statesBundleString";
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -91,30 +92,113 @@ namespace Mark5.Mobile.Droid.Views.Activity
             }
         }
 
+        Dictionary<ModuleType, List<Android.Support.V4.App.Fragment.SavedState>> statesForModule = new Dictionary<ModuleType, List<Android.Support.V4.App.Fragment.SavedState>>();
+        bool firstTime = true;
         public bool OnNavigationItemSelected(IMenuItem menuItem)
         {
+            var newModuleType = GetModuleFromMenuId(menuItem.ItemId);
+
             if (lastSelectedItem != menuItem)
             {
+                if (!firstTime)
+                {
+                    var previousModuleType = GetModuleFromMenuId(lastSelectedItem.ItemId);
+                    var states = new List<Android.Support.V4.App.Fragment.SavedState>();
+
+                    var firstFragment = SupportFragmentManager.FindFragmentByTag(previousModuleType.ToString());
+                    var firstFragmentState = SupportFragmentManager.SaveFragmentInstanceState(firstFragment);
+                    states.Add(firstFragmentState);
+
+                    for (int i = 0; i < SupportFragmentManager.BackStackEntryCount; i++)
+                    {
+                        var tag = SupportFragmentManager.GetBackStackEntryAt(i).Name;
+                        var fragment = SupportFragmentManager.FindFragmentByTag(tag);
+                        var state = SupportFragmentManager.SaveFragmentInstanceState(fragment);
+                        states.Add(state);
+                    }
+
+                    statesForModule[previousModuleType] = states;
+                }
+
+                if (statesForModule.ContainsKey(newModuleType))
+                {
+                    ClearBackStack();
+
+                    var ft = SupportFragmentManager.BeginTransaction();
+
+                    var firstState = statesForModule[newModuleType][0];
+                    var firstFoldersListFragment = FoldersListFragment.Create(newModuleType, null);
+                    firstFoldersListFragment.SetInitialSavedState(firstState);
+                    ft.Replace(Resource.Id.fragment_container, firstFoldersListFragment, newModuleType.ToString());
+                    ft.Commit();
+
+                    foreach (var state in statesForModule[newModuleType].Skip(1))
+                    {
+                        ft = SupportFragmentManager.BeginTransaction();
+                        var foldersListFragment = FoldersListFragment.Create(newModuleType, null);
+                        foldersListFragment.SetInitialSavedState(state);
+                        var t = System.Guid.NewGuid().ToString();
+                        ft.Replace(Resource.Id.fragment_container, foldersListFragment, t);
+                        ft.AddToBackStack(t);
+                        ft.Commit();
+                    }
+
+                    statesForModule[newModuleType].Clear();
+                }
+                else
+                {
+                    var foldersListFragment = FoldersListFragment.Create(newModuleType, null);
+
+                    ClearBackStack();
+
+                    var ft = SupportFragmentManager.BeginTransaction();
+                    ft.Replace(Resource.Id.fragment_container, foldersListFragment, newModuleType.ToString());
+                    ft.Commit();
+                }
+
                 lastSelectedItem = menuItem;
+                firstTime = false;
 
-                var foldersListFragment = FoldersListFragment.Create(ModuleType.Documents, null);
-
-                var ft = SupportFragmentManager.BeginTransaction();
-                ft.Replace(Resource.Id.fragment_container, foldersListFragment, "0");
-                ft.Commit();
             }
 
             drawer.CloseDrawer(GravityCompat.Start);
             return true;
         }
 
+        void ClearBackStack()
+        {
+            SupportFragmentManager.PopBackStackImmediate(null, (int)PopBackStackFlags.Inclusive);
+        }
+
+        ModuleType GetModuleFromMenuId(int itemId)
+        {
+            ModuleType moduleType = ModuleType.None;
+
+            switch (itemId)
+            {
+                case Resource.Id.nav_documents:
+                    moduleType = ModuleType.Documents;
+                    break;
+                case Resource.Id.nav_contacts:
+                    moduleType = ModuleType.Contacts;
+                    break;
+                case Resource.Id.nav_shortcodes:
+                    moduleType = ModuleType.Shortcodes;
+                    break;
+                case Resource.Id.nav_calendar:
+                    moduleType = ModuleType.Calendar;
+                    break;
+                default:
+                    break;
+            }
+
+            return moduleType;
+        }
+
         protected override void OnSaveInstanceState(Bundle outState)
         {
             base.OnSaveInstanceState(outState);
-
             outState.PutInt(MenuItemIdBundleString, lastSelectedItem.ItemId);
-            outState.PutString(ActionBarTitleBundleString, SupportActionBar.Title); //TODO need to investigate why the title is not saved after orientation changes
-            outState.PutString(ActionBarSubtitleBundleString, SupportActionBar.Subtitle);
         }
 
         protected override void OnRestoreInstanceState(Bundle savedInstanceState)
@@ -124,10 +208,8 @@ namespace Mark5.Mobile.Droid.Views.Activity
             var menuItemId = savedInstanceState.GetInt(MenuItemIdBundleString);
             var menuItem = navigationView.Menu.FindItem(menuItemId);
             lastSelectedItem = menuItem;
-
-            SupportActionBar.Title = savedInstanceState.GetString(ActionBarTitleBundleString);
-            SupportActionBar.Subtitle = savedInstanceState.GetString(ActionBarSubtitleBundleString);
         }
+
 
         void FoldersListFragment.IFoldersListFragmentSelectedListener.NavigateInFolder(ModuleType moduleType, Folder folder)
         {
@@ -136,7 +218,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
             var ft = SupportFragmentManager.BeginTransaction();
             ft.SetTransition((int)FragmentTransit.FragmentOpen);
             ft.Replace(Resource.Id.fragment_container, foldersListFragment, folder.Id.ToString());
-            ft.AddToBackStack(null);
+            ft.AddToBackStack(folder.Id.ToString());
             ft.Commit();
         }
 
@@ -146,5 +228,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
             SupportActionBar.Subtitle = subtitle;
         }
     }
+
 }
 
