@@ -227,5 +227,83 @@ namespace Mark5.Mobile.Droid.Views.Activity
         }
     }
 
+    public abstract class MenuItemContent
+    {
+        protected List<Android.Support.V4.App.Fragment.SavedState> backstackStates;
+
+        public abstract int ItemId { get; set; }
+
+        public abstract void Save(Android.Support.V4.App.FragmentManager fm);
+        public abstract void RestoreOrCreate(Android.Support.V4.App.FragmentManager fm);
+    }
+
+    public abstract class ModulesMenuItemContent : MenuItemContent
+    {
+        public override void Save(Android.Support.V4.App.FragmentManager fm)
+        {
+            backstackStates.Clear();
+
+            var firstFragment = fm.FindFragmentByTag(ItemId.ToString());
+            var firstFragmentState = fm.SaveFragmentInstanceState(firstFragment);
+            backstackStates.Add(firstFragmentState);
+
+            for (int i = 0; i < fm.BackStackEntryCount; i++)
+            {
+                var tag = fm.GetBackStackEntryAt(i).Name;
+                var fragment = fm.FindFragmentByTag(tag);
+                var state = fm.SaveFragmentInstanceState(fragment);
+                backstackStates.Add(state);
+            }
+        }
+
+        public override void RestoreOrCreate(Android.Support.V4.App.FragmentManager fm)
+        {
+
+        }
+    }
+
+    public abstract class DocumentsModuleMenuItemContent : ModulesMenuItemContent
+    {
+        public override int ItemId
+        {
+            get
+            {
+                return Resource.Id.nav_documents;
+            }
+        }
+    }
+
+    public abstract class ContactsModuleMenuItemContent : ModulesMenuItemContent
+    {
+        public override int ItemId
+        {
+            get
+            {
+                return Resource.Id.nav_contacts;
+            }
+        }
+    }
+
+    public abstract class ShortcodesModuleMenuItemContent : ModulesMenuItemContent
+    {
+        public override int ItemId
+        {
+            get
+            {
+                return Resource.Id.nav_shortcodes;
+            }
+        }
+    }
+
+    public abstract class CalendarModuleMenuItemContent : ModulesMenuItemContent
+    {
+        public override int ItemId
+        {
+            get
+            {
+                return Resource.Id.nav_calendar;
+            }
+        }
+    }
 }
 

@@ -143,6 +143,7 @@
     <Compile Include="Views\Fragments\FoldersListFragment.cs" />
     <Compile Include="Views\Activities\MainActivity.cs" />
     <Compile Include="Views\Common\BaseAppCompatActivity.cs" />
+    <Compile Include="Views\Common\RetainStateFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
