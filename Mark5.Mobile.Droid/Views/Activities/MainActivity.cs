@@ -93,14 +93,14 @@ namespace Mark5.Mobile.Droid.Views.Activity
         }
 
         Dictionary<ModuleType, List<Android.Support.V4.App.Fragment.SavedState>> statesForModule = new Dictionary<ModuleType, List<Android.Support.V4.App.Fragment.SavedState>>();
-        bool firstTime = true;
+
         public bool OnNavigationItemSelected(IMenuItem menuItem)
         {
             var newModuleType = GetModuleFromMenuId(menuItem.ItemId);
 
             if (lastSelectedItem != menuItem)
             {
-                if (!firstTime)
+                if (lastSelectedItem != null)
                 {
                     var previousModuleType = GetModuleFromMenuId(lastSelectedItem.ItemId);
                     var states = new List<Android.Support.V4.App.Fragment.SavedState>();
@@ -157,8 +157,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
                 }
 
                 lastSelectedItem = menuItem;
-                firstTime = false;
-
             }
 
             drawer.CloseDrawer(GravityCompat.Start);

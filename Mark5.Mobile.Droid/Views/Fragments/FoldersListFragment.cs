@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             get
             {
-                return stateFragment.ModuleType;
+                return stateFragment.state.Module;
             }
         }
 
@@ -35,7 +35,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             get
             {
-                return stateFragment.CurrentFolder;
+                return stateFragment.state;
             }
         }
 
@@ -46,7 +46,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         IFoldersListFragmentSelectedListener listener;
 
-        FoldersListRetainStateFragment stateFragment;
+        RetainStateFragment<Folder> stateFragment;
         string stateFragmentTag;
 
         const string StateFragmentTagBundleKey = "StateFragmentTagBundleKey";
@@ -62,14 +62,14 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 currentFolder = Folder.RootPerModule(moduleType);
             }
 
-            var tag = FoldersListRetainStateFragment.GetTag(moduleType, currentFolder);
+            var tag = $"{typeof(FoldersListFragment)}{moduleType}_{currentFolder.Id}";
             fragment.stateFragmentTag = tag;
 
             bool fragmentCreated;
-            fragment.stateFragment = FoldersListRetainStateFragment.FindOrCreate(fm, tag, out fragmentCreated);
+            fragment.stateFragment = RetainStateFragment<Folder>.FindOrCreate(fm, tag, out fragmentCreated);
             if (fragmentCreated)
             {
-                fragment.stateFragment.SetState(moduleType, currentFolder);
+                fragment.stateFragment.SetState(currentFolder);
             }
 
             return fragment;
@@ -119,7 +119,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 bool _fragmentCreated;
                 stateFragmentTag = savedInstanceState.GetString(StateFragmentTagBundleKey);
-                stateFragment = FoldersListRetainStateFragment.FindOrCreate(Activity.SupportFragmentManager, stateFragmentTag, out _fragmentCreated);
+                stateFragment = RetainStateFragment<Folder>.FindOrCreate(Activity.SupportFragmentManager, stateFragmentTag, out _fragmentCreated);
             }
         }
 
@@ -128,9 +128,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             base.OnStart();
 
             SetTitles();
-
             await RefreshData();
-
         }
 
         public override void OnSaveInstanceState(Bundle outState)
@@ -376,15 +374,14 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             FolderIcon = itemView.FindViewById<ImageView>(Resource.Id.folderIcon);
 
             var internalContainerLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.internalContainerLayout);
-            internalContainerLayout.Click += (sender, e) => { itemClicked(this, itemView); };
+            internalContainerLayout.Click += (sender, e) => itemClicked(this, itemView);
             internalContainerLayout.LongClick += (sender, e) => itemLongClicked(this, itemView);
         }
     }
 
-    class FoldersListRetainStateFragment : Fragment
+    class RetainStateFragment<T> : Fragment
     {
-        public Folder CurrentFolder { get; set; }
-        public ModuleType ModuleType { get; set; }
+        public T state { get; set; }
         bool stateSet;
 
         public override void OnCreate(Bundle savedInstanceState)
@@ -393,35 +390,29 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             RetainInstance = true;
         }
 
-        public static string GetTag(ModuleType moduleType, Folder currentFolder)
+        public static RetainStateFragment<T> FindOrCreate(FragmentManager fm, string tag, out bool fragmentCreated)
         {
-            return $"{typeof(FoldersListRetainStateFragment)}_{moduleType}_{currentFolder.Id}";
-        }
-
-        public static FoldersListRetainStateFragment FindOrCreate(FragmentManager fm, string tag, out bool fragmentCreated)
-        {
-            var retainFragment = fm.FindFragmentByTag(tag) as FoldersListRetainStateFragment;
+            var retainFragment = fm.FindFragmentByTag(tag) as RetainStateFragment<T>;
             fragmentCreated = false;
 
             if (retainFragment == null)
             {
                 fragmentCreated = true;
-                retainFragment = new FoldersListRetainStateFragment();
+                retainFragment = new RetainStateFragment<T>();
                 fm.BeginTransaction().Add(retainFragment, tag).CommitAllowingStateLoss(); //TODO check why we need this
             }
 
             return retainFragment;
         }
 
-        public void SetState(ModuleType moduleType, Folder currentFolder)
+        public void SetState(T state)
         {
             if (stateSet)
             {
                 throw new InvalidOperationException("The state has already been set!");
             }
 
-            this.ModuleType = moduleType;
-            this.CurrentFolder = currentFolder;
+            this.state = state;
             stateSet = true;
         }
 
