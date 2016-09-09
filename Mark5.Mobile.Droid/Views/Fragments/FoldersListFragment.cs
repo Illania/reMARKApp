@@ -49,6 +49,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         FoldersListRetainStateFragment stateFragment;
         string stateFragmentTag;
 
+        const string StateFragmentTagBundleKey = "StateFragmentTagBundleKey";
+
         #region Factory method
 
         public static FoldersListFragment Create(FragmentManager fm, ModuleType moduleType, Folder currentFolder)
@@ -116,6 +118,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             if (stateFragment == null)
             {
                 bool _fragmentCreated;
+                stateFragmentTag = savedInstanceState.GetString(StateFragmentTagBundleKey);
                 stateFragment = FoldersListRetainStateFragment.FindOrCreate(Activity.SupportFragmentManager, stateFragmentTag, out _fragmentCreated);
             }
         }
@@ -128,6 +131,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             await RefreshData();
 
+        }
+
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+            outState.PutString(StateFragmentTagBundleKey, stateFragmentTag);
         }
 
         #endregion
@@ -150,7 +159,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 currentFolder.SubFolders = folders;
 
                 adapter.Refresh(folders);
-                //refreshLayout.Refreshing = false;
                 refreshLayout.Post(() => refreshLayout.Refreshing = false); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
             }
             else
