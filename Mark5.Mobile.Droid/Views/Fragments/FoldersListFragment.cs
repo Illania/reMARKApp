@@ -17,41 +17,58 @@ using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
 
     public class FoldersListFragment : Fragment, ActionMode.ICallback
     {
-        ModuleType moduleType;
-        Folder currentFolder;
+        public ModuleType moduleType
+        {
+            get
+            {
+                return stateFragment.ModuleType;
+            }
+        }
+
+        public Folder currentFolder
+        {
+            get
+            {
+                return stateFragment.CurrentFolder;
+            }
+        }
 
         FolderListAdapter adapter;
         RecyclerView recyclerView;
         SwipeRefreshLayout refreshLayout;
-        List<Folder> savedFoldersInView = new List<Folder>();
         View rootView;
-
-        const string ModuleTypeBundleString = "moduleTypeBundleString";
-        const string CurrentFolderBundleString = "currentFolderBundleString";
-        const string FoldersListBundleString = "foldersListBundleString";
-
-        bool restored;
-        bool refreshed;
 
         IFoldersListFragmentSelectedListener listener;
 
+        FoldersListRetainStateFragment stateFragment;
+        string stateFragmentTag;
+
         #region Factory method
 
-        public static FoldersListFragment Create(ModuleType moduleType, Folder currentFolder)
+        public static FoldersListFragment Create(FragmentManager fm, ModuleType moduleType, Folder currentFolder)
         {
             var fragment = new FoldersListFragment();
-            var arguments = new Bundle();
 
-            arguments.PutString(ModuleTypeBundleString, SerializationUtils.Serialize(moduleType));
-            arguments.PutString(CurrentFolderBundleString, SerializationUtils.Serialize(currentFolder));
-            fragment.Arguments = arguments;
+            if (currentFolder == null)
+            {
+                currentFolder = Folder.RootPerModule(moduleType);
+            }
+
+            var tag = FoldersListRetainStateFragment.GetTag(moduleType, currentFolder);
+            fragment.stateFragmentTag = tag;
+
+            bool fragmentCreated;
+            fragment.stateFragment = FoldersListRetainStateFragment.FindOrCreate(fm, tag, out fragmentCreated);
+            if (fragmentCreated)
+            {
+                fragment.stateFragment.SetState(moduleType, currentFolder);
+            }
 
             return fragment;
         }
@@ -64,12 +81,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             base.OnAttach(context);
             listener = context as IFoldersListFragmentSelectedListener;
-        }
-
-        public override void OnCreate(Bundle savedInstanceState)
-        {
-            base.OnCreate(savedInstanceState);
-            RecoverState(savedInstanceState);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -102,11 +113,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             base.OnActivityCreated(savedInstanceState);
 
-            RecoverState(savedInstanceState);
-
-            if (savedFoldersInView != null && savedFoldersInView.Any())
+            if (stateFragment == null)
             {
-                adapter.Refresh(savedFoldersInView);
+                bool _fragmentCreated;
+                stateFragment = FoldersListRetainStateFragment.FindOrCreate(Activity.SupportFragmentManager, stateFragmentTag, out _fragmentCreated);
             }
         }
 
@@ -116,51 +126,42 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             SetTitles();
 
-            if (!restored & !refreshed)
-            {
-                await RefreshData();
-            }
-        }
+            await RefreshData();
 
-        public override void OnSaveInstanceState(Bundle outState)
-        {
-            base.OnSaveInstanceState(outState);
-            var foldersToSave = adapter != null ? adapter.foldersInView : savedFoldersInView;
-            outState.PutString(FoldersListBundleString, SerializationUtils.Serialize(foldersToSave));
         }
 
         #endregion
 
         #region Utility methods
 
-        async Task RefreshData()
+        async Task RefreshData(bool forceRefresh = false)
         {
-            refreshLayout.Post(() => refreshLayout.Refreshing = true); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
-
-            var folders = await Managers.FoldersManager.GetFoldersAsync(moduleType, currentFolder);
-            adapter.Refresh(folders);
-
-            refreshLayout.Refreshing = false;
-            refreshed = true;
-        }
-
-        void RecoverState(Bundle savedInstanceState)
-        {
-            if (Arguments != null)
+            if (!currentFolder.HasSubFolders)
             {
-                moduleType = SerializationUtils.Deserialize<ModuleType>(Arguments.GetString(ModuleTypeBundleString));
-                currentFolder = SerializationUtils.Deserialize<Folder>(Arguments.GetString(CurrentFolderBundleString));
+                return; //TODO could it happen?
             }
-            if (savedInstanceState != null)
+
+            if (forceRefresh || !currentFolder.SubFolders.Any())
             {
-                restored = true;
-                savedFoldersInView = SerializationUtils.Deserialize<List<Folder>>(savedInstanceState.GetString(FoldersListBundleString));
+                refreshLayout.Post(() => refreshLayout.Refreshing = true); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
+
+                var folders = await Managers.FoldersManager.GetFoldersAsync(moduleType, currentFolder.Root ? null : currentFolder, 0); //TODO do we do this check here or in the manager?
+                currentFolder.SubFolders.Clear();
+                currentFolder.SubFolders = folders;
+
+                adapter.Refresh(folders);
+                //refreshLayout.Refreshing = false;
+                refreshLayout.Post(() => refreshLayout.Refreshing = false); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
+            }
+            else
+            {
+                adapter.Refresh(currentFolder.SubFolders);
             }
         }
 
         void SetTitles()
         {
-            var subtitle = currentFolder != null ? currentFolder.Name : string.Empty;
+            var subtitle = currentFolder.Root ? string.Empty : currentFolder.Name;
             listener.SetTitles(moduleType.ToString(), subtitle);
         }
 
@@ -240,7 +241,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         async void RefreshLayout_Refresh(object sender, EventArgs e)
         {
-            await RefreshData();
+            await RefreshData(true);
         }
 
         #endregion
@@ -254,6 +255,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         }
 
         #endregion
+
     }
 
     class FolderListAdapter : RecyclerView.Adapter
@@ -372,22 +374,46 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
     class FoldersListRetainStateFragment : Fragment
     {
-        //The tag should be already there
+        public Folder CurrentFolder { get; set; }
+        public ModuleType ModuleType { get; set; }
+        bool stateSet;
+
         public override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             RetainInstance = true;
         }
 
-        public static FoldersListRetainStateFragment FindOrCreate(FragmentManager fm, string tag)
+        public static string GetTag(ModuleType moduleType, Folder currentFolder)
         {
-            var retainFragment = fm.FindFragmentByTag(tag);
+            return $"{typeof(FoldersListRetainStateFragment)}_{moduleType}_{currentFolder.Id}";
+        }
+
+        public static FoldersListRetainStateFragment FindOrCreate(FragmentManager fm, string tag, out bool fragmentCreated)
+        {
+            var retainFragment = fm.FindFragmentByTag(tag) as FoldersListRetainStateFragment;
+            fragmentCreated = false;
 
             if (retainFragment == null)
             {
+                fragmentCreated = true;
                 retainFragment = new FoldersListRetainStateFragment();
                 fm.BeginTransaction().Add(retainFragment, tag).CommitAllowingStateLoss(); //TODO check why we need this
             }
+
+            return retainFragment;
+        }
+
+        public void SetState(ModuleType moduleType, Folder currentFolder)
+        {
+            if (stateSet)
+            {
+                throw new InvalidOperationException("The state has already been set!");
+            }
+
+            this.ModuleType = moduleType;
+            this.CurrentFolder = currentFolder;
+            stateSet = true;
         }
 
     }

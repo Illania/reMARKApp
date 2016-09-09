@@ -127,7 +127,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
                     var ft = SupportFragmentManager.BeginTransaction();
 
                     var firstState = statesForModule[newModuleType][0];
-                    var firstFoldersListFragment = FoldersListFragment.Create(newModuleType, null);
+                    var firstFoldersListFragment = FoldersListFragment.Create(SupportFragmentManager, newModuleType, null);
                     firstFoldersListFragment.SetInitialSavedState(firstState);
                     ft.Replace(Resource.Id.fragment_container, firstFoldersListFragment, newModuleType.ToString());
                     ft.Commit();
@@ -135,7 +135,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
                     foreach (var state in statesForModule[newModuleType].Skip(1))
                     {
                         ft = SupportFragmentManager.BeginTransaction();
-                        var foldersListFragment = FoldersListFragment.Create(newModuleType, null);
+                        var foldersListFragment = FoldersListFragment.Create(SupportFragmentManager, newModuleType, null);
                         foldersListFragment.SetInitialSavedState(state);
                         var t = System.Guid.NewGuid().ToString();
                         ft.Replace(Resource.Id.fragment_container, foldersListFragment, t);
@@ -147,7 +147,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
                 }
                 else
                 {
-                    var foldersListFragment = FoldersListFragment.Create(newModuleType, null);
+                    var foldersListFragment = FoldersListFragment.Create(SupportFragmentManager, newModuleType, null);
 
                     ClearBackStack();
 
@@ -213,11 +213,11 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
         void FoldersListFragment.IFoldersListFragmentSelectedListener.NavigateInFolder(ModuleType moduleType, Folder folder)
         {
-            var foldersListFragment = FoldersListFragment.Create(moduleType, folder);
+            var foldersListFragment = FoldersListFragment.Create(SupportFragmentManager, moduleType, folder);
 
             var ft = SupportFragmentManager.BeginTransaction();
             ft.SetTransition((int)FragmentTransit.FragmentOpen);
-            ft.Replace(Resource.Id.fragment_container, foldersListFragment, folder.Id.ToString());
+            ft.Replace(Resource.Id.fragment_container, foldersListFragment, folder.Id.ToString()); //TODO need to decide on a common tag
             ft.AddToBackStack(folder.Id.ToString());
             ft.Commit();
         }
