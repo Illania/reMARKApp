@@ -366,7 +366,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public event EventHandler<View> itemClicked = delegate { };
         public event EventHandler<View> itemLongClicked = delegate { };
 
-        public FolderViewHolder(View itemView) : base(itemView) //TODO change names
+        public FolderViewHolder(View itemView) : base(itemView)
         {
             // Locate and cache view references
             ExpandButtonLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.expandButtonLayout);
@@ -375,8 +375,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             FolderName = itemView.FindViewById<TextView>(Resource.Id.folderName);
             FolderIcon = itemView.FindViewById<ImageView>(Resource.Id.folderIcon);
 
-            itemView.Click += (sender, e) => { itemClicked(this, itemView); };
-            itemView.LongClick += (sender, e) => itemLongClicked(this, itemView);
+            var internalContainerLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.internalContainerLayout);
+            internalContainerLayout.Click += (sender, e) => { itemClicked(this, itemView); };
+            internalContainerLayout.LongClick += (sender, e) => itemLongClicked(this, itemView);
         }
     }
 
