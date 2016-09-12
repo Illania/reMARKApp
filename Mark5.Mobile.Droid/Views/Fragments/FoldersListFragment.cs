@@ -28,7 +28,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             get
             {
-                return stateFragment.state.Module;
+                return stateFragment.State.Module;
             }
         }
 
@@ -36,7 +36,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             get
             {
-                return stateFragment.state;
+                return stateFragment.State;
             }
         }
 
@@ -66,9 +66,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             var tag = $"{typeof(FoldersListFragment)}{moduleType}_{currentFolder.Id}";
             fragment.stateFragmentTag = tag;
 
-            bool fragmentCreated;
-            fragment.stateFragment = RetainStateFragment<Folder>.FindOrCreate(fm, tag, out fragmentCreated);
-            if (fragmentCreated)
+            bool stateFragmentCreated;
+            fragment.stateFragment = RetainStateFragment<Folder>.FindOrCreate(fm, tag, out stateFragmentCreated);
+            if (stateFragmentCreated)
             {
                 fragment.stateFragment.SetState(currentFolder);
             }

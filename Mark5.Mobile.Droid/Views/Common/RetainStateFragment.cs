@@ -1,13 +1,13 @@
 ﻿
 using System;
-using Android.App;
 using Android.OS;
+using Android.Support.V4.App;
 
 namespace Mark5.Mobile.Droid.Views.Common
 {
     public class RetainStateFragment<T> : Fragment
     {
-        public T state { get; set; }
+        public T State { get; set; }
         bool stateSet;
 
         public override void OnCreate(Bundle savedInstanceState)
@@ -38,7 +38,7 @@ namespace Mark5.Mobile.Droid.Views.Common
                 throw new InvalidOperationException("The state has already been set!");
             }
 
-            this.state = state;
+            this.State = state;
             stateSet = true;
         }
 
