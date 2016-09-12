@@ -15,6 +15,7 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Views.Common;
@@ -43,7 +44,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         FolderListAdapter adapter;
         RecyclerView recyclerView;
         SwipeRefreshLayout refreshLayout;
-        View rootView;
 
         IFoldersListFragmentSelectedListener listener;
 
@@ -88,12 +88,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            if (rootView != null)
-            {
-                return rootView;
-            }
-
-            rootView = inflater.Inflate(Resource.Layout.fragment_list_folders, container, false);
+            var rootView = inflater.Inflate(Resource.Layout.fragment_list_folders, container, false);
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
             refreshLayout.Refresh += RefreshLayout_Refresh;
@@ -136,6 +131,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             base.OnSaveInstanceState(outState);
             outState.PutString(StateFragmentTagBundleKey, stateFragmentTag);
+        }
+
+        protected override void JavaFinalize()
+        {
+            CommonConfig.Logger.Error("LOOK AT MEEEEEEE" + stateFragmentTag);
+            base.JavaFinalize();
         }
 
         #endregion
