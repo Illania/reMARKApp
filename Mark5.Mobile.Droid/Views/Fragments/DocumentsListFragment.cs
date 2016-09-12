@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using Android.OS;
+using Android.Support.V7.App;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Views.Common;
@@ -37,12 +38,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            return inflater.Inflate(Resource.Layout.fragment_list_documents, container, false);
-        }
+            ((AppCompatActivity)Activity).SupportActionBar.Title = Folder?.Name;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
 
-        public override void OnViewCreated(View view, Bundle savedInstanceState)
-        {
-            base.OnViewCreated(view, savedInstanceState);
+            return inflater.Inflate(Resource.Layout.fragment_list_documents, container, false);
         }
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
@@ -51,6 +50,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             if (dlfs != null)
             {
                 Folder = dlfs.Folder;
+
+                ((AppCompatActivity)Activity).SupportActionBar.Title = Folder?.Name;
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
             }
         }
 
