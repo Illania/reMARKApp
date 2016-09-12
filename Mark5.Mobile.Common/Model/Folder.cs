@@ -103,13 +103,13 @@ namespace Mark5.Mobile.Common.Model
                 InternalType = InternalType,
                 HasSubFolders = HasSubFolders,
                 Position = Position,
+                OptionalParameters = OptionalParameters?.ShallowCopy()
             };
         }
 
         public Folder DeepCopy()
         {
             var copy = ShallowCopy();
-            copy.OptionalParameters = OptionalParameters?.DeepCopy();
             copy.SubFolders.AddRange(SubFolders.Select(f => f.DeepCopy()));
             return copy;
         }

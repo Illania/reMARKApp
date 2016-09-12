@@ -155,6 +155,9 @@
     <Compile Include="Utilities\Hockey\CustomCrashManagerListener.cs" />
     <Compile Include="Utilities\Hockey\CustomFeedbackManagerLister.cs" />
     <Compile Include="Utilities\Hockey\CustomFeedbackActivity.cs" />
+    <Compile Include="Views\Activities\DocumentsListActivity.cs" />
+    <Compile Include="Views\Common\RetainableStateFragment.cs" />
+    <Compile Include="Views\Fragments\DocumentsListFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -219,6 +222,7 @@
     <AndroidResource Include="Resources\xml\preferences.axml" />
     <AndroidResource Include="Resources\values\strings-preferences.axml" />
     <AndroidResource Include="Resources\values\values-preferences.axml" />
+    <AndroidResource Include="Resources\layout\fragment_list_documents.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
