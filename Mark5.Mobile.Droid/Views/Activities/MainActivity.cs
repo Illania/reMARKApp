@@ -181,8 +181,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
     {
         protected List<Android.Support.V4.App.Fragment.SavedState> backstackStates = new List<Android.Support.V4.App.Fragment.SavedState>();
 
-        public abstract int ItemId { get; }
-
         public abstract void Save(Android.Support.V4.App.FragmentManager fm);
         public abstract void RestoreOrCreate(Android.Support.V4.App.FragmentManager fm);
     }
@@ -210,8 +208,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
         public override void RestoreOrCreate(Android.Support.V4.App.FragmentManager fm)
         {
-            //TODO need to do a clear stack before this 
-
             if (backstackStates == null || !backstackStates.Any())
             {
                 //Create 
@@ -261,11 +257,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
     public class DocumentsModuleMenuItemContent : ModulesMenuItemContent
     {
-        public override int ItemId
-        {
-            get { return Resource.Id.nav_documents; }
-        }
-
         protected override ModuleType ModuleType
         {
             get { return ModuleType.Documents; }
@@ -274,11 +265,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
     public class ContactsModuleMenuItemContent : ModulesMenuItemContent
     {
-        public override int ItemId
-        {
-            get { return Resource.Id.nav_contacts; }
-        }
-
         protected override ModuleType ModuleType
         {
             get { return ModuleType.Contacts; }
@@ -287,11 +273,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
     public class ShortcodesModuleMenuItemContent : ModulesMenuItemContent
     {
-        public override int ItemId
-        {
-            get { return Resource.Id.nav_shortcodes; }
-        }
-
         protected override ModuleType ModuleType
         {
             get { return ModuleType.Shortcodes; }
@@ -300,11 +281,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
     public class CalendarModuleMenuItemContent : ModulesMenuItemContent
     {
-        public override int ItemId
-        {
-            get { return Resource.Id.nav_calendar; }
-        }
-
         protected override ModuleType ModuleType
         {
             get { return ModuleType.Calendar; }
