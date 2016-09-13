@@ -38,7 +38,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
         const string RetainStateFragmentTag = "MainActivity_RetainStateFragmentTag";
 
-        RetainStateFragment<MainActivityState> stateFragment;
+        RetainedFragment<MainActivityState> stateFragment;
 
         public Dictionary<int, MenuItemContent> menuItemContents
         {
@@ -65,12 +65,11 @@ namespace Mark5.Mobile.Droid.Views.Activity
             navigationView = FindViewById<NavigationView>(Resource.Id.navigation_view);
             navigationView.SetNavigationItemSelectedListener(this);
 
-            bool stateFragmentCreated;
-            stateFragment = RetainStateFragment<MainActivityState>.FindOrCreate(SupportFragmentManager, RetainStateFragmentTag, out stateFragmentCreated);
+            stateFragment = RetainedFragment<MainActivityState>.FindOrCreate(SupportFragmentManager, RetainStateFragmentTag);
 
-            if (stateFragmentCreated)
+            if (savedInstanceState == null)
             {
-                var mainActivityState = new MainActivityState();
+                var mainActivityState = new MainActivityState(); //TODO could be put in another method
 
                 var contents = new Dictionary<int, MenuItemContent>();
                 contents[Resource.Id.nav_documents] = new DocumentsModuleMenuItemContent();
@@ -80,10 +79,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
                 mainActivityState.MenuItemContents = contents;
 
                 stateFragment.State = mainActivityState;
-            }
 
-            if (savedInstanceState == null)
-            {
                 var initialMenuItem = navigationView.Menu.FindItem(Resource.Id.nav_documents);
                 initialMenuItem.SetChecked(true);
                 OnNavigationItemSelected(initialMenuItem);
@@ -97,10 +93,10 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
                 RunOnUiThreadIfNecessary(() =>
                 {
-                    var headerTitle = FindViewById<AppCompatTextView>(Resource.Id.nav_header_title); //TODO sometimes the header title is null
+                    var headerTitle = FindViewById<AppCompatTextView>(Resource.Id.nav_header_title);
                     var headerSubtitle = FindViewById<AppCompatTextView>(Resource.Id.nav_header_subtitle);
 
-                    headerTitle.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}"; //TODO this should probably be passed as a bundle or something
+                    headerTitle.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
 
                     headerSubtitle.Text = $"{ci?.Username}@{ci?.Hostname}:{ci?.Port}";
                 });
@@ -113,9 +109,13 @@ namespace Mark5.Mobile.Droid.Views.Activity
             {
                 drawer.CloseDrawer(GravityCompat.Start);
             }
-            else
+            else if (SupportFragmentManager.BackStackEntryCount > 1)
             {
                 base.OnBackPressed();
+            }
+            else
+            {
+                Finish();
             }
         }
 
@@ -141,7 +141,10 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
         void ClearBackStack()
         {
-            SupportFragmentManager.PopBackStackImmediate(null, (int)PopBackStackFlags.Inclusive);
+            if (SupportFragmentManager.BackStackEntryCount > 0)
+            {
+                SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int)PopBackStackFlags.Inclusive);
+            }
         }
 
         protected override void OnSaveInstanceState(Bundle outState)
@@ -161,12 +164,17 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
         void FoldersListFragment.IFoldersListFragmentSelectedListener.NavigateInFolder(ModuleType moduleType, Folder folder)
         {
-            var foldersListFragment = FoldersListFragment.Create(SupportFragmentManager, moduleType, folder);
+            var foldersListFragment = new FoldersListFragment
+            {
+                CurrentFolder = folder,
+                ModuleType = moduleType,
+            };
 
+            var tag = foldersListFragment.GenerateTag();
             var ft = SupportFragmentManager.BeginTransaction();
             ft.SetTransition((int)FragmentTransit.FragmentOpen);
-            ft.Replace(Resource.Id.fragment_container, foldersListFragment, folder.Id.ToString()); //TODO need to decide on a common tag
-            ft.AddToBackStack(folder.Id.ToString());
+            ft.Replace(Resource.Id.fragment_container, foldersListFragment, tag);
+            ft.AddToBackStack(tag);
             ft.Commit();
         }
 
@@ -179,7 +187,8 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
     public abstract class MenuItemContent
     {
-        protected List<Android.Support.V4.App.Fragment.SavedState> backstackStates = new List<Android.Support.V4.App.Fragment.SavedState>();
+        protected readonly List<Android.Support.V4.App.Fragment.SavedState> backstackStates = new List<Android.Support.V4.App.Fragment.SavedState>();
+        protected readonly List<string> savedTags = new List<string>();
 
         public abstract void Save(Android.Support.V4.App.FragmentManager fm);
         public abstract void RestoreOrCreate(Android.Support.V4.App.FragmentManager fm);
@@ -193,13 +202,10 @@ namespace Mark5.Mobile.Droid.Views.Activity
         {
             backstackStates.Clear();
 
-            var firstFragment = fm.FindFragmentByTag($"{ModuleType}_{0}");
-            var firstFragmentState = fm.SaveFragmentInstanceState(firstFragment);
-            backstackStates.Add(firstFragmentState);
-
             for (int i = 0; i < fm.BackStackEntryCount; i++)
             {
                 var tag = fm.GetBackStackEntryAt(i).Name;
+                savedTags.Add(tag);
                 var fragment = fm.FindFragmentByTag(tag);
                 var state = fm.SaveFragmentInstanceState(fragment);
                 backstackStates.Add(state);
@@ -211,31 +217,41 @@ namespace Mark5.Mobile.Droid.Views.Activity
             if (backstackStates == null || !backstackStates.Any())
             {
                 //Create 
-                var foldersListFragment = FoldersListFragment.Create(fm, ModuleType, null);
+                var foldersListFragment = new FoldersListFragment
+                {
+                    CurrentFolder = Folder.RootPerModule(ModuleType),
+                    ModuleType = ModuleType,
+                };
 
+                var tag = foldersListFragment.GenerateTag();
                 var ft = fm.BeginTransaction();
-                ft.Replace(Resource.Id.fragment_container, foldersListFragment, $"{ModuleType}_0");
+                ft.Replace(Resource.Id.fragment_container, foldersListFragment, tag);
+                ft.AddToBackStack(tag);
+
                 ft.Commit();
             }
             else
             {
                 //Restore
                 var index = 0;
-                foreach (var state in backstackStates)
+                var backStackStatesAndTags = backstackStates.Zip(savedTags, (state, tag) => new { State = state, Tag = tag });
+
+                foreach (var item in backStackStatesAndTags)
                 {
+                    var state = item.State;
+                    var tag = item.Tag;
+
                     var ft = fm.BeginTransaction();
                     var foldersListFragment = new FoldersListFragment();
                     foldersListFragment.SetInitialSavedState(state);
-                    var tagName = $"{ModuleType}_{index}";
-                    ft.Replace(Resource.Id.fragment_container, foldersListFragment, tagName);
-                    if (index != 0)
-                    {
-                        ft.AddToBackStack(tagName);
-                    }
+                    ft.Replace(Resource.Id.fragment_container, foldersListFragment, tag);
+                    ft.AddToBackStack(tag);
                     ft.Commit();
                     index++;
                 }
+
                 backstackStates.Clear();
+                savedTags.Clear();
             }
         }
     }

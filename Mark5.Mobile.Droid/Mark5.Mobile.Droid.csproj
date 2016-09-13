@@ -149,7 +149,6 @@
     <Compile Include="Views\Fragments\FoldersListFragment.cs" />
     <Compile Include="Views\Activities\MainActivity.cs" />
     <Compile Include="Views\Common\BaseAppCompatActivity.cs" />
-    <Compile Include="Views\Common\RetainStateFragment.cs" />
     <Compile Include="Views\Fragments\PreferenceFragment.cs" />
     <Compile Include="Utilities\Preferences.cs" />
     <Compile Include="Utilities\Integration.cs" />
@@ -159,6 +158,7 @@
     <Compile Include="Views\Activities\DocumentsListActivity.cs" />
     <Compile Include="Views\Common\RetainableStateFragment.cs" />
     <Compile Include="Views\Fragments\DocumentsListFragment.cs" />
+    <Compile Include="Views\Common\RetainedFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
