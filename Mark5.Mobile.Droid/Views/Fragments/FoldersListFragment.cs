@@ -86,6 +86,15 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             listener = context as IFoldersListFragmentSelectedListener;
         }
 
+        public override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+            if (savedInstanceState != null)
+            {
+                stateFragmentTag = savedInstanceState.GetString(StateFragmentTagBundleKey);
+            }
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             var rootView = inflater.Inflate(Resource.Layout.fragment_list_folders, container, false);
@@ -107,6 +116,11 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return rootView;
         }
 
+        public override void OnViewStateRestored(Bundle savedInstanceState)
+        {
+            base.OnViewStateRestored(savedInstanceState);
+        }
+
         public override void OnActivityCreated(Bundle savedInstanceState)
         {
             base.OnActivityCreated(savedInstanceState);
@@ -114,7 +128,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             if (stateFragment == null)
             {
                 bool _fragmentCreated;
-                stateFragmentTag = savedInstanceState.GetString(StateFragmentTagBundleKey);
                 stateFragment = RetainStateFragment<Folder>.FindOrCreate(Activity.SupportFragmentManager, stateFragmentTag, out _fragmentCreated);
             }
         }
@@ -131,12 +144,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             base.OnSaveInstanceState(outState);
             outState.PutString(StateFragmentTagBundleKey, stateFragmentTag);
-        }
-
-        protected override void JavaFinalize()
-        {
-            CommonConfig.Logger.Error("LOOK AT MEEEEEEE" + stateFragmentTag);
-            base.JavaFinalize();
         }
 
         #endregion
