@@ -3,6 +3,7 @@
 	<style name="mark5" parent="mark5Base">
 	</style>
 	<style name="mark5Base" parent="Theme.AppCompat.Light.NoActionBar">
+		<item name="windowActionModeOverlay">true</item>
 		<item name="colorPrimary">@color/darkerblue</item>
 		<item name="colorPrimaryDark">@color/darkerblue</item>
 		<item name="colorAccent">@color/brown</item>
