@@ -69,14 +69,15 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
             if (savedInstanceState == null)
             {
-                var mainActivityState = new MainActivityState(); //TODO could be put in another method
+                var mainActivityState = new MainActivityState();
 
-                var contents = new Dictionary<int, MenuItemContent>();
-                contents[Resource.Id.nav_documents] = new DocumentsModuleMenuItemContent();
-                contents[Resource.Id.nav_contacts] = new ContactsModuleMenuItemContent();
-                contents[Resource.Id.nav_shortcodes] = new ShortcodesModuleMenuItemContent();
-                contents[Resource.Id.nav_calendar] = new CalendarModuleMenuItemContent();
-                mainActivityState.MenuItemContents = contents;
+                mainActivityState.MenuItemContents = new Dictionary<int, MenuItemContent>()
+                {
+                    {Resource.Id.nav_documents,  new DocumentsModuleMenuItemContent()},
+                    {Resource.Id.nav_contacts,  new ContactsModuleMenuItemContent()},
+                    {Resource.Id.nav_shortcodes,  new ShortcodesModuleMenuItemContent()},
+                    {Resource.Id.nav_calendar,  new CalendarModuleMenuItemContent()},
+                };
 
                 stateFragment.State = mainActivityState;
 
