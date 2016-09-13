@@ -23,24 +23,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             set;
         }
 
-        public static DocumentsListFragment Create(Folder folder)
-        {
-            return new DocumentsListFragment
-            {
-                Folder = folder
-            };
-        }
-
-        public override void OnCreate(Bundle savedInstanceState)
-        {
-            base.OnCreate(savedInstanceState);
-        }
-
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            ((AppCompatActivity)Activity).SupportActionBar.Title = Folder?.Name;
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
-
             return inflater.Inflate(Resource.Layout.fragment_list_documents, container, false);
         }
 
@@ -50,10 +34,15 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             if (dlfs != null)
             {
                 Folder = dlfs.Folder;
-
-                ((AppCompatActivity)Activity).SupportActionBar.Title = Folder?.Name;
-                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
             }
+        }
+
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        {
+            base.OnViewCreated(view, savedInstanceState);
+
+            ((AppCompatActivity)Activity).SupportActionBar.Title = Folder?.Name;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
         }
 
         public override IRetainableState OnRetainInstanceState()
@@ -64,7 +53,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             };
         }
 
-        public string GenerateTag()
+        public override string GenerateTag()
         {
             return $"{nameof(DocumentsListFragment)} [FolderId={Folder.Id}, FolderName={Folder.Name}]";
         }

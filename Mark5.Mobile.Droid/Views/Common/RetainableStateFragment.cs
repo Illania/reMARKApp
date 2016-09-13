@@ -79,6 +79,8 @@ namespace Mark5.Mobile.Droid.Views.Common
             retainedFragment = null;
         }
 
+        public abstract string GenerateTag();
+
         class RetainedFragment<Y> : Fragment where Y : class
         {
 
