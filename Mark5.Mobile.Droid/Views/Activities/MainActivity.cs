@@ -25,7 +25,6 @@ using Mark5.Mobile.Droid.Views.Fragments;
 
 namespace Mark5.Mobile.Droid.Views.Activity
 {
-
     [Activity]
     public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener
     {
@@ -33,20 +32,21 @@ namespace Mark5.Mobile.Droid.Views.Activity
         DrawerLayout drawer;
         ActionBarDrawerToggle drawerToggle;
         NavigationView navigationView;
-
         IMenuItem lastSelectedItem;
-
-        const string RetainStateFragmentTag = "MainActivity_RetainStateFragmentTag";
 
         RetainedFragment<MainActivityState> stateFragment;
 
-        public Dictionary<int, MenuItemContent> menuItemContents
+        Dictionary<int, MenuItemContent> menuItemContents
         {
             get
             {
                 return stateFragment.State.MenuItemContents;
             }
         }
+
+        const string RetainStateFragmentTag = "MainActivity_RetainStateFragmentTag";
+
+        #region Overrides
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -120,6 +120,25 @@ namespace Mark5.Mobile.Droid.Views.Activity
             }
         }
 
+        protected override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+            stateFragment.State.LastSelectedItemId = lastSelectedItem.ItemId;
+        }
+
+        protected override void OnRestoreInstanceState(Bundle savedInstanceState)
+        {
+            base.OnRestoreInstanceState(savedInstanceState);
+
+            var menuItemId = stateFragment.State.LastSelectedItemId;
+            var menuItem = navigationView.Menu.FindItem(menuItemId);
+            lastSelectedItem = menuItem;
+        }
+
+        #endregion
+
+        #region Utility methods
+
         public bool OnNavigationItemSelected(IMenuItem menuItem)
         {
             if (lastSelectedItem != menuItem)
@@ -148,23 +167,22 @@ namespace Mark5.Mobile.Droid.Views.Activity
             }
         }
 
-        protected override void OnSaveInstanceState(Bundle outState)
+        #endregion
+
+        #region State class
+
+        class MainActivityState
         {
-            base.OnSaveInstanceState(outState);
-            stateFragment.State.LastSelectedItemId = lastSelectedItem.ItemId;
+            public int LastSelectedItemId { get; set; }
+            public Dictionary<int, MenuItemContent> MenuItemContents { get; set; }
         }
 
-        protected override void OnRestoreInstanceState(Bundle savedInstanceState)
-        {
-            base.OnRestoreInstanceState(savedInstanceState);
-
-            var menuItemId = stateFragment.State.LastSelectedItemId; //TODO check if it can be done in a more clever way
-            var menuItem = navigationView.Menu.FindItem(menuItemId);
-            lastSelectedItem = menuItem;
-        }
+        #endregion
     }
 
-    public abstract class MenuItemContent
+    #region MenuItemContent classes
+
+    abstract class MenuItemContent
     {
         protected readonly List<Android.Support.V4.App.Fragment.SavedState> backstackStates = new List<Android.Support.V4.App.Fragment.SavedState>();
         protected readonly List<string> savedTags = new List<string>();
@@ -173,7 +191,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
         public abstract void RestoreOrCreate(Android.Support.V4.App.FragmentManager fm);
     }
 
-    public abstract class ModulesMenuItemContent : MenuItemContent
+    abstract class ModulesMenuItemContent : MenuItemContent
     {
         protected abstract ModuleType ModuleType { get; }
 
@@ -235,22 +253,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
         }
     }
 
-    public class MainActivityState
-    {
-        public int LastSelectedItemId
-        {
-            get;
-            set;
-        }
-
-        public Dictionary<int, MenuItemContent> MenuItemContents
-        {
-            get;
-            set;
-        }
-    }
-
-    public class DocumentsModuleMenuItemContent : ModulesMenuItemContent
+    class DocumentsModuleMenuItemContent : ModulesMenuItemContent
     {
         protected override ModuleType ModuleType
         {
@@ -258,7 +261,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
         }
     }
 
-    public class ContactsModuleMenuItemContent : ModulesMenuItemContent
+    class ContactsModuleMenuItemContent : ModulesMenuItemContent
     {
         protected override ModuleType ModuleType
         {
@@ -266,7 +269,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
         }
     }
 
-    public class ShortcodesModuleMenuItemContent : ModulesMenuItemContent
+    class ShortcodesModuleMenuItemContent : ModulesMenuItemContent
     {
         protected override ModuleType ModuleType
         {
@@ -274,12 +277,15 @@ namespace Mark5.Mobile.Droid.Views.Activity
         }
     }
 
-    public class CalendarModuleMenuItemContent : ModulesMenuItemContent
+    class CalendarModuleMenuItemContent : ModulesMenuItemContent
     {
         protected override ModuleType ModuleType
         {
             get { return ModuleType.Calendar; }
         }
     }
+
+    #endregion
+
 }
 
