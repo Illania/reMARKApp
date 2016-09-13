@@ -54,4 +54,10 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/lightgray" />
+    <View
+        android:id="@+id/selected_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:visibility="invisible" />
 </android.support.v7.widget.LinearLayoutCompat>

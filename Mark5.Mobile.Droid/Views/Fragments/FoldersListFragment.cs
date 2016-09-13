@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
+using Android.Content;
 using Android.OS;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
@@ -18,14 +19,15 @@ using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Views.Activities;
 using Mark5.Mobile.Droid.Views.Common;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
-
     public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback
     {
-        public ModuleType ModuleType { get; set; }
+        public ModuleType ModuleType { get; set; } //TODO remove
         public Folder CurrentFolder { get; set; }
 
         FolderListAdapter adapter;
@@ -51,6 +53,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             adapter.itemClicked += Adapter_ItemClicked;
             adapter.itemLongClicked += Adapter_ItemLongClicked;
 
+            //HasOptionsMenu = true;
+
             recyclerView.SetAdapter(adapter);
 
             return rootView;
@@ -63,6 +67,17 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             SetTitles();
             await RefreshData();
         }
+
+        //public override bool OnOptionsItemSelected(IMenuItem item)
+        //{
+        //    if (item.ItemId == Android.Resource.Id.Home)
+        //    {
+        //        Activity.OnBackPressed();
+        //        return true;
+        //    }
+
+        //    return base.OnOptionsItemSelected(item);
+        //}
 
         #endregion
 
@@ -130,7 +145,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         void Adapter_ItemClicked(object sender, Folder folder)
         {
-
+            var i = new Intent(Activity, typeof(DocumentsListActivity));
+            i.PutExtra(DocumentsListActivity.FolderIntentKey, SerializationUtils.Serialize(folder));
+            StartActivity(i);
         }
 
         void Adapter_ItemLongClicked(object sender, Folder folder)
@@ -216,7 +233,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var flfs = restoredState as FolderListFragmentState ?? null;
+            var flfs = restoredState as FolderListFragmentState;
             if (flfs != null)
             {
                 CurrentFolder = flfs.Folder;
@@ -237,10 +254,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
     class FolderListAdapter : RecyclerView.Adapter
     {
-        public readonly List<Folder> foldersInView = new List<Folder>();
+        readonly List<Folder> foldersInView = new List<Folder>();
         readonly RecyclerView parentView;
 
-        public event EventHandler<Folder> expandIconClicked = delegate { };
+        public event EventHandler<Folder> expandIconClicked = delegate { }; //TODO case
         public event EventHandler<Folder> itemClicked = delegate { };
         public event EventHandler<Folder> itemLongClicked = delegate { };
 
@@ -259,6 +276,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
         {
+
             //Binding of actual parameters, the view is already created
             var fh = holder as FolderViewHolder;
             var folder = foldersInView[position];

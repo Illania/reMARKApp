@@ -26,7 +26,7 @@ using Mark5.Mobile.Droid.Views.Fragments;
 namespace Mark5.Mobile.Droid.Views.Activity
 {
     [Activity]
-    public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener
+    public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, Android.Support.V4.App.FragmentManager.IOnBackStackChangedListener
     {
         Toolbar toolbar;
         DrawerLayout drawer;
@@ -58,9 +58,11 @@ namespace Mark5.Mobile.Droid.Views.Activity
             SetSupportActionBar(toolbar);
 
             drawer = FindViewById<DrawerLayout>(Resource.Id.drawer_layout);
-            drawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, Resource.String.open_drawer, Resource.String.close_drawer);
+            drawerToggle = new ActionBarDrawerToggle(this, drawer, Resource.String.open_drawer, Resource.String.close_drawer);
             drawer.AddDrawerListener(drawerToggle);
             drawerToggle.SyncState();
+
+            SupportFragmentManager.AddOnBackStackChangedListener(this);
 
             navigationView = FindViewById<NavigationView>(Resource.Id.navigation_view);
             navigationView.SetNavigationItemSelectedListener(this);
@@ -71,7 +73,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
             {
                 var mainActivityState = new MainActivityState();
 
-                mainActivityState.MenuItemContents = new Dictionary<int, MenuItemContent>()
+                mainActivityState.MenuItemContents = new Dictionary<int, MenuItemContent>
                 {
                     {Resource.Id.nav_documents,  new DocumentsModuleMenuItemContent()},
                     {Resource.Id.nav_contacts,  new ContactsModuleMenuItemContent()},
@@ -123,7 +125,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
         protected override void OnSaveInstanceState(Bundle outState)
         {
             base.OnSaveInstanceState(outState);
-            stateFragment.State.LastSelectedItemId = lastSelectedItem.ItemId;
+            stateFragment.State.LastSelectedItemId = lastSelectedItem.ItemId; //TODO accessor
         }
 
         protected override void OnRestoreInstanceState(Bundle savedInstanceState)
@@ -137,6 +139,18 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
         #endregion
 
+        public override void OnConfigurationChanged(Android.Content.Res.Configuration newConfig)
+        {
+            base.OnConfigurationChanged(newConfig);
+            drawerToggle.OnConfigurationChanged(newConfig);
+        }
+
+        protected override void OnPostCreate(Bundle savedInstanceState)
+        {
+            base.OnPostCreate(savedInstanceState);
+            drawerToggle.SyncState();
+        }
+
         #region Utility methods
 
         public bool OnNavigationItemSelected(IMenuItem menuItem)
@@ -148,7 +162,11 @@ namespace Mark5.Mobile.Droid.Views.Activity
                     menuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
                 }
 
-                ClearBackStack();
+                //Clear back stack
+                if (SupportFragmentManager.BackStackEntryCount > 0)
+                {
+                    SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int)PopBackStackFlags.Inclusive);
+                }
 
                 menuItemContents[menuItem.ItemId].RestoreOrCreate(SupportFragmentManager);
 
@@ -159,12 +177,25 @@ namespace Mark5.Mobile.Droid.Views.Activity
             return true;
         }
 
-        void ClearBackStack()
+        public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            if (SupportFragmentManager.BackStackEntryCount > 0)
+            return drawerToggle.OnOptionsItemSelected(item);
+        }
+
+        public void OnBackStackChanged()
+        {
+            if (SupportFragmentManager.BackStackEntryCount > 1)
             {
-                SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int)PopBackStackFlags.Inclusive);
+                drawerToggle.DrawerIndicatorEnabled = false;
+                SupportActionBar.SetDisplayHomeAsUpEnabled(true);
             }
+            else
+            {
+                SupportActionBar.SetDisplayHomeAsUpEnabled(false);
+                drawerToggle.DrawerIndicatorEnabled = true;
+            }
+
+            drawerToggle.SyncState();
         }
 
         #endregion
