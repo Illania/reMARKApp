@@ -15,7 +15,7 @@ namespace Mark5.Mobile.Common.Managers
     public interface IFoldersManager
     {
 
-        Task<List<Folder>> GetFoldersAsync(ModuleType module, Folder parentFolder = null, int depth = 2, SourceType sourceType = SourceType.Auto);
+        Task<List<Folder>> GetFoldersAsync(Folder parentFolder, int depth = 2, SourceType sourceType = SourceType.Auto);
 
         Task<List<Folder>> GetFavoriteFoldersAsync(ModuleType module, SourceType sourceType = SourceType.Auto);
 

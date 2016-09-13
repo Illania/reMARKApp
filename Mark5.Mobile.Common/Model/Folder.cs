@@ -133,23 +133,6 @@ namespace Mark5.Mobile.Common.Model
             }
         }
 
-        public static Folder RootPerModule(ModuleType module)
-        {
-            switch (module)
-            {
-                case ModuleType.Documents:
-                    return documentsRootFolder;
-                case ModuleType.Contacts:
-                    return contactsRootFolder;
-                case ModuleType.Shortcodes:
-                    return shortcodesRootFolder;
-                case ModuleType.Calendar:
-                    return calendarRootFolder;
-                default:
-                    throw new ArgumentException("Input module not valid");
-            }
-        }
-
         readonly static Folder documentsRootFolder = new Folder
         {
             Id = -100,
@@ -189,6 +172,23 @@ namespace Mark5.Mobile.Common.Model
             Type = FolderType.None,
             HasSubFolders = true,
         };
+
+        public static Folder RootPerModule(ModuleType module)
+        {
+            switch (module)
+            {
+                case ModuleType.Documents:
+                    return documentsRootFolder;
+                case ModuleType.Contacts:
+                    return contactsRootFolder;
+                case ModuleType.Shortcodes:
+                    return shortcodesRootFolder;
+                case ModuleType.Calendar:
+                    return calendarRootFolder;
+                default:
+                    throw new ArgumentException("Input module not valid");
+            }
+        }
 
         #endregion
 

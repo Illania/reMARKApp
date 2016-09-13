@@ -215,12 +215,11 @@
     <AndroidResource Include="Resources\mipmap-xhdpi\logo.png" />
     <AndroidResource Include="Resources\mipmap-xxhdpi\logo.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\logo.png" />
-    <AndroidResource Include="Resources\layout\fragment_list_folders.axml" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\mipmap-xxhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\mipmap-xhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\mipmap-hdpi\drawer_header_background.png" />
-    <AndroidResource Include="Resources\layout\folder_list_item.axml" />
+    <AndroidResource Include="Resources\layout\list_item_folder.axml" />
     <AndroidResource Include="Resources\drawable-hdpi\folder.png" />
     <AndroidResource Include="Resources\drawable-hdpi\folder_draft.png" />
     <AndroidResource Include="Resources\drawable-hdpi\folder_outgoing.png" />
@@ -248,7 +247,7 @@
     <AndroidResource Include="Resources\xml\preferences.axml" />
     <AndroidResource Include="Resources\values\strings-preferences.axml" />
     <AndroidResource Include="Resources\values\values-preferences.axml" />
-    <AndroidResource Include="Resources\layout\fragment_list_documents.axml" />
+    <AndroidResource Include="Resources\layout\list.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

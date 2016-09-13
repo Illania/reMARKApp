@@ -11,27 +11,26 @@
         android:layout_height="56dp"
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
-        android:id="@+id/internalContainerLayout">
+        android:id="@+id/list_item_folder_internal_Layout">
         <android.support.v7.widget.LinearLayoutCompat
             android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:padding="16dp"
             android:layout_weight="1"
-            android:layout_gravity="left"
-            android:id="@+id/folderNameLayout">
+            android:layout_gravity="left">
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
-                android:id="@+id/folderIcon" />
+                android:id="@+id/list_item_folder_icon" />
             <TextView
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:layout_gravity="center_vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:paddingLeft="24dp"
-                android:id="@+id/folderName" />
+                android:id="@+id/list_item_folder_name" />
         </android.support.v7.widget.LinearLayoutCompat>
         <android.support.v7.widget.LinearLayoutCompat
             android:orientation="horizontal"
@@ -39,15 +38,14 @@
             android:layout_height="match_parent"
             android:layout_gravity="right"
             android:padding="16dp"
-            android:clickable="true"
-            android:id="@+id/expandButtonLayout">
+            android:clickable="true">
             <Button
                 android:background="@drawable/arrow_right"
                 android:clickable="false"
                 android:layout_gravity="center_vertical"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:id="@+id/expandButton" />
+                android:id="@+id/list_item_folder_expand" />
         </android.support.v7.widget.LinearLayoutCompat>
     </android.support.v7.widget.LinearLayoutCompat>
     <View
@@ -55,7 +53,7 @@
         android:layout_height="1dp"
         android:background="@color/lightgray" />
     <View
-        android:id="@+id/selected_overlay"
+        android:id="@+id/list_item_folder_selected_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/transparent"
