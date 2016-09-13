@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
 {
 
     [Activity]
-    public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FoldersListFragment.IFoldersListFragmentSelectedListener
+    public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener
     {
         Toolbar toolbar;
         DrawerLayout drawer;
@@ -161,28 +161,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
             var menuItemId = stateFragment.State.LastSelectedItemId; //TODO check if it can be done in a more clever way
             var menuItem = navigationView.Menu.FindItem(menuItemId);
             lastSelectedItem = menuItem;
-        }
-
-        void FoldersListFragment.IFoldersListFragmentSelectedListener.NavigateInFolder(ModuleType moduleType, Folder folder)
-        {
-            var foldersListFragment = new FoldersListFragment
-            {
-                CurrentFolder = folder,
-                ModuleType = moduleType,
-            };
-
-            var tag = foldersListFragment.GenerateTag();
-            var ft = SupportFragmentManager.BeginTransaction();
-            ft.SetTransition((int)FragmentTransit.FragmentOpen);
-            ft.Replace(Resource.Id.fragment_container, foldersListFragment, tag);
-            ft.AddToBackStack(tag);
-            ft.Commit();
-        }
-
-        void FoldersListFragment.IFoldersListFragmentSelectedListener.SetTitles(string title, string subtitle)
-        {
-            SupportActionBar.Title = title;
-            SupportActionBar.Subtitle = subtitle;
         }
     }
 

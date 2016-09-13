@@ -9,9 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.App;
 using Android.OS;
-using Android.Support.V4.App;
 using Android.Support.V4.Widget;
+using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
@@ -38,15 +39,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         RecyclerView recyclerView;
         SwipeRefreshLayout refreshLayout;
 
-        IFoldersListFragmentSelectedListener listener;
-
         #region Overrides
-
-        public override void OnAttach(Android.Content.Context context)
-        {
-            base.OnAttach(context);
-            listener = context as IFoldersListFragmentSelectedListener;
-        }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -107,8 +100,29 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         void SetTitles()
         {
+            var title = ModuleType.ToString();
             var subtitle = CurrentFolder.Root ? string.Empty : CurrentFolder.Name;
-            listener.SetTitles(ModuleType.ToString(), subtitle);
+
+            ((AppCompatActivity)Activity).SupportActionBar.Title = title;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = subtitle;
+        }
+
+        void NavigateInFolder(ModuleType moduleType, Folder folder) //TODO need to put in the right place
+        {
+            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
+
+            var foldersListFragment = new FoldersListFragment
+            {
+                CurrentFolder = folder,
+                ModuleType = moduleType,
+            };
+
+            var tag = foldersListFragment.GenerateTag();
+            var ft = fragmentManager.BeginTransaction();
+            ft.SetTransition((int)FragmentTransit.FragmentOpen);
+            ft.Replace(Resource.Id.fragment_container, foldersListFragment, tag);
+            ft.AddToBackStack(tag);
+            ft.Commit();
         }
 
         #endregion
@@ -117,7 +131,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         void Adapter_ExpandClicked(object sender, Folder folder)
         {
-            listener.NavigateInFolder(ModuleType, folder);
+            NavigateInFolder(ModuleType, folder);
         }
 
         void Adapter_ItemClicked(object sender, Folder folder)
@@ -191,17 +205,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         }
 
         #endregion
-
-        #region Listener interface definition
-
-        public interface IFoldersListFragmentSelectedListener
-        {
-            void NavigateInFolder(ModuleType moduleType, Folder folder);
-            void SetTitles(string title, string subtitle);
-        }
-
-        #endregion
-
 
         #region Retained Fragment methods
 
