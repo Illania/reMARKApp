@@ -25,19 +25,13 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
     public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback
     {
-        public ModuleType ModuleType
-        {
-            get; set;
-        }
-
-        public Folder CurrentFolder
-        {
-            get; set;
-        }
+        public ModuleType ModuleType { get; set; }
+        public Folder CurrentFolder { get; set; }
 
         FolderListAdapter adapter;
         RecyclerView recyclerView;
         SwipeRefreshLayout refreshLayout;
+        ActionMode actionMode;
 
         #region Overrides
 
@@ -78,7 +72,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             if (!CurrentFolder.HasSubFolders)
             {
-                return; //TODO could it happen?
+                return;
             }
 
             if (forceRefresh || !CurrentFolder.SubFolders.Any())
@@ -107,7 +101,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = subtitle;
         }
 
-        void NavigateInFolder(ModuleType moduleType, Folder folder) //TODO need to put in the right place
+        void NavigateInFolder(ModuleType moduleType, Folder folder)
         {
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
 
@@ -152,8 +146,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             actionMode = Activity.StartActionMode(this);
         }
-
-        ActionMode actionMode;
 
         bool ActionMode.ICallback.OnActionItemClicked(ActionMode mode, IMenuItem item)
         {
@@ -235,11 +227,13 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         class FolderListFragmentState : IRetainableState
         {
             public Folder Folder { get; set; }
-            public ModuleType Module { get; set; } //TODO eventually change names
+            public ModuleType Module { get; set; }
         }
 
         #endregion
     }
+
+    #region RecyclerView Adapter/ViewHolder
 
     class FolderListAdapter : RecyclerView.Adapter
     {
@@ -319,7 +313,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             var position = parentView.GetChildLayoutPosition(view);
             var folder = foldersInView[position];
-
             itemClicked(view, folder);
         }
 
@@ -355,5 +348,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             internalContainerLayout.LongClick += (sender, e) => itemLongClicked(this, itemView);
         }
     }
+
+    #endregion
+
 }
 
