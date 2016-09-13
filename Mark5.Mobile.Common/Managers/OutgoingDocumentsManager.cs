@@ -1,4 +1,11 @@
-﻿using System;
+﻿//
+// Project: Mark5.Mobile.Common
+// File: OutgoingDocumentsManager.cs
+// Author: Ferdinando Papale <fp@nordic-it.com>
+//
+// Copyright (c) 2016 Nordic IT
+//
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,8 +16,10 @@ using Mark5.Mobile.Common.Storage;
 
 namespace Mark5.Mobile.Common.Managers
 {
+
     class OutgoingDocumentsManager : IOutgoingDocumentsManager
     {
+
         CancellationTokenSource cts;
         Task sendTask;
 
@@ -200,9 +209,7 @@ namespace Mark5.Mobile.Common.Managers
                         await FileSystemStorage.DeleteOutgoingDocumentFolderAsync(info.Identifier);
                         DocumentSendingSuccessful(this, container);
                     }
-
                 }
-
             }
             catch (Exception ex)
             {
@@ -220,7 +227,7 @@ namespace Mark5.Mobile.Common.Managers
 
         async void ReachabilityRefreshed(object sender, ReachabilityRefreshedEventArgs e)
         {
-            if (!active)
+            if (!active || !e.Changed)
             {
                 return;
             }

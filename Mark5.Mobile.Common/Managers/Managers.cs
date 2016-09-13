@@ -96,11 +96,6 @@ namespace Mark5.Mobile.Common.Managers
                 throw new ArgumentNullException(nameof(connectionInfo));
             }
 
-            if (!connectionInfo.Authenticated)
-            {
-                throw new ArgumentException("Connection info is not authenticated.");
-            }
-
             var appServiceProxy = AppServiceProxyFactory.Create(connectionInfo.SslMode != SslMode.Off, connectionInfo.Hostname, connectionInfo.Port);
             var fileTransferServiceProxy = FileTransferServiceProxyFactory.Create(connectionInfo.SslMode != SslMode.Off, connectionInfo.Hostname, connectionInfo.Port);
 
@@ -111,8 +106,6 @@ namespace Mark5.Mobile.Common.Managers
             var calendarDataAccess = new CalendarDataAccess(DatabaseConnectionProvider.CalendarDatabase);
             var notificationsDataAccess = new NotificationsDataAccess(DatabaseConnectionProvider.SystemDatabase);
 
-            OutgoingDocumentsManager = new OutgoingDocumentsManager();
-            DownloadManager = new DownloadManager(documentsDataAccess, contactsDataAccess, shortcodesDataAccess);
             FoldersManager = new FoldersManager(connectionInfo, appServiceProxy, foldersDataAccess);
             DocumentsManager = new DocumentsManager(connectionInfo, appServiceProxy, fileTransferServiceProxy, documentsDataAccess);
             ContactsManager = new ContactsManager(connectionInfo, appServiceProxy, contactsDataAccess);
@@ -122,6 +115,8 @@ namespace Mark5.Mobile.Common.Managers
             NotificationsManager = new NotificationsManager(connectionInfo, appServiceProxy, foldersDataAccess, notificationsDataAccess);
             SystemManager = new SystemManager(connectionInfo, appServiceProxy);
             CommonActionsManager = new CommonActionsManager(connectionInfo, appServiceProxy, documentsDataAccess, contactsDataAccess, shortcodesDataAccess, calendarDataAccess);
+            OutgoingDocumentsManager = new OutgoingDocumentsManager();
+            DownloadManager = new DownloadManager(documentsDataAccess, contactsDataAccess, shortcodesDataAccess);
             CleanUpManager = new CleanUpManager(documentsDataAccess, contactsDataAccess, shortcodesDataAccess, calendarDataAccess);
         }
     }

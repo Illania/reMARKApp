@@ -6,7 +6,6 @@
 // Copyright (c) 2014 Nordic IT
 //
 using System;
-using System.ServiceModel;
 
 namespace Mark5.Mobile.Common.Utilities
 {

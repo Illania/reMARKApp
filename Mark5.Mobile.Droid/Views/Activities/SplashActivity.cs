@@ -5,17 +5,20 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Views;
+using HockeyApp.Android;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
+using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Xamarin;
+using Mark5.Mobile.Droid.Services;
+using Mark5.Mobile.Droid.Utilities.Hockey;
 using Mark5.Mobile.Droid.Views.Common;
 
 namespace Mark5.Mobile.Droid.Views.Activity
@@ -30,6 +33,8 @@ namespace Mark5.Mobile.Droid.Views.Activity
     public class SplashActivity : BaseAppCompatActivity
     {
 
+        const string HockeyId = "137e2a4fb6384cb3a51de617dd2f5999";
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -39,50 +44,112 @@ namespace Mark5.Mobile.Droid.Views.Activity
             uiOptions |= (int)SystemUiFlags.Immersive;
             uiOptions |= (int)SystemUiFlags.HideNavigation;
             Window.DecorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
+
+            if (CommonConfig.Logger.IsInfoEnabled())
+            {
+                CommonConfig.Logger.Info($"Created {nameof(SplashActivity)}");
+            }
         }
 
-        protected override void OnResume()
+        protected override void OnStart()
         {
-            base.OnResume();
+            base.OnStart();
+
+            CommonConfig.Logger.Info($"Starting {nameof(SplashActivity)}...");
+
+            CrashManager.Register(this, HockeyId, new CustomCrashManagerListener());
+            FeedbackManager.Register(this, HockeyId, new CustomFeedbackManagerLister());
+            CrashManager.ResetAlwaysSend(new Java.Lang.Ref.WeakReference(this));
 
             Task.Run(async () =>
             {
                 var authenticator = AuthenticatorFactory.Create();
-                if (await authenticator.IsAuthenticatedAsync())
+                if (!await authenticator.IsAuthenticatedAsync())
                 {
-                    var ci = await authenticator.GetConnectionInfoAsync();
+                    CommonConfig.Logger.Info($"User was not authenticated - will present {nameof(LoginActivity)}");
 
-                    switch (ci.SslMode)
-                    {
-                        case SslMode.AllowSelfSigned:
-                            PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
-                            break;
-                        default:
-                            PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
-                            break;
-                    }
+                    return false;
+                }
 
-                    Managers.Initialize(ci);
-                    PlatformConfig.ReachabilityBroadcastReceiver.Register();
+                CommonConfig.Logger.Info($"User is authenticated - initializing...");
 
-                    var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+                var ci = await authenticator.GetConnectionInfoAsync();
 
-                    Insights.Identify($"{ci.Username}@{ci.SslMode},{ci.Hostname}:{ci.Port}", new Dictionary<string, string>
-                    {
-                        [Insights.Traits.FirstName] = ss?.UserInfo?.User?.FirstName,
-                        [Insights.Traits.LastName] = ss?.UserInfo?.User?.LastName,
-                        ["System Administrator"] = (ss?.UserInfo?.IsSystemAdministrator ?? false) ? "Yes" : "No"
-                    });
+                CommonConfig.Logger.Info($"Current connection info: {ci}");
 
-                    RunOnUiThreadIfNecessary(() => StartActivity(new Intent(this, typeof(MainActivity))));
+                switch (ci.SslMode)
+                {
+                    case SslMode.AllowSelfSigned:
+                        PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
+                        break;
+                    default:
+                        PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
+                        break;
+                }
+
+                CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
+
+                Managers.Initialize(ci);
+                Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
+                Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                var policies = Managers.DownloadManager.DownloadPolicies;
+                policies[ObjectType.Document] = new DownloadFoldersPolicy();
+                if (PlatformConfig.Preferences.SynchroniseContacts)
+                {
+                    policies[ObjectType.Contact] = new DownloadAllPolicy();
+                }
+                if (PlatformConfig.Preferences.SynchroniseShortcodes)
+                {
+                    policies[ObjectType.Shortcode] = new DownloadAllPolicy();
+                }
+
+                if (PlatformConfig.Preferences.ClearCache)
+                {
+                    CommonConfig.Logger.Info("Clearing cache...");
+
+                    await DatabaseUtils.ResetDatabases();
+                    PlatformConfig.Preferences.ClearCache = false;
+
+                    CommonConfig.Logger.Info("Cleared cache");
+                }
+
+                if (await Managers.CleanUpManager.IsCleanUpNecessary(PlatformConfig.Preferences.CleanCacheIntervalDays))
+                {
+                    CommonConfig.Logger.Info("Cleaning up cache....");
+
+                    await Managers.CleanUpManager.CleanUp();
+
+                    CommonConfig.Logger.Info("Cleaned up cache");
+                }
+
+                CommonConfig.Logger.Info($"Starting {nameof(IDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
+
+                await Managers.DownloadManager.Start();
+                await Managers.OutgoingDocumentsManager.Start();
+
+                CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
+
+                await CommonConfig.ReachabilityService.Refresh();
+                PlatformConfig.ReachabilityBroadcastReceiver.Register();
+
+                CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
+
+                return true;
+            }).ContinueWith(t =>
+            {
+                if (t.Result)
+                {
+                    StartActivity(new Intent(this, typeof(MainActivity)));
                 }
                 else
                 {
-                    RunOnUiThreadIfNecessary(() => StartActivity(new Intent(this, typeof(LoginActivity))));
+                    StartActivity(new Intent(this, typeof(LoginActivity)));
                 }
 
                 Finish();
-            });
+            }, TaskScheduler.FromCurrentSynchronizationContext());
+
+            CommonConfig.Logger.Info($"Started {nameof(SplashActivity)}");
         }
     }
 }

@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+	<string-array name="pref_documents_to_load_entries">
+		<item>250</item>
+		<item>500</item>
+		<item>1000</item>
+	</string-array>
+	<string-array name="pref_documents_to_load_entryvalues">
+		<item>250</item>
+		<item>500</item>
+		<item>1000</item>
+	</string-array>
+	<string name="pref_documents_to_load_default">500</string>
+	<string-array name="pref_documents_mark_as_read_entries">
+		<item>Never</item>
+		<item>Immediately</item>
+		<item>1 second</item>
+		<item>2 seconds</item>
+		<item>3 seconds</item>
+	</string-array>
+	<string-array name="pref_documents_mark_as_read_entryvalues">
+		<item>-1</item>
+		<item>0</item>
+		<item>1</item>
+		<item>2</item>
+		<item>3</item>
+	</string-array>
+	<string name="pref_documents_mark_as_read_default">0</string>
+	<bool name="pref_documents_large_attachment_warn_default">true</bool>
+	<bool name="pref_documents_sub_priority_default">true</bool>
+	<bool name="pref_documents_sub_reference_number_default">true</bool>
+	<bool name="pref_documents_sub_read_by_default">true</bool>
+	<bool name="pref_documents_sub_creator_default">true</bool>
+	<bool name="pref_documents_sub_originator_default">true</bool>
+	<bool name="pref_documents_download_as_plaintext_default">false</bool>
+	<bool name="pref_contacts_synchronised_default">false</bool>
+	<bool name="pref_contacts_sub_comm_fax_default">true</bool>
+	<bool name="pref_contacts_sub_comm_telex_default">true</bool>
+	<bool name="pref_contacts_sub_comm_im_default">true</bool>
+	<bool name="pref_contacts_sub_comm_internal_default">true</bool>
+	<bool name="pref_contacts_sub_comm_other_default">true</bool>
+	<bool name="pref_contacts_sub_address_default">true</bool>
+	<bool name="pref_contacts_sub_birthdate_default">true</bool>
+	<bool name="pref_contacts_sub_account_default">true</bool>
+	<bool name="pref_contacts_sub_vat_default">true</bool>
+	<bool name="pref_shortcodes_synchronised_default">false</bool>
+	<bool name="pref_compose_remove_line_summary_default">false</bool>
+	<string-array name="pref_compose_template_mode_entries">
+		<item>Don\'t use</item>
+		<item>Use default</item>
+		<item>Use local</item>
+		<item>Always ask</item>
+	</string-array>
+	<string-array name="pref_compose_template_mode_entryvalues">
+		<item>0</item>
+		<item>1</item>
+		<item>2</item>
+		<item>3</item>
+	</string-array>
+	<string name="pref_compose_template_mode_default">1</string>
+	<string name="pref_compose_template_local_default">Sent from MARK5 for Android</string>
+	<string-array name="pref_cache_auto_clean_entries">
+		<item>3 days</item>
+		<item>7 days</item>
+		<item>14 days</item>
+	</string-array>
+	<string-array name="pref_cache_auto_clean_entryvalues">
+		<item>3</item>
+		<item>7</item>
+		<item>14</item>
+	</string-array>
+	<string name="pref_cache_auto_clean_default">7</string>
+	<bool name="pref_cache_clear_default">false</bool>
+	<bool name="pref_advanced_enable_reporting_default">true</bool>
+</resources>

@@ -9,6 +9,7 @@ using System;
 
 namespace Mark5.Mobile.Common.Model
 {
+
     public interface IBusinessEntity
     {
 

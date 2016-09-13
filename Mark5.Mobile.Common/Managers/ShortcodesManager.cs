@@ -22,7 +22,9 @@ namespace Mark5.Mobile.Common.Managers
 
     class ShortcodesManager : AbstractManager, IShortcodesManager
     {
-        const int NumbeOfShortcodesToFetchPerCall = 250;
+
+        public int MaxToFetch { get; set; } = 250;
+
         readonly IShortcodesDataAccess shortcodesDataAccess;
 
         public ShortcodesManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy, IShortcodesDataAccess shortcodesDataAccess)
@@ -31,7 +33,7 @@ namespace Mark5.Mobile.Common.Managers
             this.shortcodesDataAccess = shortcodesDataAccess;
         }
 
-        public async Task<List<ShortcodePreview>> GetShortcodePreviewsAsync(Folder folder, int startRowId = -1, int maxItems = 500, SourceType sourceType = SourceType.Auto)
+        public async Task<List<ShortcodePreview>> GetShortcodePreviewsAsync(Folder folder, int startRowId = -1, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
@@ -40,7 +42,7 @@ namespace Mark5.Mobile.Common.Managers
                     Token = Token,
                     FolderId = folder.Id,
                     StartRowId = startRowId,
-                    MaxToFetch = maxItems
+                    MaxToFetch = MaxToFetch
                 });
 
                 var shortcodePreviews = result.ShortcodePreviews.WhereNotNull().OrderBy(cp => cp.RowId).Select(sp => sp.Convert()).ToList();
@@ -52,7 +54,7 @@ namespace Mark5.Mobile.Common.Managers
 
             if (sourceType == SourceType.Local)
             {
-                return await shortcodesDataAccess.GetShortcodePreviewsAsync(folder, startRowId, maxItems);
+                return await shortcodesDataAccess.GetShortcodePreviewsAsync(folder, startRowId, MaxToFetch);
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
@@ -65,11 +67,11 @@ namespace Mark5.Mobile.Common.Managers
 
             while (!stopLoop && !ct.IsCancellationRequested)
             {
-                var previews = await GetShortcodePreviewsAsync(folder, startId, NumbeOfShortcodesToFetchPerCall, sourceType);
+                var previews = await GetShortcodePreviewsAsync(folder, startId, sourceType);
                 await handler(previews);
 
-                startId += NumbeOfShortcodesToFetchPerCall;
-                stopLoop = previews.Count < NumbeOfShortcodesToFetchPerCall;
+                startId += MaxToFetch;
+                stopLoop = previews.Count < MaxToFetch;
             }
         }
 

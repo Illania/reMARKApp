@@ -12,7 +12,6 @@ using System.Text;
 using System.Threading;
 using Android.Util;
 using Mark5.Mobile.Common.Utilities;
-using Xamarin;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -32,19 +31,21 @@ namespace Mark5.Mobile.Droid.Utilities
             // Build message
             var logMessageBuilder = new StringBuilder();
             //logMessageBuilder.Append ("[").Append (DateTime.Now.ToString ("yyyy-MM-dd HH:mm:ss.ffff")).Append ("] ");
-            logMessageBuilder.Append(" [").Append(logLevel).Append("] ");
-            logMessageBuilder.Append(" [").Append(Thread.CurrentThread.ManagedThreadId).Append("] ");
-            logMessageBuilder.Append(" [").Append(GetStackInfo(4)).Append("] ");
+            //logMessageBuilder.Append("[").Append(logLevel).Append("] ");
+            logMessageBuilder.Append("[").Append(Thread.CurrentThread.ManagedThreadId).Append("] ");
+            logMessageBuilder.Append("[").Append(GetStackInfo(3)).Append("] ");
             logMessageBuilder.Append(message);
 
             if (includeStackTrace)
             {
+#pragma warning disable XS0001 // Find usages of mono todo items
                 logMessageBuilder.Append("\n Stacktrace: ").Append(new StackTrace(true));
+#pragma warning restore XS0001 // Find usages of mono todo items
             }
 
             if (exception != null)
             {
-                logMessageBuilder.Append(" Exception: ").Append(exception.Message).Append(" ").Append(exception.StackTrace);
+                logMessageBuilder.Append($"{exception.GetType()}: ").Append(exception.Message).Append(" ").Append(exception.StackTrace);
             }
 
             LogPriority priority = LogPriority.Info;
@@ -68,37 +69,13 @@ namespace Mark5.Mobile.Droid.Utilities
             }
 
             Log.WriteLine(priority, Tag, logMessageBuilder.ToString());
-
-            LogToInsightsIfNecessary(logLevel, exception);
-        }
-
-        static void LogToInsightsIfNecessary(LogLevel logLevel, Exception exception)
-        {
-            try
-            {
-                if (exception != null)
-                {
-                    if (logLevel == LogLevel.ERROR)
-                    {
-                        Insights.Report(exception, Insights.Severity.Error);
-                    }
-                    else
-                    {
-                        Insights.Report(exception);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                // Let's catch this exception in case Insights are failing,
-                // so we do not crash the entire application.
-                Log.WriteLine(LogPriority.Error, Tag, "Error occured in Xamarin Insights: " + e.Message);
-            }
         }
 
         static string GetStackInfo(int depth)
         {
+#pragma warning disable XS0001 // Find usages of mono todo items
             var sf = new StackFrame(depth, true);
+#pragma warning restore XS0001 // Find usages of mono todo items
             return sf.GetMethod().DeclaringType + ":" + sf.GetMethod().Name + ":" + sf.GetFileLineNumber();
         }
     }

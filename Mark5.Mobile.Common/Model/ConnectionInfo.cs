@@ -28,8 +28,10 @@ namespace Mark5.Mobile.Common.Model
 
         public string InstallationId { get; set; }
 
-        public bool Authenticated { get; set; }
-
+        public override string ToString()
+        {
+            return $"[ConnectionInfo: Token={Token}, Username={Username}, Hostname={Hostname}, Port={Port}, SslMode={SslMode}, DeviceType={DeviceType}, FriendlyDeviceName={FriendlyDeviceName}, InstallationId={InstallationId}]";
+        }
     }
 }
 

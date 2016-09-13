@@ -137,19 +137,9 @@
     <Compile Include="DataAccess\INotificationsDataAccess.cs" />
     <Compile Include="DataAccess\NotificationsDataAccess.cs" />
     <Compile Include="Model\NotificationSettings.cs" />
-    <Compile Include="Model\ICommonManager.cs" />
     <Compile Include="Model\CommentsValue.cs" />
     <Compile Include="Managers\CommonActionsManager.cs" />
     <Compile Include="Model\CategoriesValue.cs" />
-    <Compile Include="Managers\Interfaces\ICalendarManager.cs" />
-    <Compile Include="Managers\Interfaces\ICommonActionsManager.cs" />
-    <Compile Include="Managers\Interfaces\IContactsManager.cs" />
-    <Compile Include="Managers\Interfaces\IDocumentsManager.cs" />
-    <Compile Include="Managers\Interfaces\IFoldersManager.cs" />
-    <Compile Include="Managers\Interfaces\INotificationsManager.cs" />
-    <Compile Include="Managers\Interfaces\ISearchManager.cs" />
-    <Compile Include="Managers\Interfaces\IShortcodesManager.cs" />
-    <Compile Include="Managers\Interfaces\ISystemManager.cs" />
     <Compile Include="Model\SearchCalendarTasksResult.cs" />
     <Compile Include="Model\SearchCalendarAppointmentsResult.cs" />
     <Compile Include="Model\Attachment.cs" />
@@ -157,15 +147,12 @@
     <Compile Include="Managers\OutgoingDocumentsManager.cs" />
     <Compile Include="Utilities\PortableCollections\IPortableConcurrentQueue.cs" />
     <Compile Include="Model\Support\OutgoingDocumentInfo.cs" />
-    <Compile Include="Managers\Interfaces\IOutgoingDocumentsManager.cs" />
-    <Compile Include="Utilities\PortableCollections\PortableCollectionsExtensions.cs" />
+    <Compile Include="Utilities\PortableCollections\CrossPlatformCollectionsExtensions.cs" />
     <Compile Include="Model\Support\OutgoingDocumentContainer.cs" />
     <Compile Include="Managers\DownloadManager.cs" />
-    <Compile Include="Managers\Interfaces\IDownloadManager.cs" />
     <Compile Include="Model\Support\DownloadItemInfo.cs" />
     <Compile Include="Model\Support\DownloadPolicy.cs" />
     <Compile Include="Managers\CleanUpManager.cs" />
-    <Compile Include="Managers\Interfaces\CleanUpManager.cs" />
     <Compile Include="Tester\ITester.cs" />
     <Compile Include="Tester\Tester.cs" />
     <Compile Include="Tester\TesterFactory.cs" />
@@ -174,6 +161,18 @@
     <Compile Include="Utilities\ILogger.cs" />
     <Compile Include="Utilities\Validator.cs" />
     <Compile Include="Utilities\IDeviceInfoProvider.cs" />
+    <Compile Include="Managers\ICalendarManager.cs" />
+    <Compile Include="Managers\ICleanUpManager.cs" />
+    <Compile Include="Managers\ICommonActionsManager.cs" />
+    <Compile Include="Managers\IContactsManager.cs" />
+    <Compile Include="Managers\IDocumentsManager.cs" />
+    <Compile Include="Managers\IDownloadManager.cs" />
+    <Compile Include="Managers\IFoldersManager.cs" />
+    <Compile Include="Managers\INotificationsManager.cs" />
+    <Compile Include="Managers\IOutgoingDocumentsManager.cs" />
+    <Compile Include="Managers\ISearchManager.cs" />
+    <Compile Include="Managers\IShortcodesManager.cs" />
+    <Compile Include="Managers\ISystemManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />
@@ -189,7 +188,6 @@
     <Folder Include="DataAccess\Exceptions\" />
     <Folder Include="Extensions\" />
     <Folder Include="Model\Links\" />
-    <Folder Include="Managers\Interfaces\" />
     <Folder Include="Utilities\PortableCollections\" />
     <Folder Include="Model\Support\" />
     <Folder Include="Tester\" />

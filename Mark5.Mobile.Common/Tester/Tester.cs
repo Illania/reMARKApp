@@ -20,7 +20,7 @@ namespace Mark5.Mobile.Common.Tester
 
         public async Task<bool> CanTest(CancellationToken ct = default(CancellationToken))
         {
-            return (await FileSystemStorage.GetConnectionInfoAsync(ct))?.Authenticated ?? false;
+            return (await FileSystemStorage.GetConnectionInfoAsync(ct)) != null;
         }
 
         public async Task<bool> Test(CancellationToken ct = default(CancellationToken))

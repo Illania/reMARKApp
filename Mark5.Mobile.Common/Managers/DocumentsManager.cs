@@ -25,6 +25,9 @@ namespace Mark5.Mobile.Common.Managers
     class DocumentsManager : AbstractManager, IDocumentsManager
     {
 
+        public int MaxToFetch { get; set; } = 500;
+        public DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; } = DocumentBodyTypeRequest.HtmlOnly;
+
         readonly IFileTransferServiceProxy fileTransferServiceProxy;
         readonly IDocumentsDataAccess documentsDataAccess;
 
@@ -35,7 +38,7 @@ namespace Mark5.Mobile.Common.Managers
             this.documentsDataAccess = documentsDataAccess;
         }
 
-        public async Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId = -1, int endId = -1, int maxItems = 500, SourceType sourceType = SourceType.Auto)
+        public async Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId = -1, int endId = -1, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
@@ -45,7 +48,7 @@ namespace Mark5.Mobile.Common.Managers
                     FolderId = folder.Id,
                     StartId = startId,
                     EndId = endId,
-                    MaxToFetch = maxItems,
+                    MaxToFetch = MaxToFetch,
                     ReverseSortOrder = false
                 });
 
@@ -58,18 +61,18 @@ namespace Mark5.Mobile.Common.Managers
 
             if (sourceType == SourceType.Local)
             {
-                return await documentsDataAccess.GetDocumentPreviewsAsync(folder, startId, endId, maxItems);
+                return await documentsDataAccess.GetDocumentPreviewsAsync(folder, startId, endId, MaxToFetch);
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<Document> GetDocumentAsync(Folder folder, int documentId, DocumentBodyTypeRequest bodyType, SourceType sourceType = SourceType.Auto)
+        public async Task<Document> GetDocumentAsync(Folder folder, int documentId, SourceType sourceType = SourceType.Auto)
         {
-            return await GetDocumentAsync(folder.Id, documentId, bodyType, sourceType);
+            return await GetDocumentAsync(folder.Id, documentId, sourceType);
         }
 
-        public async Task<Document> GetDocumentAsync(int folderId, int documentId, DocumentBodyTypeRequest bodyType, SourceType sourceType = SourceType.Auto)
+        public async Task<Document> GetDocumentAsync(int folderId, int documentId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
@@ -78,7 +81,7 @@ namespace Mark5.Mobile.Common.Managers
                     Token = Token,
                     FolderId = folderId,
                     DocumentId = documentId,
-                    BodyRequest = bodyType.ConvertEnum<DataContract.DocumentBodyTypeRequest>(),
+                    BodyRequest = DocumentBodyTypeRequest.ConvertEnum<DataContract.DocumentBodyTypeRequest>(),
                     IncludePreview = false
                 });
 
@@ -128,7 +131,7 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided");
         }
 
-        public async Task InserDocumentInOutgoingAsync(Guid id, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
+        public async Task InsertDocumentInOutgoingAsync(Guid id, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
                                                        DateTime sendOn, bool confirmRead, bool confirmDelivery, SourceType sourceType = SourceType.Auto)
         {
             var outgoingDocumentInfo = new OutgoingDocumentInfo
@@ -434,21 +437,6 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<Version> GetServiceVersionAsync(SourceType sourceType = SourceType.Auto)
-        {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
-            {
-                var result = await fileTransferServiceProxy.GetServiceVersionAsync(new DataContract.GetServiceVersionRequest
-                {
-                    Token = Token,
-                });
-
-                return result.Version;
-            }
-
-            throw new ArgumentException("Invalid sourceType provided.");
-        }
-
         public async Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, Document document, Folder folder, bool checkMD5 = false, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
@@ -460,7 +448,7 @@ namespace Mark5.Mobile.Common.Managers
                     Id = attachmentDescription.Id,
                     FolderId = folder.Id,
                     DocumentId = document.Id,
-                }, async (Stream arg) => { path = await FileSystemStorage.SaveAttachmentAsync(attachmentDescription, arg); });
+                }, async stream => { path = await FileSystemStorage.SaveAttachmentAsync(attachmentDescription, stream); });
 
                 return path;
             }
@@ -478,7 +466,7 @@ namespace Mark5.Mobile.Common.Managers
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
-                var result = await fileTransferServiceProxy.UploadTemporaryAttachmentAsync(new DataContract.UploadTemporaryAttachmentRequest()
+                var result = await fileTransferServiceProxy.UploadTemporaryAttachmentAsync(new DataContract.UploadTemporaryAttachmentRequest
                 {
                     Token = Token,
                     Extension = attachment.Extension,

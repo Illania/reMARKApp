@@ -1,4 +1,11 @@
-﻿using System;
+﻿//
+// Project: Mark5.Mobile.Common
+// File: DownloadManager.cs
+// Author: Ferdinando Papale <fp@nordic-it.com>
+//
+// Copyright (c) 2016 Nordic IT
+//
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,9 +16,17 @@ using Mark5.Mobile.Common.Services;
 
 namespace Mark5.Mobile.Common
 {
+
     class DownloadManager : IDownloadManager
     {
-        readonly IPortableConcurrentQueue<DownloadItemInfo> queue;
+
+        public Dictionary<ObjectType, DownloadPolicy> DownloadPolicies
+        {
+            get
+            {
+                return downloadPolicies;
+            }
+        }
 
         CancellationTokenSource cts;
         Task downloadTask;
@@ -19,23 +34,12 @@ namespace Mark5.Mobile.Common
         bool active;
         bool subscribed;
 
-        SemaphoreSlim semaphore;
-
         readonly IContactsDataAccess contactsDataAccess;
         readonly IShortcodesDataAccess shortcodesDataAccess;
         readonly IDocumentsDataAccess documentsDataAccess;
-
-        public DocumentBodyTypeRequest DocumentBodyTypeRequest
-        {
-            get;
-            set;
-        }
-
-        public Dictionary<ObjectType, DownloadPolicy> DownloadPolicies
-        {
-            get;
-            set;
-        }
+        readonly SemaphoreSlim semaphore;
+        readonly IPortableConcurrentQueue<DownloadItemInfo> queue;
+        readonly Dictionary<ObjectType, DownloadPolicy> downloadPolicies;
 
         public DownloadManager(IDocumentsDataAccess documentsDataAccess, IContactsDataAccess contactsDataAccess, IShortcodesDataAccess shortcodesDataAccess)
         {
@@ -43,8 +47,9 @@ namespace Mark5.Mobile.Common
             this.shortcodesDataAccess = shortcodesDataAccess;
             this.documentsDataAccess = documentsDataAccess;
 
-            queue = (IPortableConcurrentQueue<DownloadItemInfo>)Activator.CreateInstance(CommonConfig.ConcurrentQueueType.MakeGenericType(new Type[] { typeof(DownloadItemInfo) }));
             semaphore = new SemaphoreSlim(1);
+            queue = (IPortableConcurrentQueue<DownloadItemInfo>)Activator.CreateInstance(CommonConfig.ConcurrentQueueType.MakeGenericType(new Type[] { typeof(DownloadItemInfo) }));
+            downloadPolicies = new Dictionary<ObjectType, DownloadPolicy>();
         }
 
         #region Public methods
@@ -92,14 +97,14 @@ namespace Mark5.Mobile.Common
                 return false;
             }
 
-            if (DownloadPolicies[objectType].GlobalSettingPolicy)
+            if (DownloadPolicies[objectType] is DownloadAllPolicy)
             {
                 return true;
             }
 
-            if (DownloadPolicies[objectType].AvailableFoldersId.Contains(folderId))
+            if (DownloadPolicies[objectType] is DownloadFoldersPolicy)
             {
-                return true;
+                return ((DownloadFoldersPolicy)DownloadPolicies[objectType]).FolderIds.Contains(folderId);
             }
 
             return false;
@@ -119,7 +124,7 @@ namespace Mark5.Mobile.Common
                     subscribed = true;
                 }
 
-                StartSendTask();
+                StartDownloadTask();
             }
             finally
             {
@@ -132,7 +137,7 @@ namespace Mark5.Mobile.Common
             try
             {
                 await semaphore.WaitAsync();
-                await StopSendTask();
+                await StopDownloadTask();
 
                 if (subscribed)
                 {
@@ -152,7 +157,7 @@ namespace Mark5.Mobile.Common
 
         #region Private methods
 
-        void StartSendTask()
+        void StartDownloadTask()
         {
             if (downloadTask != null)
             {
@@ -178,7 +183,7 @@ namespace Mark5.Mobile.Common
             });
         }
 
-        async Task StopSendTask()
+        async Task StopDownloadTask()
         {
             if (cts != null)
             {
@@ -226,7 +231,6 @@ namespace Mark5.Mobile.Common
                             throw new ArgumentException("Object type not supported");
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -258,7 +262,7 @@ namespace Mark5.Mobile.Common
                     continue;
                 }
 
-                await Managers.Managers.DocumentsManager.GetDocumentAsync(itemInfo.FolderId, documentId, DocumentBodyTypeRequest);
+                await Managers.Managers.DocumentsManager.GetDocumentAsync(itemInfo.FolderId, documentId);
             }
         }
 
@@ -382,18 +386,18 @@ namespace Mark5.Mobile.Common
 
         async void ReachabilityRefreshed(object sender, ReachabilityRefreshedEventArgs e)
         {
-            if (!active)
+            if (!active || !e.Changed)
             {
                 return;
             }
 
             if (e.IsReachable)
             {
-                StartSendTask();
+                StartDownloadTask();
             }
             else
             {
-                await StopSendTask();
+                await StopDownloadTask();
             }
         }
 

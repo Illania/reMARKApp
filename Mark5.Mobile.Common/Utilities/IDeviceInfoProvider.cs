@@ -18,6 +18,8 @@ namespace Mark5.Mobile.Common.Utilities
         string GetDeviceId();
 
         string GetDeviceName();
+
+        string GetAppVersionString();
     }
 }
 

@@ -6,19 +6,19 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V7.Widget;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Services;
 using Mark5.Mobile.Droid.Views.Common;
-using Xamarin;
 
 namespace Mark5.Mobile.Droid.Views.Activity
 {
@@ -39,7 +39,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-
             SetTitle(Resource.String.app_name);
             SetContentView(Resource.Layout.activity_login);
 
@@ -64,59 +63,74 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
             authenticator = AuthenticatorFactory.Create();
 
+            CommonConfig.Logger.Info($"Created {nameof(LoginActivity)}");
+        }
+
+        protected override void OnStart()
+        {
+            base.OnStart();
+
+            CommonConfig.Logger.Info($"Starting {nameof(LoginActivity)}...");
+
             Task.Run(async () =>
             {
-                var ci = await authenticator.GetConnectionInfoAsync();
+                return await authenticator.GetConnectionInfoAsync();
+            }).ContinueWith(t =>
+            {
+                var ci = t.Result;
 
-                RunOnUiThreadIfNecessary(() =>
-                {
-                    usernameEditText.Text = ci?.Username;
-                    passwordEditText.Text = string.Empty;
-                    hostnameEditText.Text = ci?.Hostname;
-                    portEditText.Text = ci?.Port.ToString();
-                    sslSpinner.SetSelection((int?)ci?.SslMode ?? 0);
+                usernameEditText.Text = ci?.Username;
+                passwordEditText.Text = string.Empty;
+                hostnameEditText.Text = ci?.Hostname;
+                portEditText.Text = ci?.Port.ToString();
+                sslSpinner.SetSelection((int?)ci?.SslMode ?? 0);
 
-                    loginButton.Enabled = true;
-                });
-            });
+                loginButton.Enabled = true;
+            }, TaskScheduler.FromCurrentSynchronizationContext());
+
+            CommonConfig.Logger.Info($"Started {nameof(LoginActivity)}");
         }
 
         async void LoginButton_Click(object sender, EventArgs e)
         {
+            CommonConfig.Logger.Info($"Attempting login...");
+
             Action dismissAction = null;
 
             try
             {
-                //var username = usernameEditText.Text;
-                //var password = passwordEditText.Text;
-                //var hostname = hostnameEditText.Text;
-                //var port = portEditText.Text;
-                //var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
-
-                var username = "mark5";
-                var password = "mark5";
-                var hostname = "192.168.75.51";
-                var port = "8093";
-                var sslMode = SslMode.Off;
+                var username = usernameEditText.Text;
+                var password = passwordEditText.Text;
+                var hostname = hostnameEditText.Text;
+                var port = portEditText.Text;
+                var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
 
                 var errors = false;
                 if (!Validator.IsUsernameValid(username))
                 {
+                    CommonConfig.Logger.Info($"Invalid username was entered: {username}");
+
                     usernameEditText.Error = GetText(Resource.String.username_invalid);
                     errors = true;
                 }
                 if (!Validator.IsPasswordValid(password))
                 {
+                    CommonConfig.Logger.Info($"Invalid password was entered: {password}");
+
                     passwordEditText.Error = GetText(Resource.String.passowrd_invalid);
                     errors = true;
                 }
                 if (!Validator.IsHostNameValid(hostname))
                 {
+                    CommonConfig.Logger.Info($"Invalid hostname was entered: {hostname}");
+
                     hostnameEditText.Error = GetText(Resource.String.hostname_invalid);
                     errors = true;
                 }
                 if (!Validator.IsPortValid(port))
                 {
+                    CommonConfig.Logger.Info($"Invalid port was entered: {port}");
+
                     portEditText.Error = GetText(Resource.String.port_invalid);
                     errors = true;
                 }
@@ -125,14 +139,18 @@ namespace Mark5.Mobile.Droid.Views.Activity
                 {
                     return;
                 }
+
                 if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_accept_selfsigned_warning))
                 {
                     return;
                 }
+
                 if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_off_warning))
                 {
                     return;
                 }
+
+                CommonConfig.Logger.Info("Logging in...");
 
                 dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.logging_in, Resource.String.please_wait);
 
@@ -146,21 +164,46 @@ namespace Mark5.Mobile.Droid.Views.Activity
                         break;
                 }
 
+
+                CommonConfig.Logger.Info("Authenticating...");
+
                 var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port));
 
-                Managers.Initialize(ci);
-                PlatformConfig.ReachabilityBroadcastReceiver.Register();
-
-                var ss = await Managers.SystemManager.GetSystemSettingsAsync();
-
-                Insights.Identify($"{ci.Username}@{ci.SslMode},{ci.Hostname}:{ci.Port}", new Dictionary<string, string>
-                {
-                    [Insights.Traits.FirstName] = ss?.UserInfo?.User?.FirstName,
-                    [Insights.Traits.LastName] = ss?.UserInfo?.User?.LastName,
-                    ["System Administrator"] = (ss?.UserInfo?.IsSystemAdministrator ?? false) ? "Yes" : "No"
-                });
+                CommonConfig.Logger.Info($"Authenticated - saving connection info {ci}...");
 
                 await authenticator.SaveConnectionInfoAsync(ci);
+
+                CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
+
+                Managers.Initialize(ci);
+                Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
+                Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                var policies = Managers.DownloadManager.DownloadPolicies;
+                policies[ObjectType.Document] = new DownloadFoldersPolicy();
+                if (PlatformConfig.Preferences.SynchroniseContacts)
+                {
+                    policies[ObjectType.Contact] = new DownloadAllPolicy();
+                }
+                if (PlatformConfig.Preferences.SynchroniseShortcodes)
+                {
+                    policies[ObjectType.Shortcode] = new DownloadAllPolicy();
+                }
+
+                CommonConfig.Logger.Info($"Starting {nameof(IDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
+
+                await Managers.DownloadManager.Start();
+                await Managers.OutgoingDocumentsManager.Start();
+
+                CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
+
+                await CommonConfig.ReachabilityService.Refresh();
+                PlatformConfig.ReachabilityBroadcastReceiver.Register();
+
+                CommonConfig.Logger.Info("Retrieving system settings...");
+
+                await Managers.SystemManager.GetSystemSettingsAsync();
+
+                CommonConfig.Logger.Info($"Logged in - will present {nameof(MainActivity)}");
 
                 StartActivity(new Intent(this, typeof(MainActivity)));
                 Finish();
@@ -172,9 +215,12 @@ namespace Mark5.Mobile.Droid.Views.Activity
                     dismissAction();
                 }
 
+                CommonConfig.Logger.Error("Log in failed", ex);
+
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
     }
+
 }
 

@@ -680,12 +680,12 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     var innerSelectQueryText = $"select {nameof(FolderDocumentLink.DocumentId)} from {nameof(FolderDocumentLink)}";
 
-                    var outerDeleteQueryPreview = $"delete from {nameof(DocumentPreview)} where {nameof(DocumentPreview.Id)} not in ({innerSelectQueryText}) ";
-                    var cmd = c.CreateCommand(outerDeleteQueryPreview);
+                    var outerDeleteQueryDocumentPreview = $"delete from {nameof(DocumentPreview)} where {nameof(DocumentPreview.Id)} not in ({innerSelectQueryText}) ";
+                    var cmd = c.CreateCommand(outerDeleteQueryDocumentPreview);
                     cmd.ExecuteNonQuery();
 
-                    var outerDeleteQueryContact = $"delete from {nameof(Document)} where {nameof(Document.Id)} not in ({innerSelectQueryText}) ";
-                    var cmd2 = c.CreateCommand(outerDeleteQueryContact);
+                    var outerDeleteQueryDocument = $"delete from {nameof(Document)} where {nameof(Document.Id)} not in ({innerSelectQueryText}) ";
+                    var cmd2 = c.CreateCommand(outerDeleteQueryDocument);
                     cmd2.ExecuteNonQuery();
                 });
 

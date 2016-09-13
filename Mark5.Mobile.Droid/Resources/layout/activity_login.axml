@@ -77,7 +77,7 @@
                 android:layout_marginTop="10dp" />
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/login_button"
-                android:text="@string/login"
+                android:text="@string/log_in"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"

@@ -29,6 +29,7 @@ namespace Mark5.Mobile.Common.Storage
             public const string SystemUserDepartments = "systemUserDepartments.json";
             public const string FavoriteFolders = "favoriteFolders.json";
             public const string NotificationSettings = "notificationSettings.json";
+            public const string LastCacheCleanUp = "lastCacheCleanUp.json";
 
             public const string OutgoingDocument = "document.json";
             public const string OutgoingDocumentPreview = "documentPreview.json";
@@ -45,7 +46,8 @@ namespace Mark5.Mobile.Common.Storage
             [Filenames.SystemSettings] = new SemaphoreSlim(1),
             [Filenames.SystemUserDepartments] = new SemaphoreSlim(1),
             [Filenames.FavoriteFolders] = new SemaphoreSlim(1),
-            [Filenames.NotificationSettings] = new SemaphoreSlim(1)
+            [Filenames.NotificationSettings] = new SemaphoreSlim(1),
+            [Filenames.LastCacheCleanUp] = new SemaphoreSlim(1)
         }.ToImmutableDictionary();
 
         static readonly IDictionary<string, object> objectCache = new Dictionary<string, object>();
@@ -131,6 +133,27 @@ namespace Mark5.Mobile.Common.Storage
         {
             await SaveAsync(notificationSettings, Filenames.NotificationSettings, ct);
         }
+
+        #endregion
+
+        #region LastCacheCleanUp
+
+        public static async Task<DateTime> GetLastCacheCleanUpAsync(CancellationToken ct = default(CancellationToken))
+        {
+            var lastCacheCleanUpString = await GetAsync<string>(Filenames.LastCacheCleanUp, ct);
+            if (lastCacheCleanUpString == null)
+            {
+                return DateTime.SpecifyKind(default(DateTime), DateTimeKind.Utc);
+            }
+            return DateTime.SpecifyKind(Convert.ToDateTime(lastCacheCleanUpString), DateTimeKind.Utc);
+        }
+
+        public static async Task SaveLastCacheCleanUpAsync(DateTime lastCacheCleanUp, CancellationToken ct = default(CancellationToken))
+        {
+            await SaveAsync(lastCacheCleanUp.ToUniversalTime().ToString("s"), Filenames.LastCacheCleanUp, ct);
+        }
+
+        #endregion
 
         #region OutgoingDocuments
 
@@ -293,8 +316,6 @@ namespace Mark5.Mobile.Common.Storage
 
         #endregion
 
-        #endregion
-
         #region Private methods
 
         static async Task<T> GetAsync<T>(string filename, CancellationToken ct = default(CancellationToken)) where T : class
@@ -347,56 +368,6 @@ namespace Mark5.Mobile.Common.Storage
         }
 
         #endregion
-
-        #region Reset
-
-        static async Task ResetFileStorage()
-        {
-            var connectionInfo = await GetConnectionInfoAsync();
-            connectionInfo.Authenticated = false;
-            connectionInfo.Token = null;
-            await SaveConnectionInfoAsync(connectionInfo);
-
-            objectCache.Clear();
-
-            var filesToRemove = new List<IFile>();
-            var foldersToRemove = new List<IFolder>();
-
-            var foldersToClear = new List<IFolder> {CommonConfig.AttachmentsFolder, CommonConfig.OutgoingFolder,
-                                                                CommonConfig.CacheFolder};
-            //If Attachments and Outgoing are subfolders of Cache, that's not necessary
-
-            foreach (var folderToClear in foldersToClear)
-            {
-                filesToRemove.AddRange(await folderToClear.GetFilesAsync());
-                foldersToRemove.AddRange(await folderToClear.GetFoldersAsync());
-            }
-
-            var filenames = new List<string>{Filenames.SystemSettings, Filenames.SystemUserDepartments,
-                                                      Filenames.NotificationSettings};
-
-            foreach (var filename in filenames)
-            {
-                var fileExists = await CommonConfig.DataFolder.CheckExistsAsync(filename);
-                if (fileExists == ExistenceCheckResult.FileExists)
-                {
-                    filesToRemove.Add(await CommonConfig.DataFolder.GetFileAsync(filename));
-                }
-            }
-
-            foreach (var file in filesToRemove)
-            {
-                await file.DeleteAsync();
-            }
-
-            foreach (var folder in foldersToRemove)
-            {
-                await folder.DeleteAsync();
-            }
-        }
-
-
-        #endregion  
 
     }
 }
