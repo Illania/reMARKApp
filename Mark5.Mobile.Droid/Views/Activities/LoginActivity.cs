@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
+using Android.Content.PM;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V7.Widget;
@@ -23,7 +24,7 @@ using Mark5.Mobile.Droid.Views.Common;
 namespace Mark5.Mobile.Droid.Views.Activity
 {
 
-    [Activity]
+    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class LoginActivity : BaseAppCompatActivity
     {
 
