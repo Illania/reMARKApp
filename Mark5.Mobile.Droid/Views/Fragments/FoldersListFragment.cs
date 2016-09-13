@@ -6,51 +6,368 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Android.App;
+using Android.Content;
 using Android.OS;
-using Android.Support.V4.App;
+using Android.Support.V4.Widget;
+using Android.Support.V7.App;
+using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Android.Content;
-using Mark5.Mobile.Droid.Views.Activities;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Views.Activities;
+using Mark5.Mobile.Droid.Views.Common;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
-
-    public class FoldersListFragment : Fragment
+    public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback
     {
+        public ModuleType ModuleType { get; set; } //TODO remove
+        public Folder CurrentFolder { get; set; }
 
-        public int Text
-        {
-            get;
-            set;
-        }
+        FolderListAdapter adapter;
+        RecyclerView recyclerView;
+        SwipeRefreshLayout refreshLayout;
+        ActionMode actionMode;
+
+        #region Overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            return inflater.Inflate(Resource.Layout.fragment_list_folders, container, false);
+            var rootView = inflater.Inflate(Resource.Layout.fragment_list_folders, container, false);
+
+            refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
+            refreshLayout.Refresh += RefreshLayout_Refresh;
+
+            recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.folderRecyclerView);
+            recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
+            recyclerView.HasFixedSize = true;
+
+            adapter = new FolderListAdapter(recyclerView);
+            adapter.expandIconClicked += Adapter_ExpandClicked;
+            adapter.itemClicked += Adapter_ItemClicked;
+            adapter.itemLongClicked += Adapter_ItemLongClicked;
+
+            //HasOptionsMenu = true;
+
+            recyclerView.SetAdapter(adapter);
+
+            return rootView;
         }
 
-        public override void OnStart()
+        public async override void OnStart()
         {
             base.OnStart();
 
-            var btn = Activity.FindViewById<Button>(Resource.Id.btn1);
-            btn.Text = "OpenFolder";
-            btn.Click += (sender, e) =>
-            {
-                var f = new Folder
-                {
-                    Id = 4,
-                    Name = "Browse (all)",
-                };
+            SetTitles();
+            await RefreshData();
+        }
 
-                var i = new Intent(Activity, typeof(DocumentsListActivity));
-                i.PutExtra(DocumentsListActivity.FolderIntentKey, SerializationUtils.Serialize(f));
-                StartActivity(i);
+        //public override bool OnOptionsItemSelected(IMenuItem item)
+        //{
+        //    if (item.ItemId == Android.Resource.Id.Home)
+        //    {
+        //        Activity.OnBackPressed();
+        //        return true;
+        //    }
+
+        //    return base.OnOptionsItemSelected(item);
+        //}
+
+        #endregion
+
+        #region Utility methods
+
+        async Task RefreshData(bool forceRefresh = false)
+        {
+            if (!CurrentFolder.HasSubFolders)
+            {
+                return;
+            }
+
+            if (forceRefresh || !CurrentFolder.SubFolders.Any())
+            {
+                refreshLayout.Post(() => refreshLayout.Refreshing = true); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
+
+                var folders = await Managers.FoldersManager.GetFoldersAsync(ModuleType, CurrentFolder.Root ? null : CurrentFolder, 0); //TODO do we do this check here or in the manager?
+                CurrentFolder.SubFolders.Clear();
+                CurrentFolder.SubFolders = folders;
+
+                adapter.Refresh(folders);
+                refreshLayout.Post(() => refreshLayout.Refreshing = false); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
+            }
+            else
+            {
+                adapter.Refresh(CurrentFolder.SubFolders);
+            }
+        }
+
+        void SetTitles()
+        {
+            var title = ModuleType.ToString();
+            var subtitle = CurrentFolder.Root ? string.Empty : CurrentFolder.Name;
+
+            ((AppCompatActivity)Activity).SupportActionBar.Title = title;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = subtitle;
+        }
+
+        void NavigateInFolder(ModuleType moduleType, Folder folder)
+        {
+            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
+
+            var foldersListFragment = new FoldersListFragment
+            {
+                CurrentFolder = folder,
+                ModuleType = moduleType,
+            };
+
+            var tag = foldersListFragment.GenerateTag();
+            var ft = fragmentManager.BeginTransaction();
+            ft.SetTransition((int)FragmentTransit.FragmentOpen);
+            ft.Replace(Resource.Id.fragment_container, foldersListFragment, tag);
+            ft.AddToBackStack(tag);
+            ft.Commit();
+        }
+
+        #endregion
+
+        #region List item event handlers
+
+        void Adapter_ExpandClicked(object sender, Folder folder)
+        {
+            NavigateInFolder(ModuleType, folder);
+        }
+
+        void Adapter_ItemClicked(object sender, Folder folder)
+        {
+            var i = new Intent(Activity, typeof(DocumentsListActivity));
+            i.PutExtra(DocumentsListActivity.FolderIntentKey, SerializationUtils.Serialize(folder));
+            StartActivity(i);
+        }
+
+        void Adapter_ItemLongClicked(object sender, Folder folder)
+        {
+            if (actionMode != null)
+            {
+                return;
+            }
+
+            var itemView = sender as View;
+            itemView.Selected = true;
+            itemView.Activated = true;
+
+            actionMode = Activity.StartActionMode(this);
+        }
+
+        bool ActionMode.ICallback.OnActionItemClicked(ActionMode mode, IMenuItem item)
+        {
+            switch (item.ItemId)
+            {
+                case 1:
+                    mode.Finish();
+                    return true;
+                case 2:
+                    mode.Finish();
+                    return true;
+                case 3:
+                    mode.Finish();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        bool ActionMode.ICallback.OnCreateActionMode(ActionMode mode, IMenu menu)
+        {
+            menu.Add(Menu.None, 1, Menu.None, "First").SetIcon(Resource.Drawable.abc_ic_menu_share_mtrl_alpha);
+            menu.Add(Menu.None, 6, Menu.None, "Six").SetIcon(Resource.Drawable.abc_ic_menu_copy_mtrl_am_alpha);
+            menu.Add(Menu.None, 2, Menu.None, "Second");
+            menu.Add(Menu.None, 3, Menu.None, "Third");
+            menu.Add(Menu.None, 4, Menu.None, "Four");
+            menu.Add(Menu.None, 5, Menu.None, "Five");
+
+            return true;
+        }
+
+        void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
+        {
+            actionMode = null;
+        }
+
+        bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
+        {
+            return false;
+        }
+
+        #endregion
+
+        #region SwipeRefresLayout event handlers
+
+        async void RefreshLayout_Refresh(object sender, EventArgs e)
+        {
+            await RefreshData(true);
+        }
+
+        #endregion
+
+        #region Retained Fragment methods
+
+        public override string GenerateTag()
+        {
+            return $"{nameof(FoldersListFragment)} [FolderId={CurrentFolder.Id}, ModuleType={ModuleType}]";
+        }
+
+        public override IRetainableState OnRetainInstanceState()
+        {
+            return new FolderListFragmentState
+            {
+                Folder = CurrentFolder,
+                Module = ModuleType,
             };
         }
+
+        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
+        {
+            var flfs = restoredState as FolderListFragmentState;
+            if (flfs != null)
+            {
+                CurrentFolder = flfs.Folder;
+                ModuleType = flfs.Module;
+            }
+        }
+
+        class FolderListFragmentState : IRetainableState
+        {
+            public Folder Folder { get; set; }
+            public ModuleType Module { get; set; }
+        }
+
+        #endregion
     }
+
+    #region RecyclerView Adapter/ViewHolder
+
+    class FolderListAdapter : RecyclerView.Adapter
+    {
+        readonly List<Folder> foldersInView = new List<Folder>();
+        readonly RecyclerView parentView;
+
+        public event EventHandler<Folder> expandIconClicked = delegate { }; //TODO case
+        public event EventHandler<Folder> itemClicked = delegate { };
+        public event EventHandler<Folder> itemLongClicked = delegate { };
+
+        public FolderListAdapter(RecyclerView parentRecyclerView)
+        {
+            this.parentView = parentRecyclerView;
+        }
+
+        public override int ItemCount
+        {
+            get
+            {
+                return foldersInView.Count;
+            }
+        }
+
+        public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
+        {
+
+            //Binding of actual parameters, the view is already created
+            var fh = holder as FolderViewHolder;
+            var folder = foldersInView[position];
+
+            fh.FolderName.Text = folder.Name;
+            fh.ExpandButtonLayout.Visibility = folder.HasSubFolders ? ViewStates.Visible : ViewStates.Gone;
+            if (folder.InternalType == FolderInternalType.Worktray)
+            {
+                fh.FolderIcon.SetImageResource(Resource.Drawable.folder_worktray);
+            }
+            else if (folder.Type == FolderType.Spam)
+            {
+                fh.FolderIcon.SetImageResource(Resource.Drawable.folder_spam);
+            }
+            else if (folder.Type == FolderType.Draft)
+            {
+                fh.FolderIcon.SetImageResource(Resource.Drawable.folder_draft);
+            }
+            else
+            {
+                fh.FolderIcon.SetImageResource(Resource.Drawable.folder); //TODO need to add icon for local
+            }
+        }
+
+        public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
+        {
+            View itemView = LayoutInflater.From(parent.Context).
+                                          Inflate(Resource.Layout.folder_list_item, parent, false);
+
+            var folderViewHolder = new FolderViewHolder(itemView);
+            folderViewHolder.expandClicked += FolderViewHolder_ExpandClicked;
+            folderViewHolder.itemClicked += FolderViewHolder_ItemClicked;
+            folderViewHolder.itemLongClicked += FolderViewHolder_ItemLongClicked;
+            return folderViewHolder;
+        }
+
+        public void Refresh(List<Folder> folders)
+        {
+            foldersInView.Clear();
+            foldersInView.AddRange(folders);
+            NotifyDataSetChanged();
+        }
+
+        void FolderViewHolder_ExpandClicked(object sender, View view)
+        {
+            var position = parentView.GetChildLayoutPosition(view);
+            var folder = foldersInView[position];
+            expandIconClicked(view, folder);
+        }
+
+        void FolderViewHolder_ItemClicked(object sender, View view)
+        {
+            var position = parentView.GetChildLayoutPosition(view);
+            var folder = foldersInView[position];
+            itemClicked(view, folder);
+        }
+
+        void FolderViewHolder_ItemLongClicked(object sender, View view)
+        {
+            var position = parentView.GetChildLayoutPosition(view);
+            var folder = foldersInView[position];
+            itemLongClicked(view, folder);
+        }
+    }
+
+    class FolderViewHolder : RecyclerView.ViewHolder
+    {
+        public LinearLayoutCompat ExpandButtonLayout { get; private set; }
+        public TextView FolderName { get; private set; }
+        public ImageView FolderIcon { get; private set; }
+
+        public event EventHandler<View> expandClicked = delegate { };
+        public event EventHandler<View> itemClicked = delegate { };
+        public event EventHandler<View> itemLongClicked = delegate { };
+
+        public FolderViewHolder(View itemView) : base(itemView)
+        {
+            // Locate and cache view references
+            ExpandButtonLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.expandButtonLayout);
+            ExpandButtonLayout.Click += (sender, e) => { expandClicked(this, itemView); };
+
+            FolderName = itemView.FindViewById<TextView>(Resource.Id.folderName);
+            FolderIcon = itemView.FindViewById<ImageView>(Resource.Id.folderIcon);
+
+            var internalContainerLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.internalContainerLayout);
+            internalContainerLayout.Click += (sender, e) => itemClicked(this, itemView);
+            internalContainerLayout.LongClick += (sender, e) => itemLongClicked(this, itemView);
+        }
+    }
+
+    #endregion
+
 }
 

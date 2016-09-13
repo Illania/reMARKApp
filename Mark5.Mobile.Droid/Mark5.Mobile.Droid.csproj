@@ -158,6 +158,7 @@
     <Compile Include="Views\Activities\DocumentsListActivity.cs" />
     <Compile Include="Views\Common\RetainableStateFragment.cs" />
     <Compile Include="Views\Fragments\DocumentsListFragment.cs" />
+    <Compile Include="Views\Common\RetainedFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -219,6 +220,31 @@
     <AndroidResource Include="Resources\mipmap-xxhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\mipmap-xhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\mipmap-hdpi\drawer_header_background.png" />
+    <AndroidResource Include="Resources\layout\folder_list_item.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder_outgoing.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder_spam.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder_outgoing.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder_spam.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder_outgoing.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder_spam.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_outgoing.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_spam.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\arrow_right.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\arrow_right.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\arrow_right.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\arrow_right.png" />
     <AndroidResource Include="Resources\xml\preferences.axml" />
     <AndroidResource Include="Resources\values\strings-preferences.axml" />
     <AndroidResource Include="Resources\values\values-preferences.axml" />
