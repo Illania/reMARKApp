@@ -31,8 +31,8 @@ namespace Mark5.ServiceReference.AppService
         {
             Name = "AppService.v3",
             Namespace = "com.nordic-it.appservice.v3",
-            MaxBufferSize = 64 * 1024 * 1024,
-            MaxReceivedMessageSize = 64 * 1024 * 1024,
+            MaxBufferSize = 16 * 1024 * 1024,
+            MaxReceivedMessageSize = 16 * 1024 * 1024,
             OpenTimeout = new TimeSpan(0, 15, 0),
             ReceiveTimeout = new TimeSpan(0, 15, 0),
             CloseTimeout = new TimeSpan(0, 15, 0),

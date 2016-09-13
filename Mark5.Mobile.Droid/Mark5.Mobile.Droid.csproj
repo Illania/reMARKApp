@@ -28,13 +28,14 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <AndroidLinkMode>None</AndroidLinkMode>
-    <AndroidSupportedAbis>armeabi-v7a;armeabi;arm64-v8a</AndroidSupportedAbis>
+    <AndroidSupportedAbis>armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
 <AndroidKeyStore>True</AndroidKeyStore>
 <AndroidSigningKeyStore>../../extra/App Development Certificates/Android/default.keystore</AndroidSigningKeyStore>
 <AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
 <AndroidSigningKeyAlias>default -tsa https://timestamp.geotrust.com/tsa</AndroidSigningKeyAlias>
 <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
 <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+<AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -49,6 +50,7 @@
 <AndroidSigningKeyAlias>default -tsa https://timestamp.geotrust.com/tsa</AndroidSigningKeyAlias>
 <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
 <AndroidLinkSkip>System.Runtime;System.Collections;System.Runtime.Serialization</AndroidLinkSkip>
+<AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
