@@ -161,6 +161,7 @@
     <Compile Include="Views\Common\RetainableStateFragment.cs" />
     <Compile Include="Views\Fragments\DocumentsListFragment.cs" />
     <Compile Include="Views\Common\RetainedFragment.cs" />
+    <Compile Include="Views\Common\SmoothActionBarDrawerToggle.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
