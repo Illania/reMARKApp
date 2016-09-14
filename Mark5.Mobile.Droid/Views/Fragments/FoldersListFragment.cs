@@ -88,7 +88,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 refreshLayout.Post(() => refreshLayout.Refreshing = true); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
 
-                var folders = await Managers.FoldersManager.GetFoldersAsync(Folder.Root ? null : Folder, 0); //TODO do we do this check here or in the manager?
+                var folders = await Managers.FoldersManager.GetFoldersAsync(Folder, 2);
                 Folder.SubFolders.Clear();
                 Folder.SubFolders = folders;
 
