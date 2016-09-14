@@ -28,8 +28,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 {
     public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback
     {
-        public ModuleType ModuleType { get; set; } //TODO remove
-        public Folder CurrentFolder { get; set; }
+        public Folder Folder { get; set; }
 
         FolderListAdapter adapter;
         RecyclerView recyclerView;
@@ -40,12 +39,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            var rootView = inflater.Inflate(Resource.Layout.fragment_list_folders, container, false);
+            var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
             refreshLayout.Refresh += RefreshLayout_Refresh;
 
-            recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.folderRecyclerView);
+            recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recyclerView);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.HasFixedSize = true;
 
@@ -59,11 +58,18 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return rootView;
         }
 
-        public async override void OnStart()
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
-            base.OnStart();
+            base.OnViewCreated(view, savedInstanceState);
 
-            SetTitles();
+            ((AppCompatActivity)Activity).SupportActionBar.Title = Folder.Module.ToString();
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder.Root ? string.Empty : Folder.Name;
+        }
+
+        public async override void OnResume()
+        {
+            base.OnResume();
+
             await RefreshData();
         }
 
@@ -73,35 +79,26 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         async Task RefreshData(bool forceRefresh = false)
         {
-            if (!CurrentFolder.HasSubFolders)
+            if (!Folder.HasSubFolders)
             {
                 return;
             }
 
-            if (forceRefresh || !CurrentFolder.SubFolders.Any())
+            if (forceRefresh || !Folder.SubFolders.Any())
             {
                 refreshLayout.Post(() => refreshLayout.Refreshing = true); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
 
-                var folders = await Managers.FoldersManager.GetFoldersAsync(ModuleType, CurrentFolder.Root ? null : CurrentFolder, 0); //TODO do we do this check here or in the manager?
-                CurrentFolder.SubFolders.Clear();
-                CurrentFolder.SubFolders = folders;
+                var folders = await Managers.FoldersManager.GetFoldersAsync(Folder.Root ? null : Folder, 0); //TODO do we do this check here or in the manager?
+                Folder.SubFolders.Clear();
+                Folder.SubFolders = folders;
 
                 adapter.Refresh(folders);
                 refreshLayout.Post(() => refreshLayout.Refreshing = false); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
             }
             else
             {
-                adapter.Refresh(CurrentFolder.SubFolders);
+                adapter.Refresh(Folder.SubFolders);
             }
-        }
-
-        void SetTitles()
-        {
-            var title = ModuleType.ToString();
-            var subtitle = CurrentFolder.Root ? string.Empty : CurrentFolder.Name;
-
-            ((AppCompatActivity)Activity).SupportActionBar.Title = title;
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = subtitle;
         }
 
         void NavigateInFolder(ModuleType moduleType, Folder folder)
@@ -110,8 +107,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             var foldersListFragment = new FoldersListFragment
             {
-                CurrentFolder = folder,
-                ModuleType = moduleType,
+                Folder = folder,
             };
 
             var tag = foldersListFragment.GenerateTag();
@@ -128,7 +124,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         void Adapter_ExpandClicked(object sender, int position)
         {
-            NavigateInFolder(ModuleType, adapter.GetItemAtPosition(position));
+            NavigateInFolder(Folder.Module, adapter.GetItemAtPosition(position));
         }
 
         void Adapter_ItemClicked(object sender, int position)
@@ -232,15 +228,14 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(FoldersListFragment)} [FolderId={CurrentFolder.Id}, ModuleType={ModuleType}]";
+            return $"{nameof(FoldersListFragment)} [FolderId={Folder.Id}, ModuleType={Folder.Module}]";
         }
 
         public override IRetainableState OnRetainInstanceState()
         {
             return new FolderListFragmentState
             {
-                Folder = CurrentFolder,
-                Module = ModuleType,
+                Folder = Folder,
             };
         }
 
@@ -249,15 +244,13 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             var flfs = restoredState as FolderListFragmentState;
             if (flfs != null)
             {
-                CurrentFolder = flfs.Folder;
-                ModuleType = flfs.Module;
+                Folder = flfs.Folder;
             }
         }
 
         class FolderListFragmentState : IRetainableState
         {
             public Folder Folder { get; set; }
-            public ModuleType Module { get; set; }
         }
 
         #endregion
@@ -369,7 +362,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
         {
             View itemView = LayoutInflater.From(parent.Context).
-                                          Inflate(Resource.Layout.folder_list_item, parent, false);
+                                          Inflate(Resource.Layout.list_item_folder, parent, false);
 
             var folderViewHolder = new FolderViewHolder(itemView);
             folderViewHolder.expandClicked += FolderViewHolder_ExpandClicked;
