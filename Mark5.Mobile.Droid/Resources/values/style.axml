@@ -9,6 +9,7 @@
 		<item name="colorAccent">@color/brown</item>
 		<item name="colorButtonNormal">@color/lightgray</item>
 		<item name="colorControlHighlight">@color/brown</item>
+		<item name="colorControlActivated">@color/brown</item>
 		<item name="actionBarItemBackground">@color/darkblue</item>
 		<item name="actionModeBackground">@color/darkblue</item>
 		<item name="spinnerStyle">@style/mark5spinner</item>

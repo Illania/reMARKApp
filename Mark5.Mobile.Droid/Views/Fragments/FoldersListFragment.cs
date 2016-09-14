@@ -17,6 +17,7 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -53,8 +54,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             adapter.itemClicked += Adapter_ItemClicked;
             adapter.itemLongClicked += Adapter_ItemLongClicked;
 
-            //HasOptionsMenu = true;
-
             recyclerView.SetAdapter(adapter);
 
             return rootView;
@@ -67,17 +66,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             SetTitles();
             await RefreshData();
         }
-
-        //public override bool OnOptionsItemSelected(IMenuItem item)
-        //{
-        //    if (item.ItemId == Android.Resource.Id.Home)
-        //    {
-        //        Activity.OnBackPressed();
-        //        return true;
-        //    }
-
-        //    return base.OnOptionsItemSelected(item);
-        //}
 
         #endregion
 
@@ -138,30 +126,50 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         #region List item event handlers
 
-        void Adapter_ExpandClicked(object sender, Folder folder)
+        void Adapter_ExpandClicked(object sender, int position)
         {
-            NavigateInFolder(ModuleType, folder);
+            NavigateInFolder(ModuleType, adapter.GetItemAtPosition(position));
         }
 
-        void Adapter_ItemClicked(object sender, Folder folder)
+        void Adapter_ItemClicked(object sender, int position)
         {
-            var i = new Intent(Activity, typeof(DocumentsListActivity));
-            i.PutExtra(DocumentsListActivity.FolderIntentKey, SerializationUtils.Serialize(folder));
-            StartActivity(i);
-        }
-
-        void Adapter_ItemLongClicked(object sender, Folder folder)
-        {
-            if (actionMode != null)
+            if (actionMode == null)
             {
-                return;
+                var i = new Intent(Activity, typeof(DocumentsListActivity));
+                i.PutExtra(DocumentsListActivity.FolderIntentKey, SerializationUtils.Serialize(adapter.GetItemAtPosition(position)));
+                StartActivity(i);
+            }
+            else
+            {
+                ToggleSelection(position);
+            }
+        }
+
+        void Adapter_ItemLongClicked(object sender, int position)
+        {
+            if (actionMode == null)
+            {
+                actionMode = Activity.StartActionMode(this);
             }
 
-            var itemView = sender as View;
-            itemView.Selected = true;
-            itemView.Activated = true;
+            ToggleSelection(position);
+        }
 
-            actionMode = Activity.StartActionMode(this);
+        void ToggleSelection(int position)
+        {
+            adapter.TogggleSelection(position);
+
+            var selectedItemsCount = adapter.SelectedItemsCount;
+            if (selectedItemsCount == 0)
+            {
+                actionMode.Finish();
+            }
+            else
+            {
+                actionMode.Title = selectedItemsCount.ToString();
+                actionMode.Invalidate();
+            }
+
         }
 
         bool ActionMode.ICallback.OnActionItemClicked(ActionMode mode, IMenuItem item)
@@ -169,6 +177,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             switch (item.ItemId)
             {
                 case 1:
+                    foreach (var folder in adapter.GetSelectedItems())
+                    {
+                        CommonConfig.Logger.Error("FOLDER SELECTED: " + folder);
+                    }
                     mode.Finish();
                     return true;
                 case 2:
@@ -196,6 +208,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
         {
+            adapter.ClearSelection();
             actionMode = null;
         }
 
@@ -248,6 +261,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         }
 
         #endregion
+
     }
 
     #region RecyclerView Adapter/ViewHolder
@@ -256,10 +270,11 @@ namespace Mark5.Mobile.Droid.Views.Fragments
     {
         readonly List<Folder> foldersInView = new List<Folder>();
         readonly RecyclerView parentView;
+        readonly List<int> selectedItemPositions = new List<int>();
 
-        public event EventHandler<Folder> expandIconClicked = delegate { }; //TODO case
-        public event EventHandler<Folder> itemClicked = delegate { };
-        public event EventHandler<Folder> itemLongClicked = delegate { };
+        public event EventHandler<int> expandIconClicked = delegate { }; //TODO case
+        public event EventHandler<int> itemClicked = delegate { };
+        public event EventHandler<int> itemLongClicked = delegate { };
 
         public FolderListAdapter(RecyclerView parentRecyclerView)
         {
@@ -273,6 +288,15 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 return foldersInView.Count;
             }
         }
+
+        public int SelectedItemsCount
+        {
+            get
+            {
+                return selectedItemPositions.Count;
+            }
+        }
+
 
         public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
         {
@@ -299,6 +323,47 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 fh.FolderIcon.SetImageResource(Resource.Drawable.folder); //TODO need to add icon for local
             }
+
+            fh.SelectedOverlay.Visibility = IsItemSelected(position) ? ViewStates.Visible : ViewStates.Invisible;
+        }
+
+        public void ClearSelection() //TODO put in the right place
+        {
+            var selectedItemPositionsCopy = new List<int>(selectedItemPositions);
+            selectedItemPositions.Clear();
+            foreach (var position in selectedItemPositionsCopy)
+            {
+                NotifyItemChanged(position);
+            }
+        }
+
+        public Folder GetItemAtPosition(int position)
+        {
+            return foldersInView[position];
+        }
+
+        public IEnumerable<Folder> GetSelectedItems()
+        {
+            return selectedItemPositions.Select(i => foldersInView[i]);
+        }
+
+        public void TogggleSelection(int position)
+        {
+            if (IsItemSelected(position))
+            {
+                selectedItemPositions.Remove(position);
+            }
+            else
+            {
+                selectedItemPositions.Add(position);
+            }
+
+            NotifyItemChanged(position);
+        }
+
+        bool IsItemSelected(int position) //TODO put in the right position, check also the accessbility of all the objects
+        {
+            return selectedItemPositions.Contains(position);
         }
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -323,22 +388,19 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         void FolderViewHolder_ExpandClicked(object sender, View view)
         {
             var position = parentView.GetChildLayoutPosition(view);
-            var folder = foldersInView[position];
-            expandIconClicked(view, folder);
+            expandIconClicked(view, position);
         }
 
         void FolderViewHolder_ItemClicked(object sender, View view)
         {
             var position = parentView.GetChildLayoutPosition(view);
-            var folder = foldersInView[position];
-            itemClicked(view, folder);
+            itemClicked(view, position);
         }
 
         void FolderViewHolder_ItemLongClicked(object sender, View view)
         {
             var position = parentView.GetChildLayoutPosition(view);
-            var folder = foldersInView[position];
-            itemLongClicked(view, folder);
+            itemLongClicked(view, position);
         }
     }
 
@@ -347,6 +409,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public LinearLayoutCompat ExpandButtonLayout { get; private set; }
         public TextView FolderName { get; private set; }
         public ImageView FolderIcon { get; private set; }
+        public View SelectedOverlay { get; private set; }
 
         public event EventHandler<View> expandClicked = delegate { };
         public event EventHandler<View> itemClicked = delegate { };
@@ -364,6 +427,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             var internalContainerLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.internalContainerLayout);
             internalContainerLayout.Click += (sender, e) => itemClicked(this, itemView);
             internalContainerLayout.LongClick += (sender, e) => itemLongClicked(this, itemView);
+
+            SelectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
+            SelectedOverlay.Background.Alpha = 125;
         }
     }
 

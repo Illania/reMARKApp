@@ -62,8 +62,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
             drawer.AddDrawerListener(drawerToggle);
             drawerToggle.SyncState();
 
-            SupportFragmentManager.AddOnBackStackChangedListener(this);
-
             navigationView = FindViewById<NavigationView>(Resource.Id.navigation_view);
             navigationView.SetNavigationItemSelectedListener(this);
 
@@ -138,18 +136,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
         }
 
         #endregion
-
-        public override void OnConfigurationChanged(Android.Content.Res.Configuration newConfig)
-        {
-            base.OnConfigurationChanged(newConfig);
-            drawerToggle.OnConfigurationChanged(newConfig);
-        }
-
-        protected override void OnPostCreate(Bundle savedInstanceState)
-        {
-            base.OnPostCreate(savedInstanceState);
-            drawerToggle.SyncState();
-        }
 
         #region Utility methods
 
