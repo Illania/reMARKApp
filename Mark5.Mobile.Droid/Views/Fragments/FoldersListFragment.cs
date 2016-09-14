@@ -129,9 +129,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         void Adapter_ItemClicked(object sender, Folder folder)
         {
-            var i = new Intent(Activity, typeof(DocumentsListActivity));
-            i.PutExtra(DocumentsListActivity.FolderIntentKey, SerializationUtils.Serialize(folder.ShallowCopy()));
-            StartActivity(i);
+            if (folder.Module == ModuleType.Documents)
+            {
+                var i = new Intent(Activity, typeof(DocumentsListActivity));
+                i.PutExtra(DocumentsListActivity.FolderIntentKey, SerializationUtils.Serialize(folder.ShallowCopy()));
+                StartActivity(i);
+            }
         }
 
         void Adapter_ItemLongClicked(object sender, Folder folder)
