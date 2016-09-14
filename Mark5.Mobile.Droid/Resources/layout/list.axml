@@ -9,5 +9,7 @@
         android:id="@+id/recyclerView"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        android:fadeScrollbars="true" />
 </android.support.v4.widget.SwipeRefreshLayout>
