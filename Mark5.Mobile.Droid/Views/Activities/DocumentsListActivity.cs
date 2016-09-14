@@ -22,7 +22,7 @@ namespace Mark5.Mobile.Droid.Views.Activities
     public class DocumentsListActivity : BaseAppCompatActivity
     {
 
-        public const string FolderIntentKey = "ExtraFolder_fc733ef0-68cb-4412-9255-cf128602f176";
+        public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
 
         Toolbar toolbar;
 

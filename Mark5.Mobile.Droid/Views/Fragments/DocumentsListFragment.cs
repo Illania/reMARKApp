@@ -25,7 +25,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            return inflater.Inflate(Resource.Layout.fragment_list_documents, container, false);
+            return inflater.Inflate(Resource.Layout.list, container, false);
         }
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)

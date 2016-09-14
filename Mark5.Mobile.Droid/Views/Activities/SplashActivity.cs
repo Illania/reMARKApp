@@ -28,7 +28,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
               MainLauncher = true,
               Icon = "@mipmap/ic_icon",
               Theme = "@style/mark5Splash",
-              ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation,
               ScreenOrientation = ScreenOrientation.Portrait)]
     public class SplashActivity : BaseAppCompatActivity
     {

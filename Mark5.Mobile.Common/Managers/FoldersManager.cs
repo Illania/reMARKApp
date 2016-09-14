@@ -31,29 +31,29 @@ namespace Mark5.Mobile.Common.Managers
             this.foldersDataAccess = foldersDataAccess;
         }
 
-        public async Task<List<Folder>> GetFoldersAsync(ModuleType moduleType, Folder parentFolder = null, int depth = 2, SourceType sourceType = SourceType.Auto)
+        public async Task<List<Folder>> GetFoldersAsync(Folder parentFolder, int depth = 2, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
                 var foldersResult = await AppServiceProxy.GetFoldersAsync(new DataContract.GetFoldersParameters
                 {
                     Token = Token,
-                    ModuleType = moduleType.ConvertEnum<DataContract.ModuleType>(),
-                    FolderId = parentFolder?.Id ?? -1,
+                    ModuleType = parentFolder.Module.ConvertEnum<DataContract.ModuleType>(),
+                    FolderId = parentFolder.Root ? -1 : parentFolder.Id,
                     Depth = depth
                 });
 
                 var folders = foldersResult.Folders.WhereNotNull().Select(f => f.Convert()).ToList();
                 ProcessFolders(folders, parentFolder);
 
-                await foldersDataAccess.InsertOrReplaceRecursively(moduleType, folders, parentFolder);
+                await foldersDataAccess.InsertOrReplaceRecursively(parentFolder.Module, folders, parentFolder);
 
                 return folders;
             }
 
             if (sourceType == SourceType.Local)
             {
-                return await foldersDataAccess.GetRecursively(moduleType, parentFolder, depth);
+                return await foldersDataAccess.GetRecursively(parentFolder.Module, parentFolder, depth);
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
