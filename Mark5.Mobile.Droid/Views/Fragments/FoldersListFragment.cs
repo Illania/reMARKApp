@@ -290,10 +290,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
         }
 
-
         public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
         {
-
             //Binding of actual parameters, the view is already created
             var fh = holder as FolderViewHolder;
             var folder = foldersInView[position];
