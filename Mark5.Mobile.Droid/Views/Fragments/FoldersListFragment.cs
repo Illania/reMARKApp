@@ -34,6 +34,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         RecyclerView recyclerView;
         SwipeRefreshLayout refreshLayout;
         ActionMode actionMode;
+        List<int> recoveredSelectedItemsPosition;
 
         #region Overrides
 
@@ -71,6 +72,16 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             base.OnResume();
 
             await RefreshData();
+            RestoreSelection();
+        }
+
+        public override void OnPause()
+        {
+            base.OnPause();
+            if (actionMode != null)
+            {
+                actionMode.Finish();
+            }
         }
 
         #endregion
@@ -101,7 +112,18 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
         }
 
-        void NavigateInFolder(ModuleType moduleType, Folder folder)
+        void RestoreSelection()
+        {
+            if (recoveredSelectedItemsPosition != null && recoveredSelectedItemsPosition.Any())
+            {
+                actionMode = Activity.StartActionMode(this);
+                adapter.SetSelection(recoveredSelectedItemsPosition);
+                actionMode.Title = adapter.SelectedItemsCount.ToString();
+                actionMode.Invalidate();
+            }
+        }
+
+        void NavigateInFolder(Folder folder)
         {
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
 
@@ -124,7 +146,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         void Adapter_ExpandClicked(object sender, int position)
         {
-            NavigateInFolder(Folder.Module, adapter.GetItemAtPosition(position));
+            NavigateInFolder(adapter.GetItemAtPosition(position));
         }
 
         void Adapter_ItemClicked(object sender, int position)
@@ -236,6 +258,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return new FolderListFragmentState
             {
                 Folder = Folder,
+                SelectedItemPositions = adapter.SelectedItemPositions
             };
         }
 
@@ -245,16 +268,17 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             if (flfs != null)
             {
                 Folder = flfs.Folder;
+                recoveredSelectedItemsPosition = flfs.SelectedItemPositions;
             }
         }
 
         class FolderListFragmentState : IRetainableState
         {
             public Folder Folder { get; set; }
+            public List<int> SelectedItemPositions { get; set; }
         }
 
         #endregion
-
     }
 
     #region RecyclerView Adapter/ViewHolder
@@ -271,7 +295,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public FolderListAdapter(RecyclerView parentRecyclerView)
         {
-            this.parentView = parentRecyclerView;
+            parentView = parentRecyclerView;
         }
 
         public override int ItemCount
@@ -289,6 +313,16 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 return selectedItemPositions.Count;
             }
         }
+
+        public List<int> SelectedItemPositions
+        {
+            get
+            {
+                return selectedItemPositions;
+            }
+        }
+
+        #region Overrides
 
         public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
         {
@@ -318,7 +352,30 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             fh.SelectedOverlay.Visibility = IsItemSelected(position) ? ViewStates.Visible : ViewStates.Invisible;
         }
 
-        public void ClearSelection() //TODO put in the right place
+        public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
+        {
+            View itemView = LayoutInflater.From(parent.Context).
+                                          Inflate(Resource.Layout.list_item_folder, parent, false);
+
+            var folderViewHolder = new FolderViewHolder(itemView);
+            folderViewHolder.expandClicked += FolderViewHolder_ExpandClicked;
+            folderViewHolder.itemClicked += FolderViewHolder_ItemClicked;
+            folderViewHolder.itemLongClicked += FolderViewHolder_ItemLongClicked;
+            return folderViewHolder;
+        }
+
+        #endregion
+
+        public void Refresh(List<Folder> folders)
+        {
+            foldersInView.Clear();
+            foldersInView.AddRange(folders);
+            NotifyDataSetChanged();
+        }
+
+        #region Selection methods
+
+        public void ClearSelection()
         {
             var selectedItemPositionsCopy = new List<int>(selectedItemPositions);
             selectedItemPositions.Clear();
@@ -352,29 +409,25 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             NotifyItemChanged(position);
         }
 
-        bool IsItemSelected(int position) //TODO put in the right position, check also the accessbility of all the objects
+        public void SetSelection(List<int> positionList)
+        {
+            ClearSelection();
+            selectedItemPositions.Clear();
+            foreach (var position in positionList)
+            {
+                selectedItemPositions.Add(position);
+                NotifyItemChanged(position);
+            }
+        }
+
+        bool IsItemSelected(int position)
         {
             return selectedItemPositions.Contains(position);
         }
 
-        public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
-        {
-            View itemView = LayoutInflater.From(parent.Context).
-                                          Inflate(Resource.Layout.list_item_folder, parent, false);
+        #endregion
 
-            var folderViewHolder = new FolderViewHolder(itemView);
-            folderViewHolder.expandClicked += FolderViewHolder_ExpandClicked;
-            folderViewHolder.itemClicked += FolderViewHolder_ItemClicked;
-            folderViewHolder.itemLongClicked += FolderViewHolder_ItemLongClicked;
-            return folderViewHolder;
-        }
-
-        public void Refresh(List<Folder> folders)
-        {
-            foldersInView.Clear();
-            foldersInView.AddRange(folders);
-            NotifyDataSetChanged();
-        }
+        #region ViewHolder handlers
 
         void FolderViewHolder_ExpandClicked(object sender, View view)
         {
@@ -393,6 +446,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             var position = parentView.GetChildLayoutPosition(view);
             itemLongClicked(view, position);
         }
+
+        #endregion
     }
 
     class FolderViewHolder : RecyclerView.ViewHolder
