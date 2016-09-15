@@ -1,63 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <android.support.v7.widget.LinearLayoutCompat
-        android:orientation="horizontal"
+        android:id="@+id/list_item_folder_internal_Layout"
         android:layout_width="match_parent"
-        android:gravity="center"
+        android:layout_height="60dp"
         android:layout_gravity="center_vertical"
-        android:layout_height="56dp"
+        android:gravity="center"
+        android:orientation="horizontal"
         android:background="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:id="@+id/list_item_folder_internal_Layout">
-        <android.support.v7.widget.LinearLayoutCompat
-            android:orientation="horizontal"
+        android:clickable="true">
+        <ImageView
+            android:paddingLeft="16dp"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:padding="16dp"
-            android:layout_weight="1"
-            android:layout_gravity="left">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:id="@+id/list_item_folder_icon" />
+            android:gravity="center_vertical"
+            android:id="@+id/list_item_folder_icon" />
+        <android.support.v7.widget.LinearLayoutCompat
+            android:id="@+id/folderNameLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:layout_weight="1">
             <TextView
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:layout_gravity="center_vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:paddingLeft="24dp"
-                android:id="@+id/list_item_folder_name" />
+                android:id="@+id/list_item_folder_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <TextView
+                android:id="@+id/list_item_folder_subtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_marginTop="2dp" />
         </android.support.v7.widget.LinearLayoutCompat>
-        <android.support.v7.widget.LinearLayoutCompat
-            android:orientation="horizontal"
+        <ImageButton
+            android:id="@+id/list_item_folder_expand"
+            android:layout_gravity="center_vertical"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="right"
+            android:layout_height="wrap_content"
             android:padding="16dp"
-            android:clickable="true">
-            <Button
-                android:background="@drawable/arrow_right"
-                android:clickable="false"
-                android:layout_gravity="center_vertical"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:id="@+id/list_item_folder_expand" />
-        </android.support.v7.widget.LinearLayoutCompat>
+            android:background="@null"
+            android:src="@drawable/arrow_right"
+            android:clickable="false" />
     </android.support.v7.widget.LinearLayoutCompat>
     <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/lightgray" />
-    <View
-        android:id="@+id/list_item_folder_selected_overlay"
+        android:id="@+id/selected_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/transparent"
-        android:visibility="invisible" />
-</android.support.v7.widget.LinearLayoutCompat>
+        android:background="?android:attr/colorControlActivated" />
+</FrameLayout>
