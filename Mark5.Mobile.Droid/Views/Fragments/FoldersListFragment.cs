@@ -47,6 +47,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recyclerView);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
+            recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
             recyclerView.HasFixedSize = true;
 
             adapter = new FolderListAdapter(recyclerView);
@@ -258,7 +259,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return new FolderListFragmentState
             {
                 Folder = Folder,
-                SelectedItemPositions = adapter.SelectedItemPositions
+                SelectedItemPositions = new List<int>(adapter.SelectedItemPositions),
             };
         }
 

@@ -54,10 +54,6 @@
                     android:id="@+id/expandButton" />
             </android.support.v7.widget.LinearLayoutCompat>
         </android.support.v7.widget.LinearLayoutCompat>
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/lightgray" />
     </android.support.v7.widget.LinearLayoutCompat>
     <View
         android:id="@+id/selected_overlay"

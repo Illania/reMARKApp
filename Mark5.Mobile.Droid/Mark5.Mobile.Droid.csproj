@@ -161,6 +161,7 @@
     <Compile Include="Views\Common\RetainableStateFragment.cs" />
     <Compile Include="Views\Fragments\DocumentsListFragment.cs" />
     <Compile Include="Views\Common\RetainedFragment.cs" />
+    <Compile Include="Views\Common\DividerItemDecorator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -250,6 +251,7 @@
     <AndroidResource Include="Resources\values\strings-preferences.axml" />
     <AndroidResource Include="Resources\values\values-preferences.axml" />
     <AndroidResource Include="Resources\layout\list.axml" />
+    <AndroidResource Include="Resources\drawable\line_divider.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
