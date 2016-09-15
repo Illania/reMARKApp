@@ -162,6 +162,7 @@
     <Compile Include="Views\Fragments\DocumentsListFragment.cs" />
     <Compile Include="Views\Common\RetainedFragment.cs" />
     <Compile Include="Views\Common\DividerItemDecorator.cs" />
+    <Compile Include="Views\Fragments\FirstFolderFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
