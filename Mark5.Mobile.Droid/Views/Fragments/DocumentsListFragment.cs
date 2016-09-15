@@ -7,6 +7,8 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Android.OS;
 using Android.Support.V4.Widget;
@@ -24,6 +26,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
     public class DocumentsListFragment : RetainableStateFragment
     {
 
+        const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
+
         public Folder Folder
         {
             get;
@@ -35,6 +39,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         DocumentsListAdapter adapter;
+
+        AutoRefreshWorker autoRefreshWorker;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -48,7 +54,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
-            adapter = new DocumentsListAdapter(async (endId) => await RefreshData(endId: endId));
+            adapter = new DocumentsListAdapter(async (startId) => await RefreshData(startId: startId));
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
             recyclerView.SetAdapter(adapter);
@@ -72,6 +78,19 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 await RefreshData();
             }
+
+            if (!IsAdded || IsDetached || IsRemoving) return;
+
+            autoRefreshWorker?.Stop();
+            autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, () => { return adapter?.Items?.FirstOrDefault(); }, AutoRefreshIntervalMs);
+            autoRefreshWorker.Start();
+        }
+
+        public override void OnPause()
+        {
+            base.OnPause();
+
+            autoRefreshWorker?.Stop();
         }
 
         public override IRetainableState OnRetainInstanceState()
@@ -79,7 +98,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return new DocumentsListFragmentState
             {
                 Folder = Folder,
-                DocumentPreviews = adapter.Items
+                DocumentPreviews = adapter.Items,
             };
         }
 
@@ -89,13 +108,33 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             if (dlfs != null)
             {
                 Folder = dlfs.Folder;
-                adapter.AddItems(dlfs.DocumentPreviews);
+                adapter.AppendItems(dlfs.DocumentPreviews);
             }
         }
 
         public override string GenerateTag()
         {
             return $"{nameof(DocumentsListFragment)} [FolderId={Folder.Id}, FolderName={Folder.Name}]";
+        }
+
+        async Task AutoRefreshData(int endId)
+        {
+            if (!IsAdded || IsDetached || IsRemoving) return;
+            if (refreshing) return;
+
+            refreshing = true;
+
+            var documents = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, endId: endId);
+
+            if (documents.Count > 0)
+            {
+                Activity?.RunOnUiThread(() =>
+                {
+                    adapter?.PrependItems(documents);
+                });
+            }
+
+            refreshing = false;
         }
 
         async Task RefreshData(int startId = -1, int endId = -1, bool force = false)
@@ -111,7 +150,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
 
             var documents = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, startId, endId);
-            adapter.AddItems(documents);
+            adapter.AppendItems(documents);
 
             refreshLayout.Post(() => refreshLayout.Refreshing = false); //Bug: fixed in support library v 24.2.0 (issue 77712)
             refreshing = false;
@@ -191,11 +230,18 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 return new DocumentViewHolder(itemView);
             }
 
-            public void AddItems(IEnumerable<DocumentPreview> items)
+            public void PrependItems(List<DocumentPreview> items)
+            {
+                var count = items.Count;
+                documentsInView.InsertRange(0, items);
+                NotifyItemRangeInserted(0, count);
+            }
+
+            public void AppendItems(List<DocumentPreview> items)
             {
                 var count = documentsInView.Count;
                 documentsInView.AddRange(items);
-                NotifyItemRangeInserted(count, count - documentsInView.Count);
+                NotifyItemRangeInserted(count, items.Count);
             }
 
             public void Clear()
@@ -232,6 +278,55 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         #endregion
 
+        class AutoRefreshWorker
+        {
+
+            CancellationTokenSource cts;
+
+            readonly Func<int, Task> work;
+            readonly Func<DocumentPreview> firstOrDefaultItem;
+            readonly int intervalMs;
+
+            readonly object lockObj = new object();
+
+            public AutoRefreshWorker(Func<int, Task> work, Func<DocumentPreview> firstOrDefaultItem, int intervalMs)
+            {
+                this.work = work;
+                this.firstOrDefaultItem = firstOrDefaultItem;
+                this.intervalMs = intervalMs;
+            }
+
+            public void Start()
+            {
+                lock (lockObj)
+                {
+                    cts?.Cancel();
+                    cts = new CancellationTokenSource();
+                    Task.Run(async () =>
+                    {
+                        while (true)
+                        {
+                            await Task.Delay(intervalMs);
+                            if (cts.IsCancellationRequested) break;
+
+                            var first = firstOrDefaultItem();
+                            if (first != null)
+                            {
+                                await work(first.Id);
+                            }
+                        }
+                    });
+                }
+            }
+
+            public void Stop()
+            {
+                lock (lockObj)
+                {
+                    cts?.Cancel();
+                }
+            }
+        }
     }
 }
 
