@@ -1,4 +1,4 @@
-//
+﻿//
 // Project: Mark5.Mobile.Droid
 // File: MainActivity.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -8,12 +8,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Android.App;
 using Android.OS;
 using Android.Support.Design.Widget;
+using Android.Support.V4.App;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
-using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Authenticator;
@@ -25,13 +24,13 @@ using Mark5.Mobile.Droid.Views.Fragments;
 namespace Mark5.Mobile.Droid.Views.Activity
 {
 
-    [Activity]
-    public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, Android.Support.V4.App.FragmentManager.IOnBackStackChangedListener
+    [Android.App.Activity]
+    public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FragmentManager.IOnBackStackChangedListener
     {
 
         Toolbar toolbar;
         DrawerLayout drawer;
-        ActionBarDrawerToggle drawerToggle;
+        SmoothActionBarDrawerToggle drawerToggle;
         NavigationView navigationView;
         IMenuItem lastSelectedItem;
 
@@ -69,9 +68,14 @@ namespace Mark5.Mobile.Droid.Views.Activity
             SetSupportActionBar(toolbar);
 
             drawer = FindViewById<DrawerLayout>(Resource.Id.drawer_layout);
-            drawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, Resource.String.open_drawer, Resource.String.close_drawer);
+            drawerToggle = new SmoothActionBarDrawerToggle(this, drawer, Resource.String.open_drawer, Resource.String.close_drawer);
             drawer.AddDrawerListener(drawerToggle);
             drawerToggle.SyncState();
+
+            SupportActionBar.SetDisplayHomeAsUpEnabled(true);
+            SupportActionBar.SetHomeButtonEnabled(true);
+
+            SupportFragmentManager.AddOnBackStackChangedListener(this);
 
             navigationView = FindViewById<NavigationView>(Resource.Id.navigation_view);
             navigationView.SetNavigationItemSelectedListener(this);
@@ -87,7 +91,8 @@ namespace Mark5.Mobile.Droid.Views.Activity
                         [Resource.Id.nav_documents] = new ModulesMenuItemContent(ModuleType.Documents),
                         [Resource.Id.nav_contacts] = new ModulesMenuItemContent(ModuleType.Contacts),
                         [Resource.Id.nav_shortcodes] = new ModulesMenuItemContent(ModuleType.Shortcodes),
-                        [Resource.Id.nav_calendar] = new ModulesMenuItemContent(ModuleType.Calendar)
+                        [Resource.Id.nav_calendar] = new ModulesMenuItemContent(ModuleType.Calendar),
+                        [Resource.Id.nav_settings] = new PreferencesMenuItemContent()
                     }
                 };
 
@@ -115,6 +120,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
         protected override void OnPostCreate(Bundle savedInstanceState)
         {
             base.OnPostCreate(savedInstanceState);
+            drawerToggle.DrawerIndicatorEnabled = SupportFragmentManager.BackStackEntryCount <= 1;
             drawerToggle.SyncState();
         }
 
@@ -161,24 +167,28 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
         public bool OnNavigationItemSelected(IMenuItem menuItem)
         {
-            if (lastSelectedItem != menuItem)
+            drawerToggle.RunWhenIdle(() =>
             {
-                if (lastSelectedItem != null)
+                if (lastSelectedItem != menuItem)
                 {
-                    MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
+                    if (lastSelectedItem != null)
+                    {
+                        MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
+                    }
+
+                    if (SupportFragmentManager.BackStackEntryCount > 0)
+                    {
+                        SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int)Android.App.PopBackStackFlags.Inclusive);
+                    }
+
+                    MenuItemContents[menuItem.ItemId].RestoreOrCreate(SupportFragmentManager);
+
+                    lastSelectedItem = menuItem;
                 }
-
-                if (SupportFragmentManager.BackStackEntryCount > 0)
-                {
-                    SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int)PopBackStackFlags.Inclusive);
-                }
-
-                MenuItemContents[menuItem.ItemId].RestoreOrCreate(SupportFragmentManager);
-
-                lastSelectedItem = menuItem;
-            }
+            }, lastSelectedItem == null);
 
             drawer.CloseDrawer(GravityCompat.Start);
+
             return true;
         }
 
@@ -189,22 +199,18 @@ namespace Mark5.Mobile.Droid.Views.Activity
                 return true;
             }
 
+            if (item.ItemId == Android.Resource.Id.Home)
+            {
+                OnBackPressed();
+                return true;
+            }
+
             return base.OnOptionsItemSelected(item);
         }
 
         public void OnBackStackChanged()
         {
-            if (SupportFragmentManager.BackStackEntryCount > 1)
-            {
-                drawerToggle.DrawerIndicatorEnabled = false;
-                SupportActionBar.SetDisplayHomeAsUpEnabled(true);
-            }
-            else
-            {
-                SupportActionBar.SetDisplayHomeAsUpEnabled(false);
-                drawerToggle.DrawerIndicatorEnabled = true;
-            }
-
+            drawerToggle.DrawerIndicatorEnabled = SupportFragmentManager.BackStackEntryCount <= 1;
             drawerToggle.SyncState();
         }
 
@@ -227,12 +233,26 @@ namespace Mark5.Mobile.Droid.Views.Activity
         abstract class MenuItemContent
         {
 
-            protected readonly List<Android.Support.V4.App.Fragment.SavedState> BackstackStates = new List<Android.Support.V4.App.Fragment.SavedState>();
+            protected readonly List<Fragment.SavedState> BackstackStates = new List<Fragment.SavedState>();
             protected readonly List<string> SavedTags = new List<string>();
 
-            public abstract void Save(Android.Support.V4.App.FragmentManager fm);
+            public virtual void Save(FragmentManager fm) { }
 
-            public abstract void RestoreOrCreate(Android.Support.V4.App.FragmentManager fm);
+            public virtual void RestoreOrCreate(FragmentManager fm) { }
+        }
+
+        class PreferencesMenuItemContent : MenuItemContent
+        {
+
+            public override void RestoreOrCreate(FragmentManager fm)
+            {
+                var ft = fm.BeginTransaction();
+                var foldersListFragment = new PreferenceFragment();
+                ft.SetTransition(FragmentTransaction.TransitFragmentFade);
+                ft.Replace(Resource.Id.fragment_container, foldersListFragment, "PreferenceFragment");
+                ft.AddToBackStack("PreferenceFragment");
+                ft.Commit();
+            }
         }
 
         class ModulesMenuItemContent : MenuItemContent
@@ -245,7 +265,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
                 ModuleType = moduleType;
             }
 
-            public override void Save(Android.Support.V4.App.FragmentManager fm)
+            public override void Save(FragmentManager fm)
             {
                 BackstackStates.Clear();
                 SavedTags.Clear();
@@ -260,20 +280,20 @@ namespace Mark5.Mobile.Droid.Views.Activity
                 }
             }
 
-            public override void RestoreOrCreate(Android.Support.V4.App.FragmentManager fm)
+            public override void RestoreOrCreate(FragmentManager fm)
             {
                 if (BackstackStates == null || !BackstackStates.Any())
                 {
                     var foldersListFragment = new FoldersListFragment
                     {
-                        Folder = Folder.RootPerModule(ModuleType),
+                        Folder = Folder.RootPerModule(ModuleType)
                     };
 
                     var tag = foldersListFragment.GenerateTag();
                     var ft = fm.BeginTransaction();
+                    ft.SetTransition(FragmentTransaction.TransitFragmentFade);
                     ft.Replace(Resource.Id.fragment_container, foldersListFragment, tag);
                     ft.AddToBackStack(tag);
-
                     ft.Commit();
                 }
                 else
@@ -288,6 +308,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
                         var ft = fm.BeginTransaction();
                         var foldersListFragment = new FoldersListFragment();
                         foldersListFragment.SetInitialSavedState(state);
+                        ft.SetTransition(FragmentTransaction.TransitFragmentFade);
                         ft.Replace(Resource.Id.fragment_container, foldersListFragment, tag);
                         ft.AddToBackStack(tag);
                         ft.Commit();
