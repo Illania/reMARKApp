@@ -8,54 +8,35 @@
         android:layout_width="match_parent"
         android:gravity="center"
         android:layout_gravity="center_vertical"
-        android:layout_height="56dp"
+        android:layout_height="60dp"
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:id="@+id/internalContainerLayout">
-        <android.support.v7.widget.LinearLayoutCompat
-            android:orientation="horizontal"
+        <ImageView
+            android:paddingLeft="16dp"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:padding="16dp"
-            android:layout_weight="1"
-            android:layout_gravity="left"
-            android:id="@+id/folderNameLayout">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:id="@+id/folderIcon" />
-            <TextView
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:layout_gravity="center_vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:paddingLeft="24dp"
-                android:id="@+id/folderName" />
-        </android.support.v7.widget.LinearLayoutCompat>
-    <!--		
-         <android.support.v7.widget.LinearLayoutCompat
+            android:gravity="center_vertical"
+            android:id="@+id/folderIcon" />
+        <android.support.v7.widget.LinearLayoutCompat
             android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:padding="16dp"
+            android:padding="8dp"
             android:layout_weight="1"
-            android:layout_gravity="left"
             android:id="@+id/folderNameLayout">
             <TextView
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:layout_gravity="center_vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/folderNameTitle" />
-			<TextView
+            <TextView
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_gravity="center_vertical"
+                android:layout_marginTop="2dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/folderNameSubtitle" />
         </android.support.v7.widget.LinearLayoutCompat>
-		-->
         <ImageButton
             android:padding="16dp"
             android:background="@null"

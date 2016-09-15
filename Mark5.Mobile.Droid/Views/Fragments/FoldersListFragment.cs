@@ -51,9 +51,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             recyclerView.HasFixedSize = true;
 
             adapter = new FolderListAdapter(recyclerView);
-            adapter.expandIconClicked += Adapter_ExpandClicked;
-            adapter.itemClicked += Adapter_ItemClicked;
-            adapter.itemLongClicked += Adapter_ItemLongClicked;
+            adapter.ExpandIconClicked += Adapter_ExpandClicked;
+            adapter.ItemClicked += Adapter_ItemClicked;
+            adapter.ItemLongClicked += Adapter_ItemLongClicked;
 
             recyclerView.SetAdapter(adapter);
 
@@ -290,9 +290,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         readonly RecyclerView parentView;
         readonly List<int> selectedItemPositions = new List<int>();
 
-        public event EventHandler<int> expandIconClicked = delegate { }; //TODO case
-        public event EventHandler<int> itemClicked = delegate { };
-        public event EventHandler<int> itemLongClicked = delegate { };
+        public event EventHandler<int> ExpandIconClicked = delegate { }; //TODO case
+        public event EventHandler<int> ItemClicked = delegate { };
+        public event EventHandler<int> ItemLongClicked = delegate { };
 
         public FolderListAdapter(RecyclerView parentRecyclerView)
         {
@@ -331,8 +331,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             var fh = holder as FolderViewHolder;
             var folder = foldersInView[position];
 
-            fh.FolderName.Text = folder.Name;
-            fh.ExpandButtonLayout.Visibility = folder.HasSubFolders ? ViewStates.Visible : ViewStates.Gone;
+            fh.FolderNameTitle.Text = folder.Name;
+            fh.FolderNameSubTitle.Text = folder.Name + "sdf";
+
+            fh.ExpandButton.Visibility = folder.HasSubFolders ? ViewStates.Visible : ViewStates.Gone;
             if (folder.InternalType == FolderInternalType.Worktray)
             {
                 fh.FolderIcon.SetImageResource(Resource.Drawable.folder_worktray);
@@ -433,19 +435,19 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         void FolderViewHolder_ExpandClicked(object sender, View view)
         {
             var position = parentView.GetChildLayoutPosition(view);
-            expandIconClicked(view, position);
+            ExpandIconClicked(view, position);
         }
 
         void FolderViewHolder_ItemClicked(object sender, View view)
         {
             var position = parentView.GetChildLayoutPosition(view);
-            itemClicked(view, position);
+            ItemClicked(view, position);
         }
 
         void FolderViewHolder_ItemLongClicked(object sender, View view)
         {
             var position = parentView.GetChildLayoutPosition(view);
-            itemLongClicked(view, position);
+            ItemLongClicked(view, position);
         }
 
         #endregion
@@ -453,8 +455,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
     class FolderViewHolder : RecyclerView.ViewHolder
     {
-        public ImageButton ExpandButtonLayout { get; private set; } //TODO need to change name
-        public TextView FolderName { get; private set; }
+        public ImageButton ExpandButton { get; private set; }
+        public TextView FolderNameTitle { get; private set; }
+        public TextView FolderNameSubTitle { get; private set; }
         public ImageView FolderIcon { get; private set; }
         public View SelectedOverlay { get; private set; }
 
@@ -465,10 +468,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public FolderViewHolder(View itemView) : base(itemView)
         {
             // Locate and cache view references
-            ExpandButtonLayout = itemView.FindViewById<ImageButton>(Resource.Id.expandButton);
-            ExpandButtonLayout.Click += (sender, e) => { expandClicked(this, itemView); };
+            ExpandButton = itemView.FindViewById<ImageButton>(Resource.Id.expandButton);
+            ExpandButton.Click += (sender, e) => { expandClicked(this, itemView); };
 
-            FolderName = itemView.FindViewById<TextView>(Resource.Id.folderName);
+            FolderNameTitle = itemView.FindViewById<TextView>(Resource.Id.folderNameTitle);
+            FolderNameSubTitle = itemView.FindViewById<TextView>(Resource.Id.folderNameSubtitle);
+
             FolderIcon = itemView.FindViewById<ImageView>(Resource.Id.folderIcon);
 
             var internalContainerLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.internalContainerLayout);
