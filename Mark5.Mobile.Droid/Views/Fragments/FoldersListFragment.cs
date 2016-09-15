@@ -290,7 +290,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         readonly RecyclerView parentView;
         readonly List<int> selectedItemPositions = new List<int>();
 
-        public event EventHandler<int> ExpandIconClicked = delegate { }; //TODO case
+        public event EventHandler<int> ExpandIconClicked = delegate { };
         public event EventHandler<int> ItemClicked = delegate { };
         public event EventHandler<int> ItemLongClicked = delegate { };
 
@@ -361,9 +361,21 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                                           Inflate(Resource.Layout.list_item_folder, parent, false);
 
             var folderViewHolder = new FolderViewHolder(itemView);
-            folderViewHolder.expandClicked += FolderViewHolder_ExpandClicked;
-            folderViewHolder.itemClicked += FolderViewHolder_ItemClicked;
-            folderViewHolder.itemLongClicked += FolderViewHolder_ItemLongClicked;
+            folderViewHolder.ExpandClicked += (sender, e) =>
+            {
+                var position = parentView.GetChildLayoutPosition(e);
+                ExpandIconClicked(e, position);
+            };
+            folderViewHolder.ItemClicked += (sender, e) =>
+            {
+                var position = parentView.GetChildLayoutPosition(e);
+                ItemClicked(e, position);
+            };
+            folderViewHolder.ItemLongClicked += (sender, e) =>
+            {
+                var position = parentView.GetChildLayoutPosition(e);
+                ItemLongClicked(e, position);
+            };
             return folderViewHolder;
         }
 
@@ -429,28 +441,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         }
 
         #endregion
-
-        #region ViewHolder handlers
-
-        void FolderViewHolder_ExpandClicked(object sender, View view)
-        {
-            var position = parentView.GetChildLayoutPosition(view);
-            ExpandIconClicked(view, position);
-        }
-
-        void FolderViewHolder_ItemClicked(object sender, View view)
-        {
-            var position = parentView.GetChildLayoutPosition(view);
-            ItemClicked(view, position);
-        }
-
-        void FolderViewHolder_ItemLongClicked(object sender, View view)
-        {
-            var position = parentView.GetChildLayoutPosition(view);
-            ItemLongClicked(view, position);
-        }
-
-        #endregion
     }
 
     class FolderViewHolder : RecyclerView.ViewHolder
@@ -461,15 +451,15 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public ImageView FolderIcon { get; private set; }
         public View SelectedOverlay { get; private set; }
 
-        public event EventHandler<View> expandClicked = delegate { };
-        public event EventHandler<View> itemClicked = delegate { };
-        public event EventHandler<View> itemLongClicked = delegate { };
+        public event EventHandler<View> ExpandClicked = delegate { };
+        public event EventHandler<View> ItemClicked = delegate { };
+        public event EventHandler<View> ItemLongClicked = delegate { };
 
         public FolderViewHolder(View itemView) : base(itemView)
         {
             // Locate and cache view references
             ExpandButton = itemView.FindViewById<ImageButton>(Resource.Id.expandButton);
-            ExpandButton.Click += (sender, e) => { expandClicked(this, itemView); };
+            ExpandButton.Click += (sender, e) => { ExpandClicked(this, itemView); };
 
             FolderNameTitle = itemView.FindViewById<TextView>(Resource.Id.folderNameTitle);
             FolderNameSubTitle = itemView.FindViewById<TextView>(Resource.Id.folderNameSubtitle);
@@ -477,8 +467,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             FolderIcon = itemView.FindViewById<ImageView>(Resource.Id.folderIcon);
 
             var internalContainerLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.internalContainerLayout);
-            internalContainerLayout.Click += (sender, e) => itemClicked(this, itemView);
-            internalContainerLayout.LongClick += (sender, e) => itemLongClicked(this, itemView);
+            internalContainerLayout.Click += (sender, e) => ItemClicked(this, itemView);
+            internalContainerLayout.LongClick += (sender, e) => ItemLongClicked(this, itemView);
 
             SelectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
             SelectedOverlay.Background.Alpha = 125;
