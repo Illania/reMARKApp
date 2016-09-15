@@ -284,7 +284,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
             {
                 if (BackstackStates == null || !BackstackStates.Any())
                 {
-                    var foldersListFragment = new FoldersListFragment
+                    var foldersListFragment = new FirstFolderListFragment
                     {
                         Folder = Folder.RootPerModule(ModuleType)
                     };
