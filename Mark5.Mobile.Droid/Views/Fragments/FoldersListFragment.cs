@@ -453,7 +453,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
     class FolderViewHolder : RecyclerView.ViewHolder
     {
-        public LinearLayoutCompat ExpandButtonLayout { get; private set; }
+        public ImageButton ExpandButtonLayout { get; private set; } //TODO need to change name
         public TextView FolderName { get; private set; }
         public ImageView FolderIcon { get; private set; }
         public View SelectedOverlay { get; private set; }
@@ -465,7 +465,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public FolderViewHolder(View itemView) : base(itemView)
         {
             // Locate and cache view references
-            ExpandButtonLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.expandButtonLayout);
+            ExpandButtonLayout = itemView.FindViewById<ImageButton>(Resource.Id.expandButton);
             ExpandButtonLayout.Click += (sender, e) => { expandClicked(this, itemView); };
 
             FolderName = itemView.FindViewById<TextView>(Resource.Id.folderName);

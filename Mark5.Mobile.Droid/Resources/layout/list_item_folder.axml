@@ -33,22 +33,38 @@
                 android:paddingLeft="24dp"
                 android:id="@+id/folderName" />
         </android.support.v7.widget.LinearLayoutCompat>
-        <android.support.v7.widget.LinearLayoutCompat
-            android:orientation="horizontal"
+    <!--		
+         <android.support.v7.widget.LinearLayoutCompat
+            android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_gravity="right"
             android:padding="16dp"
-            android:clickable="true"
-            android:id="@+id/expandButtonLayout">
-            <Button
-                android:background="@drawable/arrow_right"
-                android:clickable="false"
+            android:layout_weight="1"
+            android:layout_gravity="left"
+            android:id="@+id/folderNameLayout">
+            <TextView
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:layout_gravity="center_vertical"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:id="@+id/expandButton" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/folderNameTitle" />
+			<TextView
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_gravity="center_vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/folderNameSubtitle" />
         </android.support.v7.widget.LinearLayoutCompat>
+		-->
+        <ImageButton
+            android:padding="16dp"
+            android:background="@null"
+            android:src="@drawable/arrow_right"
+            android:clickable="false"
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/expandButton" />
     </android.support.v7.widget.LinearLayoutCompat>
     <View
         android:id="@+id/selected_overlay"
