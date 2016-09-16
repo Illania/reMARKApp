@@ -256,6 +256,30 @@
     <AndroidResource Include="Resources\layout\list.axml" />
     <AndroidResource Include="Resources\layout\list_item_documents.axml" />
     <AndroidResource Include="Resources\drawable\line_divider.xml" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\incoming.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\outgoing.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\incoming.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\outgoing.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\incoming.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\outgoing.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\incoming.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\outgoing.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\draft.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\unread.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\draft.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\unread.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\draft.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\unread.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\draft.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\unread.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\attachment.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\attachment.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\attachment.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\attachment.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\comment.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\comment.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\comment.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\comment.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

@@ -11,6 +11,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
+using Android.Graphics;
+using Android.Graphics.Drawables;
 using Android.OS;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
@@ -22,8 +24,6 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Views.Common;
-using Android.Graphics.Drawables;
-using Android.Graphics;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
@@ -249,10 +249,15 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                     dvh.Date = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
                 }
 
-                dvh.Subject = d.Subject;
-                dvh.Preview = d.Preview.Trim().Trim('\n');
+                dvh.Subject = string.IsNullOrEmpty(d.Subject) ? context.GetString(Resource.String.no_subject) : d.Subject;
+                dvh.Preview = string.IsNullOrEmpty(d.Preview) ? context.GetString(Resource.String.no_content) : d.Preview.Trim().Trim('\n');
                 dvh.Categories = d.Categories;
-
+                dvh.IncomingIndicator = d.Direction == DocumentDirection.Incoming;
+                dvh.OutgoingIndicator = d.Direction == DocumentDirection.Outgoing;
+                dvh.DraftIndicator = d.Direction == DocumentDirection.Draft;
+                dvh.UnreadIndicator = !d.IsReadByCurrent;
+                dvh.AttachmentIndicator = d.AttachmentsCount > 0;
+                dvh.CommentIndicator = d.CommentsCount > 0;
 
                 if (loadMoreAction != null && position == ItemCount - 1)
                 {
@@ -341,11 +346,65 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 }
             }
 
+            public bool IncomingIndicator
+            {
+                set
+                {
+                    incomingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
+                }
+            }
+
+            public bool OutgoingIndicator
+            {
+                set
+                {
+                    outgoingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
+                }
+            }
+
+            public bool DraftIndicator
+            {
+                set
+                {
+                    draftImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
+                }
+            }
+
+            public bool UnreadIndicator
+            {
+                set
+                {
+                    unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
+                }
+            }
+
+            public bool AttachmentIndicator
+            {
+                set
+                {
+                    attachmentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
+                }
+            }
+
+            public bool CommentIndicator
+            {
+                set
+                {
+                    commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
+                }
+            }
+
             readonly TextView recipentTextView;
             readonly TextView dateTextView;
             readonly TextView subjectTextView;
             readonly TextView previewTextView;
             readonly LinearLayoutCompat categoriesLayout;
+            readonly AppCompatImageView incomingImageView;
+            readonly AppCompatImageView outgoingImageView;
+            readonly AppCompatImageView draftImageView;
+            readonly AppCompatImageView unreadImageView;
+            readonly AppCompatImageView attachmentImageView;
+            readonly AppCompatImageView commentImageView;
 
             public DocumentViewHolder(View itemView)
                     : base(itemView)
@@ -355,6 +414,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 subjectTextView = itemView.FindViewById<TextView>(Resource.Id.list_item_document_subject);
                 previewTextView = itemView.FindViewById<TextView>(Resource.Id.list_item_document_preview);
                 categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_categories);
+                incomingImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_incoming);
+                outgoingImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_outgoing);
+                draftImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_draft);
+                unreadImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_unread);
+                attachmentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_attachment);
+                commentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_comment);
             }
         }
 
