@@ -165,6 +165,8 @@
     <Compile Include="Views\Common\DividerItemDecorator.cs" />
     <Compile Include="ServerConfig.cs" />
     <Compile Include="Utilities\DateTimeUtils.cs" />
+    <Compile Include="Views\Common\ActionOnClickListener.cs" />
+    <Compile Include="Views\Common\ActionOnLongClickListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

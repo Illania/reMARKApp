@@ -29,7 +29,7 @@ using Mark5.Mobile.Droid.Views.Common;
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
 
-    public class DocumentsListFragment : RetainableStateFragment
+    public class DocumentsListFragment : RetainableStateFragment, ActionMode.ICallback
     {
 
         const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
@@ -45,6 +45,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         DocumentsListAdapter adapter;
+        ActionMode actionMode;
 
         AutoRefreshWorker autoRefreshWorker;
 
@@ -105,6 +106,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 Folder = Folder,
                 DocumentPreviews = adapter.Items,
+                SelectedDocumentPreviews = adapter.SelectedItems
             };
         }
 
@@ -115,6 +117,15 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 Folder = dlfs.Folder;
                 adapter.AppendItems(dlfs.DocumentPreviews);
+
+                if (dlfs.SelectedDocumentPreviews.Count > 0)
+                {
+                    actionMode?.Finish();
+                    actionMode = Activity.StartActionMode(this);
+
+                    adapter.SetSelected(dlfs.SelectedDocumentPreviews, true);
+                    actionMode.Title = adapter.SelectedItemCount.ToString();
+                }
             }
         }
 
@@ -166,8 +177,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                     adapter.Clear();
                 }
 
-                var documents = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, startId, endId);
-                adapter.AppendItems(documents);
+                var documentPreviews = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, startId, endId);
+                adapter.AppendItems(documentPreviews);
             }
             catch (Exception ex)
             {
@@ -182,14 +193,68 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
         }
 
-        void Adapter_ItemClicked(object sender, DocumentPreview e)
+        void Adapter_ItemClicked(object sender, DocumentPreview documentPreview)
         {
-            Toast.MakeText(Activity, "Document clicked!", ToastLength.Short).Show();
+            if (actionMode == null)
+            {
+                Toast.MakeText(Activity, "Document clicked!", ToastLength.Short).Show();
+            }
+            else
+            {
+                adapter.SetSelected(documentPreview, !adapter.IsSelected(documentPreview));
+
+                if (adapter.SelectedItemCount < 1)
+                {
+                    actionMode.Finish();
+                }
+                else
+                {
+                    actionMode.Title = adapter.SelectedItemCount.ToString();
+                    actionMode.Invalidate();
+                }
+            }
         }
 
-        void Adapter_ItemLongClicked(object sender, DocumentPreview e)
+        void Adapter_ItemLongClicked(object sender, DocumentPreview documentPreview)
         {
-            Toast.MakeText(Activity, "Document long clicked!", ToastLength.Short).Show();
+            if (actionMode == null)
+            {
+                actionMode = Activity.StartActionMode(this);
+            }
+
+            Adapter_ItemClicked(sender, documentPreview);
+        }
+
+        public bool OnPrepareActionMode(ActionMode mode, IMenu menu)
+        {
+            return false;
+        }
+
+        public bool OnCreateActionMode(ActionMode mode, IMenu menu)
+        {
+            menu.Add(Menu.None, 10, 10, Resource.String.mark_as_read);
+            menu.Add(Menu.None, 20, 20, Resource.String.reply);
+            menu.Add(Menu.None, 30, 30, Resource.String.reply_all);
+            menu.Add(Menu.None, 40, 40, Resource.String.forward);
+            menu.Add(Menu.None, 50, 50, Resource.String.copy_to_worktray);
+            menu.Add(Menu.None, 60, 60, Resource.String.copy_to_folder);
+            menu.Add(Menu.None, 70, 70, Resource.String.move_to_folder);
+            menu.Add(Menu.None, 80, 80, Resource.String.categories);
+            menu.Add(Menu.None, 90, 90, Resource.String.delete_from_folder);
+            menu.Add(Menu.None, 100, 100, Resource.String.delete);
+
+            return true;
+        }
+
+        public bool OnActionItemClicked(ActionMode mode, IMenuItem item)
+        {
+            return true;
+        }
+
+        public void OnDestroyActionMode(ActionMode mode)
+        {
+            actionMode = null;
+            adapter.ClearSelections();
         }
 
         class DocumentsListFragmentState : IRetainableState
@@ -198,6 +263,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             public Folder Folder { get; set; }
 
             public List<DocumentPreview> DocumentPreviews { get; set; }
+
+            public List<DocumentPreview> SelectedDocumentPreviews { get; set; }
         }
 
         #region RecyclerView Adapter/ViewHolder
@@ -209,7 +276,15 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 get
                 {
-                    return documentsInView;
+                    return documentPreviewssInView.ToList();
+                }
+            }
+
+            public List<DocumentPreview> SelectedItems
+            {
+                get
+                {
+                    return selectedDocumentsInView.Values.ToList();
                 }
             }
 
@@ -217,11 +292,20 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 get
                 {
-                    return documentsInView.Count;
+                    return documentPreviewssInView.Count;
                 }
             }
 
-            readonly List<DocumentPreview> documentsInView = new List<DocumentPreview>(1000);
+            public int SelectedItemCount
+            {
+                get
+                {
+                    return selectedDocumentsInView.Count;
+                }
+            }
+
+            readonly List<DocumentPreview> documentPreviewssInView = new List<DocumentPreview>(1000);
+            readonly Dictionary<int, DocumentPreview> selectedDocumentsInView = new Dictionary<int, DocumentPreview>();
             readonly Action<int> loadMoreAction;
             readonly Context context;
 
@@ -236,85 +320,140 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var dvh = holder as DocumentViewHolder;
-                if (dvh == null) return;
+                var dpvh = holder as DocumentPreviewViewHolder;
+                if (dpvh == null) return;
 
-                var d = documentsInView[position];
+                var dp = documentPreviewssInView[position];
 
-                dvh.ItemView.Click += (sender, e) => ItemClicked(this, d);
-                dvh.ItemView.LongClick += (sender, e) => ItemLongClicked(this, d);
+                dpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
+                dpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
 
-                if (d.Direction == DocumentDirection.Incoming)
+                if (dp.Direction == DocumentDirection.Incoming)
                 {
-                    var address = d.Addresses?.Where(da => da.AddressType == DocumentAddressType.From).FirstOrDefault();
-                    dvh.Recipent = address?.Name ?? address?.Address;
+                    var address = dp.Addresses?.Where(da => da.AddressType == DocumentAddressType.From).FirstOrDefault();
+                    dpvh.Recipent = address?.Name ?? address?.Address;
                 }
                 else
                 {
-                    var address = d.Addresses?.Where(da => da.AddressType == DocumentAddressType.To).FirstOrDefault();
-                    dvh.Recipent = address?.Name ?? address?.Address;
+                    var address = dp.Addresses?.Where(da => da.AddressType == DocumentAddressType.To).FirstOrDefault();
+                    dpvh.Recipent = address?.Name ?? address?.Address;
                 }
 
-                var dateReceived = d.DateReceived.ToServerTime();
+                var dateReceived = dp.DateReceived.ToServerTime();
                 if (DateTime.Now.Date == dateReceived.Date)
                 {
-                    dvh.Date = DateFormat.Is24HourFormat(context) ? dateReceived.ToString("HH:mm") : dateReceived.ToString("hh:mm tt");
+                    dpvh.Date = DateFormat.Is24HourFormat(context) ? dateReceived.ToString("HH:mm") : dateReceived.ToString("hh:mm tt");
                 }
                 else if (DateTime.Now.AddDays(-1).Date == dateReceived.Date)
                 {
-                    dvh.Date = context.GetString(Resource.String.yesterday);
+                    dpvh.Date = context.GetString(Resource.String.yesterday);
                 }
                 else
                 {
                     var dfo = DateFormat.GetDateFormatOrder(context);
-                    dvh.Date = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
+                    dpvh.Date = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
                 }
 
-                dvh.Subject = string.IsNullOrEmpty(d.Subject) ? context.GetString(Resource.String.no_subject) : d.Subject;
-                dvh.Preview = string.IsNullOrEmpty(d.Preview) ? context.GetString(Resource.String.no_content) : d.Preview.Trim().Trim('\n');
-                dvh.Categories = d.Categories;
-                dvh.IncomingIndicator = d.Direction == DocumentDirection.Incoming;
-                dvh.OutgoingIndicator = d.Direction == DocumentDirection.Outgoing;
-                dvh.DraftIndicator = d.Direction == DocumentDirection.Draft;
-                dvh.UnreadIndicator = !d.IsReadByCurrent;
-                dvh.AttachmentIndicator = d.AttachmentsCount > 0;
-                dvh.CommentIndicator = d.CommentsCount > 0;
+                dpvh.Subject = string.IsNullOrEmpty(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
+                dpvh.Preview = string.IsNullOrEmpty(dp.Preview) ? context.GetString(Resource.String.no_content) : dp.Preview.Trim().Trim('\n');
+                dpvh.Categories = dp.Categories;
+                dpvh.IncomingIndicator = dp.Direction == DocumentDirection.Incoming;
+                dpvh.OutgoingIndicator = dp.Direction == DocumentDirection.Outgoing;
+                dpvh.DraftIndicator = dp.Direction == DocumentDirection.Draft;
+                dpvh.UnreadIndicator = !dp.IsReadByCurrent;
+                dpvh.AttachmentIndicator = dp.AttachmentsCount > 0;
+                dpvh.CommentIndicator = dp.CommentsCount > 0;
+
+                dpvh.Selected = selectedDocumentsInView.ContainsKey(dp.Id);
 
                 if (loadMoreAction != null && position == ItemCount - 1)
                 {
-                    loadMoreAction(d.Id);
+                    loadMoreAction(dp.Id);
                 }
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
             {
                 var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_documents, parent, false);
-                return new DocumentViewHolder(itemView);
+                return new DocumentPreviewViewHolder(itemView);
             }
 
             public void PrependItems(List<DocumentPreview> items)
             {
                 var count = items.Count;
-                documentsInView.InsertRange(0, items);
+                documentPreviewssInView.InsertRange(0, items);
                 NotifyItemRangeInserted(0, count);
             }
 
             public void AppendItems(List<DocumentPreview> items)
             {
-                var count = documentsInView.Count;
-                documentsInView.AddRange(items);
+                var count = documentPreviewssInView.Count;
+                documentPreviewssInView.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
 
             public void Clear()
             {
-                var size = documentsInView.Count;
-                documentsInView.Clear();
+                var size = documentPreviewssInView.Count;
+                documentPreviewssInView.Clear();
                 NotifyItemRangeRemoved(0, size);
+            }
+
+            public bool IsSelected(DocumentPreview documentPreview)
+            {
+                return selectedDocumentsInView.ContainsKey(documentPreview.Id);
+            }
+
+            public void SetSelected(List<DocumentPreview> documentPreviews, bool selected)
+            {
+                foreach (var document in documentPreviews)
+                {
+                    SetSelected(document, selected);
+                }
+            }
+
+            public void SetSelected(DocumentPreview documentPreview, bool selected)
+            {
+                var position = GetPosition(documentPreview);
+                if (position < 0) return;
+
+                if (selected)
+                {
+                    selectedDocumentsInView[documentPreview.Id] = documentPreview;
+                }
+                else
+                {
+                    selectedDocumentsInView.Remove(documentPreview.Id);
+                }
+                NotifyItemChanged(position);
+            }
+
+            public void ClearSelections()
+            {
+                var documents = selectedDocumentsInView.Values.ToArray();
+                selectedDocumentsInView.Clear();
+                foreach (var document in documents)
+                {
+                    NotifyItemChanged(GetPosition(document));
+                }
+            }
+
+            int GetPosition(DocumentPreview documentPreview)
+            {
+                var position = -1;
+                for (var i = 0; i < documentPreviewssInView.Count; i++)
+                {
+                    if (documentPreviewssInView[i].Id == documentPreview.Id)
+                    {
+                        position = i;
+                        break;
+                    }
+                }
+                return position;
             }
         }
 
-        class DocumentViewHolder : RecyclerView.ViewHolder
+        class DocumentPreviewViewHolder : RecyclerView.ViewHolder
         {
 
             public string Recipent
@@ -415,6 +554,14 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 }
             }
 
+            public bool Selected
+            {
+                set
+                {
+                    selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
+                }
+            }
+
             readonly TextView recipentTextView;
             readonly TextView dateTextView;
             readonly TextView subjectTextView;
@@ -426,8 +573,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             readonly AppCompatImageView unreadImageView;
             readonly AppCompatImageView attachmentImageView;
             readonly AppCompatImageView commentImageView;
+            readonly View selectedOverlay;
 
-            public DocumentViewHolder(View itemView)
+            public DocumentPreviewViewHolder(View itemView)
                     : base(itemView)
             {
                 recipentTextView = itemView.FindViewById<TextView>(Resource.Id.list_item_document_recipent);
@@ -441,6 +589,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 unreadImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_unread);
                 attachmentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_attachment);
                 commentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_comment);
+                selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
             }
         }
 
