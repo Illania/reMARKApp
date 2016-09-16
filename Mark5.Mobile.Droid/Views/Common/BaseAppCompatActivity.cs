@@ -9,7 +9,6 @@ using System;
 using Android.Content;
 using Android.OS;
 using Android.Support.V7.App;
-using UK.CO.Chrisjenx.Calligraphy;
 
 namespace Mark5.Mobile.Droid.Views.Common
 {
@@ -19,7 +18,8 @@ namespace Mark5.Mobile.Droid.Views.Common
 
         protected override void AttachBaseContext(Context @base)
         {
-            base.AttachBaseContext(CalligraphyContextWrapper.Wrap(@base));
+            //base.AttachBaseContext(UK.CO.Chrisjenx.Calligraphy.CalligraphyContextWrapper.Wrap(@base));
+            base.AttachBaseContext(@base);
         }
 
         protected void RunOnUiThreadIfNecessary(Action a)

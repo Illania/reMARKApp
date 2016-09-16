@@ -10,15 +10,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Android.Content;
 using Android.OS;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
+using Android.Text.Format;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Views.Common;
+using Android.Graphics.Drawables;
+using Android.Graphics;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
@@ -54,7 +59,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
-            adapter = new DocumentsListAdapter(async (startId) => await RefreshData(startId: startId));
+            adapter = new DocumentsListAdapter(Activity, async (startId) => await RefreshData(startId));
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
             recyclerView.SetAdapter(adapter);
@@ -197,12 +202,14 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             readonly List<DocumentPreview> documentsInView = new List<DocumentPreview>(1000);
             readonly Action<int> loadMoreAction;
+            readonly Context context;
 
             public event EventHandler<DocumentPreview> ItemClicked = delegate { };
             public event EventHandler<DocumentPreview> ItemLongClicked = delegate { };
 
-            public DocumentsListAdapter(Action<int> loadMoreAction)
+            public DocumentsListAdapter(Context context, Action<int> loadMoreAction)
             {
+                this.context = context;
                 this.loadMoreAction = loadMoreAction;
             }
 
@@ -216,7 +223,36 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 dvh.ItemView.Click += (sender, e) => ItemClicked(this, d);
                 dvh.ItemView.LongClick += (sender, e) => ItemLongClicked(this, d);
 
-                dvh.Subject = d.Id + " " + d.Subject;
+                if (d.Direction == DocumentDirection.Incoming)
+                {
+                    var address = d.Addresses?.Where(da => da.AddressType == DocumentAddressType.From).FirstOrDefault();
+                    dvh.Recipent = address?.Name ?? address?.Address;
+                }
+                else
+                {
+                    var address = d.Addresses?.Where(da => da.AddressType == DocumentAddressType.To).FirstOrDefault();
+                    dvh.Recipent = address?.Name ?? address?.Address;
+                }
+
+                var dateReceived = d.DateReceived.ToServerTime();
+                if (DateTime.Now.Date == dateReceived.Date)
+                {
+                    dvh.Date = DateFormat.Is24HourFormat(context) ? dateReceived.ToString("HH:mm") : dateReceived.ToString("hh:mm tt");
+                }
+                else if (DateTime.Now.AddDays(-1).Date == dateReceived.Date)
+                {
+                    dvh.Date = context.GetString(Resource.String.yesterday);
+                }
+                else
+                {
+                    var dfo = DateFormat.GetDateFormatOrder(context);
+                    dvh.Date = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
+                }
+
+                dvh.Subject = d.Subject;
+                dvh.Preview = d.Preview.Trim().Trim('\n');
+                dvh.Categories = d.Categories;
+
 
                 if (loadMoreAction != null && position == ItemCount - 1)
                 {
@@ -255,24 +291,70 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         class DocumentViewHolder : RecyclerView.ViewHolder
         {
 
+            public string Recipent
+            {
+                set
+                {
+                    recipentTextView.Text = value;
+                }
+            }
+
+            public string Date
+            {
+                set
+                {
+                    dateTextView.Text = value;
+                }
+            }
+
             public string Subject
             {
-                get
-                {
-                    return subjectTextView.Text;
-                }
                 set
                 {
                     subjectTextView.Text = value;
                 }
             }
 
+            public string Preview
+            {
+                set
+                {
+                    previewTextView.Text = value;
+                }
+            }
+
+            public List<Category> Categories
+            {
+                set
+                {
+                    categoriesLayout.RemoveAllViews();
+
+                    foreach (var hexColor in value.Select(c => c.HexColor))
+                    {
+                        var view = new View(ItemView.Context)
+                        {
+                            LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent, 1f),
+                            Background = new ColorDrawable(Color.ParseColor(hexColor))
+                        };
+                        categoriesLayout.AddView(view);
+                    }
+                }
+            }
+
+            readonly TextView recipentTextView;
+            readonly TextView dateTextView;
             readonly TextView subjectTextView;
+            readonly TextView previewTextView;
+            readonly LinearLayoutCompat categoriesLayout;
 
             public DocumentViewHolder(View itemView)
-                : base(itemView)
+                    : base(itemView)
             {
+                recipentTextView = itemView.FindViewById<TextView>(Resource.Id.list_item_document_recipent);
+                dateTextView = itemView.FindViewById<TextView>(Resource.Id.list_item_document_date);
                 subjectTextView = itemView.FindViewById<TextView>(Resource.Id.list_item_document_subject);
+                previewTextView = itemView.FindViewById<TextView>(Resource.Id.list_item_document_preview);
+                categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_categories);
             }
         }
 

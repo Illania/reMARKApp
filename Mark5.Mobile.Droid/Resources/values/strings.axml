@@ -8,6 +8,7 @@
 	<string name="ok">OK</string>
 	<string name="cancel">Cancel</string>
 	<string name="please_wait">Please wait...</string>
+	<string name="yesterday">Yesterday</string>
 	<string name="username">Username</string>
 	<string name="username_invalid">Username is not valid.</string>
 	<string name="password">Password</string>

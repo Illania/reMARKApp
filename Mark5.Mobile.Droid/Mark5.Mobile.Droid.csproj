@@ -163,6 +163,8 @@
     <Compile Include="Views\Common\RetainedFragment.cs" />
     <Compile Include="Views\Common\SmoothActionBarDrawerToggle.cs" />
     <Compile Include="Views\Common\DividerItemDecorator.cs" />
+    <Compile Include="ServerConfig.cs" />
+    <Compile Include="Utilities\DateTimeUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
