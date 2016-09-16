@@ -123,6 +123,88 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        public async Task<bool> IsFolderFavouriteAsync(ModuleType module, Folder folder, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Local)
+            {
+                var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
+
+                List<Folder> moduleFavoriteFolders;
+                if (!favoriteFolders.TryGetValue(module, out moduleFavoriteFolders))
+                {
+                    return false;
+                }
+
+                return moduleFavoriteFolders.Contains(folder);
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task AddOfflineFolderAsync(ModuleType module, Folder folder, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Local)
+            {
+                var offlineFolders = await FileSystemStorage.GetOfflineFoldersAsync();
+
+                List<Folder> moduleOfflineFolders;
+                if (!offlineFolders.TryGetValue(module, out moduleOfflineFolders))
+                {
+                    moduleOfflineFolders = new List<Folder>();
+                    offlineFolders[module] = moduleOfflineFolders;
+                }
+
+                moduleOfflineFolders.Add(folder.ShallowCopy());
+
+                await FileSystemStorage.SaveOfflineFoldersAsync(offlineFolders);
+
+                return;
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task RemoveOfflineFolderAsync(ModuleType module, Folder folder, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Local)
+            {
+                var offlineFolders = await FileSystemStorage.GetOfflineFoldersAsync();
+
+                List<Folder> moduleOfflineFolders;
+                if (!offlineFolders.TryGetValue(module, out moduleOfflineFolders))
+                {
+                    moduleOfflineFolders = new List<Folder>();
+                    offlineFolders[module] = moduleOfflineFolders;
+                }
+
+                moduleOfflineFolders.RemoveAll(f => f.Id == folder.Id);
+
+                await FileSystemStorage.SaveOfflineFoldersAsync(offlineFolders);
+
+                return;
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task<bool> IsFolderOfflineAsync(ModuleType module, Folder folder, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Local)
+            {
+                var offlineFolders = await FileSystemStorage.GetOfflineFoldersAsync();
+
+                List<Folder> moduleOfflineFolders;
+                if (!offlineFolders.TryGetValue(module, out moduleOfflineFolders))
+                {
+                    return false;
+                }
+
+                return moduleOfflineFolders.Contains(folder);
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
         #region Helper methods
 
         void ProcessFolders(List<Folder> folders, Folder parentFolder)
