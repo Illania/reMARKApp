@@ -29,12 +29,14 @@ namespace Mark5.Mobile.Droid.Views.Fragments
     public class FirstFolderListFragment : RetainableStateFragment, ActionMode.ICallback
     {
         public Folder Folder { get; set; }
+        Folder FavouriteRootFolder;
 
         FirstFolderListAdapter adapter;
         RecyclerView recyclerView;
         SwipeRefreshLayout refreshLayout;
         ActionMode actionMode;
         List<int> recoveredSelectedItemsPosition;
+        List<Section> availableSections;
 
         #region Overrides
 
@@ -51,7 +53,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             recyclerView.SetItemAnimator(new DefaultItemAnimator());
             recyclerView.HasFixedSize = true;
 
-            adapter = new FirstFolderListAdapter(recyclerView, new List<Section> { Section.Favourites, Section.Remote });
+            adapter = new FirstFolderListAdapter(recyclerView);
             adapter.ExpandIconClicked += Adapter_ExpandClicked;
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
@@ -73,6 +75,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             base.OnResume();
 
+            SetSections();
             await RefreshData();
             RestoreSelection();
         }
@@ -97,26 +100,50 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 return;
             }
 
-            if (forceRefresh || !Folder.SubFolders.Any())
+            refreshLayout.Post(() => refreshLayout.Refreshing = true); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
+
+            if (availableSections.Contains(Section.Remote))
             {
-                refreshLayout.Post(() => refreshLayout.Refreshing = true); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
+                if (forceRefresh || !Folder.SubFolders.Any())
+                {
 
-                var folders = await Managers.FoldersManager.GetFoldersAsync(Folder, 2);
-                Folder.SubFolders.Clear();
-                Folder.SubFolders = folders;
+                    var folders = await Managers.FoldersManager.GetFoldersAsync(Folder, 2);
+                    Folder.SubFolders.Clear();
+                    Folder.SubFolders = folders;
 
-                adapter.Refresh(folders, Section.Remote);
-
-                await Task.Delay(3000);
-
-                adapter.Refresh(folders.Take(2).ToList(), Section.Favourites);
-
-                refreshLayout.Post(() => refreshLayout.Refreshing = false); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
+                    adapter.Refresh(folders, Section.Remote);
+                }
+                else
+                {
+                    adapter.Refresh(Folder.SubFolders, Section.Remote);
+                }
             }
-            else
+            if (availableSections.Contains(Section.Favourites))
             {
-                adapter.Refresh(Folder.SubFolders, Section.Remote);
+                if (FavouriteRootFolder == null)
+                {
+                    FavouriteRootFolder = Folder.RootPerModule(Folder.Module, true);
+                }
+                if (forceRefresh || !FavouriteRootFolder.SubFolders.Any())
+                {
+
+                    var folders = await Managers.FoldersManager.GetFavoriteFoldersAsync(Folder.Module);
+                    FavouriteRootFolder.SubFolders.Clear();
+                    FavouriteRootFolder.SubFolders = folders;
+
+                    adapter.Refresh(folders, Section.Favourites);
+                }
+                else
+                {
+                    adapter.Refresh(FavouriteRootFolder.SubFolders, Section.Favourites);
+                }
             }
+            if (availableSections.Contains(Section.Local))
+            {
+
+            }
+
+            refreshLayout.Post(() => refreshLayout.Refreshing = false); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
         }
 
         void RestoreSelection()
@@ -130,11 +157,25 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
         }
 
+        void SetSections()
+        {
+            if (Folder.Root)
+            {
+                availableSections = new List<Section> { Section.Favourites, Section.Remote, Section.Local };
+            }
+            else
+            {
+                availableSections = new List<Section> { Section.Remote };
+            }
+
+            adapter.SetSections(availableSections);
+        }
+
         void NavigateInFolder(Folder folder)
         {
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
 
-            var foldersListFragment = new FoldersListFragment
+            var foldersListFragment = new FirstFolderListFragment
             {
                 Folder = folder,
             };
@@ -265,6 +306,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return new FolderListFragmentState
             {
                 Folder = Folder,
+                FavouriteRootFolder = FavouriteRootFolder,
                 SelectedItemPositions = new List<int>(adapter.SelectedItemPositions),
             };
         }
@@ -275,6 +317,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             if (flfs != null)
             {
                 Folder = flfs.Folder;
+                FavouriteRootFolder = flfs.FavouriteRootFolder;
                 recoveredSelectedItemsPosition = flfs.SelectedItemPositions;
             }
         }
@@ -282,6 +325,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         class FolderListFragmentState : IRetainableState
         {
             public Folder Folder { get; set; }
+            public Folder FavouriteRootFolder { get; set; }
             public List<int> SelectedItemPositions { get; set; }
         }
 
@@ -316,10 +360,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public event EventHandler<int> ItemClicked = delegate { };
         public event EventHandler<int> ItemLongClicked = delegate { };
 
-        public FirstFolderListAdapter(RecyclerView parentRecyclerView, List<Section> availableSections)
+        public FirstFolderListAdapter(RecyclerView parentRecyclerView)
         {
             parentView = parentRecyclerView;
-            sectionsInView = availableSections; //TODO should copy
             foldersInSection[Section.Favourites] = new List<Folder>();
             foldersInSection[Section.Remote] = new List<Folder>();
             foldersInSection[Section.Local] = new List<Folder>();
@@ -329,7 +372,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             get
             {
-                return foldersInSection.Sum(f => f.Value.Count) + sectionsInView.Count;
+                return foldersInSection.Sum(f => f.Value.Count) + (sectionsInView.Count == 1 ? 0 : sectionsInView.Count);
             }
         }
 
@@ -356,74 +399,14 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return SectionsPositionToSection().ContainsKey(position) ? ViewType.SectionView : ViewType.FolderView;
         }
 
-        Dictionary<int, Section> SectionsPositionToSection()
-        {
-            if (!sectionsInView.Any())
-            {
-                return null;
-            }
-
-            var positions = new Dictionary<int, Section>();
-            positions.Add(0, sectionsInView[0]);
-
-            int previousSectionPosition = 0;
-            int previousSectionItemsCount = foldersInSection[sectionsInView[0]].Count;
-            for (int i = 1; i < sectionsInView.Count; i++)
-            {
-                var sectionPosition = previousSectionPosition + previousSectionItemsCount + 1;
-                positions.Add(sectionPosition, sectionsInView[i]);
-
-                previousSectionPosition = sectionPosition;
-                previousSectionItemsCount = foldersInSection[sectionsInView[i]].Count;
-            }
-
-            return positions;
-        }
-
-        Folder FolderForSectionedPosition(int position) //TODO give better names
-        {
-            int sectionPosition = 0;
-            var sectionPositionToSection = SectionsPositionToSection();
-            var sectionPositions = sectionPositionToSection.Keys.ToList();
-            for (int i = sectionPositions.Count - 1; i > 0; i--)
-            {
-                if (position > sectionPositions[i])
-                {
-                    sectionPosition = sectionPositions[i];
-                    break;
-                }
-            }
-
-            var section = sectionPositionToSection[sectionPosition];
-            return foldersInSection[section][position - sectionPosition - 1];
-        }
-
-        //int SectionForPosition(int position) //TODO give better names
-        //{
-        //    int sectionPosition = 0;
-        //    var sectionPositionToSection = SectionsPositionToSection();
-        //    var sectionPositions = sectionPositionToSection.Keys.ToList();
-        //    for (int i = sectionPositions.Count; i > 0; i--)
-        //    {
-        //        if (position > sectionPositions[i])
-        //        {
-        //            sectionPosition = sectionPositions[i];
-        //            break;
-        //        }
-        //    }
-
-        //    return sectionPositionToSection[sectionPosition];
-        //}
-
         public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
         {
             //Binding of actual parameters, the view is already created
-
             if (holder is FolderViewHolder)
             {
                 var fh = holder as FolderViewHolder;
 
-                var folder = FolderForSectionedPosition(position);
+                var folder = GetItemAtPosition(position);
 
                 fh.FolderNameTitle.Text = folder.Name;
                 fh.FolderNameSubTitle.Text = folder.Name + "sdf";
@@ -469,7 +452,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
                 sh.SectionTitle.Text = title;
             }
-
         }
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -503,22 +485,28 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                                               Inflate(Resource.Layout.list_item_section, parent, false);
                 return new SectionViewHolder(itemView);
             }
-
         }
 
         #endregion
 
+        #region Public methods
+
         public void Refresh(List<Folder> folders, Section section)
         {
             var sectionPosition = SectionsPositionToSection().FirstOrDefault(c => c.Value == section).Key;
-            var itemCount = folders.Count;
+            var offset = sectionsInView.Count == 1 ? 0 : 1;
 
-            foldersInSection[section].Clear();
+            var oldItemCount = foldersInSection[section].Count;
+            if (oldItemCount > 0)
+            {
+                foldersInSection[section].Clear();
+                NotifyItemRangeRemoved(sectionPosition + offset, oldItemCount);
+            }
+
+            var newItemCount = folders.Count;
             foldersInSection[section].AddRange(folders);
-            NotifyItemRangeInserted(sectionPosition, itemCount);
+            NotifyItemRangeInserted(sectionPosition + offset, newItemCount);
         }
-
-        #region Selection methods
 
         public void ClearSelection()
         {
@@ -532,13 +520,30 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public Folder GetItemAtPosition(int position)
         {
-            //return foldersInView[position];
-            throw new NotImplementedException(); //TODO need to think about it
+            if (sectionsInView.Count == 1)
+            {
+                return foldersInSection[sectionsInView.First()][position];
+            }
+
+            int sectionPosition = 0;
+            var sectionPositionToSection = SectionsPositionToSection();
+            var sectionPositions = sectionPositionToSection.Keys.ToList();
+            for (int i = sectionPositions.Count - 1; i > 0; i--)
+            {
+                if (position > sectionPositions[i])
+                {
+                    sectionPosition = sectionPositions[i];
+                    break;
+                }
+            }
+
+            var section = sectionPositionToSection[sectionPosition];
+            return foldersInSection[section][position - sectionPosition - 1];
         }
 
         public IEnumerable<Folder> GetSelectedItems()
         {
-            return selectedItemPositions.Select(i => FolderForSectionedPosition(i));
+            return selectedItemPositions.Select(i => GetItemAtPosition(i));
         }
 
         public void TogggleSelection(int position)
@@ -566,9 +571,43 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
         }
 
+        public void SetSections(List<Section> availableSections)
+        {
+            sectionsInView = availableSections;
+            NotifyDataSetChanged();
+        }
+
+        #endregion
+
+        #region Utilities
+
         bool IsItemSelected(int position)
         {
             return selectedItemPositions.Contains(position);
+        }
+
+        Dictionary<int, Section> SectionsPositionToSection()
+        {
+            if (sectionsInView.Count <= 1)
+            {
+                return new Dictionary<int, Section>();
+            }
+
+            var positions = new Dictionary<int, Section>();
+            positions.Add(0, sectionsInView[0]);
+
+            int previousSectionPosition = 0;
+            int previousSectionItemsCount = foldersInSection[sectionsInView[0]].Count;
+            for (int i = 1; i < sectionsInView.Count; i++)
+            {
+                var sectionPosition = previousSectionPosition + previousSectionItemsCount + 1;
+                positions.Add(sectionPosition, sectionsInView[i]);
+
+                previousSectionPosition = sectionPosition;
+                previousSectionItemsCount = foldersInSection[sectionsInView[i]].Count;
+            }
+
+            return positions;
         }
 
         #endregion

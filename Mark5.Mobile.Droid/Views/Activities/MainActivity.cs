@@ -306,7 +306,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
                         var tag = item.Tag;
 
                         var ft = fm.BeginTransaction();
-                        var foldersListFragment = new FoldersListFragment();
+                        var foldersListFragment = new FirstFolderListFragment();
                         foldersListFragment.SetInitialSavedState(state);
                         ft.SetTransition(FragmentTransaction.TransitFragmentFade);
                         ft.Replace(Resource.Id.fragment_container, foldersListFragment, tag);
