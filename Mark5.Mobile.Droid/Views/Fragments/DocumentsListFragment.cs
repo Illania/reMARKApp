@@ -20,6 +20,7 @@ using Android.Support.V7.Widget;
 using Android.Text.Format;
 using Android.Views;
 using Android.Widget;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
@@ -124,41 +125,61 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         async Task AutoRefreshData(int endId)
         {
-            if (!IsAdded || IsDetached || IsRemoving) return;
-            if (refreshing) return;
-
-            refreshing = true;
-
-            var documents = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, endId: endId);
-
-            if (documents.Count > 0)
+            try
             {
-                Activity?.RunOnUiThread(() =>
-                {
-                    adapter?.PrependItems(documents);
-                });
-            }
+                if (!IsAdded || IsDetached || IsRemoving) return;
+                if (refreshing) return;
 
-            refreshing = false;
+                refreshing = true;
+
+                var documents = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, endId: endId);
+
+                if (documents.Count > 0)
+                {
+                    Activity?.RunOnUiThread(() =>
+                    {
+                        adapter?.PrependItems(documents);
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Automatic refresh failed [endId={endId}]", ex);
+            }
+            finally
+            {
+                refreshing = false;
+            }
         }
 
         async Task RefreshData(int startId = -1, int endId = -1, bool force = false)
         {
-            if (refreshing) return;
-
-            refreshing = true;
-            refreshLayout.Post(() => refreshLayout.Refreshing = true); //Bug: fixed in support library v 24.2.0 (issue 77712)
-
-            if (force)
+            try
             {
-                adapter.Clear();
+                if (refreshing) return;
+
+                refreshing = true;
+                refreshLayout.Post(() => refreshLayout.Refreshing = true); //Bug: fixed in support library v 24.2.0 (issue 77712)
+
+                if (force)
+                {
+                    adapter.Clear();
+                }
+
+                var documents = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, startId, endId);
+                adapter.AppendItems(documents);
             }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Downloading documents failed [folder.Name={Folder?.Name}, folder.id={Folder?.Id}, startId={startId}, endId={endId}, force={force}]", ex);
 
-            var documents = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, startId, endId);
-            adapter.AppendItems(documents);
-
-            refreshLayout.Post(() => refreshLayout.Refreshing = false); //Bug: fixed in support library v 24.2.0 (issue 77712)
-            refreshing = false;
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+            finally
+            {
+                refreshLayout.Post(() => refreshLayout.Refreshing = false); //Bug: fixed in support library v 24.2.0 (issue 77712)
+                refreshing = false;
+            }
         }
 
         void Adapter_ItemClicked(object sender, DocumentPreview e)

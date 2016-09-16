@@ -213,10 +213,8 @@ namespace Mark5.Mobile.Common.Managers
             }
             catch (Exception ex)
             {
-                if (CommonConfig.Logger.IsErrorEnabled())
-                {
-                    CommonConfig.Logger.Error("Error in send action for for OutgoingDocumentManager", ex);
-                }
+                CommonConfig.Logger.Error("Error in send action", ex);
+
                 throw ex;
             }
         }

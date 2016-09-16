@@ -234,10 +234,8 @@ namespace Mark5.Mobile.Common
             }
             catch (Exception ex)
             {
-                if (CommonConfig.Logger.IsErrorEnabled())
-                {
-                    CommonConfig.Logger.Error("Error in download action for DownloadManager", ex);
-                }
+                CommonConfig.Logger.Error("Error in download action", ex);
+
                 throw ex;
             }
         }
