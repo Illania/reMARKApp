@@ -284,7 +284,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
             {
                 if (BackstackStates == null || !BackstackStates.Any())
                 {
-                    var foldersListFragment = new FirstFolderListFragment
+                    var foldersListFragment = new FoldersListFragment
                     {
                         Folder = Folder.RootPerModule(ModuleType)
                     };
@@ -306,7 +306,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
                         var tag = item.Tag;
 
                         var ft = fm.BeginTransaction();
-                        var foldersListFragment = new FirstFolderListFragment();
+                        var foldersListFragment = new FoldersListFragment();
                         foldersListFragment.SetInitialSavedState(state);
                         ft.SetTransition(FragmentTransaction.TransitFragmentFade);
                         ft.Replace(Resource.Id.fragment_container, foldersListFragment, tag);

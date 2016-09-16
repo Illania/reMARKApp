@@ -148,7 +148,6 @@
     <Compile Include="Views\Activities\LoginActivity.cs" />
     <Compile Include="Views\Activities\SplashActivity.cs" />
     <Compile Include="Utilities\PortableConcurrentQueue.cs" />
-    <Compile Include="Views\Fragments\FoldersListFragment.cs" />
     <Compile Include="Views\Activities\MainActivity.cs" />
     <Compile Include="Views\Common\BaseAppCompatActivity.cs" />
     <Compile Include="Views\Fragments\PreferenceFragment.cs" />
@@ -163,7 +162,7 @@
     <Compile Include="Views\Common\RetainedFragment.cs" />
     <Compile Include="Views\Common\SmoothActionBarDrawerToggle.cs" />
     <Compile Include="Views\Common\DividerItemDecorator.cs" />
-    <Compile Include="Views\Fragments\FirstFolderFragment.cs" />
+    <Compile Include="Views\Fragments\FoldersListFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
