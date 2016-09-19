@@ -14,12 +14,12 @@ using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
+using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Text.Format;
 using Android.Views;
-using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
@@ -29,7 +29,7 @@ using Mark5.Mobile.Droid.Views.Common;
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
 
-    public class DocumentsListFragment : RetainableStateFragment, ActionMode.ICallback
+    public class DocumentsListFragment : RetainableStateFragment, ActionMode.ICallback, View.IOnClickListener, SearchView.IOnQueryTextListener, SearchView.IOnCloseListener
     {
 
         const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
@@ -45,7 +45,11 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         DocumentsListAdapter adapter;
+        DocumentsListAdapter searchAdapter;
         ActionMode actionMode;
+        SearchView searchView;
+
+        readonly Handler searchHandler = new Handler();
 
         AutoRefreshWorker autoRefreshWorker;
 
@@ -65,6 +69,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
             recyclerView.SetAdapter(adapter);
+
+            searchAdapter = new DocumentsListAdapter(Activity);
+            searchAdapter.ItemClicked += Adapter_ItemClicked;
+            searchAdapter.ItemLongClicked += Adapter_ItemLongClicked;
+
+            HasOptionsMenu = true;
 
             return rootView;
         }
@@ -98,6 +108,18 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             base.OnPause();
 
             autoRefreshWorker?.Stop();
+        }
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            inflater.Inflate(Resource.Menu.menu_main, menu);
+
+            var searchItem = menu.FindItem(Resource.Id.action_search);
+            searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
+            searchView.QueryHint = GetString(Resource.String.filter);
+            searchView.SetOnSearchClickListener(this);
+            searchView.SetOnQueryTextListener(this);
+            searchView.SetOnCloseListener(this);
         }
 
         public override IRetainableState OnRetainInstanceState()
@@ -197,19 +219,20 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             if (actionMode == null)
             {
-                Toast.MakeText(Activity, "Document clicked!", ToastLength.Short).Show();
+                Android.Widget.Toast.MakeText(Activity, "Document clicked!", Android.Widget.ToastLength.Short).Show();
             }
             else
             {
-                adapter.SetSelected(documentPreview, !adapter.IsSelected(documentPreview));
+                var currentAdapter = (DocumentsListAdapter)recyclerView.GetAdapter();
+                currentAdapter.SetSelected(documentPreview, !currentAdapter.IsSelected(documentPreview));
 
-                if (adapter.SelectedItemCount < 1)
+                if (currentAdapter.SelectedItemCount < 1)
                 {
                     actionMode.Finish();
                 }
                 else
                 {
-                    actionMode.Title = adapter.SelectedItemCount.ToString();
+                    actionMode.Title = currentAdapter.SelectedItemCount.ToString();
                     actionMode.Invalidate();
                 }
             }
@@ -253,8 +276,76 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public void OnDestroyActionMode(ActionMode mode)
         {
+            var currentAdapter = (DocumentsListAdapter)recyclerView.GetAdapter();
+            currentAdapter.ClearSelections();
             actionMode = null;
-            adapter.ClearSelections();
+        }
+
+        void View.IOnClickListener.OnClick(View v)
+        {
+            if (v == searchView)
+            {
+                refreshLayout.Enabled = false;
+                adapter.ClearSelections();
+                recyclerView.SwapAdapter(searchAdapter, true);
+            }
+        }
+
+        public bool OnQueryTextChange(string newText)
+        {
+            searchHandler.RemoveCallbacksAndMessages(null);
+            searchHandler.PostDelayed(() =>
+            {
+                if (string.IsNullOrWhiteSpace(newText))
+                {
+                    searchAdapter.Clear();
+                }
+                else
+                {
+                    searchAdapter.ReplaceItems(adapter.Items.Where(dp => MatchesQuery(dp, newText)).ToList());
+                }
+            }, 500);
+            return false;
+        }
+
+        public bool OnQueryTextSubmit(string query)
+        {
+            return false;
+        }
+
+        public bool OnClose()
+        {
+            searchHandler.RemoveCallbacksAndMessages(null);
+            searchAdapter.Clear();
+            recyclerView.SwapAdapter(adapter, true);
+            refreshLayout.Enabled = true;
+            return false;
+        }
+
+        static bool MatchesQuery(DocumentPreview dp, string query)
+        {
+            if (dp.Subject.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
+            {
+                return true;
+            }
+            if (dp.Preview.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
+            {
+                return true;
+            }
+            if (dp.Addresses.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0))
+            {
+                return true;
+            }
+            if (dp.Addresses.Any(da => da.Address.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0))
+            {
+                return true;
+            }
+            if (dp.Categories.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         class DocumentsListFragmentState : IRetainableState
@@ -276,7 +367,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 get
                 {
-                    return documentPreviewssInView.ToList();
+                    return documentPreviewsInView.ToList();
                 }
             }
 
@@ -292,7 +383,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 get
                 {
-                    return documentPreviewssInView.Count;
+                    return documentPreviewsInView.Count;
                 }
             }
 
@@ -304,13 +395,18 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 }
             }
 
-            readonly List<DocumentPreview> documentPreviewssInView = new List<DocumentPreview>(1000);
+            readonly List<DocumentPreview> documentPreviewsInView = new List<DocumentPreview>(1000);
             readonly Dictionary<int, DocumentPreview> selectedDocumentsInView = new Dictionary<int, DocumentPreview>();
             readonly Action<int> loadMoreAction;
             readonly Context context;
 
             public event EventHandler<DocumentPreview> ItemClicked = delegate { };
             public event EventHandler<DocumentPreview> ItemLongClicked = delegate { };
+
+            public DocumentsListAdapter(Context context)
+            {
+                this.context = context;
+            }
 
             public DocumentsListAdapter(Context context, Action<int> loadMoreAction)
             {
@@ -323,7 +419,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 var dpvh = holder as DocumentPreviewViewHolder;
                 if (dpvh == null) return;
 
-                var dp = documentPreviewssInView[position];
+                var dp = documentPreviewsInView[position];
 
                 dpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
                 dpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
@@ -331,12 +427,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 if (dp.Direction == DocumentDirection.Incoming)
                 {
                     var address = dp.Addresses?.Where(da => da.AddressType == DocumentAddressType.From).FirstOrDefault();
-                    dpvh.Recipent = address?.Name ?? address?.Address;
+                    dpvh.Recipent = string.IsNullOrWhiteSpace(address?.Name) ? address?.Address : address?.Name;
                 }
                 else
                 {
                     var address = dp.Addresses?.Where(da => da.AddressType == DocumentAddressType.To).FirstOrDefault();
-                    dpvh.Recipent = address?.Name ?? address?.Address;
+                    dpvh.Recipent = string.IsNullOrWhiteSpace(address?.Name) ? address?.Address : address?.Name;
                 }
 
                 var dateReceived = dp.DateReceived.ToServerTime();
@@ -381,21 +477,28 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             public void PrependItems(List<DocumentPreview> items)
             {
                 var count = items.Count;
-                documentPreviewssInView.InsertRange(0, items);
+                documentPreviewsInView.InsertRange(0, items);
                 NotifyItemRangeInserted(0, count);
             }
 
             public void AppendItems(List<DocumentPreview> items)
             {
-                var count = documentPreviewssInView.Count;
-                documentPreviewssInView.AddRange(items);
+                var count = documentPreviewsInView.Count;
+                documentPreviewsInView.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
+            }
+
+            public void ReplaceItems(List<DocumentPreview> items)
+            {
+                Clear();
+                AppendItems(items);
             }
 
             public void Clear()
             {
-                var size = documentPreviewssInView.Count;
-                documentPreviewssInView.Clear();
+                var size = documentPreviewsInView.Count;
+                documentPreviewsInView.Clear();
+                selectedDocumentsInView.Clear();
                 NotifyItemRangeRemoved(0, size);
             }
 
@@ -441,9 +544,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             int GetPosition(DocumentPreview documentPreview)
             {
                 var position = -1;
-                for (var i = 0; i < documentPreviewssInView.Count; i++)
+                for (var i = 0; i < documentPreviewsInView.Count; i++)
                 {
-                    if (documentPreviewssInView[i].Id == documentPreview.Id)
+                    if (documentPreviewsInView[i].Id == documentPreview.Id)
                     {
                         position = i;
                         break;
@@ -562,10 +665,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 }
             }
 
-            readonly TextView recipentTextView;
-            readonly TextView dateTextView;
-            readonly TextView subjectTextView;
-            readonly TextView previewTextView;
+            readonly AppCompatTextView recipentTextView;
+            readonly AppCompatTextView dateTextView;
+            readonly AppCompatTextView subjectTextView;
+            readonly AppCompatTextView previewTextView;
             readonly LinearLayoutCompat categoriesLayout;
             readonly AppCompatImageView incomingImageView;
             readonly AppCompatImageView outgoingImageView;
@@ -578,10 +681,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             public DocumentPreviewViewHolder(View itemView)
                     : base(itemView)
             {
-                recipentTextView = itemView.FindViewById<TextView>(Resource.Id.list_item_document_recipent);
-                dateTextView = itemView.FindViewById<TextView>(Resource.Id.list_item_document_date);
-                subjectTextView = itemView.FindViewById<TextView>(Resource.Id.list_item_document_subject);
-                previewTextView = itemView.FindViewById<TextView>(Resource.Id.list_item_document_preview);
+                recipentTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_recipent);
+                dateTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_date);
+                subjectTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_subject);
+                previewTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_preview);
                 categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_categories);
                 incomingImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_incoming);
                 outgoingImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_outgoing);

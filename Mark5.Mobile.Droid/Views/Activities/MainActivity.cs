@@ -247,9 +247,9 @@ namespace Mark5.Mobile.Droid.Views.Activity
             public override void RestoreOrCreate(FragmentManager fm)
             {
                 var ft = fm.BeginTransaction();
-                var foldersListFragment = new PreferenceFragment();
+                var pf = new PreferenceFragment();
                 ft.SetTransition(FragmentTransaction.TransitFragmentFade);
-                ft.Replace(Resource.Id.fragment_container, foldersListFragment, "PreferenceFragment");
+                ft.Replace(Resource.Id.fragment_container, pf, "PreferenceFragment");
                 ft.AddToBackStack("PreferenceFragment");
                 ft.Commit();
             }

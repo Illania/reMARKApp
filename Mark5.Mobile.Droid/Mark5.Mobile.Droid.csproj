@@ -282,6 +282,7 @@
     <AndroidResource Include="Resources\mipmap-xxhdpi\comment.png" />
     <AndroidResource Include="Resources\mipmap-xhdpi\comment.png" />
     <AndroidResource Include="Resources\mipmap-hdpi\comment.png" />
+    <AndroidResource Include="Resources\menu\menu_main.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
