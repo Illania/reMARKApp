@@ -251,12 +251,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 case MenuItemActions.AddToFavourites:
                     AddSelectionToFavourites();
-                    actionMode.Finish();
+                    mode.Finish();
                     RefreshFavorites(true).Wait();
                     return true;
                 case MenuItemActions.RemoveFromFavourites:
                     RemoveSelectionFromFavourites();
-                    actionMode.Finish(); //TODO could put the actionModeFinish at the end
+                    mode.Finish();
                     RefreshFavorites(true).Wait();
                     return true;
                 case MenuItemActions.EnableOffline:
@@ -280,7 +280,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                     return false;
             }
         }
-
 
         bool ActionMode.ICallback.OnCreateActionMode(ActionMode mode, IMenu menu)
         {
