@@ -103,15 +103,91 @@ namespace Mark5.Mobile.Common.Model
                 InternalType = InternalType,
                 HasSubFolders = HasSubFolders,
                 Position = Position,
+                OptionalParameters = OptionalParameters?.ShallowCopy()
             };
         }
 
         public Folder DeepCopy()
         {
             var copy = ShallowCopy();
-            copy.OptionalParameters = OptionalParameters?.DeepCopy();
             copy.SubFolders.AddRange(SubFolders.Select(f => f.DeepCopy()));
             return copy;
+        }
+
+        #endregion
+
+        #region Root folders
+
+        [Ignore]
+        public bool Root
+        {
+            get
+            {
+                return new[]
+                {
+                    documentsRootFolder,
+                    contactsRootFolder,
+                    shortcodesRootFolder,
+                    calendarRootFolder,
+                }.Contains(this);
+            }
+        }
+
+        readonly static Folder documentsRootFolder = new Folder
+        {
+            Id = -100,
+            Guid = new Guid("{00000000-0000-0000-0000-000000000100}"),
+            Name = "DOCUMENTS_ROOT",
+            Module = ModuleType.Documents,
+            Type = FolderType.None,
+            HasSubFolders = true,
+        };
+
+        readonly static Folder contactsRootFolder = new Folder
+        {
+            Id = -200,
+            Guid = new Guid("{00000000-0000-0000-0000-000000000200}"),
+            Name = "CONTACTS_ROOT",
+            Module = ModuleType.Contacts,
+            Type = FolderType.None,
+            HasSubFolders = true,
+        };
+
+        readonly static Folder shortcodesRootFolder = new Folder
+        {
+            Id = -300,
+            Guid = new Guid("{00000000-0000-0000-0000-000000000300}"),
+            Name = "SHORTCODES_ROOT",
+            Module = ModuleType.Shortcodes,
+            Type = FolderType.None,
+            HasSubFolders = true,
+        };
+
+        readonly static Folder calendarRootFolder = new Folder
+        {
+            Id = -400,
+            Guid = new Guid("{00000000-0000-0000-0000-000000000400}"),
+            Name = "CALENDAR_ROOT",
+            Module = ModuleType.Calendar,
+            Type = FolderType.None,
+            HasSubFolders = true,
+        };
+
+        public static Folder RootPerModule(ModuleType module)
+        {
+            switch (module)
+            {
+                case ModuleType.Documents:
+                    return documentsRootFolder;
+                case ModuleType.Contacts:
+                    return contactsRootFolder;
+                case ModuleType.Shortcodes:
+                    return shortcodesRootFolder;
+                case ModuleType.Calendar:
+                    return calendarRootFolder;
+                default:
+                    throw new ArgumentException("Input module not valid");
+            }
         }
 
         #endregion

@@ -28,7 +28,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
               MainLauncher = true,
               Icon = "@mipmap/ic_icon",
               Theme = "@style/mark5Splash",
-              ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation,
               ScreenOrientation = ScreenOrientation.Portrait)]
     public class SplashActivity : BaseAppCompatActivity
     {
@@ -131,6 +130,10 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
                 await CommonConfig.ReachabilityService.Refresh();
                 PlatformConfig.ReachabilityBroadcastReceiver.Register();
+
+                CommonConfig.Logger.Info("Retrieving system settings...");
+
+                ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
 
                 CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
 

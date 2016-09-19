@@ -5,6 +5,8 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
+using System.Threading.Tasks;
 using Android.Content;
 using Android.OS;
 using Android.Support.V4.App;
@@ -63,6 +65,31 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             if (preference.Key == GetString(Resource.String.pref_key_advanced_send_feedback))
             {
                 FeedbackManager.ShowFeedbackActivity(Activity);
+                return true;
+            }
+
+            if (preference.Key == GetString(Resource.String.pref_key_advanced_update_config))
+            {
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_update_config_title, Resource.String.please_wait);
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        var ss = await Managers.SystemManager.GetSystemSettingsAsync();
+                        ServerConfig.SystemSettings = ss;
+
+                        await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+
+                        dismissAction();
+                    }
+                    catch (Exception ex)
+                    {
+                        dismissAction();
+
+                        await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                    }
+                });
+
                 return true;
             }
 

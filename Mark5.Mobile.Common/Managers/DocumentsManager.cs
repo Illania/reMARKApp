@@ -49,12 +49,12 @@ namespace Mark5.Mobile.Common.Managers
                     StartId = startId,
                     EndId = endId,
                     MaxToFetch = MaxToFetch,
-                    ReverseSortOrder = false
+                    ReverseSortOrder = true
                 });
 
                 var documentPreviews = result.DocumentPreviews.WhereNotNull().OrderByDescending(dp => dp.Id).Select(dp => dp.Convert()).ToList();
 
-                await documentsDataAccess.SaveDocumentPreviewsAsync(folder, documentPreviews, startId == -1);
+                await documentsDataAccess.SaveDocumentPreviewsAsync(folder, documentPreviews, startId == -1 && endId == -1);
 
                 return documentPreviews;
             }

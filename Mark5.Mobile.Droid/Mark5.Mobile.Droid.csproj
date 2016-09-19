@@ -28,13 +28,14 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <AndroidLinkMode>None</AndroidLinkMode>
-    <AndroidSupportedAbis>armeabi-v7a;armeabi;arm64-v8a</AndroidSupportedAbis>
+    <AndroidSupportedAbis>armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
 <AndroidKeyStore>True</AndroidKeyStore>
 <AndroidSigningKeyStore>../../extra/App Development Certificates/Android/default.keystore</AndroidSigningKeyStore>
 <AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
 <AndroidSigningKeyAlias>default -tsa https://timestamp.geotrust.com/tsa</AndroidSigningKeyAlias>
 <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
 <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+<AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -49,6 +50,7 @@
 <AndroidSigningKeyAlias>default -tsa https://timestamp.geotrust.com/tsa</AndroidSigningKeyAlias>
 <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
 <AndroidLinkSkip>System.Runtime;System.Collections;System.Runtime.Serialization</AndroidLinkSkip>
+<AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -131,6 +133,9 @@
     <Reference Include="HockeySDK">
       <HintPath>..\Components\hockeyappandroid-4.1.0.2\lib\android\HockeySDK.dll</HintPath>
     </Reference>
+    <Reference Include="Xamarin.Android.Support.v7.CardView">
+      <HintPath>..\packages\Xamarin.Android.Support.v7.CardView.23.4.0.1\lib\MonoAndroid403\Xamarin.Android.Support.v7.CardView.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -155,6 +160,16 @@
     <Compile Include="Utilities\Hockey\CustomCrashManagerListener.cs" />
     <Compile Include="Utilities\Hockey\CustomFeedbackManagerLister.cs" />
     <Compile Include="Utilities\Hockey\CustomFeedbackActivity.cs" />
+    <Compile Include="Views\Activities\DocumentsListActivity.cs" />
+    <Compile Include="Views\Common\RetainableStateFragment.cs" />
+    <Compile Include="Views\Fragments\DocumentsListFragment.cs" />
+    <Compile Include="Views\Common\RetainedFragment.cs" />
+    <Compile Include="Views\Common\SmoothActionBarDrawerToggle.cs" />
+    <Compile Include="Views\Common\DividerItemDecorator.cs" />
+    <Compile Include="ServerConfig.cs" />
+    <Compile Include="Utilities\DateTimeUtils.cs" />
+    <Compile Include="Views\Common\ActionOnClickListener.cs" />
+    <Compile Include="Views\Common\ActionOnLongClickListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -211,14 +226,66 @@
     <AndroidResource Include="Resources\mipmap-xhdpi\logo.png" />
     <AndroidResource Include="Resources\mipmap-xxhdpi\logo.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\logo.png" />
-    <AndroidResource Include="Resources\layout\fragment_list_folders.axml" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\mipmap-xxhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\mipmap-xhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\mipmap-hdpi\drawer_header_background.png" />
+    <AndroidResource Include="Resources\layout\list_item_folder.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder_outgoing.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder_spam.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder_outgoing.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder_spam.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder_outgoing.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder_spam.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_outgoing.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_spam.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\arrow_right.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\arrow_right.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\arrow_right.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\arrow_right.png" />
     <AndroidResource Include="Resources\xml\preferences.axml" />
     <AndroidResource Include="Resources\values\strings-preferences.axml" />
     <AndroidResource Include="Resources\values\values-preferences.axml" />
+    <AndroidResource Include="Resources\layout\list.axml" />
+    <AndroidResource Include="Resources\layout\list_item_documents.axml" />
+    <AndroidResource Include="Resources\drawable\line_divider.xml" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\incoming.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\outgoing.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\incoming.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\outgoing.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\incoming.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\outgoing.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\incoming.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\outgoing.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\draft.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\unread.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\draft.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\unread.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\draft.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\unread.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\draft.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\unread.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\attachment.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\attachment.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\attachment.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\attachment.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\comment.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\comment.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\comment.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\comment.png" />
+    <AndroidResource Include="Resources\menu\menu_main.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <View
+        android:id="@+id/selected_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="?android:attr/colorControlActivated" />
+    <android.support.v7.widget.LinearLayoutCompat
+        android:id="@+id/list_item_document_internal_Layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingRight="16dp"
+        android:orientation="horizontal"
+        android:background="?android:attr/selectableItemBackground">
+        <android.support.v7.widget.LinearLayoutCompat
+            android:id="@+id/list_item_document_categories"
+            android:layout_width="4dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical" />
+        <android.support.v7.widget.LinearLayoutCompat
+            android:layout_width="32dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/list_item_document_direction_incoming"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:padding="4dp"
+                android:src="@mipmap/incoming"
+                android:tint="#123D57"
+                android:visibility="gone" />
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/list_item_document_direction_outgoing"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:padding="4dp"
+                android:src="@mipmap/outgoing"
+                android:tint="#123D57"
+                android:visibility="gone" />
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/list_item_document_direction_draft"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:padding="4dp"
+                android:src="@mipmap/draft"
+                android:tint="#123D57"
+                android:visibility="gone" />
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/list_item_document_unread"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:padding="4dp"
+                android:src="@mipmap/unread"
+                android:tint="#123D57"
+                android:visibility="gone" />
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/list_item_document_attachment"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:padding="4dp"
+                android:src="@mipmap/attachment"
+                android:tint="#123D57"
+                android:visibility="gone" />
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/list_item_document_comment"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:padding="4dp"
+                android:src="@mipmap/comment"
+                android:tint="#123D57"
+                android:visibility="gone" />
+        </android.support.v7.widget.LinearLayoutCompat>
+        <android.support.v7.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <android.support.v7.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="4dp"
+                android:orientation="horizontal">
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/list_item_document_recipent"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="75"
+                    android:layout_gravity="left"
+                    android:gravity="left|center_vertical"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/list_item_document_date"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="25"
+                    android:layout_gravity="right"
+                    android:gravity="right|center_vertical"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:maxLines="1" />
+            </android.support.v7.widget.LinearLayoutCompat>
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/list_item_document_subject"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="4dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textColor="@color/darkerblue"
+                android:maxLines="1"
+                android:ellipsize="end" />
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/list_item_document_preview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:maxLines="5"
+                android:ellipsize="end" />
+        </android.support.v7.widget.LinearLayoutCompat>
+    </android.support.v7.widget.LinearLayoutCompat>
+</FrameLayout>
