@@ -147,6 +147,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
                     adapter.SetSelected(dlfs.SelectedDocumentPreviews, true);
                     actionMode.Title = adapter.SelectedItemCount.ToString();
+                    actionMode.Invalidate();
                 }
             }
         }
@@ -250,22 +251,60 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public bool OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
-            return false;
+            menu.Clear();
+
+            var currentAdapter = (DocumentsListAdapter)recyclerView.GetAdapter();
+
+            if (currentAdapter.SelectedItems.Any(dp => !dp.IsReadByCurrent))
+            {
+                menu.Add(Menu.None, 10, 10, Resource.String.mark_as_read);
+            }
+
+            if (currentAdapter.SelectedItems.Any(dp => dp.IsReadByCurrent))
+            {
+                menu.Add(Menu.None, 11, 11, Resource.String.marks_as_unread);
+            }
+
+            if (currentAdapter.SelectedItemCount == 1)
+            {
+                menu.Add(Menu.None, 20, 20, Resource.String.reply);
+                menu.Add(Menu.None, 21, 21, Resource.String.reply_all);
+                menu.Add(Menu.None, 22, 22, Resource.String.forward);
+            }
+
+            menu.Add(Menu.None, 30, 30, Resource.String.copy_to_worktray);
+            menu.Add(Menu.None, 40, 40, Resource.String.copy_to_folder);
+
+            if (Folder.InternalType == FolderInternalType.FilterView
+                || Folder.InternalType == FolderInternalType.Static
+                || Folder.InternalType == FolderInternalType.Worktray)
+            {
+                menu.Add(Menu.None, 41, 41, Resource.String.move_to_folder);
+            }
+
+            if (currentAdapter.SelectedItemCount == 1)
+            {
+                menu.Add(Menu.None, 50, 50, Resource.String.categories);
+            }
+
+            if (Folder.InternalType == FolderInternalType.FilterView
+                || Folder.InternalType == FolderInternalType.Static
+                || Folder.InternalType == FolderInternalType.Worktray)
+            {
+                menu.Add(Menu.None, 60, 60, Resource.String.delete_from_folder);
+            }
+
+            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
+                || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed)
+            {
+                menu.Add(Menu.None, 61, 61, Resource.String.delete);
+            }
+
+            return true;
         }
 
         public bool OnCreateActionMode(ActionMode mode, IMenu menu)
         {
-            menu.Add(Menu.None, 10, 10, Resource.String.mark_as_read);
-            menu.Add(Menu.None, 20, 20, Resource.String.reply);
-            menu.Add(Menu.None, 30, 30, Resource.String.reply_all);
-            menu.Add(Menu.None, 40, 40, Resource.String.forward);
-            menu.Add(Menu.None, 50, 50, Resource.String.copy_to_worktray);
-            menu.Add(Menu.None, 60, 60, Resource.String.copy_to_folder);
-            menu.Add(Menu.None, 70, 70, Resource.String.move_to_folder);
-            menu.Add(Menu.None, 80, 80, Resource.String.categories);
-            menu.Add(Menu.None, 90, 90, Resource.String.delete_from_folder);
-            menu.Add(Menu.None, 100, 100, Resource.String.delete);
-
             return true;
         }
 
