@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
@@ -59,7 +60,13 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
             refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
-            refreshLayout.Refresh += async (sender, e) => await RefreshData(force: true);
+            refreshLayout.Refresh += async (sender, e) =>
+            {
+                actionMode?.Finish();
+                actionMode = null;
+
+                await RefreshData(force: true);
+            };
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recyclerView);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
@@ -489,8 +496,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                     dpvh.Date = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
                 }
 
-                dpvh.Subject = string.IsNullOrEmpty(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
-                dpvh.Preview = string.IsNullOrEmpty(dp.Preview) ? context.GetString(Resource.String.no_content) : dp.Preview.Trim().Trim('\n');
+                dpvh.Subject = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
+                dpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                 dpvh.Categories = dp.Categories;
                 dpvh.IncomingIndicator = dp.Direction == DocumentDirection.Incoming;
                 dpvh.OutgoingIndicator = dp.Direction == DocumentDirection.Outgoing;
