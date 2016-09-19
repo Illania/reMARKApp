@@ -241,6 +241,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         }
 
+        #endregion
+
+        #region ActionMode callbacks
+
         bool ActionMode.ICallback.OnActionItemClicked(ActionMode mode, IMenuItem item)
         {
             switch (item.ItemId)
@@ -255,42 +259,28 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                     actionMode.Finish(); //TODO could put the actionModeFinish at the end
                     RefreshFavorites(true).Wait();
                     return true;
-                case 3:
+                case MenuItemActions.EnableOffline:
+                    AddSelectionToAvailableOffline();
                     mode.Finish();
                     return true;
+                case MenuItemActions.DisableOffline:
+                    RemoveSelectionFromAvailableOffline();
+                    mode.Finish();
+                    return true;
+                case MenuItemActions.Subscribe:
+                    SubscribeToSelection();
+                    mode.Finish();
+                    return true;
+                case MenuItemActions.Unsubscribe:
+                    UnsubscribeFromSelection();
+                    mode.Finish();
+                    return true;
+
                 default:
                     return false;
             }
         }
 
-        void AddSelectionToFavourites() //TODO move to a new place
-        {
-            var selectedFolders = adapter.GetSelectedItems().ToList();
-            if (!selectedFolders.Any())
-            {
-                return;
-            }
-
-            foreach (var folder in selectedFolders)
-            {
-                AsyncHelpers.RunSync(() => Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder));
-            }
-        }
-
-        void RemoveSelectionFromFavourites() //TODO move to a new place
-        {
-            var selectedFolders = adapter.GetSelectedItems().ToList();
-            if (!selectedFolders.Any())
-            {
-                return;
-            }
-
-            foreach (var folder in selectedFolders)
-            {
-                AsyncHelpers.RunSync(() => Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder));
-            }
-
-        }
 
         bool ActionMode.ICallback.OnCreateActionMode(ActionMode mode, IMenu menu)
         {
@@ -328,6 +318,77 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return true;
         }
 
+        void UnsubscribeFromSelection()
+        {
+            throw new NotImplementedException();
+        }
+
+        void SubscribeToSelection()
+        {
+            throw new NotImplementedException();
+        }
+
+        void RemoveSelectionFromAvailableOffline()
+        {
+            var selectedFolders = adapter.GetSelectedItems().ToList();
+            if (!selectedFolders.Any())
+            {
+                return;
+            }
+
+            foreach (var folder in selectedFolders)
+            {
+                AsyncHelpers.RunSync(() => Managers.FoldersManager.RemoveOfflineFolderAsync(folder.Module, folder));
+                adapter.RefreshFolder(folder);
+            }
+        }
+
+        void AddSelectionToAvailableOffline()
+        {
+            var selectedFolders = adapter.GetSelectedItems().ToList();
+            if (!selectedFolders.Any())
+            {
+                return;
+            }
+
+            foreach (var folder in selectedFolders)
+            {
+                AsyncHelpers.RunSync(() => Managers.FoldersManager.AddOfflineFolderAsync(folder.Module, folder));
+                adapter.RefreshFolder(folder);
+            }
+
+        }
+
+        void AddSelectionToFavourites() //TODO move to a new place
+        {
+            var selectedFolders = adapter.GetSelectedItems().ToList();
+            if (!selectedFolders.Any())
+            {
+                return;
+            }
+
+            foreach (var folder in selectedFolders)
+            {
+                AsyncHelpers.RunSync(() => Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder));
+            }
+        }
+
+        void RemoveSelectionFromFavourites() //TODO move to a new place
+        {
+            var selectedFolders = adapter.GetSelectedItems().ToList();
+            if (!selectedFolders.Any())
+            {
+                return;
+            }
+
+            foreach (var folder in selectedFolders)
+            {
+                AsyncHelpers.RunSync(() => Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder));
+            }
+
+        }
+
+
         static class MenuItemActions
         {
             public const int AddToFavourites = 0;
@@ -339,6 +400,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         }
 
         #endregion
+
 
         #region SwipeRefresLayout event handlers
 
@@ -404,7 +466,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             public const int SectionView = 1;
         }
 
-
         List<Section> sectionsInView = new List<Section>();
         Dictionary<Section, List<Folder>> foldersInSection = new Dictionary<Section, List<Folder>>();
 
@@ -464,7 +525,19 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 var folder = GetItemAtPosition(position);
 
                 fh.FolderNameTitle.Text = folder.Name;
-                fh.FolderNameSubTitle.Text = folder.Name + "sdf";
+
+                var isFolderSubscribed = folder.Subscribed;
+                var isFolderAvailableOffline = AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderOfflineAsync(folder.Module, folder));
+
+                fh.FolderNameSubTitle.Text = string.Empty;
+                if (isFolderSubscribed)
+                {
+                    fh.FolderNameSubTitle.Text += "/SUBSCRIBED";
+                }
+                if (isFolderAvailableOffline)
+                {
+                    fh.FolderNameSubTitle.Text += "/OFFLINE";
+                }
 
                 fh.ExpandButton.Visibility = folder.HasSubFolders ? ViewStates.Visible : ViewStates.Gone;
                 if (folder.InternalType == FolderInternalType.Worktray)
@@ -561,6 +634,21 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             var newItemCount = folders.Count;
             foldersInSection[section].AddRange(folders);
             NotifyItemRangeInserted(sectionPosition + offset, newItemCount);
+        }
+
+        public void RefreshFolder(Folder folder)
+        {
+            var offset = sectionsInView.Count == 1 ? 0 : 1;
+            var sectionsPositionToSection = SectionsPositionToSection();
+            foreach (var section in sectionsInView)
+            {
+                var index = foldersInSection[section].FindIndex(f => f.Id == folder.Id);
+                if (index >= 0)
+                {
+                    var sectionPosition = sectionsPositionToSection.FirstOrDefault(c => c.Value == section).Key;
+                    NotifyItemChanged(sectionPosition + index + offset);
+                }
+            }
         }
 
         public void ClearSelection()

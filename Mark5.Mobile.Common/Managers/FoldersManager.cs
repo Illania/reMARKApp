@@ -157,7 +157,10 @@ namespace Mark5.Mobile.Common.Managers
                     offlineFolders[module] = moduleOfflineFolders;
                 }
 
-                moduleOfflineFolders.Add(folder.ShallowCopy());
+                if (moduleOfflineFolders.FirstOrDefault(f => f.Id == folder.Id) == null)
+                {
+                    moduleOfflineFolders.Add(folder.ShallowCopy());
+                }
 
                 await FileSystemStorage.SaveOfflineFoldersAsync(offlineFolders);
 
@@ -202,7 +205,7 @@ namespace Mark5.Mobile.Common.Managers
                     return false;
                 }
 
-                return moduleOfflineFolders.Contains(folder);
+                return moduleOfflineFolders.FirstOrDefault(f => f.Id == folder.Id) != null;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
