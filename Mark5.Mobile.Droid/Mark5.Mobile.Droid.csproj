@@ -170,6 +170,8 @@
     <Compile Include="Utilities\DateTimeUtils.cs" />
     <Compile Include="Views\Common\ActionOnClickListener.cs" />
     <Compile Include="Views\Common\ActionOnLongClickListener.cs" />
+    <Compile Include="Views\Activities\ContactsListActivity.cs" />
+    <Compile Include="Views\Fragments\ContactsListFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -286,6 +288,7 @@
     <AndroidResource Include="Resources\mipmap-xhdpi\comment.png" />
     <AndroidResource Include="Resources\mipmap-hdpi\comment.png" />
     <AndroidResource Include="Resources\menu\menu_main.axml" />
+    <AndroidResource Include="Resources\layout\list_item_contacts.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
