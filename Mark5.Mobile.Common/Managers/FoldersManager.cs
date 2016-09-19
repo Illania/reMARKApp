@@ -71,7 +71,7 @@ namespace Mark5.Mobile.Common.Managers
                     return new List<Folder>();
                 }
 
-                return moduleFavoriteFolders;
+                return moduleFavoriteFolders.Select(f => f.ShallowCopy()).ToList(); //TODO think it if can be done differently
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
@@ -90,7 +90,10 @@ namespace Mark5.Mobile.Common.Managers
                     favoriteFolders[module] = moduleFavoriteFolders;
                 }
 
-                moduleFavoriteFolders.Add(folder.ShallowCopy());
+                if (moduleFavoriteFolders.FirstOrDefault(f => f.Id == folder.Id) == null)
+                {
+                    moduleFavoriteFolders.Add(folder.ShallowCopy());
+                }
 
                 await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
 
@@ -135,7 +138,7 @@ namespace Mark5.Mobile.Common.Managers
                     return false;
                 }
 
-                return moduleFavoriteFolders.Contains(folder);
+                return moduleFavoriteFolders.FirstOrDefault(f => f.Id == folder.Id) != null;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");

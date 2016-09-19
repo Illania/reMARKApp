@@ -106,7 +106,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 if (forceRefresh || !Folder.SubFolders.Any())
                 {
-
                     var folders = await Managers.FoldersManager.GetFoldersAsync(Folder, 2);
                     Folder.SubFolders.Clear();
                     Folder.SubFolders = folders;
@@ -120,23 +119,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
             if (availableSections.Contains(Section.Favourites))
             {
-                if (FavouriteRootFolder == null)
-                {
-                    FavouriteRootFolder = Folder.RootPerModule(Folder.Module, true);
-                }
-                if (forceRefresh || !FavouriteRootFolder.SubFolders.Any())
-                {
-
-                    var folders = await Managers.FoldersManager.GetFavoriteFoldersAsync(Folder.Module);
-                    FavouriteRootFolder.SubFolders.Clear();
-                    FavouriteRootFolder.SubFolders = folders;
-
-                    adapter.Refresh(folders, Section.Favourites);
-                }
-                else
-                {
-                    adapter.Refresh(FavouriteRootFolder.SubFolders, Section.Favourites);
-                }
+                await RefreshFavorites(forceRefresh);
             }
             if (availableSections.Contains(Section.Local))
             {
@@ -144,6 +127,26 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
 
             refreshLayout.Post(() => refreshLayout.Refreshing = false); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
+        }
+
+        async Task RefreshFavorites(bool forceRefresh = false)
+        {
+            if (FavouriteRootFolder == null)
+            {
+                FavouriteRootFolder = Folder.RootPerModule(Folder.Module, true);
+            }
+            if (forceRefresh || !FavouriteRootFolder.SubFolders.Any())
+            {
+                var folders = await Managers.FoldersManager.GetFavoriteFoldersAsync(Folder.Module);
+                FavouriteRootFolder.SubFolders.Clear();
+                FavouriteRootFolder.SubFolders = folders;
+
+                adapter.Refresh(folders, Section.Favourites);
+            }
+            else
+            {
+                adapter.Refresh(FavouriteRootFolder.SubFolders, Section.Favourites);
+            }
         }
 
         void RestoreSelection()
@@ -242,15 +245,15 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             switch (item.ItemId)
             {
-                case 1:
-                    foreach (var folder in adapter.GetSelectedItems())
-                    {
-                        CommonConfig.Logger.Error("FOLDER SELECTED: " + folder);
-                    }
-                    mode.Finish();
+                case MenuItemActions.AddToFavourites:
+                    AddSelectionToFavourites();
+                    actionMode.Finish();
+                    RefreshFavorites(true).Wait();
                     return true;
-                case 2:
-                    mode.Finish();
+                case MenuItemActions.RemoveFromFavourites:
+                    RemoveSelectionFromFavourites();
+                    actionMode.Finish(); //TODO could put the actionModeFinish at the end
+                    RefreshFavorites(true).Wait();
                     return true;
                 case 3:
                     mode.Finish();
@@ -260,15 +263,37 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
         }
 
+        void AddSelectionToFavourites() //TODO move to a new place
+        {
+            var selectedFolders = adapter.GetSelectedItems().ToList();
+            if (!selectedFolders.Any())
+            {
+                return;
+            }
+
+            foreach (var folder in selectedFolders)
+            {
+                AsyncHelpers.RunSync(() => Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder));
+            }
+        }
+
+        void RemoveSelectionFromFavourites() //TODO move to a new place
+        {
+            var selectedFolders = adapter.GetSelectedItems().ToList();
+            if (!selectedFolders.Any())
+            {
+                return;
+            }
+
+            foreach (var folder in selectedFolders)
+            {
+                AsyncHelpers.RunSync(() => Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder));
+            }
+
+        }
+
         bool ActionMode.ICallback.OnCreateActionMode(ActionMode mode, IMenu menu)
         {
-            menu.Add(Menu.None, 1, Menu.None, "First").SetIcon(Resource.Drawable.abc_ic_menu_share_mtrl_alpha);
-            menu.Add(Menu.None, 6, Menu.None, "Six").SetIcon(Resource.Drawable.abc_ic_menu_copy_mtrl_am_alpha);
-            menu.Add(Menu.None, 2, Menu.None, "Second");
-            menu.Add(Menu.None, 3, Menu.None, "Third");
-            menu.Add(Menu.None, 4, Menu.None, "Four");
-            menu.Add(Menu.None, 5, Menu.None, "Five");
-
             return true;
         }
 
@@ -280,7 +305,37 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
-            return false;
+            var selectedFolders = adapter.GetSelectedItems().ToList();
+            if (!selectedFolders.Any())
+            {
+                return false;
+            }
+
+            menu.Clear();
+
+            var areAllSelectedFoldersSubscribed = selectedFolders.All(f => f.Subscribed);
+            var areAllSelectedFoldersFavourites = selectedFolders.All(f => AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderFavouriteAsync(f.Module, f)));
+            var areAllSelectedFolderOffline = selectedFolders.All(f => AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderOfflineAsync(f.Module, f)));
+
+            var favoritesString = areAllSelectedFoldersFavourites ? "Remove from favourites" : "Add to favourites";
+            var offlineString = areAllSelectedFolderOffline ? "Disable offline mode" : "Enable offline mode"; //TODO check wording
+            var subscriptionString = areAllSelectedFoldersSubscribed ? "Unsubscribe" : "Subscribe";
+
+            menu.Add(Menu.None, areAllSelectedFoldersFavourites ? MenuItemActions.RemoveFromFavourites : MenuItemActions.AddToFavourites, Menu.None, favoritesString).SetShowAsAction(ShowAsAction.Never);
+            menu.Add(Menu.None, areAllSelectedFolderOffline ? MenuItemActions.DisableOffline : MenuItemActions.EnableOffline, Menu.None, offlineString).SetShowAsAction(ShowAsAction.Never);
+            menu.Add(Menu.None, areAllSelectedFoldersSubscribed ? MenuItemActions.Unsubscribe : MenuItemActions.Subscribe, Menu.None, subscriptionString).SetShowAsAction(ShowAsAction.Never);
+
+            return true;
+        }
+
+        static class MenuItemActions
+        {
+            public const int AddToFavourites = 0;
+            public const int RemoveFromFavourites = 1;
+            public const int Subscribe = 2;
+            public const int Unsubscribe = 3;
+            public const int EnableOffline = 4;
+            public const int DisableOffline = 5;
         }
 
         #endregion

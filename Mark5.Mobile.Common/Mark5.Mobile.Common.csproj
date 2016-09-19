@@ -173,6 +173,7 @@
     <Compile Include="Managers\ISearchManager.cs" />
     <Compile Include="Managers\IShortcodesManager.cs" />
     <Compile Include="Managers\ISystemManager.cs" />
+    <Compile Include="Utilities\AsyncHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />
