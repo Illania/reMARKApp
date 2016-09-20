@@ -22,6 +22,8 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Views.Common;
+using Android.Graphics.Drawables.Shapes;
+using Android.Support.V4.Content;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
@@ -498,11 +500,19 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         class ContactPreviewViewHolder : RecyclerView.ViewHolder
         {
 
+            static readonly Random r = new Random();
+            static readonly int[] colors = { Resource.Color.darkerblue, Resource.Color.darkblue, Resource.Color.blue };
+
             public string Name
             {
                 set
                 {
                     nameTextView.Text = value;
+                    letterTextView.Text = value.Substring(0, 1).ToUpper();
+
+                    var sd = new ShapeDrawable(new OvalShape());
+                    sd.Paint.Color = new Color(ContextCompat.GetColor(ItemView.Context, colors[Math.Abs(value.GetHashCode() % colors.Length)]));
+                    letterTextView.Background = sd;
                 }
             }
 
@@ -541,6 +551,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 }
             }
 
+            readonly AppCompatTextView letterTextView;
             readonly AppCompatTextView nameTextView;
             readonly AppCompatTextView descTextView;
             readonly LinearLayoutCompat categoriesLayout;
@@ -549,6 +560,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             public ContactPreviewViewHolder(View itemView)
                     : base(itemView)
             {
+                letterTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_contact_letter);
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_contact_name);
                 descTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_contact_desc);
                 categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_contact_categories);
