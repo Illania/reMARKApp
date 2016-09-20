@@ -20,7 +20,7 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<List<ContactPreview>> GetContactPreviewsAsync(Folder folder, int startRowId = -1, SourceType sourceType = SourceType.Auto);
 
-        void GetAllContactPreviews(Folder folder, Action<List<ContactPreview>> callback, Action finishedCallback, Action<Exception> errorCallback, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto);
+        void GetAllContactPreviews(Folder folder, Action<List<ContactPreview>> callback, Action finishedCallback, Action<Exception> errorCallback, int startId = -1, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto);
 
         Task<Contact> GetContactAsync(Folder folder, int contactId, SourceType sourceType = SourceType.Auto);
 

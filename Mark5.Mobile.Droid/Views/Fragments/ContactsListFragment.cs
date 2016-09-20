@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.Graphics.Drawables.Shapes;
@@ -61,19 +60,19 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 actionMode?.Finish();
                 actionMode = null;
 
-                RefreshData(true);
+                RefreshData(force: true);
             };
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recyclerView);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
-            adapter = new ContactsListAdapter(Activity);
+            adapter = new ContactsListAdapter();
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
             recyclerView.SetAdapter(adapter);
 
-            searchAdapter = new ContactsListAdapter(Activity);
+            searchAdapter = new ContactsListAdapter();
             searchAdapter.ItemClicked += Adapter_ItemClicked;
             searchAdapter.ItemLongClicked += Adapter_ItemLongClicked;
 
@@ -125,7 +124,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 Folder = Folder,
                 ContactPreviews = adapter.Items,
-                SelectedContactPreviews = adapter.SelectedItems
+                SelectedContactPreviews = adapter.SelectedItems,
+                RefreshInProgress = refreshing
             };
         }
 
@@ -136,6 +136,11 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 Folder = dlfs.Folder;
                 adapter.AppendItems(dlfs.ContactPreviews);
+
+                if (dlfs.RefreshInProgress)
+                {
+                    RefreshData(dlfs.ContactPreviews[dlfs.ContactPreviews.Count - 1].RowId);
+                }
 
                 if (dlfs.SelectedContactPreviews.Count > 0)
                 {
@@ -154,7 +159,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return $"{nameof(ContactsListFragment)} [FolderId={Folder.Id}, FolderName={Folder.Name}]";
         }
 
-        void RefreshData(bool force = false)
+        void RefreshData(int startId = -1, bool force = false)
         {
             if (refreshing) return;
 
@@ -181,7 +186,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 CommonConfig.Logger.Error($"Downloading contacts failed [folder.Name={Folder?.Name}, folder.id={Folder?.Id}, force={force}]", ex);
 
                 Dialogs.ShowErrorDialog(Activity, ex);
-            }, cts.Token);
+            }, startId, cts.Token);
         }
 
         void Adapter_ItemClicked(object sender, ContactPreview contactPreview)
@@ -350,6 +355,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             public List<ContactPreview> ContactPreviews { get; set; }
 
             public List<ContactPreview> SelectedContactPreviews { get; set; }
+
+            public bool RefreshInProgress { get; set; }
         }
 
         #region RecyclerView Adapter/ViewHolder
@@ -391,15 +398,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             readonly List<ContactPreview> contactPreviewsInView = new List<ContactPreview>(1000);
             readonly Dictionary<int, ContactPreview> selectedContactsInView = new Dictionary<int, ContactPreview>();
-            readonly Context context;
 
             public event EventHandler<ContactPreview> ItemClicked = delegate { };
             public event EventHandler<ContactPreview> ItemLongClicked = delegate { };
-
-            public ContactsListAdapter(Context context)
-            {
-                this.context = context;
-            }
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
