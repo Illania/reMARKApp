@@ -317,7 +317,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return true;
         }
 
-        void SetFoldersSubscriptionToSelection(bool enabled)
+        async Task SetFoldersSubscriptionToSelection(bool enabled)
         {
             var selectedFolders = adapter.GetSelectedItems().ToList();
             if (!selectedFolders.Any())
@@ -328,7 +328,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             var token = PlatformConfig.Preferences.PushNotificationToken;
             if (string.IsNullOrEmpty(token))
             {
-                Dialogs.ShowConfirmDialog(this.Activity, Resource.String.subscription_token_missing_title, Resource.String.subscription_token_missing_content);
+                await Dialogs.ShowConfirmDialogAsync(this.Activity, Resource.String.subscription_token_missing_title, Resource.String.subscription_token_missing_content);
                 return;
             }
 
@@ -337,12 +337,11 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             try
             {
-                Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, module, selectedFolders, enabled);
+                await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, module, selectedFolders, enabled);
                 dismissAction();
                 selectedFolders.ForEach(f =>
                 {
-                    f.Subscribed = enabled;
-                    adapter.RefreshFolder(f);
+                    adapter.RefreshFolder(f, enabled);
                 });
             }
             catch (Exception ex)
@@ -658,7 +657,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             NotifyItemRangeInserted(sectionPosition + offset, newItemCount);
         }
 
-        public void RefreshFolder(Folder folder)
+        public void RefreshFolder(Folder folder, bool? subscriptionEnabled = null)
         {
             var offset = sectionsInView.Count == 1 ? 0 : 1;
             var sectionsPositionToSection = SectionsPositionToSection();
@@ -667,6 +666,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 var index = foldersInSection[section].FindIndex(f => f.Id == folder.Id);
                 if (index >= 0)
                 {
+                    if (subscriptionEnabled.HasValue)
+                    {
+                        foldersInSection[section][index].Subscribed = subscriptionEnabled.Value;
+                    }
                     var sectionPosition = sectionsPositionToSection.FirstOrDefault(c => c.Value == section).Key;
                     NotifyItemChanged(sectionPosition + index + offset);
                 }

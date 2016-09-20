@@ -102,6 +102,7 @@ namespace Mark5.Mobile.Common.Model
                 Type = Type,
                 InternalType = InternalType,
                 HasSubFolders = HasSubFolders,
+                Subscribed = Subscribed,
                 Position = Position,
                 OptionalParameters = OptionalParameters?.ShallowCopy()
             };
