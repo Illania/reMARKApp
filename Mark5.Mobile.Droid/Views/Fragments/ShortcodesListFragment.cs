@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: ContactsListFragment.cs
+// File: ShortcodesListFragment.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -27,7 +27,7 @@ using Mark5.Mobile.Droid.Views.Common;
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
 
-    public class ContactsListFragment : RetainableStateFragment, ActionMode.ICallback, View.IOnClickListener, SearchView.IOnQueryTextListener, SearchView.IOnCloseListener
+    public class ShortcodesListFragment : RetainableStateFragment, ActionMode.ICallback, View.IOnClickListener, SearchView.IOnQueryTextListener, SearchView.IOnCloseListener
     {
 
         public Folder Folder
@@ -40,8 +40,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
-        ContactsListAdapter adapter;
-        ContactsListAdapter searchAdapter;
+        ShortcodesListAdapter adapter;
+        ShortcodesListAdapter searchAdapter;
         ActionMode actionMode;
         SearchView searchView;
 
@@ -68,12 +68,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
             recyclerView.HasFixedSize = true;
 
-            adapter = new ContactsListAdapter();
+            adapter = new ShortcodesListAdapter();
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
             recyclerView.SetAdapter(adapter);
 
-            searchAdapter = new ContactsListAdapter();
+            searchAdapter = new ShortcodesListAdapter();
             searchAdapter.ItemClicked += Adapter_ItemClicked;
             searchAdapter.ItemLongClicked += Adapter_ItemLongClicked;
 
@@ -87,7 +87,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             base.OnViewCreated(view, savedInstanceState);
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = Folder?.Name;
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.contacts);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.shortcodes);
         }
 
         public override void OnResume()
@@ -121,34 +121,34 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            return new ContactsListFragmentState
+            return new ShortcodesListFragmentState
             {
                 Folder = Folder,
-                ContactPreviews = adapter.Items,
-                SelectedContactPreviews = adapter.SelectedItems,
+                ShortcodePreviews = adapter.Items,
+                SelectedShortcodePreviews = adapter.SelectedItems,
                 RefreshInProgress = refreshing
             };
         }
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var dlfs = restoredState as ContactsListFragmentState;
+            var dlfs = restoredState as ShortcodesListFragmentState;
             if (dlfs != null)
             {
                 Folder = dlfs.Folder;
-                adapter.AppendItems(dlfs.ContactPreviews);
+                adapter.AppendItems(dlfs.ShortcodePreviews);
 
                 if (dlfs.RefreshInProgress)
                 {
-                    RefreshData(dlfs.ContactPreviews[dlfs.ContactPreviews.Count - 1].RowId);
+                    RefreshData(dlfs.ShortcodePreviews[dlfs.ShortcodePreviews.Count - 1].RowId);
                 }
 
-                if (dlfs.SelectedContactPreviews.Count > 0)
+                if (dlfs.SelectedShortcodePreviews.Count > 0)
                 {
                     actionMode?.Finish();
                     actionMode = Activity.StartActionMode(this);
 
-                    adapter.SetSelected(dlfs.SelectedContactPreviews, true);
+                    adapter.SetSelected(dlfs.SelectedShortcodePreviews, true);
                     actionMode.Title = adapter.SelectedItemCount.ToString();
                     actionMode.Invalidate();
                 }
@@ -157,7 +157,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(ContactsListFragment)} [FolderId={Folder.Id}, FolderName={Folder.Name}]";
+            return $"{nameof(ShortcodesListFragment)} [FolderId={Folder.Id}, FolderName={Folder.Name}]";
         }
 
         void RefreshData(int startId = -1, bool force = false)
@@ -175,7 +175,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 adapter.Clear();
             }
 
-            Managers.ContactsManager.GetAllContactPreviews(Folder, cps =>
+            Managers.ShortcodesManager.GetAllShortcodePreviews(Folder, cps =>
             {
                 Activity.RunOnUiThread(() => adapter.AppendItems(cps));
             }, () =>
@@ -184,22 +184,22 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 refreshing = false;
             }, ex =>
             {
-                CommonConfig.Logger.Error($"Downloading contacts failed [folder.Name={Folder?.Name}, folder.id={Folder?.Id}, force={force}]", ex);
+                CommonConfig.Logger.Error($"Downloading shortcodes failed [folder.Name={Folder?.Name}, folder.id={Folder?.Id}, force={force}]", ex);
 
                 Dialogs.ShowErrorDialog(Activity, ex);
             }, startId, cts.Token);
         }
 
-        void Adapter_ItemClicked(object sender, ContactPreview contactPreview)
+        void Adapter_ItemClicked(object sender, ShortcodePreview shortcodePreview)
         {
             if (actionMode == null)
             {
-                Android.Widget.Toast.MakeText(Activity, "Contact clicked!", Android.Widget.ToastLength.Short).Show();
+                Android.Widget.Toast.MakeText(Activity, "Shortcode clicked!", Android.Widget.ToastLength.Short).Show();
             }
             else
             {
-                var currentAdapter = (ContactsListAdapter)recyclerView.GetAdapter();
-                currentAdapter.SetSelected(contactPreview, !currentAdapter.IsSelected(contactPreview));
+                var currentAdapter = (ShortcodesListAdapter)recyclerView.GetAdapter();
+                currentAdapter.SetSelected(shortcodePreview, !currentAdapter.IsSelected(shortcodePreview));
 
                 if (currentAdapter.SelectedItemCount < 1)
                 {
@@ -213,21 +213,21 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
         }
 
-        void Adapter_ItemLongClicked(object sender, ContactPreview contactPreview)
+        void Adapter_ItemLongClicked(object sender, ShortcodePreview shortcodePreview)
         {
             if (actionMode == null)
             {
                 actionMode = Activity.StartActionMode(this);
             }
 
-            Adapter_ItemClicked(sender, contactPreview);
+            Adapter_ItemClicked(sender, shortcodePreview);
         }
 
         public bool OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
             menu.Clear();
 
-            var currentAdapter = (ContactsListAdapter)recyclerView.GetAdapter();
+            var currentAdapter = (ShortcodesListAdapter)recyclerView.GetAdapter();
 
             menu.Add(Menu.None, 30, 30, Resource.String.copy_to_worktray);
             menu.Add(Menu.None, 40, 40, Resource.String.copy_to_folder);
@@ -252,7 +252,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
-                || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
+                || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
             {
                 menu.Add(Menu.None, 61, 61, Resource.String.delete);
             }
@@ -272,7 +272,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public void OnDestroyActionMode(ActionMode mode)
         {
-            var currentAdapter = (ContactsListAdapter)recyclerView.GetAdapter();
+            var currentAdapter = (ShortcodesListAdapter)recyclerView.GetAdapter();
             currentAdapter.ClearSelections();
             actionMode = null;
         }
@@ -318,17 +318,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return false;
         }
 
-        static bool MatchesQuery(ContactPreview cp, string query)
+        static bool MatchesQuery(ShortcodePreview cp, string query)
         {
             if (cp.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
-            {
-                return true;
-            }
-            if (cp.CompanyName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
-            {
-                return true;
-            }
-            if (cp.ShortId.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
             {
                 return true;
             }
@@ -336,48 +328,40 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 return true;
             }
-            if (cp.PrimaryAddress?.Address?.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
-            {
-                return true;
-            }
-            if (cp.Categories.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0))
-            {
-                return true;
-            }
 
             return false;
         }
 
-        class ContactsListFragmentState : IRetainableState
+        class ShortcodesListFragmentState : IRetainableState
         {
 
             public Folder Folder { get; set; }
 
-            public List<ContactPreview> ContactPreviews { get; set; }
+            public List<ShortcodePreview> ShortcodePreviews { get; set; }
 
-            public List<ContactPreview> SelectedContactPreviews { get; set; }
+            public List<ShortcodePreview> SelectedShortcodePreviews { get; set; }
 
             public bool RefreshInProgress { get; set; }
         }
 
         #region RecyclerView Adapter/ViewHolder
 
-        class ContactsListAdapter : RecyclerView.Adapter
+        class ShortcodesListAdapter : RecyclerView.Adapter
         {
 
-            public List<ContactPreview> Items
+            public List<ShortcodePreview> Items
             {
                 get
                 {
-                    return contactPreviewsInView.ToList();
+                    return shortcodePreviewsInView.ToList();
                 }
             }
 
-            public List<ContactPreview> SelectedItems
+            public List<ShortcodePreview> SelectedItems
             {
                 get
                 {
-                    return selectedContactsInView.Values.ToList();
+                    return selectedShortcodesInView.Values.ToList();
                 }
             }
 
@@ -385,7 +369,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 get
                 {
-                    return contactPreviewsInView.Count;
+                    return shortcodePreviewsInView.Count;
                 }
             }
 
@@ -393,54 +377,53 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 get
                 {
-                    return selectedContactsInView.Count;
+                    return selectedShortcodesInView.Count;
                 }
             }
 
-            readonly List<ContactPreview> contactPreviewsInView = new List<ContactPreview>(1000);
-            readonly Dictionary<int, ContactPreview> selectedContactsInView = new Dictionary<int, ContactPreview>();
+            readonly List<ShortcodePreview> shortcodePreviewsInView = new List<ShortcodePreview>(1000);
+            readonly Dictionary<int, ShortcodePreview> selectedShortcodesInView = new Dictionary<int, ShortcodePreview>();
 
-            public event EventHandler<ContactPreview> ItemClicked = delegate { };
-            public event EventHandler<ContactPreview> ItemLongClicked = delegate { };
+            public event EventHandler<ShortcodePreview> ItemClicked = delegate { };
+            public event EventHandler<ShortcodePreview> ItemLongClicked = delegate { };
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var cpvh = holder as ContactPreviewViewHolder;
+                var cpvh = holder as ShortcodePreviewViewHolder;
                 if (cpvh == null) return;
 
-                var cp = contactPreviewsInView[position];
+                var cp = shortcodePreviewsInView[position];
 
                 cpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, cp)));
                 cpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, cp)));
 
                 cpvh.Name = cp.Name;
                 cpvh.Description = cp.Description;
-                cpvh.Categories = cp.Categories;
 
-                cpvh.Selected = selectedContactsInView.ContainsKey(cp.Id);
+                cpvh.Selected = selectedShortcodesInView.ContainsKey(cp.Id);
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
             {
-                var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_contacts, parent, false);
-                return new ContactPreviewViewHolder(itemView);
+                var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_shortcodes, parent, false);
+                return new ShortcodePreviewViewHolder(itemView);
             }
 
-            public void PrependItems(List<ContactPreview> items)
+            public void PrependItems(List<ShortcodePreview> items)
             {
                 var count = items.Count;
-                contactPreviewsInView.InsertRange(0, items);
+                shortcodePreviewsInView.InsertRange(0, items);
                 NotifyItemRangeInserted(0, count);
             }
 
-            public void AppendItems(List<ContactPreview> items)
+            public void AppendItems(List<ShortcodePreview> items)
             {
-                var count = contactPreviewsInView.Count;
-                contactPreviewsInView.AddRange(items);
+                var count = shortcodePreviewsInView.Count;
+                shortcodePreviewsInView.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
 
-            public void ReplaceItems(List<ContactPreview> items)
+            public void ReplaceItems(List<ShortcodePreview> items)
             {
                 Clear();
                 AppendItems(items);
@@ -448,57 +431,57 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             public void Clear()
             {
-                var size = contactPreviewsInView.Count;
-                contactPreviewsInView.Clear();
-                selectedContactsInView.Clear();
+                var size = shortcodePreviewsInView.Count;
+                shortcodePreviewsInView.Clear();
+                selectedShortcodesInView.Clear();
                 NotifyItemRangeRemoved(0, size);
             }
 
-            public bool IsSelected(ContactPreview contactPreview)
+            public bool IsSelected(ShortcodePreview shortcodePreview)
             {
-                return selectedContactsInView.ContainsKey(contactPreview.Id);
+                return selectedShortcodesInView.ContainsKey(shortcodePreview.Id);
             }
 
-            public void SetSelected(List<ContactPreview> contactPreviews, bool selected)
+            public void SetSelected(List<ShortcodePreview> shortcodePreviews, bool selected)
             {
-                foreach (var contact in contactPreviews)
+                foreach (var shortcode in shortcodePreviews)
                 {
-                    SetSelected(contact, selected);
+                    SetSelected(shortcode, selected);
                 }
             }
 
-            public void SetSelected(ContactPreview contactPreview, bool selected)
+            public void SetSelected(ShortcodePreview shortcodePreview, bool selected)
             {
-                var position = GetPosition(contactPreview);
+                var position = GetPosition(shortcodePreview);
                 if (position < 0) return;
 
                 if (selected)
                 {
-                    selectedContactsInView[contactPreview.Id] = contactPreview;
+                    selectedShortcodesInView[shortcodePreview.Id] = shortcodePreview;
                 }
                 else
                 {
-                    selectedContactsInView.Remove(contactPreview.Id);
+                    selectedShortcodesInView.Remove(shortcodePreview.Id);
                 }
                 NotifyItemChanged(position);
             }
 
             public void ClearSelections()
             {
-                var contacts = selectedContactsInView.Values.ToArray();
-                selectedContactsInView.Clear();
-                foreach (var contact in contacts)
+                var shortcodes = selectedShortcodesInView.Values.ToArray();
+                selectedShortcodesInView.Clear();
+                foreach (var shortcode in shortcodes)
                 {
-                    NotifyItemChanged(GetPosition(contact));
+                    NotifyItemChanged(GetPosition(shortcode));
                 }
             }
 
-            int GetPosition(ContactPreview contactPreview)
+            int GetPosition(ShortcodePreview shortcodePreview)
             {
                 var position = -1;
-                for (var i = 0; i < contactPreviewsInView.Count; i++)
+                for (var i = 0; i < shortcodePreviewsInView.Count; i++)
                 {
-                    if (contactPreviewsInView[i].Id == contactPreview.Id)
+                    if (shortcodePreviewsInView[i].Id == shortcodePreview.Id)
                     {
                         position = i;
                         break;
@@ -508,7 +491,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
         }
 
-        class ContactPreviewViewHolder : RecyclerView.ViewHolder
+        class ShortcodePreviewViewHolder : RecyclerView.ViewHolder
         {
 
             static readonly int[] colors = { Resource.Color.darkerblue, Resource.Color.darkblue, Resource.Color.blue };
@@ -535,24 +518,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 }
             }
 
-            public List<Category> Categories
-            {
-                set
-                {
-                    categoriesLayout.RemoveAllViews();
-
-                    foreach (var hexColor in value.Select(c => c.HexColor))
-                    {
-                        var view = new View(ItemView.Context)
-                        {
-                            LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent, 1f),
-                            Background = new ColorDrawable(Color.ParseColor(hexColor))
-                        };
-                        categoriesLayout.AddView(view);
-                    }
-                }
-            }
-
             public bool Selected
             {
                 set
@@ -564,16 +529,14 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             readonly AppCompatTextView letterTextView;
             readonly AppCompatTextView nameTextView;
             readonly AppCompatTextView descTextView;
-            readonly LinearLayoutCompat categoriesLayout;
             readonly View selectedOverlay;
 
-            public ContactPreviewViewHolder(View itemView)
+            public ShortcodePreviewViewHolder(View itemView)
                     : base(itemView)
             {
-                letterTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_contact_letter);
-                nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_contact_name);
+                letterTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_shortcode_letter);
+                nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_shortcode_name);
                 descTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_contact_desc);
-                categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_contact_categories);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
             }
         }
