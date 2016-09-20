@@ -8,11 +8,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Threading;
 using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
+using Android.Graphics.Drawables.Shapes;
 using Android.OS;
+using Android.Support.V4.Content;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
@@ -22,8 +24,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Views.Common;
-using Android.Graphics.Drawables.Shapes;
-using Android.Support.V4.Content;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
@@ -46,6 +46,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         ActionMode actionMode;
         SearchView searchView;
 
+        CancellationTokenSource cts;
+
         readonly Handler searchHandler = new Handler();
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -54,12 +56,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
             refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
-            refreshLayout.Refresh += async (sender, e) =>
+            refreshLayout.Refresh += (sender, e) =>
             {
                 actionMode?.Finish();
                 actionMode = null;
 
-                await RefreshData(force: true);
+                RefreshData(true);
             };
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recyclerView);
@@ -88,14 +90,21 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.contacts);
         }
 
-        public override async void OnResume()
+        public override void OnResume()
         {
             base.OnResume();
 
             if (adapter.ItemCount < 1)
             {
-                await RefreshData();
+                RefreshData();
             }
+        }
+
+        public override void OnPause()
+        {
+            base.OnPause();
+
+            cts?.Cancel();
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -145,34 +154,34 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return $"{nameof(ContactsListFragment)} [FolderId={Folder.Id}, FolderName={Folder.Name}]";
         }
 
-        async Task RefreshData(int startId = -1, bool force = false)
+        void RefreshData(bool force = false)
         {
-            try
+            if (refreshing) return;
+
+            refreshing = true;
+            refreshLayout.Post(() => refreshLayout.Refreshing = true); //Bug: fixed in support library v 24.2.0 (issue 77712)
+
+            cts?.Cancel();
+            cts = new CancellationTokenSource();
+
+            if (force)
             {
-                if (refreshing) return;
-
-                refreshing = true;
-                refreshLayout.Post(() => refreshLayout.Refreshing = true); //Bug: fixed in support library v 24.2.0 (issue 77712)
-
-                if (force)
-                {
-                    adapter.Clear();
-                }
-
-                var contactPreviews = await Managers.ContactsManager.GetContactPreviewsAsync(Folder, startId);
-                adapter.AppendItems(contactPreviews);
+                adapter.Clear();
             }
-            catch (Exception ex)
+
+            Managers.ContactsManager.GetAllContactPreviews(Folder, cps =>
             {
-                CommonConfig.Logger.Error($"Downloading contacts failed [folder.Name={Folder?.Name}, folder.id={Folder?.Id}, startId={startId}, force={force}]", ex);
-
-                await Dialogs.ShowErrorDialogAsync(Activity, ex);
-            }
-            finally
+                Activity.RunOnUiThread(() => adapter.AppendItems(cps));
+            }, () =>
             {
                 refreshLayout.Post(() => refreshLayout.Refreshing = false); //Bug: fixed in support library v 24.2.0 (issue 77712)
                 refreshing = false;
-            }
+            }, ex =>
+            {
+                CommonConfig.Logger.Error($"Downloading contacts failed [folder.Name={Folder?.Name}, folder.id={Folder?.Id}, force={force}]", ex);
+
+                Dialogs.ShowErrorDialog(Activity, ex);
+            }, cts.Token);
         }
 
         void Adapter_ItemClicked(object sender, ContactPreview contactPreview)

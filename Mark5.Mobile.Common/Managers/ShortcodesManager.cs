@@ -23,7 +23,7 @@ namespace Mark5.Mobile.Common.Managers
     class ShortcodesManager : AbstractManager, IShortcodesManager
     {
 
-        public int MaxToFetch { get; set; } = 250;
+        public int MaxToFetch { get; set; } = 100;
 
         readonly IShortcodesDataAccess shortcodesDataAccess;
 

@@ -105,16 +105,18 @@ namespace Mark5.Mobile.Droid.Views.Activity
             {
                 var ci = await AuthenticatorFactory.Create().GetConnectionInfoAsync();
                 var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+                return new { ConnectionInfo = ci, SystemSettings = ss };
+            }).ContinueWith(t =>
+            {
+                var ci = t.Result.ConnectionInfo;
+                var ss = t.Result.SystemSettings;
 
-                RunOnUiThreadIfNecessary(() =>
-                {
-                    var headerTitle = FindViewById<AppCompatTextView>(Resource.Id.nav_header_title);
-                    var headerSubtitle = FindViewById<AppCompatTextView>(Resource.Id.nav_header_subtitle);
+                var headerTitle = FindViewById<AppCompatTextView>(Resource.Id.nav_header_title);
+                var headerSubtitle = FindViewById<AppCompatTextView>(Resource.Id.nav_header_subtitle);
 
-                    headerTitle.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
-                    headerSubtitle.Text = $"{ci?.Username}@{ci?.Hostname}:{ci?.Port}";
-                });
-            });
+                headerTitle.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
+                headerSubtitle.Text = $"{ci?.Username}@{ci?.Hostname}:{ci?.Port}";
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         protected override void OnPostCreate(Bundle savedInstanceState)
