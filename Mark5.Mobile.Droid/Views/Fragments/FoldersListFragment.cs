@@ -268,11 +268,11 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                     mode.Finish();
                     return true;
                 case MenuItemActions.Subscribe:
-                    SubscribeToSelection();
+                    SetFoldersSubscriptionToSelection(true);
                     mode.Finish();
                     return true;
                 case MenuItemActions.Unsubscribe:
-                    UnsubscribeFromSelection();
+                    SetFoldersSubscriptionToSelection(false);
                     mode.Finish();
                     return true;
 
@@ -317,17 +317,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return true;
         }
 
-        void UnsubscribeFromSelection()
-        {
-            throw new NotImplementedException();
-        }
-
-        void SubscribeToSelection()
-        {
-            throw new NotImplementedException();
-        }
-
-        void RemoveSelectionFromAvailableOffline()
+        void SetFoldersSubscriptionToSelection(bool enabled)
         {
             var selectedFolders = adapter.GetSelectedItems().ToList();
             if (!selectedFolders.Any())
@@ -335,10 +325,32 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 return;
             }
 
-            foreach (var folder in selectedFolders)
+            var token = PlatformConfig.Preferences.PushNotificationToken;
+            if (string.IsNullOrEmpty(token))
             {
-                AsyncHelpers.RunSync(() => Managers.FoldersManager.RemoveOfflineFolderAsync(folder.Module, folder));
-                adapter.RefreshFolder(folder);
+                Dialogs.ShowConfirmDialog(this.Activity, Resource.String.subscription_token_missing_title, Resource.String.subscription_token_missing_content);
+                return;
+            }
+
+            var module = selectedFolders.First().Module;
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(this.Activity, enabled ? Resource.String.subscribing_folders : Resource.String.unsubscribing_folders, Resource.String.please_wait);
+
+            try
+            {
+                Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, module, selectedFolders, enabled);
+                dismissAction();
+                selectedFolders.ForEach(f =>
+                {
+                    f.Subscribed = enabled;
+                    adapter.RefreshFolder(f);
+                });
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"{(enabled ? "Subscription" : "Unsubscription")}  failed", ex);
+                Dialogs.ShowErrorDialog(this.Activity, ex);
             }
         }
 
@@ -355,7 +367,21 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 AsyncHelpers.RunSync(() => Managers.FoldersManager.AddOfflineFolderAsync(folder.Module, folder));
                 adapter.RefreshFolder(folder);
             }
+        }
 
+        void RemoveSelectionFromAvailableOffline()
+        {
+            var selectedFolders = adapter.GetSelectedItems().ToList();
+            if (!selectedFolders.Any())
+            {
+                return;
+            }
+
+            foreach (var folder in selectedFolders)
+            {
+                AsyncHelpers.RunSync(() => Managers.FoldersManager.RemoveOfflineFolderAsync(folder.Module, folder));
+                adapter.RefreshFolder(folder);
+            }
         }
 
         void AddSelectionToFavourites() //TODO move to a new place
@@ -384,9 +410,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 AsyncHelpers.RunSync(() => Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder));
             }
-
         }
-
 
         static class MenuItemActions
         {
@@ -399,7 +423,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         }
 
         #endregion
-
 
         #region SwipeRefresLayout event handlers
 

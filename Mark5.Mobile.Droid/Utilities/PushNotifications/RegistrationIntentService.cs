@@ -37,6 +37,8 @@ namespace Mark5.Mobile.Droid.Utilities.PushNotifications
             {
                 CommonConfig.Logger.Error("Request token failed.", e);
 
+                //TODO what to do here?
+
                 return;
             }
         }
