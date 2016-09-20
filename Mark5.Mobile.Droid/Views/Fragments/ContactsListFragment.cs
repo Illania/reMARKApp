@@ -66,6 +66,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recyclerView);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
+            recyclerView.HasFixedSize = true;
 
             adapter = new ContactsListAdapter();
             adapter.ItemClicked += Adapter_ItemClicked;
