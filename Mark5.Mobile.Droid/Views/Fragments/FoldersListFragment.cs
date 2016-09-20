@@ -104,18 +104,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             if (availableSections.Contains(Section.Remote))
             {
-                if (forceRefresh || !Folder.SubFolders.Any())
-                {
-                    var folders = await Managers.FoldersManager.GetFoldersAsync(Folder, 2);
-                    Folder.SubFolders.Clear();
-                    Folder.SubFolders = folders;
-
-                    adapter.Refresh(folders, Section.Remote);
-                }
-                else
-                {
-                    adapter.Refresh(Folder.SubFolders, Section.Remote);
-                }
+                RefreshOffline(forceRefresh);
             }
             if (availableSections.Contains(Section.Favourites))
             {
@@ -123,10 +112,26 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
             if (availableSections.Contains(Section.Local))
             {
-
+                await RefreshLocal(forceRefresh);
             }
 
             refreshLayout.Post(() => refreshLayout.Refreshing = false); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
+        }
+
+        async Task RefreshOffline(bool forceRefresh = false)
+        {
+            if (forceRefresh || !Folder.SubFolders.Any())
+            {
+                var folders = await Managers.FoldersManager.GetFoldersAsync(Folder, 2);
+                Folder.SubFolders.Clear();
+                Folder.SubFolders = folders;
+
+                adapter.Refresh(folders, Section.Remote);
+            }
+            else
+            {
+                adapter.Refresh(Folder.SubFolders, Section.Remote);
+            }
         }
 
         async Task RefreshFavorites(bool forceRefresh = false)
@@ -149,6 +154,11 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
         }
 
+        async Task RefreshLocal(bool forceRefresh = false)
+        {
+            //TODO need to implement this
+        }
+
         void RestoreSelection()
         {
             if (recoveredSelectedItemsPosition != null && recoveredSelectedItemsPosition.Any())
@@ -164,7 +174,11 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             if (Folder.Root)
             {
-                availableSections = new List<Section> { Section.Favourites, Section.Remote, Section.Local };
+                availableSections = new List<Section> { Section.Favourites, Section.Remote };
+                if (Folder.Module == ModuleType.Documents)
+                {
+                    availableSections.Add(Section.Local);
+                }
             }
             else
             {
@@ -268,7 +282,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                     mode.Finish();
                     return true;
                 case MenuItemActions.Subscribe:
-                    SetFoldersSubscriptionToSelection(true);
+                    SetFoldersSubscriptionToSelection(true); //TODO need to think about this
                     mode.Finish();
                     return true;
                 case MenuItemActions.Unsubscribe:
