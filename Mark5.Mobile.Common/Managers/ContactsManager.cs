@@ -23,7 +23,7 @@ namespace Mark5.Mobile.Common.Managers
     class ContactsManager : AbstractManager, IContactsManager
     {
 
-        public int MaxToFetch { get; set; } = 250;
+        public int MaxToFetch { get; set; } = 100;
 
         readonly IContactsDataAccess contactsDataAccess;
 
@@ -60,19 +60,35 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task GetAllContactPreviewsAsync(Folder folder, Func<List<ContactPreview>, Task> handler, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
+        public void GetAllContactPreviews(Folder folder, Action<List<ContactPreview>> callback, Action finishedCallback, Action<Exception> errorCallback, int startRowId = -1, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
         {
-            var startId = 0;
-            var stopLoop = false;
-
-            while (!stopLoop && !ct.IsCancellationRequested)
+            Task.Run(async () =>
             {
-                var previews = await GetContactPreviewsAsync(folder, startId, sourceType);
-                await handler(previews);
+                var stopLoop = false;
 
-                startId += MaxToFetch;
-                stopLoop = previews.Count < MaxToFetch;
-            }
+                while (!stopLoop && !ct.IsCancellationRequested)
+                {
+                    var previews = await GetContactPreviewsAsync(folder, startRowId, sourceType);
+
+                    if (ct.IsCancellationRequested) continue;
+
+                    if (previews.Count > 0)
+                    {
+                        callback(previews);
+                        startRowId = previews.LastOrDefault()?.RowId + 1 ?? -1;
+                    }
+
+                    stopLoop = previews.Count < 1 || previews.Count < MaxToFetch;
+                }
+            }).ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                {
+                    errorCallback(t.Exception.InnerException);
+                }
+
+                finishedCallback();
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         public async Task<Contact> GetContactAsync(int folderId, int contactId, SourceType sourceType = SourceType.Auto)
@@ -117,7 +133,7 @@ namespace Mark5.Mobile.Common.Managers
                     Token = Token,
                     Contact = contact.Convert(),
                     ContactPreview = contactPreview.Convert(),
-                    ParentObjectId = parentObjectId,
+                    ParentObjectId = parentObjectId
                 });
 
                 contact.Id = result.Id;
@@ -139,7 +155,7 @@ namespace Mark5.Mobile.Common.Managers
                 var result = await AppServiceProxy.GetAllCategoriesAsync(new DataContract.GetAllCategoriesParameters
                 {
                     Token = Token,
-                    ObjectType = DataContract.ObjectType.Contact,
+                    ObjectType = DataContract.ObjectType.Contact
                 });
 
                 var categories = result.Categories.WhereNotNull().Select(c => c.Convert()).ToList();
@@ -234,7 +250,7 @@ namespace Mark5.Mobile.Common.Managers
                     Token = Token,
                     CommentId = comment.Id,
                     ObjectId = contact.Id,
-                    ObjectType = DataContract.ObjectType.Contact,
+                    ObjectType = DataContract.ObjectType.Contact
                 });
 
                 await contactsDataAccess.DeleteCommentAsync(contact, comment);

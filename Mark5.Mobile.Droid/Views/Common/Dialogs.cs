@@ -80,6 +80,34 @@ namespace Mark5.Mobile.Droid.Views.Common
             builder.Show();
         }
 
+        public static void ShowConfirmDialog(Context context, int titleId, int contentId, Action action = null)
+        {
+            var builder = new MaterialDialog.Builder(context);
+            //builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
+            builder.Title(titleId);
+            builder.Content(contentId);
+            builder.PositiveText(Resource.String.ok);
+            if (action != null)
+            {
+                builder.OnPositive(new SingleButtonCallback(action));
+            }
+            builder.Show();
+        }
+
+        public static void ShowErrorDialog(Context context, Exception ex, Action action = null)
+        {
+            var builder = new MaterialDialog.Builder(context);
+            //builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
+            builder.Title(Resource.String.error);
+            builder.Content(ex.Message);
+            builder.PositiveText(Resource.String.ok);
+            if (action != null)
+            {
+                builder.OnPositive(new SingleButtonCallback(action));
+            }
+            builder.Show();
+        }
+
         public static Action ShowInfiniteProgressDialog(Context context, int titleId, int contentId, CancellationTokenSource cts = null)
         {
             var builder = new MaterialDialog.Builder(context);
@@ -88,13 +116,11 @@ namespace Mark5.Mobile.Droid.Views.Common
             builder.Content(contentId);
             builder.Progress(true, -1);
             builder.Cancelable(false);
-
             if (cts != null)
             {
                 builder.PositiveText(Resource.String.cancel);
                 builder.OnPositive(new SingleButtonCallback(cts.Cancel));
             }
-
             var dialog = builder.Show();
             return dialog.Dismiss;
         }

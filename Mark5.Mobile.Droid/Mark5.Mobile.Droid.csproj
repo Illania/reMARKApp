@@ -170,6 +170,8 @@
     <Compile Include="Utilities\DateTimeUtils.cs" />
     <Compile Include="Views\Common\ActionOnClickListener.cs" />
     <Compile Include="Views\Common\ActionOnLongClickListener.cs" />
+    <Compile Include="Views\Activities\ContactsListActivity.cs" />
+    <Compile Include="Views\Fragments\ContactsListFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -260,7 +262,7 @@
     <AndroidResource Include="Resources\values\values-preferences.axml" />
     <AndroidResource Include="Resources\layout\list.axml" />
     <AndroidResource Include="Resources\layout\list_item_documents.axml" />
-    <AndroidResource Include="Resources\drawable\line_divider.xml" />
+    <AndroidResource Include="Resources\drawable\line_divider.axml" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\incoming.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\outgoing.png" />
     <AndroidResource Include="Resources\mipmap-xxhdpi\incoming.png" />
@@ -286,6 +288,8 @@
     <AndroidResource Include="Resources\mipmap-xhdpi\comment.png" />
     <AndroidResource Include="Resources\mipmap-hdpi\comment.png" />
     <AndroidResource Include="Resources\menu\menu_main.axml" />
+    <AndroidResource Include="Resources\layout\list_item_contacts.axml" />
+    <AndroidResource Include="Resources\drawable\circle.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
