@@ -79,7 +79,7 @@ namespace Mark5.Mobile.Common.DataAccess
                 await databaseForModuleType(moduleType).RunInConnectionAsync(c =>
                 {
                     var cmd = c.CreateCommand($"update \"{nameof(Folder)}\"" +
-                                              $"set \"{nameof(Folder.Subscribed)}\" = @subscribed" +
+                                              $"set \"{nameof(Folder.Subscribed)}\" = @subscribed " +
                                               $"where \"{nameof(Folder.Id)}\" in ({string.Join(",", folders.Select(f => f.Id))})");
                     cmd.Bind("@subscribed", subscribed);
                     cmd.ExecuteNonQuery();
