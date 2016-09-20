@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.Content;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.App;
@@ -18,6 +19,7 @@ using Android.Views;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Utilities.PushNotifications;
 using Mark5.Mobile.Droid.Views.Common;
 using Mark5.Mobile.Droid.Views.Fragments;
 
@@ -99,6 +101,9 @@ namespace Mark5.Mobile.Droid.Views.Activity
                 var initialMenuItem = navigationView.Menu.FindItem(Resource.Id.nav_documents);
                 initialMenuItem.SetChecked(true);
                 OnNavigationItemSelected(initialMenuItem);
+
+                var registrationIntent = new Intent(this, typeof(RegistrationIntentService));
+                StartService(registrationIntent);
             }
 
             Task.Run(async () =>

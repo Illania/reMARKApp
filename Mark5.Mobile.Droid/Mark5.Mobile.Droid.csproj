@@ -163,6 +163,9 @@
     <Compile Include="Views\Common\SmoothActionBarDrawerToggle.cs" />
     <Compile Include="Views\Common\DividerItemDecorator.cs" />
     <Compile Include="Views\Fragments\FoldersListFragment.cs" />
+    <Compile Include="Utilities\PushNotifications\GcmListenerService.cs" />
+    <Compile Include="Utilities\PushNotifications\InstanceIdListenerService.cs" />
+    <Compile Include="Utilities\PushNotifications\RegistrationIntentService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -274,6 +277,7 @@
     <Folder Include="Assets\fonts\" />
     <Folder Include="Resources\xml\" />
     <Folder Include="Utilities\Hockey\" />
+    <Folder Include="Utilities\PushNotifications\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
