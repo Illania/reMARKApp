@@ -116,13 +116,11 @@ namespace Mark5.Mobile.Droid.Views.Common
             builder.Content(contentId);
             builder.Progress(true, -1);
             builder.Cancelable(false);
-
             if (cts != null)
             {
                 builder.PositiveText(Resource.String.cancel);
                 builder.OnPositive(new SingleButtonCallback(cts.Cancel));
             }
-
             var dialog = builder.Show();
             return dialog.Dismiss;
         }

@@ -202,7 +202,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
                 CommonConfig.Logger.Info("Retrieving system settings...");
 
-                await Managers.SystemManager.GetSystemSettingsAsync();
+                ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
 
                 CommonConfig.Logger.Info($"Logged in - will present {nameof(MainActivity)}");
 

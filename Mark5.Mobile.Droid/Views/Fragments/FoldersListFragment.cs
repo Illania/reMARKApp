@@ -226,9 +226,20 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             if (actionMode == null)
             {
-                var i = new Intent(Activity, typeof(DocumentsListActivity));
-                i.PutExtra(DocumentsListActivity.FolderIntentKey, SerializationUtils.Serialize(adapter.GetItemAtPosition(position)));
-                StartActivity(i);
+                var folder = adapter.GetItemAtPosition(position);
+
+                if (folder.Module == ModuleType.Documents)
+                {
+                    var i = new Intent(Activity, typeof(DocumentsListActivity));
+                    i.PutExtra(DocumentsListActivity.FolderIntentKey, SerializationUtils.Serialize(folder));
+                    StartActivity(i);
+                }
+                if (folder.Module == ModuleType.Contacts)
+                {
+                    var i = new Intent(Activity, typeof(ContactsListActivity));
+                    i.PutExtra(ContactsListActivity.FolderIntentKey, SerializationUtils.Serialize(folder));
+                    StartActivity(i);
+                }
             }
             else
             {

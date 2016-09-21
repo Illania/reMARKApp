@@ -68,6 +68,9 @@
 	<string name="pref_advanced_enable_reporting_title">Share diagnostics and usage statistics</string>
 	<string name="pref_advanced_enable_reporting_summary_on">Share anonymous usage statistics and diagnostic information with Nordic IT, to help improve MARK5</string>
 	<string name="pref_advanced_enable_reporting_summary_off">Don\'t share anonymous usage statistics and diagnostic information with Nordic IT</string>
+	<string name="pref_key_advanced_update_config">pref_key_advanced_update_config</string>
+	<string name="pref_advanced_update_config_title">Update configuration</string>
+	<string name="pref_advanced_update_config_summary">Download new configuration settings from MARK5 server</string>
 	<string name="pref_key_advanced_logout">pref_key_advanced_logout</string>
 	<string name="pref_advanced_logout_title">Log out</string>
 	<string name="pref_advanced_logout_summary">Log out from MARK5. MARK5 needs to restart after this operation and all personal settings will be lost.</string>
@@ -101,6 +104,7 @@
 	<string name="pref_contacts_sub_account_title">Account</string>
 	<string name="pref_key_contacts_sub_vat">pref_key_contacts_sub_vat</string>
 	<string name="pref_contacts_sub_vat_title">VAT number</string>
+	<string name="dialog_update_config_title">Updating configuration</string>
 	<string name="dialog_logout_title">Log out</string>
 	<string name="dialog_logout_content">MARK5 will be shutdown after your are logged out. All personal settings will be lost and you will have to start MARK5 again manually. Do you want to continue?</string>
 	<string name="push_notification_token">push_notification_token</string>

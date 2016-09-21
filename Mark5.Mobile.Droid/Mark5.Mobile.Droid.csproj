@@ -133,6 +133,9 @@
     <Reference Include="HockeySDK">
       <HintPath>..\Components\hockeyappandroid-4.1.0.2\lib\android\HockeySDK.dll</HintPath>
     </Reference>
+    <Reference Include="Xamarin.Android.Support.v7.CardView">
+      <HintPath>..\packages\Xamarin.Android.Support.v7.CardView.23.4.0.1\lib\MonoAndroid403\Xamarin.Android.Support.v7.CardView.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -166,6 +169,12 @@
     <Compile Include="Utilities\PushNotifications\GcmListenerService.cs" />
     <Compile Include="Utilities\PushNotifications\InstanceIdListenerService.cs" />
     <Compile Include="Utilities\PushNotifications\RegistrationIntentService.cs" />
+    <Compile Include="ServerConfig.cs" />
+    <Compile Include="Utilities\DateTimeUtils.cs" />
+    <Compile Include="Views\Common\ActionOnClickListener.cs" />
+    <Compile Include="Views\Common\ActionOnLongClickListener.cs" />
+    <Compile Include="Views\Activities\ContactsListActivity.cs" />
+    <Compile Include="Views\Fragments\ContactsListFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -258,6 +267,34 @@
     <AndroidResource Include="Resources\layout\list_item_documents.axml" />
     <AndroidResource Include="Resources\drawable\line_divider.xml" />
     <AndroidResource Include="Resources\layout\list_item_section.axml" />
+    <AndroidResource Include="Resources\drawable\line_divider.axml" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\incoming.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\outgoing.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\incoming.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\outgoing.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\incoming.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\outgoing.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\incoming.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\outgoing.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\draft.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\unread.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\draft.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\unread.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\draft.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\unread.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\draft.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\unread.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\attachment.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\attachment.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\attachment.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\attachment.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\comment.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\comment.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\comment.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\comment.png" />
+    <AndroidResource Include="Resources\menu\menu_main.axml" />
+    <AndroidResource Include="Resources\layout\list_item_contacts.axml" />
+    <AndroidResource Include="Resources\drawable\circle.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

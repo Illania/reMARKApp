@@ -23,7 +23,7 @@ namespace Mark5.Mobile.Common.Managers
     class ContactsManager : AbstractManager, IContactsManager
     {
 
-        public int MaxToFetch { get; set; } = 250;
+        public int MaxToFetch { get; set; } = 100;
 
         readonly IContactsDataAccess contactsDataAccess;
 
@@ -60,19 +60,36 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task GetAllContactPreviewsAsync(Folder folder, Func<List<ContactPreview>, Task> handler, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
+        public void GetAllContactPreviews(Folder folder, Action<List<ContactPreview>> callback, Action finishedCallback, Action<Exception> errorCallback, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
         {
-            var startId = 0;
-            var stopLoop = false;
-
-            while (!stopLoop && !ct.IsCancellationRequested)
+            Task.Run(async () =>
             {
-                var previews = await GetContactPreviewsAsync(folder, startId, sourceType);
-                await handler(previews);
+                var startId = -1;
+                var stopLoop = false;
 
-                startId += MaxToFetch;
-                stopLoop = previews.Count < MaxToFetch;
-            }
+                while (!stopLoop && !ct.IsCancellationRequested)
+                {
+                    var previews = await GetContactPreviewsAsync(folder, startId, sourceType);
+
+                    if (ct.IsCancellationRequested) continue;
+
+                    if (previews.Count > 0)
+                    {
+                        callback(previews);
+                    }
+
+                    startId += MaxToFetch;
+                    stopLoop = previews.Count < MaxToFetch;
+                }
+            }).ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                {
+                    errorCallback(t.Exception.InnerException);
+                }
+
+                finishedCallback();
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         public async Task<Contact> GetContactAsync(int folderId, int contactId, SourceType sourceType = SourceType.Auto)
