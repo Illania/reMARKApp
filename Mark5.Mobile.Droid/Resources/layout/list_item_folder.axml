@@ -25,6 +25,8 @@
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true">
         <android.support.v7.widget.AppCompatImageView
+            android:padding="5dp"
+            android:background="@drawable/circle"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginRight="16dp"
@@ -35,18 +37,21 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="vertical"
+            android:gravity="center_vertical"
             android:layout_weight="1">
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/list_item_folder_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:gravity="center_vertical"
+                android:textAppearance="@style/fontListPrimary1"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="1" />
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/list_item_folder_subtitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_marginTop="2dp" />
+                android:textAppearance="@style/fontListSecondary" />
         </android.support.v7.widget.LinearLayoutCompat>
         <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/list_item_folder_expand"

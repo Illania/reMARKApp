@@ -586,6 +586,15 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                     fh.FolderNameSubTitle.Text += "/OFFLINE";
                 }
 
+                if (!string.IsNullOrEmpty(fh.FolderNameSubTitle.Text))
+                {
+                    fh.FolderNameSubTitle.Visibility = ViewStates.Visible;
+                }
+                else
+                {
+                    fh.FolderNameSubTitle.Visibility = ViewStates.Gone;
+                }
+
                 fh.ExpandButton.Visibility = folder.HasSubFolders ? ViewStates.Visible : ViewStates.Gone;
                 if (folder.InternalType == FolderInternalType.Worktray)
                 {
