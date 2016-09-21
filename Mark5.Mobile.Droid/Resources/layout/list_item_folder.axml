@@ -5,6 +5,12 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
+    <View
+        android:id="@+id/selected_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="?android:attr/colorControlActivated" />
     <android.support.v7.widget.LinearLayoutCompat
         android:id="@+id/list_item_folder_internal_Layout"
         android:layout_width="match_parent"
@@ -49,9 +55,4 @@
             android:src="@drawable/arrow_right"
             android:clickable="false" />
     </android.support.v7.widget.LinearLayoutCompat>
-    <View
-        android:id="@+id/selected_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?android:attr/colorControlActivated" />
 </FrameLayout>

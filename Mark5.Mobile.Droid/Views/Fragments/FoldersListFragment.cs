@@ -604,7 +604,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                     fh.FolderIcon.SetImageResource(Resource.Drawable.folder); //TODO need to add icon for local
                 }
 
-                fh.SelectedOverlay.Visibility = IsItemSelected(position) ? ViewStates.Visible : ViewStates.Invisible;
+                fh.SelectedOverlay.Visibility = IsItemSelected(position) ? ViewStates.Visible : ViewStates.Gone;
             }
             else if (holder is SectionViewHolder)
             {
@@ -840,7 +840,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             internalContainerLayout.LongClick += (sender, e) => ItemLongClicked(this, itemView);
 
             SelectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
-            SelectedOverlay.Background.Alpha = 125;
         }
     }
 
