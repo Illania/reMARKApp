@@ -88,23 +88,27 @@ namespace Mark5.Mobile.Droid.Views.Activity
                 var initialMenuItem = navigationView.Menu.FindItem(Resource.Id.nav_documents);
                 initialMenuItem.SetChecked(true);
                 OnNavigationItemSelected(initialMenuItem);
+
+                Task.Run(async () =>
+                {
+                    var ci = await AuthenticatorFactory.Create().GetConnectionInfoAsync();
+                    var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+                    return new { ConnectionInfo = ci, SystemSettings = ss };
+                }).ContinueWith(t =>
+                {
+                    var ci = t.Result.ConnectionInfo;
+                    var ss = t.Result.SystemSettings;
+
+                    navHeaderTitleTextView.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
+                    navHeaderSubtitleTextView.Text = $"{ci?.Username}@{ci?.Hostname}:{ci?.Port}";
+                }, TaskScheduler.FromCurrentSynchronizationContext());
+
+                CommonConfig.Logger.Info($"Started {nameof(MainActivity)}");
             }
-
-            Task.Run(async () =>
+            else
             {
-                var ci = await AuthenticatorFactory.Create().GetConnectionInfoAsync();
-                var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
-                return new { ConnectionInfo = ci, SystemSettings = ss };
-            }).ContinueWith(t =>
-            {
-                var ci = t.Result.ConnectionInfo;
-                var ss = t.Result.SystemSettings;
-
-                navHeaderTitleTextView.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
-                navHeaderSubtitleTextView.Text = $"{ci?.Username}@{ci?.Hostname}:{ci?.Port}";
-            }, TaskScheduler.FromCurrentSynchronizationContext());
-
-            CommonConfig.Logger.Info($"Started {nameof(MainActivity)}");
+                CommonConfig.Logger.Info($"Restored {nameof(MainActivity)}");
+            }
         }
 
         protected override void OnPostCreate(Bundle savedInstanceState)
