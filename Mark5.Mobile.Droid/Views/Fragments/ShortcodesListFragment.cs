@@ -49,6 +49,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         readonly Handler searchHandler = new Handler();
 
+        #region Fragment overrides
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -119,6 +121,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             searchView.SetOnCloseListener(this);
         }
 
+        #endregion
+
+        #region RetainableStateFragment overrides
+
         public override IRetainableState OnRetainInstanceState()
         {
             return new ShortcodesListFragmentState
@@ -160,6 +166,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return $"{nameof(ShortcodesListFragment)} [FolderId={Folder.Id}, FolderName={Folder.Name}]";
         }
 
+        #endregion
+
+        #region Refreshing
+
         void RefreshData(int startId = -1, bool force = false)
         {
             if (refreshing) return;
@@ -191,6 +201,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }, startId, cts.Token);
         }
 
+        #endregion
+
+        #region Adapter callbacks
+
         void Adapter_ItemClicked(object sender, ShortcodePreview shortcodePreview)
         {
             if (actionMode == null)
@@ -214,6 +228,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
         }
 
+        #endregion
+
+        #region Action mode
+
         void Adapter_ItemLongClicked(object sender, ShortcodePreview shortcodePreview)
         {
             if (actionMode == null)
@@ -227,8 +245,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public bool OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
             menu.Clear();
-
-            var currentAdapter = (ShortcodesListAdapter)recyclerView.GetAdapter();
 
             menu.Add(Menu.None, 30, 30, Resource.String.copy_to_worktray);
             menu.Add(Menu.None, 40, 40, Resource.String.copy_to_folder);
@@ -272,6 +288,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             currentAdapter.ClearSelections();
             actionMode = null;
         }
+
+        #endregion
+
+        #region Filtering
 
         void View.IOnClickListener.OnClick(View v)
         {
@@ -328,6 +348,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return false;
         }
 
+        #endregion
+
+        #region State
+
         class ShortcodesListFragmentState : IRetainableState
         {
 
@@ -339,6 +363,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             public bool RefreshInProgress { get; set; }
         }
+
+        #endregion
 
         #region RecyclerView Adapter/ViewHolder
 

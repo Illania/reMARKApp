@@ -49,6 +49,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         readonly Handler searchHandler = new Handler();
 
+        #region Fragment overrides
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -119,6 +121,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             searchView.SetOnCloseListener(this);
         }
 
+        #endregion
+
+        #region RetainableStateFragment overrides
+
         public override IRetainableState OnRetainInstanceState()
         {
             return new ContactsListFragmentState
@@ -160,6 +166,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return $"{nameof(ContactsListFragment)} [FolderId={Folder.Id}, FolderName={Folder.Name}]";
         }
 
+        #endregion
+
+        #region Refreshing
+
         void RefreshData(int startId = -1, bool force = false)
         {
             if (refreshing) return;
@@ -190,6 +200,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 Dialogs.ShowErrorDialog(Activity, ex);
             }, startId, cts.Token);
         }
+
+        #endregion
+
+        #region Adapter callbacks
 
         void Adapter_ItemClicked(object sender, ContactPreview contactPreview)
         {
@@ -223,6 +237,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             Adapter_ItemClicked(sender, contactPreview);
         }
+
+        #endregion
+
+        #region Action mode
 
         public bool OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
@@ -277,6 +295,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             currentAdapter.ClearSelections();
             actionMode = null;
         }
+
+        #endregion
+
+        #region Filtering
 
         void View.IOnClickListener.OnClick(View v)
         {
@@ -349,6 +371,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return false;
         }
 
+        #endregion
+
+        #region State
+
         class ContactsListFragmentState : IRetainableState
         {
 
@@ -360,6 +386,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             public bool RefreshInProgress { get; set; }
         }
+
+        #endregion
 
         #region RecyclerView Adapter/ViewHolder
 

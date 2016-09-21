@@ -54,6 +54,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         AutoRefreshWorker autoRefreshWorker;
 
+        #region Fragment overrides
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -129,6 +131,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             searchView.SetOnCloseListener(this);
         }
 
+        #endregion
+
+        #region RetainableStateFragment overrides
+
         public override IRetainableState OnRetainInstanceState()
         {
             return new DocumentsListFragmentState
@@ -163,6 +169,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             return $"{nameof(DocumentsListFragment)} [FolderId={Folder.Id}, FolderName={Folder.Name}]";
         }
+
+        #endregion
+
+        #region Refreshing
 
         async Task AutoRefreshData(int endId)
         {
@@ -227,6 +237,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
         }
 
+        #endregion
+
+        #region Adapter callbacks
+
         void Adapter_ItemClicked(object sender, DocumentPreview documentPreview)
         {
             if (actionMode == null)
@@ -259,6 +273,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             Adapter_ItemClicked(sender, documentPreview);
         }
+
+        #endregion
+
+        #region Action mode
 
         public bool OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
@@ -331,6 +349,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             actionMode = null;
         }
 
+        #endregion
+
+        #region Filtering
+
         void View.IOnClickListener.OnClick(View v)
         {
             if (v == searchView)
@@ -398,6 +420,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return false;
         }
 
+        #endregion
+
+        #region State
+
         class DocumentsListFragmentState : IRetainableState
         {
 
@@ -407,6 +433,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             public List<DocumentPreview> SelectedDocumentPreviews { get; set; }
         }
+
+        #endregion
 
         #region RecyclerView Adapter/ViewHolder
 
