@@ -154,6 +154,27 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true,
         };
 
+        readonly static Folder documentsOutgoingFolder = new Folder
+        {
+            Id = -121,
+            Guid = new Guid("{00000000-0000-0000-0000-000000000121}"),
+            Name = "Outgoing",
+            Module = ModuleType.Documents,
+            Type = FolderType.None,
+            HasSubFolders = false,
+        };
+
+        readonly static Folder documenstLocalRootFolder = new Folder
+        {
+            Id = -120,
+            Guid = new Guid("{00000000-0000-0000-0000-000000000120}"),
+            Name = "DOCUMENTS_LOCAL_ROOT",
+            Module = ModuleType.Documents,
+            Type = FolderType.None,
+            HasSubFolders = true,
+            SubFolders = { documentsOutgoingFolder },
+        };
+
         readonly static Folder contactsRootFolder = new Folder
         {
             Id = -200,
@@ -226,6 +247,17 @@ namespace Mark5.Mobile.Common.Model
                     return favorite ? shortcodesFavoriteRootFolder : shortcodesRootFolder;
                 case ModuleType.Calendar:
                     return favorite ? calendarFavoriteRootFolder : calendarRootFolder;
+                default:
+                    throw new ArgumentException("Input module not valid");
+            }
+        }
+
+        public static Folder LocalRootPerModule(ModuleType module)
+        {
+            switch (module)
+            {
+                case ModuleType.Documents:
+                    return documenstLocalRootFolder;
                 default:
                     throw new ArgumentException("Input module not valid");
             }
