@@ -112,7 +112,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
             if (availableSections.Contains(Section.Local))
             {
-                RefreshLocal(forceRefresh);
+                RefreshLocal();
             }
 
             refreshLayout.Post(() => refreshLayout.Refreshing = false); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
@@ -161,11 +161,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
         }
 
-        void RefreshLocal(bool forceRefresh = false)
+        void RefreshLocal()
         {
             var localRootFolder = Folder.LocalRootPerModule(Folder.Module);
             adapter.Refresh(localRootFolder.SubFolders, Section.Local);
-
         }
 
         void RestoreSelection()
