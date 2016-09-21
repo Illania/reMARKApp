@@ -60,26 +60,25 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public void GetAllContactPreviews(Folder folder, Action<List<ContactPreview>> callback, Action finishedCallback, Action<Exception> errorCallback, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
+        public void GetAllContactPreviews(Folder folder, Action<List<ContactPreview>> callback, Action finishedCallback, Action<Exception> errorCallback, int startRowId = -1, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
         {
             Task.Run(async () =>
             {
-                var startId = -1;
                 var stopLoop = false;
 
                 while (!stopLoop && !ct.IsCancellationRequested)
                 {
-                    var previews = await GetContactPreviewsAsync(folder, startId, sourceType);
+                    var previews = await GetContactPreviewsAsync(folder, startRowId, sourceType);
 
                     if (ct.IsCancellationRequested) continue;
 
                     if (previews.Count > 0)
                     {
                         callback(previews);
+                        startRowId = previews.LastOrDefault()?.RowId + 1 ?? -1;
                     }
 
-                    startId += MaxToFetch;
-                    stopLoop = previews.Count < MaxToFetch;
+                    stopLoop = previews.Count < 1 || previews.Count < MaxToFetch;
                 }
             }).ContinueWith(t =>
             {
@@ -134,7 +133,7 @@ namespace Mark5.Mobile.Common.Managers
                     Token = Token,
                     Contact = contact.Convert(),
                     ContactPreview = contactPreview.Convert(),
-                    ParentObjectId = parentObjectId,
+                    ParentObjectId = parentObjectId
                 });
 
                 contact.Id = result.Id;
@@ -156,7 +155,7 @@ namespace Mark5.Mobile.Common.Managers
                 var result = await AppServiceProxy.GetAllCategoriesAsync(new DataContract.GetAllCategoriesParameters
                 {
                     Token = Token,
-                    ObjectType = DataContract.ObjectType.Contact,
+                    ObjectType = DataContract.ObjectType.Contact
                 });
 
                 var categories = result.Categories.WhereNotNull().Select(c => c.Convert()).ToList();
@@ -251,7 +250,7 @@ namespace Mark5.Mobile.Common.Managers
                     Token = Token,
                     CommentId = comment.Id,
                     ObjectId = contact.Id,
-                    ObjectType = DataContract.ObjectType.Contact,
+                    ObjectType = DataContract.ObjectType.Contact
                 });
 
                 await contactsDataAccess.DeleteCommentAsync(contact, comment);
