@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -14,7 +14,7 @@
         android:orientation="horizontal"
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true">
-        <ImageView
+        <android.support.v7.widget.AppCompatImageView
             android:paddingLeft="16dp"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -27,19 +27,19 @@
             android:orientation="vertical"
             android:padding="8dp"
             android:layout_weight="1">
-            <TextView
+            <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/list_item_folder_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
-            <TextView
+            <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/list_item_folder_subtitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:layout_marginTop="2dp" />
         </android.support.v7.widget.LinearLayoutCompat>
-        <ImageButton
+        <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/list_item_folder_expand"
             android:layout_gravity="center_vertical"
             android:layout_width="wrap_content"
