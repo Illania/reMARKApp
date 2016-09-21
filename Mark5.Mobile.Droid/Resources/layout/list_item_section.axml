@@ -5,9 +5,8 @@
     android:gravity="center_vertical"
     android:paddingLeft="16dp"
     android:singleLine="true"
-    android:textAllCaps="true"
-    android:textColor="@color/blue"
+    android:textAppearance="@style/fontListSecondary"
+    android:textColor="@color/brown"
     android:background="@android:color/transparent"
-    android:textSize="16sp"
     android:id="@+id/list_item_section"
     android:textStyle="bold" />
