@@ -323,17 +323,21 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             menu.Clear();
 
-            var areAllSelectedFoldersSubscribed = selectedFolders.All(f => f.Subscribed);
             var areAllSelectedFoldersFavourites = selectedFolders.All(f => AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderFavouriteAsync(f.Module, f)));
             var areAllSelectedFolderOffline = selectedFolders.All(f => AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderOfflineAsync(f.Module, f)));
 
             var favoritesString = areAllSelectedFoldersFavourites ? "Remove from favourites" : "Add to favourites";
-            var offlineString = areAllSelectedFolderOffline ? "Disable offline mode" : "Enable offline mode"; //TODO check wording
-            var subscriptionString = areAllSelectedFoldersSubscribed ? "Unsubscribe" : "Subscribe";
+            var offlineString = areAllSelectedFolderOffline ? "Disable offline mode" : "Enable offline mode";
+
+            if (Folder.Module == ModuleType.Documents)
+            {
+                var areAllSelectedFoldersSubscribed = selectedFolders.All(f => f.Subscribed);
+                var subscriptionString = areAllSelectedFoldersSubscribed ? "Unsubscribe" : "Subscribe";
+                menu.Add(Menu.None, areAllSelectedFoldersSubscribed ? MenuItemActions.Unsubscribe : MenuItemActions.Subscribe, Menu.None, subscriptionString).SetShowAsAction(ShowAsAction.Never);
+            }
 
             menu.Add(Menu.None, areAllSelectedFoldersFavourites ? MenuItemActions.RemoveFromFavourites : MenuItemActions.AddToFavourites, Menu.None, favoritesString).SetShowAsAction(ShowAsAction.Never);
             menu.Add(Menu.None, areAllSelectedFolderOffline ? MenuItemActions.DisableOffline : MenuItemActions.EnableOffline, Menu.None, offlineString).SetShowAsAction(ShowAsAction.Never);
-            menu.Add(Menu.None, areAllSelectedFoldersSubscribed ? MenuItemActions.Unsubscribe : MenuItemActions.Subscribe, Menu.None, subscriptionString).SetShowAsAction(ShowAsAction.Never);
 
             return true;
         }
@@ -384,7 +388,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 dismissAction();
 
                 CommonConfig.Logger.Error($"{(enabled ? "Subscription" : "Unsubscription")}  failed", ex);
-                Dialogs.ShowErrorDialog(this.Activity, ex);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
         }
 
