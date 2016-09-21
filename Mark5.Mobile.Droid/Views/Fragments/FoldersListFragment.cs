@@ -264,29 +264,29 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             switch (item.ItemId)
             {
                 case MenuItemActions.AddToFavourites:
-                    AddSelectionToFavourites();
+                    SetFolderFavouriteStatusForSelection(true);
                     mode.Finish();
                     RefreshFavorites(true).Wait();
                     return true;
                 case MenuItemActions.RemoveFromFavourites:
-                    RemoveSelectionFromFavourites();
+                    SetFolderFavouriteStatusForSelection(false);
                     mode.Finish();
                     RefreshFavorites(true).Wait();
                     return true;
                 case MenuItemActions.EnableOffline:
-                    AddSelectionToAvailableOffline();
+                    Task.Run(async () => await SetFolderOfflineStatusForSelection(true));
                     mode.Finish();
                     return true;
                 case MenuItemActions.DisableOffline:
-                    RemoveSelectionFromAvailableOffline();
+                    Task.Run(async () => await SetFolderOfflineStatusForSelection(false));
                     mode.Finish();
                     return true;
                 case MenuItemActions.Subscribe:
-                    SetFoldersSubscriptionToSelection(true); //TODO need to think about this
+                    Task.Run(async () => await SetFoldersSubscriptionToSelection(true));
                     mode.Finish();
                     return true;
                 case MenuItemActions.Unsubscribe:
-                    SetFoldersSubscriptionToSelection(false);
+                    Task.Run(async () => await SetFoldersSubscriptionToSelection(false));
                     mode.Finish();
                     return true;
 
@@ -331,6 +331,20 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return true;
         }
 
+        static class MenuItemActions
+        {
+            public const int AddToFavourites = 0;
+            public const int RemoveFromFavourites = 1;
+            public const int Subscribe = 2;
+            public const int Unsubscribe = 3;
+            public const int EnableOffline = 4;
+            public const int DisableOffline = 5;
+        }
+
+        #endregion
+
+        #region Folder actions
+
         async Task SetFoldersSubscriptionToSelection(bool enabled)
         {
             var selectedFolders = adapter.GetSelectedItems().ToList();
@@ -367,7 +381,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
         }
 
-        void AddSelectionToAvailableOffline()
+        async Task SetFolderOfflineStatusForSelection(bool offline)
         {
             var selectedFolders = adapter.GetSelectedItems().ToList();
             if (!selectedFolders.Any())
@@ -377,12 +391,20 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             foreach (var folder in selectedFolders)
             {
-                AsyncHelpers.RunSync(() => Managers.FoldersManager.AddOfflineFolderAsync(folder.Module, folder));
+                if (offline)
+                {
+                    await Managers.FoldersManager.AddOfflineFolderAsync(folder.Module, folder);
+                }
+                else
+                {
+                    await Managers.FoldersManager.RemoveOfflineFolderAsync(folder.Module, folder);
+
+                }
                 adapter.RefreshFolder(folder);
             }
         }
 
-        void RemoveSelectionFromAvailableOffline()
+        void SetFolderFavouriteStatusForSelection(bool favourite)
         {
             var selectedFolders = adapter.GetSelectedItems().ToList();
             if (!selectedFolders.Any())
@@ -392,47 +414,15 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             foreach (var folder in selectedFolders)
             {
-                AsyncHelpers.RunSync(() => Managers.FoldersManager.RemoveOfflineFolderAsync(folder.Module, folder));
-                adapter.RefreshFolder(folder);
+                if (favourite)
+                {
+                    AsyncHelpers.RunSync(() => Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder));
+                }
+                else
+                {
+                    AsyncHelpers.RunSync(() => Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder));
+                }
             }
-        }
-
-        void AddSelectionToFavourites() //TODO move to a new place
-        {
-            var selectedFolders = adapter.GetSelectedItems().ToList();
-            if (!selectedFolders.Any())
-            {
-                return;
-            }
-
-            foreach (var folder in selectedFolders)
-            {
-                AsyncHelpers.RunSync(() => Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder));
-            }
-        }
-
-        void RemoveSelectionFromFavourites() //TODO move to a new place
-        {
-            var selectedFolders = adapter.GetSelectedItems().ToList();
-            if (!selectedFolders.Any())
-            {
-                return;
-            }
-
-            foreach (var folder in selectedFolders)
-            {
-                AsyncHelpers.RunSync(() => Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder));
-            }
-        }
-
-        static class MenuItemActions
-        {
-            public const int AddToFavourites = 0;
-            public const int RemoveFromFavourites = 1;
-            public const int Subscribe = 2;
-            public const int Unsubscribe = 3;
-            public const int EnableOffline = 4;
-            public const int DisableOffline = 5;
         }
 
         #endregion
