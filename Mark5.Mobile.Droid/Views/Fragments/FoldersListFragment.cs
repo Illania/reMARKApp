@@ -168,6 +168,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                     i.PutExtra(ContactsListActivity.FolderIntentKey, SerializationUtils.Serialize(folder));
                     StartActivity(i);
                 }
+                if (folder.Module == ModuleType.Shortcodes)
+                {
+                    var i = new Intent(Activity, typeof(ShortcodesListActivity));
+                    i.PutExtra(ShortcodesListActivity.FolderIntentKey, SerializationUtils.Serialize(folder));
+                    StartActivity(i);
+                }
             }
             else
             {

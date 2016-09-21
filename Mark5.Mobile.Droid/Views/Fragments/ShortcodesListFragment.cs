@@ -239,11 +239,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 menu.Add(Menu.None, 41, 41, Resource.String.move_to_folder);
             }
 
-            if (currentAdapter.SelectedItemCount == 1)
-            {
-                menu.Add(Menu.None, 50, 50, Resource.String.categories);
-            }
-
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static
                 || Folder.InternalType == FolderInternalType.Worktray)
@@ -536,7 +531,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 letterTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_shortcode_letter);
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_shortcode_name);
-                descTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_contact_desc);
+                descTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_shortcode_desc);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
             }
         }

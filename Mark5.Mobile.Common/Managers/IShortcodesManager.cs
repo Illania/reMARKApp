@@ -22,7 +22,7 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<List<ShortcodePreview>> GetShortcodePreviewsAsync(Folder folder, int startRowId = -1, SourceType sourceType = SourceType.Auto);
 
-        Task GetAllShortcodePreviewsAsync(Folder folder, Func<List<ShortcodePreview>, Task> handler, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto);
+        void GetAllShortcodePreviews(Folder folder, Action<List<ShortcodePreview>> callback, Action finishedCallback, Action<Exception> errorCallback, int startRowId = -1, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto);
 
         Task<Shortcode> GetShortcodeAsync(Folder folder, int shortcodeId, SourceType sourceType = SourceType.Auto);
 
