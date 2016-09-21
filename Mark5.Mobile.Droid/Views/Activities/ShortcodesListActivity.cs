@@ -30,6 +30,8 @@ namespace Mark5.Mobile.Droid.Views.Activities
         {
             base.OnCreate(savedInstanceState);
 
+            CommonConfig.Logger.Info($"Creating {nameof(ShortcodesListActivity)}...");
+
             SetTitle(Resource.String.shortcodes);
             SetContentView(Resource.Layout.base_layout);
 

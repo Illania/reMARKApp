@@ -58,6 +58,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            CommonConfig.Logger.Info($"Creating {nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
@@ -167,7 +169,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(DocumentsListFragment)} [FolderId={Folder.Id}, FolderName={Folder.Name}]";
+            return $"{nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]";
         }
 
         #endregion
@@ -226,7 +228,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Downloading documents failed [folder.Name={Folder?.Name}, folder.id={Folder?.Id}, startId={startId}, endId={endId}, force={force}]", ex);
+                CommonConfig.Logger.Error($"Downloading documents failed [folder.name={Folder?.Name}, folder.id={Folder?.Id}, startId={startId}, endId={endId}, force={force}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }

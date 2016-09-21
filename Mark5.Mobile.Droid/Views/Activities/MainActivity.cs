@@ -103,7 +103,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
                     navHeaderSubtitleTextView.Text = $"{ci?.Username}@{ci?.Hostname}:{ci?.Port}";
                 }, TaskScheduler.FromCurrentSynchronizationContext());
 
-                CommonConfig.Logger.Info($"Started {nameof(MainActivity)}");
+                CommonConfig.Logger.Info($"Created {nameof(MainActivity)}");
             }
             else
             {

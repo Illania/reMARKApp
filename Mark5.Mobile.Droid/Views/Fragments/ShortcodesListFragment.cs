@@ -53,6 +53,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            CommonConfig.Logger.Info($"Creating {nameof(ShortcodesListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
@@ -163,14 +165,14 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(ShortcodesListFragment)} [FolderId={Folder.Id}, FolderName={Folder.Name}]";
+            return $"{nameof(ShortcodesListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]";
         }
 
         #endregion
 
         #region Refreshing
 
-        void RefreshData(int startId = -1, bool force = false)
+        void RefreshData(int startRowId = -1, bool force = false)
         {
             if (refreshing) return;
 
@@ -195,10 +197,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 refreshing = false;
             }, ex =>
             {
-                CommonConfig.Logger.Error($"Downloading shortcodes failed [folder.Name={Folder?.Name}, folder.id={Folder?.Id}, force={force}]", ex);
+                CommonConfig.Logger.Error($"Downloading shortcodes failed [folder.name={Folder?.Name}, folder.id={Folder?.Id}, startRowId={startRowId}, force={force}]", ex);
 
                 Dialogs.ShowErrorDialog(Activity, ex);
-            }, startId, cts.Token);
+            }, startRowId, cts.Token);
         }
 
         #endregion

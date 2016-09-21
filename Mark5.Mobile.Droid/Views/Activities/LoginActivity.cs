@@ -40,6 +40,9 @@ namespace Mark5.Mobile.Droid.Views.Activity
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+
+            CommonConfig.Logger.Info($"Creating {nameof(LoginActivity)}...");
+
             SetTitle(Resource.String.app_name);
             SetContentView(Resource.Layout.activity_login);
 
