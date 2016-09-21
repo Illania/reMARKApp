@@ -104,7 +104,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             if (availableSections.Contains(Section.Remote))
             {
-                RefreshOffline(forceRefresh);
+                await RefreshOffline(forceRefresh);
             }
             if (availableSections.Contains(Section.Favourites))
             {
@@ -274,22 +274,21 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                     RefreshFavorites(true).Wait();
                     return true;
                 case MenuItemActions.EnableOffline:
-                    Task.Run(async () => await SetFolderOfflineStatusForSelection(true));
+                    SetFolderOfflineStatusForSelection(true);
                     mode.Finish();
                     return true;
                 case MenuItemActions.DisableOffline:
-                    Task.Run(async () => await SetFolderOfflineStatusForSelection(false));
+                    SetFolderOfflineStatusForSelection(false);
                     mode.Finish();
                     return true;
                 case MenuItemActions.Subscribe:
-                    Task.Run(async () => await SetFoldersSubscriptionToSelection(true));
+                    SetFoldersSubscriptionToSelection(true);
                     mode.Finish();
                     return true;
                 case MenuItemActions.Unsubscribe:
-                    Task.Run(async () => await SetFoldersSubscriptionToSelection(false));
+                    SetFoldersSubscriptionToSelection(false);
                     mode.Finish();
                     return true;
-
                 default:
                     return false;
             }
