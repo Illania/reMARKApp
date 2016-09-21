@@ -177,6 +177,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             Managers.ShortcodesManager.GetAllShortcodePreviews(Folder, cps =>
             {
+                Managers.DownloadManager.Notify(ObjectType.Shortcode, Folder.Id);
                 Activity.RunOnUiThread(() => adapter.AppendItems(cps));
             }, () =>
             {

@@ -177,6 +177,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             Managers.ContactsManager.GetAllContactPreviews(Folder, cps =>
             {
+                Managers.DownloadManager.Notify(ObjectType.Contact, Folder.Id);
                 Activity.RunOnUiThread(() => adapter.AppendItems(cps));
             }, () =>
             {

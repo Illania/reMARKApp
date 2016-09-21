@@ -177,6 +177,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
                 if (documents.Count > 0)
                 {
+                    Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
+
                     Activity?.RunOnUiThread(() =>
                     {
                         adapter?.PrependItems(documents);
@@ -208,6 +210,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 }
 
                 var documentPreviews = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, startId, endId);
+
+                Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
                 adapter.AppendItems(documentPreviews);
             }
             catch (Exception ex)
