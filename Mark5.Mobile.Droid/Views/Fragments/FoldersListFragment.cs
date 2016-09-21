@@ -122,11 +122,18 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             if (forceRefresh || !Folder.SubFolders.Any())
             {
-                var folders = await Managers.FoldersManager.GetFoldersAsync(Folder, 2);
-                Folder.SubFolders.Clear();
-                Folder.SubFolders = folders;
+                try
+                {
+                    var folders = await Managers.FoldersManager.GetFoldersAsync(Folder, 2);
+                    Folder.SubFolders.Clear();
+                    Folder.SubFolders = folders;
 
-                adapter.Refresh(folders, Section.Remote);
+                    adapter.Refresh(folders, Section.Remote);
+                }
+                catch (Exception ex)
+                {
+                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                }
             }
             else
             {
