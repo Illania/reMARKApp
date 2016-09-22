@@ -40,6 +40,9 @@ namespace Mark5.Mobile.Droid.Views.Activity
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+
+            CommonConfig.Logger.Info($"Creating {nameof(LoginActivity)}...");
+
             SetTitle(Resource.String.app_name);
             SetContentView(Resource.Layout.activity_login);
 
@@ -195,9 +198,10 @@ namespace Mark5.Mobile.Droid.Views.Activity
                 await Managers.DownloadManager.Start();
                 await Managers.OutgoingDocumentsManager.Start();
 
-                CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
-
+                CommonConfig.Logger.Info($"Refreshing reachability status...");
                 await CommonConfig.ReachabilityService.Refresh();
+
+                CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
                 PlatformConfig.ReachabilityBroadcastReceiver.Register();
 
                 CommonConfig.Logger.Info("Retrieving system settings...");

@@ -60,19 +60,35 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task GetAllShortcodePreviewsAsync(Folder folder, Func<List<ShortcodePreview>, Task> handler, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
+        public void GetAllShortcodePreviews(Folder folder, Action<List<ShortcodePreview>> callback, Action finishedCallback, Action<Exception> errorCallback, int startRowId = -1, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
         {
-            var startId = 0;
-            var stopLoop = false;
-
-            while (!stopLoop && !ct.IsCancellationRequested)
+            Task.Run(async () =>
             {
-                var previews = await GetShortcodePreviewsAsync(folder, startId, sourceType);
-                await handler(previews);
+                var stopLoop = false;
 
-                startId += MaxToFetch;
-                stopLoop = previews.Count < MaxToFetch;
-            }
+                while (!stopLoop && !ct.IsCancellationRequested)
+                {
+                    var previews = await GetShortcodePreviewsAsync(folder, startRowId, sourceType);
+
+                    if (ct.IsCancellationRequested) continue;
+
+                    if (previews.Count > 0)
+                    {
+                        callback(previews);
+                        startRowId = previews.LastOrDefault()?.RowId + 1 ?? -1;
+                    }
+
+                    stopLoop = previews.Count < MaxToFetch;
+                }
+            }).ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                {
+                    errorCallback(t.Exception.InnerException);
+                }
+
+                finishedCallback();
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         public async Task<Shortcode> GetShortcodeAsync(int folderId, int shortcodeId, SourceType sourceType = SourceType.Auto)

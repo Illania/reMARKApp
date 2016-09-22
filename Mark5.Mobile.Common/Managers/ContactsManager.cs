@@ -78,7 +78,7 @@ namespace Mark5.Mobile.Common.Managers
                         startRowId = previews.LastOrDefault()?.RowId + 1 ?? -1;
                     }
 
-                    stopLoop = previews.Count < 1 || previews.Count < MaxToFetch;
+                    stopLoop = previews.Count < MaxToFetch;
                 }
             }).ContinueWith(t =>
             {

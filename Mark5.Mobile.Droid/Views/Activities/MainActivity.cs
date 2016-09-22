@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: MainActivity.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -16,6 +16,7 @@ using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.Widget;
 using Android.Views;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
@@ -34,35 +35,19 @@ namespace Mark5.Mobile.Droid.Views.Activity
         DrawerLayout drawer;
         SmoothActionBarDrawerToggle drawerToggle;
         NavigationView navigationView;
+        AppCompatTextView navHeaderTitleTextView;
+        AppCompatTextView navHeaderSubtitleTextView;
         IMenuItem lastSelectedItem;
 
         RetainedFragment<MainActivityState> stateFragment;
-
-        int LastSelectedItemId
-        {
-            get
-            {
-                return stateFragment.State.LastSelectedItemId;
-            }
-            set
-            {
-                stateFragment.State.LastSelectedItemId = value;
-            }
-        }
-
-        Dictionary<int, MenuItemContent> MenuItemContents
-        {
-            get
-            {
-                return stateFragment.State.MenuItemContents;
-            }
-        }
 
         #region Activity lifecycle
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+
+            CommonConfig.Logger.Info($"Starting {nameof(MainActivity)}...");
 
             SetContentView(Resource.Layout.activity_main);
 
@@ -81,6 +66,10 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
             navigationView = FindViewById<NavigationView>(Resource.Id.navigation_view);
             navigationView.SetNavigationItemSelectedListener(this);
+
+            var header = navigationView.GetHeaderView(0);
+            navHeaderTitleTextView = header.FindViewById<AppCompatTextView>(Resource.Id.nav_header_title);
+            navHeaderSubtitleTextView = header.FindViewById<AppCompatTextView>(Resource.Id.nav_header_subtitle);
 
             stateFragment = RetainedFragment<MainActivityState>.FindOrCreate(SupportFragmentManager, nameof(MainActivity));
 
@@ -106,27 +95,32 @@ namespace Mark5.Mobile.Droid.Views.Activity
                 StartService(registrationIntent);
             }
 
-            Task.Run(async () =>
-            {
-                var ci = await AuthenticatorFactory.Create().GetConnectionInfoAsync();
-                var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
-                return new { ConnectionInfo = ci, SystemSettings = ss };
-            }).ContinueWith(t =>
-            {
-                var ci = t.Result.ConnectionInfo;
-                var ss = t.Result.SystemSettings;
+                Task.Run(async () =>
+                {
+                    var ci = await AuthenticatorFactory.Create().GetConnectionInfoAsync();
+                    var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+                    return new { ConnectionInfo = ci, SystemSettings = ss };
+                }).ContinueWith(t =>
+                {
+                    var ci = t.Result.ConnectionInfo;
+                    var ss = t.Result.SystemSettings;
 
-                var headerTitle = FindViewById<AppCompatTextView>(Resource.Id.nav_header_title);
-                var headerSubtitle = FindViewById<AppCompatTextView>(Resource.Id.nav_header_subtitle);
+                    navHeaderTitleTextView.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
+                    navHeaderSubtitleTextView.Text = $"{ci?.Username}@{ci?.Hostname}:{ci?.Port}";
+                }, TaskScheduler.FromCurrentSynchronizationContext());
 
-                headerTitle.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
-                headerSubtitle.Text = $"{ci?.Username}@{ci?.Hostname}:{ci?.Port}";
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+                CommonConfig.Logger.Info($"Created {nameof(MainActivity)}");
+            }
+            else
+            {
+                CommonConfig.Logger.Info($"Restored {nameof(MainActivity)}");
+            }
         }
 
         protected override void OnPostCreate(Bundle savedInstanceState)
         {
             base.OnPostCreate(savedInstanceState);
+
             drawerToggle.DrawerIndicatorEnabled = SupportFragmentManager.BackStackEntryCount <= 1;
             drawerToggle.SyncState();
         }
@@ -150,14 +144,21 @@ namespace Mark5.Mobile.Droid.Views.Activity
         protected override void OnSaveInstanceState(Bundle outState)
         {
             base.OnSaveInstanceState(outState);
-            LastSelectedItemId = lastSelectedItem.ItemId;
+
+            stateFragment.State.NavHeaderTitle = navHeaderTitleTextView.Text;
+            stateFragment.State.NavHeaderSubtitle = navHeaderSubtitleTextView.Text;
+
+            stateFragment.State.LastSelectedItemId = lastSelectedItem.ItemId;
         }
 
         protected override void OnRestoreInstanceState(Bundle savedInstanceState)
         {
             base.OnRestoreInstanceState(savedInstanceState);
 
-            var menuItemId = LastSelectedItemId;
+            navHeaderTitleTextView.Text = stateFragment.State.NavHeaderTitle;
+            navHeaderSubtitleTextView.Text = stateFragment.State.NavHeaderSubtitle;
+
+            var menuItemId = stateFragment.State.LastSelectedItemId;
             var menuItem = navigationView.Menu.FindItem(menuItemId);
             lastSelectedItem = menuItem;
         }
@@ -165,6 +166,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
         public override void OnConfigurationChanged(Android.Content.Res.Configuration newConfig)
         {
             base.OnConfigurationChanged(newConfig);
+
             drawerToggle.OnConfigurationChanged(newConfig);
         }
 
@@ -174,13 +176,15 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
         public bool OnNavigationItemSelected(IMenuItem menuItem)
         {
+            CommonConfig.Logger.Info($"Switching to {menuItem.TitleFormatted}...");
+
             drawerToggle.RunWhenIdle(() =>
             {
                 if (lastSelectedItem != menuItem)
                 {
                     if (lastSelectedItem != null)
                     {
-                        MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
+                        stateFragment.State.MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
                     }
 
                     if (SupportFragmentManager.BackStackEntryCount > 0)
@@ -188,7 +192,7 @@ namespace Mark5.Mobile.Droid.Views.Activity
                         SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int)Android.App.PopBackStackFlags.Inclusive);
                     }
 
-                    MenuItemContents[menuItem.ItemId].RestoreOrCreate(SupportFragmentManager);
+                    stateFragment.State.MenuItemContents[menuItem.ItemId].RestoreOrCreate(SupportFragmentManager);
 
                     lastSelectedItem = menuItem;
                 }
@@ -227,6 +231,10 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
         class MainActivityState
         {
+
+            public string NavHeaderTitle { get; set; }
+
+            public string NavHeaderSubtitle { get; set; }
 
             public int LastSelectedItemId { get; set; }
 

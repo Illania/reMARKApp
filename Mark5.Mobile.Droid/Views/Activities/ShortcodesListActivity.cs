@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: DocumentsListActivity.cs
+// File: ShortcodesListActivity.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -19,7 +19,7 @@ namespace Mark5.Mobile.Droid.Views.Activities
 {
 
     [Activity]
-    public class DocumentsListActivity : BaseAppCompatActivity
+    public class ShortcodesListActivity : BaseAppCompatActivity
     {
 
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
@@ -30,9 +30,9 @@ namespace Mark5.Mobile.Droid.Views.Activities
         {
             base.OnCreate(savedInstanceState);
 
-            CommonConfig.Logger.Info($"Creating {nameof(DocumentsListActivity)}...");
+            CommonConfig.Logger.Info($"Creating {nameof(ShortcodesListActivity)}...");
 
-            SetTitle(Resource.String.documents);
+            SetTitle(Resource.String.shortcodes);
             SetContentView(Resource.Layout.base_layout);
 
             toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
@@ -43,18 +43,18 @@ namespace Mark5.Mobile.Droid.Views.Activities
             {
                 var folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                var dlf = new DocumentsListFragment
+                var dlf = new ShortcodesListFragment
                 {
                     Folder = folder
                 };
                 ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
                 ft.Commit();
 
-                CommonConfig.Logger.Info($"Created {nameof(DocumentsListActivity)}");
+                CommonConfig.Logger.Info($"Created {nameof(ShortcodesListActivity)}");
             }
             else
             {
-                CommonConfig.Logger.Info($"Restored {nameof(DocumentsListActivity)}");
+                CommonConfig.Logger.Info($"Restored {nameof(ShortcodesListActivity)}");
             }
         }
 
