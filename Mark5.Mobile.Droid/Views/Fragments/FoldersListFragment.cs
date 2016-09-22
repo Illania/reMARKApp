@@ -607,24 +607,18 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 var isFolderSubscribed = folder.Subscribed;
                 var isFolderAvailableOffline = AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderOfflineAsync(folder.Module, folder));
 
-                fh.FolderNameSubTitle.Text = string.Empty;
+                var subtitleStrings = new List<string>();
                 if (isFolderSubscribed)
                 {
-                    fh.FolderNameSubTitle.Text += "/SUBSCRIBED";
+                    subtitleStrings.Add("Notifications On");
                 }
                 if (isFolderAvailableOffline)
                 {
-                    fh.FolderNameSubTitle.Text += "/OFFLINE";
+                    subtitleStrings.Add("Available Offline");
                 }
 
-                if (!string.IsNullOrEmpty(fh.FolderNameSubTitle.Text))
-                {
-                    fh.FolderNameSubTitle.Visibility = ViewStates.Visible;
-                }
-                else
-                {
-                    fh.FolderNameSubTitle.Visibility = ViewStates.Gone;
-                }
+                fh.FolderNameSubTitle.Text = string.Join(", ", subtitleStrings);
+                fh.FolderNameSubTitle.Visibility = !string.IsNullOrEmpty(fh.FolderNameSubTitle.Text) ? ViewStates.Visible : ViewStates.Gone;
 
                 fh.ExpandButton.Visibility = folder.HasSubFolders ? ViewStates.Visible : ViewStates.Gone;
                 if (folder.InternalType == FolderInternalType.Worktray)
@@ -650,22 +644,35 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 var sh = holder as SectionViewHolder;
                 var section = SectionsPositionToSection()[position];
-                string title = string.Empty;
 
-                switch (section)
+                if (foldersInSection[section].Any())
                 {
-                    case Section.Favourites:
-                        title = "Favourites";
-                        break;
-                    case Section.Remote:
-                        title = "Remote";
-                        break;
-                    case Section.Local:
-                        title = "Local";
-                        break;
-                }
+                    string title = string.Empty;
 
-                sh.SectionTitle.Text = title;
+                    switch (section)
+                    {
+                        case Section.Favourites:
+                            title = "Favourites";
+                            break;
+                        case Section.Remote:
+                            title = "Remote";
+                            break;
+                        case Section.Local:
+                            title = "Local";
+                            break;
+                    }
+
+                    sh.SectionTitle.Text = title;
+
+                    int height = ConversionUtils.ConvertDpToPixels(48); //TODO this could be computed also only once
+                    sh.ItemView.Visibility = ViewStates.Visible;
+                    sh.ItemView.LayoutParameters.Height = height;
+                }
+                else
+                {
+                    sh.ItemView.Visibility = ViewStates.Gone;
+                    sh.ItemView.LayoutParameters.Height = 0;
+                }
             }
         }
 
@@ -721,6 +728,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             var newItemCount = folders.Count;
             foldersInSection[section].AddRange(folders);
             NotifyItemRangeInserted(sectionPosition + offset, newItemCount);
+            if (sectionsInView.Count > 1)
+            {
+                NotifyItemChanged(sectionPosition);
+            }
         }
 
         public void RefreshFolder(Folder folder, bool? subscriptionEnabled = null)
@@ -867,6 +878,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public TextView FolderNameSubTitle { get; private set; }
         public ImageView FolderIcon { get; private set; }
         public View SelectedOverlay { get; private set; }
+        public FrameLayout FrameLayout { get; private set; }
 
         public event EventHandler<View> ExpandClicked = delegate { };
         public event EventHandler<View> ItemClicked = delegate { };
@@ -874,6 +886,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public FolderViewHolder(View itemView) : base(itemView)
         {
+            FrameLayout = itemView as FrameLayout;
+
             // Locate and cache view references
             ExpandButton = itemView.FindViewById<ImageButton>(Resource.Id.list_item_folder_expand);
             ExpandButton.Click += (sender, e) => { ExpandClicked(this, itemView); };

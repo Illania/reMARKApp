@@ -177,6 +177,7 @@
     <Compile Include="Views\Fragments\ContactsListFragment.cs" />
     <Compile Include="Views\Fragments\ShortcodesListFragment.cs" />
     <Compile Include="Views\Activities\ShortcodesListActivity.cs" />
+    <Compile Include="Utilities\ConversionUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
