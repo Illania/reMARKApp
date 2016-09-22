@@ -126,9 +126,10 @@ namespace Mark5.Mobile.Droid.Views.Activity
                 await Managers.DownloadManager.Start();
                 await Managers.OutgoingDocumentsManager.Start();
 
-                CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
-
+                CommonConfig.Logger.Info($"Refreshing reachability status...");
                 await CommonConfig.ReachabilityService.Refresh();
+
+                CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
                 PlatformConfig.ReachabilityBroadcastReceiver.Register();
 
                 CommonConfig.Logger.Info("Retrieving system settings...");

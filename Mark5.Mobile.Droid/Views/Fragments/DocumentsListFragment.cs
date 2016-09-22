@@ -54,8 +54,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         AutoRefreshWorker autoRefreshWorker;
 
+        #region Fragment overrides
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            CommonConfig.Logger.Info($"Creating {nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
@@ -129,6 +133,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             searchView.SetOnCloseListener(this);
         }
 
+        #endregion
+
+        #region RetainableStateFragment overrides
+
         public override IRetainableState OnRetainInstanceState()
         {
             return new DocumentsListFragmentState
@@ -161,8 +169,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(DocumentsListFragment)} [FolderId={Folder.Id}, FolderName={Folder.Name}]";
+            return $"{nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]";
         }
+
+        #endregion
+
+        #region Refreshing
 
         async Task AutoRefreshData(int endId)
         {
@@ -177,6 +189,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
                 if (documents.Count > 0)
                 {
+                    Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
+
                     Activity?.RunOnUiThread(() =>
                     {
                         adapter?.PrependItems(documents);
@@ -208,11 +222,13 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 }
 
                 var documentPreviews = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, startId, endId);
+
+                Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
                 adapter.AppendItems(documentPreviews);
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Downloading documents failed [folder.Name={Folder?.Name}, folder.id={Folder?.Id}, startId={startId}, endId={endId}, force={force}]", ex);
+                CommonConfig.Logger.Error($"Downloading documents failed [folder.name={Folder?.Name}, folder.id={Folder?.Id}, startId={startId}, endId={endId}, force={force}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
@@ -222,6 +238,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 refreshing = false;
             }
         }
+
+        #endregion
+
+        #region Adapter callbacks
 
         void Adapter_ItemClicked(object sender, DocumentPreview documentPreview)
         {
@@ -255,6 +275,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             Adapter_ItemClicked(sender, documentPreview);
         }
+
+        #endregion
+
+        #region Action mode
 
         public bool OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
@@ -327,6 +351,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             actionMode = null;
         }
 
+        #endregion
+
+        #region Filtering
+
         void View.IOnClickListener.OnClick(View v)
         {
             if (v == searchView)
@@ -394,6 +422,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             return false;
         }
 
+        #endregion
+
+        #region State
+
         class DocumentsListFragmentState : IRetainableState
         {
 
@@ -403,6 +435,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             public List<DocumentPreview> SelectedDocumentPreviews { get; set; }
         }
+
+        #endregion
 
         #region RecyclerView Adapter/ViewHolder
 

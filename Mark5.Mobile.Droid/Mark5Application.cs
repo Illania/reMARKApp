@@ -28,7 +28,7 @@ namespace Mark5.Mobile.Droid
         public Mark5Application(IntPtr javaReference, JniHandleOwnership transfer)
             : base(javaReference, transfer)
         {
-            ThreadPool.SetMinThreads(25, 25);
+            ThreadPool.SetMinThreads(50, 50);
             ThreadPool.SetMaxThreads(100, 100);
         }
 
