@@ -299,32 +299,20 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                     RefreshFavorites(true).Wait();
                     return true;
                 case MenuItemActions.EnableOffline:
-                    Task.Run(async () =>
-                    {
-                        await SetFolderOfflineStatusForSelection(true);
-                        mode.Finish();
-                    });
+                    SetFolderOfflineStatusForSelection(true);
+                    mode.Finish();
                     return true;
                 case MenuItemActions.DisableOffline:
-                    Task.Run(async () =>
-                    {
-                        await SetFolderOfflineStatusForSelection(false);
-                        mode.Finish();
-                    });
+                    SetFolderOfflineStatusForSelection(false);
+                    mode.Finish();
                     return true;
                 case MenuItemActions.Subscribe:
-                    Task.Run(async () =>
-                    {
-                        await SetFoldersSubscriptionToSelection(true);
-                        mode.Finish();
-                    });
+                    SetFoldersSubscriptionToSelection(true);
+                    mode.Finish();
                     return true;
                 case MenuItemActions.Unsubscribe:
-                    Task.Run(async () =>
-                    {
-                        await SetFoldersSubscriptionToSelection(false);
-                        mode.Finish();
-                    });
+                    SetFoldersSubscriptionToSelection(false);
+                    mode.Finish();
                     return true;
                 default:
                     return false;
@@ -385,7 +373,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         #region Folder actions
 
-        async Task SetFoldersSubscriptionToSelection(bool enabled)
+        void SetFoldersSubscriptionToSelection(bool enabled)
         {
             var selectedFolders = adapter.GetSelectedItems().ToList();
             if (!selectedFolders.Any())
@@ -396,29 +384,36 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             var token = PlatformConfig.Preferences.PushNotificationToken;
             if (string.IsNullOrEmpty(token))
             {
-                Activity.RunOnUiThread(() => Dialogs.ShowConfirmDialog(this.Activity, Resource.String.subscription_token_missing_title, Resource.String.subscription_token_missing_content));
+                Dialogs.ShowConfirmDialog(Activity, Resource.String.subscription_token_missing_title, Resource.String.subscription_token_missing_content);
                 return;
             }
 
             var module = selectedFolders.First().Module;
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(this.Activity, enabled ? Resource.String.subscribing_folders : Resource.String.unsubscribing_folders, Resource.String.please_wait);
 
-            try
+            Task.Run(async () =>
             {
                 await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, module, selectedFolders, enabled);
-                dismissAction();
-                Activity.RunOnUiThread(() => adapter.RefreshFolders(selectedFolders, enabled));
-            }
-            catch (Exception ex)
-            {
-                dismissAction();
 
-                CommonConfig.Logger.Error($"{(enabled ? "Subscription" : "Unsubscription")}  failed", ex);
-                await Dialogs.ShowErrorDialogAsync(Activity, ex);
-            }
+            }).ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                {
+                    dismissAction();
+
+                    CommonConfig.Logger.Error($"{(enabled ? "Subscription" : "Unsubscription")}  failed", t.Exception);
+                    Dialogs.ShowErrorDialog(Activity, t.Exception);
+                }
+                else
+                {
+                    dismissAction();
+                    adapter.RefreshFolders(selectedFolders, enabled);
+                }
+
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        async Task SetFolderOfflineStatusForSelection(bool offline)
+        void SetFolderOfflineStatusForSelection(bool offline)
         {
             var selectedFolders = adapter.GetSelectedItems().ToList();
             if (!selectedFolders.Any())
@@ -426,22 +421,31 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 return;
             }
 
-            var updatedFolders = new List<Folder>();
-            foreach (var folder in selectedFolders)
+            Task.Run(async () =>
             {
-                if (offline)
+                foreach (var folder in selectedFolders)
                 {
-                    await Managers.FoldersManager.AddOfflineFolderAsync(folder.Module, folder);
+                    if (offline)
+                    {
+                        await Managers.FoldersManager.AddOfflineFolderAsync(folder.Module, folder);
+                    }
+                    else
+                    {
+                        await Managers.FoldersManager.RemoveOfflineFolderAsync(folder.Module, folder);
+                    }
+                }
+            }).ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                {
+                    CommonConfig.Logger.Error($"Error while changing offline status for folders", t.Exception);
+                    Dialogs.ShowErrorDialog(Activity, t.Exception);
                 }
                 else
                 {
-                    await Managers.FoldersManager.RemoveOfflineFolderAsync(folder.Module, folder);
+                    adapter.RefreshFolders(selectedFolders);
                 }
-
-                updatedFolders.Add(Folder);
-            }
-
-            Activity.RunOnUiThread(() => adapter.RefreshFolders(updatedFolders));
+            });
         }
 
         void SetFolderFavouriteStatusForSelection(bool favourite)

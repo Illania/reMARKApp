@@ -93,7 +93,6 @@ namespace Mark5.Mobile.Droid.Views.Activity
 
                 var registrationIntent = new Intent(this, typeof(RegistrationIntentService));
                 StartService(registrationIntent);
-            }
 
                 Task.Run(async () =>
                 {
