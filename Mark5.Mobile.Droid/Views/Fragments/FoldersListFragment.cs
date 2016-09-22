@@ -249,12 +249,22 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
             else
             {
+                if (adapter.GetItemAtPosition(position).Local)
+                {
+                    return;
+                }
+
                 ToggleSelection(position);
             }
         }
 
         void Adapter_ItemLongClicked(object sender, int position)
         {
+            if (adapter.GetItemAtPosition(position).Local)
+            {
+                return;
+            }
+
             if (actionMode == null)
             {
                 actionMode = Activity.StartActionMode(this);
@@ -277,7 +287,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 actionMode.Title = selectedItemsCount.ToString();
                 actionMode.Invalidate();
             }
-
         }
 
         #endregion

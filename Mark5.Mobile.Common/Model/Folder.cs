@@ -42,6 +42,15 @@ namespace Mark5.Mobile.Common.Model
         [Column("HasSubFolders")]
         public bool HasSubFolders { get; set; }
 
+        [Ignore]
+        public bool Local
+        {
+            get
+            {
+                return documenstLocalRootFolder.SubFolders.Contains(this);
+            }
+        }
+
         List<Folder> subFolders;
 
         [Ignore]
