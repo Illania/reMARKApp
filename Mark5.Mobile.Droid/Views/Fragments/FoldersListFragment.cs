@@ -293,20 +293,32 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                     RefreshFavorites(true).Wait();
                     return true;
                 case MenuItemActions.EnableOffline:
-                    SetFolderOfflineStatusForSelection(true);
-                    mode.Finish();
+                    Task.Run(async () =>
+                    {
+                        await SetFolderOfflineStatusForSelection(true);
+                        mode.Finish();
+                    });
                     return true;
                 case MenuItemActions.DisableOffline:
-                    SetFolderOfflineStatusForSelection(false);
-                    mode.Finish();
+                    Task.Run(async () =>
+                    {
+                        await SetFolderOfflineStatusForSelection(false);
+                        mode.Finish();
+                    });
                     return true;
                 case MenuItemActions.Subscribe:
-                    SetFoldersSubscriptionToSelection(true);
-                    mode.Finish();
+                    Task.Run(async () =>
+                    {
+                        await SetFoldersSubscriptionToSelection(true);
+                        mode.Finish();
+                    });
                     return true;
                 case MenuItemActions.Unsubscribe:
-                    SetFoldersSubscriptionToSelection(false);
-                    mode.Finish();
+                    Task.Run(async () =>
+                    {
+                        await SetFoldersSubscriptionToSelection(false);
+                        mode.Finish();
+                    });
                     return true;
                 default:
                     return false;
@@ -378,7 +390,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             var token = PlatformConfig.Preferences.PushNotificationToken;
             if (string.IsNullOrEmpty(token))
             {
-                await Dialogs.ShowConfirmDialogAsync(this.Activity, Resource.String.subscription_token_missing_title, Resource.String.subscription_token_missing_content);
+                Activity.RunOnUiThread(() => Dialogs.ShowConfirmDialog(this.Activity, Resource.String.subscription_token_missing_title, Resource.String.subscription_token_missing_content));
                 return;
             }
 
@@ -389,10 +401,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, module, selectedFolders, enabled);
                 dismissAction();
-                selectedFolders.ForEach(f =>
-                {
-                    adapter.RefreshFolder(f, enabled);
-                });
+                Activity.RunOnUiThread(() => adapter.RefreshFolders(selectedFolders, enabled));
             }
             catch (Exception ex)
             {
@@ -411,6 +420,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 return;
             }
 
+            var updatedFolders = new List<Folder>();
             foreach (var folder in selectedFolders)
             {
                 if (offline)
@@ -420,10 +430,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 else
                 {
                     await Managers.FoldersManager.RemoveOfflineFolderAsync(folder.Module, folder);
-
                 }
-                adapter.RefreshFolder(folder);
+
+                updatedFolders.Add(Folder);
             }
+
+            Activity.RunOnUiThread(() => adapter.RefreshFolders(updatedFolders));
         }
 
         void SetFolderFavouriteStatusForSelection(bool favourite)
@@ -708,6 +720,14 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                     var sectionPosition = sectionsPositionToSection.FirstOrDefault(c => c.Value == section).Key;
                     NotifyItemChanged(sectionPosition + index + offset);
                 }
+            }
+        }
+
+        public void RefreshFolders(List<Folder> folders, bool? subscriptionEnabled = null)
+        {
+            foreach (var folder in folders)
+            {
+                RefreshFolder(folder, subscriptionEnabled);
             }
         }
 
