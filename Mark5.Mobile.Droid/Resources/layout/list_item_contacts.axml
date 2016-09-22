@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
-        android:background="?android:attr/colorControlActivated" />
+        android:background="@color/lightbrown" />
     <android.support.v7.widget.LinearLayoutCompat
         android:id="@+id/list_item_contact_internal_Layout"
         android:layout_width="match_parent"
@@ -20,7 +20,7 @@
         android:paddingRight="16dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:background="?android:attr/selectableItemBackground">
+        android:background="?attr/selectableItemBackground">
         <android.support.v7.widget.LinearLayoutCompat
             android:id="@+id/list_item_contact_categories"
             android:layout_width="4dp"
