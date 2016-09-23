@@ -387,22 +387,19 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             menu.Clear();
 
-            var areAllSelectedFoldersFavourites = selectedFolders.All(f => AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderFavouriteAsync(f.Module, f)));
-            var favoritesString = areAllSelectedFoldersFavourites ? "Remove from favourites" : "Add to favourites";
-
-            menu.Add(Menu.None, areAllSelectedFoldersFavourites ? MenuItemActions.RemoveFromFavourites : MenuItemActions.AddToFavourites, Menu.None, favoritesString).SetShowAsAction(ShowAsAction.Never);
+            menu.Add(Menu.None, MenuItemActions.AddToFavourites, MenuItemActions.AddToFavourites, "Add to favourites").SetShowAsAction(ShowAsAction.Never);
+            menu.Add(Menu.None, MenuItemActions.RemoveFromFavourites, MenuItemActions.RemoveFromFavourites, "Remove from favourites").SetShowAsAction(ShowAsAction.Never);
 
             if (section != Section.Favourites)
             {
-                var areAllSelectedFolderOffline = selectedFolders.All(f => AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderOfflineAsync(f.Module, f)));
-                var offlineString = areAllSelectedFolderOffline ? "Disable offline mode" : "Enable offline mode";
-                menu.Add(Menu.None, areAllSelectedFolderOffline ? MenuItemActions.DisableOffline : MenuItemActions.EnableOffline, Menu.None, offlineString).SetShowAsAction(ShowAsAction.Never);
+                menu.Add(Menu.None, MenuItemActions.EnableOffline, MenuItemActions.EnableOffline, "Enable offline mode").SetShowAsAction(ShowAsAction.Never);
+                menu.Add(Menu.None, MenuItemActions.DisableOffline, MenuItemActions.DisableOffline, "Disable offline mode").SetShowAsAction(ShowAsAction.Never);
 
                 if (Folder.Module == ModuleType.Documents)
                 {
-                    var areAllSelectedFoldersSubscribed = selectedFolders.All(f => f.Subscribed);
-                    var subscriptionString = areAllSelectedFoldersSubscribed ? "Unsubscribe" : "Subscribe";
-                    menu.Add(Menu.None, areAllSelectedFoldersSubscribed ? MenuItemActions.Unsubscribe : MenuItemActions.Subscribe, Menu.None, subscriptionString).SetShowAsAction(ShowAsAction.Never);
+                    menu.Add(Menu.None, MenuItemActions.Subscribe, MenuItemActions.Subscribe, "Subscribe").SetShowAsAction(ShowAsAction.Never);
+                    menu.Add(Menu.None, MenuItemActions.Unsubscribe, MenuItemActions.Unsubscribe, "Unsubscribe").SetShowAsAction(ShowAsAction.Never);
+
                 }
             }
             return true;
@@ -415,12 +412,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         static class MenuItemActions
         {
-            public const int AddToFavourites = 0;
-            public const int RemoveFromFavourites = 1;
-            public const int Subscribe = 2;
-            public const int Unsubscribe = 3;
-            public const int EnableOffline = 4;
-            public const int DisableOffline = 5;
+            public const int AddToFavourites = 10;
+            public const int RemoveFromFavourites = 20;
+            public const int Subscribe = 30;
+            public const int Unsubscribe = 40;
+            public const int EnableOffline = 50;
+            public const int DisableOffline = 60;
         }
 
         #endregion
@@ -583,7 +580,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         List<Folder> GetMatchingFolders(string query)
         {
-            var flattenedFolders = Folder.SubFolders.Flatten(f => f.SubFolders);
+            var folder = Folder.RootPerModule(Folder.Module);
+            var flattenedFolders = folder.SubFolders.Flatten(f => f.SubFolders);
             return flattenedFolders.Where(f => f.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0).ToList();
         }
 
@@ -629,6 +627,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
     public enum Section
     {
+        None,
         Favourites,
         Remote,
         Local,
@@ -658,9 +657,6 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public FolderListAdapter(RecyclerView parentRecyclerView)
         {
             parentView = parentRecyclerView;
-            foldersInSection[Section.Favourites] = new List<Folder>();
-            foldersInSection[Section.Remote] = new List<Folder>();
-            foldersInSection[Section.Local] = new List<Folder>();
             sectionHeight = ConversionUtils.ConvertDpToPixels(48);
         }
 
@@ -707,22 +703,32 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 fh.FolderNameTitle.Text = folder.Name;
 
                 var isFolderSubscribed = folder.Subscribed;
-                var isFolderAvailableOffline = AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderOfflineAsync(folder.Module, folder));
 
-                var subtitleStrings = new List<string>();
-                if (isFolderSubscribed)
+                var sectionForPosition = GetSectionForPosition(position);
+                if (sectionForPosition == Section.Favourites || sectionForPosition == Section.None)
                 {
-                    subtitleStrings.Add("Notifications On");
+                    fh.FolderNameSubTitle.Text = folder.Path;
                 }
-                if (isFolderAvailableOffline)
+                else
                 {
-                    subtitleStrings.Add("Available Offline");
+                    var isFolderAvailableOffline = AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderOfflineAsync(folder.Module, folder));
+
+                    var subtitleStrings = new List<string>();
+                    if (isFolderSubscribed)
+                    {
+                        subtitleStrings.Add("Notifications On");
+                    }
+                    if (isFolderAvailableOffline)
+                    {
+                        subtitleStrings.Add("Available Offline");
+                    }
+
+                    fh.FolderNameSubTitle.Text = string.Join(", ", subtitleStrings);
                 }
 
-                fh.FolderNameSubTitle.Text = string.Join(", ", subtitleStrings);
                 fh.FolderNameSubTitle.Visibility = !string.IsNullOrEmpty(fh.FolderNameSubTitle.Text) ? ViewStates.Visible : ViewStates.Gone;
 
-                fh.ExpandButton.Visibility = folder.HasSubFolders ? ViewStates.Visible : ViewStates.Gone;
+                fh.ExpandButton.Visibility = (folder.HasSubFolders && sectionForPosition != Section.None) ? ViewStates.Visible : ViewStates.Gone;
                 if (folder.InternalType == FolderInternalType.Worktray)
                 {
                     fh.FolderIcon.SetImageResource(Resource.Drawable.folder_worktray);
@@ -963,6 +969,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public void SetSections(List<Section> availableSections)
         {
             sectionsInView = availableSections;
+            sectionsInView.ForEach(s => foldersInSection[s] = new List<Folder>());
             NotifyDataSetChanged();
         }
 
@@ -1006,21 +1013,21 @@ namespace Mark5.Mobile.Droid.Views.Fragments
     {
         public SearchFolderListAdapter(RecyclerView parentRecyclerView) : base(parentRecyclerView)
         {
-            sectionsInView = new List<Section> { Section.Remote };
+            sectionsInView = new List<Section> { Section.None };
+            foldersInSection[Section.None] = new List<Folder>();
         }
 
         public void Clear()
         {
-            var itemCount = foldersInSection[Section.Remote].Count;
-            foldersInSection[Section.Remote].Clear();
+            var itemCount = foldersInSection[Section.None].Count;
+            foldersInSection[Section.None].Clear();
             NotifyItemRangeRemoved(0, itemCount);
         }
 
         public void RefreshSearch(List<Folder> folders)
         {
-            Refresh(folders, Section.Remote);
+            Refresh(folders, Section.None);
         }
-
     }
 
     #endregion

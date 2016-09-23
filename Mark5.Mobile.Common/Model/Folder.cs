@@ -17,6 +17,7 @@ namespace Mark5.Mobile.Common.Model
     [Table("Folder")]
     public class Folder : ICopiable<Folder>
     {
+        public const string PathSeparator = "/";
 
         [Column("Id"), PrimaryKey]
         public int Id { get; set; } = -1;
@@ -41,6 +42,9 @@ namespace Mark5.Mobile.Common.Model
 
         [Column("HasSubFolders")]
         public bool HasSubFolders { get; set; }
+
+        [Column("Path")]
+        public string Path { get; set; }
 
         [Ignore]
         public bool Local
@@ -113,6 +117,7 @@ namespace Mark5.Mobile.Common.Model
                 HasSubFolders = HasSubFolders,
                 Subscribed = Subscribed,
                 Position = Position,
+                Path = Path,
                 OptionalParameters = OptionalParameters?.ShallowCopy()
             };
         }

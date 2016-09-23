@@ -215,9 +215,11 @@ namespace Mark5.Mobile.Common.Managers
 
         void ProcessFolders(List<Folder> folders, Folder parentFolder)
         {
+            var parentPath = parentFolder.Root ? string.Empty : parentFolder.Path;
             foreach (var folder in folders)
             {
                 folder.ParentFolderId = parentFolder?.Id ?? 0;
+                folder.Path = parentPath + Folder.PathSeparator + folder.Name;
                 if (folder.HasSubFolders && folder.SubFolders.Count > 0)
                 {
                     ProcessFolders(folder.SubFolders, folder);
