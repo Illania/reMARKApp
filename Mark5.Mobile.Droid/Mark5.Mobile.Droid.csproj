@@ -293,6 +293,7 @@
     <AndroidResource Include="Resources\layout\list_item_contacts.axml" />
     <AndroidResource Include="Resources\drawable\circle.axml" />
     <AndroidResource Include="Resources\layout\list_item_shortcodes.axml" />
+    <AndroidResource Include="Resources\values\plurals.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

@@ -27,6 +27,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Views.Common;
 using Android.Support.Design.Widget;
+using Android.Support.V4.Content;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
@@ -44,6 +45,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         bool refreshing;
 
+        CoordinatorLayout coordinatorLayout;
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         DocumentsListAdapter adapter;
@@ -62,6 +64,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             CommonConfig.Logger.Info($"Creating {nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
+
+            coordinatorLayout = (CoordinatorLayout)container.Parent;
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
             refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
@@ -215,6 +219,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 if (documents.Count > 0)
                 {
                     CommonConfig.Logger.Info($"Received {documents.Count} new documents");
+
+                    Snackbar.Make(coordinatorLayout, Resources.GetQuantityString(Resource.Plurals.new_documents_received, documents.Count, documents.Count), Snackbar.LengthShort).Show();
 
                     Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
 

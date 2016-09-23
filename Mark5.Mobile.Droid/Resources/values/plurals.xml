@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+	<plurals name="new_documents_received">
+		<item quantity="one">%1$d new document received.</item>
+		<item quantity="other">%1$d new documents received.</item>
+	</plurals>
+</resources>
