@@ -46,6 +46,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
+            refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
             refreshLayout.Refresh += RefreshLayout_Refresh;
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recyclerView);
