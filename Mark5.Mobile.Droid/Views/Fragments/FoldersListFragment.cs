@@ -55,7 +55,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             recyclerView.SetItemAnimator(new DefaultItemAnimator());
             recyclerView.HasFixedSize = true;
 
-            adapter = new FirstFolderListAdapter(recyclerView);
+            adapter = new FolderListAdapter(recyclerView);
             adapter.ExpandIconClicked += Adapter_ExpandClicked;
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
@@ -347,7 +347,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
         {
-            adapter.ClearSelection();
+            adapter.ClearSelections();
             actionMode = null;
         }
 
@@ -552,7 +552,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
     #region RecyclerView Adapter
 
-    class FirstFolderListAdapter : RecyclerView.Adapter
+    class FolderListAdapter : RecyclerView.Adapter
     {
         public static class ViewType
         {
@@ -570,7 +570,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public event EventHandler<int> ItemClicked = delegate { };
         public event EventHandler<int> ItemLongClicked = delegate { };
 
-        public FirstFolderListAdapter(RecyclerView parentRecyclerView)
+        public FolderListAdapter(RecyclerView parentRecyclerView)
         {
             parentView = parentRecyclerView;
             foldersInSection[Section.Favourites] = new List<Folder>();
@@ -777,7 +777,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
         }
 
-        public void ClearSelection()
+        public void ClearSelections()
         {
             var selectedItemPositionsCopy = new List<int>(selectedItemPositions);
             selectedItemPositions.Clear();
@@ -866,7 +866,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public void SetSelection(List<int> positionList)
         {
-            ClearSelection();
+            ClearSelections();
             selectedItemPositions.Clear();
             foreach (var position in positionList)
             {
