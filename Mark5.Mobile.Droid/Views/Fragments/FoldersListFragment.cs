@@ -16,7 +16,6 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
-using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
@@ -32,6 +31,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         Folder FavouriteRootFolder;
 
         FirstFolderListAdapter adapter;
+        FirstFolderListAdapter searchAdapter;
+        SearchView searchView;
         RecyclerView recyclerView;
         SwipeRefreshLayout refreshLayout;
         ActionMode actionMode;
@@ -108,7 +109,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
             if (availableSections.Contains(Section.Favourites))
             {
-                await RefreshFavorites(forceRefresh);
+                await RefreshFavorites();
             }
             if (availableSections.Contains(Section.Local))
             {
@@ -141,24 +142,19 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             }
         }
 
-        async Task RefreshFavorites(bool forceRefresh = false) //TODO do we need try cach also here?
+        async Task RefreshFavorites()
         {
             if (FavouriteRootFolder == null)
             {
                 FavouriteRootFolder = Folder.RootPerModule(Folder.Module, true);
             }
-            if (forceRefresh || !FavouriteRootFolder.SubFolders.Any())
-            {
-                var folders = await Managers.FoldersManager.GetFavoriteFoldersAsync(Folder.Module);
-                FavouriteRootFolder.SubFolders.Clear();
-                FavouriteRootFolder.SubFolders = folders;
 
-                adapter.Refresh(folders, Section.Favourites);
-            }
-            else
-            {
-                adapter.Refresh(FavouriteRootFolder.SubFolders, Section.Favourites);
-            }
+            var folders = await Managers.FoldersManager.GetFavoriteFoldersAsync(Folder.Module);
+            FavouriteRootFolder.SubFolders.Clear();
+            FavouriteRootFolder.SubFolders = folders;
+
+            adapter.Refresh(folders, Section.Favourites);
+
         }
 
         void RefreshLocal()
@@ -254,6 +250,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                     return;
                 }
 
+                var sectionForSelectedItems = adapter.GetSectionForSelectedItems();
+                if (sectionForSelectedItems != null && sectionForSelectedItems != adapter.GetSectionForPosition(position))
+                {
+                    return;
+                }
+
                 ToggleSelection(position);
             }
         }
@@ -261,6 +263,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         void Adapter_ItemLongClicked(object sender, int position)
         {
             if (adapter.GetItemAtPosition(position).Local)
+            {
+                return;
+            }
+
+            var sectionForSelectedItems = adapter.GetSectionForSelectedItems();
+            if (sectionForSelectedItems != null && sectionForSelectedItems != adapter.GetSectionForPosition(position))
             {
                 return;
             }
@@ -295,37 +303,40 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         bool ActionMode.ICallback.OnActionItemClicked(ActionMode mode, IMenuItem item)
         {
+            bool favouritesAction = false;
+
             switch (item.ItemId)
             {
                 case MenuItemActions.AddToFavourites:
                     SetFolderFavouriteStatusForSelection(true);
-                    mode.Finish();
-                    RefreshFavorites(true).Wait();
-                    return true;
+                    favouritesAction = true;
+                    break;
                 case MenuItemActions.RemoveFromFavourites:
                     SetFolderFavouriteStatusForSelection(false);
-                    mode.Finish();
-                    RefreshFavorites(true).Wait();
-                    return true;
+                    favouritesAction = true;
+                    break;
                 case MenuItemActions.EnableOffline:
                     SetFolderOfflineStatusForSelection(true);
-                    mode.Finish();
-                    return true;
+                    break;
                 case MenuItemActions.DisableOffline:
                     SetFolderOfflineStatusForSelection(false);
-                    mode.Finish();
-                    return true;
+                    break;
                 case MenuItemActions.Subscribe:
                     SetFoldersSubscriptionToSelection(true);
-                    mode.Finish();
-                    return true;
+                    break;
                 case MenuItemActions.Unsubscribe:
                     SetFoldersSubscriptionToSelection(false);
-                    mode.Finish();
-                    return true;
-                default:
-                    return false;
+                    break;
             }
+
+            mode.Finish();
+
+            if (favouritesAction && availableSections.Contains(Section.Favourites))
+            {
+                RefreshFavorites().Wait();
+            }
+
+            return true;
         }
 
         bool ActionMode.ICallback.OnCreateActionMode(ActionMode mode, IMenu menu)
@@ -347,24 +358,28 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 return false;
             }
 
+            var section = adapter.GetSectionForSelectedItems();
+
             menu.Clear();
 
             var areAllSelectedFoldersFavourites = selectedFolders.All(f => AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderFavouriteAsync(f.Module, f)));
-            var areAllSelectedFolderOffline = selectedFolders.All(f => AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderOfflineAsync(f.Module, f)));
-
             var favoritesString = areAllSelectedFoldersFavourites ? "Remove from favourites" : "Add to favourites";
-            var offlineString = areAllSelectedFolderOffline ? "Disable offline mode" : "Enable offline mode";
-
-            if (Folder.Module == ModuleType.Documents)
-            {
-                var areAllSelectedFoldersSubscribed = selectedFolders.All(f => f.Subscribed);
-                var subscriptionString = areAllSelectedFoldersSubscribed ? "Unsubscribe" : "Subscribe";
-                menu.Add(Menu.None, areAllSelectedFoldersSubscribed ? MenuItemActions.Unsubscribe : MenuItemActions.Subscribe, Menu.None, subscriptionString).SetShowAsAction(ShowAsAction.Never);
-            }
 
             menu.Add(Menu.None, areAllSelectedFoldersFavourites ? MenuItemActions.RemoveFromFavourites : MenuItemActions.AddToFavourites, Menu.None, favoritesString).SetShowAsAction(ShowAsAction.Never);
-            menu.Add(Menu.None, areAllSelectedFolderOffline ? MenuItemActions.DisableOffline : MenuItemActions.EnableOffline, Menu.None, offlineString).SetShowAsAction(ShowAsAction.Never);
 
+            if (section != Section.Favourites)
+            {
+                var areAllSelectedFolderOffline = selectedFolders.All(f => AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderOfflineAsync(f.Module, f)));
+                var offlineString = areAllSelectedFolderOffline ? "Disable offline mode" : "Enable offline mode";
+                menu.Add(Menu.None, areAllSelectedFolderOffline ? MenuItemActions.DisableOffline : MenuItemActions.EnableOffline, Menu.None, offlineString).SetShowAsAction(ShowAsAction.Never);
+
+                if (Folder.Module == ModuleType.Documents)
+                {
+                    var areAllSelectedFoldersSubscribed = selectedFolders.All(f => f.Subscribed);
+                    var subscriptionString = areAllSelectedFoldersSubscribed ? "Unsubscribe" : "Subscribe";
+                    menu.Add(Menu.None, areAllSelectedFoldersSubscribed ? MenuItemActions.Unsubscribe : MenuItemActions.Subscribe, Menu.None, subscriptionString).SetShowAsAction(ShowAsAction.Never);
+                }
+            }
             return true;
         }
 
@@ -813,6 +828,41 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             NotifyItemChanged(position);
         }
 
+        public Section? GetSectionForSelectedItems()
+        {
+            if (selectedItemPositions.Any())
+            {
+                return GetSectionForPosition(selectedItemPositions.First());
+            }
+
+            return null;
+        }
+
+        public Section GetSectionForPosition(int position)
+        {
+            if (sectionsInView.Count == 1)
+            {
+                return sectionsInView[0];
+            }
+
+            var sectionPositions = SectionsPositionToSection();
+
+            Section currentSection = Section.Favourites;
+            foreach (var sectionPosition in sectionPositions.Keys)
+            {
+                if (position > sectionPosition)
+                {
+                    currentSection = sectionPositions[sectionPosition];
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return currentSection;
+        }
+
         public void SetSelection(List<int> positionList)
         {
             ClearSelection();
@@ -873,12 +923,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
     class FolderViewHolder : RecyclerView.ViewHolder
     {
-        public ImageButton ExpandButton { get; private set; }
-        public TextView FolderNameTitle { get; private set; }
-        public TextView FolderNameSubTitle { get; private set; }
-        public ImageView FolderIcon { get; private set; }
+        public AppCompatImageButton ExpandButton { get; private set; }
+        public AppCompatTextView FolderNameTitle { get; private set; }
+        public AppCompatTextView FolderNameSubTitle { get; private set; }
+        public AppCompatImageView FolderIcon { get; private set; }
         public View SelectedOverlay { get; private set; }
-        public FrameLayout FrameLayout { get; private set; }
+        public View FrameLayout { get; private set; }
 
         public event EventHandler<View> ExpandClicked = delegate { };
         public event EventHandler<View> ItemClicked = delegate { };
@@ -886,16 +936,16 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public FolderViewHolder(View itemView) : base(itemView)
         {
-            FrameLayout = itemView as FrameLayout;
+            FrameLayout = itemView;
 
             // Locate and cache view references
-            ExpandButton = itemView.FindViewById<ImageButton>(Resource.Id.list_item_folder_expand);
+            ExpandButton = itemView.FindViewById<AppCompatImageButton>(Resource.Id.list_item_folder_expand);
             ExpandButton.Click += (sender, e) => { ExpandClicked(this, itemView); };
 
-            FolderNameTitle = itemView.FindViewById<TextView>(Resource.Id.list_item_folder_name);
-            FolderNameSubTitle = itemView.FindViewById<TextView>(Resource.Id.list_item_folder_subtitle);
+            FolderNameTitle = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_folder_name);
+            FolderNameSubTitle = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_folder_subtitle);
 
-            FolderIcon = itemView.FindViewById<ImageView>(Resource.Id.list_item_folder_icon);
+            FolderIcon = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_folder_icon);
 
             var internalContainerLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_folder_internal_Layout);
             internalContainerLayout.Click += (sender, e) => ItemClicked(this, itemView);
@@ -907,12 +957,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
     class SectionViewHolder : RecyclerView.ViewHolder
     {
-        public TextView SectionTitle { get; private set; }
+        public AppCompatTextView SectionTitle { get; private set; }
 
         public SectionViewHolder(View itemView) : base(itemView)
         {
             // Locate and cache view references
-            SectionTitle = itemView as TextView;
+            SectionTitle = itemView as AppCompatTextView;
         }
     }
 
