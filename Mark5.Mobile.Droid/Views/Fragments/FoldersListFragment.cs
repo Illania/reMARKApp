@@ -649,6 +649,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         readonly RecyclerView parentView;
         readonly List<int> selectedItemPositions = new List<int>();
+        readonly int sectionHeight;
 
         public event EventHandler<int> ExpandIconClicked = delegate { };
         public event EventHandler<int> ItemClicked = delegate { };
@@ -660,6 +661,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             foldersInSection[Section.Favourites] = new List<Folder>();
             foldersInSection[Section.Remote] = new List<Folder>();
             foldersInSection[Section.Local] = new List<Folder>();
+            sectionHeight = ConversionUtils.ConvertDpToPixels(48);
         }
 
         public override int ItemCount
@@ -764,14 +766,13 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
                     sh.SectionTitle.Text = title;
 
-                    int height = ConversionUtils.ConvertDpToPixels(48); //TODO this could be computed also only once
                     sh.ItemView.Visibility = ViewStates.Visible;
-                    sh.ItemView.LayoutParameters.Height = height;
+                    sh.ItemView.LayoutParameters.Height = sectionHeight;
                 }
                 else
                 {
                     sh.ItemView.Visibility = ViewStates.Gone;
-                    sh.ItemView.LayoutParameters.Height = 0;
+                    sh.ItemView.LayoutParameters.Height = 1;
                 }
             }
         }
