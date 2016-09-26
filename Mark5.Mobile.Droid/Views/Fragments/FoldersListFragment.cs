@@ -48,6 +48,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            CommonConfig.Logger.Info($"Creating {nameof(FoldersListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
@@ -82,11 +84,15 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = Folder.Module.ToString();
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder.Root ? string.Empty : Folder.Name;
+
+            CommonConfig.Logger.Info($"Created {nameof(FoldersListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]");
         }
 
         public async override void OnResume()
         {
             base.OnResume();
+
+            CommonConfig.Logger.Info($"Resuming {nameof(FoldersListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
 
             SetSections();
             await RefreshData();
@@ -96,6 +102,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public override void OnPause()
         {
             base.OnPause();
+
+            CommonConfig.Logger.Info($"Pausing {nameof(FoldersListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+
             if (actionMode != null)
             {
                 actionMode.Finish();
@@ -120,7 +129,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         async Task RefreshData(bool forceRefresh = false)
         {
-            if (!Folder.HasSubFolders)
+            CommonConfig.Logger.Info($"Refreshing...");
+
+            if (!Folder.HasSubFolders || refreshLayout.Refreshing)
             {
                 return;
             }
@@ -145,6 +156,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         async Task RefreshOffline(bool forceRefresh = false)
         {
+            CommonConfig.Logger.Info($"Refreshing remote folders...");
+
             if (forceRefresh || !Folder.SubFolders.Any())
             {
                 try
@@ -157,29 +170,38 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 }
                 catch (Exception ex)
                 {
+                    CommonConfig.Logger.Error($"Downloading folders failed [folder.name={Folder.Name}, folder.id={Folder.Id}]", ex);
                     await Dialogs.ShowErrorDialogAsync(Activity, ex);
                 }
             }
             else
             {
+                CommonConfig.Logger.Info($"Folders already downloaded, refreshing views...");
+
                 adapter.Refresh(Folder.SubFolders, Section.Remote);
             }
         }
 
         async Task RefreshFavorites()
         {
+            CommonConfig.Logger.Info($"Refreshing favourite folders...");
+
             var folders = await Managers.FoldersManager.GetFavoriteFoldersAsync(Folder.Module);
             adapter.Refresh(folders, Section.Favourites);
         }
 
         void RefreshLocal()
         {
+            CommonConfig.Logger.Info($"Refreshing local folders...");
+
             var localRootFolder = Folder.LocalRootPerModule(Folder.Module);
             adapter.Refresh(localRootFolder.SubFolders, Section.Local);
         }
 
         void RestoreSelection()
         {
+            CommonConfig.Logger.Info("Restoring selected items");
+
             if (recoveredSelectedItemsPosition != null && recoveredSelectedItemsPosition.Any())
             {
                 actionMode = Activity.StartActionMode(this);
@@ -191,6 +213,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         void SetSections()
         {
+            CommonConfig.Logger.Info("Setting sections according to the folder");
+
             if (Folder.Root)
             {
                 availableSections = new List<Section> { Section.Favourites, Section.Remote };
@@ -414,6 +438,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 return;
             }
 
+            CommonConfig.Logger.Info($"Setting subscription status of {selectedFolders.Count} folders to {enabled}");
+
             var token = PlatformConfig.Preferences.PushNotificationToken;
             if (string.IsNullOrEmpty(token))
             {
@@ -457,6 +483,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 return;
             }
 
+            CommonConfig.Logger.Info($"Setting offline status of {selectedFolders.Count} folders to {offline}");
+
             Task.Run(async () =>
             {
                 foreach (var folder in selectedFolders)
@@ -495,6 +523,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 return;
             }
+
+            CommonConfig.Logger.Info($"Setting favourite status of {selectedFolders.Count} folders to {favourite}");
 
             Task.Run(async () =>
             {
@@ -602,6 +632,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
+            CommonConfig.Logger.Info($"Retaining state: [folderName={Folder.Name}, folderId={Folder.Id}, selectedItemsCount={adapter.SelectedItemPositions.Count} ]");
+
             return new FolderListFragmentState
             {
                 Folder = Folder,
@@ -616,6 +648,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 Folder = flfs.Folder;
                 recoveredSelectedItemsPosition = flfs.SelectedItemPositions;
+
+                CommonConfig.Logger.Info($"Restored state state: [folderName={Folder.Name}, folderId={Folder.Id}, selectedItemsCount={recoveredSelectedItemsPosition.Count} ]");
             }
         }
 
