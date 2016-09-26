@@ -52,4 +52,10 @@
 	<string name="categories">Categories</string>
 	<string name="delete_from_folder">Delete from folder</string>
 	<string name="delete">Delete</string>
+	<string name="subscribe_folder">Subscribe</string>
+	<string name="unsubscribe_folder">Unsubscribe</string>
+	<string name="add_favorites">Add to favourites</string>
+	<string name="remove_favorites">Remove from favourites</string>
+	<string name="add_offline">Enable offline mode</string>
+	<string name="remove_offline">Disable offline mode</string>
 </resources>
