@@ -24,7 +24,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         DescriptionSubview descriptionSubview;
 
-        List<IContactSubview> contactSubViews;
+        List<IContactSubview> contactSubViews = new List<IContactSubview>();
 
         public override Android.Views.View OnCreateView(Android.Views.LayoutInflater inflater, Android.Views.ViewGroup container, Android.OS.Bundle savedInstanceState)
         {

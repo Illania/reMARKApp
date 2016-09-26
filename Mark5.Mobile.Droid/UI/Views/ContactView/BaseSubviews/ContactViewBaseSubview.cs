@@ -19,10 +19,11 @@ namespace Mark5.Mobile.Droid.UI.Views.ContactView.BaseSubviews
 
         public ContactViewBaseSubview(Android.Content.Context context, Android.Util.IAttributeSet attrs) : base(context, attrs)
         {
-            Orientation = LinearLayoutCompat.Vertical;
+            Orientation = LinearLayoutCompat.Vertical; ;
+            SetPadding(20, 20, 20, 20); //TODO need to put right values (and in dp)
 
             titleTextView = new AppCompatTextView(context);
-            titleTextView.SetBackgroundColor(Android.Graphics.Color.AliceBlue);
+            titleTextView.SetTextAppearance(Resource.Style.contactFieldTitle);
             titleTextView.LayoutParameters = new LayoutParams(LayoutParams.MatchParent, LayoutParams.WrapContent);
             AddView(titleTextView);
         }

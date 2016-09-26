@@ -12,7 +12,7 @@ namespace Mark5.Mobile.Droid.UI.Views.ContactView.BaseSubviews
 {
     public class DescriptionSubview : ContactViewBaseTextSubview
     {
-        [Register("contactView.descriptionSubView")]
+        [Register("Mark5.Mobile.Droid.UI.Views.ContactView.BaseSubviews.DescriptionSubview")]
         public DescriptionSubview(Android.Content.Context context, Android.Util.IAttributeSet attrs) : base(context, attrs)
         {
         }

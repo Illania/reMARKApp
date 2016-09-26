@@ -17,6 +17,7 @@ namespace Mark5.Mobile.Droid.UI.Views.ContactView.BaseSubviews
         public ContactViewBaseTextSubview(Android.Content.Context context, Android.Util.IAttributeSet attrs) : base(context, attrs)
         {
             contentTextView = new AppCompatTextView(context);
+            contentTextView.SetTextAppearance(Resource.Style.contactFieldContent);
             contentTextView.LayoutParameters = new LayoutParams(LayoutParams.MatchParent, LayoutParams.WrapContent);
             AddView(contentTextView);
         }

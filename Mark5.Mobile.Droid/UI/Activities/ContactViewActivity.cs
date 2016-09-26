@@ -9,6 +9,7 @@ using System;
 using Android.App;
 using Android.OS;
 using Android.Support.V7.Widget;
+using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -58,6 +59,17 @@ namespace Mark5.Mobile.Droid.Views.Activities
             {
                 CommonConfig.Logger.Info($"Restored {nameof(ContactViewActivity)}");
             }
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == Android.Resource.Id.Home)
+            {
+                OnBackPressed();
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
         }
     }
 }
