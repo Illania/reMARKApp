@@ -145,35 +145,41 @@
     <Compile Include="Mark5Application.cs" />
     <Compile Include="Utilities\SSLCertificateVerificationManager.cs" />
     <Compile Include="Utilities\SimpleLogger.cs" />
-    <Compile Include="Views\Common\Dialogs.cs" />
+    <Compile Include="UI\Common\Dialogs.cs" />
     <Compile Include="Utilities\DeviceInfoProvider.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
-    <Compile Include="Views\Activities\LoginActivity.cs" />
-    <Compile Include="Views\Activities\SplashActivity.cs" />
+    <Compile Include="UI\Activities\LoginActivity.cs" />
+    <Compile Include="UI\Activities\SplashActivity.cs" />
     <Compile Include="Utilities\PortableConcurrentQueue.cs" />
-    <Compile Include="Views\Fragments\FoldersListFragment.cs" />
-    <Compile Include="Views\Activities\MainActivity.cs" />
-    <Compile Include="Views\Common\BaseAppCompatActivity.cs" />
-    <Compile Include="Views\Fragments\PreferenceFragment.cs" />
+    <Compile Include="UI\Fragments\FoldersListFragment.cs" />
+    <Compile Include="UI\Activities\MainActivity.cs" />
+    <Compile Include="UI\Common\BaseAppCompatActivity.cs" />
+    <Compile Include="UI\Fragments\PreferenceFragment.cs" />
     <Compile Include="Utilities\Preferences.cs" />
     <Compile Include="Utilities\Integration.cs" />
     <Compile Include="Utilities\Hockey\CustomCrashManagerListener.cs" />
     <Compile Include="Utilities\Hockey\CustomFeedbackManagerLister.cs" />
     <Compile Include="Utilities\Hockey\CustomFeedbackActivity.cs" />
-    <Compile Include="Views\Activities\DocumentsListActivity.cs" />
-    <Compile Include="Views\Common\RetainableStateFragment.cs" />
-    <Compile Include="Views\Fragments\DocumentsListFragment.cs" />
-    <Compile Include="Views\Common\RetainedFragment.cs" />
-    <Compile Include="Views\Common\SmoothActionBarDrawerToggle.cs" />
-    <Compile Include="Views\Common\DividerItemDecorator.cs" />
+    <Compile Include="UI\Activities\DocumentsListActivity.cs" />
+    <Compile Include="UI\Common\RetainableStateFragment.cs" />
+    <Compile Include="UI\Fragments\DocumentsListFragment.cs" />
+    <Compile Include="UI\Common\RetainedFragment.cs" />
+    <Compile Include="UI\Common\SmoothActionBarDrawerToggle.cs" />
+    <Compile Include="UI\Common\DividerItemDecorator.cs" />
     <Compile Include="ServerConfig.cs" />
     <Compile Include="Utilities\DateTimeUtils.cs" />
-    <Compile Include="Views\Common\ActionOnClickListener.cs" />
-    <Compile Include="Views\Common\ActionOnLongClickListener.cs" />
-    <Compile Include="Views\Activities\ContactsListActivity.cs" />
-    <Compile Include="Views\Fragments\ContactsListFragment.cs" />
-    <Compile Include="Views\Fragments\ShortcodesListFragment.cs" />
-    <Compile Include="Views\Activities\ShortcodesListActivity.cs" />
+    <Compile Include="UI\Common\ActionOnClickListener.cs" />
+    <Compile Include="UI\Common\ActionOnLongClickListener.cs" />
+    <Compile Include="UI\Activities\ContactsListActivity.cs" />
+    <Compile Include="UI\Fragments\ContactsListFragment.cs" />
+    <Compile Include="UI\Fragments\ShortcodesListFragment.cs" />
+    <Compile Include="UI\Activities\ShortcodesListActivity.cs" />
+    <Compile Include="UI\Activities\ContactViewActivity.cs" />
+    <Compile Include="UI\Fragments\ContactViewFragment.cs" />
+    <Compile Include="UI\Views\ContactView\BaseSubviews\ContactViewBaseListSubview.cs" />
+    <Compile Include="UI\Views\ContactView\BaseSubviews\ContactViewBaseSubview.cs" />
+    <Compile Include="UI\Views\ContactView\BaseSubviews\ContactViewBaseTextSubview.cs" />
+    <Compile Include="UI\Views\ContactView\DescriptionSubview.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -294,15 +300,16 @@
     <AndroidResource Include="Resources\drawable\circle.axml" />
     <AndroidResource Include="Resources\layout\list_item_shortcodes.axml" />
     <AndroidResource Include="Resources\values\plurals.xml" />
+    <AndroidResource Include="Resources\layout\contact_view.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
     <Folder Include="Services\" />
     <Folder Include="Utilities\" />
-    <Folder Include="Views\" />
-    <Folder Include="Views\Common\" />
-    <Folder Include="Views\Activities\" />
-    <Folder Include="Views\Fragments\" />
+    <Folder Include="UI\" />
+    <Folder Include="UI\Common\" />
+    <Folder Include="UI\Activities\" />
+    <Folder Include="UI\Fragments\" />
     <Folder Include="Resources\menu\" />
     <Folder Include="Resources\color\" />
     <Folder Include="Resources\mipmap\" />
@@ -313,6 +320,8 @@
     <Folder Include="Assets\fonts\" />
     <Folder Include="Resources\xml\" />
     <Folder Include="Utilities\Hockey\" />
+    <Folder Include="UI\Views\" />
+    <Folder Include="UI\Views\ContactView\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
