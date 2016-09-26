@@ -26,6 +26,8 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Views.Common;
+using Android.Support.Design.Widget;
+using Android.Support.V4.Content;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
 {
@@ -43,6 +45,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         bool refreshing;
 
+        CoordinatorLayout coordinatorLayout;
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         DocumentsListAdapter adapter;
@@ -61,6 +64,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             CommonConfig.Logger.Info($"Creating {nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
+
+            coordinatorLayout = (CoordinatorLayout)container.Parent;
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
             refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
@@ -96,29 +101,45 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = Folder?.Name;
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
+
+            CommonConfig.Logger.Info($"Created {nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]");
         }
 
         public override async void OnResume()
         {
             base.OnResume();
 
+            CommonConfig.Logger.Info($"Resuming {nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+
             if (adapter.ItemCount < 1)
             {
+                CommonConfig.Logger.Info($"No elements - will refresh...");
+
                 await RefreshData();
             }
 
             if (!IsAdded || IsDetached || IsRemoving) return;
 
+            CommonConfig.Logger.Info($"Starting automatic refresh...");
+
             autoRefreshWorker?.Stop();
             autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, () => { return adapter?.Items?.FirstOrDefault(); }, AutoRefreshIntervalMs);
             autoRefreshWorker.Start();
+
+            CommonConfig.Logger.Info($"Started automatic refresh");
         }
 
         public override void OnPause()
         {
             base.OnPause();
 
+            CommonConfig.Logger.Info($"Pausing {nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+
+            CommonConfig.Logger.Info($"Stopping automatic refresh...");
+
             autoRefreshWorker?.Stop();
+
+            CommonConfig.Logger.Info($"Stopped automatic refresh");
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -139,6 +160,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
+            CommonConfig.Logger.Info($"Retaining state [folder.id={Folder.Id}, folder.name={Folder.Name}, documentPreviews.Count={adapter.ItemCount}/{adapter.SelectedItemCount}]...");
+
             return new DocumentsListFragmentState
             {
                 Folder = Folder,
@@ -152,6 +175,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             var dlfs = restoredState as DocumentsListFragmentState;
             if (dlfs != null)
             {
+                CommonConfig.Logger.Info($"Restoring state [dlfs.folder.id={dlfs.Folder.Id}, dlfs.items.count={dlfs.DocumentPreviews.Count}, dlfs.selectedItems.count={dlfs.SelectedDocumentPreviews.Count}]...");
+
                 Folder = dlfs.Folder;
                 adapter.AppendItems(dlfs.DocumentPreviews);
 
@@ -180,15 +205,23 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             try
             {
+                CommonConfig.Logger.Debug($"Attempting automatic refresh [endId={endId}, !isAdded={!IsAdded}, isDetached={IsDetached}, isRemoving={IsRemoving}, refreshing={refreshing}]...");
+
                 if (!IsAdded || IsDetached || IsRemoving) return;
                 if (refreshing) return;
 
                 refreshing = true;
 
+                CommonConfig.Logger.Debug($"Automatic refresh running...");
+
                 var documents = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, endId: endId);
 
                 if (documents.Count > 0)
                 {
+                    CommonConfig.Logger.Info($"Received {documents.Count} new documents");
+
+                    Snackbar.Make(coordinatorLayout, Resources.GetQuantityString(Resource.Plurals.new_documents_received, documents.Count, documents.Count), Snackbar.LengthShort).Show();
+
                     Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
 
                     Activity?.RunOnUiThread(() =>
@@ -204,6 +237,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             finally
             {
                 refreshing = false;
+
+                CommonConfig.Logger.Debug($"Automatic refresh finished");
             }
         }
 
@@ -211,10 +246,14 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             try
             {
+                CommonConfig.Logger.Info($"Attempting refresh [startId={startId}, endId={endId}, force={force}]...");
+
                 if (refreshing) return;
 
                 refreshing = true;
                 refreshLayout.Post(() => refreshLayout.Refreshing = true); //Bug: fixed in support library v 24.2.0 (issue 77712)
+
+                CommonConfig.Logger.Info($"Refresh running...");
 
                 if (force)
                 {
@@ -236,6 +275,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             {
                 refreshLayout.Post(() => refreshLayout.Refreshing = false); //Bug: fixed in support library v 24.2.0 (issue 77712)
                 refreshing = false;
+
+                CommonConfig.Logger.Info($"Refresh finished");
             }
         }
 

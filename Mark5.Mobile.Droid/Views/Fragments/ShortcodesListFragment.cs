@@ -92,11 +92,15 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = Folder?.Name;
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.shortcodes);
+
+            CommonConfig.Logger.Info($"Created {nameof(ShortcodesListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]");
         }
 
         public override void OnResume()
         {
             base.OnResume();
+
+            CommonConfig.Logger.Info($"Resuming {nameof(ShortcodesListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
 
             if (adapter.ItemCount < 1)
             {
@@ -107,6 +111,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public override void OnPause()
         {
             base.OnPause();
+
+            CommonConfig.Logger.Info($"Pausing {nameof(ShortcodesListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
 
             cts?.Cancel();
         }
@@ -129,6 +135,8 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
+            CommonConfig.Logger.Info($"Retaining state [folder.id={Folder.Id}, folder.name={Folder.Name}, shortcodePreviews.Count={adapter.ItemCount}/{adapter.SelectedItemCount}, refreshing={refreshing}]...");
+
             return new ShortcodesListFragmentState
             {
                 Folder = Folder,
@@ -143,11 +151,15 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             var dlfs = restoredState as ShortcodesListFragmentState;
             if (dlfs != null)
             {
+                CommonConfig.Logger.Info($"Restoring state [dlfs.folder.id={dlfs.Folder.Id}, dlfs.items.count={dlfs.ShortcodePreviews.Count}, dlfs.selectedItems.count={dlfs.SelectedShortcodePreviews.Count}]...");
+
                 Folder = dlfs.Folder;
                 adapter.AppendItems(dlfs.ShortcodePreviews);
 
                 if (dlfs.RefreshInProgress)
                 {
+                    CommonConfig.Logger.Info($"Refresh was in progress before - will continue...");
+
                     RefreshData(dlfs.ShortcodePreviews[dlfs.ShortcodePreviews.Count - 1].RowId);
                 }
 
@@ -174,10 +186,14 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         void RefreshData(int startRowId = -1, bool force = false)
         {
+            CommonConfig.Logger.Info($"Attempting refresh [startRowId={startRowId}, force={force}]...");
+
             if (refreshing) return;
 
             refreshing = true;
             refreshLayout.Post(() => refreshLayout.Refreshing = true); //Bug: fixed in support library v 24.2.0 (issue 77712)
+
+            CommonConfig.Logger.Info($"Refresh running...");
 
             cts?.Cancel();
             cts = new CancellationTokenSource();
@@ -189,12 +205,16 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             Managers.ShortcodesManager.GetAllShortcodePreviews(Folder, cps =>
             {
+                CommonConfig.Logger.Debug($"Retrieved {cps.Count} contacts");
+
                 Managers.DownloadManager.Notify(ObjectType.Shortcode, Folder.Id);
                 Activity.RunOnUiThread(() => adapter.AppendItems(cps));
             }, () =>
             {
                 refreshLayout.Post(() => refreshLayout.Refreshing = false); //Bug: fixed in support library v 24.2.0 (issue 77712)
                 refreshing = false;
+
+                CommonConfig.Logger.Info($"Refresh finished");
             }, ex =>
             {
                 CommonConfig.Logger.Error($"Downloading shortcodes failed [folder.name={Folder?.Name}, folder.id={Folder?.Id}, startRowId={startRowId}, force={force}]", ex);
