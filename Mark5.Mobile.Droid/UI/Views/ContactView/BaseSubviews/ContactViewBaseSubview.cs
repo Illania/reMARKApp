@@ -41,6 +41,9 @@ namespace Mark5.Mobile.Droid.UI.Views.ContactView.BaseSubviews
 
     interface IContactSubview
     {
+        ContactPreview ContactPreview { get; set; }
+        Contact Contact { get; set; }
+
         void UpdateView();
     }
 }

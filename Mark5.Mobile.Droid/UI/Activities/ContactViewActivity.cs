@@ -21,6 +21,7 @@ namespace Mark5.Mobile.Droid.Views.Activities
     public class ContactViewActivity : BaseAppCompatActivity
     {
         public const string ContactPreviewIntentKey = "ContactPreview_0da27d12-4d29-4f44-8dbf-2e28d7f93aae";
+        public const string FolderIntentKey = "Folder_88a33f0b-ebbf-4eed-b33d-49fba4f43f15";
 
         Toolbar toolbar;
 
@@ -40,10 +41,13 @@ namespace Mark5.Mobile.Droid.Views.Activities
             if (savedInstanceState == null)
             {
                 var contactPreview = SerializationUtils.Deserialize<ContactPreview>(Intent.Extras.GetString(ContactPreviewIntentKey));
+                var folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+
                 var ft = SupportFragmentManager.BeginTransaction();
                 var dlf = new ContactViewFragment
                 {
-                    ContactPreview = contactPreview
+                    ContactPreview = contactPreview,
+                    Folder = folder,
                 };
                 ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
                 ft.Commit();

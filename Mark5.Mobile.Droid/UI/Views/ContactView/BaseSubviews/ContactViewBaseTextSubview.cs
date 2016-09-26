@@ -10,7 +10,6 @@ using Android.Support.V7.Widget;
 
 namespace Mark5.Mobile.Droid.UI.Views.ContactView.BaseSubviews
 {
-    [Register("Mark5.Mobile.Droid.Views.ContactViewSubviews.BaseSubviews.ContactViewBaseTextSubview")]
     public class ContactViewBaseTextSubview : ContactViewBaseSubview
     {
         readonly AppCompatTextView contentTextView;
