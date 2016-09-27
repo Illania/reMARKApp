@@ -11,6 +11,7 @@
 	<string name="please_wait">Please wait...</string>
 	<string name="today">Today</string>
 	<string name="yesterday">Yesterday</string>
+	<string name="to">to</string>
 	<string name="username">Username</string>
 	<string name="username_invalid">Username is not valid.</string>
 	<string name="password">Password</string>
@@ -48,7 +49,9 @@
 	<string name="copy_to_folder">Copy to folder</string>
 	<string name="move_to_folder">Move to folder</string>
 	<string name="categories">Categories</string>
+	<string name="comments">Comments</string>
+	<string name="actions">Actions</string>
+	<string name="links">Links</string>
 	<string name="delete_from_folder">Delete from folder</string>
 	<string name="delete">Delete</string>
-	<string name="to">to</string>
 </resources>

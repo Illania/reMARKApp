@@ -54,6 +54,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ContentView(Context));
 
+            HasOptionsMenu = true;
+
             return rootView;
         }
 
@@ -71,6 +73,55 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnResume();
 
             await RefreshData();
+        }
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            if (!DocumentPreview.IsReadByCurrent)
+            {
+                menu.Add(Menu.None, 10, 10, Resource.String.mark_as_read);
+            }
+
+            if (DocumentPreview.IsReadByCurrent)
+            {
+                menu.Add(Menu.None, 11, 11, Resource.String.marks_as_unread);
+            }
+
+            menu.Add(Menu.None, 20, 20, Resource.String.reply);
+            menu.Add(Menu.None, 21, 21, Resource.String.reply_all);
+            menu.Add(Menu.None, 22, 22, Resource.String.forward);
+            menu.Add(Menu.None, 30, 30, Resource.String.copy_to_worktray);
+            menu.Add(Menu.None, 40, 40, Resource.String.copy_to_folder);
+
+            if (Folder.InternalType == FolderInternalType.FilterView
+                || Folder.InternalType == FolderInternalType.Static
+                || Folder.InternalType == FolderInternalType.Worktray)
+            {
+                menu.Add(Menu.None, 41, 41, Resource.String.move_to_folder);
+            }
+
+            menu.Add(Menu.None, 50, 50, Resource.String.categories);
+            menu.Add(Menu.None, 60, 60, Resource.String.comments);
+            menu.Add(Menu.None, 70, 70, Resource.String.actions);
+            menu.Add(Menu.None, 80, 80, Resource.String.links);
+
+            if (Folder.InternalType == FolderInternalType.FilterView
+                || Folder.InternalType == FolderInternalType.Static
+                || Folder.InternalType == FolderInternalType.Worktray)
+            {
+                menu.Add(Menu.None, 90, 90, Resource.String.delete_from_folder);
+            }
+
+            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
+                || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed)
+            {
+                menu.Add(Menu.None, 91, 91, Resource.String.delete);
+            }
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            return base.OnOptionsItemSelected(item);
         }
 
         async Task RefreshData()
