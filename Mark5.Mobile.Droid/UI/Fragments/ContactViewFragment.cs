@@ -9,10 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.Support.V7.App;
+using Android.Support.V7.Widget;
+using Android.Widget;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Views.ContactView;
-using Mark5.Mobile.Droid.Ui.Views.ContactView.BaseSubviews;
 using Mark5.Mobile.Droid.Views.Common;
 
 namespace Mark5.Mobile.Droid.Views.Fragments

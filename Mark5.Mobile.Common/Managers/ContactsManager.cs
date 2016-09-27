@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Converters;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
@@ -59,6 +60,7 @@ namespace Mark5.Mobile.Common.Managers
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
+
 
         public void GetAllContactPreviews(Folder folder, Action<List<ContactPreview>> callback, Action finishedCallback, Action<Exception> errorCallback, int startRowId = -1, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
         {
@@ -118,6 +120,40 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        public async Task<ContactContainer> GetContactWithPreviewAsync(Folder folder, int contactId, SourceType sourceType = SourceType.Auto)
+        {
+            return await GetContactWithPreviewAsync(folder.Id, contactId, sourceType);
+        }
+
+        public async Task<ContactContainer> GetContactWithPreviewAsync(int folderId, int contactId, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.GetContactAsync(new DataContract.GetContactParameters
+                {
+                    Token = Token,
+                    FolderId = folderId,
+                    ContactId = contactId,
+                    IncludePreview = true
+                });
+
+                var contact = result.Contact.Convert();
+                var contactPreview = result.ContactPreview.Convert();
+
+                var container = new ContactContainer(contactPreview, contact);
+
+                await contactsDataAccess.SaveContactWithPreviewAsync(container);
+
+                return container;
+            }
+
+            if (sourceType == SourceType.Local)
+            {
+                return await contactsDataAccess.GetContactWithPreviewAsync(contactId);
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
 
         public async Task<Contact> GetContactAsync(Folder folder, int contactId, SourceType sourceType = SourceType.Auto)
         {
