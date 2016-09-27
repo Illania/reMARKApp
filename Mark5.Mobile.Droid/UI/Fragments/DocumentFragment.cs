@@ -49,6 +49,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
             linearLayout.AddView(new SubjectView(Context), new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+            linearLayout.AddView(new RecipentsView(Context), new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+            linearLayout.AddView(new ContentView(Context), new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
             return rootView;
         }
@@ -57,7 +59,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = DocumentPreview?.Subject;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = string.Empty;
 
             CommonConfig.Logger.Info($"Created {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}]");
         }

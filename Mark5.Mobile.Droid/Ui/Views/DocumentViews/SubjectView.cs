@@ -5,9 +5,8 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
 using Android.Content;
-using Android.Runtime;
+using Android.OS;
 using Android.Support.V7.Widget;
 using Android.Util;
 using Android.Views;
@@ -31,26 +30,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             set;
         }
 
-        AppCompatTextView titleView;
-        AppCompatTextView contentView;
-
-        public SubjectView(IntPtr javaReference, JniHandleOwnership transfer)
-            : base(javaReference, transfer)
-        {
-            InitializeView();
-        }
-
-        public SubjectView(Context context, IAttributeSet attrs, int defStyleAttr)
-            : base(context, attrs, defStyleAttr)
-        {
-            InitializeView();
-        }
-
-        public SubjectView(Context context, IAttributeSet attrs)
-            : base(context, attrs)
-        {
-            InitializeView();
-        }
+        AppCompatTextView subjectView;
 
         public SubjectView(Context context)
             : base(context)
@@ -60,15 +40,25 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         void InitializeView()
         {
-            Orientation = Horizontal;
             Visibility = ViewStates.Gone;
+            var paddingLarge = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 16.0f, Resources.DisplayMetrics) + 0.5f);
+            var paddingSmall = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 8.0f, Resources.DisplayMetrics) + 0.5f);
+            SetPadding(paddingLarge, paddingLarge, paddingLarge, paddingSmall);
 
-            titleView = new AppCompatTextView(Context);
-            titleView.Text = "Subject:";
-            AddView(titleView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent));
-
-            contentView = new AppCompatTextView(Context);
-            AddView(contentView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+            subjectView = new AppCompatTextView(Context);
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                subjectView.SetTextAppearance(Context, Resource.Style.fontTitle);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                subjectView.SetTextAppearance(Resource.Style.fontTitle);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            AddView(subjectView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
         }
 
         public void RefreshView()
@@ -76,14 +66,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             if (DocumentPreview != null)
             {
                 Visibility = ViewStates.Visible;
-
-                contentView.Text = DocumentPreview.Subject;
+                subjectView.Text = string.IsNullOrWhiteSpace(DocumentPreview.Subject) ? Context.GetString(Resource.String.no_subject) : DocumentPreview.Subject;
             }
             else
             {
                 Visibility = ViewStates.Gone;
-
-                contentView.Text = string.Empty;
+                subjectView.Text = string.Empty;
             }
 
             Invalidate();
