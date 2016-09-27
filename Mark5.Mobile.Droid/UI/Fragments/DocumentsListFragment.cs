@@ -58,7 +58,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(DocumentsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
@@ -99,14 +99,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Title = Folder?.Name;
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
 
-            CommonConfig.Logger.Info($"Created {nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]");
+            CommonConfig.Logger.Info($"Created {nameof(DocumentsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]");
         }
 
         public override async void OnResume()
         {
             base.OnResume();
 
-            CommonConfig.Logger.Info($"Resuming {nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+            CommonConfig.Logger.Info($"Resuming {nameof(DocumentsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             if (adapter.ItemCount < 1)
             {
@@ -130,7 +130,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnPause();
 
-            CommonConfig.Logger.Info($"Pausing {nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+            CommonConfig.Logger.Info($"Pausing {nameof(DocumentsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             CommonConfig.Logger.Info($"Stopping automatic refresh...");
 
@@ -157,7 +157,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            CommonConfig.Logger.Info($"Retaining state [folder.id={Folder.Id}, folder.name={Folder.Name}, documentPreviews.Count={adapter.ItemCount}/{adapter.SelectedItemCount}]...");
+            CommonConfig.Logger.Info($"Retaining state [folder.id={Folder?.Id}, folder.name={Folder?.Name}, documentPreviews.Count={adapter?.ItemCount}/{adapter?.SelectedItemCount}]...");
 
             return new DocumentsListFragmentState
             {
@@ -172,7 +172,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var dlfs = restoredState as DocumentsListFragmentState;
             if (dlfs != null)
             {
-                CommonConfig.Logger.Info($"Restoring state [dlfs.folder.id={dlfs.Folder.Id}, dlfs.items.count={dlfs.DocumentPreviews.Count}, dlfs.selectedItems.count={dlfs.SelectedDocumentPreviews.Count}]...");
+                CommonConfig.Logger.Info($"Restoring state [dlfs.folder.id={dlfs.Folder?.Id}, dlfs.items.count={dlfs.DocumentPreviews?.Count}, dlfs.selectedItems.count={dlfs.SelectedDocumentPreviews?.Count}]...");
 
                 Folder = dlfs.Folder;
                 adapter.AppendItems(dlfs.DocumentPreviews);
@@ -215,7 +215,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (documents.Count > 0)
                 {
-                    CommonConfig.Logger.Info($"Received {documents.Count} new documents");
+                    CommonConfig.Logger.Info($"Received {documents?.Count} new documents");
 
                     Snackbar.Make(coordinatorLayout, Resources.GetQuantityString(Resource.Plurals.new_documents_received, documents.Count, documents.Count), Snackbar.LengthShort).Show();
 
