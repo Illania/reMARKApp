@@ -50,11 +50,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             if (DocumentPreview != null)
             {
                 Visibility = ViewStates.Visible;
+
                 subjectView.Text = string.IsNullOrWhiteSpace(DocumentPreview.Subject) ? Context.GetString(Resource.String.no_subject) : DocumentPreview.Subject;
             }
             else
             {
                 Visibility = ViewStates.Gone;
+
                 subjectView.Text = string.Empty;
             }
         }

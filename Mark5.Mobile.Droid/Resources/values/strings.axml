@@ -9,6 +9,7 @@
 	<string name="cancel">Cancel</string>
 	<string name="filter">Filter...</string>
 	<string name="please_wait">Please wait...</string>
+	<string name="today">Today</string>
 	<string name="yesterday">Yesterday</string>
 	<string name="username">Username</string>
 	<string name="username_invalid">Username is not valid.</string>

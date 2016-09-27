@@ -11,6 +11,9 @@ using Android.Support.V4.View;
 using Android.Views;
 using Android.Webkit;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Utilities;
+using Android.Text.Util;
+using Android.Text;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
@@ -47,7 +50,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 Visibility = ViewStates.Visible;
 
-                webView.LoadData(Document.HtmlBody, "text/html", "UTF-8");
+                if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
+                {
+                    webView.LoadDataWithBaseURL(null, Document.PlainTextBody, "text/plain", "UTF-8", null);
+                }
+                else
+                {
+                    webView.LoadDataWithBaseURL(null, Document.HtmlBody, "text/html", "UTF-8", null);
+                }
             }
             else
             {
