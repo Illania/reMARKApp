@@ -30,6 +30,7 @@
 	<string name="open_drawer">Open navigation drawer</string>
 	<string name="close_drawer">Close navigation drawer</string>
 	<string name="search">Search</string>
+	<string name="document">Document</string>
 	<string name="documents">Documents</string>
 	<string name="contacts">Contacts</string>
 	<string name="contact">Contact</string>
@@ -49,4 +50,5 @@
 	<string name="categories">Categories</string>
 	<string name="delete_from_folder">Delete from folder</string>
 	<string name="delete">Delete</string>
+	<string name="to">to</string>
 </resources>

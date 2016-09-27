@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: SmoothActionBarDrawerToggle.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -10,7 +10,7 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Support.V4.Widget;
 
-namespace Mark5.Mobile.Droid.Views.Common
+namespace Mark5.Mobile.Droid.Ui.Common
 {
 
     public class SmoothActionBarDrawerToggle : ActionBarDrawerToggle

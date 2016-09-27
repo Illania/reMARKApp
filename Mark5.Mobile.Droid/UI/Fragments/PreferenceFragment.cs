@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: PreferenceFragment.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -17,9 +17,9 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
-using Mark5.Mobile.Droid.Views.Common;
+using Mark5.Mobile.Droid.Ui.Common;
 
-namespace Mark5.Mobile.Droid.Views.Fragments
+namespace Mark5.Mobile.Droid.Ui.Fragments
 {
 
     public class PreferenceFragment : PreferenceFragmentCompat, PreferenceFragmentCompat.IOnPreferenceStartScreenCallback, ISharedPreferencesOnSharedPreferenceChangeListener

@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: FoldersListFragment.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -22,12 +22,13 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
-using Mark5.Mobile.Droid.Views.Common;
+using Mark5.Mobile.Droid.Ui.Common;
 
-namespace Mark5.Mobile.Droid.Views.Fragments
+namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback
     {
+
         public Folder Folder { get; set; }
 
         FolderListAdapter adapter;
@@ -42,10 +43,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
-            refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
+            refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
             refreshLayout.Refresh += RefreshLayout_Refresh;
 
-            recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recyclerView);
+            recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
             recyclerView.HasFixedSize = true;

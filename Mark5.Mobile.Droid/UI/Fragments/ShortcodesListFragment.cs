@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: ShortcodesListFragment.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -22,9 +22,9 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Views.Common;
+using Mark5.Mobile.Droid.Ui.Common;
 
-namespace Mark5.Mobile.Droid.Views.Fragments
+namespace Mark5.Mobile.Droid.Ui.Fragments
 {
 
     public class ShortcodesListFragment : RetainableStateFragment, ActionMode.ICallback, View.IOnClickListener, SearchView.IOnQueryTextListener, SearchView.IOnCloseListener
@@ -53,11 +53,11 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(ShortcodesListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(ShortcodesListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
-            refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
+            refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
             refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
             refreshLayout.Refresh += (sender, e) =>
             {
@@ -67,7 +67,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 RefreshData(force: true);
             };
 
-            recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recyclerView);
+            recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
             recyclerView.HasFixedSize = true;
@@ -93,14 +93,14 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Title = Folder?.Name;
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.shortcodes);
 
-            CommonConfig.Logger.Info($"Created {nameof(ShortcodesListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]");
+            CommonConfig.Logger.Info($"Created {nameof(ShortcodesListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]");
         }
 
         public override void OnResume()
         {
             base.OnResume();
 
-            CommonConfig.Logger.Info($"Resuming {nameof(ShortcodesListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+            CommonConfig.Logger.Info($"Resuming {nameof(ShortcodesListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             if (adapter.ItemCount < 1)
             {
@@ -112,7 +112,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             base.OnPause();
 
-            CommonConfig.Logger.Info($"Pausing {nameof(ShortcodesListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+            CommonConfig.Logger.Info($"Pausing {nameof(ShortcodesListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             cts?.Cancel();
         }
@@ -135,7 +135,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            CommonConfig.Logger.Info($"Retaining state [folder.id={Folder.Id}, folder.name={Folder.Name}, shortcodePreviews.Count={adapter.ItemCount}/{adapter.SelectedItemCount}, refreshing={refreshing}]...");
+            CommonConfig.Logger.Info($"Retaining state [folder.id={Folder?.Id}, folder.name={Folder?.Name}, shortcodePreviews.Count={adapter?.ItemCount}/{adapter?.SelectedItemCount}, refreshing={refreshing}]...");
 
             return new ShortcodesListFragmentState
             {
@@ -205,7 +205,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             Managers.ShortcodesManager.GetAllShortcodePreviews(Folder, cps =>
             {
-                CommonConfig.Logger.Debug($"Retrieved {cps.Count} contacts");
+                CommonConfig.Logger.Debug($"Retrieved {cps?.Count} contacts");
 
                 Managers.DownloadManager.Notify(ObjectType.Shortcode, Folder.Id);
                 Activity.RunOnUiThread(() => adapter.AppendItems(cps));

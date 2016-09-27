@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: ContactsListFragment.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -25,9 +25,9 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
-using Mark5.Mobile.Droid.Views.Common;
+using Mark5.Mobile.Droid.Ui.Common;
 
-namespace Mark5.Mobile.Droid.Views.Fragments
+namespace Mark5.Mobile.Droid.Ui.Fragments
 {
 
     public class ContactsListFragment : RetainableStateFragment, ActionMode.ICallback, View.IOnClickListener, SearchView.IOnQueryTextListener, SearchView.IOnCloseListener
@@ -56,11 +56,11 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(ContactsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(ContactsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
-            refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
+            refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
             refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
             refreshLayout.Refresh += (sender, e) =>
             {
@@ -70,7 +70,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 RefreshData(force: true);
             };
 
-            recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recyclerView);
+            recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
             recyclerView.HasFixedSize = true;
@@ -96,14 +96,14 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Title = Folder?.Name;
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.contacts);
 
-            CommonConfig.Logger.Info($"Created {nameof(ContactsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]");
+            CommonConfig.Logger.Info($"Created {nameof(ContactsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]");
         }
 
         public override void OnResume()
         {
             base.OnResume();
 
-            CommonConfig.Logger.Info($"Resuming {nameof(ContactsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+            CommonConfig.Logger.Info($"Resuming {nameof(ContactsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             if (adapter.ItemCount < 1)
             {
@@ -117,7 +117,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             base.OnPause();
 
-            CommonConfig.Logger.Info($"Pausing {nameof(ContactsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+            CommonConfig.Logger.Info($"Pausing {nameof(ContactsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             cts?.Cancel();
         }
@@ -140,7 +140,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            CommonConfig.Logger.Info($"Retaining state [folder.id={Folder.Id}, folder.name={Folder.Name}, contactPreviews.Count={adapter.ItemCount}/{adapter.SelectedItemCount}, refreshing={refreshing}]...");
+            CommonConfig.Logger.Info($"Retaining state [folder.id={Folder?.Id}, folder.name={Folder?.Name}, contactPreviews.Count={adapter?.ItemCount}/{adapter?.SelectedItemCount}, refreshing={refreshing}]...");
 
             return new ContactsListFragmentState
             {
@@ -156,7 +156,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             var dlfs = restoredState as ContactsListFragmentState;
             if (dlfs != null)
             {
-                CommonConfig.Logger.Info($"Restoring state [dlfs.folder.id={dlfs.Folder.Id}, dlfs.items.count={dlfs.ContactPreviews.Count}, dlfs.selectedItems.count={dlfs.SelectedContactPreviews.Count}]...");
+                CommonConfig.Logger.Info($"Restoring state [dlfs.folder.id={dlfs.Folder?.Id}, dlfs.items.count={dlfs.ContactPreviews?.Count}, dlfs.selectedItems.count={dlfs.SelectedContactPreviews?.Count}]...");
 
                 Folder = dlfs.Folder;
                 adapter.AppendItems(dlfs.ContactPreviews);
@@ -210,7 +210,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             Managers.ContactsManager.GetAllContactPreviews(Folder, cps =>
             {
-                CommonConfig.Logger.Debug($"Retrieved {cps.Count} contacts");
+                CommonConfig.Logger.Debug($"Retrieved {cps?.Count} contacts");
 
                 Managers.DownloadManager.Notify(ObjectType.Contact, Folder.Id);
                 Activity.RunOnUiThread(() => adapter.AppendItems(cps));
@@ -222,7 +222,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 CommonConfig.Logger.Info($"Refresh finished");
             }, ex =>
             {
-                CommonConfig.Logger.Error($"Downloading contacts failed [folder.name={Folder.Name}, folder.id={Folder.Id}, startRowId={startRowId}, force={force}]", ex);
+                CommonConfig.Logger.Error($"Downloading contacts failed [folder.name={Folder?.Name}, folder.id={Folder?.Id}, startRowId={startRowId}, force={force}]", ex);
 
                 Dialogs.ShowErrorDialog(Activity, ex);
             }, startRowId, cts.Token);

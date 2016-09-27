@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: ActionOnClickListener.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -8,7 +8,7 @@
 using System;
 using Android.Views;
 
-namespace Mark5.Mobile.Droid.Views.Common
+namespace Mark5.Mobile.Droid.Ui.Common
 {
 
     public class ActionOnClickListener : Java.Lang.Object, View.IOnClickListener

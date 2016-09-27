@@ -7,12 +7,12 @@
 //
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.Common.Storage;
 using Mark5.ServiceReference.AppService;
@@ -100,6 +100,42 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        public async Task<DocumentContainer> GetDocumentWithPreviewAsync(Folder folder, int documentId, SourceType sourceType = SourceType.Auto)
+        {
+            return await GetDocumentWithPreviewAsync(folder.Id, documentId, sourceType);
+        }
+
+        public async Task<DocumentContainer> GetDocumentWithPreviewAsync(int folderId, int documentId, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.GetDocumentAsync(new DataContract.GetDocumentParameters
+                {
+                    Token = Token,
+                    FolderId = folderId,
+                    DocumentId = documentId,
+                    BodyRequest = DocumentBodyTypeRequest.ConvertEnum<DataContract.DocumentBodyTypeRequest>(),
+                    IncludePreview = true
+                });
+
+                var documentPreview = result.DocumentPreview.Convert();
+                var document = result.Document.Convert();
+
+                var container = new DocumentContainer(documentPreview, document);
+
+                await documentsDataAccess.SaveDocumentWithPreviewAsync(container);
+
+                return container;
+            }
+
+            if (sourceType == SourceType.Local)
+            {
+                return await documentsDataAccess.GetDocumentWithPreviewAsync(documentId);
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
         public async Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
                                            DateTime sendOn, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto)
         {
@@ -116,7 +152,7 @@ namespace Mark5.Mobile.Common.Managers
                     SendOn = sendOn.ConvertToUTC(),
                     ConfirmRead = confirmRead,
                     ConfirmDelivery = confirmDelivery,
-                    TemporaryAttachmentGuids = temporaryAttachmentGuids,
+                    TemporaryAttachmentGuids = temporaryAttachmentGuids
                 });
 
                 document.Id = result.Id;
@@ -142,7 +178,7 @@ namespace Mark5.Mobile.Common.Managers
                 SendOn = sendOn,
                 ConfirmRead = confirmRead,
                 ConfirmDelivery = confirmDelivery,
-                Identifier = id,
+                Identifier = id
             };
 
             await FileSystemStorage.SaveOutgoingDocumentAsync(outgoingDocumentInfo, document, documentPreview);
@@ -331,7 +367,7 @@ namespace Mark5.Mobile.Common.Managers
                 var result = await AppServiceProxy.GetAllCategoriesAsync(new DataContract.GetAllCategoriesParameters
                 {
                     Token = Token,
-                    ObjectType = DataContract.ObjectType.Document,
+                    ObjectType = DataContract.ObjectType.Document
                 });
 
                 var categories = result.Categories.WhereNotNull().Select(c => c.Convert()).ToList();
@@ -447,7 +483,7 @@ namespace Mark5.Mobile.Common.Managers
                     Token = Token,
                     Id = attachmentDescription.Id,
                     FolderId = folder.Id,
-                    DocumentId = document.Id,
+                    DocumentId = document.Id
                 }, async stream => { path = await FileSystemStorage.SaveAttachmentAsync(attachmentDescription, stream); });
 
                 return path;
@@ -471,7 +507,7 @@ namespace Mark5.Mobile.Common.Managers
                     Token = Token,
                     Extension = attachment.Extension,
                     Filename = attachment.Filename,
-                    Stream = attachment.Stream,
+                    Stream = attachment.Stream
                 });
 
                 return result.Guid;

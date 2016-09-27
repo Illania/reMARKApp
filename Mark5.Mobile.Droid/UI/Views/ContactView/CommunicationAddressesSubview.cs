@@ -30,7 +30,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactView
 
                 foreach (var address in Contact.CommunicationAddresses)
                 {
-                    address.ty
                 }
 
             }

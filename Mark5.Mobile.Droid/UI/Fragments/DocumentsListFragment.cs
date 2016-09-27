@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: DocumentsListFragment.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -15,6 +15,7 @@ using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
+using Android.Support.Design.Widget;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
@@ -24,12 +25,12 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
-using Mark5.Mobile.Droid.Views.Common;
-using Android.Support.Design.Widget;
-using Android.Support.V4.Content;
+using Mark5.Mobile.Droid.Ui.Activities;
+using Mark5.Mobile.Droid.Ui.Common;
 
-namespace Mark5.Mobile.Droid.Views.Fragments
+namespace Mark5.Mobile.Droid.Ui.Fragments
 {
 
     public class DocumentsListFragment : RetainableStateFragment, ActionMode.ICallback, View.IOnClickListener, SearchView.IOnQueryTextListener, SearchView.IOnCloseListener
@@ -37,11 +38,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
 
-        public Folder Folder
-        {
-            get;
-            set;
-        }
+        public Folder Folder { get; set; }
 
         bool refreshing;
 
@@ -61,13 +58,13 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(DocumentsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
             coordinatorLayout = (CoordinatorLayout)container.Parent;
 
-            refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
+            refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
             refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
             refreshLayout.Refresh += async (sender, e) =>
             {
@@ -77,7 +74,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 await RefreshData(force: true);
             };
 
-            recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recyclerView);
+            recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
@@ -102,14 +99,14 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Title = Folder?.Name;
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
 
-            CommonConfig.Logger.Info($"Created {nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]");
+            CommonConfig.Logger.Info($"Created {nameof(DocumentsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]");
         }
 
         public override async void OnResume()
         {
             base.OnResume();
 
-            CommonConfig.Logger.Info($"Resuming {nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+            CommonConfig.Logger.Info($"Resuming {nameof(DocumentsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             if (adapter.ItemCount < 1)
             {
@@ -133,7 +130,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             base.OnPause();
 
-            CommonConfig.Logger.Info($"Pausing {nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+            CommonConfig.Logger.Info($"Pausing {nameof(DocumentsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             CommonConfig.Logger.Info($"Stopping automatic refresh...");
 
@@ -160,7 +157,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            CommonConfig.Logger.Info($"Retaining state [folder.id={Folder.Id}, folder.name={Folder.Name}, documentPreviews.Count={adapter.ItemCount}/{adapter.SelectedItemCount}]...");
+            CommonConfig.Logger.Info($"Retaining state [folder.id={Folder?.Id}, folder.name={Folder?.Name}, documentPreviews.Count={adapter?.ItemCount}/{adapter?.SelectedItemCount}]...");
 
             return new DocumentsListFragmentState
             {
@@ -175,7 +172,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             var dlfs = restoredState as DocumentsListFragmentState;
             if (dlfs != null)
             {
-                CommonConfig.Logger.Info($"Restoring state [dlfs.folder.id={dlfs.Folder.Id}, dlfs.items.count={dlfs.DocumentPreviews.Count}, dlfs.selectedItems.count={dlfs.SelectedDocumentPreviews.Count}]...");
+                CommonConfig.Logger.Info($"Restoring state [dlfs.folder.id={dlfs.Folder?.Id}, dlfs.items.count={dlfs.DocumentPreviews?.Count}, dlfs.selectedItems.count={dlfs.SelectedDocumentPreviews?.Count}]...");
 
                 Folder = dlfs.Folder;
                 adapter.AppendItems(dlfs.DocumentPreviews);
@@ -218,7 +215,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
                 if (documents.Count > 0)
                 {
-                    CommonConfig.Logger.Info($"Received {documents.Count} new documents");
+                    CommonConfig.Logger.Info($"Received {documents?.Count} new documents");
 
                     Snackbar.Make(coordinatorLayout, Resources.GetQuantityString(Resource.Plurals.new_documents_received, documents.Count, documents.Count), Snackbar.LengthShort).Show();
 
@@ -288,7 +285,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             if (actionMode == null)
             {
-                Android.Widget.Toast.MakeText(Activity, "Document clicked!", Android.Widget.ToastLength.Short).Show();
+                var i = new Intent(Activity, typeof(DocumentActivity));
+                i.PutExtra(DocumentActivity.FolderIntentKey, SerializationUtils.Serialize(Folder));
+                i.PutExtra(DocumentActivity.DocumentPreviewIntentKey, SerializationUtils.Serialize(documentPreview));
+                StartActivity(i);
             }
             else
             {

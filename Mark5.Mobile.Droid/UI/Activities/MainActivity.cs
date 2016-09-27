@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: MainActivity.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -19,10 +19,10 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Views.Common;
-using Mark5.Mobile.Droid.Views.Fragments;
+using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Fragments;
 
-namespace Mark5.Mobile.Droid.Ui.Activities
+namespace Mark5.Mobile.Droid.Ui.Activity
 {
 
     [Android.App.Activity]
