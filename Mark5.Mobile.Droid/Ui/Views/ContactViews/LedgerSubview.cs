@@ -1,33 +1,36 @@
 ﻿//
 // Project: 
-// File: AccountSubview.cs
+// File: LedgerSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
 // Copyright (c) 2016 Nordic IT
 //
 
+using Android.Content;
 using Android.Views;
 
-namespace Mark5.Mobile.Droid.Ui.Views.ContactView
+namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class AccountSubview : ContactViewBaseTextSubview
+    public class LedgerSubview : ContactViewBaseTextSubview
     {
-        public AccountSubview(Android.Content.Context context) : base(context)
+        public LedgerSubview(Context context) :
+            base(context)
         {
-            SetTitle("Account");
+            SetTitle("Ledger");
         }
 
         public override void RefreshView()
         {
-            if (!string.IsNullOrEmpty(Contact?.Account))
+            if (!string.IsNullOrEmpty(Contact?.Ledger))
             {
                 Visibility = ViewStates.Visible;
-                SetContent(Contact.Account);
+                SetContent(Contact.Ledger);
             }
             else
             {
                 Visibility = ViewStates.Gone;
             }
         }
+
     }
 }

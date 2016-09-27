@@ -9,7 +9,7 @@ using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 
-namespace Mark5.Mobile.Droid.Ui.Views.ContactView
+namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
     public class ContactViewBaseTextSubview : ContactViewBaseSubview
     {

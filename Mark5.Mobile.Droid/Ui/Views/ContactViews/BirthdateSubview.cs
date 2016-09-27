@@ -7,7 +7,7 @@
 //
 using Android.Views;
 
-namespace Mark5.Mobile.Droid.Ui.Views.ContactView
+namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
     public class BirthdateSubview : ContactViewBaseTextSubview
     {

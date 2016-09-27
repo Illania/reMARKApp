@@ -12,7 +12,7 @@ using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
 
-namespace Mark5.Mobile.Droid.Ui.Views.ContactView
+namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
     public class ContactViewBaseSubview : LinearLayoutCompat, IContactSubview
     {

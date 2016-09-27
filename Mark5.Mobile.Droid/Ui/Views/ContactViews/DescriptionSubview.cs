@@ -1,27 +1,27 @@
 ﻿//
 // Project: 
-// File: VatSubview.cs
+// File: DescriptionSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
 // Copyright (c) 2016 Nordic IT
 //
 using Android.Views;
 
-namespace Mark5.Mobile.Droid.Ui.Views.ContactView
+namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class VatSubview : ContactViewBaseTextSubview
+    public class DescriptionSubview : ContactViewBaseTextSubview
     {
-        public VatSubview(Android.Content.Context context) : base(context)
+        public DescriptionSubview(Android.Content.Context context) : base(context)
         {
-            SetTitle("VAT");
+            SetTitle("Description");
         }
 
         public override void RefreshView()
         {
-            if (!string.IsNullOrEmpty(Contact?.Vat))
+            if (!string.IsNullOrEmpty(ContactPreview?.Description))
             {
                 Visibility = ViewStates.Visible;
-                SetContent(Contact.Vat);
+                SetContent(ContactPreview.Description);
             }
             else
             {

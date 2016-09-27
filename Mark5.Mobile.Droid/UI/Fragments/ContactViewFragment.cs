@@ -14,7 +14,7 @@ using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Ui.Views.ContactView;
+using Mark5.Mobile.Droid.Ui.Views.ContactViews;
 using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments

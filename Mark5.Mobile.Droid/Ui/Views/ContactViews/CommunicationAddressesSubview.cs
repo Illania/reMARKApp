@@ -10,7 +10,7 @@ using System.Linq;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
 
-namespace Mark5.Mobile.Droid.Ui.Views.ContactView
+namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
     public class CommunicationAddressesSubview : ContactViewBaseListSubview
     {
