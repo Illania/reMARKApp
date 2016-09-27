@@ -8,27 +8,14 @@
 using Android.Content;
 using Android.OS;
 using Android.Support.V7.Widget;
-using Android.Util;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
 
-    public class SubjectView : LinearLayoutCompat, IDocumentView
+    public class SubjectView : DocumentView
     {
-
-        public DocumentPreview DocumentPreview
-        {
-            get;
-            set;
-        }
-
-        public Document Document
-        {
-            get;
-            set;
-        }
 
         AppCompatTextView subjectView;
 
@@ -40,11 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         void InitializeView()
         {
-            LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            Visibility = ViewStates.Gone;
-            var paddingLarge = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 16.0f, Resources.DisplayMetrics) + 0.5f);
-            var paddingSmall = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 8.0f, Resources.DisplayMetrics) + 0.5f);
-            SetPadding(paddingLarge, paddingLarge, paddingLarge, paddingSmall);
+            SetPadding(PaddingLarge, PaddingLarge, PaddingLarge, PaddingSmall);
 
             subjectView = new AppCompatTextView(Context);
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)
@@ -62,7 +45,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             AddView(subjectView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
         }
 
-        public void RefreshView()
+        public override void RefreshView()
         {
             if (DocumentPreview != null)
             {
@@ -74,9 +57,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 Visibility = ViewStates.Gone;
                 subjectView.Text = string.Empty;
             }
-
-            Invalidate();
-            RequestLayout();
         }
     }
 }

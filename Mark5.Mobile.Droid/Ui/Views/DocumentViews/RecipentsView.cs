@@ -9,27 +9,14 @@ using System.Linq;
 using Android.Content;
 using Android.OS;
 using Android.Support.V7.Widget;
-using Android.Util;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
 
-    public class RecipentsView : LinearLayoutCompat, IDocumentView
+    public class RecipentsView : DocumentView
     {
-
-        public DocumentPreview DocumentPreview
-        {
-            get;
-            set;
-        }
-
-        public Document Document
-        {
-            get;
-            set;
-        }
 
         AppCompatTextView line1;
         AppCompatTextView line2;
@@ -42,11 +29,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         void InitializeView()
         {
-            LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            Visibility = ViewStates.Gone;
-            var paddingLarge = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 16.0f, Resources.DisplayMetrics) + 0.5f);
-            var paddingSmall = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 8.0f, Resources.DisplayMetrics) + 0.5f);
-            SetPadding(paddingLarge, paddingSmall, paddingLarge, paddingSmall);
+            SetPadding(PaddingLarge, PaddingSmall, PaddingLarge, PaddingSmall);
 
             line1 = new AppCompatTextView(Context);
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)
@@ -79,7 +62,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             AddView(line2, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
         }
 
-        public void RefreshView()
+        public override void RefreshView()
         {
             if (DocumentPreview != null && Document != null)
             {
@@ -114,9 +97,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 line1.Text = string.Empty;
                 line2.Text = string.Empty;
             }
-
-            Invalidate();
-            RequestLayout();
         }
     }
 }

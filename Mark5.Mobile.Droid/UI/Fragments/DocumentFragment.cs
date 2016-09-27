@@ -97,7 +97,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             for (var i = 0; i < linearLayout.ChildCount; i++)
             {
-                var dv = linearLayout.GetChildAt(i) as IDocumentView;
+                var dv = linearLayout.GetChildAt(i) as DocumentView;
                 if (dv != null)
                 {
                     dv.DocumentPreview = DocumentPreview;
@@ -105,6 +105,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dv.RefreshView();
                 }
             }
+
+            linearLayout.Invalidate();
+            linearLayout.RequestLayout();
         }
 
         public override IRetainableState OnRetainInstanceState()

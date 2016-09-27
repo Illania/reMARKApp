@@ -6,31 +6,17 @@
 // Copyright (c) 2016 Nordic IT
 //
 using Android.Content;
+using Android.Net;
 using Android.Support.V4.View;
-using Android.Support.V7.Widget;
-using Android.Util;
 using Android.Views;
 using Android.Webkit;
 using Mark5.Mobile.Common.Model;
-using Android.Net;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
 
-    public class ContentView : LinearLayoutCompat, IDocumentView
+    public class ContentView : DocumentView
     {
-
-        public DocumentPreview DocumentPreview
-        {
-            get;
-            set;
-        }
-
-        public Document Document
-        {
-            get;
-            set;
-        }
 
         CustomWebView webView;
 
@@ -42,9 +28,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         void InitializeView()
         {
-            LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            var paddingSmall = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 8.0f, Resources.DisplayMetrics) + 0.5f);
-            SetPadding(0, paddingSmall, 0, paddingSmall);
+            SetPadding(PaddingNone, PaddingSmall, PaddingNone, PaddingSmall);
 
             webView = new CustomWebView(Context);
             webView.SetWebViewClient(new CustomWebViewClient());
@@ -57,7 +41,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             AddView(webView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
         }
 
-        public void RefreshView()
+        public override void RefreshView()
         {
             if (DocumentPreview != null && Document != null)
             {
@@ -71,9 +55,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
                 webView.LoadData(string.Empty, "text/plain", "UTF-8");
             }
-
-            Invalidate();
-            RequestLayout();
         }
 
         class CustomWebView : WebView
