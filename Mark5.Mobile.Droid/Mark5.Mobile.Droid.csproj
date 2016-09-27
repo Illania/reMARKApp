@@ -187,6 +187,12 @@
     <Compile Include="Utilities\ConversionUtils.cs" />
     <Compile Include="UI\Views\ContactView\IContactView.cs" />
     <Compile Include="UI\Views\ContactView\LedgerSubview.cs" />
+    <Compile Include="UI\Views\ContactView\CommunicationAddressesSubview.cs" />
+    <Compile Include="UI\Views\ContactView\PhysicalAddressesSubview.cs" />
+    <Compile Include="UI\Views\ContactView\BaseSubviews\ResponsibleSubview.cs" />
+    <Compile Include="UI\Views\ContactView\PrimaryPersonSubview.cs" />
+    <Compile Include="UI\Views\ContactView\ChildrenSubview.cs" />
+    <Compile Include="UI\Views\ShortIdSubview.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

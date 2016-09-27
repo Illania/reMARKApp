@@ -7,6 +7,7 @@
 //
 using Android.Content;
 using Android.Support.V7.Widget;
+using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactView
 {
@@ -14,8 +15,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactView
     {
         AppCompatTextView contentTextView;
 
-        public ContactViewBaseTextSubview(Context context)
-            : base(context)
+        public ContactViewBaseTextSubview(Context context) : base(context)
         {
             InitializeView();
         }
@@ -24,7 +24,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactView
         {
             contentTextView = new AppCompatTextView(Context);
             contentTextView.SetTextAppearance(Resource.Style.contactFieldContent);
-            contentTextView.LayoutParameters = new LayoutParams(LayoutParams.MatchParent, LayoutParams.WrapContent);
+            contentTextView.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             AddView(contentTextView);
 
             AddView(separatorView);

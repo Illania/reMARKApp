@@ -22,6 +22,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactView
         public ContactPreview ContactPreview { get; set; }
         public Contact Contact { get; set; }
 
+        public string Title
+        {
+            get;
+            set;
+        }
+
         public ContactViewBaseSubview(Context context)
             : base(context)
         {
