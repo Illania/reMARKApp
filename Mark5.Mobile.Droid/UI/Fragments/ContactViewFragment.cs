@@ -88,7 +88,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 contactSubview.Contact = Contact;
                 contactSubview.ContactPreview = ContactPreview;
 
-                contactSubview.UpdateView();
+                contactSubview.RefreshView();
             }
 
         }

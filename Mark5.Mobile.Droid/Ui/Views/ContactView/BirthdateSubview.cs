@@ -19,7 +19,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactView
             SetTitle("Birthdate");
         }
 
-        public override void UpdateView()
+        public override void RefreshView()
         {
             if (Contact?.BirthDate != null && Contact.BirthDate != default(DateTime))
             {

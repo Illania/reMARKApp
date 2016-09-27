@@ -5,10 +5,9 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using Android.Runtime;
 using Android.Support.V7.Widget;
 
-namespace Mark5.Mobile.Droid.Ui.Views.ContactView.BaseSubviews
+namespace Mark5.Mobile.Droid.Ui.Views.ContactView
 {
     public class ContactViewBaseTextSubview : ContactViewBaseSubview
     {

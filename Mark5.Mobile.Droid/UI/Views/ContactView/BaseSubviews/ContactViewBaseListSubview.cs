@@ -7,7 +7,7 @@
 //
 using System;
 
-namespace Mark5.Mobile.Droid.Ui.Views.ContactView.BaseSubviews
+namespace Mark5.Mobile.Droid.Ui.Views.ContactView
 {
     public class ContactViewBaseListSubview : ContactViewBaseSubview
     {
@@ -15,7 +15,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactView.BaseSubviews
         {
         }
 
-        public override void UpdateView()
+        public override void RefreshView()
         {
             throw new NotImplementedException();
         }

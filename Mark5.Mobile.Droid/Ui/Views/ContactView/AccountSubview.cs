@@ -19,7 +19,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactView
             SetTitle("Account");
         }
 
-        public override void UpdateView()
+        public override void RefreshView()
         {
             if (!string.IsNullOrEmpty(Contact?.Account))
             {

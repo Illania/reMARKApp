@@ -10,7 +10,7 @@ using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
 
-namespace Mark5.Mobile.Droid.Ui.Views.ContactView.BaseSubviews
+namespace Mark5.Mobile.Droid.Ui.Views.ContactView
 {
     public class ContactViewBaseSubview : LinearLayoutCompat, IContactSubview
     {
@@ -52,7 +52,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactView.BaseSubviews
             separatorView.Visibility = visible ? ViewStates.Visible : ViewStates.Gone;
         }
 
-        public virtual void UpdateView()
+        public virtual void RefreshView()
         {
 
         }
@@ -64,7 +64,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactView.BaseSubviews
         ContactPreview ContactPreview { get; set; }
         Contact Contact { get; set; }
 
-        void UpdateView();
+        void RefreshView();
         void SetVisibility(bool visible);
         void SetSeparatorVisibility(bool visible);
     }
