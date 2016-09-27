@@ -11,7 +11,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactView
 {
     public class ContactViewBaseListSubview : ContactViewBaseSubview
     {
-        public ContactViewBaseListSubview(Android.Content.Context context, Android.Util.IAttributeSet attrs) : base(context, attrs)
+        public ContactViewBaseListSubview(Android.Content.Context context) : base(context)
         {
         }
 
