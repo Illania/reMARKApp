@@ -7,7 +7,6 @@
 //
 using System;
 using Android.Runtime;
-using Mark5.Mobile.Droid.Ui.Views.ContactView.BaseSubviews;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactView
 {
