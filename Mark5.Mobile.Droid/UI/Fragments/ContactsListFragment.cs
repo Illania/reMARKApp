@@ -236,9 +236,9 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             if (actionMode == null)
             {
-                var i = new Intent(Activity, typeof(ContactViewActivity));
-                i.PutExtra(ContactViewActivity.ContactPreviewIntentKey, SerializationUtils.Serialize(contactPreview));
-                i.PutExtra(ContactViewActivity.FolderIntentKey, SerializationUtils.Serialize(Folder));
+                var i = new Intent(Activity, typeof(ContactActivity));
+                i.PutExtra(ContactActivity.ContactPreviewIntentKey, SerializationUtils.Serialize(contactPreview));
+                i.PutExtra(ContactActivity.FolderIntentKey, SerializationUtils.Serialize(Folder));
                 StartActivity(i);
             }
             else

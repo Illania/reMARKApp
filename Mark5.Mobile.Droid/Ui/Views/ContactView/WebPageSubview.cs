@@ -1,6 +1,6 @@
 ﻿//
 // Project: 
-// File: DescriptionSubview.cs
+// File: WebPageSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
 // Copyright (c) 2016 Nordic IT
@@ -11,20 +11,20 @@ using Mark5.Mobile.Droid.Ui.Views.ContactView.BaseSubviews;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactView
 {
-    [Register("ContactView.DescriptionSubview")]
-    public class DescriptionSubview : ContactViewBaseTextSubview
+    [Register("ContactView.WebPageSubview")]
+    public class WebPageSubview : ContactViewBaseTextSubview
     {
-        public DescriptionSubview(Android.Content.Context context, Android.Util.IAttributeSet attrs) : base(context, attrs)
+        public WebPageSubview(Android.Content.Context context, Android.Util.IAttributeSet attrs) : base(context, attrs)
         {
-            SetTitle("Description");
+            SetTitle("Web page");
         }
 
         public override void UpdateView()
         {
-            if (!string.IsNullOrEmpty(ContactPreview?.Description))
+            if (!string.IsNullOrEmpty(Contact?.WebPageAddress))
             {
                 SetVisibility(true);
-                SetContent(ContactPreview.Description);
+                SetContent(Contact.WebPageAddress);
             }
             else
             {

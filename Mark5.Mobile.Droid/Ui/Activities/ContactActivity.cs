@@ -16,10 +16,10 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Views.Common;
 using Mark5.Mobile.Droid.Views.Fragments;
 
-namespace Mark5.Mobile.Droid.Views.Activities
+namespace Mark5.Mobile.Droid.Ui.Activities
 {
     [Activity]
-    public class ContactViewActivity : BaseAppCompatActivity
+    public class ContactActivity : BaseAppCompatActivity
     {
         public const string ContactPreviewIntentKey = "ContactPreview_0da27d12-4d29-4f44-8dbf-2e28d7f93aae";
         public const string FolderIntentKey = "Folder_88a33f0b-ebbf-4eed-b33d-49fba4f43f15";
@@ -30,7 +30,7 @@ namespace Mark5.Mobile.Droid.Views.Activities
         {
             base.OnCreate(savedInstanceState);
 
-            CommonConfig.Logger.Info($"Creating {nameof(ContactViewActivity)}...");
+            CommonConfig.Logger.Info($"Creating {nameof(ContactActivity)}...");
 
             SetTitle(Resource.String.contact);
             SetContentView(Resource.Layout.base_layout);
@@ -53,11 +53,11 @@ namespace Mark5.Mobile.Droid.Views.Activities
                 ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
                 ft.Commit();
 
-                CommonConfig.Logger.Info($"Created {nameof(ContactViewActivity)}");
+                CommonConfig.Logger.Info($"Created {nameof(ContactActivity)}");
             }
             else
             {
-                CommonConfig.Logger.Info($"Restored {nameof(ContactViewActivity)}");
+                CommonConfig.Logger.Info($"Restored {nameof(ContactActivity)}");
             }
         }
 

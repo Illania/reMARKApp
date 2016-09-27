@@ -6,9 +6,8 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
-using Mark5.Mobile.Common.Model.Containers;
 
-namespace Mark5.Mobile.Droid.UI.Views.ContactView.BaseSubviews
+namespace Mark5.Mobile.Droid.Ui.Views.ContactView.BaseSubviews
 {
     public class ContactViewBaseListSubview : ContactViewBaseSubview
     {

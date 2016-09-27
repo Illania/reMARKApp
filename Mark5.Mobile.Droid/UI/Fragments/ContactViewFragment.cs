@@ -11,7 +11,8 @@ using System.Threading.Tasks;
 using Android.Support.V7.App;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.UI.Views.ContactView.BaseSubviews;
+using Mark5.Mobile.Droid.Ui.Views.ContactView;
+using Mark5.Mobile.Droid.Ui.Views.ContactView.BaseSubviews;
 using Mark5.Mobile.Droid.Views.Common;
 
 namespace Mark5.Mobile.Droid.Views.Fragments
@@ -23,6 +24,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public Folder Folder { get; set; }
 
         DescriptionSubview descriptionSubview;
+        VatSubview vatSubview;
+        BirthdateSubview birthdateSubview;
+        AccountSubview accountSubview;
+        WebPageSubview webpageSubview;
 
         List<IContactSubview> contactSubViews = new List<IContactSubview>();
 
@@ -31,8 +36,16 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             var rootView = inflater.Inflate(Resource.Layout.contact_view, container, false);
 
             descriptionSubview = rootView.FindViewById<DescriptionSubview>(Resource.Id.description_subview);
+            birthdateSubview = rootView.FindViewById<BirthdateSubview>(Resource.Id.birthdate_subview);
+            vatSubview = rootView.FindViewById<VatSubview>(Resource.Id.vat_subview);
+            accountSubview = rootView.FindViewById<AccountSubview>(Resource.Id.account_subview);
+            webpageSubview = rootView.FindViewById<WebPageSubview>(Resource.Id.webpage_subview);
 
             contactSubViews.Add(descriptionSubview);
+            contactSubViews.Add(birthdateSubview);
+            contactSubViews.Add(vatSubview);
+            contactSubViews.Add(accountSubview);
+            contactSubViews.Add(webpageSubview);
 
             return rootView;
         }

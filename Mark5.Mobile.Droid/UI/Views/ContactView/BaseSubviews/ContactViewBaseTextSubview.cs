@@ -8,7 +8,7 @@
 using Android.Runtime;
 using Android.Support.V7.Widget;
 
-namespace Mark5.Mobile.Droid.UI.Views.ContactView.BaseSubviews
+namespace Mark5.Mobile.Droid.Ui.Views.ContactView.BaseSubviews
 {
     public class ContactViewBaseTextSubview : ContactViewBaseSubview
     {
@@ -20,6 +20,8 @@ namespace Mark5.Mobile.Droid.UI.Views.ContactView.BaseSubviews
             contentTextView.SetTextAppearance(Resource.Style.contactFieldContent);
             contentTextView.LayoutParameters = new LayoutParams(LayoutParams.MatchParent, LayoutParams.WrapContent);
             AddView(contentTextView);
+
+            AddView(separatorView);
         }
 
         public void SetContent(string title)

@@ -15,7 +15,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Views.Common;
 using Mark5.Mobile.Droid.Views.Fragments;
 
-namespace Mark5.Mobile.Droid.Views.Activities
+namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Activity]

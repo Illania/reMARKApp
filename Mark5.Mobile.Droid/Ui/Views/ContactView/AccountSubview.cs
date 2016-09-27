@@ -1,6 +1,6 @@
 ﻿//
 // Project: 
-// File: DescriptionSubview.cs
+// File: AccountSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
 // Copyright (c) 2016 Nordic IT
@@ -11,20 +11,20 @@ using Mark5.Mobile.Droid.Ui.Views.ContactView.BaseSubviews;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactView
 {
-    [Register("ContactView.DescriptionSubview")]
-    public class DescriptionSubview : ContactViewBaseTextSubview
+    [Register("ContactView.AccountSubview")]
+    public class AccountSubview : ContactViewBaseTextSubview
     {
-        public DescriptionSubview(Android.Content.Context context, Android.Util.IAttributeSet attrs) : base(context, attrs)
+        public AccountSubview(Android.Content.Context context, Android.Util.IAttributeSet attrs) : base(context, attrs)
         {
-            SetTitle("Description");
+            SetTitle("Account");
         }
 
         public override void UpdateView()
         {
-            if (!string.IsNullOrEmpty(ContactPreview?.Description))
+            if (!string.IsNullOrEmpty(Contact?.Account))
             {
                 SetVisibility(true);
-                SetContent(ContactPreview.Description);
+                SetContent(Contact.Account);
             }
             else
             {

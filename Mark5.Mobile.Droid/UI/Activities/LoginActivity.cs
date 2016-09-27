@@ -21,7 +21,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Services;
 using Mark5.Mobile.Droid.Views.Common;
 
-namespace Mark5.Mobile.Droid.Views.Activity
+namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
