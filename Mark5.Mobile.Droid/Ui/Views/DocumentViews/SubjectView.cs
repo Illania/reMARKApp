@@ -40,6 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         void InitializeView()
         {
+            LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             Visibility = ViewStates.Gone;
             var paddingLarge = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 16.0f, Resources.DisplayMetrics) + 0.5f);
             var paddingSmall = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 8.0f, Resources.DisplayMetrics) + 0.5f);

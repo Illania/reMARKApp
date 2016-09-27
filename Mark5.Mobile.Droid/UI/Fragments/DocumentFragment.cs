@@ -48,9 +48,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
-            linearLayout.AddView(new SubjectView(Context), new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-            linearLayout.AddView(new RecipentsView(Context), new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-            linearLayout.AddView(new ContentView(Context), new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+            linearLayout.AddView(new SubjectView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new RecipentsView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContentView(Context));
 
             return rootView;
         }

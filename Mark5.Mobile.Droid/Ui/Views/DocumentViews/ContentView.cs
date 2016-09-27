@@ -42,6 +42,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         void InitializeView()
         {
+            LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             var paddingSmall = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 8.0f, Resources.DisplayMetrics) + 0.5f);
             SetPadding(0, paddingSmall, 0, paddingSmall);
 

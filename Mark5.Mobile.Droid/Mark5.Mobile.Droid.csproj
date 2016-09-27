@@ -192,6 +192,7 @@
     <Compile Include="Ui\Views\DocumentViews\SubjectView.cs" />
     <Compile Include="Ui\Views\DocumentViews\RecipentsView.cs" />
     <Compile Include="Ui\Views\DocumentViews\ContentView.cs" />
+    <Compile Include="Ui\Views\DocumentViews\Divider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
