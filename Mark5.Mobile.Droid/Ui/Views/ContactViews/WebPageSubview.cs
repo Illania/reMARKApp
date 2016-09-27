@@ -10,7 +10,7 @@ using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class WebPageSubview : ContactViewBaseTextSubview
+    public class WebPageSubview : ContactTextSubview
     {
         public WebPageSubview(Android.Content.Context context) : base(context)
         {

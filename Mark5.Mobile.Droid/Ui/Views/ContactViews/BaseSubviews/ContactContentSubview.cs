@@ -11,24 +11,15 @@ using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class ContactViewBaseListSubview : ContactViewBaseSubview
+    public class ContactContentSubview : ContactSubView
     {
         protected LinearLayoutCompat contentLayout;
 
-        public ContactViewBaseListSubview(Android.Content.Context context) : base(context)
-        {
-            InitializeView();
-        }
-
-        void InitializeView()
+        public ContactContentSubview(Android.Content.Context context) : base(context)
         {
             contentLayout = new LinearLayoutCompat(Context);
-            contentLayout.SetPadding(20, 20, 20, 20); //TODO put the right valued
             contentLayout.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            AddView(contentLayout);
-
-            AddView(separatorView);
+            internalLayout.AddView(contentLayout);
         }
-
     }
 }

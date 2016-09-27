@@ -6,7 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
-namespace Mark5.Mobile.Droid
+namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
     public class PrimaryPersonSubview
     {

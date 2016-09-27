@@ -188,9 +188,9 @@
     <Compile Include="Ui\Activities\ShortcodesListActivity.cs" />
     <Compile Include="Ui\Activities\ContactActivity.cs" />
     <Compile Include="Ui\Fragments\ContactViewFragment.cs" />
-    <Compile Include="Ui\Views\ContactViews\BaseSubviews\ContactViewBaseListSubview.cs" />
-    <Compile Include="Ui\Views\ContactViews\BaseSubviews\ContactViewBaseSubview.cs" />
-    <Compile Include="Ui\Views\ContactViews\BaseSubviews\ContactViewBaseTextSubview.cs" />
+    <Compile Include="Ui\Views\ContactViews\BaseSubviews\ContactContentSubview.cs" />
+    <Compile Include="Ui\Views\ContactViews\BaseSubviews\ContactSubView.cs" />
+    <Compile Include="Ui\Views\ContactViews\BaseSubviews\ContactTextSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\DescriptionSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\WebPageSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\BirthdateSubview.cs" />
@@ -201,17 +201,17 @@
     <Compile Include="Ui\Views\ContactViews\LedgerSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\CommunicationAddressesSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\PhysicalAddressesSubview.cs" />
-    <Compile Include="Ui\Views\ContactViews\BaseSubviews\ResponsibleSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\PrimaryPersonSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\ChildrenSubview.cs" />
-    <Compile Include="Ui\Views\ShortIdSubview.cs" />
     <Compile Include="Ui\Activities\DocumentActivity.cs" />
     <Compile Include="Ui\Fragments\DocumentFragment.cs" />
     <Compile Include="Ui\Views\DocumentViews\DocumentView.cs" />
     <Compile Include="Ui\Views\DocumentViews\SubjectView.cs" />
     <Compile Include="Ui\Views\DocumentViews\RecipentsView.cs" />
     <Compile Include="Ui\Views\DocumentViews\ContentView.cs" />
-    <Compile Include="Ui\Views\DocumentViews\Divider.cs" />
+    <Compile Include="Ui\Views\ContactViews\ResponsibleSubview.cs" />
+    <Compile Include="Ui\Views\ContactViews\ShortIdSubview.cs" />
+    <Compile Include="Ui\Views\Divider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

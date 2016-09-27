@@ -5,8 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
-using System.Collections.Generic;
+
 using System.Threading.Tasks;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -16,6 +15,7 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Views.ContactViews;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -31,13 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ScrollView scrollView;
         LinearLayoutCompat linearLayout;
 
-        DescriptionSubview descriptionSubview;
-        VatSubview vatSubview;
-        BirthdateSubview birthdateSubview;
-        AccountSubview accountSubview;
-        WebPageSubview webpageSubview;
-
-        public override Android.Views.View OnCreateView(Android.Views.LayoutInflater inflater, Android.Views.ViewGroup container, Android.OS.Bundle savedInstanceState)
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
             var rootView = inflater.Inflate(Resource.Layout.linear_layout, container, false);
 
@@ -45,22 +39,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
-            descriptionSubview = new DescriptionSubview(Context);
-            vatSubview = new VatSubview(Context);
-            birthdateSubview = new BirthdateSubview(Context);
-            accountSubview = new AccountSubview(Context);
-            webpageSubview = new WebPageSubview(Context);
-
-            linearLayout.AddView(descriptionSubview);
-            linearLayout.AddView(birthdateSubview);
-            linearLayout.AddView(vatSubview);
-            linearLayout.AddView(accountSubview);
-            linearLayout.AddView(webpageSubview);
-
+            linearLayout.AddView(new DescriptionSubview(Context));
+            linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.Email));
+            linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.Fax));
+            linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.IM));
+            linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.Internal));
+            linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.Mobile));
+            linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.Phone));
+            linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.Skype));
+            linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.System));
+            linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.Telex));
+            linearLayout.AddView(new VatSubview(Context));
+            linearLayout.AddView(new BirthdateSubview(Context));
+            linearLayout.AddView(new AccountSubview(Context));
+            linearLayout.AddView(new WebPageSubview(Context));
             return rootView;
         }
 
-        public override void OnViewCreated(Android.Views.View view, Android.OS.Bundle savedInstanceState)
+        public override void OnViewCreated(View view, Android.OS.Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
 
@@ -100,12 +96,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             for (int i = 0; i < linearLayout.ChildCount; i++)
             {
                 var contactSubview = linearLayout.GetChildAt(i) as IContactSubview;
+                if (contactSubview != null)
+                {
+                    contactSubview.Contact = Contact;
+                    contactSubview.ContactPreview = ContactPreview;
 
-                contactSubview.Contact = Contact;
-                contactSubview.ContactPreview = ContactPreview;
-
-                contactSubview.RefreshView();
+                    contactSubview.RefreshView();
+                }
             }
+
+            linearLayout.Invalidate();
+            linearLayout.RequestLayout();
         }
 
         #region RetainedInstance
@@ -117,6 +118,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Contact = Contact,
                 ContactPreview = ContactPreview,
                 Folder = Folder,
+                ContactId = ContactId,
             };
         }
 
@@ -142,8 +144,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         class ContactViewFragmentState : IRetainableState
         {
             public Contact Contact { get; set; }
-            public ContactPreview ContactPreview { get; set; } //TODO think what happens if we start from notification
+            public ContactPreview ContactPreview { get; set; }
             public Folder Folder { get; set; }
+            public int? ContactId { get; set; }
         }
 
         #endregion
