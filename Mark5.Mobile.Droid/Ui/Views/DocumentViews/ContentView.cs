@@ -16,6 +16,7 @@ using Android.Net;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
+
     public class ContentView : LinearLayoutCompat, IDocumentView
     {
 
