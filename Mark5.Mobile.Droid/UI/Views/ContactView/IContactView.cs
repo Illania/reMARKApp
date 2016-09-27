@@ -16,7 +16,5 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactView
         Contact Contact { get; set; }
 
         void RefreshView();
-        void SetVisibility(bool visible);
-        void SetSeparatorVisibility(bool visible);
     }
 }

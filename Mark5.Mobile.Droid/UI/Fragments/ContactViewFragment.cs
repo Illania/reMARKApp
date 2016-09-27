@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
+using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
@@ -23,6 +24,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         public ContactPreview ContactPreview { get; set; }
         public Contact Contact { get; set; }
         public Folder Folder { get; set; }
+        public int? FolderId { get; set; }
+        public int? ContactId { get; set; }
+
+        ProgressBar progress;
+        ScrollView scrollView;
+        LinearLayoutCompat linearLayout;
 
         DescriptionSubview descriptionSubview;
         VatSubview vatSubview;
@@ -30,11 +37,13 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         AccountSubview accountSubview;
         WebPageSubview webpageSubview;
 
-        List<IContactSubview> contactSubViews = new List<IContactSubview>();
-
         public override Android.Views.View OnCreateView(Android.Views.LayoutInflater inflater, Android.Views.ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
             var rootView = inflater.Inflate(Resource.Layout.linear_layout, container, false);
+
+            progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
+            scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
+            linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
             descriptionSubview = new DescriptionSubview(Context);
             vatSubview = new VatSubview(Context);
@@ -42,13 +51,11 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             accountSubview = new AccountSubview(Context);
             webpageSubview = new WebPageSubview(Context);
 
-
-
-            contactSubViews.Add(descriptionSubview);
-            contactSubViews.Add(birthdateSubview);
-            contactSubViews.Add(vatSubview);
-            contactSubViews.Add(accountSubview);
-            contactSubViews.Add(webpageSubview);
+            linearLayout.AddView(descriptionSubview);
+            linearLayout.AddView(birthdateSubview);
+            linearLayout.AddView(vatSubview);
+            linearLayout.AddView(accountSubview);
+            linearLayout.AddView(webpageSubview);
 
             return rootView;
         }
@@ -65,35 +72,40 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             base.OnResume();
 
-            await LoadContact();
-            ShowContact();
+            await RefreshData();
         }
 
-        async Task LoadContact()
+        async Task RefreshData()
         {
-            if (ContactPreview != null)
+            if (ContactId.HasValue && ContactPreview == null && Contact == null)
             {
-                if (Contact == null)
-                {
-                    Contact = await Managers.ContactsManager.GetContactAsync(Folder, ContactPreview.Id);
-                }
+                var container = await Managers.ContactsManager.GetContactWithPreviewAsync(FolderId.Value, ContactId.Value);
+                Contact = container.Contact;
+                ContactPreview = container.ContactPreview;
             }
-            else
-            {
 
+            if (ContactPreview != null && Contact == null)
+            {
+                Contact = await Managers.ContactsManager.GetContactAsync(Folder, ContactPreview.Id);
             }
+
+            RefreshView();
         }
 
-        void ShowContact()
+        void RefreshView()
         {
-            foreach (var contactSubview in contactSubViews)
+            progress.Visibility = ViewStates.Gone;
+            scrollView.Visibility = ViewStates.Visible;
+
+            for (int i = 0; i < linearLayout.ChildCount; i++)
             {
+                var contactSubview = linearLayout.GetChildAt(i) as IContactSubview;
+
                 contactSubview.Contact = Contact;
                 contactSubview.ContactPreview = ContactPreview;
 
                 contactSubview.RefreshView();
             }
-
         }
 
         #region RetainedInstance

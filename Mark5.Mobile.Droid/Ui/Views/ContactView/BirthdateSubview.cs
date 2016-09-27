@@ -7,6 +7,7 @@
 //
 using System;
 using Android.Runtime;
+using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactView
 {
@@ -22,12 +23,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactView
         {
             if (Contact?.BirthDate != null && Contact.BirthDate != default(DateTime))
             {
-                SetVisibility(true);
+                Visibility = ViewStates.Visible;
                 SetContent(Contact.BirthDate.ToString()); //TODO need to write it in a better way
             }
             else
             {
-                SetVisibility(false);
+                Visibility = ViewStates.Gone;
             }
         }
     }

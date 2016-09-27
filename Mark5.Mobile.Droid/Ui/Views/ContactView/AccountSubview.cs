@@ -7,6 +7,7 @@
 //
 using System;
 using Android.Runtime;
+using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactView
 {
@@ -22,12 +23,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactView
         {
             if (!string.IsNullOrEmpty(Contact?.Account))
             {
-                SetVisibility(true);
+                Visibility = ViewStates.Visible;
                 SetContent(Contact.Account);
             }
             else
             {
-                SetVisibility(false);
+                Visibility = ViewStates.Gone;
             }
         }
     }
