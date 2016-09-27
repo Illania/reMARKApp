@@ -33,13 +33,15 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override Android.Views.View OnCreateView(Android.Views.LayoutInflater inflater, Android.Views.ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
-            var rootView = inflater.Inflate(Resource.Layout.contact_view, container, false);
+            var rootView = inflater.Inflate(Resource.Layout.linear_layout, container, false);
 
-            descriptionSubview = rootView.FindViewById<DescriptionSubview>(Resource.Id.description_subview);
-            birthdateSubview = rootView.FindViewById<BirthdateSubview>(Resource.Id.birthdate_subview);
-            vatSubview = rootView.FindViewById<VatSubview>(Resource.Id.vat_subview);
-            accountSubview = rootView.FindViewById<AccountSubview>(Resource.Id.account_subview);
-            webpageSubview = rootView.FindViewById<WebPageSubview>(Resource.Id.webpage_subview);
+            descriptionSubview = new DescriptionSubview(Context);
+            vatSubview = new VatSubview(Context);
+            birthdateSubview = new BirthdateSubview(Context);
+            accountSubview = new AccountSubview(Context);
+            webpageSubview = new WebPageSubview(Context);
+
+
 
             contactSubViews.Add(descriptionSubview);
             contactSubViews.Add(birthdateSubview);

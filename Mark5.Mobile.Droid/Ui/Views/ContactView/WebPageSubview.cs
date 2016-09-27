@@ -13,7 +13,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactView
     [Register("ContactView.WebPageSubview")]
     public class WebPageSubview : ContactViewBaseTextSubview
     {
-        public WebPageSubview(Android.Content.Context context, Android.Util.IAttributeSet attrs) : base(context, attrs)
+        public WebPageSubview(Android.Content.Context context) : base(context)
         {
             SetTitle("Web page");
         }

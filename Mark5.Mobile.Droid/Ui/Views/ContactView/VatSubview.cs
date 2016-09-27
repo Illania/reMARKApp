@@ -13,7 +13,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactView
     [Register("ContactView.VatSubview")]
     public class VatSubview : ContactViewBaseTextSubview
     {
-        public VatSubview(Android.Content.Context context, Android.Util.IAttributeSet attrs) : base(context, attrs)
+        public VatSubview(Android.Content.Context context) : base(context)
         {
             SetTitle("VAT");
         }

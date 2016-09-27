@@ -13,7 +13,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactView
     [Register("ContactView.BirthdateSubview")]
     public class BirthdateSubview : ContactViewBaseTextSubview
     {
-        public BirthdateSubview(Android.Content.Context context, Android.Util.IAttributeSet attrs) : base(context, attrs)
+        public BirthdateSubview(Android.Content.Context context) : base(context)
         {
             SetTitle("Birthdate");
         }

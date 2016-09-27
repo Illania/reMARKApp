@@ -5,7 +5,11 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
+using Android.Content;
+using Android.Runtime;
 using Android.Support.V7.Widget;
+using Android.Util;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
@@ -14,23 +18,29 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactView
 {
     public class ContactViewBaseSubview : LinearLayoutCompat, IContactSubview
     {
-        readonly AppCompatTextView titleTextView;
-        readonly protected View separatorView;
+        AppCompatTextView titleTextView;
+        protected View separatorView;
 
         public ContactPreview ContactPreview { get; set; }
         public Contact Contact { get; set; }
 
-        public ContactViewBaseSubview(Android.Content.Context context, Android.Util.IAttributeSet attrs) : base(context, attrs)
+        public ContactViewBaseSubview(Context context)
+            : base(context)
         {
-            Orientation = LinearLayoutCompat.Vertical;
+            InitializeView();
+        }
+
+        void InitializeView()
+        {
+            Orientation = Vertical;
             SetPadding(20, 20, 20, 20); //TODO need to put right values (and in dp)
 
-            titleTextView = new AppCompatTextView(context);
+            titleTextView = new AppCompatTextView(Context);
             titleTextView.SetTextAppearance(Resource.Style.contactFieldTitle);
             titleTextView.LayoutParameters = new LayoutParams(LayoutParams.MatchParent, LayoutParams.WrapContent);
             AddView(titleTextView);
 
-            separatorView = new View(context);
+            separatorView = new View(Context);
             separatorView.LayoutParameters = new LayoutParams(LayoutParams.MatchParent, ConversionUtils.ConvertDpToPixels(1));
             separatorView.SetBackgroundColor(Android.Graphics.Color.LightGray);
 
@@ -59,13 +69,4 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactView
 
     }
 
-    interface IContactSubview
-    {
-        ContactPreview ContactPreview { get; set; }
-        Contact Contact { get; set; }
-
-        void RefreshView();
-        void SetVisibility(bool visible);
-        void SetSeparatorVisibility(bool visible);
-    }
 }

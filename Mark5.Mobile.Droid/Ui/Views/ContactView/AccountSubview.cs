@@ -7,14 +7,13 @@
 //
 using System;
 using Android.Runtime;
-using Mark5.Mobile.Droid.Ui.Views.ContactView.BaseSubviews;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactView
 {
     [Register("ContactView.AccountSubview")]
     public class AccountSubview : ContactViewBaseTextSubview
     {
-        public AccountSubview(Android.Content.Context context, Android.Util.IAttributeSet attrs) : base(context, attrs)
+        public AccountSubview(Android.Content.Context context) : base(context)
         {
             SetTitle("Account");
         }
