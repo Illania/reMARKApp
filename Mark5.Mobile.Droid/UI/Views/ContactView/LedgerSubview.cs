@@ -1,32 +1,36 @@
 ﻿//
 // Project: 
-// File: VatSubview.cs
+// File: LedgerSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
 // Copyright (c) 2016 Nordic IT
 //
+
+using Android.Content;
 using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactView
 {
-    public class VatSubview : ContactViewBaseTextSubview
+    public class LedgerSubview : ContactViewBaseTextSubview
     {
-        public VatSubview(Android.Content.Context context) : base(context)
+        public LedgerSubview(Context context) :
+            base(context)
         {
-            SetTitle("VAT");
+            SetTitle("Ledger");
         }
 
         public override void RefreshView()
         {
-            if (!string.IsNullOrEmpty(Contact?.Vat))
+            if (!string.IsNullOrEmpty(Contact?.Ledger))
             {
                 Visibility = ViewStates.Visible;
-                SetContent(Contact.Vat);
+                SetContent(Contact.Ledger);
             }
             else
             {
                 Visibility = ViewStates.Gone;
             }
         }
+
     }
 }

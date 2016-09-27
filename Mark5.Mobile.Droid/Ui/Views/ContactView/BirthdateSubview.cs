@@ -5,13 +5,10 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
-using Android.Runtime;
 using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactView
 {
-    [Register("ContactView.BirthdateSubview")]
     public class BirthdateSubview : ContactViewBaseTextSubview
     {
         public BirthdateSubview(Android.Content.Context context) : base(context)
@@ -21,10 +18,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactView
 
         public override void RefreshView()
         {
-            if (Contact?.BirthDate != null && Contact.BirthDate != default(DateTime))
+            if (!string.IsNullOrEmpty(Contact?.Ledger))
             {
                 Visibility = ViewStates.Visible;
-                SetContent(Contact.BirthDate.ToString()); //TODO need to write it in a better way
+                SetContent(Contact.Ledger);
             }
             else
             {

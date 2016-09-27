@@ -186,6 +186,7 @@
     <Compile Include="UI\Views\ContactView\VatSubview.cs" />
     <Compile Include="Utilities\ConversionUtils.cs" />
     <Compile Include="UI\Views\ContactView\IContactView.cs" />
+    <Compile Include="UI\Views\ContactView\LedgerSubview.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

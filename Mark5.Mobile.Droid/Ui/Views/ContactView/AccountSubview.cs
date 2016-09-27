@@ -5,13 +5,11 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
-using Android.Runtime;
+
 using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactView
 {
-    [Register("ContactView.AccountSubview")]
     public class AccountSubview : ContactViewBaseTextSubview
     {
         public AccountSubview(Android.Content.Context context) : base(context)

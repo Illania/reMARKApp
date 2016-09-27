@@ -5,13 +5,11 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
-using Android.Runtime;
+
 using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactView
 {
-    [Register("ContactView.WebPageSubview")]
     public class WebPageSubview : ContactViewBaseTextSubview
     {
         public WebPageSubview(Android.Content.Context context) : base(context)
