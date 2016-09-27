@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: ContactsListFragment.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -22,9 +22,9 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Views.Common;
+using Mark5.Mobile.Droid.Ui.Common;
 
-namespace Mark5.Mobile.Droid.Views.Fragments
+namespace Mark5.Mobile.Droid.Ui.Fragments
 {
 
     public class ContactsListFragment : RetainableStateFragment, ActionMode.ICallback, View.IOnClickListener, SearchView.IOnQueryTextListener, SearchView.IOnCloseListener
@@ -57,7 +57,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
-            refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
+            refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
             refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
             refreshLayout.Refresh += (sender, e) =>
             {
@@ -67,7 +67,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 RefreshData(force: true);
             };
 
-            recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recyclerView);
+            recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
             recyclerView.HasFixedSize = true;

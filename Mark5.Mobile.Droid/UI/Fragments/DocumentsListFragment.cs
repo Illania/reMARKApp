@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: DocumentsListFragment.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -15,6 +15,7 @@ using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
+using Android.Support.Design.Widget;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
@@ -24,12 +25,12 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
-using Mark5.Mobile.Droid.Views.Common;
-using Android.Support.Design.Widget;
-using Android.Support.V4.Content;
+using Mark5.Mobile.Droid.Ui.Activities;
+using Mark5.Mobile.Droid.Ui.Common;
 
-namespace Mark5.Mobile.Droid.Views.Fragments
+namespace Mark5.Mobile.Droid.Ui.Fragments
 {
 
     public class DocumentsListFragment : RetainableStateFragment, ActionMode.ICallback, View.IOnClickListener, SearchView.IOnQueryTextListener, SearchView.IOnCloseListener
@@ -37,11 +38,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
 
-        public Folder Folder
-        {
-            get;
-            set;
-        }
+        public Folder Folder { get; set; }
 
         bool refreshing;
 
@@ -67,7 +64,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
             coordinatorLayout = (CoordinatorLayout)container.Parent;
 
-            refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
+            refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
             refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
             refreshLayout.Refresh += async (sender, e) =>
             {
@@ -77,7 +74,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
                 await RefreshData(force: true);
             };
 
-            recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recyclerView);
+            recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
@@ -288,7 +285,10 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             if (actionMode == null)
             {
-                Android.Widget.Toast.MakeText(Activity, "Document clicked!", Android.Widget.ToastLength.Short).Show();
+                var i = new Intent(Activity, typeof(DocumentActivity));
+                i.PutExtra(DocumentActivity.FolderIntentKey, SerializationUtils.Serialize(Folder));
+                i.PutExtra(DocumentActivity.DocumentPreviewIntentKey, SerializationUtils.Serialize(documentPreview));
+                StartActivity(i);
             }
             else
             {

@@ -1,6 +1,6 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
-// File: ContactsListActivity.cs
+// File: DocumentsListActivity.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -12,14 +12,14 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Views.Common;
-using Mark5.Mobile.Droid.Views.Fragments;
+using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Fragments;
 
-namespace Mark5.Mobile.Droid.Views.Activities
+namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Activity]
-    public class ContactsListActivity : BaseAppCompatActivity
+    public class DocumentsListActivity : BaseAppCompatActivity
     {
 
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
@@ -30,9 +30,9 @@ namespace Mark5.Mobile.Droid.Views.Activities
         {
             base.OnCreate(savedInstanceState);
 
-            CommonConfig.Logger.Info($"Creating {nameof(ContactsListActivity)}...");
+            CommonConfig.Logger.Info($"Creating {nameof(DocumentsListActivity)}...");
 
-            SetTitle(Resource.String.contacts);
+            SetTitle(Resource.String.documents);
             SetContentView(Resource.Layout.base_layout);
 
             toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
@@ -43,18 +43,18 @@ namespace Mark5.Mobile.Droid.Views.Activities
             {
                 var folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                var dlf = new ContactsListFragment
+                var dlf = new DocumentsListFragment
                 {
                     Folder = folder
                 };
                 ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
                 ft.Commit();
 
-                CommonConfig.Logger.Info($"Created {nameof(ContactsListActivity)}");
+                CommonConfig.Logger.Info($"Created {nameof(DocumentsListActivity)}");
             }
             else
             {
-                CommonConfig.Logger.Info($"Restored {nameof(ContactsListActivity)}");
+                CommonConfig.Logger.Info($"Restored {nameof(DocumentsListActivity)}");
             }
         }
 

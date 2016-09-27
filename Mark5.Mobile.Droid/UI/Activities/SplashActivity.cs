@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: SplashActivity.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -19,9 +19,9 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Services;
 using Mark5.Mobile.Droid.Utilities.Hockey;
-using Mark5.Mobile.Droid.Views.Common;
+using Mark5.Mobile.Droid.Ui.Common;
 
-namespace Mark5.Mobile.Droid.Views.Activity
+namespace Mark5.Mobile.Droid.Ui.Activity
 {
 
     [Activity(Label = "MARK5",

@@ -1,28 +1,29 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
-// File: DocumentsListActivity.cs
+// File: DocumentActivity.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using Android.App;
 using Android.OS;
 using Android.Support.V7.Widget;
-using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Views.Common;
-using Mark5.Mobile.Droid.Views.Fragments;
+using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Fragments;
 
-namespace Mark5.Mobile.Droid.Views.Activities
+namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Activity]
-    public class DocumentsListActivity : BaseAppCompatActivity
+    public class DocumentActivity : BaseAppCompatActivity
     {
 
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
+        public const string DocumentPreviewIntentKey = "DocumentPreview_0bd291a4-22a5-431c-ad6e-4c8b273eeb98";
 
         Toolbar toolbar;
 
@@ -30,9 +31,9 @@ namespace Mark5.Mobile.Droid.Views.Activities
         {
             base.OnCreate(savedInstanceState);
 
-            CommonConfig.Logger.Info($"Creating {nameof(DocumentsListActivity)}...");
+            CommonConfig.Logger.Info($"Creating {nameof(DocumentActivity)}...");
 
-            SetTitle(Resource.String.documents);
+            SetTitle(Resource.String.document);
             SetContentView(Resource.Layout.base_layout);
 
             toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
@@ -42,23 +43,25 @@ namespace Mark5.Mobile.Droid.Views.Activities
             if (savedInstanceState == null)
             {
                 var folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+                var documentPreview = SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                var dlf = new DocumentsListFragment
+                var dlf = new DocumentFragment
                 {
-                    Folder = folder
+                    Folder = folder,
+                    DocumentPreview = documentPreview
                 };
                 ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
                 ft.Commit();
 
-                CommonConfig.Logger.Info($"Created {nameof(DocumentsListActivity)}");
+                CommonConfig.Logger.Info($"Created {nameof(DocumentActivity)}");
             }
             else
             {
-                CommonConfig.Logger.Info($"Restored {nameof(DocumentsListActivity)}");
+                CommonConfig.Logger.Info($"Restored {nameof(DocumentActivity)}");
             }
         }
 
-        public override bool OnOptionsItemSelected(IMenuItem item)
+        public override bool OnOptionsItemSelected(Android.Views.IMenuItem item)
         {
             if (item.ItemId == Android.Resource.Id.Home)
             {

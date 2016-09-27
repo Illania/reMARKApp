@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: BaseAppCompatActivity.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -10,7 +10,7 @@ using Android.Content;
 using Android.OS;
 using Android.Support.V7.App;
 
-namespace Mark5.Mobile.Droid.Views.Common
+namespace Mark5.Mobile.Droid.Ui.Common
 {
 
     public abstract class BaseAppCompatActivity : AppCompatActivity
