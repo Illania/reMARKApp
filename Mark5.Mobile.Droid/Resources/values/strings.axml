@@ -11,7 +11,7 @@
 	<string name="please_wait">Please wait...</string>
 	<string name="today">Today</string>
 	<string name="yesterday">Yesterday</string>
-	<string name="to">to</string>
+	<string name="to_prefix">to</string>
 	<string name="show_details">Show details</string>
 	<string name="hide_details">Hide details</string>
 	<string name="username">Username</string>

@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: RecipentsView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -545,26 +545,25 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 if (DocumentPreview.Direction == DocumentDirection.Incoming)
                 {
-                    var addressFrom = DocumentPreview.Addresses?.Where(da => da.AddressType == DocumentAddressType.From).FirstOrDefault();
-                    var from = string.IsNullOrWhiteSpace(addressFrom?.Name) ? addressFrom?.Address : addressFrom?.Name;
-
-                    var addressesTo = DocumentPreview.Addresses?.Where(da => da.AddressType == DocumentAddressType.To);
-                    var to = string.Join(", ", addressesTo.Select(at => string.IsNullOrWhiteSpace(at?.Name) ? at?.Address : at?.Name));
+                    var addressFrom = DocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).FirstOrDefault();
+                    var from = string.IsNullOrWhiteSpace(addressFrom.Name) ? addressFrom.Address : addressFrom.Name;
+                    var addressesTo = DocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType);
+                    var to = string.Join(", ", addressesTo.Select(at => string.IsNullOrWhiteSpace(at.Name) ? at.Address : at.Name));
 
                     letter.Text = from.Substring(0, 1).ToUpper();
                     line1.Text = from;
-                    line2.Text = Context.GetString(Resource.String.to) + " " + to;
+                    line2.Text = Context.GetString(Resource.String.to_prefix) + " " + to;
                 }
                 else
                 {
-                    var from = Document.Lines.FirstOrDefault()?.Name;
+                    var from = Document.Lines.FirstOrDefault().Name;
 
-                    var addressesTo = DocumentPreview.Addresses?.Where(da => da.AddressType == DocumentAddressType.To);
-                    var to = string.Join(", ", addressesTo.Select(at => string.IsNullOrWhiteSpace(at?.Name) ? at?.Address : at?.Name));
+                    var addressesTo = DocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To);
+                    var to = string.Join(", ", addressesTo.Select(at => string.IsNullOrWhiteSpace(at.Name) ? at.Address : at.Name));
 
                     letter.Text = from.Substring(0, 1).ToUpper();
                     line1.Text = from;
-                    line2.Text = Context.GetString(Resource.String.to) + " " + to;
+                    line2.Text = Context.GetString(Resource.String.to_prefix) + " " + to;
                 }
 
                 var dateReceived = DocumentPreview.DateReceived.ToServerTime();
