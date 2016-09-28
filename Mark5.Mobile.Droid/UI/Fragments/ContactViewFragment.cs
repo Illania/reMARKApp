@@ -59,7 +59,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Telex));
             subviews.Add(new PhysicalAddressesSubview(Context));
             subviews.Add(new LinkedContactSubview(Context, LinkedContactType.PrimaryPerson));
-            //subviews.Add(new ResponsibleSubview(Context));
+            subviews.Add(new ResponsibleSubview(Context));
             subviews.Add(new LinkedContactSubview(Context, LinkedContactType.Company));
             subviews.Add(new LinkedContactSubview(Context, LinkedContactType.Department));
             subviews.Add(new LinkedContactSubview(Context, LinkedContactType.Person));

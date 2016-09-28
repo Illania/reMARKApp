@@ -209,7 +209,7 @@ namespace Mark5.Mobile.Common.Model.Converters
             if (c.ResponsibleUserIds != null)
                 result.ResponsibleUserIds.AddRange(c.ResponsibleUserIds);
             if (c.ResponsibleUsers != null)
-                result.ResponsibleUsers.Union(c.ResponsibleUsers);
+                result.ResponsibleUsers = result.ResponsibleUsers.Union(c.ResponsibleUsers).ToDictionary(k => k.Key, v => v.Value);
             if (c.Comments != null)
                 result.Comments.AddRange(c.Comments.WhereNotNull().Select(Convert));
             return result;
