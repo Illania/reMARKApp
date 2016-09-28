@@ -653,7 +653,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 var dfo = DateFormat.GetDateFormatOrder(Context);
                 var dateText = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
                 var timeText = (DateFormat.Is24HourFormat(Context) ? dateReceived.ToString("HH:mm") : dateReceived.ToString("hh:mm tt"));
-                var dateReceivedText = timeText + "  " + dateText;
+                var dateReceivedText = timeText + " " + dateText;
                 dateReceivedValue.Visibility = string.IsNullOrWhiteSpace(dateReceivedText) ? ViewStates.Gone : ViewStates.Visible;
                 dateReceivedValue.Text = dateReceivedText;
             }

@@ -57,7 +57,7 @@
 	<string name="delete_from_folder">Delete from folder</string>
 	<string name="delete">Delete</string>
 	<string name="lines">Lines:</string>
-	<string name="reference">Ref:</string>
+	<string name="reference">Ref.:</string>
 	<string name="to">To:</string>
 	<string name="from">From:</string>
 	<string name="cc">Cc:</string>

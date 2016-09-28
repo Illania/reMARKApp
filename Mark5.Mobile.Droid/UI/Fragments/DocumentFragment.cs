@@ -52,6 +52,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new RecipentsView(Context));
             linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new AttachmentsView(Context));
+            linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ContentView(Context));
 
             HasOptionsMenu = true;
@@ -154,6 +156,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dv.DocumentPreview = DocumentPreview;
                     dv.Document = Document;
                     dv.RefreshView();
+
+                    var d = linearLayout.GetChildAt(i + 1) as Divider;
+                    if (d != null)
+                    {
+                        d.Visibility = dv.Visibility;
+                        i++;
+                    }
                 }
             }
 
