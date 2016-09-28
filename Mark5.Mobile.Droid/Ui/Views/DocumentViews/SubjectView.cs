@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         void InitializeView()
         {
-            SetPadding(PaddingLarge, PaddingLarge, PaddingLarge, PaddingSmall);
+            SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceNormal);
 
             subjectView = new AppCompatTextView(Context);
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)

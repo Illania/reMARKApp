@@ -31,7 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         void InitializeView()
         {
-            SetPadding(PaddingNone, PaddingSmall, PaddingNone, PaddingSmall);
+            SetPadding(DistanceNone, DistanceNormal, DistanceNone, DistanceNormal);
 
             webView = new CustomWebView(Context);
             webView.SetWebViewClient(new CustomWebViewClient());

@@ -21,17 +21,36 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         public Document Document { get; set; }
 
-        protected readonly int PaddingNone;
-        protected readonly int PaddingLarge;
-        protected readonly int PaddingSmall;
+        protected int DistanceNone;
+        protected int DistanceLarge;
+        protected int DistanceNormal;
+        protected int DistanceSmall;
+
+        public DocumentView(Context context, IAttributeSet attrs, int defStyleAttr)
+            : base(context, attrs, defStyleAttr)
+        {
+            Init();
+        }
+
+        public DocumentView(Context context, IAttributeSet attrs)
+            : base(context, attrs)
+        {
+            Init();
+        }
 
         protected DocumentView(Context context)
             : base(context)
         {
+            Init();
+        }
+
+        void Init()
+        {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
-            PaddingLarge = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 16.0f, Resources.DisplayMetrics) + 0.5f);
-            PaddingSmall = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 8.0f, Resources.DisplayMetrics) + 0.5f);
+            DistanceLarge = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 16.0f, Resources.DisplayMetrics) + 0.5f);
+            DistanceNormal = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 8.0f, Resources.DisplayMetrics) + 0.5f);
+            DistanceSmall = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 4.0f, Resources.DisplayMetrics) + 0.5f);
 
             Visibility = ViewStates.Gone;
         }

@@ -12,6 +12,8 @@
 	<string name="today">Today</string>
 	<string name="yesterday">Yesterday</string>
 	<string name="to">to</string>
+	<string name="show_details">Show details</string>
+	<string name="hide_details">Hide details</string>
 	<string name="username">Username</string>
 	<string name="username_invalid">Username is not valid.</string>
 	<string name="password">Password</string>
@@ -54,4 +56,12 @@
 	<string name="links">Links</string>
 	<string name="delete_from_folder">Delete from folder</string>
 	<string name="delete">Delete</string>
+	<string name="lines">Lines:</string>
+	<string name="reference">Ref:</string>
+	<string name="to">To:</string>
+	<string name="from">From:</string>
+	<string name="cc">Cc:</string>
+	<string name="bcc">Bcc:</string>
+	<string name="reply_to">Reply to:</string>
+	<string name="date">Date:</string>
 </resources>

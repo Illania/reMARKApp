@@ -18,6 +18,7 @@ using Android.Util;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
+using Android.Widget;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
@@ -25,10 +26,31 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
     public class RecipentsView : DocumentView
     {
 
+        LinearLayoutCompat compactLayout;
         AppCompatTextView letter;
         AppCompatTextView line1;
         AppCompatTextView line2;
         AppCompatTextView line3;
+        AppCompatButton showButton;
+
+        TableLayout extendedLayout;
+        TableRow tableRowLine;
+        TableRow tableRowReferenceNumber;
+        TableRow tableRowFrom;
+        TableRow tableRowTo;
+        TableRow tableRowCc;
+        TableRow tableRowBcc;
+        TableRow tableRowReplyTo;
+        TableRow tableRowDateReceived;
+        AppCompatTextView lineValue;
+        AppCompatTextView referenceNumberValue;
+        AppCompatTextView fromValue;
+        AppCompatTextView toValue;
+        AppCompatTextView ccValue;
+        AppCompatTextView bccValue;
+        AppCompatTextView replyToValue;
+        AppCompatTextView dateReceivedValue;
+        AppCompatButton hideButton;
 
         public RecipentsView(Context context)
             : base(context)
@@ -39,22 +61,39 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         void InitializeView()
         {
             Orientation = Vertical;
-            SetPadding(PaddingLarge, PaddingLarge, PaddingLarge, PaddingLarge);
+            SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceLarge);
 
-            var innerLayout = new LinearLayoutCompat(Context)
+            var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
+            SetBackgroundResource(typedArray.GetResourceId(0, 0));
+            typedArray.Recycle();
+
+            Clickable = true;
+            Click += (sender, e) =>
+            {
+                compactLayout.Visibility = compactLayout.Visibility == ViewStates.Visible ? ViewStates.Gone : ViewStates.Visible;
+                extendedLayout.Visibility = extendedLayout.Visibility == ViewStates.Visible ? ViewStates.Gone : ViewStates.Visible;
+            };
+
+            InitializeCompactView();
+            InitializeExtendedView();
+        }
+
+        void InitializeCompactView()
+        {
+            compactLayout = new LinearLayoutCompat(Context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                 Orientation = Horizontal
             };
-            innerLayout.SetGravity((int)GravityFlags.CenterVertical);
-            AddView(innerLayout);
+            compactLayout.SetGravity((int)GravityFlags.CenterVertical);
+            AddView(compactLayout);
 
             var size = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 40.0f, Resources.DisplayMetrics) + 0.5f);
             letter = new AppCompatTextView(Context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(size, size),
                 Background = ContextCompat.GetDrawable(Context, Resource.Drawable.circle),
-                Gravity = GravityFlags.Center,
+                Gravity = GravityFlags.Center
             };
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)
             {
@@ -69,15 +108,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 #pragma warning restore XA0001 // Find issues with Android API usage
             }
             letter.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.white)));
-            innerLayout.AddView(letter);
+            compactLayout.AddView(letter);
 
-            var toFromLayout = new LinearLayoutCompat(Context)
+            var innerLayout = new LinearLayoutCompat(Context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                 Orientation = Vertical
             };
-            toFromLayout.SetPadding(PaddingLarge, PaddingNone, PaddingNone, PaddingNone);
-            innerLayout.AddView(toFromLayout);
+            innerLayout.SetPadding(DistanceLarge, DistanceNone, DistanceNone, DistanceNone);
+            compactLayout.AddView(innerLayout);
 
             line1 = new AppCompatTextView(Context)
             {
@@ -85,7 +124,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 Ellipsize = TextUtils.TruncateAt.End
             };
             line1.SetSingleLine(true);
-
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)
             {
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -98,7 +136,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 line1.SetTextAppearance(Resource.Style.fontPrimary);
 #pragma warning restore XA0001 // Find issues with Android API usage
             }
-            toFromLayout.AddView(line1);
+            innerLayout.AddView(line1);
 
             line2 = new AppCompatTextView(Context)
             {
@@ -106,7 +144,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 Ellipsize = TextUtils.TruncateAt.End
             };
             line2.SetSingleLine(true);
-
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)
             {
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -119,7 +156,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 line2.SetTextAppearance(Resource.Style.fontSecondary);
 #pragma warning restore XA0001 // Find issues with Android API usage
             }
-            toFromLayout.AddView(line2);
+            innerLayout.AddView(line2);
 
             line3 = new AppCompatTextView(Context)
             {
@@ -127,7 +164,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 Ellipsize = TextUtils.TruncateAt.End
             };
             line3.SetSingleLine(true);
-
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)
             {
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -140,7 +176,348 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 line3.SetTextAppearance(Resource.Style.fontSecondary);
 #pragma warning restore XA0001 // Find issues with Android API usage
             }
-            toFromLayout.AddView(line3);
+            innerLayout.AddView(line3);
+
+            showButton = new AppCompatButton(Context, null, Resource.Style.Widget_AppCompat_Button_Borderless_Colored)
+            {
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                Text = Context.GetString(Resource.String.show_details)
+            };
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                showButton.SetTextAppearance(Context, Resource.Style.fontButtonLink);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                showButton.SetTextAppearance(Resource.Style.fontButtonLink);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            showButton.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.brown)));
+            innerLayout.AddView(showButton);
+        }
+
+        void InitializeExtendedView()
+        {
+            extendedLayout = new TableLayout(Context)
+            {
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                Visibility = ViewStates.Gone,
+            };
+            AddView(extendedLayout);
+
+            tableRowLine = new TableRow(Context);
+            var lineLabel = new AppCompatTextView(Context)
+            {
+                Text = Context.GetString(Resource.String.lines)
+            };
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                lineLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                lineLabel.SetTextAppearance(Resource.Style.fontPrimary);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            tableRowLine.AddView(lineLabel);
+            lineValue = new AppCompatTextView(Context);
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                lineValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                lineValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            lineValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+            tableRowLine.AddView(lineValue);
+            extendedLayout.AddView(tableRowLine);
+
+            tableRowReferenceNumber = new TableRow(Context);
+            tableRowReferenceNumber.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+            var referenceNumberLabel = new AppCompatTextView(Context)
+            {
+                Text = Context.GetString(Resource.String.reference)
+            };
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                referenceNumberLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                referenceNumberLabel.SetTextAppearance(Resource.Style.fontPrimary);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            tableRowReferenceNumber.AddView(referenceNumberLabel);
+            referenceNumberValue = new AppCompatTextView(Context);
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                referenceNumberValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                referenceNumberValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            referenceNumberValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+            tableRowReferenceNumber.AddView(referenceNumberValue);
+            extendedLayout.AddView(tableRowReferenceNumber);
+
+            tableRowFrom = new TableRow(Context);
+            tableRowFrom.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+            var fromLabel = new AppCompatTextView(Context)
+            {
+                Text = Context.GetString(Resource.String.from)
+            };
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                fromLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                fromLabel.SetTextAppearance(Resource.Style.fontPrimary);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            tableRowFrom.AddView(fromLabel);
+            fromValue = new AppCompatTextView(Context);
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                fromValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                fromValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            fromValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+            tableRowFrom.AddView(fromValue);
+            extendedLayout.AddView(tableRowFrom);
+
+            tableRowTo = new TableRow(Context);
+            tableRowTo.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+            var toLabel = new AppCompatTextView(Context)
+            {
+                Text = Context.GetString(Resource.String.to)
+            };
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                toLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                toLabel.SetTextAppearance(Resource.Style.fontPrimary);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            tableRowTo.AddView(toLabel);
+            toValue = new AppCompatTextView(Context);
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                toValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                toValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            toValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+            tableRowTo.AddView(toValue);
+            extendedLayout.AddView(tableRowTo);
+
+            tableRowCc = new TableRow(Context);
+            tableRowCc.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+            var ccLabel = new AppCompatTextView(Context)
+            {
+                Text = Context.GetString(Resource.String.cc)
+            };
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                ccLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                ccLabel.SetTextAppearance(Resource.Style.fontPrimary);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            tableRowCc.AddView(ccLabel);
+            ccValue = new AppCompatTextView(Context);
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                ccValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                ccValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            ccValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+            tableRowCc.AddView(ccValue);
+            extendedLayout.AddView(tableRowCc);
+
+            tableRowBcc = new TableRow(Context);
+            tableRowBcc.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+            var bccLabel = new AppCompatTextView(Context)
+            {
+                Text = Context.GetString(Resource.String.bcc)
+            };
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                bccLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                bccLabel.SetTextAppearance(Resource.Style.fontPrimary);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            tableRowBcc.AddView(bccLabel);
+            bccValue = new AppCompatTextView(Context);
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                bccValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                bccValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            bccValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+            tableRowBcc.AddView(bccValue);
+            extendedLayout.AddView(tableRowBcc);
+
+            tableRowReplyTo = new TableRow(Context);
+            tableRowReplyTo.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+            var replyToLabel = new AppCompatTextView(Context)
+            {
+                Text = Context.GetString(Resource.String.reply_to)
+            };
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                replyToLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                replyToLabel.SetTextAppearance(Resource.Style.fontPrimary);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            tableRowReplyTo.AddView(replyToLabel);
+            replyToValue = new AppCompatTextView(Context);
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                replyToValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                replyToValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            replyToValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+            tableRowReplyTo.AddView(replyToValue);
+            extendedLayout.AddView(tableRowReplyTo);
+
+            tableRowDateReceived = new TableRow(Context);
+            tableRowDateReceived.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+            var dateReceivedLabel = new AppCompatTextView(Context)
+            {
+                Text = Context.GetString(Resource.String.date)
+            };
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                dateReceivedLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                dateReceivedLabel.SetTextAppearance(Resource.Style.fontPrimary);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            tableRowDateReceived.AddView(dateReceivedLabel);
+            dateReceivedValue = new AppCompatTextView(Context);
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                dateReceivedValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                dateReceivedValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            dateReceivedValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+            tableRowDateReceived.AddView(dateReceivedValue);
+            extendedLayout.AddView(tableRowDateReceived);
+
+            hideButton = new AppCompatButton(Context, null, Resource.Style.Widget_AppCompat_Button_Borderless_Colored)
+            {
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                Text = Context.GetString(Resource.String.hide_details)
+            };
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                hideButton.SetTextAppearance(Context, Resource.Style.fontButtonLink);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                hideButton.SetTextAppearance(Resource.Style.fontButtonLink);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            hideButton.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+            hideButton.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.brown)));
+            extendedLayout.AddView(hideButton);
+
+            extendedLayout.SetColumnStretchable(1, true);
+            extendedLayout.SetColumnShrinkable(1, true);
         }
 
         public override void RefreshView()
@@ -149,13 +526,30 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 Visibility = ViewStates.Visible;
 
+            }
+            else
+            {
+                Visibility = ViewStates.Gone;
+            }
+
+            compactLayout.Visibility = compactLayout.Visibility = ViewStates.Visible;
+            extendedLayout.Visibility = extendedLayout.Visibility = ViewStates.Gone;
+
+            RefreshCompactView();
+            RefreshExtendedView();
+        }
+
+        void RefreshCompactView()
+        {
+            if (DocumentPreview != null && Document != null)
+            {
                 if (DocumentPreview.Direction == DocumentDirection.Incoming)
                 {
                     var addressFrom = DocumentPreview.Addresses?.Where(da => da.AddressType == DocumentAddressType.From).FirstOrDefault();
                     var from = string.IsNullOrWhiteSpace(addressFrom?.Name) ? addressFrom?.Address : addressFrom?.Name;
 
-                    var addressTo = DocumentPreview.Addresses?.Where(da => da.AddressType == DocumentAddressType.To).FirstOrDefault();
-                    var to = string.IsNullOrWhiteSpace(addressTo?.Name) ? addressTo?.Address : addressTo?.Name;
+                    var addressesTo = DocumentPreview.Addresses?.Where(da => da.AddressType == DocumentAddressType.To);
+                    var to = string.Join(", ", addressesTo.Select(at => string.IsNullOrWhiteSpace(at?.Name) ? at?.Address : at?.Name));
 
                     letter.Text = from.Substring(0, 1).ToUpper();
                     line1.Text = from;
@@ -165,8 +559,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 {
                     var from = Document.Lines.FirstOrDefault()?.Name;
 
-                    var addressTo = DocumentPreview.Addresses?.Where(da => da.AddressType == DocumentAddressType.To).FirstOrDefault();
-                    var to = string.IsNullOrWhiteSpace(addressTo?.Name) ? addressTo?.Address : addressTo?.Name;
+                    var addressesTo = DocumentPreview.Addresses?.Where(da => da.AddressType == DocumentAddressType.To);
+                    var to = string.Join(", ", addressesTo.Select(at => string.IsNullOrWhiteSpace(at?.Name) ? at?.Address : at?.Name));
 
                     letter.Text = from.Substring(0, 1).ToUpper();
                     line1.Text = from;
@@ -194,12 +588,95 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             }
             else
             {
-                Visibility = ViewStates.Gone;
-
                 letter.Text = string.Empty;
                 line1.Text = string.Empty;
                 line2.Text = string.Empty;
                 line3.Text = string.Empty;
+            }
+        }
+
+        void RefreshExtendedView()
+        {
+            if (DocumentPreview != null && Document != null)
+            {
+                var lineText = string.Join(", ", Document.Lines.Select(d => d.Name));
+                tableRowLine.Visibility = string.IsNullOrWhiteSpace(lineText) ? ViewStates.Gone : ViewStates.Visible;
+                lineValue.Text = lineText;
+
+                var referenceNumbertext = DocumentPreview.ReferenceNumber;
+                tableRowReferenceNumber.Visibility = string.IsNullOrWhiteSpace(referenceNumbertext) ? ViewStates.Gone : ViewStates.Visible;
+                referenceNumberValue.Text = referenceNumbertext;
+
+                Func<DocumentAddress, string> addressText = (da) =>
+                {
+                    if (!string.IsNullOrWhiteSpace(da.Name) && string.IsNullOrWhiteSpace(da.Address))
+                    {
+                        return da.Name;
+                    }
+                    if (!string.IsNullOrWhiteSpace(da.Name) && !string.IsNullOrWhiteSpace(da.Address))
+                    {
+                        return da.Name + " <" + da.Address + ">";
+                    }
+                    if (string.IsNullOrWhiteSpace(da.Name) && !string.IsNullOrWhiteSpace(da.Address))
+                    {
+                        return da.Address;
+                    }
+
+                    return string.Empty;
+                };
+
+                var fromTextArray = DocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(addressText);
+                var fromText = string.Join(",\n", fromTextArray);
+                tableRowFrom.Visibility = string.IsNullOrWhiteSpace(fromText) ? ViewStates.Gone : ViewStates.Visible;
+                fromValue.Text = fromText;
+
+                var toTextArray = DocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To).Select(addressText);
+                var toText = string.Join(",\n", toTextArray);
+                tableRowTo.Visibility = string.IsNullOrWhiteSpace(toText) ? ViewStates.Gone : ViewStates.Visible;
+                toValue.Text = toText;
+
+                var ccTextArray = DocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.Cc).Select(addressText);
+                var ccText = string.Join(",\n", ccTextArray);
+                tableRowCc.Visibility = string.IsNullOrWhiteSpace(ccText) ? ViewStates.Gone : ViewStates.Visible;
+                ccValue.Text = ccText;
+
+                var bccTextArray = DocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.Bcc).Select(addressText);
+                var bccText = string.Join(",\n", bccTextArray);
+                tableRowBcc.Visibility = string.IsNullOrWhiteSpace(bccText) ? ViewStates.Gone : ViewStates.Visible;
+                bccValue.Text = bccText;
+
+                var replyToTextArray = DocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo).Select(addressText);
+                var replyToText = string.Join(",\n", replyToTextArray);
+                tableRowReplyTo.Visibility = string.IsNullOrWhiteSpace(replyToText) ? ViewStates.Gone : ViewStates.Visible;
+                replyToValue.Text = replyToText;
+
+                var dateReceived = DocumentPreview.DateReceived.ToServerTime();
+                var dfo = DateFormat.GetDateFormatOrder(Context);
+                var dateText = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
+                var timeText = (DateFormat.Is24HourFormat(Context) ? dateReceived.ToString("HH:mm") : dateReceived.ToString("hh:mm tt"));
+                var dateReceivedText = timeText + "  " + dateText;
+                dateReceivedValue.Visibility = string.IsNullOrWhiteSpace(dateReceivedText) ? ViewStates.Gone : ViewStates.Visible;
+                dateReceivedValue.Text = dateReceivedText;
+            }
+            else
+            {
+                tableRowLine.Visibility = ViewStates.Gone;
+                tableRowReferenceNumber.Visibility = ViewStates.Gone;
+                tableRowFrom.Visibility = ViewStates.Gone;
+                tableRowTo.Visibility = ViewStates.Gone;
+                tableRowCc.Visibility = ViewStates.Gone;
+                tableRowBcc.Visibility = ViewStates.Gone;
+                tableRowReplyTo.Visibility = ViewStates.Gone;
+                tableRowDateReceived.Visibility = ViewStates.Gone;
+
+                lineValue.Text = string.Empty;
+                referenceNumberValue.Text = string.Empty;
+                fromValue.Text = string.Empty;
+                toValue.Text = string.Empty;
+                ccValue.Text = string.Empty;
+                bccValue.Text = string.Empty;
+                replyToValue.Text = string.Empty;
+                dateReceivedValue.Text = string.Empty;
             }
         }
     }
