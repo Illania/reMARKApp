@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System.Linq;
+using System.Text;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
@@ -52,14 +53,45 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 AddView(typeTextView, new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent));
 
                 var addressTextView = new AppCompatTextView(context);
-                var formattedAddress = $"{physicalAddress.Country.Name} - {physicalAddress.City}, {physicalAddress.Area}, {physicalAddress.Street}, {physicalAddress.ZipCode}"; //TODO need to do a good formatting
-                AddView(addressTextView, new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1.0f));
-                addressTextView.Text = formattedAddress;
+                addressTextView.Text = GetAddressText(physicalAddress);
+                var addressTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1.0f);
+                addressTextViewLayoutParams.LeftMargin = ConversionUtils.ConvertDpToPixels(6);
+                AddView(addressTextView, addressTextViewLayoutParams);
 
                 var button = new AppCompatImageView(context);
                 button.SetImageResource(Resource.Drawable.folder_draft);
                 var buttonSizes = ConversionUtils.ConvertDpToPixels(16);
                 AddView(button, new LayoutParams(buttonSizes, buttonSizes));
+            }
+
+            string GetAddressText(PhysicalAddress address)
+            {
+                var sb = new StringBuilder();
+                if (!string.IsNullOrWhiteSpace(address.Street))
+                {
+                    sb.AppendLine(address.Street);
+                }
+                if (!string.IsNullOrWhiteSpace(address.Area))
+                {
+                    sb.AppendLine(address.Area);
+                }
+                if (!string.IsNullOrWhiteSpace(address.ZipCode))
+                {
+                    sb.Append(address.ZipCode);
+                    if (string.IsNullOrWhiteSpace(address.City))
+                    {
+                        sb.AppendLine();
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(address.City))
+                {
+                    sb.Append(" ").AppendLine(address.City);
+                }
+                if (address.Country != null)
+                {
+                    sb.Append(address.Country.Name);
+                }
+                return sb.ToString();
             }
         }
     }

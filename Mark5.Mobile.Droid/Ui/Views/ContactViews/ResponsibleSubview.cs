@@ -29,7 +29,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 foreach (var id in Contact.ResponsibleUserIds)
                 {
                     var subsubview = new ResponsibleSubSubview(Context, id, Contact.ResponsibleUsers[id]);
-                    internalLayout.AddView(subsubview);
+                    internalLayout.AddView(subsubview); //TODO bug in the service, need to check!
                 }
             }
             else

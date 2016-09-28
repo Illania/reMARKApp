@@ -58,7 +58,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 var descriptionTextView = new AppCompatTextView(context);
                 descriptionTextView.Text = communicationAddress.Description;
                 var descriptionTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1.0f);
-                descriptionTextViewLayoutParams.LeftMargin = ConversionUtils.ConvertDpToPixels(4);
+                descriptionTextViewLayoutParams.LeftMargin = ConversionUtils.ConvertDpToPixels(6);
                 AddView(descriptionTextView, descriptionTextViewLayoutParams);
 
                 var button = new AppCompatImageView(context);
