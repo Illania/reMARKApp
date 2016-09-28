@@ -10,6 +10,7 @@ using System.Linq;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
@@ -33,7 +34,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 foreach (var address in communicationAddressesForType)
                 {
                     var subsubview = new CommunicationAddressesSubSubview(Context, address);
-                    AddView(subsubview);
+                    contentLayout.AddView(subsubview);
                 }
             }
             else
@@ -49,15 +50,23 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         {
             Orientation = Horizontal;
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            var paddingValue = ConversionUtils.ConvertDpToPixels(4);
+            SetPadding(0, paddingValue, paddingValue, paddingValue);
 
             var addressTextView = new AppCompatTextView(context);
             addressTextView.Text = communicationAddress.Address;
+            AddView(addressTextView, new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent));
 
             var descriptionTextView = new AppCompatTextView(context);
             descriptionTextView.Text = communicationAddress.Description;
+            var descriptionTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1.0f);
+            descriptionTextViewLayoutParams.LeftMargin = ConversionUtils.ConvertDpToPixels(4);
+            AddView(descriptionTextView, descriptionTextViewLayoutParams);
 
-            AddView(addressTextView);
-            AddView(descriptionTextView);
+            var button = new AppCompatImageView(context);
+            var buttonSizes = ConversionUtils.ConvertDpToPixels(16);
+            button.SetImageResource(Resource.Drawable.folder_draft);
+            AddView(button, new LayoutParams(buttonSizes, buttonSizes));
         }
     }
 }

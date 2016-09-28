@@ -30,6 +30,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
             internalLayout = new LinearLayoutCompat(context);
+            internalLayout.Orientation = Vertical;
             internalLayout.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
             var paddingLarge = ConversionUtils.ConvertDpToPixels(16);
