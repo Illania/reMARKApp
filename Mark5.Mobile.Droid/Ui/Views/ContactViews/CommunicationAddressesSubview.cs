@@ -5,7 +5,6 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
 using System.Linq;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -14,7 +13,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class CommunicationAddressesSubview : ContactContentSubview
+    public class CommunicationAddressesSubview : ContactSubView
     {
         CommunicationAddressType addressType;
 
@@ -34,7 +33,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 foreach (var address in communicationAddressesForType)
                 {
                     var subsubview = new CommunicationAddressesSubSubview(Context, address);
-                    contentLayout.AddView(subsubview);
+                    internalLayout.AddView(subsubview);
                 }
             }
             else

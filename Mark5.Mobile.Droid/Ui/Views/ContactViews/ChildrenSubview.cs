@@ -14,7 +14,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class ChildrenSubview : ContactContentSubview
+    public class ChildrenSubview : ContactSubView
     {
         public ChildrenSubview(Android.Content.Context context) : base(context)
         {
@@ -30,7 +30,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 foreach (var child in Contact.Children)
                 {
                     var subsubview = new ChildrenSubSubview(Context, child);
-                    contentLayout.AddView(subsubview);
+                    internalLayout.AddView(subsubview);
                 }
             }
             else

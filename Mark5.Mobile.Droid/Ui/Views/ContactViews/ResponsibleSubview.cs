@@ -13,7 +13,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class ResponsibleSubview : ContactContentSubview
+    public class ResponsibleSubview : ContactSubView
     {
         public ResponsibleSubview(Android.Content.Context context) : base(context)
         {
@@ -29,7 +29,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 foreach (var id in Contact.ResponsibleUserIds)
                 {
                     var subsubview = new ResponsibleSubSubview(Context, id, Contact.ResponsibleUsers[id]);
-                    contentLayout.AddView(subsubview);
+                    internalLayout.AddView(subsubview);
                 }
             }
             else

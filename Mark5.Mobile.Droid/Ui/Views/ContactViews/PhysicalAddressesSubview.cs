@@ -13,7 +13,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class PhysicalAddressesSubview : ContactContentSubview
+    public class PhysicalAddressesSubview : ContactSubView
     {
         public PhysicalAddressesSubview(Android.Content.Context context) : base(context)
         {
@@ -29,7 +29,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 foreach (var address in Contact.PhysicalAddresses)
                 {
                     var subsubview = new PhysicalAddressesSubSubview(Context, address);
-                    contentLayout.AddView(subsubview);
+                    internalLayout.AddView(subsubview);
                 }
             }
             else
@@ -52,13 +52,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 AddView(typeTextView, new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent));
 
                 var addressTextView = new AppCompatTextView(context);
-                var formattedAddress = $"{physicalAddress.Country} - {physicalAddress.City}, {physicalAddress.Area}, {physicalAddress.Street}, {physicalAddress.ZipCode}"; //TODO need to do a good formatting
+                var formattedAddress = $"{physicalAddress.Country.Name} - {physicalAddress.City}, {physicalAddress.Area}, {physicalAddress.Street}, {physicalAddress.ZipCode}"; //TODO need to do a good formatting
                 AddView(addressTextView, new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1.0f));
                 addressTextView.Text = formattedAddress;
 
                 var button = new AppCompatImageView(context);
-                button.SetImageResource(Resource.Drawable.common_plus_signin_btn_icon_dark_normal);
-                AddView(button, new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent));
+                button.SetImageResource(Resource.Drawable.folder_draft);
+                var buttonSizes = ConversionUtils.ConvertDpToPixels(16);
+                AddView(button, new LayoutParams(buttonSizes, buttonSizes));
             }
         }
     }

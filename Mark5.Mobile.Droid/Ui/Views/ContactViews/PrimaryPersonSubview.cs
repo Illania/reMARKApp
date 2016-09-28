@@ -12,7 +12,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class PrimaryPersonSubview : ContactContentSubview
+    public class PrimaryPersonSubview : ContactSubView
     {
         public PrimaryPersonSubview(Android.Content.Context context) : base(context)
         {
@@ -25,7 +25,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             {
                 Visibility = ViewStates.Visible;
                 var subsubview = new PrimaryPersonSubSubview(Context, Contact.PrimaryPerson);
-                contentLayout.AddView(subsubview);
+                internalLayout.AddView(subsubview);
             }
             else
             {
