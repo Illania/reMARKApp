@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: 
 // File: ContactViewFragment.cs
 // Author: Ferdinando Papale fp@nordic-it.com
@@ -6,16 +6,18 @@
 // Copyright (c) 2016 Nordic IT
 //
 
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Ui.Views.ContactViews;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Views;
+using Mark5.Mobile.Droid.Ui.Views.ContactViews;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -30,6 +32,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ProgressBar progress;
         ScrollView scrollView;
         LinearLayoutCompat linearLayout;
+        List<IContactSubview> subviews;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
@@ -39,26 +42,33 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
-            linearLayout.AddView(new DescriptionSubview(Context));
-            linearLayout.AddView(new ShortIdSubview(Context));
-            linearLayout.AddView(new BirthdateSubview(Context));
-            linearLayout.AddView(new WebPageSubview(Context));
-            linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.Email));
-            linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.Fax));
-            linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.IM));
-            linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.Internal));
-            linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.Mobile));
-            linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.Phone));
-            linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.Skype));
-            linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.System));
-            linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.Telex));
-            linearLayout.AddView(new PhysicalAddressesSubview(Context));
-            linearLayout.AddView(new PrimaryPersonSubview(Context));
-            linearLayout.AddView(new ResponsibleSubview(Context));
-            linearLayout.AddView(new ChildrenSubview(Context));
-            linearLayout.AddView(new VatSubview(Context));
-            linearLayout.AddView(new LedgerSubview(Context));
-            linearLayout.AddView(new AccountSubview(Context));
+            subviews = new List<IContactSubview>();
+
+            subviews.Add(new DescriptionSubview(Context));
+            subviews.Add(new ShortIdSubview(Context));
+            subviews.Add(new BirthdateSubview(Context));
+            subviews.Add(new WebPageSubview(Context));
+            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Email));
+            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Fax));
+            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.IM));
+            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Internal));
+            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Mobile));
+            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Phone));
+            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Skype));
+            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.System));
+            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Telex));
+            subviews.Add(new PhysicalAddressesSubview(Context));
+            subviews.Add(new LinkedContactSubview(Context, LinkedContactType.PrimaryPerson));
+            //subviews.Add(new ResponsibleSubview(Context));
+            subviews.Add(new LinkedContactSubview(Context, LinkedContactType.Company));
+            subviews.Add(new LinkedContactSubview(Context, LinkedContactType.Department));
+            subviews.Add(new LinkedContactSubview(Context, LinkedContactType.Person));
+            subviews.Add(new VatSubview(Context));
+            subviews.Add(new LedgerSubview(Context));
+            subviews.Add(new AccountSubview(Context));
+
+            subviews.OfType<LinkedContactSubview>().ForEach(lcs => lcs.ContactClicked += LinkedContactClicked);
+            subviews.OfType<View>().ForEach(linearLayout.AddView);
 
             return rootView;
         }
@@ -116,6 +126,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.RequestLayout();
         }
 
+        #region Subviews Actions
+
+        void LinkedContactClicked(object sender, ContactPreview e)
+        {
+            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
+            var ft = fragmentManager.BeginTransaction();
+
+            var cvf = new ContactViewFragment
+            {
+                ContactPreview = e,
+                Folder = Folder,
+            };
+
+            ft.Replace(Resource.Id.fragment_container, cvf, cvf.GenerateTag());
+            ft.AddToBackStack(null);
+            ft.Commit();
+        }
+
+        #endregion
+
         #region RetainedInstance
 
         public override IRetainableState OnRetainInstanceState()
@@ -135,7 +165,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (cvfs != null)
             {
-                //TODO complete
+                Contact = cvfs.Contact;
+                ContactPreview = cvfs.ContactPreview;
+                Folder = cvfs.Folder;
+                ContactId = cvfs.ContactId;
             }
         }
 
