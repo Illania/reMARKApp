@@ -5,13 +5,31 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
+using Android.Content;
+using Android.Views;
+
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class ShortIdSubview
+    public class ShortIdSubview : ContactTextSubview
     {
-        public ShortIdSubview()
+        public ShortIdSubview(Context context) :
+            base(context)
         {
+            SetTitle("Short Id"); //TODO check
         }
+
+        public override void RefreshView()
+        {
+            if (!string.IsNullOrEmpty(ContactPreview?.ShortId))
+            {
+                Visibility = ViewStates.Visible;
+                SetContent(ContactPreview?.ShortId);
+            }
+            else
+            {
+                Visibility = ViewStates.Gone;
+            }
+        }
+
     }
 }

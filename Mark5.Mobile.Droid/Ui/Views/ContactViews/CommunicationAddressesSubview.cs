@@ -42,31 +42,32 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 Visibility = ViewStates.Gone;
             }
         }
-    }
 
-    class CommunicationAddressesSubSubview : LinearLayoutCompat
-    {
-        public CommunicationAddressesSubSubview(Android.Content.Context context, CommunicationAddress communicationAddress) : base(context)
+        class CommunicationAddressesSubSubview : LinearLayoutCompat
         {
-            Orientation = Horizontal;
-            LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            var paddingValue = ConversionUtils.ConvertDpToPixels(4);
-            SetPadding(0, paddingValue, paddingValue, paddingValue);
+            public CommunicationAddressesSubSubview(Android.Content.Context context, CommunicationAddress communicationAddress) : base(context)
+            {
+                Orientation = Horizontal;
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+                var paddingValue = ConversionUtils.ConvertDpToPixels(4);
+                SetPadding(0, paddingValue, paddingValue, paddingValue);
 
-            var addressTextView = new AppCompatTextView(context);
-            addressTextView.Text = communicationAddress.Address;
-            AddView(addressTextView, new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent));
+                var addressTextView = new AppCompatTextView(context);
+                addressTextView.Text = communicationAddress.Address;
+                AddView(addressTextView, new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent));
 
-            var descriptionTextView = new AppCompatTextView(context);
-            descriptionTextView.Text = communicationAddress.Description;
-            var descriptionTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1.0f);
-            descriptionTextViewLayoutParams.LeftMargin = ConversionUtils.ConvertDpToPixels(4);
-            AddView(descriptionTextView, descriptionTextViewLayoutParams);
+                var descriptionTextView = new AppCompatTextView(context);
+                descriptionTextView.Text = communicationAddress.Description;
+                var descriptionTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1.0f);
+                descriptionTextViewLayoutParams.LeftMargin = ConversionUtils.ConvertDpToPixels(4);
+                AddView(descriptionTextView, descriptionTextViewLayoutParams);
 
-            var button = new AppCompatImageView(context);
-            var buttonSizes = ConversionUtils.ConvertDpToPixels(16);
-            button.SetImageResource(Resource.Drawable.folder_draft);
-            AddView(button, new LayoutParams(buttonSizes, buttonSizes));
+                var button = new AppCompatImageView(context);
+                var buttonSizes = ConversionUtils.ConvertDpToPixels(16);
+                button.SetImageResource(Resource.Drawable.folder_draft);
+                AddView(button, new LayoutParams(buttonSizes, buttonSizes));
+            }
         }
     }
+
 }

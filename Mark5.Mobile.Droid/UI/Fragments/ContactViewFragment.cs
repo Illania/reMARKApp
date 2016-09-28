@@ -40,6 +40,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
             linearLayout.AddView(new DescriptionSubview(Context));
+            linearLayout.AddView(new ShortIdSubview(Context));
+            linearLayout.AddView(new BirthdateSubview(Context));
+            linearLayout.AddView(new WebPageSubview(Context));
             linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.Email));
             linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.Fax));
             linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.IM));
@@ -49,10 +52,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.Skype));
             linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.System));
             linearLayout.AddView(new CommunicationAddressesSubview(Context, CommunicationAddressType.Telex));
+            linearLayout.AddView(new PhysicalAddressesSubview(Context));
+            linearLayout.AddView(new PrimaryPersonSubview(Context));
+            linearLayout.AddView(new ResponsibleSubview(Context));
+            linearLayout.AddView(new ChildrenSubview(Context));
             linearLayout.AddView(new VatSubview(Context));
-            linearLayout.AddView(new BirthdateSubview(Context));
+            linearLayout.AddView(new LedgerSubview(Context));
             linearLayout.AddView(new AccountSubview(Context));
-            linearLayout.AddView(new WebPageSubview(Context));
+
             return rootView;
         }
 
