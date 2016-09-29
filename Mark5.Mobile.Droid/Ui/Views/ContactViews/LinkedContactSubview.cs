@@ -68,8 +68,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
         class LinkedContactSubSubview : LinearLayoutCompat
         {
-            readonly LinkedContactSubview parentView;
-
             public LinkedContactSubSubview(Android.Content.Context context, LinkedContactSubview parentView, ContactPreview linkedContact) : base(context)
             {
                 Click += (sender, e) => parentView.ContactClicked(this, linkedContact);

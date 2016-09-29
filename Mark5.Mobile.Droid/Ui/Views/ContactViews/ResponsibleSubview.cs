@@ -42,7 +42,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
         class ResponsibleSubSubview : LinearLayoutCompat
         {
-            ResponsibleSubview parentView;
 
             public ResponsibleSubSubview(Android.Content.Context context, ResponsibleSubview parentView, int responsibleUserId, string responsibleUserName) : base(context)
             {

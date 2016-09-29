@@ -33,9 +33,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             internalLayout.Orientation = Vertical;
             internalLayout.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
-            var paddingLarge = ConversionUtils.ConvertDpToPixels(16);
-            var paddingSmall = ConversionUtils.ConvertDpToPixels(8);
-            internalLayout.SetPadding(paddingLarge, paddingLarge, paddingLarge, paddingLarge);
+            var internalLayoutPadding = ConversionUtils.ConvertDpToPixels(16);
+            internalLayout.SetPadding(internalLayoutPadding, internalLayoutPadding, internalLayoutPadding, internalLayoutPadding);
             AddView(internalLayout);
 
             var divider = new Divider(Context);

@@ -7,7 +7,6 @@
 //
 using Android.Content;
 using Android.Support.V4.Content;
-using Android.Util;
 using Android.Views;
 using Mark5.Mobile.Droid.Utilities;
 
