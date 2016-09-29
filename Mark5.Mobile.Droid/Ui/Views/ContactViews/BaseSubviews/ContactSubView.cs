@@ -35,10 +35,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
             var paddingLarge = ConversionUtils.ConvertDpToPixels(16);
             var paddingSmall = ConversionUtils.ConvertDpToPixels(8);
-            internalLayout.SetPadding(paddingLarge, paddingLarge, paddingLarge, paddingSmall);
-
+            internalLayout.SetPadding(paddingLarge, paddingLarge, paddingLarge, paddingLarge);
             AddView(internalLayout);
-            AddView(new Divider(context));
+
+            var divider = new Divider(Context);
+            var dividerPadding = ConversionUtils.ConvertDpToPixels(4);
+            divider.SetPadding(dividerPadding, 0, dividerPadding, 0);
+            AddView(divider);
 
             titleTextView = new AppCompatTextView(Context);
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)

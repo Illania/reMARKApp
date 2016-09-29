@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
@@ -92,14 +94,34 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (ContactId.HasValue && ContactPreview == null && Contact == null)
             {
-                var container = await Managers.ContactsManager.GetContactWithPreviewAsync(FolderId.Value, ContactId.Value);
-                Contact = container.Contact;
-                ContactPreview = container.ContactPreview;
+                try
+                {
+                    var container = await Managers.ContactsManager.GetContactWithPreviewAsync(FolderId.Value, ContactId.Value);
+                    Contact = container.Contact;
+                    ContactPreview = container.ContactPreview;
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error($"Downloading contact and contact preview failed [folderId={FolderId.Value}, contactId={ContactId.Value}]", ex);
+                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                    Activity.OnBackPressed();
+                    return;
+                }
             }
 
             if (ContactPreview != null && Contact == null)
             {
-                Contact = await Managers.ContactsManager.GetContactAsync(Folder, ContactPreview.Id);
+                try
+                {
+                    Contact = await Managers.ContactsManager.GetContactAsync(Folder, ContactPreview.Id);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error($"Downloading contact failed [folder.name={Folder.Name}, contact.id={ContactPreview.Id}]", ex);
+                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                    Activity.OnBackPressed();
+                    return;
+                }
             }
 
             RefreshView();

@@ -68,12 +68,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
         class LinkedContactSubSubview : LinearLayoutCompat
         {
-            readonly ContactPreview linkedContact;
             readonly LinkedContactSubview parentView;
 
             public LinkedContactSubSubview(Android.Content.Context context, LinkedContactSubview parentView, ContactPreview linkedContact) : base(context)
             {
-                this.linkedContact = linkedContact; //TODO will be used later for clicks
                 Click += (sender, e) => parentView.ContactClicked(this, linkedContact);
 
                 Orientation = Horizontal;

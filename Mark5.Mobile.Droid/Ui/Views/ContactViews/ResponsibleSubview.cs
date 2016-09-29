@@ -15,6 +15,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
     public class ResponsibleSubview : ContactSubView
     {
+        public event EventHandler<int> ContactClicked = delegate { };
+
         public ResponsibleSubview(Android.Content.Context context) : base(context)
         {
             SetTitle("Responsible Users"); //TODO check
@@ -28,8 +30,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
                 foreach (var id in Contact.ResponsibleUserIds)
                 {
-                    var subsubview = new ResponsibleSubSubview(Context, id, Contact.ResponsibleUsers[id]);
-                    internalLayout.AddView(subsubview); //TODO bug in the service, need to check!
+                    var subsubview = new ResponsibleSubSubview(Context, this, id, Contact.ResponsibleUsers[id]);
+                    internalLayout.AddView(subsubview);
                 }
             }
             else
@@ -40,11 +42,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
         class ResponsibleSubSubview : LinearLayoutCompat
         {
-            readonly int responsibleUserId;
+            ResponsibleSubview parentView;
 
-            public ResponsibleSubSubview(Android.Content.Context context, int responsibleUserId, string responsibleUserName) : base(context)
+            public ResponsibleSubSubview(Android.Content.Context context, ResponsibleSubview parentView, int responsibleUserId, string responsibleUserName) : base(context)
             {
-                this.responsibleUserId = responsibleUserId; //TODO will be used later for clicks
+                this.Click += (sender, e) => parentView.ContactClicked(this, responsibleUserId);
 
                 Orientation = Horizontal;
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
