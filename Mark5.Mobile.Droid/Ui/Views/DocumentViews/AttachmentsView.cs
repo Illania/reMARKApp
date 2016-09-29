@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: AttachmentsView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -70,8 +70,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             public AttachmentView(Context context, AttachmentDescription attachmentDescription)
                 : base(context)
             {
-                var minimumWidth = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 75.0f, Resources.DisplayMetrics) + 0.5f);
-                var maximumWidth = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 150.0f, Resources.DisplayMetrics) + 0.5f);
+                var minimumWidth = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 100.0f, Resources.DisplayMetrics) + 0.5f);
+                var maximumWidth = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 175.0f, Resources.DisplayMetrics) + 0.5f);
                 var margin = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 8.0f, Resources.DisplayMetrics) + 0.5f);
                 var innerMargin = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 4.0f, Resources.DisplayMetrics) + 0.5f);
 
@@ -134,13 +134,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 if (Build.VERSION.SdkInt < BuildVersionCodes.M)
                 {
 #pragma warning disable CS0618 // Type or member is obsolete
-                    extension.SetTextAppearance(Context, Resource.Style.fontButtonLink);
+                    extension.SetTextAppearance(Context, Resource.Style.fontTiny);
 #pragma warning restore CS0618 // Type or member is obsolete
                 }
                 else
                 {
 #pragma warning disable XA0001 // Find issues with Android API usage
-                    extension.SetTextAppearance(Resource.Style.fontButtonLink);
+                    extension.SetTextAppearance(Resource.Style.fontTiny);
 #pragma warning restore XA0001 // Find issues with Android API usage
                 }
                 innerLayout.AddView(extension);
@@ -158,13 +158,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 if (Build.VERSION.SdkInt < BuildVersionCodes.M)
                 {
 #pragma warning disable CS0618 // Type or member is obsolete
-                    size.SetTextAppearance(Context, Resource.Style.fontSecondary);
+                    size.SetTextAppearance(Context, Resource.Style.fontTinyLight);
 #pragma warning restore CS0618 // Type or member is obsolete
                 }
                 else
                 {
 #pragma warning disable XA0001 // Find issues with Android API usage
-                    size.SetTextAppearance(Resource.Style.fontSecondary);
+                    size.SetTextAppearance(Resource.Style.fontTinyLight);
 #pragma warning restore XA0001 // Find issues with Android API usage
                 }
                 innerLayout.AddView(size);

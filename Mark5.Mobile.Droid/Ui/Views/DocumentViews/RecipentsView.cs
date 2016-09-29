@@ -98,13 +98,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)
             {
 #pragma warning disable CS0618 // Type or member is obsolete
-                letter.SetTextAppearance(Context, Resource.Style.fontCircle);
+                letter.SetTextAppearance(Context, Resource.Style.fontLarge);
 #pragma warning restore CS0618 // Type or member is obsolete
             }
             else
             {
 #pragma warning disable XA0001 // Find issues with Android API usage
-                letter.SetTextAppearance(Resource.Style.fontCircle);
+                letter.SetTextAppearance(Resource.Style.fontLarge);
 #pragma warning restore XA0001 // Find issues with Android API usage
             }
             letter.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.white)));
@@ -147,13 +147,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)
             {
 #pragma warning disable CS0618 // Type or member is obsolete
-                line2.SetTextAppearance(Context, Resource.Style.fontSecondary);
+                line2.SetTextAppearance(Context, Resource.Style.fontSmallLight);
 #pragma warning restore CS0618 // Type or member is obsolete
             }
             else
             {
 #pragma warning disable XA0001 // Find issues with Android API usage
-                line2.SetTextAppearance(Resource.Style.fontSecondary);
+                line2.SetTextAppearance(Resource.Style.fontSmallLight);
 #pragma warning restore XA0001 // Find issues with Android API usage
             }
             innerLayout.AddView(line2);
@@ -167,13 +167,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)
             {
 #pragma warning disable CS0618 // Type or member is obsolete
-                line3.SetTextAppearance(Context, Resource.Style.fontSecondary);
+                line3.SetTextAppearance(Context, Resource.Style.fontSmallLight);
 #pragma warning restore CS0618 // Type or member is obsolete
             }
             else
             {
 #pragma warning disable XA0001 // Find issues with Android API usage
-                line3.SetTextAppearance(Resource.Style.fontSecondary);
+                line3.SetTextAppearance(Resource.Style.fontSmallLight);
 #pragma warning restore XA0001 // Find issues with Android API usage
             }
             innerLayout.AddView(line3);
@@ -186,13 +186,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)
             {
 #pragma warning disable CS0618 // Type or member is obsolete
-                showButton.SetTextAppearance(Context, Resource.Style.fontButtonLink);
+                showButton.SetTextAppearance(Context, Resource.Style.fontSmall);
 #pragma warning restore CS0618 // Type or member is obsolete
             }
             else
             {
 #pragma warning disable XA0001 // Find issues with Android API usage
-                showButton.SetTextAppearance(Resource.Style.fontButtonLink);
+                showButton.SetTextAppearance(Resource.Style.fontSmall);
 #pragma warning restore XA0001 // Find issues with Android API usage
             }
             showButton.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.brown)));
@@ -503,13 +503,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)
             {
 #pragma warning disable CS0618 // Type or member is obsolete
-                hideButton.SetTextAppearance(Context, Resource.Style.fontButtonLink);
+                hideButton.SetTextAppearance(Context, Resource.Style.fontSmall);
 #pragma warning restore CS0618 // Type or member is obsolete
             }
             else
             {
 #pragma warning disable XA0001 // Find issues with Android API usage
-                hideButton.SetTextAppearance(Resource.Style.fontButtonLink);
+                hideButton.SetTextAppearance(Resource.Style.fontSmall);
 #pragma warning restore XA0001 // Find issues with Android API usage
             }
             hideButton.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
