@@ -194,6 +194,7 @@
     <Compile Include="Ui\Views\DocumentViews\ContentView.cs" />
     <Compile Include="Ui\Views\DocumentViews\Divider.cs" />
     <Compile Include="Ui\Views\DocumentViews\AttachmentsView.cs" />
+    <Compile Include="Ui\Common\Formatters.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -315,6 +316,7 @@
     <AndroidResource Include="Resources\layout\list_item_shortcodes.axml" />
     <AndroidResource Include="Resources\values\plurals.xml" />
     <AndroidResource Include="Resources\layout\linear_layout.axml" />
+    <AndroidResource Include="Resources\drawable\rounded_background.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
