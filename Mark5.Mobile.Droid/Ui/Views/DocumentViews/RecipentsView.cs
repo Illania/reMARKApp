@@ -42,6 +42,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         TableRow tableRowBcc;
         TableRow tableRowReplyTo;
         TableRow tableRowDateReceived;
+        TableRow tableRowCreator;
         AppCompatTextView lineValue;
         AppCompatTextView referenceNumberValue;
         AppCompatTextView fromValue;
@@ -50,6 +51,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         AppCompatTextView bccValue;
         AppCompatTextView replyToValue;
         AppCompatTextView dateReceivedValue;
+        AppCompatTextView creatorValue;
         AppCompatButton hideButton;
 
         public RecipentsView(Context context)
@@ -495,6 +497,42 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             tableRowDateReceived.AddView(dateReceivedValue);
             extendedLayout.AddView(tableRowDateReceived);
 
+            tableRowCreator = new TableRow(Context);
+            tableRowCreator.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+            var creatorLabel = new AppCompatTextView(Context)
+            {
+                Text = Context.GetString(Resource.String.creator)
+            };
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                creatorLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                creatorLabel.SetTextAppearance(Resource.Style.fontPrimary);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            tableRowCreator.AddView(creatorLabel);
+            creatorValue = new AppCompatTextView(Context);
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                creatorValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                creatorValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            creatorValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+            tableRowCreator.AddView(creatorValue);
+            extendedLayout.AddView(tableRowCreator);
+
             hideButton = new AppCompatButton(Context, null, Resource.Style.Widget_AppCompat_Button_Borderless_Colored)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
@@ -654,8 +692,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 var dateText = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
                 var timeText = (DateFormat.Is24HourFormat(Context) ? dateReceived.ToString("HH:mm") : dateReceived.ToString("hh:mm tt"));
                 var dateReceivedText = timeText + " " + dateText;
-                dateReceivedValue.Visibility = string.IsNullOrWhiteSpace(dateReceivedText) ? ViewStates.Gone : ViewStates.Visible;
+                tableRowDateReceived.Visibility = string.IsNullOrWhiteSpace(dateReceivedText) ? ViewStates.Gone : ViewStates.Visible;
                 dateReceivedValue.Text = dateReceivedText;
+
+                var creatorText = DocumentPreview.Creator;
+                tableRowCreator.Visibility = string.IsNullOrWhiteSpace(creatorText) ? ViewStates.Gone : ViewStates.Visible;
+                creatorValue.Text = creatorText;
             }
             else
             {
@@ -667,6 +709,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 tableRowBcc.Visibility = ViewStates.Gone;
                 tableRowReplyTo.Visibility = ViewStates.Gone;
                 tableRowDateReceived.Visibility = ViewStates.Gone;
+                tableRowCreator.Visibility = ViewStates.Gone;
 
                 lineValue.Text = string.Empty;
                 referenceNumberValue.Text = string.Empty;
@@ -676,6 +719,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 bccValue.Text = string.Empty;
                 replyToValue.Text = string.Empty;
                 dateReceivedValue.Text = string.Empty;
+                creatorValue.Text = string.Empty;
             }
         }
     }

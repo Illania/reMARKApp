@@ -195,6 +195,7 @@
     <Compile Include="Ui\Views\DocumentViews\Divider.cs" />
     <Compile Include="Ui\Views\DocumentViews\AttachmentsView.cs" />
     <Compile Include="Ui\Common\Formatters.cs" />
+    <Compile Include="Ui\Views\DocumentViews\PriorityView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

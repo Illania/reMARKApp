@@ -52,7 +52,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new RecipentsView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new AttachmentsView(Context));
+            linearLayout.AddView(new PriorityView(Context));
+            linearLayout.AddView(new Divider(Context));
+            var av = new AttachmentsView(Context);
+            av.AttachmentClicked += AttachmentsView_AttachmentClicked;
+            linearLayout.AddView(av);
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ContentView(Context));
 
@@ -124,6 +128,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             return base.OnOptionsItemSelected(item);
+        }
+
+        async void AttachmentsView_AttachmentClicked(object sender, AttachmentDescription e)
+        {
+            // TODO
         }
 
         async Task RefreshData()

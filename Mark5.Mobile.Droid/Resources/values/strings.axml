@@ -64,4 +64,7 @@
 	<string name="bcc">Bcc:</string>
 	<string name="reply_to">Reply to:</string>
 	<string name="date">Date:</string>
+	<string name="creator">Creator:</string>
+	<string name="high_priority_document">This document has high priority.</string>
+	<string name="low_priority_document">This document has low priority.</string>
 </resources>

@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using Android.Content;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -22,6 +23,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
     {
 
         LinearLayoutCompat container;
+
+        public event EventHandler<AttachmentDescription> AttachmentClicked = delegate { };
 
         public AttachmentsView(Context context)
             : base(context)
@@ -54,7 +57,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
                 foreach (var ad in Document.Attachments)
                 {
-                    container.AddView(new AttachmentView(Context, ad));
+                    var av = new AttachmentView(Context, ad);
+                    av.AttachmentClicked += AttachmentClicked;
+                    container.AddView(av);
                 }
             }
             else
@@ -66,6 +71,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         class AttachmentView : LinearLayoutCompat
         {
+
+            public event EventHandler<AttachmentDescription> AttachmentClicked = delegate { };
 
             public AttachmentView(Context context, AttachmentDescription attachmentDescription)
                 : base(context)
@@ -86,6 +93,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 };
                 Elevation = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 2.0f, Resources.DisplayMetrics) + 0.5f);
                 SetBackgroundResource(Resource.Drawable.rounded_background);
+
+                Clickable = true;
+                Click += (sender, e) => AttachmentClicked(this, attachmentDescription);
 
                 var title = new AppCompatTextView(Context)
                 {
