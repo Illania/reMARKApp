@@ -10,7 +10,6 @@ using System.Linq;
 using Mark5.Mobile.Common.Extensions;
 using DataContract = Mark5.ServiceReference.DataContract;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace Mark5.Mobile.Common.Model.Converters
 {
