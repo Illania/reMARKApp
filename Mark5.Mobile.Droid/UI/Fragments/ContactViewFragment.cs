@@ -70,6 +70,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             subviews.Add(new AccountSubview(Context));
 
             subviews.OfType<LinkedContactSubview>().ForEach(lcs => lcs.ContactClicked += LinkedContactClicked);
+            subviews.OfType<ResponsibleSubview>().ForEach(rsv => rsv.ContactClicked += ResponsibleUserClicked);
+
             subviews.OfType<View>().ForEach(linearLayout.AddView);
 
             return rootView;
@@ -78,17 +80,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnViewCreated(View view, Android.OS.Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
-
-            ((AppCompatActivity)Activity).SupportActionBar.Title = ContactPreview?.Name;
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = ContactPreview?.CompanyName;
+            RefreshTitle();
         }
 
         public override async void OnResume()
         {
             base.OnResume();
-
             await RefreshData();
         }
+
+        #region Refresh methods
 
         async Task RefreshData()
         {
@@ -129,6 +130,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void RefreshView()
         {
+            RefreshTitle();
             progress.Visibility = ViewStates.Gone;
             scrollView.Visibility = ViewStates.Visible;
 
@@ -148,7 +150,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.RequestLayout();
         }
 
-        #region Subviews Actions
+        void RefreshTitle()
+        {
+            ((AppCompatActivity)Activity).SupportActionBar.Title = ContactPreview?.Name;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = ContactPreview?.CompanyName;
+        }
+
+        #endregion
+
+        #region Subviews event handlers
 
         void LinkedContactClicked(object sender, ContactPreview e)
         {
@@ -164,6 +174,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ft.Replace(Resource.Id.fragment_container, cvf, cvf.GenerateTag());
             ft.AddToBackStack(null);
             ft.Commit();
+        }
+
+        void ResponsibleUserClicked(object sender, int contactId)
+        {
+            //TODO to decide what to do here 
         }
 
         #endregion
@@ -196,7 +211,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(ContactViewFragment)} [contactPreview.id={ContactPreview.Id}, contactPreview.name={ContactPreview.Name}]";
+            if (ContactPreview != null)
+            {
+                return $"{nameof(ContactViewFragment)} [contactPreview.id={ContactPreview.Id}, contactPreview.name={ContactPreview.Name}]";
+            }
+            else
+            {
+                return $"{nameof(ContactViewFragment)} [contactId={ContactId}, folderId={FolderId}]";
+            }
         }
 
         #endregion
