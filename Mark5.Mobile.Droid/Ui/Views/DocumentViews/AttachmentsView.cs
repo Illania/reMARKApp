@@ -6,6 +6,8 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.IO;
+using System.Linq;
 using Android.Content;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -103,7 +105,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                     {
                         BottomMargin = innerMargin
                     },
-                    Text = attachmentDescription.Name.Split('.')[0],
+                    Text = Path.GetFileNameWithoutExtension(attachmentDescription.Name),
                     Ellipsize = TextUtils.TruncateAt.End,
                     Gravity = GravityFlags.Top,
                 };
@@ -137,7 +139,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                         RightMargin = innerMargin,
                         Weight = 1
                     },
-                    Text = attachmentDescription.Name.Split('.')[1].ToUpper(),
+                    Text = Path.GetExtension(attachmentDescription.Name).Skip(1).ToString().ToUpper(),
                     Gravity = GravityFlags.Start
                 };
                 extension.SetSingleLine(true);
