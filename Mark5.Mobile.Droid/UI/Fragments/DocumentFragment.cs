@@ -61,6 +61,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             var av = new AttachmentsView(Context);
             av.AttachmentClicked += AttachmentsView_AttachmentClicked;
+            av.AttachmentLongClicked += AttachmentsView_AttachmentLongClicked;
             linearLayout.AddView(av);
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ContentView(Context));
@@ -135,22 +136,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return base.OnOptionsItemSelected(item);
         }
 
-        async void AttachmentsView_AttachmentClicked(object sender, AttachmentDescription ad)
+        async void AttachmentsView_AttachmentClicked(object sender, AttachmentDescription attachmentDescription)
+        {
+            await AttachmentClicked(attachmentDescription, Intent.ActionView);
+        }
+
+        async void AttachmentsView_AttachmentLongClicked(object sender, AttachmentDescription attachmentDescription)
+        {
+            await AttachmentClicked(attachmentDescription, Intent.ActionSend);
+        }
+
+        async Task AttachmentClicked(AttachmentDescription attachmentDescription, string intentAction)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
 
             try
             {
-                var path = await Managers.DocumentsManager.GetAttachmentAsync(ad, Document, Folder, false, SourceType.Local);
+                var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, Folder, false, SourceType.Local);
                 if (string.IsNullOrWhiteSpace(path))
                 {
-                    path = await Managers.DocumentsManager.GetAttachmentAsync(ad, Document, Folder, false, SourceType.Remote);
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, Folder, false, SourceType.Remote);
                 }
 
-                var uri = FileProvider.GetUriForFile(Context, "com.nordic_it.mark5.mobile.android.fileprovider", new Java.IO.File(path));
+                var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
                 var mimeType = Context.ContentResolver.GetType(uri);
 
-                var openFileIntent = new Intent(Intent.ActionView);
+                var openFileIntent = new Intent(intentAction);
                 openFileIntent.SetDataAndType(uri, mimeType);
                 openFileIntent.AddFlags(ActivityFlags.NewTask);
                 openFileIntent.AddFlags(ActivityFlags.GrantReadUriPermission);
@@ -158,7 +169,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to open attachment [document.Id={Document.Id}, attachment.Id={ad.Id}, attachment.Name={ad.Name}", ex);
+                CommonConfig.Logger.Error($"Failed to open attachment [document.Id={Document.Id}, attachment.Id={attachmentDescription.Id}, attachment.Name={attachmentDescription.Name}", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(Context, ex);
