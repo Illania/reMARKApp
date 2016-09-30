@@ -319,6 +319,7 @@
     <AndroidResource Include="Resources\values\plurals.xml" />
     <AndroidResource Include="Resources\layout\linear_layout.axml" />
     <AndroidResource Include="Resources\drawable\rounded_background.xml" />
+    <AndroidResource Include="Resources\xml\filepaths.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

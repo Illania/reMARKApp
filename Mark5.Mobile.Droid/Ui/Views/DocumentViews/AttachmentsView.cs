@@ -58,6 +58,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 Visibility = ViewStates.Visible;
 
+                container.RemoveViews(0, container.ChildCount);
                 foreach (var ad in Document.Attachments)
                 {
                     var av = new AttachmentView(Context, ad);
@@ -134,6 +135,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 };
                 AddView(innerLayout);
 
+                var extensionFromPath = Path.GetExtension(attachmentDescription.Name);
                 var extension = new AppCompatTextView(Context)
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
@@ -141,7 +143,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                         RightMargin = innerMargin,
                         Weight = 1
                     },
-                    Text = Path.GetExtension(attachmentDescription.Name).Skip(1).ToString().ToUpper(),
+                    Text = string.IsNullOrWhiteSpace(extensionFromPath) ? string.Empty : extensionFromPath.Substring(1).ToUpper(),
                     Gravity = GravityFlags.Start
                 };
                 extension.SetSingleLine(true);

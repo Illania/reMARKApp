@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Android.Content;
@@ -20,6 +21,7 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.DocumentViews;
+using Android.Support.V4.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -135,17 +137,36 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void AttachmentsView_AttachmentClicked(object sender, AttachmentDescription ad)
         {
-            var path = await Managers.DocumentsManager.GetAttachmentAsync(ad, Document, Folder, false, SourceType.Local);
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                path = await Managers.DocumentsManager.GetAttachmentAsync(ad, Document, Folder, false, SourceType.Remote);
-            }
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
 
-            var mimeType = MimeTypeMap.Singleton.GetMimeTypeFromExtension(Path.GetExtension(path));
-            var openFileIntent = new Intent(Intent.ActionView);
-            openFileIntent.SetDataAndType(Android.Net.Uri.FromFile(new Java.IO.File(path)), mimeType);
-            openFileIntent.SetFlags(ActivityFlags.NewTask);
-            Context.StartActivity(openFileIntent);
+            try
+            {
+                var path = await Managers.DocumentsManager.GetAttachmentAsync(ad, Document, Folder, false, SourceType.Local);
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(ad, Document, Folder, false, SourceType.Remote);
+                }
+
+                var uri = FileProvider.GetUriForFile(Context, "com.nordic_it.mark5.mobile.android.fileprovider", new Java.IO.File(path));
+                var mimeType = Context.ContentResolver.GetType(uri);
+
+                var openFileIntent = new Intent(Intent.ActionView);
+                openFileIntent.SetDataAndType(uri, mimeType);
+                openFileIntent.AddFlags(ActivityFlags.NewTask);
+                openFileIntent.AddFlags(ActivityFlags.GrantReadUriPermission);
+                Context.StartActivity(openFileIntent);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to open attachment [document.Id={Document.Id}, attachment.Id={ad.Id}, attachment.Name={ad.Name}", ex);
+
+                dismissAction();
+                await Dialogs.ShowErrorDialogAsync(Context, ex);
+            }
+            finally
+            {
+                dismissAction();
+            }
         }
 
         async Task RefreshData()
