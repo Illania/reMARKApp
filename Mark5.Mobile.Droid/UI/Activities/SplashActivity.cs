@@ -28,7 +28,8 @@ namespace Mark5.Mobile.Droid.Ui.Activity
               MainLauncher = true,
               Icon = "@mipmap/ic_icon",
               Theme = "@style/mark5Splash",
-              ScreenOrientation = ScreenOrientation.Portrait)]
+              ScreenOrientation = ScreenOrientation.Portrait,
+              NoHistory = true)]
     public class SplashActivity : BaseAppCompatActivity
     {
 
@@ -149,8 +150,6 @@ namespace Mark5.Mobile.Droid.Ui.Activity
                 {
                     StartActivity(new Intent(this, typeof(LoginActivity)));
                 }
-
-                Finish();
             }, TaskScheduler.FromCurrentSynchronizationContext());
 
             CommonConfig.Logger.Info($"Started {nameof(SplashActivity)}");
