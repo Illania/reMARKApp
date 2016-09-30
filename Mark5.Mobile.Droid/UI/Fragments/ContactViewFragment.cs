@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -20,6 +21,7 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.ContactViews;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -39,40 +41,59 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
             var rootView = inflater.Inflate(Resource.Layout.linear_layout, container, false);
+            rootView.SetBackgroundColor(new Android.Graphics.Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
 
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
+            linearLayout.SetClipToPadding(false);
+
+            var paddingLinearLayout = ConversionUtils.ConvertDpToPixels(10);
+            linearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, paddingLinearLayout);
 
             subviews = new List<IContactSubview>();
 
-            subviews.Add(new DescriptionSubview(Context));
-            subviews.Add(new ShortIdSubview(Context));
-            subviews.Add(new BirthdateSubview(Context));
-            subviews.Add(new WebPageSubview(Context));
+            //subviews.Add(new DescriptionSubview(Context));
+            //subviews.Add(new ShortIdSubview(Context));
+            //subviews.Add(new BirthdateSubview(Context));
+            //subviews.Add(new WebPageSubview(Context));
             subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Email));
-            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Fax));
-            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.IM));
-            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Internal));
-            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Mobile));
-            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Phone));
-            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Skype));
-            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.System));
-            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Telex));
-            subviews.Add(new PhysicalAddressesSubview(Context));
-            subviews.Add(new LinkedContactSubview(Context, LinkedContactType.PrimaryPerson));
-            subviews.Add(new ResponsibleSubview(Context));
-            subviews.Add(new LinkedContactSubview(Context, LinkedContactType.Company));
-            subviews.Add(new LinkedContactSubview(Context, LinkedContactType.Department));
-            subviews.Add(new LinkedContactSubview(Context, LinkedContactType.Person));
-            subviews.Add(new VatSubview(Context));
-            subviews.Add(new LedgerSubview(Context));
-            subviews.Add(new AccountSubview(Context));
+            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Email));
+
+            //subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Fax));
+            //subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.IM));
+            //subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Internal));
+            //subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Mobile));
+            //subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Phone));
+            //subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Skype));
+            //subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.System));
+            //subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Telex));
+            //subviews.Add(new PhysicalAddressesSubview(Context));
+            //subviews.Add(new LinkedContactSubview(Context, LinkedContactType.PrimaryPerson));
+            //subviews.Add(new ResponsibleSubview(Context));
+            //subviews.Add(new LinkedContactSubview(Context, LinkedContactType.Company));
+            //subviews.Add(new LinkedContactSubview(Context, LinkedContactType.Department));
+            //subviews.Add(new LinkedContactSubview(Context, LinkedContactType.Person));
+            //subviews.Add(new VatSubview(Context));
+            //subviews.Add(new LedgerSubview(Context));
+            //subviews.Add(new AccountSubview(Context));
+
+            var cardView = new CardView(Context);
+            cardView.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            cardView.Elevation = ConversionUtils.ConvertDpToPixels(2.0f);
+            cardView.Radius = ConversionUtils.ConvertDpToPixels(2.0f);
+            cardView.UseCompatPadding = true;
+
+            var internalLayout = new LinearLayoutCompat(Context);
+            internalLayout.Orientation = LinearLayoutCompat.Vertical;
+            internalLayout.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            cardView.AddView(internalLayout);
 
             subviews.OfType<LinkedContactSubview>().ForEach(lcs => lcs.ContactClicked += LinkedContactClicked);
             subviews.OfType<ResponsibleSubview>().ForEach(rsv => rsv.ContactClicked += ResponsibleUserClicked);
+            subviews.OfType<View>().ForEach(internalLayout.AddView);
 
-            subviews.OfType<View>().ForEach(linearLayout.AddView);
+            linearLayout.AddView(cardView);
 
             return rootView;
         }
@@ -134,16 +155,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             progress.Visibility = ViewStates.Gone;
             scrollView.Visibility = ViewStates.Visible;
 
-            for (int i = 0; i < linearLayout.ChildCount; i++)
+            foreach (var contactSubview in subviews)
             {
-                var contactSubview = linearLayout.GetChildAt(i) as IContactSubview;
-                if (contactSubview != null)
-                {
-                    contactSubview.Contact = Contact;
-                    contactSubview.ContactPreview = ContactPreview;
+                contactSubview.Contact = Contact;
+                contactSubview.ContactPreview = ContactPreview;
 
-                    contactSubview.RefreshView();
-                }
+                contactSubview.RefreshView();
             }
 
             linearLayout.Invalidate();
