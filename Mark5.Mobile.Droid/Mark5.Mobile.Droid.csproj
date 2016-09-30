@@ -35,7 +35,7 @@
 <AndroidSigningKeyAlias>default -tsa https://timestamp.geotrust.com/tsa</AndroidSigningKeyAlias>
 <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
 <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-<AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
+<AndroidHttpClientHandlerType></AndroidHttpClientHandlerType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -196,6 +196,7 @@
     <Compile Include="Ui\Views\DocumentViews\AttachmentsView.cs" />
     <Compile Include="Ui\Common\Formatters.cs" />
     <Compile Include="Ui\Views\DocumentViews\PriorityView.cs" />
+    <Compile Include="Utilities\InsecureAndroidClientHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

@@ -6,11 +6,14 @@
 // Copyright (c) 2016 Nordic IT
 //
 
+using System.IO;
 using System.Threading.Tasks;
+using Android.Content;
 using Android.OS;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
+using Android.Webkit;
 using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
@@ -130,9 +133,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return base.OnOptionsItemSelected(item);
         }
 
-        async void AttachmentsView_AttachmentClicked(object sender, AttachmentDescription e)
+        async void AttachmentsView_AttachmentClicked(object sender, AttachmentDescription ad)
         {
-            // TODO
+            var path = await Managers.DocumentsManager.GetAttachmentAsync(ad, Document, Folder, false, SourceType.Local);
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                path = await Managers.DocumentsManager.GetAttachmentAsync(ad, Document, Folder, false, SourceType.Remote);
+            }
+
+            var mimeType = MimeTypeMap.Singleton.GetMimeTypeFromExtension(Path.GetExtension(path));
+            var openFileIntent = new Intent(Intent.ActionView);
+            openFileIntent.SetDataAndType(Android.Net.Uri.FromFile(new Java.IO.File(path)), mimeType);
+            openFileIntent.SetFlags(ActivityFlags.NewTask);
+            Context.StartActivity(openFileIntent);
         }
 
         async Task RefreshData()
