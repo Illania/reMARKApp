@@ -47,6 +47,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             container = new LinearLayoutCompat(Context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                Orientation = Horizontal
             };
             scrollView.AddView(container);
         }
@@ -128,7 +129,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
                 var innerLayout = new LinearLayoutCompat(Context)
                 {
-                    LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                    LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                    Orientation = Horizontal
                 };
                 AddView(innerLayout);
 

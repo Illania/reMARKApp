@@ -27,9 +27,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         void InitializeView()
         {
+            Orientation = Horizontal;
             SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceNormal);
 
-            subjectView = new AppCompatTextView(Context);
+            subjectView = new AppCompatTextView(Context)
+            {
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)
             {
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -42,7 +46,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 subjectView.SetTextAppearance(Resource.Style.fontTitle);
 #pragma warning restore XA0001 // Find issues with Android API usage
             }
-            AddView(subjectView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+            AddView(subjectView);
         }
 
         public override void RefreshView()

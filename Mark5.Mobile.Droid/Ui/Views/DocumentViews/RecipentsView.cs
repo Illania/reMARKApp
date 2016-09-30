@@ -31,6 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         AppCompatTextView line1;
         AppCompatTextView line2;
         AppCompatTextView line3;
+        AppCompatTextView line4;
         AppCompatButton showButton;
 
         TableLayout extendedLayout;
@@ -41,6 +42,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         TableRow tableRowCc;
         TableRow tableRowBcc;
         TableRow tableRowReplyTo;
+        TableRow tableRowReadBy;
         TableRow tableRowDateReceived;
         TableRow tableRowCreator;
         AppCompatTextView lineValue;
@@ -50,6 +52,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         AppCompatTextView ccValue;
         AppCompatTextView bccValue;
         AppCompatTextView replyToValue;
+        AppCompatTextView readByValue;
         AppCompatTextView dateReceivedValue;
         AppCompatTextView creatorValue;
         AppCompatButton hideButton;
@@ -179,6 +182,26 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 #pragma warning restore XA0001 // Find issues with Android API usage
             }
             innerLayout.AddView(line3);
+
+            line4 = new AppCompatTextView(Context)
+            {
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                Ellipsize = TextUtils.TruncateAt.End
+            };
+            line4.SetSingleLine(true);
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                line4.SetTextAppearance(Context, Resource.Style.fontSmallLight);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                line4.SetTextAppearance(Resource.Style.fontSmallLight);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            innerLayout.AddView(line4);
 
             showButton = new AppCompatButton(Context, null, Resource.Style.Widget_AppCompat_Button_Borderless_Colored)
             {
@@ -461,6 +484,42 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             tableRowReplyTo.AddView(replyToValue);
             extendedLayout.AddView(tableRowReplyTo);
 
+            tableRowReadBy = new TableRow(Context);
+            tableRowReadBy.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+            var readByLabel = new AppCompatTextView(Context)
+            {
+                Text = Context.GetString(Resource.String.read_by)
+            };
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                readByLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                readByLabel.SetTextAppearance(Resource.Style.fontPrimary);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            tableRowReadBy.AddView(readByLabel);
+            readByValue = new AppCompatTextView(Context);
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                readByValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                readByValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            readByValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+            tableRowReadBy.AddView(readByValue);
+            extendedLayout.AddView(tableRowReadBy);
+
             tableRowDateReceived = new TableRow(Context);
             tableRowDateReceived.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
             var dateReceivedLabel = new AppCompatTextView(Context)
@@ -604,6 +663,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                     line2.Text = Context.GetString(Resource.String.to_prefix) + " " + to;
                 }
 
+                if (Document.ReadByUserNames.Count > 0)
+                {
+                    line3.Visibility = ViewStates.Visible;
+                    line3.Text = Context.GetString(Resource.String.read_by_prefix) + " " + string.Join(", ", Document.ReadByUserNames.Values).ToUpper();
+                }
+                else
+                {
+                    line3.Visibility = ViewStates.Gone;
+                    line3.Text = string.Empty;
+                }
+
                 var dateReceived = DocumentPreview.DateReceived.ToServerTime();
 
                 string dateText;
@@ -621,14 +691,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                     dateText = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
                 }
 
-                line3.Text = dateText + ", " + (DateFormat.Is24HourFormat(Context) ? dateReceived.ToString("HH:mm") : dateReceived.ToString("hh:mm tt"));
+                line4.Text = dateText + ", " + (DateFormat.Is24HourFormat(Context) ? dateReceived.ToString("HH:mm") : dateReceived.ToString("hh:mm tt"));
             }
             else
             {
                 letter.Text = string.Empty;
                 line1.Text = string.Empty;
                 line2.Text = string.Empty;
+                line3.Visibility = ViewStates.Gone;
                 line3.Text = string.Empty;
+                line4.Text = string.Empty;
             }
         }
 
@@ -687,6 +759,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 tableRowReplyTo.Visibility = string.IsNullOrWhiteSpace(replyToText) ? ViewStates.Gone : ViewStates.Visible;
                 replyToValue.Text = replyToText;
 
+                var readByText = string.Join(", ", Document.ReadByUserNames.Values).ToUpper();
+                tableRowReadBy.Visibility = string.IsNullOrWhiteSpace(readByText) ? ViewStates.Gone : ViewStates.Visible;
+                readByValue.Text = readByText;
+
                 var dateReceived = DocumentPreview.DateReceived.ToServerTime();
                 var dfo = DateFormat.GetDateFormatOrder(Context);
                 var dateText = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
@@ -708,6 +784,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 tableRowCc.Visibility = ViewStates.Gone;
                 tableRowBcc.Visibility = ViewStates.Gone;
                 tableRowReplyTo.Visibility = ViewStates.Gone;
+                tableRowReadBy.Visibility = ViewStates.Gone;
                 tableRowDateReceived.Visibility = ViewStates.Gone;
                 tableRowCreator.Visibility = ViewStates.Gone;
 
@@ -718,6 +795,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 ccValue.Text = string.Empty;
                 bccValue.Text = string.Empty;
                 replyToValue.Text = string.Empty;
+                readByValue.Text = string.Empty;
                 dateReceivedValue.Text = string.Empty;
                 creatorValue.Text = string.Empty;
             }
