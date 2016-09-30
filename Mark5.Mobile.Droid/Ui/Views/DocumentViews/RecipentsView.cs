@@ -19,6 +19,7 @@ using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
 using Android.Widget;
+using System.Collections.Generic;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
@@ -56,6 +57,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         AppCompatTextView dateReceivedValue;
         AppCompatTextView creatorValue;
         AppCompatButton hideButton;
+
+        List<TableRow> extraFieldsTableRows = new List<TableRow>();
 
         public RecipentsView(Context context)
             : base(context)
@@ -774,6 +777,51 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 var creatorText = DocumentPreview.Creator;
                 tableRowCreator.Visibility = string.IsNullOrWhiteSpace(creatorText) ? ViewStates.Gone : ViewStates.Visible;
                 creatorValue.Text = creatorText;
+
+                extraFieldsTableRows.ForEach(extendedLayout.RemoveView);
+                extraFieldsTableRows.Clear();
+
+                foreach (var extraField in Document.ExtraFields.Where(kv => kv.Key != null && !string.IsNullOrWhiteSpace(kv.Value)).OrderBy(kv => kv.Key.Name))
+                {
+                    var tableRowExtraField = new TableRow(Context);
+                    tableRowExtraField.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+                    var extraFieldLabel = new AppCompatTextView(Context)
+                    {
+                        Text = extraField.Key.Name + ":"
+                    };
+                    if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+                    {
+#pragma warning disable CS0618 // Type or member is obsolete
+                        extraFieldLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
+#pragma warning restore CS0618 // Type or member is obsolete
+                    }
+                    else
+                    {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                        extraFieldLabel.SetTextAppearance(Resource.Style.fontPrimary);
+#pragma warning restore XA0001 // Find issues with Android API usage
+                    }
+                    tableRowExtraField.AddView(extraFieldLabel);
+                    var extraFieldValue = new AppCompatTextView(Context)
+                    {
+                        Text = extraField.Value
+                    };
+                    if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+                    {
+#pragma warning disable CS0618 // Type or member is obsolete
+                        extraFieldValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
+#pragma warning restore CS0618 // Type or member is obsolete
+                    }
+                    else
+                    {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                        extraFieldValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
+#pragma warning restore XA0001 // Find issues with Android API usage
+                    }
+                    extraFieldValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+                    tableRowExtraField.AddView(extraFieldValue);
+                    extendedLayout.AddView(tableRowExtraField, extendedLayout.ChildCount - 1);
+                }
             }
             else
             {
@@ -798,6 +846,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 readByValue.Text = string.Empty;
                 dateReceivedValue.Text = string.Empty;
                 creatorValue.Text = string.Empty;
+
+                extraFieldsTableRows.ForEach(extendedLayout.RemoveView);
+                extraFieldsTableRows.Clear();
             }
         }
     }
