@@ -7,21 +7,20 @@
 //
 
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.OS;
+using Android.Support.V4.App;
+using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
-using Android.Webkit;
 using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.DocumentViews;
-using Android.Support.V4.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -138,15 +137,39 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void AttachmentsView_AttachmentClicked(object sender, AttachmentDescription attachmentDescription)
         {
-            await AttachmentClicked(attachmentDescription, Intent.ActionView);
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
+
+            try
+            {
+                var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, Folder, false, SourceType.Local);
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, Folder, false, SourceType.Remote);
+                }
+
+                var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
+                var mimeType = Context.ContentResolver.GetType(uri);
+
+                var openFileIntent = new Intent(Intent.ActionView);
+                openFileIntent.SetDataAndType(uri, mimeType);
+                openFileIntent.AddFlags(ActivityFlags.NewTask);
+                openFileIntent.AddFlags(ActivityFlags.GrantReadUriPermission);
+                Context.StartActivity(openFileIntent);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to view attachment [document.Id={Document.Id}, attachment.Id={attachmentDescription.Id}, attachment.Name={attachmentDescription.Name}", ex);
+
+                dismissAction();
+                await Dialogs.ShowErrorDialogAsync(Context, ex);
+            }
+            finally
+            {
+                dismissAction();
+            }
         }
 
         async void AttachmentsView_AttachmentLongClicked(object sender, AttachmentDescription attachmentDescription)
-        {
-            await AttachmentClicked(attachmentDescription, Intent.ActionSend);
-        }
-
-        async Task AttachmentClicked(AttachmentDescription attachmentDescription, string intentAction)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
 
@@ -161,15 +184,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
                 var mimeType = Context.ContentResolver.GetType(uri);
 
-                var openFileIntent = new Intent(intentAction);
-                openFileIntent.SetDataAndType(uri, mimeType);
-                openFileIntent.AddFlags(ActivityFlags.NewTask);
-                openFileIntent.AddFlags(ActivityFlags.GrantReadUriPermission);
-                Context.StartActivity(openFileIntent);
+                ShareCompat.IntentBuilder.From(Activity).SetType(mimeType).SetStream(uri).StartChooser();
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to open attachment [document.Id={Document.Id}, attachment.Id={attachmentDescription.Id}, attachment.Name={attachmentDescription.Name}", ex);
+                CommonConfig.Logger.Error($"Failed to share attachment [document.Id={Document.Id}, attachment.Id={attachmentDescription.Id}, attachment.Name={attachmentDescription.Name}", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(Context, ex);
