@@ -211,6 +211,7 @@
     <Compile Include="Ui\Views\Divider.cs" />
     <Compile Include="Ui\Views\ContactViews\LinkedContactSubview.cs" />
     <Compile Include="Ui\Views\PaddingDivider.cs" />
+    <Compile Include="Utilities\ViewUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
