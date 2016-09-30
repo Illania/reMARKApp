@@ -210,6 +210,7 @@
     <Compile Include="Ui\Views\ContactViews\ShortIdSubview.cs" />
     <Compile Include="Ui\Views\Divider.cs" />
     <Compile Include="Ui\Views\ContactViews\LinkedContactSubview.cs" />
+    <Compile Include="Ui\Views\PaddingDivider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -331,6 +332,10 @@
     <AndroidResource Include="Resources\layout\list_item_shortcodes.axml" />
     <AndroidResource Include="Resources\values\plurals.xml" />
     <AndroidResource Include="Resources\layout\linear_layout.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\email.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\email.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\email.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\email.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
