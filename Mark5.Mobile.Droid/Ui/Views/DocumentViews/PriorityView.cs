@@ -52,7 +52,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         public override void RefreshView()
         {
-            if (PlatformConfig.Preferences.DocumentViewPriorityEnabled && DocumentPreview != null)
+            if (DocumentPreview != null)
             {
                 switch (DocumentPreview.Priority)
                 {

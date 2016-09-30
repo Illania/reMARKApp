@@ -47,46 +47,6 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
-        public bool DocumentViewPriorityEnabled
-        {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_sub_priority), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_sub_priority_default));
-            }
-        }
-
-        public bool DocumentViewReferenceNumberEnabled
-        {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_sub_reference_number), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_sub_reference_number_default));
-            }
-        }
-
-        public bool DocumentViewReadByEnabled
-        {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_sub_read_by), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_sub_read_by_default));
-            }
-        }
-
-        public bool DocumentViewCreatorEnabled
-        {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_sub_creator), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_sub_creator_default));
-            }
-        }
-
-        public bool DocumentViewOriginatorEnabled
-        {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_sub_originator), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_sub_originator_default));
-            }
-        }
-
         public DocumentBodyTypeRequest DocumentBodyRequestType
         {
             get

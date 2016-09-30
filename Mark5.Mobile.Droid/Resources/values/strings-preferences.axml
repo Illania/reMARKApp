@@ -25,9 +25,6 @@
 	<string name="pref_documents_large_attachment_warn_title">Large attachment warning</string>
 	<string name="pref_documents_large_attachment_warn_summary_on">Show warning before downloading large attachment over cellular network</string>
 	<string name="pref_documents_large_attachment_warn_summary_off">Do not show warning before downloading large attachment over cellular network</string>
-	<string name="pref_key_documents_view_options">pref_key_documents_view_options</string>
-	<string name="pref_documents_view_options_title">Document view</string>
-	<string name="pref_documents_view_options_summary">Turn on or off visibility of document fields</string>
 	<string name="pref_key_documents_download_as_plaintext">pref_key_documents_download_as_plaintext</string>
 	<string name="pref_documents_download_as_plaintext_title">View documents in plain text</string>
 	<string name="pref_documents_download_as_plaintext_summary_on">Documents content will be downloaded in plain text format.</string>
@@ -76,16 +73,6 @@
 	<string name="pref_advanced_logout_summary">Log out from MARK5. MARK5 needs to restart after this operation and all personal settings will be lost.</string>
 	<string name="pref_key_about_version">pref_key_about_version</string>
 	<string name="pref_about_version_title">Version</string>
-	<string name="pref_key_documents_sub_priority">pref_key_documents_sub_priority</string>
-	<string name="pref_documents_sub_priority_title">Priority</string>
-	<string name="pref_key_documents_sub_reference_number">pref_key_documents_sub_reference_number</string>
-	<string name="pref_documents_sub_reference_number_title">Reference number</string>
-	<string name="pref_key_documents_sub_read_by">pref_key_documents_sub_read_by</string>
-	<string name="pref_documents_sub_read_by_title">Read by</string>
-	<string name="pref_key_documents_sub_creator">pref_key_documents_sub_creator</string>
-	<string name="pref_documents_sub_creator_title">Creator</string>
-	<string name="pref_key_documents_sub_originator">pref_key_documents_sub_originator</string>
-	<string name="pref_documents_sub_originator_title">Originator</string>
 	<string name="pref_key_contacts_sub_comm_fax">pref_key_contacts_sub_comm_fax</string>
 	<string name="pref_contacts_sub_comm_fax_title">Communication: Fax numbers</string>
 	<string name="pref_key_contacts_sub_comm_telex">pref_key_contacts_sub_comm_telex</string>
