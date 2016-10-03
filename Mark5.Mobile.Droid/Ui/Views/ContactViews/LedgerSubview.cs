@@ -11,7 +11,7 @@ using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class LedgerSubview : ContactTextSubview
+    public class LedgerSubview : DescriptionCardSubview
     {
         public LedgerSubview(Context context) :
             base(context)

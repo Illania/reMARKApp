@@ -10,7 +10,7 @@ using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class AccountSubview : ContactTextSubview
+    public class AccountSubview : DescriptionCardSubview
     {
         public AccountSubview(Android.Content.Context context) : base(context)
         {

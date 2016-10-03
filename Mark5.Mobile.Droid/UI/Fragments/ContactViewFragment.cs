@@ -36,7 +36,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ProgressBar progress;
         ScrollView scrollView;
         LinearLayoutCompat linearLayout;
-        List<IContactSubview> subviews;
+        List<IContactSubview> communicationSubviews;
+        List<IContactSubview> descriptionSubviews;
+
+        CardView communicationCardView;
+        CardView descriptionCardView;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
@@ -51,49 +55,58 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var paddingLinearLayout = ConversionUtils.ConvertDpToPixels(10);
             linearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, paddingLinearLayout);
 
-            subviews = new List<IContactSubview>();
+            communicationSubviews = new List<IContactSubview>();
+            descriptionSubviews = new List<IContactSubview>();
 
-            //subviews.Add(new DescriptionSubview(Context));
-            //subviews.Add(new ShortIdSubview(Context));
-            //subviews.Add(new BirthdateSubview(Context));
-            //subviews.Add(new WebPageSubview(Context));
-            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Email));
-            subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Email));
-
-            //subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Fax));
-            //subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.IM));
-            //subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Internal));
-            //subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Mobile));
-            //subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Phone));
-            //subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Skype));
-            //subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.System));
-            //subviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Telex));
+            descriptionSubviews.Add(new DescriptionSubview(Context));
+            descriptionSubviews.Add(new ShortIdSubview(Context));
+            descriptionSubviews.Add(new BirthdateSubview(Context));
+            descriptionSubviews.Add(new WebPageSubview(Context));
+            communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Email));
+            communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Fax));
+            communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.IM));
+            communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Internal));
+            communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Mobile));
+            communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Phone));
+            communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Skype));
+            communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.System));
+            communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Telex));
             //subviews.Add(new PhysicalAddressesSubview(Context));
-            //subviews.Add(new LinkedContactSubview(Context, LinkedContactType.PrimaryPerson));
-            //subviews.Add(new ResponsibleSubview(Context));
-            //subviews.Add(new LinkedContactSubview(Context, LinkedContactType.Company));
-            //subviews.Add(new LinkedContactSubview(Context, LinkedContactType.Department));
-            //subviews.Add(new LinkedContactSubview(Context, LinkedContactType.Person));
-            //subviews.Add(new VatSubview(Context));
-            //subviews.Add(new LedgerSubview(Context));
-            //subviews.Add(new AccountSubview(Context));
+            communicationSubviews.Add(new LinkedContactSubview(Context, LinkedContactType.PrimaryPerson));
+            communicationSubviews.Add(new ResponsibleSubview(Context));
+            communicationSubviews.Add(new LinkedContactSubview(Context, LinkedContactType.Company));
+            communicationSubviews.Add(new LinkedContactSubview(Context, LinkedContactType.Department));
+            communicationSubviews.Add(new LinkedContactSubview(Context, LinkedContactType.Person));
+            descriptionSubviews.Add(new VatSubview(Context));
+            descriptionSubviews.Add(new LedgerSubview(Context));
+            descriptionSubviews.Add(new AccountSubview(Context));
 
-            var cardView = new CardView(Context);
-            cardView.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            cardView.Elevation = ConversionUtils.ConvertDpToPixels(2.0f);
-            cardView.Radius = ConversionUtils.ConvertDpToPixels(2.0f);
-            cardView.UseCompatPadding = true;
+            communicationCardView = new CardView(Context);
+            communicationCardView.Elevation = ConversionUtils.ConvertDpToPixels(2.0f);
+            communicationCardView.Radius = ConversionUtils.ConvertDpToPixels(2.0f);
+            communicationCardView.UseCompatPadding = true;
 
-            var internalLayout = new LinearLayoutCompat(Context);
-            internalLayout.Orientation = LinearLayoutCompat.Vertical;
-            internalLayout.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            cardView.AddView(internalLayout);
+            var communicationCardInternalLayout = new LinearLayoutCompat(Context);
+            communicationCardInternalLayout.Orientation = LinearLayoutCompat.Vertical;
+            communicationCardView.AddView(communicationCardInternalLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
-            subviews.OfType<LinkedContactSubview>().ForEach(lcs => lcs.ContactClicked += LinkedContactClicked);
-            subviews.OfType<ResponsibleSubview>().ForEach(rsv => rsv.ContactClicked += ResponsibleUserClicked);
-            subviews.OfType<View>().ForEach(internalLayout.AddView);
+            communicationSubviews.OfType<LinkedContactSubview>().ForEach(lcs => lcs.ContactClicked += LinkedContactClicked);
+            communicationSubviews.OfType<ResponsibleSubview>().ForEach(rsv => rsv.ContactClicked += ResponsibleUserClicked);
+            communicationSubviews.OfType<View>().ForEach(communicationCardInternalLayout.AddView);
 
-            linearLayout.AddView(cardView);
+            descriptionCardView = new CardView(Context);
+            descriptionCardView.Elevation = ConversionUtils.ConvertDpToPixels(2.0f);
+            descriptionCardView.Radius = ConversionUtils.ConvertDpToPixels(2.0f);
+            descriptionCardView.UseCompatPadding = true;
+
+            var descriptionCardViewInternalLayout = new LinearLayoutCompat(Context);
+            descriptionCardViewInternalLayout.Orientation = LinearLayoutCompat.Vertical;
+            descriptionCardView.AddView(descriptionCardViewInternalLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+
+            descriptionSubviews.OfType<View>().ForEach(descriptionCardViewInternalLayout.AddView);
+
+            linearLayout.AddView(communicationCardView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+            linearLayout.AddView(descriptionCardView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
             return rootView;
         }
@@ -155,7 +168,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             progress.Visibility = ViewStates.Gone;
             scrollView.Visibility = ViewStates.Visible;
 
-            foreach (var contactSubview in subviews)
+            foreach (var contactSubview in communicationSubviews)
             {
                 contactSubview.Contact = Contact;
                 contactSubview.ContactPreview = ContactPreview;

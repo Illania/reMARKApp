@@ -9,7 +9,7 @@ using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class VatSubview : ContactTextSubview
+    public class VatSubview : DescriptionCardSubview
     {
         public VatSubview(Android.Content.Context context) : base(context)
         {

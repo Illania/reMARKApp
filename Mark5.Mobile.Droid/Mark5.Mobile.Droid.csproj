@@ -188,8 +188,8 @@
     <Compile Include="Ui\Activities\ShortcodesListActivity.cs" />
     <Compile Include="Ui\Activities\ContactActivity.cs" />
     <Compile Include="Ui\Fragments\ContactViewFragment.cs" />
-    <Compile Include="Ui\Views\ContactViews\BaseSubviews\ContactSubView.cs" />
-    <Compile Include="Ui\Views\ContactViews\BaseSubviews\ContactTextSubview.cs" />
+    <Compile Include="Ui\Views\ContactViews\BaseSubviews\CommunicationCardSubview.cs" />
+    <Compile Include="Ui\Views\ContactViews\BaseSubviews\DescriptionCardSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\DescriptionSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\WebPageSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\BirthdateSubview.cs" />

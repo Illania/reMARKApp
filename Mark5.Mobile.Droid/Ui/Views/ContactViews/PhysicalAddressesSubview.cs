@@ -14,7 +14,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class PhysicalAddressesSubview : ContactSubView
+    public class PhysicalAddressesSubview : CommunicationCardSubview
     {
         public PhysicalAddressesSubview(Android.Content.Context context) : base(context)
         {

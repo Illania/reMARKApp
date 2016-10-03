@@ -8,14 +8,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class LinkedContactSubview : ContactSubView
+    public class LinkedContactSubview : CommunicationCardSubview
     {
         LinkedContactType linkedContactType;
 
@@ -23,8 +21,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
         public LinkedContactSubview(Android.Content.Context context, LinkedContactType type) : base(context)
         {
-            this.linkedContactType = type;
+            linkedContactType = type;
             SetTitle(type.ToString());
+            iconImageView.SetImageResource(Resource.Drawable.email); //TODO should depend on type
         }
 
         public override void RefreshView()
@@ -66,20 +65,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             }
         }
 
-        class LinkedContactSubSubview : LinearLayoutCompat
+        class LinkedContactSubSubview : CommunicationCardSubSubview
         {
-            public LinkedContactSubSubview(Android.Content.Context context, LinkedContactSubview parentView, ContactPreview linkedContact) : base(context)
+            public LinkedContactSubSubview(Android.Content.Context context, LinkedContactSubview parentView, ContactPreview linkedContact)
+                : base(context, linkedContact.Name, null)
             {
                 Click += (sender, e) => parentView.ContactClicked(this, linkedContact);
-
-                Orientation = Horizontal;
-                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-                var paddingValue = ConversionUtils.ConvertDpToPixels(4);
-                SetPadding(0, paddingValue, paddingValue, paddingValue);
-
-                var childNameTextView = new AppCompatTextView(context);
-                childNameTextView.Text = linkedContact.Name;
-                AddView(childNameTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent));
             }
         }
     }

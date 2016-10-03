@@ -9,7 +9,7 @@ using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class BirthdateSubview : ContactTextSubview
+    public class BirthdateSubview : DescriptionCardSubview
     {
         public BirthdateSubview(Android.Content.Context context) : base(context)
         {
