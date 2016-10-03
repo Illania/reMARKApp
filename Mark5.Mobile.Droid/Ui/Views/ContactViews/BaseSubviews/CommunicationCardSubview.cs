@@ -36,9 +36,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
             var iconImageViewLayout = new LinearLayoutCompat(context);
             iconImageViewLayout.Orientation = Vertical;
-            iconImageViewLayout.LayoutParameters = new LayoutParams(ConversionUtils.ConvertDpToPixels(72), ViewGroup.LayoutParams.MatchParent);
-            var paddingValue = ConversionUtils.ConvertDpToPixels(24);
-            iconImageViewLayout.SetPadding(paddingValue, paddingValue, paddingValue, paddingValue);
+            iconImageViewLayout.LayoutParameters = new LayoutParams(ConversionUtils.ConvertDpToPixels(64), ViewGroup.LayoutParams.MatchParent);
+            var paddingValueBig = ConversionUtils.ConvertDpToPixels(24);
+            var paddingValueSmall = ConversionUtils.ConvertDpToPixels(16);
+            iconImageViewLayout.SetPadding(paddingValueBig, paddingValueSmall, paddingValueSmall, 0);
 
             internalLayout.AddView(iconImageViewLayout);
 
@@ -48,11 +49,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
             contentLayout = new LinearLayoutCompat(context);
             contentLayout.Orientation = Vertical;
-            contentLayout.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 1.0f);
+            contentLayout.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1.0f);
 
             internalLayout.AddView(contentLayout);
 
-            var divider = new PaddingDivider(Context, 72, 0);
+            var divider = new PaddingDivider(Context, 64, 0);
             AddView(divider);
 
             titleTextView = new AppCompatTextView(Context);
@@ -81,7 +82,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 primaryTextView.Text = primaryText;
 
                 primaryTextView.SetTextAppearanceCompat(context, Resource.Style.contactPrimary);
-                primaryTextView.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
                 AddView(primaryTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 

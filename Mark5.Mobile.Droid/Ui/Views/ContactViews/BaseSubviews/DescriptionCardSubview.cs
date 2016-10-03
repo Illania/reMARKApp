@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         {
             Orientation = Vertical;
             Visibility = ViewStates.Visible;
-            SetPadding(ConversionUtils.ConvertDpToPixels(16), 0, 0, 0);
+            SetPadding(ConversionUtils.ConvertDpToPixels(24), 0, 0, 0);
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
             titleTextView = new AppCompatTextView(context);

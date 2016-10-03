@@ -168,7 +168,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             progress.Visibility = ViewStates.Gone;
             scrollView.Visibility = ViewStates.Visible;
 
-            foreach (var contactSubview in communicationSubviews)
+            foreach (var contactSubview in communicationSubviews.Union(descriptionSubviews))
             {
                 contactSubview.Contact = Contact;
                 contactSubview.ContactPreview = ContactPreview;

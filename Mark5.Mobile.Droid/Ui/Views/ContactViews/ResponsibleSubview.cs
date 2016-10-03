@@ -45,7 +45,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             public ResponsibleSubSubview(Android.Content.Context context, ResponsibleSubview parentView, int responsibleUserId, string responsibleUserName)
                 : base(context, responsibleUserName, null)
             {
-                this.Click += (sender, e) => parentView.ContactClicked(this, responsibleUserId);
+                Click += (sender, e) => parentView.ContactClicked(this, responsibleUserId);
             }
         }
     }
