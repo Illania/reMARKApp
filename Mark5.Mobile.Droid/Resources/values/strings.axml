@@ -51,6 +51,7 @@
 	<string name="copy_to_worktray">Copy to worktray</string>
 	<string name="copy_to_folder">Copy to folder</string>
 	<string name="move_to_folder">Move to folder</string>
+	<string name="set_priority">Set priority</string>
 	<string name="categories">Categories</string>
 	<string name="comments">Comments</string>
 	<string name="actions">Actions</string>

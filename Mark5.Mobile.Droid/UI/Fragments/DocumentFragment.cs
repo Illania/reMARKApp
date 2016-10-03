@@ -128,22 +128,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 menu.Add(Menu.None, 41, 41, Resource.String.move_to_folder);
             }
 
-            menu.Add(Menu.None, 50, 50, Resource.String.categories);
-            menu.Add(Menu.None, 60, 60, Resource.String.comments);
-            menu.Add(Menu.None, 70, 70, Resource.String.actions);
-            menu.Add(Menu.None, 80, 80, Resource.String.links);
+            menu.Add(Menu.None, 50, 50, Resource.String.set_priority);
+            menu.Add(Menu.None, 60, 60, Resource.String.categories);
+            menu.Add(Menu.None, 70, 90, Resource.String.comments);
+            menu.Add(Menu.None, 80, 80, Resource.String.actions);
+            menu.Add(Menu.None, 90, 90, Resource.String.links);
 
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static
                 || Folder.InternalType == FolderInternalType.Worktray)
             {
-                menu.Add(Menu.None, 90, 90, Resource.String.delete_from_folder);
+                menu.Add(Menu.None, 100, 100, Resource.String.delete_from_folder);
             }
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
                 || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed)
             {
-                menu.Add(Menu.None, 91, 91, Resource.String.delete);
+                menu.Add(Menu.None, 101, 101, Resource.String.delete);
             }
         }
 

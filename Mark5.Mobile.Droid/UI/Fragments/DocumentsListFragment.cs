@@ -355,22 +355,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 menu.Add(Menu.None, 41, 41, Resource.String.move_to_folder);
             }
 
+            menu.Add(Menu.None, 50, 50, Resource.String.set_priority);
+
             if (currentAdapter.SelectedItemCount == 1)
             {
-                menu.Add(Menu.None, 50, 50, Resource.String.categories);
+                menu.Add(Menu.None, 60, 60, Resource.String.categories);
             }
 
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static
                 || Folder.InternalType == FolderInternalType.Worktray)
             {
-                menu.Add(Menu.None, 60, 60, Resource.String.delete_from_folder);
+                menu.Add(Menu.None, 70, 70, Resource.String.delete_from_folder);
             }
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
                 || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed)
             {
-                menu.Add(Menu.None, 61, 61, Resource.String.delete);
+                menu.Add(Menu.None, 71, 71, Resource.String.delete);
             }
 
             return true;
