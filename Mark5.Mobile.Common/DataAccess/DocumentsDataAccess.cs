@@ -13,6 +13,7 @@ using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Links;
+using Mark5.Mobile.Common.Model.Containers;
 
 namespace Mark5.Mobile.Common.DataAccess
 {
@@ -136,7 +137,88 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task SetDocumentPreviewsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead)
+        public async Task SaveDocumentWithPreviewAsync(DocumentContainer container)
+        {
+            try
+            {
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    c.InsertOrReplace(container.DocumentPreview);
+                    c.InsertOrReplace(container.Document);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error saving document with preview.", ex);
+            }
+        }
+
+        public async Task<DocumentContainer> GetDocumentWithPreviewAsync(int documentId)
+        {
+            try
+            {
+                DocumentContainer container = null;
+
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    var documentPreview = c.Find<DocumentPreview>(documentId);
+                    if (documentPreview == null)
+                    {
+                        throw new DataNotFoundException("DocumentPreview could not be found.");
+                    }
+
+                    var document = c.Find<Document>(documentId);
+                    if (document == null)
+                    {
+                        throw new DataNotFoundException("Document could not be found.");
+                    }
+
+                    container = new DocumentContainer(documentPreview, document);
+                });
+
+                return container;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting document with preview.", ex);
+            }
+        }
+
+        public async Task SetDocumentReadStatusAsync(DocumentPreview documentPreview, Document document)
+        {
+            try
+            {
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
+                                              $"set \"{nameof(DocumentPreview.IsReadByCurrent)}\" = @isReadByCurrent " +
+                                              $"   and \"{nameof(DocumentPreview.IsReadByAnyone)}\" = @isReadByAnyone " +
+                                              $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
+                    cmd.Bind("@isReadByCurrent", documentPreview.IsReadByCurrent);
+                    cmd.Bind("@isReadByAnyone", documentPreview.IsReadByAnyone);
+                    cmd.Bind("@documentPreviewId", documentPreview.Id);
+
+                    cmd.ExecuteNonQuery();
+
+
+                    cmd = c.CreateCommand($"update \"{nameof(Document)}\" " +
+                                          $"set \"{nameof(Document.ReadByUserIdsBytes)}\" = @readByUserIds " +
+                                          $"   and \"{nameof(Document.ReadByUserNamesBytes)}\" = @readByUsernames " +
+                                          $"where \"{nameof(Document.Id)}\" = @documentId");
+                    cmd.Bind("@readByUserIds", document.ReadByUserIdsBytes);
+                    cmd.Bind("@readByUsernames", document.ReadByUserNamesBytes);
+                    cmd.Bind("@documentId", documentPreview.Id);
+
+                    cmd.ExecuteNonQuery();
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error setting documents read status.", ex);
+            }
+        }
+
+        public async Task SetDocumentPreviewsReadStatusAsync(List<DocumentPreview> documentPreviews)
         {
             try
             {
@@ -148,8 +230,8 @@ namespace Mark5.Mobile.Common.DataAccess
                                                   $"set \"{nameof(DocumentPreview.IsReadByCurrent)}\" = @isReadByCurrent " +
                                                   $"   and \"{nameof(DocumentPreview.IsReadByAnyone)}\" = @isReadByAnyone " +
                                                   $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
-                        cmd.Bind("@isReadByCurrent", isRead);
-                        cmd.Bind("@isReadByAnyone", documentPreview.IsReadByAnyone || isRead);
+                        cmd.Bind("@isReadByCurrent", documentPreview.IsReadByCurrent);
+                        cmd.Bind("@isReadByAnyone", documentPreview.IsReadByAnyone);
                         cmd.Bind("@documentPreviewId", documentPreview.Id);
 
                         cmd.ExecuteNonQuery();
@@ -177,6 +259,8 @@ namespace Mark5.Mobile.Common.DataAccess
                         cmd.Bind("@documentPreviewId", documentPreview.Id);
 
                         cmd.ExecuteNonQuery();
+
+
                     }
                 });
             }

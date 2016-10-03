@@ -49,6 +49,8 @@ namespace Mark5.Mobile.Common.Database
                 c.CreateTable<Folder>();
                 c.CreateTable<FolderCalendarAppointmentLink>();
                 c.CreateTable<FolderCalendarTaskLink>();
+                c.CreateTable<CalendarTask>();
+                c.CreateTable<CalendarAppointment>();
                 c.CreateTable<Category>();
             });
         }
@@ -87,6 +89,8 @@ namespace Mark5.Mobile.Common.Database
                 c.DeleteAll<Folder>();
                 c.DeleteAll<FolderCalendarAppointmentLink>();
                 c.DeleteAll<FolderCalendarTaskLink>();
+                c.DeleteAll<CalendarTask>();
+                c.DeleteAll<CalendarAppointment>();
                 c.DeleteAll<Category>();
             });
         }
