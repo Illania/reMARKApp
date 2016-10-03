@@ -197,6 +197,7 @@
     <Compile Include="Ui\Common\Formatters.cs" />
     <Compile Include="Ui\Views\DocumentViews\PriorityView.cs" />
     <Compile Include="Utilities\InsecureAndroidClientHandler.cs" />
+    <Compile Include="Ui\Common\BusMesseges\DocumentPreviewReadStatusChangedMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -341,11 +342,16 @@
     <Folder Include="Utilities\Hockey\" />
     <Folder Include="Ui\Views\" />
     <Folder Include="Ui\Views\DocumentViews\" />
+    <Folder Include="Ui\Common\BusMesseges\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
       <Project>{32ACF699-5511-485F-B54B-5BFDB3D337AE}</Project>
       <Name>Mark5.Mobile.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TinyMessenger\TinyMessenger.csproj">
+      <Project>{D552EA9E-E8C6-44A4-9D05-D2A8655BE8EA}</Project>
+      <Name>TinyMessenger</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

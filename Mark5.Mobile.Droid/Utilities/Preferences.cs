@@ -39,6 +39,14 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
+        public bool UnreadIndicatorMe
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_read_indicator_me), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_read_indicator_me_default));
+            }
+        }
+
         public bool LargeAttachmentWarning
         {
             get

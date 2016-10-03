@@ -16,6 +16,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Services;
 using Mark5.Mobile.Droid.Utilities;
 using PCLStorage;
+using TinyMessenger;
 using Xamarin.Android.Net;
 
 namespace Mark5.Mobile.Droid
@@ -63,6 +64,7 @@ namespace Mark5.Mobile.Droid
                 PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();
                 PlatformConfig.ReachabilityBroadcastReceiver = new ReachabilityBroadcastReceiver();
                 PlatformConfig.Preferences = new Preferences();
+                PlatformConfig.MessengerHub = new TinyMessengerHub();
             }).Wait();
 
             CommonConfig.Logger.Info($"Initialized {nameof(Mark5Application)}");

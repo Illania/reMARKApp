@@ -58,7 +58,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         AppCompatTextView creatorValue;
         AppCompatButton hideButton;
 
-        List<TableRow> extraFieldsTableRows = new List<TableRow>();
+        readonly List<TableRow> extraFieldsTableRows = new List<TableRow>();
 
         public RecipentsView(Context context)
             : base(context)
@@ -232,7 +232,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             extendedLayout = new TableLayout(Context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                Visibility = ViewStates.Gone,
+                Visibility = ViewStates.Gone
             };
             AddView(extendedLayout);
 
@@ -645,7 +645,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 if (DocumentPreview.Direction == DocumentDirection.Incoming)
                 {
-                    var addressFrom = DocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).FirstOrDefault();
+                    var addressFrom = DocumentPreview.Addresses.FirstOrDefault(da => da.AddressType == DocumentAddressType.From);
                     var from = string.IsNullOrWhiteSpace(addressFrom.Name) ? addressFrom.Address : addressFrom.Name;
                     var addressesTo = DocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType);
                     var to = string.Join(", ", addressesTo.Select(at => string.IsNullOrWhiteSpace(at.Name) ? at.Address : at.Name));
@@ -669,7 +669,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 if (Document.ReadByUserNames.Count > 0)
                 {
                     line3.Visibility = ViewStates.Visible;
-                    line3.Text = Context.GetString(Resource.String.read_by_prefix) + " " + string.Join(", ", Document.ReadByUserNames.Values).ToUpper();
+                    line3.Text = Context.GetString(Resource.String.read_by_prefix) + " " + string.Join(", ", Document.ReadByUserNames.Values.OrderBy(s => s)).ToUpper();
                 }
                 else
                 {

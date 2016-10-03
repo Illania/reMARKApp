@@ -205,6 +205,39 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        public async Task SetDocumentReadStatusAsync(DocumentPreview documentPreview, Document document, bool isRead, SystemUser currentUser, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                await AppServiceProxy.SetDocumentsReadStatusAsync(new DataContract.SetDocumentsReadStatusParameters
+                {
+                    Token = Token,
+                    DocumentIds = new int[] { documentPreview.Id },
+                    IsRead = isRead
+                });
+
+                documentPreview.IsReadByCurrent = isRead;
+                documentPreview.IsReadByAnyone = documentPreview.IsReadByAnyone || isRead;
+
+                if (isRead)
+                {
+                    document.ReadByUserIds.Add(currentUser.Id);
+                    document.ReadByUserNames[currentUser.Id] = currentUser.Username;
+                }
+                else
+                {
+                    document.ReadByUserIds.Remove(currentUser.Id);
+                    document.ReadByUserNames.Remove(currentUser.Id);
+                }
+
+                await documentsDataAccess.SetDocumentReadStatusAsync(documentPreview, document);
+
+                return;
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
         public async Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
@@ -216,7 +249,13 @@ namespace Mark5.Mobile.Common.Managers
                     IsRead = isRead
                 });
 
-                await documentsDataAccess.SetDocumentPreviewsReadStatusAsync(documentPreviews, isRead);
+                foreach (var dp in documentPreviews)
+                {
+                    dp.IsReadByCurrent = isRead;
+                    dp.IsReadByAnyone = dp.IsReadByAnyone || isRead;
+                }
+
+                await documentsDataAccess.SetDocumentPreviewsReadStatusAsync(documentPreviews);
 
                 return;
             }

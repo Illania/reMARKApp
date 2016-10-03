@@ -39,6 +39,8 @@ namespace Mark5.Mobile.Common.Managers
 
         Task UnlockOutgoingDocumentAsync(Guid identifier, SourceType sourceType = SourceType.Auto);
 
+        Task SetDocumentReadStatusAsync(DocumentPreview documentPreview, Document document, bool isRead, SystemUser currentUser, SourceType sourceType = SourceType.Auto);
+
         Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto);
 
         Task SetDocumentPriorityAsync(List<DocumentPreview> documentPreviews, Priority priority, SourceType sourceType = SourceType.Auto);

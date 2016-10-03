@@ -7,6 +7,7 @@
 //
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.OS;
@@ -20,6 +21,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
 using Mark5.Mobile.Droid.Ui.Views.DocumentViews;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -38,9 +40,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public Document Document { get; set; }
 
+        public Action CloseRequest { get; set; }
+
         ProgressBar progress;
         ScrollView scrollView;
         LinearLayoutCompat linearLayout;
+
+        CancellationTokenSource setReadStatusCancellationTokenSource;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -84,6 +90,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnResume();
 
             await RefreshData();
+
+            if (!IsAdded || IsDetached || IsRemoving) return;
+
+            MarkAsReadIfNecessary();
+        }
+
+        public override void OnDestroyedByUser()
+        {
+            base.OnDestroyedByUser();
+
+            setReadStatusCancellationTokenSource.Cancel();
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -201,19 +218,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task RefreshData()
         {
-            if (DocumentId.HasValue && DocumentPreview == null && Document == null)
+            try
             {
-                var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(FolderId ?? Folder.Id, DocumentId.Value);
-                DocumentPreview = container.DocumentPreview;
-                Document = container.Document;
-            }
+                if (DocumentId.HasValue && DocumentPreview == null && Document == null)
+                {
+                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(FolderId ?? Folder.Id, DocumentId.Value);
+                    DocumentPreview = container.DocumentPreview;
+                    Document = container.Document;
+                }
 
-            if (DocumentPreview != null && Document == null)
+                if (DocumentPreview != null && Document == null)
+                {
+                    Document = await Managers.DocumentsManager.GetDocumentAsync(FolderId ?? Folder.Id, DocumentPreview.Id);
+                }
+
+                RefreshView();
+            }
+            catch (Exception ex)
             {
-                Document = await Managers.DocumentsManager.GetDocumentAsync(FolderId ?? Folder.Id, DocumentPreview.Id);
-            }
+                CommonConfig.Logger.Error($"Downloading document failed [folder.name={Folder?.Name}, folder.id={FolderId ?? Folder?.Id}, documentId={DocumentId ?? DocumentPreview?.Id}]", ex);
 
-            RefreshView();
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+
+                if (CloseRequest != null) CloseRequest();
+            }
         }
 
         void RefreshView()
@@ -241,6 +269,76 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout.Invalidate();
             linearLayout.RequestLayout();
+        }
+
+        void RefreshView<T>() where T : DocumentView
+        {
+            progress.Visibility = ViewStates.Gone;
+            scrollView.Visibility = ViewStates.Visible;
+
+            for (var i = 0; i < linearLayout.ChildCount; i++)
+            {
+                var dv = linearLayout.GetChildAt(i) as T;
+                if (dv != null)
+                {
+                    dv.DocumentPreview = DocumentPreview;
+                    dv.Document = Document;
+                    dv.RefreshView();
+
+                    var d = linearLayout.GetChildAt(i + 1) as Divider;
+                    if (d != null)
+                    {
+                        d.Visibility = dv.Visibility;
+                        i++;
+                    }
+                }
+            }
+
+            linearLayout.Invalidate();
+            linearLayout.RequestLayout();
+        }
+
+        void MarkAsReadIfNecessary()
+        {
+            setReadStatusCancellationTokenSource?.Cancel();
+            setReadStatusCancellationTokenSource = new CancellationTokenSource();
+
+            Task.Run(async () =>
+            {
+                var f = Folder;
+                var d = Document;
+                var dp = DocumentPreview;
+                var token = setReadStatusCancellationTokenSource.Token;
+
+                try
+                {
+                    if (dp.IsReadByCurrent)
+                    {
+                        return;
+                    }
+
+                    var delaySeconds = PlatformConfig.Preferences.MarkAsReadDelaySeconds;
+                    if (delaySeconds < 0) return;
+
+                    await Task.Delay(delaySeconds * 1000);
+
+                    if (token.IsCancellationRequested) return;
+                    await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true, ServerConfig.SystemSettings.UserInfo.User);
+
+                    Activity?.RunOnUiThread(() =>
+                    {
+                        if (token.IsCancellationRequested) return;
+                        if (!IsAdded || IsDetached || IsRemoving) return;
+
+                        RefreshView<RecipentsView>();
+                        PlatformConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, f.Id, dp.Id, dp.IsReadByCurrent, dp.IsReadByAnyone));
+                    });
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error($"Marking document as read failed [folder.name={f?.Name}, folder.id={f?.Id}, documentPreviewId={dp?.Id}]", ex);
+                }
+            });
         }
 
         public override IRetainableState OnRetainInstanceState()
