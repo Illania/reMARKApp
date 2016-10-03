@@ -5,7 +5,9 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.Linq;
+using System.Text;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
 
@@ -31,8 +33,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
                 foreach (var address in communicationAddressesForType)
                 {
-                    var subsubview = new CommunicationCardSubSubview(Context, address.Address, address.Description);
-                    contentLayout.AddView(subsubview);
+                    if (addressType == CommunicationAddressType.IM)
+                    {
+                        var handleAndType = ParseIm(address.Address);
+                        var subsubview = new CommunicationCardSubSubview(Context, handleAndType.Item1, handleAndType.Item2);
+                        contentLayout.AddView(subsubview);
+                    }
+                    else
+                    {
+                        var formattedAddress = FormatAddress(address.Address);
+                        var subsubview = new CommunicationCardSubSubview(Context, formattedAddress, address.Description);
+                        contentLayout.AddView(subsubview);
+                    }
                 }
             }
             else
@@ -41,6 +53,63 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             }
         }
 
+        string FormatAddress(string address)
+        {
+            if (new[] { CommunicationAddressType.Fax, CommunicationAddressType.Phone, CommunicationAddressType.Mobile, CommunicationAddressType.Telex }.Contains(addressType))
+            {
+                var stringBuilder = new StringBuilder();
+                var addressParts = address.Split('|');
+
+                var countryPrefix = addressParts[0];
+                var firstPart = addressParts[1];
+                var secondPart = addressParts[2];
+
+                if (!string.IsNullOrEmpty(countryPrefix))
+                {
+                    stringBuilder.Append($"+{countryPrefix} ");
+                }
+                if (!string.IsNullOrEmpty(firstPart))
+                {
+                    stringBuilder.Append($"{firstPart} ");
+                }
+                if (!string.IsNullOrEmpty(secondPart))
+                {
+                    stringBuilder.Append(secondPart);
+                }
+
+                return stringBuilder.ToString();
+            }
+            return address;
+
+        }
+
+        Tuple<string, string> ParseIm(string address)
+        {
+            var addressParts = address.Split('|');
+
+            var imHandle = addressParts[0];
+            var imTypeIndex = short.Parse(addressParts[1]);
+
+            string imTypeString = string.Empty;
+
+            switch (imTypeIndex)
+            {
+                case 0:
+                    imTypeString = "Other";
+                    break;
+                case 1:
+                    imTypeString = "MSN";
+                    break;
+                case 2:
+                    imTypeString = "Yahoo";
+                    break;
+                case 3:
+                    imTypeString = "ICQ";
+                    break;
+            }
+
+            return Tuple.Create(imHandle, imTypeString);
+        }
     }
 
 }
