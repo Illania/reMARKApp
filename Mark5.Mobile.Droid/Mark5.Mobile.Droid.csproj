@@ -212,6 +212,7 @@
     <Compile Include="Ui\Views\ContactViews\LinkedContactSubview.cs" />
     <Compile Include="Ui\Views\PaddingDivider.cs" />
     <Compile Include="Utilities\ViewUtilities.cs" />
+    <Compile Include="Ui\Views\ContactViews\BaseSubviews\BaseCardSubview.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

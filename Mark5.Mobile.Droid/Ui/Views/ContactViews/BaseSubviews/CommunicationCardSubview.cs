@@ -13,17 +13,14 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class CommunicationCardSubview : LinearLayoutCompat, IContactSubview
+    public abstract class CommunicationCardSubview : BaseCardSubview
     {
         AppCompatTextView titleTextView;
         protected LinearLayoutCompat internalLayout;
         protected LinearLayoutCompat contentLayout;
         protected AppCompatImageView iconImageView;
 
-        public ContactPreview ContactPreview { get; set; }
-        public Contact Contact { get; set; }
-
-        public CommunicationCardSubview(Context context) : base(context)
+        protected CommunicationCardSubview(Context context) : base(context)
         {
             Orientation = Vertical;
             Visibility = ViewStates.Visible;
@@ -53,8 +50,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
             internalLayout.AddView(contentLayout);
 
-            var divider = new PaddingDivider(Context, 64, 0);
-            AddView(divider);
+            Divider = new PaddingDivider(Context, 64, 0);
+            AddView(Divider);
 
             titleTextView = new AppCompatTextView(Context);
         }
@@ -62,11 +59,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         public void SetTitle(string title)
         {
             titleTextView.Text = title;
-        }
-
-        public virtual void RefreshView()
-        {
-
         }
 
         protected class CommunicationCardSubSubview : LinearLayoutCompat //TODO need to find a way to set primary

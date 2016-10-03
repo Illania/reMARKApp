@@ -5,25 +5,19 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
 using Android.Content;
-using Android.OS;
 using Android.Support.V7.Widget;
 using Android.Views;
-using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class DescriptionCardSubview : LinearLayoutCompat, IContactSubview
+    public abstract class DescriptionCardSubview : BaseCardSubview
     {
         AppCompatTextView titleTextView;
         AppCompatTextView contentTextView;
 
-        public ContactPreview ContactPreview { get; set; }
-        public Contact Contact { get; set; }
-
-        public DescriptionCardSubview(Context context) : base(context)
+        protected DescriptionCardSubview(Context context) : base(context)
         {
             Orientation = Vertical;
             Visibility = ViewStates.Visible;
@@ -43,8 +37,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             contentTextViewLayoutParams.BottomMargin = ConversionUtils.ConvertDpToPixels(16);
             AddView(contentTextView, contentTextViewLayoutParams);
 
-            var divider = new Divider(Context);
-            AddView(divider);
+            Divider = new Divider(Context);
+            AddView(Divider);
         }
 
         public void SetContent(string title)
@@ -56,13 +50,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         {
             titleTextView.Text = title;
         }
-
-        public virtual void RefreshView()
-        {
-
-        }
-
-
     }
 
 }

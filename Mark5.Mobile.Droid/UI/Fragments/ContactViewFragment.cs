@@ -20,6 +20,7 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Views;
 using Mark5.Mobile.Droid.Ui.Views.ContactViews;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -41,6 +42,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         CardView communicationCardView;
         CardView descriptionCardView;
+        AppCompatTextView descriptionCardTitle;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
@@ -82,6 +84,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             descriptionSubviews.Add(new AccountSubview(Context));
 
             communicationCardView = new CardView(Context);
+            communicationCardView.Visibility = ViewStates.Gone;
             communicationCardView.Elevation = ConversionUtils.ConvertDpToPixels(2.0f);
             communicationCardView.Radius = ConversionUtils.ConvertDpToPixels(2.0f);
             communicationCardView.UseCompatPadding = true;
@@ -95,6 +98,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             communicationSubviews.OfType<View>().ForEach(communicationCardInternalLayout.AddView);
 
             descriptionCardView = new CardView(Context);
+            descriptionCardView.Visibility = ViewStates.Gone;
             descriptionCardView.Elevation = ConversionUtils.ConvertDpToPixels(2.0f);
             descriptionCardView.Radius = ConversionUtils.ConvertDpToPixels(2.0f);
             descriptionCardView.UseCompatPadding = true;
@@ -102,6 +106,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var descriptionCardViewInternalLayout = new LinearLayoutCompat(Context);
             descriptionCardViewInternalLayout.Orientation = LinearLayoutCompat.Vertical;
             descriptionCardView.AddView(descriptionCardViewInternalLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+
+            descriptionCardTitle = new AppCompatTextView(Context);
+            descriptionCardTitle.SetTextAppearanceCompat(Context, Resource.Style.contactDescriptionTitle);
+            var padding = ConversionUtils.ConvertDpToPixels(16);
+            descriptionCardTitle.SetPadding(padding, padding, padding, padding);
+            descriptionCardViewInternalLayout.AddView(descriptionCardTitle, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+            descriptionCardViewInternalLayout.AddView(new Divider(Context));
 
             descriptionSubviews.OfType<View>().ForEach(descriptionCardViewInternalLayout.AddView);
 
@@ -176,6 +187,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 contactSubview.RefreshView();
             }
 
+            if (communicationSubviews.Any(s => s.Visible))
+            {
+                communicationCardView.Visibility = ViewStates.Visible;
+                communicationSubviews.Last(s => s.Visible).HideSeparator();
+            }
+            if (descriptionSubviews.Any(s => s.Visible))
+            {
+                descriptionCardView.Visibility = ViewStates.Visible;
+                descriptionSubviews.Last(s => s.Visible).HideSeparator();
+            }
+
             linearLayout.Invalidate();
             linearLayout.RequestLayout();
         }
@@ -184,6 +206,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             ((AppCompatActivity)Activity).SupportActionBar.Title = ContactPreview?.Name;
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = ContactPreview?.CompanyName;
+            descriptionCardTitle.Text = $"About {ContactPreview?.Name}";
         }
 
         #endregion
