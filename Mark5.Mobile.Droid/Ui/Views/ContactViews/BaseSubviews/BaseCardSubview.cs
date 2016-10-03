@@ -27,13 +27,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             }
         }
 
-        public BaseCardSubview(Context context) : base(context)
+        protected BaseCardSubview(Context context) : base(context)
         {
         }
 
         public void HideSeparator()
         {
-            Divider.Visibility = ViewStates.Gone;
+            if (Divider != null)
+            {
+                Divider.Visibility = ViewStates.Gone;
+            }
         }
 
         public abstract void RefreshView();

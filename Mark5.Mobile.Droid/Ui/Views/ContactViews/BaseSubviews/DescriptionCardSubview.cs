@@ -20,7 +20,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         protected DescriptionCardSubview(Context context) : base(context)
         {
             Orientation = Vertical;
-            Visibility = ViewStates.Visible;
             SetPadding(ConversionUtils.ConvertDpToPixels(24), 0, 0, 0);
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 

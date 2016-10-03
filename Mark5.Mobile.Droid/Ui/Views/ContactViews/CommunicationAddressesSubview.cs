@@ -24,7 +24,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             iconImageView.SetImageResource(Resource.Drawable.email);
         }
 
-        public override void RefreshView()
+        public override void RefreshView() //TODO need to think about primary and ordering
         {
             var communicationAddressesForType = Contact?.CommunicationAddresses.Where(ca => ca.Type == addressType);
             if (Contact != null && communicationAddressesForType.Any())

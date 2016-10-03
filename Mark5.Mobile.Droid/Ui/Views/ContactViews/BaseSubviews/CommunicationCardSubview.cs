@@ -8,7 +8,6 @@
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
-using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
@@ -23,7 +22,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         protected CommunicationCardSubview(Context context) : base(context)
         {
             Orientation = Vertical;
-            Visibility = ViewStates.Visible;
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
             internalLayout = new LinearLayoutCompat(context);
@@ -33,10 +31,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
             var iconImageViewLayout = new LinearLayoutCompat(context);
             iconImageViewLayout.Orientation = Vertical;
-            iconImageViewLayout.LayoutParameters = new LayoutParams(ConversionUtils.ConvertDpToPixels(64), ViewGroup.LayoutParams.MatchParent);
-            var paddingValueBig = ConversionUtils.ConvertDpToPixels(24);
-            var paddingValueSmall = ConversionUtils.ConvertDpToPixels(16);
-            iconImageViewLayout.SetPadding(paddingValueBig, paddingValueSmall, paddingValueSmall, 0);
+            iconImageViewLayout.LayoutParameters = new LayoutParams(ConversionUtils.ConvertDpToPixels(56), ViewGroup.LayoutParams.MatchParent);
+            var paddingValue = ConversionUtils.ConvertDpToPixels(16);
+            iconImageViewLayout.SetPadding(paddingValue, paddingValue, paddingValue, 0);
 
             internalLayout.AddView(iconImageViewLayout);
 
@@ -50,7 +47,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
             internalLayout.AddView(contentLayout);
 
-            Divider = new PaddingDivider(Context, 64, 0);
+            Divider = new PaddingDivider(Context, 56, 0);
             AddView(Divider);
 
             titleTextView = new AppCompatTextView(Context);
@@ -67,7 +64,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             {
                 Orientation = Vertical;
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-                var paddingValue = ConversionUtils.ConvertDpToPixels(16);
+                var paddingValue = ConversionUtils.ConvertDpToPixels(8);
                 SetPadding(0, paddingValue, 0, paddingValue);
 
                 var primaryTextView = new AppCompatTextView(context);
@@ -82,7 +79,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                     var descriptionTextView = new AppCompatTextView(context);
                     descriptionTextView.Text = descriptionText;
                     var descriptionTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent, 1.0f);
-                    descriptionTextViewLayoutParams.TopMargin = ConversionUtils.ConvertDpToPixels(3);
+                    descriptionTextViewLayoutParams.TopMargin = ConversionUtils.ConvertDpToPixels(2);
                     descriptionTextView.SetTextAppearanceCompat(context, Resource.Style.contactSecondary);
                     AddView(descriptionTextView, descriptionTextViewLayoutParams);
                 }

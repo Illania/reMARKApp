@@ -14,11 +14,12 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class PhysicalAddressesSubview : CommunicationCardSubview
+    public class PhysicalAddressesSubview : BaseCardSubview
     {
         public PhysicalAddressesSubview(Android.Content.Context context) : base(context)
         {
-            SetTitle("Addresses"); //TODO check
+            Orientation = Vertical;
+            LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
         }
 
         public override void RefreshView()
@@ -30,7 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 foreach (var address in Contact.PhysicalAddresses)
                 {
                     var subsubview = new PhysicalAddressesSubSubview(Context, address);
-                    internalLayout.AddView(subsubview);
+                    AddView(subsubview);
                 }
             }
             else
@@ -43,25 +44,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         {
             public PhysicalAddressesSubSubview(Android.Content.Context context, PhysicalAddress physicalAddress) : base(context)
             {
-                Orientation = Horizontal;
+                Orientation = Vertical;
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
                 var paddingValue = ConversionUtils.ConvertDpToPixels(4);
                 SetPadding(0, paddingValue, paddingValue, paddingValue);
 
-                var typeTextView = new AppCompatTextView(context);
-                typeTextView.Text = physicalAddress.Type.Name;
-                AddView(typeTextView, new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent));
-
                 var addressTextView = new AppCompatTextView(context);
                 addressTextView.Text = GetAddressText(physicalAddress);
-                var addressTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1.0f);
-                addressTextViewLayoutParams.LeftMargin = ConversionUtils.ConvertDpToPixels(6);
-                AddView(addressTextView, addressTextViewLayoutParams);
+                addressTextView.SetTextAppearanceCompat(context, Resource.Style.contactPrimary);
+                AddView(addressTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
-                var button = new AppCompatImageView(context);
-                button.SetImageResource(Resource.Drawable.folder_draft);
-                var buttonSizes = ConversionUtils.ConvertDpToPixels(16);
-                AddView(button, new LayoutParams(buttonSizes, buttonSizes));
+                var typeTextView = new AppCompatTextView(context);
+                typeTextView.SetTextAppearanceCompat(context, Resource.Style.contactSecondary);
+                typeTextView.Text = physicalAddress.Type.Name;
+                var typeTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+                typeTextViewLayoutParams.TopMargin = ConversionUtils.ConvertDpToPixels(3);
+                AddView(typeTextView, typeTextViewLayoutParams);
             }
 
             string GetAddressText(PhysicalAddress address)
