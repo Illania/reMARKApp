@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Links;
 
 namespace Mark5.Mobile.Common.DataAccess
@@ -134,6 +135,54 @@ namespace Mark5.Mobile.Common.DataAccess
                 throw new DataAccessException("Error getting shortcode.", ex);
             }
         }
+
+        public async Task SaveShortcodeWithPreviewAsync(ShortcodeContainer container)
+        {
+            try
+            {
+                await shortcodesDatabase.RunInConnectionAsync(c =>
+                {
+                    c.InsertOrReplace(container.ShortcodePreview);
+                    c.InsertOrReplace(container.Shortcode);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error saving shortcode with preview.", ex);
+            }
+        }
+
+        public async Task<ShortcodeContainer> GetShortcodeWithPreviewAsync(int shortcodeId)
+        {
+            try
+            {
+                ShortcodeContainer container = null;
+
+                await shortcodesDatabase.RunInConnectionAsync(c =>
+                {
+                    var shortcodePreview = c.Find<ShortcodePreview>(shortcodeId);
+                    if (shortcodePreview == null)
+                    {
+                        throw new DataNotFoundException("ShortcodePreview could not be found.");
+                    }
+
+                    var shortcode = c.Find<Shortcode>(shortcodeId);
+                    if (shortcode == null)
+                    {
+                        throw new DataNotFoundException("Shortcode could not be found.");
+                    }
+
+                    container = new ShortcodeContainer(shortcodePreview, shortcode);
+                });
+
+                return container;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting shortcode with preview.", ex);
+            }
+        }
+
         public async Task RemoveFromFolderAsync(List<ShortcodePreview> shortcodePreviews, Folder folder)
         {
             var ids = shortcodePreviews.Select(sp => sp.Id).Distinct().ToList();

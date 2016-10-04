@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: IDocumentView.cs
+// File: DocumentView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT

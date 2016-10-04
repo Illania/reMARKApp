@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.Graphics.Drawables.Shapes;
@@ -22,6 +23,8 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -231,7 +234,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (actionMode == null)
             {
-                Android.Widget.Toast.MakeText(Activity, "Shortcode clicked!", Android.Widget.ToastLength.Short).Show();
+                var i = new Intent(Activity, typeof(ShortcodeActivity));
+                i.PutExtra(ShortcodeActivity.FolderIntentKey, SerializationUtils.Serialize(Folder));
+                i.PutExtra(ShortcodeActivity.ShortcodePreviewIntentKey, SerializationUtils.Serialize(shortcodePreview));
+                StartActivity(i);
             }
             else
             {
@@ -250,10 +256,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        #endregion
-
-        #region Action mode
-
         void Adapter_ItemLongClicked(object sender, ShortcodePreview shortcodePreview)
         {
             if (actionMode == null)
@@ -263,6 +265,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             Adapter_ItemClicked(sender, shortcodePreview);
         }
+
+        #endregion
+
+        #region Action mode
 
         public bool OnPrepareActionMode(ActionMode mode, IMenu menu)
         {

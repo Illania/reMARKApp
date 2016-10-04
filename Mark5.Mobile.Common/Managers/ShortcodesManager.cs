@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Converters;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
@@ -121,6 +122,41 @@ namespace Mark5.Mobile.Common.Managers
         public async Task<Shortcode> GetShortcodeAsync(Folder folder, int shortcodeId, SourceType sourceType = SourceType.Auto)
         {
             return await GetShortcodeAsync(folder.Id, shortcodeId, sourceType);
+        }
+
+        public async Task<ShortcodeContainer> GetShortcodeWithPreviewAsync(Folder folder, int shortcodeId, SourceType sourceType = SourceType.Auto)
+        {
+            return await GetShortcodeWithPreviewAsync(folder.Id, shortcodeId, sourceType);
+        }
+
+        public async Task<ShortcodeContainer> GetShortcodeWithPreviewAsync(int folderId, int shortcodeId, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.GetShortcodeAsync(new DataContract.GetShortcodeParameters
+                {
+                    Token = Token,
+                    FolderId = folderId,
+                    ShortcodeId = shortcodeId,
+                    IncludePreview = true
+                });
+
+                var shortcodePreview = result.ShortcodePreview.Convert();
+                var shortcode = result.Shortcode.Convert();
+
+                var container = new ShortcodeContainer(shortcodePreview, shortcode);
+
+                await shortcodesDataAccess.SaveShortcodeWithPreviewAsync(container);
+
+                return container;
+            }
+
+            if (sourceType == SourceType.Local)
+            {
+                return await shortcodesDataAccess.GetShortcodeWithPreviewAsync(shortcodeId);
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
         }
     }
 }
