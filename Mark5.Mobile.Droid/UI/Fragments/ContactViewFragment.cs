@@ -124,9 +124,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             physicalAddressCardView.AddView(physicalAddressCardInternalLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
             physicalAddressSubviews.OfType<View>().ForEach(physicalAddressCardInternalLayout.AddView);
 
-
-
-
             descriptionCardView = new CardView(Context);
             descriptionCardView.Visibility = ViewStates.Gone;
             descriptionCardView.Elevation = ConversionUtils.ConvertDpToPixels(2.0f);

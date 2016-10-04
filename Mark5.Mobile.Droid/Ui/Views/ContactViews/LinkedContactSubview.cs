@@ -53,10 +53,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             {
                 Visibility = ViewStates.Visible;
 
+                contentLayout.RemoveAllViews();
                 foreach (var contact in contacts)
                 {
+
                     var subsubview = new LinkedContactSubSubview(Context, this, contact);
-                    internalLayout.AddView(subsubview);
+                    contentLayout.AddView(subsubview);
                 }
             }
             else

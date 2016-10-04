@@ -14,8 +14,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
     public abstract class DescriptionCardSubview : BaseCardSubview
     {
-        AppCompatTextView titleTextView;
-        AppCompatTextView contentTextView;
+        readonly AppCompatTextView titleTextView;
+        readonly AppCompatTextView contentTextView;
 
         protected DescriptionCardSubview(Context context) : base(context)
         {
@@ -25,12 +25,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
             titleTextView = new AppCompatTextView(context);
             titleTextView.SetTextAppearanceCompat(context, Resource.Style.contactPrimary);
+            titleTextView.SetPadding(0, 0, ConversionUtils.ConvertDpToPixels(24), 0);
             var titleTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             titleTextViewLayoutParams.TopMargin = ConversionUtils.ConvertDpToPixels(16);
             AddView(titleTextView, titleTextViewLayoutParams);
 
             contentTextView = new AppCompatTextView(context);
             contentTextView.SetTextAppearanceCompat(context, Resource.Style.contactSecondary);
+            contentTextView.SetPadding(0, 0, ConversionUtils.ConvertDpToPixels(24), 0);
             var contentTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             contentTextViewLayoutParams.TopMargin = ConversionUtils.ConvertDpToPixels(3);
             contentTextViewLayoutParams.BottomMargin = ConversionUtils.ConvertDpToPixels(16);

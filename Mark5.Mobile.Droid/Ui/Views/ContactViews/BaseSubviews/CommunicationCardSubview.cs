@@ -33,7 +33,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             iconImageViewLayout.Orientation = Vertical;
             iconImageViewLayout.LayoutParameters = new LayoutParams(ConversionUtils.ConvertDpToPixels(56), ViewGroup.LayoutParams.MatchParent);
             var paddingValue = ConversionUtils.ConvertDpToPixels(16);
-            iconImageViewLayout.SetPadding(paddingValue, paddingValue, paddingValue, 0);
+            iconImageViewLayout.SetPadding(paddingValue, ConversionUtils.ConvertDpToPixels(8), paddingValue, 0);
 
             internalLayout.AddView(iconImageViewLayout);
 
@@ -58,7 +58,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             titleTextView.Text = title;
         }
 
-        protected class CommunicationCardSubSubview : LinearLayoutCompat //TODO need to find a way to set primary
+        protected class CommunicationCardSubSubview : LinearLayoutCompat
         {
             public CommunicationCardSubSubview(Context context, string primaryText, string descriptionText) : base(context)
             {

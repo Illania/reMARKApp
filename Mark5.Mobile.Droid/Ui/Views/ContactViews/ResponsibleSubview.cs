@@ -27,10 +27,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             {
                 Visibility = ViewStates.Visible;
 
+                contentLayout.RemoveAllViews();
                 foreach (var id in Contact.ResponsibleUserIds)
                 {
                     var subsubview = new ResponsibleSubSubview(Context, this, id, Contact.ResponsibleUsers[id]);
-                    internalLayout.AddView(subsubview);
+                    contentLayout.AddView(subsubview);
                 }
             }
             else

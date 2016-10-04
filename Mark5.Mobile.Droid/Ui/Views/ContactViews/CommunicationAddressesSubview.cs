@@ -29,6 +29,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             var communicationAddressesForType = Contact?.CommunicationAddresses.Where(ca => ca.Type == addressType);
             if (Contact != null && communicationAddressesForType.Any())
             {
+                contentLayout.RemoveAllViews();
                 Visibility = ViewStates.Visible;
 
                 foreach (var address in communicationAddressesForType)
