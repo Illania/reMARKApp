@@ -23,7 +23,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         {
             linkedContactType = type;
             SetTitle(type.ToString());
-            iconImageView.SetImageResource(Resource.Drawable.email); //TODO should depend on type
+            iconImageView.SetImageResource(Resource.Drawable.email);
         }
 
         public override void RefreshView()

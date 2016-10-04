@@ -8,6 +8,7 @@
 using System;
 using System.Linq;
 using System.Text;
+using Android.Support.V4.Content;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
 
@@ -26,13 +27,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
         public override void RefreshView() //TODO need to think about primary and ordering
         {
+            if (Contact.PreferrableType == addressType)
+            {
+                iconImageView.SetColorFilter(new Android.Graphics.Color(ContextCompat.GetColor(Context, Resource.Color.brown)));
+            }
+
             var communicationAddressesForType = Contact?.CommunicationAddresses.Where(ca => ca.Type == addressType);
             if (Contact != null && communicationAddressesForType.Any())
             {
                 contentLayout.RemoveAllViews();
                 Visibility = ViewStates.Visible;
 
-                foreach (var address in communicationAddressesForType)
+                foreach (var address in communicationAddressesForType.OrderBy(ad => ad.IsPrimary != true))
                 {
                     if (addressType == CommunicationAddressType.IM)
                     {
