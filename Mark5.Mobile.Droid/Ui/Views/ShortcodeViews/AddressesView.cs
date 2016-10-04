@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.Linq;
 using Android.Content;
 using Android.Graphics;
@@ -22,6 +23,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
     {
 
         readonly DocumentAddressType type;
+
+        public event EventHandler<DocumentAddress> DocumentAddressClicked = delegate { };
 
         public AddressesView(Context context, DocumentAddressType type)
             : base(context)
@@ -54,7 +57,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
 #pragma warning restore XA0001 // Find issues with Android API usage
             }
             titleView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
-            titleView.SetPadding(DistanceLarge, 0, DistanceLarge, 0);
+            titleView.SetPadding(DistanceLarge, 0, DistanceNormal, 0);
             InnerLayout.AddView(titleView);
 
             InnerLayout.AddView(new Divider(Context));
@@ -69,13 +72,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
                 var addresses = Shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == type).ToArray();
                 for (int i = 0; i < addresses.Length; i++)
                 {
-                    var isLast = i == addresses.Length - 1;
+                    var a = addresses[i];
+                    var isNotLast = i != addresses.Length - 1;
 
-                    InnerLayout.AddView(new AddressView(Context, addresses[i], DistanceVeryLarge, DistanceNormal, isLast));
+                    var av = new AddressView(Context, a, DistanceVeryLarge, DistanceNormal);
+                    av.Click += (sender, e) => DocumentAddressClicked(this, a);
+                    InnerLayout.AddView(av);
 
-                    if (!isLast)
+                    if (isNotLast)
                     {
-                        InnerLayout.AddView(new Divider(Context));
+                        InnerLayout.AddView(new Divider(Context, DistanceVeryLarge, 0, 0, 0));
                     }
                 }
             }
@@ -90,13 +96,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
         class AddressView : LinearLayoutCompat
         {
 
-            public AddressView(Context context, DocumentAddress address, int distanceVeryLarge, int distanceNormal, bool isLast)
+            public AddressView(Context context, DocumentAddress address, int distanceVeryLarge, int distanceNormal)
                 : base(context)
             {
-                SetPadding(distanceVeryLarge, distanceNormal, distanceVeryLarge, isLast ? 0 : distanceNormal);
+                var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
+                SetBackgroundResource(typedArray.GetResourceId(0, 0));
+                typedArray.Recycle();
 
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
                 Orientation = Vertical;
+                SetPadding(distanceVeryLarge, distanceNormal, distanceVeryLarge, distanceNormal);
+
+                Clickable = true;
 
                 var addressView = new AppCompatTextView(Context)
                 {

@@ -6,11 +6,11 @@
 // Copyright (c) 2016 Nordic IT
 //
 using Android.Content;
+using Android.Graphics;
 using Android.OS;
+using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
-using Android.Support.V4.Content;
-using Android.Graphics;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
 {

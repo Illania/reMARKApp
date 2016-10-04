@@ -7,7 +7,6 @@
 //
 using System;
 using System.IO;
-using System.Linq;
 using Android.Content;
 using Android.OS;
 using Android.Support.V7.Widget;

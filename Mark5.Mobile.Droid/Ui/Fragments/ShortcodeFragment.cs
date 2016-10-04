@@ -7,12 +7,9 @@
 //
 
 using System;
-using System.Threading;
 using System.Threading.Tasks;
-using Android.Content;
 using Android.Graphics;
 using Android.OS;
-using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -23,7 +20,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.ShortcodeViews;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -63,10 +59,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.SetPadding(padding, padding, padding, padding);
 
             linearLayout.AddView(new DescriptionView(Context));
-            linearLayout.AddView(new AddressesView(Context, DocumentAddressType.ReplyTo));
-            linearLayout.AddView(new AddressesView(Context, DocumentAddressType.To));
-            linearLayout.AddView(new AddressesView(Context, DocumentAddressType.Cc));
-            linearLayout.AddView(new AddressesView(Context, DocumentAddressType.Bcc));
+            var avReplyTo = new AddressesView(Context, DocumentAddressType.ReplyTo);
+            avReplyTo.DocumentAddressClicked += AddressesView_DocumentAddressClicked;
+            linearLayout.AddView(avReplyTo);
+            var avTo = new AddressesView(Context, DocumentAddressType.To);
+            avTo.DocumentAddressClicked += AddressesView_DocumentAddressClicked;
+            linearLayout.AddView(avTo);
+            var avCc = new AddressesView(Context, DocumentAddressType.Cc);
+            avCc.DocumentAddressClicked += AddressesView_DocumentAddressClicked;
+            linearLayout.AddView(avCc);
+            var avBcc = new AddressesView(Context, DocumentAddressType.Bcc);
+            avBcc.DocumentAddressClicked += AddressesView_DocumentAddressClicked;
+            linearLayout.AddView(avBcc);
 
             HasOptionsMenu = true;
 
@@ -122,6 +126,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             return base.OnOptionsItemSelected(item);
+        }
+
+        void AddressesView_DocumentAddressClicked(object sender, DocumentAddress e)
+        {
+            // TODO
         }
 
         async Task RefreshData()
