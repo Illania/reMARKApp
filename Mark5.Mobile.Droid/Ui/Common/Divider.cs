@@ -9,6 +9,8 @@ using Android.Content;
 using Android.Support.V4.Content;
 using Android.Util;
 using Android.Views;
+using Android.Widget;
+using Android.Graphics;
 
 namespace Mark5.Mobile.Droid.Ui.Views.Common
 {
@@ -20,7 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
             : base(context)
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 0.5f, Resources.DisplayMetrics) + 0.5f));
-            Background = ContextCompat.GetDrawable(Context, Resource.Drawable.line_divider);
+            SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
         }
     }
 }

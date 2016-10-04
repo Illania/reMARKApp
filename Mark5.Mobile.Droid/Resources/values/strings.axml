@@ -74,4 +74,5 @@
 	<string name="low_priority_document">This document has low priority</string>
 	<string name="opening_attachment">Opening attachment</string>
 	<string name="cannot_open_attachment_without_ext">Attachments without extensions cannot be opened</string>
+	<string name="description">Description</string>
 </resources>

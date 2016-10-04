@@ -10,11 +10,13 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
+using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
+using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
@@ -46,21 +48,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ScrollView scrollView;
         LinearLayoutCompat linearLayout;
 
-        CancellationTokenSource setReadStatusCancellationTokenSource;
-
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(ShortcodeFragment)} [folder.id={FolderId ?? Folder?.Id}, shortcode.id={ShortcodeId ?? ShortcodePreview?.Id ?? Shortcode?.Id}...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout, container, false);
+            rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
 
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
+            linearLayout.SetClipToPadding(false);
+            var padding = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 10.0f, Resources.DisplayMetrics) + 0.5f);
+            linearLayout.SetPadding(padding, padding, padding, padding);
 
             linearLayout.AddView(new DescriptionView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new AddressesView(Context));
+            linearLayout.AddView(new AddressesView(Context, DocumentAddressType.ReplyTo));
+            linearLayout.AddView(new AddressesView(Context, DocumentAddressType.To));
+            linearLayout.AddView(new AddressesView(Context, DocumentAddressType.Cc));
+            linearLayout.AddView(new AddressesView(Context, DocumentAddressType.Bcc));
 
             HasOptionsMenu = true;
 
@@ -81,13 +87,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnResume();
 
             await RefreshData();
-        }
-
-        public override void OnDestroyedByUser()
-        {
-            base.OnDestroyedByUser();
-
-            setReadStatusCancellationTokenSource.Cancel();
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -155,6 +154,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void RefreshView()
         {
+            ((AppCompatActivity)Activity).SupportActionBar.Title = ShortcodePreview.Name;
+
             progress.Visibility = ViewStates.Gone;
             scrollView.Visibility = ViewStates.Visible;
 
@@ -166,13 +167,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dv.ShortcodePreview = ShortcodePreview;
                     dv.Shortcode = Shortcode;
                     dv.RefreshView();
-
-                    var d = linearLayout.GetChildAt(i + 1) as Divider;
-                    if (d != null)
-                    {
-                        d.Visibility = dv.Visibility;
-                        i++;
-                    }
                 }
             }
 

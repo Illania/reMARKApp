@@ -101,7 +101,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnDestroyedByUser();
 
-            setReadStatusCancellationTokenSource.Cancel();
+            setReadStatusCancellationTokenSource?.Cancel();
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
