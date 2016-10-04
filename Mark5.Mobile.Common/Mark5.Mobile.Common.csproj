@@ -165,7 +165,6 @@
     <Compile Include="Managers\ICleanUpManager.cs" />
     <Compile Include="Managers\ICommonActionsManager.cs" />
     <Compile Include="Managers\IContactsManager.cs" />
-    <Compile Include="Managers\IDocumentsManager.cs" />
     <Compile Include="Managers\IDownloadManager.cs" />
     <Compile Include="Managers\IFoldersManager.cs" />
     <Compile Include="Managers\INotificationsManager.cs" />
@@ -174,6 +173,7 @@
     <Compile Include="Managers\IShortcodesManager.cs" />
     <Compile Include="Managers\ISystemManager.cs" />
     <Compile Include="Model\ReadByValue.cs" />
+    <Compile Include="IDocumentsManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: DocumentView.cs
+// File: ShortcodeView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -11,34 +11,34 @@ using Android.Util;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
 
-namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
+namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
 {
 
-    public abstract class DocumentView : LinearLayoutCompat
+    public abstract class ShortcodeView : LinearLayoutCompat
     {
 
-        public DocumentPreview DocumentPreview { get; set; }
+        public ShortcodePreview ShortcodePreview { get; set; }
 
-        public Document Document { get; set; }
+        public Shortcode Shortcode { get; set; }
 
         protected int DistanceNone;
         protected int DistanceLarge;
         protected int DistanceNormal;
         protected int DistanceSmall;
 
-        public DocumentView(Context context, IAttributeSet attrs, int defStyleAttr)
+        public ShortcodeView(Context context, IAttributeSet attrs, int defStyleAttr)
             : base(context, attrs, defStyleAttr)
         {
             Init();
         }
 
-        public DocumentView(Context context, IAttributeSet attrs)
+        public ShortcodeView(Context context, IAttributeSet attrs)
             : base(context, attrs)
         {
             Init();
         }
 
-        protected DocumentView(Context context)
+        protected ShortcodeView(Context context)
             : base(context)
         {
             Init();

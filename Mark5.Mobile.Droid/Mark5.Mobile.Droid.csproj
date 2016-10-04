@@ -195,12 +195,17 @@
     <Compile Include="Ui\Views\DocumentViews\SubjectView.cs" />
     <Compile Include="Ui\Views\DocumentViews\RecipentsView.cs" />
     <Compile Include="Ui\Views\DocumentViews\ContentView.cs" />
-    <Compile Include="Ui\Views\DocumentViews\Divider.cs" />
     <Compile Include="Ui\Views\DocumentViews\AttachmentsView.cs" />
     <Compile Include="Ui\Common\Formatters.cs" />
     <Compile Include="Ui\Views\DocumentViews\PriorityView.cs" />
     <Compile Include="Utilities\InsecureAndroidClientHandler.cs" />
     <Compile Include="Ui\Common\BusMesseges\DocumentPreviewReadStatusChangedMessage.cs" />
+    <Compile Include="Ui\Activities\ShortcodeActivity.cs" />
+    <Compile Include="Ui\Fragments\ShortcodeFragment.cs" />
+    <Compile Include="Ui\Views\ShortcodeViews\ShortcodeView.cs" />
+    <Compile Include="Ui\Views\ShortcodeViews\DescriptionView.cs" />
+    <Compile Include="Ui\Views\ShortcodeViews\AddressesView.cs" />
+    <Compile Include="Ui\Common\Divider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -346,6 +351,7 @@
     <Folder Include="Ui\Views\" />
     <Folder Include="Ui\Views\DocumentViews\" />
     <Folder Include="Ui\Common\BusMesseges\" />
+    <Folder Include="Ui\Views\ShortcodeViews\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">

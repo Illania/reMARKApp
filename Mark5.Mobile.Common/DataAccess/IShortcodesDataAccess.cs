@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Containers;
 
 namespace Mark5.Mobile.Common.DataAccess
 {
@@ -22,6 +23,10 @@ namespace Mark5.Mobile.Common.DataAccess
         Task SaveShortcodeAsync(Shortcode shortocode);
 
         Task<Shortcode> GetShortcodeAsync(int shortcodeId);
+
+        Task SaveShortcodeWithPreviewAsync(ShortcodeContainer container);
+
+        Task<ShortcodeContainer> GetShortcodeWithPreviewAsync(int shortcodeId);
 
         Task RemoveFromFolderAsync(List<ShortcodePreview> shortcodePreviews, Folder folder);
 
