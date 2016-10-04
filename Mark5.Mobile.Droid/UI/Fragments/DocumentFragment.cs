@@ -24,12 +24,15 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.DocumentViews;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
 
     public class DocumentFragment : RetainableStateFragment
     {
+
+        const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
         public int? FolderId { get; set; }
 
@@ -163,6 +166,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, Folder, false, SourceType.Local);
                 if (string.IsNullOrWhiteSpace(path))
                 {
+                    if (attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes
+                        && PlatformConfig.Preferences.LargeAttachmentWarning
+                        && Integration.IsConnectedToMeteredConnection()
+                        && !await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.warning, Resource.String.large_attachment))
+                    {
+                        dismissAction();
+                        return;
+                    }
+
                     path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, Folder, false, SourceType.Remote);
                 }
 
@@ -197,6 +209,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, Folder, false, SourceType.Local);
                 if (string.IsNullOrWhiteSpace(path))
                 {
+                    if (attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes
+                        && PlatformConfig.Preferences.LargeAttachmentWarning
+                        && Integration.IsConnectedToMeteredConnection()
+                        && !await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.warning, Resource.String.large_attachment))
+                    {
+                        dismissAction();
+                        return;
+                    }
+
                     path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, Folder, false, SourceType.Remote);
                 }
 
