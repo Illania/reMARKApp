@@ -18,6 +18,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
     {
         CommunicationAddressType addressType;
 
+        public event EventHandler<CommunicationAddress> AddressClicked = delegate { };
+
         public CommunicationAddressesSubview(Android.Content.Context context, CommunicationAddressType type) : base(context)
         {
             addressType = type;
@@ -25,7 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             iconImageView.SetImageResource(Resource.Drawable.email);
         }
 
-        public override void RefreshView() //TODO need to think about primary and ordering
+        public override void RefreshView()
         {
             if (Contact.PreferrableType == addressType)
             {
@@ -38,18 +40,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 contentLayout.RemoveAllViews();
                 Visibility = ViewStates.Visible;
 
-                foreach (var address in communicationAddressesForType.OrderBy(ad => ad.IsPrimary != true))
+                foreach (var communicationAddress in communicationAddressesForType.OrderBy(ad => ad.IsPrimary != true))
                 {
                     if (addressType == CommunicationAddressType.IM)
                     {
-                        var handleAndType = ParseIm(address.Address);
-                        var subsubview = new CommunicationCardSubSubview(Context, handleAndType.Item1, handleAndType.Item2);
+                        var handleAndType = ParseIm(communicationAddress.Address);
+                        var subsubview = new CommunicationAddressesSubSubview(Context, this, communicationAddress, handleAndType.Item1, handleAndType.Item2);
                         contentLayout.AddView(subsubview);
                     }
                     else
                     {
-                        var formattedAddress = FormatAddress(address.Address);
-                        var subsubview = new CommunicationCardSubSubview(Context, formattedAddress, address.Description);
+                        var formattedAddress = FormatAddress(communicationAddress.Address);
+                        var subsubview = new CommunicationAddressesSubSubview(Context, this, communicationAddress, formattedAddress, communicationAddress.Description);
                         contentLayout.AddView(subsubview);
                     }
                 }
@@ -116,6 +118,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             }
 
             return Tuple.Create(imHandle, imTypeString);
+        }
+
+        class CommunicationAddressesSubSubview : CommunicationCardSubSubview
+        {
+            public CommunicationAddressesSubSubview(Android.Content.Context context, CommunicationAddressesSubview parentView, CommunicationAddress communicationAddress, string address, string description)
+                : base(context, address, description, communicationAddress.IsPrimary)
+            {
+                Click += (sender, e) => parentView.AddressClicked(this, communicationAddress);
+            }
         }
     }
 

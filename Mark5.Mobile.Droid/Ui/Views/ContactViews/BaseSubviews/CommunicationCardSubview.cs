@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using Android.Content;
+using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Droid.Utilities;
@@ -38,6 +39,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             internalLayout.AddView(iconImageViewLayout);
 
             iconImageView = new AppCompatImageView(context);
+            iconImageView.SetColorFilter(new Android.Graphics.Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
             var imageViewSize = ConversionUtils.ConvertDpToPixels(24);
             iconImageViewLayout.AddView(iconImageView, new LayoutParams(imageViewSize, imageViewSize));
 
@@ -60,7 +62,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
         protected class CommunicationCardSubSubview : LinearLayoutCompat
         {
-            public CommunicationCardSubSubview(Context context, string primaryText, string descriptionText) : base(context)
+            public CommunicationCardSubSubview(Context context, string primaryText, string descriptionText, bool primary = false) : base(context)
             {
                 Orientation = Vertical;
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
@@ -69,7 +71,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
                 var primaryTextView = new AppCompatTextView(context);
                 primaryTextView.Text = primaryText;
-                primaryTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
+                primaryTextView.SetTextAppearanceCompat(context, primary ? Resource.Style.fontPrimaryBold : Resource.Style.fontPrimary);
 
                 AddView(primaryTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
@@ -79,7 +81,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                     descriptionTextView.Text = descriptionText;
                     var descriptionTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent, 1.0f);
                     descriptionTextViewLayoutParams.TopMargin = ConversionUtils.ConvertDpToPixels(2);
-                    descriptionTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
+                    descriptionTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight); //TODO decide if it makes sense to modify it when primary
                     AddView(descriptionTextView, descriptionTextViewLayoutParams);
                 }
             }

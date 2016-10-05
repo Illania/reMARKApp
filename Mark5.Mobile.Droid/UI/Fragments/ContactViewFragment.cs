@@ -102,6 +102,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             communicationSubviews.OfType<LinkedContactSubview>().ForEach(lcs => lcs.ContactClicked += LinkedContactClicked);
             communicationSubviews.OfType<ResponsibleSubview>().ForEach(rsv => rsv.ContactClicked += ResponsibleUserClicked);
+            communicationSubviews.OfType<CommunicationAddressesSubview>().ForEach(rsv => rsv.AddressClicked += AddressClicked);
             communicationSubviews.OfType<View>().ForEach(communicationCardInternalLayout.AddView);
 
             physicalAddressCardView = new CardView(Context);
@@ -264,7 +265,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void ResponsibleUserClicked(object sender, int contactId)
         {
-            //TODO to decide what to do here 
+            //Need to fill later
+        }
+
+        void AddressClicked(object sender, CommunicationAddress e)
+        {
+            //Need to fill later
         }
 
         #endregion
