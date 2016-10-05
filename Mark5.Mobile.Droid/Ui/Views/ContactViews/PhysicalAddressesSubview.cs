@@ -20,7 +20,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         {
             Orientation = Vertical;
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            SetPadding(ConversionUtils.ConvertDpToPixels(24), 0, 0, 0);
+            SetPadding(DistanceVeryLarge, 0, 0, 0);
         }
 
         public override void RefreshView()
