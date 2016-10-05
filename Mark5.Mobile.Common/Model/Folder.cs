@@ -7,9 +7,10 @@
 //
 using System;
 using System.Collections.Generic;
-using Mark5.Mobile.Common.Utilities;
-using SQLite;
 using System.Linq;
+using Mark5.Mobile.Common.Utilities;
+using PCLStorage;
+using SQLite;
 
 namespace Mark5.Mobile.Common.Model
 {
@@ -17,7 +18,7 @@ namespace Mark5.Mobile.Common.Model
     [Table("Folder")]
     public class Folder : ICopiable<Folder>
     {
-        public const string PathSeparator = "/";
+        public static char PathSeparator = PortablePath.DirectorySeparatorChar;
 
         [Column("Id"), PrimaryKey]
         public int Id { get; set; } = -1;
