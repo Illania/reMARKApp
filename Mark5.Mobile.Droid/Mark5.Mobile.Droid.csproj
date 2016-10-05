@@ -196,7 +196,6 @@
     <Compile Include="Ui\Views\ContactViews\AccountSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\VatSubview.cs" />
     <Compile Include="Utilities\ConversionUtils.cs" />
-    <Compile Include="Ui\Views\ContactViews\IContactView.cs" />
     <Compile Include="Ui\Views\ContactViews\LedgerSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\CommunicationAddressesSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\PhysicalAddressesSubview.cs" />
@@ -210,9 +209,8 @@
     <Compile Include="Ui\Views\ContactViews\ShortIdSubview.cs" />
     <Compile Include="Ui\Views\Divider.cs" />
     <Compile Include="Ui\Views\ContactViews\LinkedContactSubview.cs" />
-    <Compile Include="Ui\Views\PaddingDivider.cs" />
     <Compile Include="Utilities\ViewUtilities.cs" />
-    <Compile Include="Ui\Views\ContactViews\BaseSubviews\BaseCardSubview.cs" />
+    <Compile Include="Ui\Views\ContactViews\BaseSubviews\ContactView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

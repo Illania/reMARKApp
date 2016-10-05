@@ -12,7 +12,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public abstract class DescriptionCardSubview : BaseCardSubview
+    public abstract class DescriptionCardSubview : ContactView
     {
         readonly AppCompatTextView titleTextView;
         readonly AppCompatTextView contentTextView;
@@ -20,22 +20,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         protected DescriptionCardSubview(Context context) : base(context)
         {
             Orientation = Vertical;
-            SetPadding(ConversionUtils.ConvertDpToPixels(24), 0, 0, 0);
+            SetPadding(DistanceVeryLarge, 0, 0, 0);
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
             titleTextView = new AppCompatTextView(context);
             titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
-            titleTextView.SetPadding(0, 0, ConversionUtils.ConvertDpToPixels(24), 0);
+            titleTextView.SetPadding(0, 0, DistanceVeryLarge, 0);
             var titleTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            titleTextViewLayoutParams.TopMargin = ConversionUtils.ConvertDpToPixels(16);
+            titleTextViewLayoutParams.TopMargin = DistanceLarge;
             AddView(titleTextView, titleTextViewLayoutParams);
 
             contentTextView = new AppCompatTextView(context);
             contentTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
-            contentTextView.SetPadding(0, 0, ConversionUtils.ConvertDpToPixels(24), 0);
+            contentTextView.SetPadding(0, 0, DistanceVeryLarge, 0);
             var contentTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             contentTextViewLayoutParams.TopMargin = ConversionUtils.ConvertDpToPixels(3);
-            contentTextViewLayoutParams.BottomMargin = ConversionUtils.ConvertDpToPixels(16);
+            contentTextViewLayoutParams.BottomMargin = DistanceLarge;
             AddView(contentTextView, contentTextViewLayoutParams);
 
             Divider = new Divider(Context);

@@ -13,10 +13,9 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public abstract class CommunicationCardSubview : BaseCardSubview
+    public abstract class CommunicationCardSubview : ContactView
     {
         AppCompatTextView titleTextView;
-        protected LinearLayoutCompat internalLayout;
         protected LinearLayoutCompat contentLayout;
         protected AppCompatImageView iconImageView;
 
@@ -25,7 +24,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             Orientation = Vertical;
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
-            internalLayout = new LinearLayoutCompat(context);
+            var internalLayout = new LinearLayoutCompat(context);
             internalLayout.Orientation = Horizontal;
             internalLayout.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             AddView(internalLayout);
@@ -33,24 +32,27 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             var iconImageViewLayout = new LinearLayoutCompat(context);
             iconImageViewLayout.Orientation = Vertical;
             iconImageViewLayout.LayoutParameters = new LayoutParams(ConversionUtils.ConvertDpToPixels(56), ViewGroup.LayoutParams.MatchParent);
-            var paddingValue = ConversionUtils.ConvertDpToPixels(16);
-            iconImageViewLayout.SetPadding(paddingValue, ConversionUtils.ConvertDpToPixels(8), paddingValue, 0);
+            iconImageViewLayout.SetPadding(DistanceLarge, DistanceNormal, DistanceLarge, 0);
 
             internalLayout.AddView(iconImageViewLayout);
 
             iconImageView = new AppCompatImageView(context);
             iconImageView.SetColorFilter(new Android.Graphics.Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
-            var imageViewSize = ConversionUtils.ConvertDpToPixels(24);
-            iconImageViewLayout.AddView(iconImageView, new LayoutParams(imageViewSize, imageViewSize));
+            iconImageViewLayout.AddView(iconImageView, new LayoutParams(DistanceVeryLarge, DistanceVeryLarge));
+
+            var contentExternalLayout = new LinearLayoutCompat(context);
+            contentExternalLayout.Orientation = Vertical;
+            contentExternalLayout.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            internalLayout.AddView(contentExternalLayout);
 
             contentLayout = new LinearLayoutCompat(context);
             contentLayout.Orientation = Vertical;
             contentLayout.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1.0f);
 
-            internalLayout.AddView(contentLayout);
+            contentExternalLayout.AddView(contentLayout);
 
-            Divider = new PaddingDivider(Context, 56, 0);
-            AddView(Divider);
+            Divider = new Divider(Context);
+            contentExternalLayout.AddView(Divider);
 
             titleTextView = new AppCompatTextView(Context);
         }

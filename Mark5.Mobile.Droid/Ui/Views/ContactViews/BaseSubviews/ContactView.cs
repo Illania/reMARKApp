@@ -9,11 +9,17 @@ using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public abstract class BaseCardSubview : LinearLayoutCompat, IContactSubview
+    public abstract class ContactView : LinearLayoutCompat
     {
+        public int DistanceVeryLarge; //TODO public in order to pass it to enclosing class
+        public int DistanceLarge;
+        public int DistanceNormal;
+        public int DistanceSmall;
+
         protected View Divider;
 
         public ContactPreview ContactPreview { get; set; }
@@ -27,8 +33,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             }
         }
 
-        protected BaseCardSubview(Context context) : base(context)
+        protected ContactView(Context context) : base(context)
         {
+            DistanceVeryLarge = ConversionUtils.ConvertDpToPixels(24);
+            DistanceLarge = ConversionUtils.ConvertDpToPixels(16);
+            DistanceNormal = ConversionUtils.ConvertDpToPixels(8);
+            DistanceSmall = ConversionUtils.ConvertDpToPixels(4);
         }
 
         public void HideSeparator()
