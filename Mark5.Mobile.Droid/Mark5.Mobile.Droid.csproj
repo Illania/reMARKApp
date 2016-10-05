@@ -338,6 +338,7 @@
     <AndroidResource Include="Resources\drawable-xhdpi\email.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\email.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\email.png" />
+    <AndroidResource Include="Resources\layout\base_layout_collapsing.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

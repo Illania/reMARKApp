@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.Support.V4.Content;
+using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -35,7 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public int? ContactId { get; set; }
 
         ProgressBar progress;
-        ScrollView scrollView;
+        NestedScrollView scrollView;
         LinearLayoutCompat linearLayout;
         List<IContactSubview> communicationSubviews;
         List<IContactSubview> descriptionSubviews;
@@ -53,7 +54,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             rootView.SetBackgroundColor(new Android.Graphics.Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
 
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
-            scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
+            scrollView = rootView.FindViewById<NestedScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
             linearLayout.SetClipToPadding(false);
 
@@ -135,7 +136,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             descriptionCardView.AddView(descriptionCardViewInternalLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
             descriptionCardTitle = new AppCompatTextView(Context);
-            descriptionCardTitle.SetTextAppearanceCompat(Context, Resource.Style.contactDescriptionTitle);
+            descriptionCardTitle.SetTextAppearanceCompat(Context, Resource.Style.fontListCircle);
             descriptionCardTitle.SetPadding(padding, padding, padding, padding);
             descriptionCardViewInternalLayout.AddView(descriptionCardTitle, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
             descriptionCardViewInternalLayout.AddView(new Divider(Context));
@@ -236,8 +237,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void RefreshTitle()
         {
-            ((AppCompatActivity)Activity).SupportActionBar.Title = ContactPreview?.Name;
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = ContactPreview?.CompanyName;
+            //((AppCompatActivity)Activity).SupportActionBar.Title = ContactPreview?.Name;
+            //((AppCompatActivity)Activity).SupportActionBar.Subtitle = ContactPreview?.CompanyName;
             descriptionCardTitle.Text = $"About {ContactPreview?.Name}";
         }
 

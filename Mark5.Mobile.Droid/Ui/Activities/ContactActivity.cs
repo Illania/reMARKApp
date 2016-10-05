@@ -7,6 +7,7 @@
 //
 using Android.App;
 using Android.OS;
+using Android.Support.Design.Widget;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
@@ -31,12 +32,19 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Creating {nameof(ContactActivity)}...");
 
-            SetTitle(Resource.String.contact);
-            SetContentView(Resource.Layout.base_layout);
+            SetContentView(Resource.Layout.base_layout_collapsing);
 
-            toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
+            var titleView = FindViewById<AppCompatTextView>(Resource.Id.title);
+            var subTitleView = FindViewById<AppCompatTextView>(Resource.Id.subtitle);
+            subTitleView.Text = "Subtitle";
+            //titleView.Text = "Title";
+
+
+            toolbar = FindViewById<Toolbar>(Resource.Id.collapsing_toolbar);
             SetSupportActionBar(toolbar);
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
+
+            //SupportActionBar.Title = "";
 
             if (savedInstanceState == null)
             {
