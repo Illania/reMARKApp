@@ -69,8 +69,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
                 var primaryTextView = new AppCompatTextView(context);
                 primaryTextView.Text = primaryText;
-
-                primaryTextView.SetTextAppearanceCompat(context, Resource.Style.contactPrimary);
+                primaryTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
 
                 AddView(primaryTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
@@ -80,7 +79,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                     descriptionTextView.Text = descriptionText;
                     var descriptionTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent, 1.0f);
                     descriptionTextViewLayoutParams.TopMargin = ConversionUtils.ConvertDpToPixels(2);
-                    descriptionTextView.SetTextAppearanceCompat(context, Resource.Style.contactSecondary);
+                    descriptionTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
                     AddView(descriptionTextView, descriptionTextViewLayoutParams);
                 }
             }

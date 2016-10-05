@@ -33,30 +33,53 @@
 		<item name="colorAccent">@color/brown</item>
 	</style>
 	<style name="hockey" parent="android:Theme.DeviceDefault.Light.DarkActionBar" />
-	<style name="fontListPrimary1" parent="TextAppearance.AppCompat.Body1">
+	<style name="fontListPrimary" parent="TextAppearance.AppCompat.Body1">
 		<item name="android:textSize">16sp</item>
 	</style>
-	<style name="fontListPrimary2" parent="TextAppearance.AppCompat.Body2">
+	<style name="fontListPrimaryBold" parent="TextAppearance.AppCompat.Body2">
 		<item name="android:textSize">16sp</item>
 	</style>
-	<style name="fontListSecondary" parent="TextAppearance.AppCompat.Caption">
+	<style name="fontListSmallLight" parent="TextAppearance.AppCompat.Caption">
 		<item name="android:textSize">14sp</item>
 	</style>
 	<style name="fontListCircle" parent="TextAppearance.AppCompat.Body1">
 		<item name="android:textSize">20sp</item>
 	</style>
 	<style name="fontTitle" parent="TextAppearance.AppCompat.Title" />
+	<style name="fontLarge" parent="TextAppearance.AppCompat.Body1">
+		<item name="android:textSize">20sp</item>
+	</style>
+	<style name="fontLargeBold" parent="TextAppearance.AppCompat.Body2">
+		<item name="android:textSize">20sp</item>
+	</style>
+	<style name="fontLargeLight" parent="TextAppearance.AppCompat.Caption">
+		<item name="android:textSize">20sp</item>
+	</style>
 	<style name="fontPrimary" parent="TextAppearance.AppCompat.Body1">
 		<item name="android:textSize">16sp</item>
 	</style>
-	<style name="fontSecondary" parent="TextAppearance.AppCompat.Caption">
+	<style name="fontPrimaryBold" parent="TextAppearance.AppCompat.Body2">
+		<item name="android:textSize">16sp</item>
+	</style>
+	<style name="fontPrimaryLight" parent="TextAppearance.AppCompat.Caption">
+		<item name="android:textSize">16sp</item>
+	</style>
+	<style name="fontSmall" parent="TextAppearance.AppCompat.Body1">
 		<item name="android:textSize">14sp</item>
 	</style>
-	<style name="contactPrimary" parent="TextAppearance.AppCompat.Subhead">
+	<style name="fontSmallBold" parent="TextAppearance.AppCompat.Body2">
+		<item name="android:textSize">14sp</item>
 	</style>
-	<style name="contactSecondary" parent="TextAppearance.AppCompat.Body1">
-		<item name="android:textColor">?android:textColorSecondary</item>
+	<style name="fontSmallLight" parent="TextAppearance.AppCompat.Caption">
+		<item name="android:textSize">14sp</item>
 	</style>
-	<style name="contactDescriptionTitle" parent="TextAppearance.AppCompat.Title">
+	<style name="fontTiny" parent="TextAppearance.AppCompat.Body1">
+		<item name="android:textSize">12sp</item>
+	</style>
+	<style name="fontTinyBold" parent="TextAppearance.AppCompat.Body1">
+		<item name="android:textSize">12sp</item>
+	</style>
+	<style name="fontTinyLight" parent="TextAppearance.AppCompat.Caption">
+		<item name="android:textSize">12sp</item>
 	</style>
 </resources>

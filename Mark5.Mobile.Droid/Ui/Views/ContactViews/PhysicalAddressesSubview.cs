@@ -52,7 +52,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
                 var addressTextView = new AppCompatTextView(context);
                 addressTextView.SetPadding(0, 0, ConversionUtils.ConvertDpToPixels(24), 0);
-                addressTextView.SetTextAppearanceCompat(context, Resource.Style.contactPrimary);
+                addressTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
                 addressTextView.Text = GetAddressText(physicalAddress);
                 var addressTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
                 addressTextViewLayoutParams.TopMargin = ConversionUtils.ConvertDpToPixels(16);
@@ -60,7 +60,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
                 var typeTextView = new AppCompatTextView(context);
                 typeTextView.SetPadding(0, 0, ConversionUtils.ConvertDpToPixels(24), 0);
-                typeTextView.SetTextAppearanceCompat(context, Resource.Style.contactSecondary);
+                typeTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
                 typeTextView.Text = physicalAddress.Type.Name;
                 var typeTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
                 typeTextViewLayoutParams.TopMargin = ConversionUtils.ConvertDpToPixels(3);

@@ -50,13 +50,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)
             {
 #pragma warning disable CS0618 // Type or member is obsolete
-                line2.SetTextAppearance(Context, Resource.Style.fontSecondary);
+                line2.SetTextAppearance(Context, Resource.Style.fontLarge);
 #pragma warning restore CS0618 // Type or member is obsolete
             }
             else
             {
 #pragma warning disable XA0001 // Find issues with Android API usage
-                line2.SetTextAppearance(Resource.Style.fontSecondary);
+                line2.SetTextAppearance(Resource.Style.fontLarge);
 #pragma warning restore XA0001 // Find issues with Android API usage
             }
             AddView(line2, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));

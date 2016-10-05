@@ -24,14 +24,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
             titleTextView = new AppCompatTextView(context);
-            titleTextView.SetTextAppearanceCompat(context, Resource.Style.contactPrimary);
+            titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             titleTextView.SetPadding(0, 0, ConversionUtils.ConvertDpToPixels(24), 0);
             var titleTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             titleTextViewLayoutParams.TopMargin = ConversionUtils.ConvertDpToPixels(16);
             AddView(titleTextView, titleTextViewLayoutParams);
 
             contentTextView = new AppCompatTextView(context);
-            contentTextView.SetTextAppearanceCompat(context, Resource.Style.contactSecondary);
+            contentTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
             contentTextView.SetPadding(0, 0, ConversionUtils.ConvertDpToPixels(24), 0);
             var contentTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             contentTextViewLayoutParams.TopMargin = ConversionUtils.ConvertDpToPixels(3);

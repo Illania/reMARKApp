@@ -115,7 +115,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var physicalCardTitle = new AppCompatTextView(Context);
             physicalCardTitle.Text = "Addresses";
-            physicalCardTitle.SetTextAppearanceCompat(Context, Resource.Style.contactDescriptionTitle);
+            physicalCardTitle.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
             var padding = ConversionUtils.ConvertDpToPixels(16);
             physicalCardTitle.SetPadding(padding, padding, padding, padding);
 
