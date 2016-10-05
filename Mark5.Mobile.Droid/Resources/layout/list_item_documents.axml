@@ -96,7 +96,7 @@
                     android:layout_weight="75"
                     android:layout_gravity="left"
                     android:gravity="left|center_vertical"
-                    android:textAppearance="@style/fontListPrimary1"
+                    android:textAppearance="@style/fontListPrimary"
                     android:maxLines="1"
                     android:ellipsize="end" />
                 <android.support.v7.widget.AppCompatTextView
@@ -106,7 +106,7 @@
                     android:layout_weight="25"
                     android:layout_gravity="right"
                     android:gravity="right|center_vertical"
-                    android:textAppearance="@style/fontListSecondary"
+                    android:textAppearance="@style/fontListSmallLight"
                     android:maxLines="1" />
             </android.support.v7.widget.LinearLayoutCompat>
             <android.support.v7.widget.AppCompatTextView
@@ -114,7 +114,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
-                android:textAppearance="@style/fontListPrimary2"
+                android:textAppearance="@style/fontListPrimaryBold"
                 android:textColor="@color/darkerblue"
                 android:maxLines="1"
                 android:ellipsize="end" />
@@ -122,7 +122,7 @@
                 android:id="@+id/list_item_document_preview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/fontListSecondary"
+                android:textAppearance="@style/fontListSmallLight"
                 android:maxLines="5"
                 android:ellipsize="end" />
         </android.support.v7.widget.LinearLayoutCompat>

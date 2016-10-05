@@ -40,14 +40,14 @@
                 android:id="@+id/list_item_shortcode_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/fontListPrimary1"
+                android:textAppearance="@style/fontListPrimary"
                 android:maxLines="1"
                 android:ellipsize="end" />
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/list_item_shortcode_desc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/fontListSecondary"
+                android:textAppearance="@style/fontListSmallLight"
                 android:maxLines="1"
                 android:ellipsize="end" />
         </android.support.v7.widget.LinearLayoutCompat>
