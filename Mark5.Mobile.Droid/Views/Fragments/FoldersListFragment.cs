@@ -48,7 +48,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(FoldersListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(FoldersListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
@@ -85,14 +85,14 @@ namespace Mark5.Mobile.Droid.Views.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Title = Folder.Module.ToString();
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder.Root ? string.Empty : Folder.Name;
 
-            CommonConfig.Logger.Info($"Created {nameof(FoldersListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]");
+            CommonConfig.Logger.Info($"Created {nameof(FoldersListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]");
         }
 
         public async override void OnResume()
         {
             base.OnResume();
 
-            CommonConfig.Logger.Info($"Resuming {nameof(FoldersListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+            CommonConfig.Logger.Info($"Resuming {nameof(FoldersListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             SetSections();
             await RefreshData();
@@ -103,7 +103,7 @@ namespace Mark5.Mobile.Droid.Views.Fragments
         {
             base.OnPause();
 
-            CommonConfig.Logger.Info($"Pausing {nameof(FoldersListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]...");
+            CommonConfig.Logger.Info($"Pausing {nameof(FoldersListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             if (actionMode != null)
             {
@@ -627,12 +627,12 @@ namespace Mark5.Mobile.Droid.Views.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(FoldersListFragment)} [FolderId={Folder.Id}, ModuleType={Folder.Module}]";
+            return $"{nameof(FoldersListFragment)} [FolderId={Folder?.Id}, ModuleType={Folder?.Module}]";
         }
 
         public override IRetainableState OnRetainInstanceState()
         {
-            CommonConfig.Logger.Info($"Retaining state: [folderName={Folder.Name}, folderId={Folder.Id}, selectedItemsCount={adapter.SelectedItemPositions.Count} ]");
+            CommonConfig.Logger.Info($"Retaining state: [folderName={Folder?.Name}, folderId={Folder?.Id}, selectedItemsCount={adapter.SelectedItemPositions.Count} ]");
 
             return new FolderListFragmentState
             {
