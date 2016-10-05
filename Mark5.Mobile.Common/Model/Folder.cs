@@ -51,7 +51,7 @@ namespace Mark5.Mobile.Common.Model
         {
             get
             {
-                return documenstLocalRootFolder.SubFolders.Contains(this);
+                return documentsLocalRootFolder.SubFolders.Contains(this);
             }
         }
 
@@ -178,7 +178,7 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = false,
         };
 
-        readonly static Folder documenstLocalRootFolder = new Folder
+        readonly static Folder documentsLocalRootFolder = new Folder
         {
             Id = -120,
             Guid = new Guid("{00000000-0000-0000-0000-000000000120}"),
@@ -271,7 +271,7 @@ namespace Mark5.Mobile.Common.Model
             switch (module)
             {
                 case ModuleType.Documents:
-                    return documenstLocalRootFolder;
+                    return documentsLocalRootFolder;
                 default:
                     throw new ArgumentException("Input module not valid");
             }
