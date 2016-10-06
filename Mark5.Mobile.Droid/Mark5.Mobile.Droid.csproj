@@ -211,6 +211,8 @@
     <Compile Include="Ui\Views\ContactViews\LinkedContactSubview.cs" />
     <Compile Include="Utilities\ViewUtilities.cs" />
     <Compile Include="Ui\Views\ContactViews\BaseSubviews\ContactView.cs" />
+    <Compile Include="Ui\Views\ContactViews\ContactHeaderView.cs" />
+    <Compile Include="Ui\Views\ContactViews\HeaderViewBehavior.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

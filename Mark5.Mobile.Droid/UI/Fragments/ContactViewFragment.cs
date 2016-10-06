@@ -259,8 +259,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void RefreshTitle()
         {
-            //((AppCompatActivity)Activity).SupportActionBar.Title = ContactPreview?.Name;
-            //((AppCompatActivity)Activity).SupportActionBar.Subtitle = ContactPreview?.CompanyName;
+            ((Activities.ContactActivity)Activity).SetTitle(ContactPreview?.Name, ContactPreview?.CompanyName);
             descriptionCardTitle.Text = $"About {ContactPreview?.Name}";
         }
 

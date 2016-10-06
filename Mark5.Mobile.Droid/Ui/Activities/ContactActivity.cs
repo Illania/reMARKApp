@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using Android.App;
 using Android.OS;
 using Android.Support.Design.Widget;
@@ -15,6 +16,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
+using Mark5.Mobile.Droid.Ui.Views.ContactViews;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -23,6 +25,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     {
         public const string ContactPreviewIntentKey = "ContactPreview_0da27d12-4d29-4f44-8dbf-2e28d7f93aae";
         public const string FolderIntentKey = "Folder_88a33f0b-ebbf-4eed-b33d-49fba4f43f15";
+
+        ContactHeaderView toolbarHeaderView;
+        ContactHeaderView floatHeaderView;
 
         Toolbar toolbar;
 
@@ -34,17 +39,17 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             SetContentView(Resource.Layout.base_layout_collapsing);
 
-            var titleView = FindViewById<AppCompatTextView>(Resource.Id.title);
-            var subTitleView = FindViewById<AppCompatTextView>(Resource.Id.subtitle);
-            subTitleView.Text = "Subtitle";
-            //titleView.Text = "Title";
-
-
             toolbar = FindViewById<Toolbar>(Resource.Id.collapsing_toolbar);
             SetSupportActionBar(toolbar);
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
 
-            //SupportActionBar.Title = "";
+            SupportActionBar.Title = "";
+
+            var appBarLayout = FindViewById<AppBarLayout>(Resource.Id.collapsing_appbar);
+            toolbarHeaderView = FindViewById<ContactHeaderView>(Resource.Id.toolbar_header_view);
+            floatHeaderView = FindViewById<ContactHeaderView>(Resource.Id.toolbar_header_view);
+
+            appBarLayout.AddOnOffsetChangedListener(new AppBarListener(toolbarHeaderView));
 
             if (savedInstanceState == null)
             {
@@ -77,6 +82,41 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
 
             return base.OnOptionsItemSelected(item);
+        }
+
+        class AppBarListener : Java.Lang.Object, AppBarLayout.IOnOffsetChangedListener
+        {
+            ContactHeaderView toolbarHeaderView;
+            bool isHideToolbarView = false;
+
+            public AppBarListener(ContactHeaderView headerView)
+            {
+                this.toolbarHeaderView = headerView;
+            }
+
+            public void OnOffsetChanged(AppBarLayout appBarLayout, int verticalOffset)
+            {
+                int maxScroll = appBarLayout.TotalScrollRange;
+                float percentage = (float)Math.Abs(verticalOffset) / (float)maxScroll;
+
+                if (percentage >= 1f && isHideToolbarView) //TODO think about this
+                {
+                    toolbarHeaderView.Visibility = ViewStates.Visible;
+                    isHideToolbarView = !isHideToolbarView;
+
+                }
+                else if (percentage < 1f && !isHideToolbarView)
+                {
+                    toolbarHeaderView.Visibility = ViewStates.Gone;
+                    isHideToolbarView = !isHideToolbarView;
+                }
+            }
+        }
+
+        public void SetTitle(string title, string subtitle)
+        {
+            toolbarHeaderView.SetTitles(title, subtitle);
+            floatHeaderView.SetTitles(title, subtitle);
         }
     }
 }

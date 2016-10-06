@@ -18,32 +18,18 @@
             android:layout_height="match_parent"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             android:fitsSystemWindows="true">
-            <android.support.v7.widget.LinearLayoutCompat
-                android:id="@+id/folderNameLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:paddingBottom="36dp"
-                android:paddingLeft="32dp"
-                android:gravity="bottom"
-                app:layout_collapseMode="parallax">
-                <android.support.v7.widget.AppCompatTextView
-                    android:id="@+id/title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp" />
-                <android.support.v7.widget.AppCompatTextView
-                    android:id="@+id/subtitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </android.support.v7.widget.LinearLayoutCompat>
             <android.support.v7.widget.Toolbar
                 android:id="@+id/collapsing_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
                 app:popupTheme="@style/mark5popupoverlay"
-                app:layout_collapseMode="pin" />
+                app:layout_collapseMode="pin">
+                <contact.ContactHeaderView
+                    android:id="@+id/toolbar_header_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </android.support.v7.widget.Toolbar>
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
     <FrameLayout
@@ -51,4 +37,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+    <contact.ContactHeaderView
+        android:id="@+id/float_header_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="contact.HeaderView.behavior" />
 </android.support.design.widget.CoordinatorLayout>
