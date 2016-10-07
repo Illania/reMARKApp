@@ -11,7 +11,7 @@ using AFollestad.MaterialDialogs;
 using Android.Content;
 using System.Threading;
 
-namespace Mark5.Mobile.Droid.Ui.Common
+namespace Mark5.Mobile.Droid.Views.Common
 {
 
     public static class Dialogs

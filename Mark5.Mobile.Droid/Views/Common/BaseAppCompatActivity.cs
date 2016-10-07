@@ -10,7 +10,7 @@ using Android.Content;
 using Android.OS;
 using Android.Support.V7.App;
 
-namespace Mark5.Mobile.Droid.Ui.Common
+namespace Mark5.Mobile.Droid.Views.Common
 {
 
     public abstract class BaseAppCompatActivity : AppCompatActivity

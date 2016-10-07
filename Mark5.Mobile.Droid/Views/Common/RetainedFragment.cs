@@ -1,7 +1,7 @@
 ﻿using Android.OS;
 using Android.Support.V4.App;
 
-namespace Mark5.Mobile.Droid.Ui.Common
+namespace Mark5.Mobile.Droid.Views.Common
 {
     public class RetainedFragment<Y> : Fragment where Y : class
     {

@@ -9,7 +9,7 @@ using Android.OS;
 using Android.Support.V4.App;
 using Android.Views;
 
-namespace Mark5.Mobile.Droid.Ui.Common
+namespace Mark5.Mobile.Droid.Views.Common
 {
 
     public abstract class RetainableStateFragment : Fragment
