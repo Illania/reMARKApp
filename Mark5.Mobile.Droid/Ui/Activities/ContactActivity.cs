@@ -47,7 +47,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             var appBarLayout = FindViewById<AppBarLayout>(Resource.Id.collapsing_appbar);
             toolbarHeaderView = FindViewById<ContactHeaderView>(Resource.Id.toolbar_header_view);
-            floatHeaderView = FindViewById<ContactHeaderView>(Resource.Id.toolbar_header_view);
+            floatHeaderView = FindViewById<ContactHeaderView>(Resource.Id.float_header_view);
 
             appBarLayout.AddOnOffsetChangedListener(new AppBarListener(toolbarHeaderView));
 
@@ -84,39 +84,32 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             return base.OnOptionsItemSelected(item);
         }
 
+
+        public void SetTitles(string title, string subtitle)
+        {
+            RunOnUiThreadIfNecessary(() =>
+            {
+                toolbarHeaderView.SetTitles(title, subtitle);
+                floatHeaderView.SetTitles(title, subtitle);
+            });
+        }
+
         class AppBarListener : Java.Lang.Object, AppBarLayout.IOnOffsetChangedListener
         {
-            ContactHeaderView toolbarHeaderView;
-            bool isHideToolbarView = false;
+            readonly ContactHeaderView toolbarHeaderView;
 
             public AppBarListener(ContactHeaderView headerView)
             {
-                this.toolbarHeaderView = headerView;
+                toolbarHeaderView = headerView;
             }
 
             public void OnOffsetChanged(AppBarLayout appBarLayout, int verticalOffset)
             {
-                int maxScroll = appBarLayout.TotalScrollRange;
-                float percentage = (float)Math.Abs(verticalOffset) / (float)maxScroll;
+                float percentage = Math.Abs(verticalOffset) / (float)appBarLayout.TotalScrollRange;
 
-                if (percentage >= 1f && isHideToolbarView) //TODO think about this
-                {
-                    toolbarHeaderView.Visibility = ViewStates.Visible;
-                    isHideToolbarView = !isHideToolbarView;
-
-                }
-                else if (percentage < 1f && !isHideToolbarView)
-                {
-                    toolbarHeaderView.Visibility = ViewStates.Gone;
-                    isHideToolbarView = !isHideToolbarView;
-                }
+                toolbarHeaderView.Visibility = percentage < 1f ? ViewStates.Gone : ViewStates.Visible;
             }
         }
 
-        public void SetTitle(string title, string subtitle)
-        {
-            toolbarHeaderView.SetTitles(title, subtitle);
-            floatHeaderView.SetTitles(title, subtitle);
-        }
     }
 }

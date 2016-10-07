@@ -211,8 +211,8 @@
     <Compile Include="Ui\Views\ContactViews\LinkedContactSubview.cs" />
     <Compile Include="Utilities\ViewUtilities.cs" />
     <Compile Include="Ui\Views\ContactViews\BaseSubviews\ContactView.cs" />
-    <Compile Include="Ui\Views\ContactViews\ContactHeaderView.cs" />
-    <Compile Include="Ui\Views\ContactViews\HeaderViewBehavior.cs" />
+    <Compile Include="Ui\Views\ContactViews\HeaderViews\ContactHeaderView.cs" />
+    <Compile Include="Ui\Views\ContactViews\HeaderViews\ContactHeaderViewBehavior.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -360,6 +360,7 @@
     <Folder Include="Utilities\Hockey\" />
     <Folder Include="Ui\Views\" />
     <Folder Include="Ui\Views\DocumentViews\" />
+    <Folder Include="Ui\Views\ContactViews\HeaderViews\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">

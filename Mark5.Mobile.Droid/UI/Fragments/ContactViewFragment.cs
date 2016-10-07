@@ -49,10 +49,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         AppCompatTextView descriptionCardTitle;
 
+        const float cardElevation = 2.0f;
+        const float cardRadius = 2.0f;
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
             var rootView = inflater.Inflate(Resource.Layout.linear_layout, container, false);
-            rootView.SetBackgroundColor(new Android.Graphics.Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
+            rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
 
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
             scrollView = rootView.FindViewById<NestedScrollView>(Resource.Id.scroll_view);
@@ -107,8 +110,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             communicationCardView = new CardView(Context);
             communicationCardView.Visibility = ViewStates.Gone;
-            communicationCardView.Elevation = ConversionUtils.ConvertDpToPixels(2.0f);
-            communicationCardView.Radius = ConversionUtils.ConvertDpToPixels(2.0f);
+            communicationCardView.Elevation = cardElevation;
+            communicationCardView.Radius = cardRadius;
             communicationCardView.UseCompatPadding = true;
 
             var communicationCardInternalLayout = new LinearLayoutCompat(Context);
@@ -134,8 +137,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             descriptionCardView = new CardView(Context);
             descriptionCardView.Visibility = ViewStates.Gone;
-            descriptionCardView.Elevation = ConversionUtils.ConvertDpToPixels(2.0f);
-            descriptionCardView.Radius = ConversionUtils.ConvertDpToPixels(2.0f);
+            descriptionCardView.Elevation = cardElevation;
+            descriptionCardView.Radius = cardRadius;
             descriptionCardView.UseCompatPadding = true;
 
             var descriptionCardViewInternalLayout = new LinearLayoutCompat(Context);
@@ -160,8 +163,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             physicalAddressCardView = new CardView(Context);
             physicalAddressCardView.Visibility = ViewStates.Gone;
-            physicalAddressCardView.Elevation = ConversionUtils.ConvertDpToPixels(2.0f);
-            physicalAddressCardView.Radius = ConversionUtils.ConvertDpToPixels(2.0f);
+            physicalAddressCardView.Elevation = cardElevation;
+            physicalAddressCardView.Radius = cardRadius;
             physicalAddressCardView.UseCompatPadding = true;
 
             var physicalAddressCardInternalLayout = new LinearLayoutCompat(Context);
@@ -259,7 +262,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void RefreshTitle()
         {
-            ((Activities.ContactActivity)Activity).SetTitle(ContactPreview?.Name, ContactPreview?.CompanyName);
+            ((Activities.ContactActivity)Activity).SetTitles(ContactPreview?.Name, ContactPreview?.CompanyName);
             descriptionCardTitle.Text = $"About {ContactPreview?.Name}";
         }
 

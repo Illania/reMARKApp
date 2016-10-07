@@ -5,21 +5,11 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Android.App;
 using Android.Content;
-using Android.OS;
 using Android.Runtime;
-using Android.Support.Design.Widget;
 using Android.Support.V7.Widget;
 using Android.Util;
 using Android.Views;
-using Android.Widget;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
@@ -54,13 +44,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
             titleTextView = new AppCompatTextView(Context);
             titleTextView.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            titleTextView.SetTextSize(ComplexUnitType.Sp, 18);
-            titleTextView.SetBackgroundColor(Android.Graphics.Color.Blue);
 
             subtitleTextView = new AppCompatTextView(Context);
             subtitleTextView.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            subtitleTextView.SetTextSize(ComplexUnitType.Sp, 16);
-            subtitleTextView.SetBackgroundColor(Android.Graphics.Color.MediumVioletRed);
+            subtitleTextView.SetTextAppearanceCompat(Context, Resource.Style.contactViewHeaderSubtitle);
 
             AddView(titleTextView);
             AddView(subtitleTextView);
@@ -69,7 +56,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         public void SetTitles(string title, string subtitle)
         {
             titleTextView.Text = title;
-            subtitleTextView.Text = subtitle;
+            if (!string.IsNullOrEmpty(subtitle))
+            {
+                subtitleTextView.Text = subtitle;
+                subtitleTextView.Visibility = ViewStates.Visible;
+                titleTextView.SetTextAppearanceCompat(Context, Resource.Style.contactViewHeaderTitle);
+            }
+            else
+            {
+                titleTextView.SetTextAppearanceCompat(Context, Resource.Style.contactViewHeaderTitleLarge);
+                subtitleTextView.Visibility = ViewStates.Gone;
+            }
         }
     }
 }

@@ -10,15 +10,14 @@ using Android.Content;
 using Android.OS;
 using Android.Runtime;
 using Android.Support.Design.Widget;
-using Android.Support.V7.Widget;
 using Android.Util;
 using Android.Views;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    [Register("contact.HeaderView.behavior")]
-    public class HeaderViewBehavior : CoordinatorLayout.Behavior
+    [Register("contact.ContactHeaderViewBehavior")]
+    public class ContactHeaderViewBehavior : CoordinatorLayout.Behavior
     {
         readonly Context mContext;
 
@@ -26,28 +25,25 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         int mEndMargintLeft;
         int mMarginRight;
         int mStartMarginBottom;
-        bool isHide;
 
-        public HeaderViewBehavior(Context context, IAttributeSet attrs)
+        public ContactHeaderViewBehavior(Context context, IAttributeSet attrs)
         {
             mContext = context;
 
             mStartMarginLeft = ConversionUtils.ConvertDpToPixels(16);
-            mEndMargintLeft = ConversionUtils.ConvertDpToPixels(40);
+            mEndMargintLeft = ConversionUtils.ConvertDpToPixels(33);
             mMarginRight = ConversionUtils.ConvertDpToPixels(14);
-            mStartMarginBottom = ConversionUtils.ConvertDpToPixels(14);
+            mStartMarginBottom = ConversionUtils.ConvertDpToPixels(14); //TODO discuss with Bartos
         }
 
-        public override bool LayoutDependsOn(CoordinatorLayout parent, Java.Lang.Object child, Android.Views.View dependency)
+        public override bool LayoutDependsOn(CoordinatorLayout parent, Java.Lang.Object child, View dependency)
         {
             return dependency is AppBarLayout;
         }
 
-        public override bool OnDependentViewChanged(CoordinatorLayout parent, Java.Lang.Object child, Android.Views.View dependency)
+        public override bool OnDependentViewChanged(CoordinatorLayout parent, Java.Lang.Object child, View dependency)
         {
             var headerView = child.JavaCast<ContactHeaderView>();
-
-            //headerView.SetTitles("bla", "Medina");
 
             int maxScroll = ((AppBarLayout)dependency).TotalScrollRange;
             float percentage = Math.Abs(dependency.GetY()) / maxScroll;
@@ -69,19 +65,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
             if (Build.VERSION.SdkInt < BuildVersionCodes.Lollipop)
             {
-                if (isHide && percentage < 1)
-                {
-                    headerView.Visibility = ViewStates.Visible;
-                    isHide = false;
-                }
-                else if (!isHide && percentage >= 1)
-                {
-                    headerView.Visibility = ViewStates.Gone;
-                    isHide = true;
-                }
+                headerView.Visibility = percentage < 1 ? ViewStates.Visible : ViewStates.Gone;
             }
             return true;
-
         }
 
         public int GetToolbarHeight()
