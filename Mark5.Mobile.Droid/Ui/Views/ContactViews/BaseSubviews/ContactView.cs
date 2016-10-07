@@ -15,10 +15,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
     public abstract class ContactView : LinearLayoutCompat
     {
-        public int DistanceVeryLarge; //TODO public in order to pass it to enclosing class
-        public int DistanceLarge;
-        public int DistanceNormal;
-        public int DistanceSmall;
+        protected int DistanceVeryLarge;
+        protected int DistanceLarge;
+        protected int DistanceNormal;
+        protected int DistanceSmall;
 
         protected View Divider;
 

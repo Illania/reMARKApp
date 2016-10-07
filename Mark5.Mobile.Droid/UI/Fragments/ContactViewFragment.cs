@@ -54,6 +54,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
+            CommonConfig.Logger.Info($"Creating {nameof(ContactViewFragment)} [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}, ...");
+
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_nested, container, false);
             rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
 
@@ -79,7 +81,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnViewCreated(View view, Android.OS.Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
-            RefreshTitle();
+
+            CommonConfig.Logger.Info($"Created {nameof(ContactViewFragment)} [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}, ...");
         }
 
         public override async void OnResume()
@@ -330,10 +333,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 return $"{nameof(ContactViewFragment)} [contactPreview.id={ContactPreview.Id}, contactPreview.name={ContactPreview.Name}]";
             }
-            else
-            {
-                return $"{nameof(ContactViewFragment)} [contactId={ContactId}, folderId={FolderId}]";
-            }
+
+            return $"{nameof(ContactViewFragment)} [contactId={ContactId}, folderId={FolderId}]";
         }
 
         #endregion
