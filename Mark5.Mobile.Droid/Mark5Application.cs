@@ -16,7 +16,8 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Services;
 using Mark5.Mobile.Droid.Utilities;
 using PCLStorage;
-using UK.CO.Chrisjenx.Calligraphy;
+using TinyMessenger;
+using Xamarin.Android.Net;
 
 namespace Mark5.Mobile.Droid
 {
@@ -36,7 +37,7 @@ namespace Mark5.Mobile.Droid
         {
             base.OnCreate();
 
-            CalligraphyConfig.InitDefault(new CalligraphyConfig.Builder().SetDefaultFontPath("fonts/Avenir-Book.ttf").Build());
+            //UK.CO.Chrisjenx.Calligraphy.CalligraphyConfig.InitDefault(new UK.CO.Chrisjenx.Calligraphy.CalligraphyConfig.Builder().SetDefaultFontPath("fonts/Avenir-Book.ttf").Build());
 
             Task.Run(async () =>
             {
@@ -50,6 +51,7 @@ namespace Mark5.Mobile.Droid
                 CommonConfig.ReachabilityService = new ReachabilityService();
                 CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
                 CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
+                CommonConfig.HttpClientHandler = () => { return new AndroidClientHandler(); };
 
 #if !DEBUG
                 CommonConfig.Logger.Level = LogLevel.TRACE;
@@ -62,6 +64,7 @@ namespace Mark5.Mobile.Droid
                 PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();
                 PlatformConfig.ReachabilityBroadcastReceiver = new ReachabilityBroadcastReceiver();
                 PlatformConfig.Preferences = new Preferences();
+                PlatformConfig.MessengerHub = new TinyMessengerHub();
             }).Wait();
 
             CommonConfig.Logger.Info($"Initialized {nameof(Mark5Application)}");

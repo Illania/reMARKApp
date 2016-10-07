@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.Net.Http;
 using Mark5.Mobile.Common.Services;
 using Mark5.Mobile.Common.Utilities;
 using PCLStorage;
@@ -31,6 +32,8 @@ namespace Mark5.Mobile.Common
         public static IDeviceInfoProvider DeviceInfoProvider { get; set; }
 
         public static Type ConcurrentQueueType { get; set; }
+
+        public static Func<HttpClientHandler> HttpClientHandler { get; set; }
     }
 }
 

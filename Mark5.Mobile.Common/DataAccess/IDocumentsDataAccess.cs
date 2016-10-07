@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Containers;
 
 namespace Mark5.Mobile.Common.DataAccess
 {
@@ -23,7 +24,13 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task<Document> GetDocumentAsync(int documentId);
 
-        Task SetDocumentPreviewsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead);
+        Task SaveDocumentWithPreviewAsync(DocumentContainer container);
+
+        Task<DocumentContainer> GetDocumentWithPreviewAsync(int documentId);
+
+        Task SetDocumentReadStatusAsync(DocumentPreview documentPreviews, Document document);
+
+        Task SetDocumentPreviewsReadStatusAsync(List<DocumentPreview> documentPreviews);
 
         Task SetDocumentPreviewsPriorityAsync(List<DocumentPreview> documentPreviews, Priority priority);
 

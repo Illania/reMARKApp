@@ -26,6 +26,7 @@
 		<item>3</item>
 	</string-array>
 	<string name="pref_documents_mark_as_read_default">0</string>
+	<bool name="pref_documents_read_indicator_me_default">true</bool>
 	<bool name="pref_documents_large_attachment_warn_default">true</bool>
 	<bool name="pref_documents_sub_priority_default">true</bool>
 	<bool name="pref_documents_sub_reference_number_default">true</bool>

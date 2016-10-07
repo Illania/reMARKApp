@@ -96,11 +96,11 @@ namespace Mark5.Mobile.Common.Model.Converters
             if (ca.UserIds != null)
                 result.UserIds.AddRange(ca.UserIds);
             if (ca.Users != null)
-                result.Users.Union(ca.Users);
+                result.Users = new Dictionary<int, string>(result.Users);
             if (ca.DepartmentIds != null)
                 result.DepartmentIds.AddRange(ca.DepartmentIds);
             if (ca.Departments != null)
-                result.Departments.Union(ca.Departments);
+                result.Departments = new Dictionary<int, string>(ca.Departments);
 
             return result;
         }
@@ -209,7 +209,7 @@ namespace Mark5.Mobile.Common.Model.Converters
             if (c.ResponsibleUserIds != null)
                 result.ResponsibleUserIds.AddRange(c.ResponsibleUserIds);
             if (c.ResponsibleUsers != null)
-                result.ResponsibleUsers.Union(c.ResponsibleUsers);
+                result.ResponsibleUsers = new Dictionary<int, string>(c.ResponsibleUsers);
             if (c.Comments != null)
                 result.Comments.AddRange(c.Comments.WhereNotNull().Select(Convert));
             return result;
@@ -276,13 +276,13 @@ namespace Mark5.Mobile.Common.Model.Converters
             if (d.ReadByUserIds != null)
                 result.ReadByUserIds.AddRange(d.ReadByUserIds);
             if (d.ReadByUserNames != null)
-                result.ReadByUserNames.Union(d.ReadByUserNames);
+                result.ReadByUserNames = new Dictionary<int, string>(d.ReadByUserNames);
             if (d.Attachments != null)
                 result.Attachments.AddRange(d.Attachments.WhereNotNull().Select(Convert));
             if (d.Comments != null)
                 result.Comments.AddRange(d.Comments.WhereNotNull().Select(Convert));
             if (d.ExtraFields != null)
-                result.ExtraFields.Union(d.ExtraFields.Where(kv => kv.Key != null).Select(kv => new KeyValuePair<DocumentExtraFieldInfo, string>(kv.Key.Convert(), kv.Value)));
+                result.ExtraFields = d.ExtraFields.Where(kv => kv.Key != null).ToDictionary(kv => kv.Key.Convert(), kv => kv.Value);
             return result;
         }
 

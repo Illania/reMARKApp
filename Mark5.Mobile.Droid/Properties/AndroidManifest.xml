@@ -22,5 +22,8 @@
 				<category android:name="com.nordic_it.mark5.mobile.android" />
 			</intent-filter>
 		</receiver>
+		<provider android:name="android.support.v4.content.FileProvider" android:authorities="com.nordic_it.mark5.mobile.android.fileprovider" android:grantUriPermissions="true" android:exported="false">
+			<meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/filepaths" />
+		</provider>
 	</application>
 </manifest>

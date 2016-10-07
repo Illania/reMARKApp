@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Containers;
 
 namespace Mark5.Mobile.Common.Managers
 {
@@ -27,6 +28,10 @@ namespace Mark5.Mobile.Common.Managers
         Task<Shortcode> GetShortcodeAsync(Folder folder, int shortcodeId, SourceType sourceType = SourceType.Auto);
 
         Task<Shortcode> GetShortcodeAsync(int folderId, int shortcodeId, SourceType sourceType = SourceType.Auto);
+
+        Task<ShortcodeContainer> GetShortcodeWithPreviewAsync(Folder folder, int shortcodeId, SourceType sourceType = SourceType.Auto);
+
+        Task<ShortcodeContainer> GetShortcodeWithPreviewAsync(int folderId, int shortcodeId, SourceType sourceType = SourceType.Auto);
     }
 }
 

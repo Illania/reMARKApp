@@ -165,7 +165,6 @@
     <Compile Include="Managers\ICleanUpManager.cs" />
     <Compile Include="Managers\ICommonActionsManager.cs" />
     <Compile Include="Managers\IContactsManager.cs" />
-    <Compile Include="Managers\IDocumentsManager.cs" />
     <Compile Include="Managers\IDownloadManager.cs" />
     <Compile Include="Managers\IFoldersManager.cs" />
     <Compile Include="Managers\INotificationsManager.cs" />
@@ -173,6 +172,8 @@
     <Compile Include="Managers\ISearchManager.cs" />
     <Compile Include="Managers\IShortcodesManager.cs" />
     <Compile Include="Managers\ISystemManager.cs" />
+    <Compile Include="Model\ReadByValue.cs" />
+    <Compile Include="IDocumentsManager.cs" />
     <Compile Include="Utilities\AsyncHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -215,9 +216,6 @@
     <Reference Include="System.Net.Http.Primitives">
       <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\portable-net40+sl4+win8+wp71+wpa81\System.Net.Http.Primitives.dll</HintPath>
     </Reference>
-    <Reference Include="SQLite-net">
-      <HintPath>..\packages\sqlite-net-pcl.1.1.2\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\SQLite-net.dll</HintPath>
-    </Reference>
     <Reference Include="System.Collections.Immutable">
       <HintPath>..\packages\System.Collections.Immutable.1.2.0\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
     </Reference>
@@ -226,6 +224,18 @@
     </Reference>
     <Reference Include="SQLitePCL.batteries">
       <HintPath>..\packages\SQLitePCL.bundle_green.0.9.3\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\SQLitePCL.batteries.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLite-net">
+      <HintPath>..\packages\sqlite-net-pcl.1.2.0\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\SQLite-net.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.core">
+      <HintPath>..\packages\SQLitePCLRaw.core.1.1.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_green">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_v2">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
