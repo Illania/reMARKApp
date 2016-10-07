@@ -97,7 +97,7 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             var appServiceProxy = AppServiceProxyFactory.Create(connectionInfo.SslMode != SslMode.Off, connectionInfo.Hostname, connectionInfo.Port);
-            var fileTransferServiceProxy = FileTransferServiceProxyFactory.Create(connectionInfo.SslMode != SslMode.Off, connectionInfo.Hostname, connectionInfo.Port);
+            var fileTransferServiceProxy = FileTransferServiceProxyFactory.Create(connectionInfo.SslMode != SslMode.Off, connectionInfo.Hostname, connectionInfo.Port, CommonConfig.HttpClientHandler);
 
             var foldersDataAccess = new FoldersDataAccess(DatabaseConnectionProvider.DatabaseForModuleType);
             var documentsDataAccess = new DocumentsDataAccess(DatabaseConnectionProvider.DocumentsDatabase);

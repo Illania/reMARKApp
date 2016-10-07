@@ -22,7 +22,7 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Views;
+using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.ContactViews;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -54,7 +54,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
-            var rootView = inflater.Inflate(Resource.Layout.linear_layout, container, false);
+            var rootView = inflater.Inflate(Resource.Layout.linear_layout_nested, container, false);
             rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
 
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);

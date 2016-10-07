@@ -10,6 +10,7 @@ using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using Mark5.Mobile.Common;
+using Xamarin.Android.Net;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -17,7 +18,7 @@ namespace Mark5.Mobile.Droid.Utilities
     public class SSLCertificateVerificationManager
     {
 
-        readonly RemoteCertificateValidationCallback callback = (sender, certificate, chain, sslPolicyErrors) =>
+        readonly RemoteCertificateValidationCallback remoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
         {
             var certificate2 = new X509Certificate2(certificate);
             var now = DateTime.Now;
@@ -29,22 +30,18 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void EnableSelfSignedCertificates()
         {
-            if (CommonConfig.Logger.IsInfoEnabled())
-            {
-                CommonConfig.Logger.Info("Enabling custom validation callback.");
-            }
+            CommonConfig.Logger.Warning("**** ENABLING CUSTOM VALIDATION CALLBACK ****");
 
-            ServicePointManager.ServerCertificateValidationCallback = callback;
+            ServicePointManager.ServerCertificateValidationCallback = remoteCertificateValidationCallback;
+            CommonConfig.HttpClientHandler = () => { return new InsecureAndroidClientHandler(); };
         }
 
         public void DisableSelfSignedCertificates()
         {
-            if (CommonConfig.Logger.IsInfoEnabled())
-            {
-                CommonConfig.Logger.Info("Disabling custom validation callback.");
-            }
+            CommonConfig.Logger.Info("Disabling custom validation callback.");
 
             ServicePointManager.ServerCertificateValidationCallback = null;
+            CommonConfig.HttpClientHandler = () => { return new AndroidClientHandler(); };
         }
     }
 }

@@ -35,7 +35,7 @@
 <AndroidSigningKeyAlias>default -tsa https://timestamp.geotrust.com/tsa</AndroidSigningKeyAlias>
 <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
 <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-<AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
+<AndroidHttpClientHandlerType></AndroidHttpClientHandlerType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -133,20 +133,23 @@
     <Reference Include="Xamarin.Android.Support.v7.CardView">
       <HintPath>..\packages\Xamarin.Android.Support.v7.CardView.23.4.0.1\lib\MonoAndroid403\Xamarin.Android.Support.v7.CardView.dll</HintPath>
     </Reference>
-    <Reference Include="SQLitePCLRaw.core">
-      <HintPath>..\packages\SQLitePCLRaw.core.1.0.1\lib\MonoAndroid\SQLitePCLRaw.core.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.lib.e_sqlite3">
-      <HintPath>..\packages\SQLitePCLRaw.lib.e_sqlite3.android.1.0.1\lib\MonoAndroid\SQLitePCLRaw.lib.e_sqlite3.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.provider.e_sqlite3">
-      <HintPath>..\packages\SQLitePCLRaw.provider.e_sqlite3.android.1.0.1\lib\MonoAndroid\SQLitePCLRaw.provider.e_sqlite3.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.batteries_green">
-      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.0.1\lib\MonoAndroid\SQLitePCLRaw.batteries_green.dll</HintPath>
-    </Reference>
     <Reference Include="SQLite-net">
       <HintPath>..\packages\sqlite-net-pcl.1.2.0\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\SQLite-net.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.core">
+      <HintPath>..\packages\SQLitePCLRaw.core.1.1.0\lib\MonoAndroid\SQLitePCLRaw.core.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.lib.e_sqlite3">
+      <HintPath>..\packages\SQLitePCLRaw.lib.e_sqlite3.android.1.1.0\lib\MonoAndroid\SQLitePCLRaw.lib.e_sqlite3.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.provider.e_sqlite3">
+      <HintPath>..\packages\SQLitePCLRaw.provider.e_sqlite3.android.1.1.0\lib\MonoAndroid\SQLitePCLRaw.provider.e_sqlite3.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_green">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.0\lib\MonoAndroid\SQLitePCLRaw.batteries_green.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_v2">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.0\lib\MonoAndroid\SQLitePCLRaw.batteries_v2.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -207,12 +210,22 @@
     <Compile Include="Ui\Views\DocumentViews\ContentView.cs" />
     <Compile Include="Ui\Views\ContactViews\ResponsibleSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\ShortIdSubview.cs" />
-    <Compile Include="Ui\Views\Divider.cs" />
     <Compile Include="Ui\Views\ContactViews\LinkedContactSubview.cs" />
     <Compile Include="Utilities\ViewUtilities.cs" />
     <Compile Include="Ui\Views\ContactViews\BaseSubviews\ContactView.cs" />
     <Compile Include="Ui\Views\ContactViews\HeaderViews\ContactHeaderView.cs" />
     <Compile Include="Ui\Views\ContactViews\HeaderViews\ContactHeaderViewBehavior.cs" />
+    <Compile Include="Ui\Views\DocumentViews\AttachmentsView.cs" />
+    <Compile Include="Ui\Common\Formatters.cs" />
+    <Compile Include="Ui\Views\DocumentViews\PriorityView.cs" />
+    <Compile Include="Utilities\InsecureAndroidClientHandler.cs" />
+    <Compile Include="Ui\Common\BusMesseges\DocumentPreviewReadStatusChangedMessage.cs" />
+    <Compile Include="Ui\Activities\ShortcodeActivity.cs" />
+    <Compile Include="Ui\Fragments\ShortcodeFragment.cs" />
+    <Compile Include="Ui\Views\ShortcodeViews\ShortcodeView.cs" />
+    <Compile Include="Ui\Views\ShortcodeViews\DescriptionView.cs" />
+    <Compile Include="Ui\Views\ShortcodeViews\AddressesView.cs" />
+    <Compile Include="Ui\Common\Divider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -339,6 +352,9 @@
     <AndroidResource Include="Resources\drawable-xxhdpi\email.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\email.png" />
     <AndroidResource Include="Resources\layout\base_layout_collapsing.axml" />
+    <AndroidResource Include="Resources\drawable\rounded_background.xml" />
+    <AndroidResource Include="Resources\xml\filepaths.xml" />
+    <AndroidResource Include="Resources\layout\linear_layout_nested.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
@@ -361,11 +377,17 @@
     <Folder Include="Ui\Views\" />
     <Folder Include="Ui\Views\DocumentViews\" />
     <Folder Include="Ui\Views\ContactViews\HeaderViews\" />
+    <Folder Include="Ui\Common\BusMesseges\" />
+    <Folder Include="Ui\Views\ShortcodeViews\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
       <Project>{32ACF699-5511-485F-B54B-5BFDB3D337AE}</Project>
       <Name>Mark5.Mobile.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TinyMessenger\TinyMessenger.csproj">
+      <Project>{D552EA9E-E8C6-44A4-9D05-D2A8655BE8EA}</Project>
+      <Name>TinyMessenger</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

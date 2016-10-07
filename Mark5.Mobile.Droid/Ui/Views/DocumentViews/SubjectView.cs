@@ -27,9 +27,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         void InitializeView()
         {
-            SetPadding(PaddingLarge, PaddingLarge, PaddingLarge, PaddingSmall);
+            Orientation = Horizontal;
+            SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceNormal);
 
-            subjectView = new AppCompatTextView(Context);
+            subjectView = new AppCompatTextView(Context)
+            {
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)
             {
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -42,7 +46,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 subjectView.SetTextAppearance(Resource.Style.fontTitle);
 #pragma warning restore XA0001 // Find issues with Android API usage
             }
-            AddView(subjectView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+            AddView(subjectView);
         }
 
         public override void RefreshView()
@@ -50,11 +54,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             if (DocumentPreview != null)
             {
                 Visibility = ViewStates.Visible;
+
                 subjectView.Text = string.IsNullOrWhiteSpace(DocumentPreview.Subject) ? Context.GetString(Resource.String.no_subject) : DocumentPreview.Subject;
             }
             else
             {
                 Visibility = ViewStates.Gone;
+
                 subjectView.Text = string.Empty;
             }
         }

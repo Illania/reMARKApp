@@ -39,17 +39,19 @@ namespace Mark5.ServiceReference.FileTransferService
         }
 
         readonly string endpointUrl;
+        readonly Func<HttpClientHandler> httpClientHandler;
 
-        public FileTransferServiceProxy(bool ssl, string hostname, int port)
+        public FileTransferServiceProxy(bool ssl, string hostname, int port, Func<HttpClientHandler> httpClientHandler)
         {
             endpointUrl = $"{(ssl ? "https" : "http")}://{hostname}:{port}/fts3";
+            this.httpClientHandler = httpClientHandler;
         }
 
         public async Task<GetServiceVersionResponse> GetServiceVersionAsync(GetServiceVersionRequest req, CancellationToken ct = default(CancellationToken))
         {
             try
             {
-                using (var client = new HttpClient())
+                using (var client = new HttpClient(httpClientHandler()))
                 {
                     var uri = (new Uri(endpointUrl)).AppendPathSegments(Segments.Version);
                     var request = new HttpRequestMessage(HttpMethod.Get, uri);
@@ -79,7 +81,7 @@ namespace Mark5.ServiceReference.FileTransferService
         {
             try
             {
-                using (var client = new HttpClient())
+                using (var client = new HttpClient(httpClientHandler()))
                 {
                     var uri = (new Uri(endpointUrl)).AppendPathSegments(Segments.Attachment, req.Id)
                                     .SetQueryParam("folderId", req.FolderId)
@@ -131,7 +133,7 @@ namespace Mark5.ServiceReference.FileTransferService
         {
             try
             {
-                using (var client = new HttpClient())
+                using (var client = new HttpClient(httpClientHandler()))
                 {
                     req.Stream.Position = 0;
 

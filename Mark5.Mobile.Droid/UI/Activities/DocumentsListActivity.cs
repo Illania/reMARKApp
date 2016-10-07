@@ -13,7 +13,9 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
 using Mark5.Mobile.Droid.Ui.Fragments;
+using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -25,6 +27,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
 
         Toolbar toolbar;
+
+        DocumentsListFragment dlf;
+
+        TinyMessageSubscriptionToken readStatusToken;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -43,7 +49,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                var dlf = new DocumentsListFragment
+                dlf = new DocumentsListFragment
                 {
                     Folder = folder
                 };
@@ -56,6 +62,21 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 CommonConfig.Logger.Info($"Restored {nameof(DocumentsListActivity)}");
             }
+
+            readStatusToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(m =>
+            {
+                if (dlf != null && m.Sender != dlf && dlf.Folder.Id == m.FolderId)
+                {
+                    dlf.UpdateReadStatus(m);
+                }
+            });
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            if (readStatusToken != null) PlatformConfig.MessengerHub.Unsubscribe<DocumentPreviewReadStatusChangedMessage>(readStatusToken);
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)

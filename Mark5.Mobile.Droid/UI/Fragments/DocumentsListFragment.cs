@@ -29,6 +29,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -354,22 +355,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 menu.Add(Menu.None, 41, 41, Resource.String.move_to_folder);
             }
 
+            menu.Add(Menu.None, 50, 50, Resource.String.set_priority);
+
             if (currentAdapter.SelectedItemCount == 1)
             {
-                menu.Add(Menu.None, 50, 50, Resource.String.categories);
+                menu.Add(Menu.None, 60, 60, Resource.String.categories);
             }
 
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static
                 || Folder.InternalType == FolderInternalType.Worktray)
             {
-                menu.Add(Menu.None, 60, 60, Resource.String.delete_from_folder);
+                menu.Add(Menu.None, 70, 70, Resource.String.delete_from_folder);
             }
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
                 || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed)
             {
-                menu.Add(Menu.None, 61, 61, Resource.String.delete);
+                menu.Add(Menu.None, 71, 71, Resource.String.delete);
             }
 
             return true;
@@ -479,6 +482,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
+        #region Messenger hub related
+
+        public void UpdateReadStatus(DocumentPreviewReadStatusChangedMessage m)
+        {
+            var position = adapter.GetPosition(m.DocumentPreviewId);
+            if (position >= 0)
+            {
+                var dp = adapter.Items[position];
+                dp.IsReadByCurrent = m.IsReadByCurrent;
+                dp.IsReadByAnyone = m.IsReadByAnyone;
+                adapter.NotifyItemChanged(position);
+            }
+
+            position = searchAdapter.GetPosition(m.DocumentPreviewId);
+            if (position >= 0)
+            {
+                var dp = searchAdapter.Items[position];
+                dp.IsReadByCurrent = m.IsReadByCurrent;
+                dp.IsReadByAnyone = m.IsReadByAnyone;
+                searchAdapter.NotifyItemChanged(position);
+            }
+        }
+
+        #endregion
+
         #region RecyclerView Adapter/ViewHolder
 
         class DocumentsListAdapter : RecyclerView.Adapter
@@ -547,13 +575,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (dp.Direction == DocumentDirection.Incoming)
                 {
-                    var address = dp.Addresses?.Where(da => da.AddressType == DocumentAddressType.From).FirstOrDefault();
-                    dpvh.Recipent = string.IsNullOrWhiteSpace(address?.Name) ? address?.Address : address?.Name;
+                    var address = dp.Addresses.FirstOrDefault(da => da.AddressType == DocumentAddressType.From);
+                    dpvh.Recipent = string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
                 }
                 else
                 {
-                    var address = dp.Addresses?.Where(da => da.AddressType == DocumentAddressType.To).FirstOrDefault();
-                    dpvh.Recipent = string.IsNullOrWhiteSpace(address?.Name) ? address?.Address : address?.Name;
+                    var address = dp.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType).FirstOrDefault();
+                    dpvh.Recipent = string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
                 }
 
                 var dateReceived = dp.DateReceived.ToServerTime();
@@ -577,7 +605,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 dpvh.IncomingIndicator = dp.Direction == DocumentDirection.Incoming;
                 dpvh.OutgoingIndicator = dp.Direction == DocumentDirection.Outgoing;
                 dpvh.DraftIndicator = dp.Direction == DocumentDirection.Draft;
-                dpvh.UnreadIndicator = !dp.IsReadByCurrent;
+                dpvh.UnreadIndicator = PlatformConfig.Preferences.UnreadIndicatorMe ? !dp.IsReadByCurrent : !dp.IsReadByAnyone;
                 dpvh.AttachmentIndicator = dp.AttachmentsCount > 0;
                 dpvh.CommentIndicator = dp.CommentsCount > 0;
 
@@ -662,18 +690,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            int GetPosition(DocumentPreview documentPreview)
+            public int GetPosition(int documentPreviewId)
             {
                 var position = -1;
                 for (var i = 0; i < documentPreviewsInView.Count; i++)
                 {
-                    if (documentPreviewsInView[i].Id == documentPreview.Id)
+                    if (documentPreviewsInView[i].Id == documentPreviewId)
                     {
                         position = i;
                         break;
                     }
                 }
                 return position;
+            }
+
+            public int GetPosition(DocumentPreview documentPreview)
+            {
+                return GetPosition(documentPreview.Id);
             }
         }
 

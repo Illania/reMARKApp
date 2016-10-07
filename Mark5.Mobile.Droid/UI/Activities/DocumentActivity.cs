@@ -45,12 +45,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
                 var documentPreview = SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                var dlf = new DocumentFragment
+                var df = new DocumentFragment
                 {
                     Folder = folder,
-                    DocumentPreview = documentPreview
+                    DocumentPreview = documentPreview,
+                    CloseRequest = OnBackPressed
                 };
-                ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(DocumentActivity)}");

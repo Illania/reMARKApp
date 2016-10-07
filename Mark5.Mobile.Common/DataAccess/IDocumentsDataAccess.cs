@@ -28,7 +28,9 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task<DocumentContainer> GetDocumentWithPreviewAsync(int documentId);
 
-        Task SetDocumentPreviewsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead);
+        Task SetDocumentReadStatusAsync(DocumentPreview documentPreviews, Document document);
+
+        Task SetDocumentPreviewsReadStatusAsync(List<DocumentPreview> documentPreviews);
 
         Task SetDocumentPreviewsPriorityAsync(List<DocumentPreview> documentPreviews, Priority priority);
 
