@@ -11,7 +11,7 @@ using Android.Graphics.Drawables;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 
-namespace Mark5.Mobile.Droid.Views.Common
+namespace Mark5.Mobile.Droid.Ui.Common
 {
 
     public class DividerItemDecorator : RecyclerView.ItemDecoration

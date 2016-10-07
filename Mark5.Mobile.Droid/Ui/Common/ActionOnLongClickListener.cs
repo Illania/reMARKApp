@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: ActionOnClickListener.cs
+// File: ActionOnLongClickListener.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -8,25 +8,28 @@
 using System;
 using Android.Views;
 
-namespace Mark5.Mobile.Droid.Views.Common
+namespace Mark5.Mobile.Droid.Ui.Common
 {
 
-    public class ActionOnClickListener : Java.Lang.Object, View.IOnClickListener
+    public class ActionOnLongClickListener : Java.Lang.Object, View.IOnLongClickListener
     {
 
         readonly Action action;
 
-        public ActionOnClickListener(Action action)
+        public ActionOnLongClickListener(Action action)
         {
             this.action = action;
         }
 
-        public void OnClick(View v)
+        public bool OnLongClick(View v)
         {
             if (action != null)
             {
                 action();
+                return true;
             }
+
+            return false;
         }
     }
 }

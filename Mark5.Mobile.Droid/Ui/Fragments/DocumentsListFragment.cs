@@ -25,11 +25,11 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
-using Mark5.Mobile.Droid.Views.Common;
+using Mark5.Mobile.Droid.Ui.Common;
 using Android.Support.Design.Widget;
 using Android.Support.V4.Content;
 
-namespace Mark5.Mobile.Droid.Views.Fragments
+namespace Mark5.Mobile.Droid.Ui.Fragments
 {
 
     public class DocumentsListFragment : RetainableStateFragment, ActionMode.ICallback, View.IOnClickListener, SearchView.IOnQueryTextListener, SearchView.IOnCloseListener

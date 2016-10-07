@@ -21,10 +21,10 @@ using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities.PushNotifications;
-using Mark5.Mobile.Droid.Views.Common;
-using Mark5.Mobile.Droid.Views.Fragments;
+using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Fragments;
 
-namespace Mark5.Mobile.Droid.Views.Activity
+namespace Mark5.Mobile.Droid.Ui.Activity
 {
 
     [Android.App.Activity]
