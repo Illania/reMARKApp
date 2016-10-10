@@ -11,7 +11,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
+using Android.Graphics;
+using Android.Graphics.Drawables;
+using Android.Graphics.Drawables.Shapes;
 using Android.OS;
+using Android.Support.V4.Content;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
@@ -63,12 +67,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.SetItemAnimator(new DefaultItemAnimator());
             recyclerView.HasFixedSize = true;
 
-            adapter = new FolderListAdapter(recyclerView);
+            adapter = new FolderListAdapter(Context, recyclerView);
             adapter.ExpandIconClicked += Adapter_ExpandClicked;
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
 
-            searchAdapter = new SearchFolderListAdapter(recyclerView);
+            searchAdapter = new SearchFolderListAdapter(Context, recyclerView);
             searchAdapter.ItemClicked += Adapter_ItemClicked;
             searchAdapter.ItemLongClicked += Adapter_ItemLongClicked;
 
@@ -682,21 +686,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int SectionView = 1;
         }
 
+        static readonly int[] colors = { Resource.Color.darkerblue, Resource.Color.darkblue, Resource.Color.blue };
+
+
         protected List<Section> sectionsInView = new List<Section>();
         protected Dictionary<Section, List<Folder>> foldersInSection = new Dictionary<Section, List<Folder>>();
 
         readonly RecyclerView parentView;
         readonly List<int> selectedItemPositions = new List<int>();
         readonly int sectionHeight;
+        readonly Context context;
 
         public event EventHandler<int> ExpandIconClicked = delegate { };
         public event EventHandler<int> ItemClicked = delegate { };
         public event EventHandler<int> ItemLongClicked = delegate { };
 
-        public FolderListAdapter(RecyclerView parentRecyclerView)
+        public FolderListAdapter(Context context, RecyclerView parentRecyclerView)
         {
             parentView = parentRecyclerView;
             sectionHeight = ConversionUtils.ConvertDpToPixels(48);
+            this.context = context;
         }
 
         public override int ItemCount
@@ -765,6 +774,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 fh.FolderNameSubTitle.Visibility = !string.IsNullOrEmpty(fh.FolderNameSubTitle.Text) ? ViewStates.Visible : ViewStates.Gone;
 
                 fh.ExpandButton.Visibility = (folder.HasSubFolders && sectionForPosition != Section.None) ? ViewStates.Visible : ViewStates.Gone;
+
+                var color = colors[Math.Abs(folder.Name.GetHashCode() % colors.Length)];
+
+                var sd = new ShapeDrawable(new OvalShape());
+                sd.Paint.Color = new Color(ContextCompat.GetColor(context, color));
+                fh.FolderIcon.Background = sd;
 
                 if (folder.InternalType == FolderInternalType.Worktray)
                 {
@@ -1048,7 +1063,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
     class SearchFolderListAdapter : FolderListAdapter
     {
-        public SearchFolderListAdapter(RecyclerView parentRecyclerView) : base(parentRecyclerView)
+        public SearchFolderListAdapter(Context context, RecyclerView parentRecyclerView) : base(context, parentRecyclerView)
         {
             sectionsInView = new List<Section> { Section.None };
             foldersInSection[Section.None] = new List<Folder>();
