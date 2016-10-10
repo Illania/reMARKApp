@@ -116,6 +116,78 @@ namespace Mark5.Mobile.Droid.Utilities
                 return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_advanced_enable_reporting), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_advanced_enable_reporting_default));
             }
         }
+
+        public bool ContactCommunicationFaxNumbersEnabled
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_fax), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_fax_default));
+            }
+        }
+
+        public bool ContactCommunicationTelexNumbersEnabled
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_telex), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_telex_default));
+            }
+        }
+
+        public bool ContactCommunicationImEnabled
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_im), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_im_default));
+            }
+        }
+
+        public bool ContactCommunicationInternalEnabled
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_internal), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_internal_default));
+            }
+        }
+
+        public bool ContactCommunicationOtherEnabled
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_other), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_other_default));
+            }
+        }
+
+        public bool ContactAddressesEnabled
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_address), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_address_default));
+            }
+        }
+
+        public bool ContactBirthdateEnabled
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_birthdate), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_birthdate_default));
+            }
+        }
+
+        public bool ContactAccountEnabled
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_account), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_account_default));
+            }
+        }
+
+        public bool ContactVatEnabled
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_vat), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_vat_default));
+            }
+        }
     }
 }
 
