@@ -136,7 +136,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"Refreshing...");
 
-            if (!Folder.HasSubFolders || refreshLayout.Refreshing)
+            if (!Folder.HasSubFolders)
             {
                 return;
             }
@@ -687,7 +687,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         static readonly int[] colors = { Resource.Color.darkerblue, Resource.Color.darkblue, Resource.Color.blue };
-
 
         protected List<Section> sectionsInView = new List<Section>();
         protected Dictionary<Section, List<Folder>> foldersInSection = new Dictionary<Section, List<Folder>>();
