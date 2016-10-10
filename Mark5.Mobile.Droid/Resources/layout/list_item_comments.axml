@@ -2,12 +2,12 @@
 <android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
+    android:layout_height="wrap_content"
     android:padding="16dp">
     <android.support.v7.widget.LinearLayoutCompat
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="60dp">
+        android:layout_height="wrap_content">
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/list_item_comment_username"
             android:layout_width="wrap_content"
@@ -29,5 +29,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="25"
-        android:textAppearance="@style/fontListPrimary" />
+        android:textAppearance="@style/fontListPrimary"
+        android:layout_marginTop="2dp" />
 </android.support.v7.widget.LinearLayoutCompat>

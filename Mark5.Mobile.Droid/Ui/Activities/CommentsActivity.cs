@@ -5,21 +5,22 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System.Collections.Generic;
 using Android.App;
 using Android.OS;
 using Android.Support.V7.Widget;
+using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
     [Activity]
     public class CommentsActivity : BaseAppCompatActivity
     {
-        public const string CommentsIntentKey = "Comments_20c8514c-b644-47db-842f-f2df4204d93a";
+        public const string EntityIntentKey = "Comments_20c8514c-b644-47db-842f-f2df4204d93a";
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -36,11 +37,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var comments = SerializationUtils.Deserialize<List<Comment>>(Intent.Extras.GetString(CommentsIntentKey));
+                var businessEntity = SerializationUtils.Deserialize<BusinessEntity>(Intent.Extras.GetString(EntityIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
                 var cf = new CommentsFragment
                 {
-                    Comments = comments,
+                    Entity = businessEntity,
                 };
                 ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
                 ft.Commit();
@@ -51,6 +52,17 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 CommonConfig.Logger.Info($"Restored {nameof(CommentsActivity)}");
             }
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == Android.Resource.Id.Home)
+            {
+                OnBackPressed();
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
         }
     }
 }

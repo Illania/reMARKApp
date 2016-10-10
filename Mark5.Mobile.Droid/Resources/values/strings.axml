@@ -76,4 +76,7 @@
 	<string name="opening_attachment">Opening attachment</string>
 	<string name="cannot_open_attachment_without_ext">Attachments without extensions cannot be opened</string>
 	<string name="description">Description</string>
+	<string name="adding_comment">Adding comment</string>
+	<string name="deleting_comment">Deleting comment</string>
+	<string name="editing_comment">Editing comment</string>
 </resources>

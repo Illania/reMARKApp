@@ -20,6 +20,8 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -134,7 +136,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             menu.Add(Menu.None, 50, 50, Resource.String.set_priority);
             menu.Add(Menu.None, 60, 60, Resource.String.categories);
-            menu.Add(Menu.None, 70, 90, Resource.String.comments);
+            menu.Add(Menu.None, 70, 70, Resource.String.comments);
             menu.Add(Menu.None, 80, 80, Resource.String.actions);
             menu.Add(Menu.None, 90, 90, Resource.String.links);
 
@@ -154,7 +156,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            return base.OnOptionsItemSelected(item);
+            if (item.ItemId == 70) //TODO need to complete
+            {
+                var i = new Intent(Activity, typeof(CommentsActivity));
+                i.PutExtra(CommentsActivity.EntityIntentKey, SerializationUtils.Serialize(Document));
+                StartActivity(i);
+            }
+            return true;
         }
 
         async void AttachmentsView_AttachmentClicked(object sender, AttachmentDescription attachmentDescription)
