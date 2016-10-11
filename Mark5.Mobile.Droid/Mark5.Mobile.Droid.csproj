@@ -210,6 +210,7 @@
     <Compile Include="Ui\Fragments\CommentsListFragment.cs" />
     <Compile Include="Ui\Common\BusMesseges\DocumentPreviewCommentCountChangedMessage.cs" />
     <Compile Include="Utilities\ConversionUtils.cs" />
+    <Compile Include="Ui\Common\ActionOnCreateContextMenuListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
