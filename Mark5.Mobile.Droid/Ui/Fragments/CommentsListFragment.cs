@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Android.Content;
 using Android.OS;
 using Android.Support.V4.Widget;
@@ -117,13 +118,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override bool OnContextItemSelected(IMenuItem item)
         {
             var comment = adapter.GetSelectedItem();
+
+            if (item.ItemId == MenuItemActions.EditComment)
+            {
+
+            }
+            else if (item.ItemId == MenuItemActions.DeleteComment)
+            {
+                Activity.RunOnUiThread(async () => await DeleteComment(comment));
+            }
+
             return true;
         }
 
         public void CreateContextMenu(IContextMenu menu, View view, IContextMenuContextMenuInfo menuInfo)
         {
-            menu.Add(Menu.None, 20, 20, Resource.String.edit);
-            menu.Add(Menu.None, 21, 21, Resource.String.delete);
+            menu.Add(Menu.None, MenuItemActions.EditComment, MenuItemActions.EditComment, Resource.String.edit);
+            menu.Add(Menu.None, MenuItemActions.DeleteComment, MenuItemActions.DeleteComment, Resource.String.delete);
 
             var position = recyclerView.GetChildAdapterPosition(view);
             adapter.SelectedPosition = position;
@@ -145,13 +156,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     case ObjectType.Document:
                         var document = Entity as Document;
                         newComment = await Managers.DocumentsManager.AddComment(document, newCommentContent);
-                        document.Comments.Add(newComment); //TODO decide where to do this, here or in the manager
                         PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
                         break;
                     case ObjectType.Contact:
                         var contact = Entity as Contact;
                         newComment = await Managers.ContactsManager.AddComment(contact, newCommentContent);
-                        contact.Comments.Add(newComment);
                         break;
                     default:
                         throw new ArgumentException("The input business entity does not have comments defined in the model");
@@ -167,6 +176,46 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Failed to add comment attachment [entity.Id={Entity?.Id}, commentContent={newCommentContent}] ", ex);
+
+                dismissAction();
+                await Dialogs.ShowErrorDialogAsync(Context, ex);
+            }
+            finally
+            {
+                dismissAction();
+            }
+        }
+
+        async Task DeleteComment(Comment comment)
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.deleting_comment, Resource.String.please_wait);
+
+            try
+            {
+                switch (Entity.ObjectType)
+                {
+                    case ObjectType.Document:
+                        var document = Entity as Document;
+                        await Managers.DocumentsManager.DeleteComment(document, comment);
+                        PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
+                        break;
+                    case ObjectType.Contact:
+                        var contact = Entity as Contact;
+                        await Managers.ContactsManager.DeleteComment(contact, comment);
+                        break;
+                    default:
+                        throw new ArgumentException("The input business entity does not have comments defined in the model");
+                }
+
+                Activity.RunOnUiThread(() =>
+                {
+                    adapter.RemoveItem(comment);
+                    recyclerView.SmoothScrollToPosition(adapter.ItemCount);
+                });
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to deleteComment attachment [entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(Context, ex);
@@ -226,6 +275,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
+
+        static class MenuItemActions
+        {
+            public const int EditComment = 10;
+            public const int DeleteComment = 20;
+        }
 
         #region RecyclerView Adapter/ViewHolder
 
@@ -309,6 +364,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 commentsInView.Add(item);
                 NotifyItemInserted(commentsInView.Count - 1);
+            }
+
+            public void RemoveItem(Comment item)
+            {
+                var position = commentsInView.FindIndex(c => c.Id == item.Id);
+                if (position >= 0)
+                {
+                    commentsInView.RemoveAt(position);
+                    NotifyItemRemoved(position);
+                }
+            }
+
+            public void EditItem(Comment item)
+            {
+                var position = commentsInView.FindIndex(c => c.Id == item.Id);
+                if (position >= 0)
+                {
+                    commentsInView[position].Content = item.Content;
+                    NotifyItemChanged(position);
+                }
             }
 
             public Comment GetItemAtPosition(int position)
