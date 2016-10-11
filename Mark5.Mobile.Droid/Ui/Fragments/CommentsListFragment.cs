@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
+using Android.Graphics.Drawables;
 using Android.OS;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
@@ -59,6 +60,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.SetAdapter(adapter);
 
             addCommentEditText = rootView.FindViewById<AppCompatEditText>(Resource.Id.add_comment_edit_text);
+            var shape = new PaintDrawable();
+            shape.SetCornerRadius(ConversionUtils.ConvertDpToPixels(2));
+            shape.SetTint(Resource.Color.white);
+            addCommentEditText.Background = shape;
             addCommentEditText.TextChanged += AddCommentEditText_TextChanged;
 
             addCommentButton = rootView.FindViewById<AppCompatImageButton>(Resource.Id.add_comment_button);
