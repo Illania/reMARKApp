@@ -10,15 +10,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
-using Android.Graphics.Drawables;
 using Android.OS;
-using Android.Support.V4.Content;
-using Android.Support.V4.Graphics.Drawable;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Text.Format;
 using Android.Views;
+using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
@@ -59,7 +57,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
             RegisterForContextMenu(recyclerView);
 
-            adapter = new CommentsListAdapter(Context);
+            adapter = new CommentsListAdapter(Context, CreateContextMenu);
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
             recyclerView.SetAdapter(adapter);
 
@@ -99,11 +97,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override void OnCreateContextMenu(IContextMenu menu, View vValue, IContextMenuContextMenuInfo menuInfo)
-        {
-            base.OnCreateContextMenu(menu, vValue, menuInfo);
-        }
-
         public void RefreshData()
         {
             switch (Entity.ObjectType)
@@ -119,6 +112,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             recyclerView.SmoothScrollToPosition(adapter.ItemCount);
+        }
+
+        public override bool OnContextItemSelected(IMenuItem item)
+        {
+            var comment = adapter.GetSelectedItem();
+            return true;
+        }
+
+        public void CreateContextMenu(IContextMenu menu, View view, IContextMenuContextMenuInfo menuInfo)
+        {
+            menu.Add(Menu.None, 20, 20, Resource.String.edit);
+            menu.Add(Menu.None, 21, 21, Resource.String.delete);
+
+            var position = recyclerView.GetChildAdapterPosition(view);
+            adapter.SelectedPosition = position;
         }
 
         #region Event handlers
@@ -239,15 +247,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
+            public int SelectedPosition { get; set; }
+
+            readonly Action<IContextMenu, View, IContextMenuContextMenuInfo> action;
             readonly List<Comment> commentsInView = new List<Comment>();
             readonly Context context;
 
-            public event EventHandler<Comment> ItemLongClicked = delegate { };
+            public event EventHandler<Comment> ItemLongClicked = delegate { }; //TODO remove
 
-            public CommentsListAdapter(Context context)
+            public CommentsListAdapter(Context context, Action<IContextMenu, View, IContextMenuContextMenuInfo> action)
             {
                 this.context = context;
+                this.action = action;
             }
+
+            //TODO think if we need remove of listener on recycling
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
@@ -256,7 +270,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 var comment = commentsInView[position];
 
-                cvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, comment)));
+                cvh.ItemView.SetOnCreateContextMenuListener(new ActionOnCreateContextMenuListener(action));
 
                 cvh.Username = ServerConfig.SystemSettings.UserInfo.User.Id == comment.UserId ? "Me" : comment.UserName;
 
@@ -295,6 +309,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 commentsInView.Add(item);
                 NotifyItemInserted(commentsInView.Count - 1);
+            }
+
+            public Comment GetItemAtPosition(int position)
+            {
+                return commentsInView[position];
+            }
+
+            public Comment GetSelectedItem()
+            {
+                return commentsInView[SelectedPosition];
             }
         }
 
