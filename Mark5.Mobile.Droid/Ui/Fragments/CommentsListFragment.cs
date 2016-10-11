@@ -99,6 +99,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public override void OnCreateContextMenu(IContextMenu menu, View vValue, IContextMenuContextMenuInfo menuInfo)
+        {
+            base.OnCreateContextMenu(menu, vValue, menuInfo);
+        }
+
         public void RefreshData()
         {
             switch (Entity.ObjectType)
