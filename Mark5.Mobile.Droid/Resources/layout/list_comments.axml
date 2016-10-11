@@ -12,7 +12,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp"
+        android:padding="12dp"
         android:background="@color/lightblue">
         <android.support.v7.widget.AppCompatEditText
             android:id="@+id/add_comment_edit_text"
@@ -20,14 +20,17 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_gravity="left"
-            android:textAppearance="@style/fontPrimary" />
+            android:textAppearance="@style/fontLarge"
+            android:layout_marginRight="4dp"
+            android:background="@android:color/transparent" />
         <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/add_comment_button"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_gravity="right|bottom"
-            android:src="@drawable/arrow_right"
+            android:src="@drawable/send"
             android:clickable="true"
-            android:scaleType="centerCrop" />
+            android:background="@android:color/transparent"
+            android:tint="@color/blue" />
     </android.support.v7.widget.LinearLayoutCompat>
 </android.support.v7.widget.LinearLayoutCompat>

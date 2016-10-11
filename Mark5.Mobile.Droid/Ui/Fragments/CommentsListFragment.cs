@@ -12,6 +12,8 @@ using System.Linq;
 using Android.Content;
 using Android.Graphics.Drawables;
 using Android.OS;
+using Android.Support.V4.Content;
+using Android.Support.V4.Graphics.Drawable;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -60,10 +62,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.SetAdapter(adapter);
 
             addCommentEditText = rootView.FindViewById<AppCompatEditText>(Resource.Id.add_comment_edit_text);
-            var shape = new PaintDrawable();
-            shape.SetCornerRadius(ConversionUtils.ConvertDpToPixels(2));
-            shape.SetTint(Resource.Color.white);
-            addCommentEditText.Background = shape;
+            addCommentEditText.Hint = Resources.GetString(Resource.String.add_comment_hint);
             addCommentEditText.TextChanged += AddCommentEditText_TextChanged;
 
             addCommentButton = rootView.FindViewById<AppCompatImageButton>(Resource.Id.add_comment_button);
@@ -143,9 +142,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         throw new ArgumentException("The input business entity does not have comments defined in the model");
                 }
 
-                adapter.AppendItem(newComment);
-                addCommentEditText.Text = string.Empty;
-
+                Activity.RunOnUiThread(() =>
+                {
+                    adapter.AppendItem(newComment);
+                    recyclerView.SmoothScrollToPosition(adapter.ItemCount);
+                    addCommentEditText.Text = string.Empty;
+                });
             }
             catch (Exception ex)
             {

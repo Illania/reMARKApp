@@ -335,6 +335,10 @@
     <AndroidResource Include="Resources\xml\filepaths.xml" />
     <AndroidResource Include="Resources\layout\list_item_comments.axml" />
     <AndroidResource Include="Resources\layout\list_comments.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\send.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\send.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\send.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\send.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
