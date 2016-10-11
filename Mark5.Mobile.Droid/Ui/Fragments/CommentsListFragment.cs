@@ -59,7 +59,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             RegisterForContextMenu(recyclerView);
 
             adapter = new CommentsListAdapter(Context, CreateContextMenu);
-            adapter.ItemLongClicked += Adapter_ItemLongClicked;
             recyclerView.SetAdapter(adapter);
 
             addCommentEditText = rootView.FindViewById<AppCompatEditText>(Resource.Id.add_comment_edit_text);
@@ -230,11 +229,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             addCommentButton.Enabled = !string.IsNullOrEmpty(addCommentEditText.Text);
         }
 
-        void Adapter_ItemLongClicked(object sender, Comment e)
-        {
-
-        }
-
         #endregion
 
         #region Retained State methods
@@ -307,15 +301,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly List<Comment> commentsInView = new List<Comment>();
             readonly Context context;
 
-            public event EventHandler<Comment> ItemLongClicked = delegate { }; //TODO remove
-
             public CommentsListAdapter(Context context, Action<IContextMenu, View, IContextMenuContextMenuInfo> action)
             {
                 this.context = context;
                 this.action = action;
             }
-
-            //TODO think if we need remove of listener on recycling
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
@@ -323,10 +313,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (cvh == null) return;
 
                 var comment = commentsInView[position];
+                var commentFromCurrentUser = ServerConfig.SystemSettings.UserInfo.User.Id == comment.UserId;
 
-                cvh.ItemView.SetOnCreateContextMenuListener(new ActionOnCreateContextMenuListener(action));
+                if (commentFromCurrentUser) //TODO !!!!! This needs to be negated, it's just for testing
+                {
+                    cvh.ItemView.SetOnCreateContextMenuListener(new ActionOnCreateContextMenuListener(action));
+                }
 
-                cvh.Username = ServerConfig.SystemSettings.UserInfo.User.Id == comment.UserId ? "Me" : comment.UserName;
+                cvh.Username = commentFromCurrentUser ? "Me" : comment.UserName;
 
                 var dateReceived = comment.DateAdded.ToServerTime();
                 if (DateTime.Now.Date == dateReceived.Date)
