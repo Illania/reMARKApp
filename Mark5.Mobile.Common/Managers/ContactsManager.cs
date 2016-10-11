@@ -206,6 +206,7 @@ namespace Mark5.Mobile.Common.Managers
                 });
 
                 var comment = result.Comment.Convert();
+                contact.Comments.Add(comment);
 
                 await contactsDataAccess.AddCommentAsync(contact, comment);
 
@@ -233,6 +234,11 @@ namespace Mark5.Mobile.Common.Managers
                 if (editSuccess)
                 {
                     await contactsDataAccess.EditCommentAsync(contact, comment);
+                    var index = contact.Comments.FindIndex(c => c.Id == comment.Id);
+                    if (index >= 0)
+                    {
+                        contact.Comments[index] = comment;
+                    }
                 }
 
                 return editSuccess;
@@ -252,6 +258,8 @@ namespace Mark5.Mobile.Common.Managers
                     ObjectId = contact.Id,
                     ObjectType = DataContract.ObjectType.Contact
                 });
+
+                contact.Comments.Remove(comment);
 
                 await contactsDataAccess.DeleteCommentAsync(contact, comment);
 
