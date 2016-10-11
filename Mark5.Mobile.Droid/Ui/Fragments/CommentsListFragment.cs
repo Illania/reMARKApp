@@ -57,8 +57,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
+            RegisterForContextMenu(recyclerView);
 
-            adapter = new CommentsListAdapter(Context); //TODO need to add events for deletion, editing and so on
+            adapter = new CommentsListAdapter(Context);
+            adapter.ItemLongClicked += Adapter_ItemLongClicked;
             recyclerView.SetAdapter(adapter);
 
             addCommentEditText = rootView.FindViewById<AppCompatEditText>(Resource.Id.add_comment_edit_text);
@@ -167,6 +169,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             addCommentButton.Enabled = !string.IsNullOrEmpty(addCommentEditText.Text);
         }
 
+        void Adapter_ItemLongClicked(object sender, Comment e)
+        {
+
+        }
+
         #endregion
 
         #region Retained State methods
@@ -230,6 +237,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly List<Comment> commentsInView = new List<Comment>();
             readonly Context context;
 
+            public event EventHandler<Comment> ItemLongClicked = delegate { };
+
             public CommentsListAdapter(Context context)
             {
                 this.context = context;
@@ -241,6 +250,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (cvh == null) return;
 
                 var comment = commentsInView[position];
+
+                cvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, comment)));
+
                 cvh.Username = ServerConfig.SystemSettings.UserInfo.User.Id == comment.UserId ? "Me" : comment.UserName;
 
                 var dateReceived = comment.DateAdded.ToServerTime();
