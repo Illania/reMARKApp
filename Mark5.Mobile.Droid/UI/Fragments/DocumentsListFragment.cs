@@ -505,6 +505,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public void UpdateCommentsCount(DocumentPreviewCommentCountChangedMessage m)
+        {
+            var position = adapter.GetPosition(m.DocumentPreviewId);
+            if (position >= 0)
+            {
+                var dp = adapter.Items[position];
+                dp.CommentsCount = m.CommentsCount;
+                adapter.NotifyItemChanged(position);
+            }
+
+            position = searchAdapter.GetPosition(m.DocumentPreviewId);
+            if (position >= 0)
+            {
+                var dp = searchAdapter.Items[position];
+                dp.CommentsCount = m.CommentsCount;
+                searchAdapter.NotifyItemChanged(position);
+            }
+        }
+
         #endregion
 
         #region RecyclerView Adapter/ViewHolder

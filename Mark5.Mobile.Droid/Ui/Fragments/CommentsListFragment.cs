@@ -20,13 +20,21 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class CommentsFragment : RetainableStateFragment
+    public class CommentsListFragment : RetainableStateFragment
     {
         public BusinessEntity Entity { get; set; }
+        public List<Comment> Comments
+        {
+            get
+            {
+                return adapter.Items;
+            }
+        }
 
         RecyclerView recyclerView;
         CommentsListAdapter adapter;
@@ -36,7 +44,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(CommentsFragment)} [entity.Id={Entity?.Id}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(CommentsListFragment)} [entity.Id={Entity?.Id}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list_comments, container, false);
 
@@ -68,14 +76,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = "Comments";
 
-            CommonConfig.Logger.Info($"Created {nameof(CommentsFragment)} [entity.Id={Entity?.Id}]");
+            CommonConfig.Logger.Info($"Created {nameof(CommentsListFragment)} [entity.Id={Entity?.Id}]");
         }
 
         public override void OnResume()
         {
             base.OnResume();
 
-            CommonConfig.Logger.Info($"Resuming {nameof(CommentsFragment)} [entity.Id={Entity?.Id}]");
+            CommonConfig.Logger.Info($"Resuming {nameof(CommentsListFragment)} [entity.Id={Entity?.Id}]");
 
             if (adapter.ItemCount < 1)
             {
@@ -114,10 +122,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 switch (Entity.ObjectType)
                 {
                     case ObjectType.Document:
-                        newComment = await Managers.DocumentsManager.AddComment(Entity as Document, newCommentContent);
+                        var document = Entity as Document;
+                        newComment = await Managers.DocumentsManager.AddComment(document, newCommentContent);
+                        document.Comments.Add(newComment); //TODO decide where to do this, here or in the manager
+                        PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
                         break;
                     case ObjectType.Contact:
-                        newComment = await Managers.ContactsManager.AddComment(Entity as Contact, newCommentContent);
+                        var contact = Entity as Contact;
+                        newComment = await Managers.ContactsManager.AddComment(contact, newCommentContent);
+                        contact.Comments.Add(newComment);
                         break;
                     default:
                         throw new ArgumentException("The input business entity does not have comments defined in the model");
@@ -125,6 +138,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 adapter.AppendItem(newComment);
                 addCommentEditText.Text = string.Empty;
+
             }
             catch (Exception ex)
             {
@@ -173,7 +187,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(CommentsFragment)} [businessEntity.Id={Entity.Id}]";
+            return $"{nameof(CommentsListFragment)} [businessEntity.Id={Entity.Id}]";
         }
 
         class CommentsFragmentState : IRetainableState

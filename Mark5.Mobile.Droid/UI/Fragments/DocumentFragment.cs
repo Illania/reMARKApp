@@ -7,6 +7,7 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
@@ -33,6 +34,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
     public class DocumentFragment : RetainableStateFragment
     {
+        public static class RequestCodes
+        {
+            public static int CommentsRequest = 1;
+        }
 
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
@@ -156,11 +161,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            if (item.ItemId == 70) //TODO need to complete
+            if (item.ItemId == 70) //TODO need to complete with other options
             {
-                var i = new Intent(Activity, typeof(CommentsActivity));
-                i.PutExtra(CommentsActivity.EntityIntentKey, SerializationUtils.Serialize(Document));
-                StartActivity(i);
+                var i = new Intent(Activity, typeof(CommentsListActivity));
+                i.PutExtra(CommentsListActivity.EntityIntentKey, SerializationUtils.Serialize(Document));
+                Activity.StartActivityForResult(i, RequestCodes.CommentsRequest); //Need to use activity, otherwise the request code is changed is changed by the enclosing activity
             }
             return true;
         }
@@ -370,6 +375,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     CommonConfig.Logger.Error($"Marking document as read failed [folder.name={f?.Name}, folder.id={f?.Id}, documentPreviewId={dp?.Id}]", ex);
                 }
             });
+        }
+
+        public void UpdateComments(List<Comment> comments)
+        {
+            if (Document != null)
+            {
+                Document.Comments.Clear();
+                Document.Comments.AddRange(comments);
+            }
+
+            if (DocumentPreview != null)
+            {
+                DocumentPreview.CommentsCount = comments.Count;
+            }
         }
 
         public override IRetainableState OnRetainInstanceState()

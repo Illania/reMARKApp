@@ -31,6 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         DocumentsListFragment dlf;
 
         TinyMessageSubscriptionToken readStatusToken;
+        TinyMessageSubscriptionToken commentCountToken;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -70,6 +71,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     dlf.UpdateReadStatus(m);
                 }
             });
+
+            commentCountToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewCommentCountChangedMessage>(m =>
+            {
+                if (dlf != null && m.Sender != dlf)
+                {
+                    dlf.UpdateCommentsCount(m);
+                }
+            });
         }
 
         protected override void OnDestroy()
@@ -77,6 +86,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.OnDestroy();
 
             if (readStatusToken != null) PlatformConfig.MessengerHub.Unsubscribe<DocumentPreviewReadStatusChangedMessage>(readStatusToken);
+            if (commentCountToken != null) PlatformConfig.MessengerHub.Unsubscribe<DocumentPreviewCommentCountChangedMessage>(commentCountToken);
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)

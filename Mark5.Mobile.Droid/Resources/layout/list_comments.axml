@@ -26,9 +26,10 @@
             android:id="@+id/add_comment_button"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:layout_gravity="right|top"
+            android:layout_gravity="right|bottom"
             android:src="@drawable/arrow_right"
             android:background="@color/blue"
-            android:clickable="true" />
+            android:clickable="true"
+            android:scaleType="centerCrop" />
     </android.support.v7.widget.LinearLayoutCompat>
 </android.support.v7.widget.LinearLayoutCompat>
