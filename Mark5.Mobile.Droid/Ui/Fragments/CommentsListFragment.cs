@@ -106,6 +106,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 default:
                     throw new ArgumentException("The input business entity does not have comments defined in the model");
             }
+
+            recyclerView.SmoothScrollToPosition(adapter.ItemCount);
         }
 
         #region Event handlers
@@ -232,7 +234,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (cvh == null) return;
 
                 var comment = commentsInView[position];
-                cvh.Username = comment.UserName; //TODO need to put ME if the same user
+                cvh.Username = ServerConfig.SystemSettings.UserInfo.User.Id == comment.UserId ? "Me" : comment.UserName;
 
                 var dateReceived = comment.DateAdded.ToServerTime();
                 if (DateTime.Now.Date == dateReceived.Date)

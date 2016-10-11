@@ -20,8 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_gravity="left"
-            android:textAppearance="@style/fontPrimary"
-            android:background="@color/darkblue" />
+            android:textAppearance="@style/fontPrimary" />
         <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/add_comment_button"
             android:layout_width="36dp"
