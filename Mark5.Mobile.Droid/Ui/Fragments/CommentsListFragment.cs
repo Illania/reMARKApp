@@ -125,7 +125,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             else if (item.ItemId == MenuItemActions.DeleteComment)
             {
-                Activity.RunOnUiThread(async () => await DeleteComment(comment));
+                DeleteComment(comment);
             }
 
             return true;
@@ -186,44 +186,43 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        async Task DeleteComment(Comment comment)
+        void DeleteComment(Comment comment)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.deleting_comment, Resource.String.please_wait);
 
-            try
-            {
-                switch (Entity.ObjectType)
-                {
-                    case ObjectType.Document:
-                        var document = Entity as Document;
-                        await Managers.DocumentsManager.DeleteComment(document, comment);
-                        PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
-                        break;
-                    case ObjectType.Contact:
-                        var contact = Entity as Contact;
-                        await Managers.ContactsManager.DeleteComment(contact, comment);
-                        break;
-                    default:
-                        throw new ArgumentException("The input business entity does not have comments defined in the model");
-                }
+            Task.Run(async () =>
+             {
+                 switch (Entity.ObjectType)
+                 {
+                     case ObjectType.Document:
+                         var document = Entity as Document;
+                         await Managers.DocumentsManager.DeleteComment(document, comment);
+                         PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
+                         break;
+                     case ObjectType.Contact:
+                         var contact = Entity as Contact;
+                         await Managers.ContactsManager.DeleteComment(contact, comment);
+                         break;
+                     default:
+                         throw new ArgumentException("The input business entity does not have comments defined in the model");
+                 }
+             }).ContinueWith(async t =>
+             {
+                 dismissAction();
 
-                Activity.RunOnUiThread(() =>
-                {
-                    adapter.RemoveItem(comment);
-                    recyclerView.SmoothScrollToPosition(adapter.ItemCount);
-                });
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error($"Failed to deleteComment attachment [entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", ex);
+                 if (t.IsFaulted)
+                 {
+                     CommonConfig.Logger.Error($"Failed to deleteComment attachment [entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
+                     await Dialogs.ShowErrorDialogAsync(Context, t.Exception.InnerException);
+                 }
+                 else
+                 {
+                     adapter.RemoveItem(comment);
+                     recyclerView.SmoothScrollToPosition(adapter.ItemCount);
+                 }
 
-                dismissAction();
-                await Dialogs.ShowErrorDialogAsync(Context, ex);
-            }
-            finally
-            {
-                dismissAction();
-            }
+             }, TaskScheduler.FromCurrentSynchronizationContext());
+
         }
 
         void AddCommentEditText_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
