@@ -54,7 +54,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 {
                     webView.LoadDataWithBaseURL(null, Document.PlainTextBody, "text/plain", "UTF-8", null);
                 }
-                else if (string.IsNullOrWhiteSpace(Document.HtmlBody))
+                else if (!string.IsNullOrWhiteSpace(Document.HtmlBody))
                 {
                     webView.LoadDataWithBaseURL(null, Document.HtmlBody, "text/html", "UTF-8", null);
                 }
