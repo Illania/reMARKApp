@@ -30,6 +30,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ContactViewFragment : RetainableStateFragment
     {
+
         public ContactPreview ContactPreview { get; set; }
         public Contact Contact { get; set; }
         public Folder Folder { get; set; }
@@ -165,8 +166,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void PrepareDescriptionCard()
         {
-
-
             descriptionSubviews = new List<ContactView>();
             descriptionSubviews.Add(new DescriptionSubview(Context));
             descriptionSubviews.Add(new ShortIdSubview(Context));

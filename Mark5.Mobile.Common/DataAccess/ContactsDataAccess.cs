@@ -138,7 +138,6 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-
         public async Task SaveContactWithPreviewAsync(ContactContainer container)
         {
             try
@@ -520,7 +519,6 @@ namespace Mark5.Mobile.Common.DataAccess
                 throw new DataAccessException("Error removing orphan contacts and contact previews.", ex);
             }
         }
-
     }
 }
 
