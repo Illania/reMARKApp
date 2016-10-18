@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
 using Android.Graphics;
@@ -16,10 +17,10 @@ using Android.Text;
 using Android.Text.Format;
 using Android.Util;
 using Android.Views;
-using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Utilities;
 using Android.Widget;
-using System.Collections.Generic;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
@@ -650,20 +651,26 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                     var addressesTo = DocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType);
                     var to = string.Join(", ", addressesTo.Select(at => string.IsNullOrWhiteSpace(at.Name) ? at.Address : at.Name));
 
-                    letter.Text = from.Substring(0, 1).ToUpper();
+                    letter.Text = from?.SafeSubstring(0, 1)?.ToUpper();
                     line1.Text = from;
                     line2.Text = Context.GetString(Resource.String.to_prefix) + " " + to;
+
+                    line1.Visibility = string.IsNullOrWhiteSpace(from) ? ViewStates.Gone : ViewStates.Visible;
+                    line2.Visibility = string.IsNullOrWhiteSpace(to) ? ViewStates.Gone : ViewStates.Visible;
                 }
                 else
                 {
-                    var from = Document.Lines.FirstOrDefault().Name;
+                    var from = Document.Lines.FirstOrDefault()?.Name;
 
                     var addressesTo = DocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To);
                     var to = string.Join(", ", addressesTo.Select(at => string.IsNullOrWhiteSpace(at.Name) ? at.Address : at.Name));
 
-                    letter.Text = from.Substring(0, 1).ToUpper();
+                    letter.Text = from?.SafeSubstring(0, 1)?.ToUpper();
                     line1.Text = from;
                     line2.Text = Context.GetString(Resource.String.to_prefix) + " " + to;
+
+                    line1.Visibility = string.IsNullOrWhiteSpace(from) ? ViewStates.Gone : ViewStates.Visible;
+                    line2.Visibility = string.IsNullOrWhiteSpace(to) ? ViewStates.Gone : ViewStates.Visible;
                 }
 
                 if (Document.ReadByUserNames.Count > 0)
