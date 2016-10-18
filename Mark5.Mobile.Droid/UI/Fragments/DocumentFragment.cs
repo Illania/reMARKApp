@@ -20,6 +20,8 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -154,6 +156,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
+            if (item.ItemId == 80)
+            {
+                var i = new Intent(Activity, typeof(ObjectActionsActivity));
+                i.PutExtra(ObjectActionsActivity.BusinessEntityTypeIntentKey, SerializationUtils.Serialize(DocumentPreview.GetType()));
+                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(DocumentPreview));
+                StartActivity(i);
+
+                return true;
+            }
+
             return base.OnOptionsItemSelected(item);
         }
 
