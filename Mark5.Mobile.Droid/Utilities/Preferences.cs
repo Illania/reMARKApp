@@ -109,6 +109,20 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
+        public string PushNotificationToken
+        {
+            get
+            {
+                return sp.GetString(Application.Context.GetString(Resource.String.push_notification_token), string.Empty);
+            }
+            set
+            {
+                var e = sp.Edit();
+                e.PutString(Application.Context.GetString(Resource.String.push_notification_token), value);
+                e.Commit();
+            }
+        }
+
         public bool EnableReporting
         {
             get

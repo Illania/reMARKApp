@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: LinqExtensions.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -25,6 +25,11 @@ namespace Mark5.Mobile.Common.Extensions
             {
                 action(item);
             }
+        }
+
+        public static IEnumerable<T> Flatten<T>(this IEnumerable<T> e, Func<T, IEnumerable<T>> childSelector)
+        {
+            return e.SelectMany(childSelector).Concat(e);
         }
     }
 

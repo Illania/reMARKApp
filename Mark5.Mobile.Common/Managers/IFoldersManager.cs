@@ -22,6 +22,15 @@ namespace Mark5.Mobile.Common.Managers
         Task AddFavoriteFolderAsync(ModuleType module, Folder folder, SourceType sourceType = SourceType.Auto);
 
         Task RemoveFavoriteFolderAsync(ModuleType module, Folder folder, SourceType sourceType = SourceType.Auto);
+
+        Task<bool> IsFolderFavouriteAsync(ModuleType module, Folder folder, SourceType sourceType = SourceType.Auto);
+
+        Task AddOfflineFolderAsync(ModuleType module, Folder folder, SourceType sourceType = SourceType.Auto);
+
+        Task RemoveOfflineFolderAsync(ModuleType module, Folder folder, SourceType sourceType = SourceType.Auto);
+
+        Task<bool> IsFolderOfflineAsync(ModuleType module, Folder folder, SourceType sourceType = SourceType.Auto);
+
     }
 }
 

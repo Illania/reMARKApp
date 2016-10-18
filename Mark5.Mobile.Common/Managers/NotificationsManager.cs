@@ -101,10 +101,16 @@ namespace Mark5.Mobile.Common.Managers
                 await foldersDataAccess.SetSubscribed(moduleType, folders, enabled);
 
                 var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync() ?? new Dictionary<ModuleType, List<Folder>>();
-                foreach (var favoriteFolder in favoriteFolders[moduleType].Where(f => folderIds.Contains(f.Id)))
+
+                List<Folder> moduleFavoriteFolders;
+                if (favoriteFolders.TryGetValue(moduleType, out moduleFavoriteFolders))
                 {
-                    favoriteFolder.Subscribed = enabled;
+                    foreach (var item in moduleFavoriteFolders.Where(f => folderIds.Contains(f.Id)))
+                    {
+                        item.Subscribed = enabled;
+                    }
                 }
+
                 await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
 
                 return;

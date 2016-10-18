@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: 
 // File: ConversionUtilities.cs
 // Author: Ferdinando Papale fp@nordic-it.com
