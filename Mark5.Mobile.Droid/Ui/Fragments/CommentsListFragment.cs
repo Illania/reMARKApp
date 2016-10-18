@@ -120,7 +120,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.EditComment)
             {
+                var editDialogBuilder = new AlertDialog.Builder(Context);
 
+                var container = new FrameLayout(Context);
+                var editTextView = new AppCompatEditText(Context);
+                editTextView.Text = comment.Content;
+
+                var lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+                lp.LeftMargin = ConversionUtils.ConvertDpToPixels(10);
+                lp.RightMargin = ConversionUtils.ConvertDpToPixels(10);
+
+                container.AddView(editTextView, lp);
+
+                editDialogBuilder.SetView(container);
+
+                editDialogBuilder.SetTitle("New Comment Message");
+
+                IDialogInterfaceOnClickListener test = null;
+                editDialogBuilder.SetPositiveButton("Confirm", test);
+                editDialogBuilder.SetNegativeButton("Cancel", test);
+                editDialogBuilder.Show();
             }
             else if (item.ItemId == MenuItemActions.DeleteComment)
             {
