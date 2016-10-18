@@ -576,12 +576,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (dp.Direction == DocumentDirection.Incoming)
                 {
                     var address = dp.Addresses.FirstOrDefault(da => da.AddressType == DocumentAddressType.From);
-                    dpvh.Recipent = string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
+                    dpvh.Recipent = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
                 }
                 else
                 {
                     var address = dp.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType).FirstOrDefault();
-                    dpvh.Recipent = string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
+                    dpvh.Recipent = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
                 }
 
                 var dateReceived = dp.DateReceived.ToServerTime();
