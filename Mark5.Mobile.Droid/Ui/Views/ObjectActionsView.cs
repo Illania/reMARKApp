@@ -6,26 +6,23 @@
 // Copyright (c) 2016 Nordic IT
 //
 using Android.Content;
-using Android.Views;
-using System.Collections.Generic;
-using Mark5.Mobile.Common.Model;
-using Android.Support.V7.Widget;
-using Android.Util;
-using Android.OS;
 using Android.Graphics;
+using Android.OS;
 using Android.Support.V4.Content;
-using Mark5.Mobile.Droid.Ui.Views.Common;
-using System;
-using System.Linq;
-using Mark5.Mobile.Droid.Utilities;
+using Android.Support.V7.Widget;
 using Android.Text.Format;
+using Android.Util;
+using Android.Views;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Ui.Views.Common;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views
 {
 
     public class ObjectActionsView : CardView
     {
-        int distanceNone;
+
         int distanceVeryLarge;
         int distanceLarge;
         int distanceNormal;
