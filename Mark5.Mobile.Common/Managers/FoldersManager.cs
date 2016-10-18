@@ -71,7 +71,7 @@ namespace Mark5.Mobile.Common.Managers
                     return new List<Folder>();
                 }
 
-                return moduleFavoriteFolders.Select(f => f.ShallowCopy()).ToList(); //TODO think it if can be done differently
+                return moduleFavoriteFolders.Select(f => f.ShallowCopy()).ToList();
             }
 
             throw new ArgumentException("Invalid sourceType provided.");

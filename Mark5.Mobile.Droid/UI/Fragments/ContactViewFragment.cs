@@ -41,9 +41,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ProgressBar progress;
         NestedScrollView scrollView;
         LinearLayoutCompat linearLayout;
-        List<ContactView> communicationSubviews;
-        List<ContactView> descriptionSubviews;
-        List<ContactView> physicalAddressSubviews;
 
         CardView communicationCardView;
         CardView descriptionCardView;
@@ -97,8 +94,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void PrepareCommunicationCard()
         {
-            communicationSubviews = new List<ContactView>();
-            //TODO Ask Bartosz if the missing ones are missing on purpose
+            var communicationSubviews = new List<ContactView>();
             communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Email));
             if (PlatformConfig.Preferences.ContactCommunicationFaxNumbersEnabled)
                 communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Fax));
@@ -136,7 +132,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void PreparePhysicalAddressesCard()
         {
-            physicalAddressSubviews = new List<ContactView>();
+            var physicalAddressSubviews = new List<ContactView>();
 
             if (PlatformConfig.Preferences.ContactAddressesEnabled)
                 physicalAddressSubviews.Add(new PhysicalAddressesSubview(Context));
@@ -167,7 +163,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void PrepareDescriptionCard()
         {
-            descriptionSubviews = new List<ContactView>();
+            var descriptionSubviews = new List<ContactView>();
             descriptionSubviews.Add(new DescriptionSubview(Context));
             descriptionSubviews.Add(new ShortIdSubview(Context));
             if (PlatformConfig.Preferences.ContactBirthdateEnabled)
@@ -247,32 +243,38 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             progress.Visibility = ViewStates.Gone;
             scrollView.Visibility = ViewStates.Visible;
 
-            foreach (var contactSubview in communicationSubviews.Concat(descriptionSubviews).Concat(physicalAddressSubviews))
-            {
-                contactSubview.Contact = Contact;
-                contactSubview.ContactPreview = ContactPreview;
-
-                contactSubview.RefreshView();
-            }
-
-            if (communicationSubviews.Any(s => s.Visibility == ViewStates.Visible))
-            {
-                communicationCardView.Visibility = ViewStates.Visible;
-                communicationSubviews.Last(s => s.Visibility == ViewStates.Visible).HideSeparator();
-            }
-            if (descriptionSubviews.Any(s => s.Visibility == ViewStates.Visible))
-            {
-                descriptionCardView.Visibility = ViewStates.Visible;
-                descriptionSubviews.Last(s => s.Visibility == ViewStates.Visible).HideSeparator();
-            }
-            if (physicalAddressSubviews.Any(s => s.Visibility == ViewStates.Visible))
-            {
-                physicalAddressCardView.Visibility = ViewStates.Visible;
-                physicalAddressSubviews.Last(s => s.Visibility == ViewStates.Visible).HideSeparator();
-            }
+            RefreshCardView(communicationCardView);
+            RefreshCardView(physicalAddressCardView);
+            RefreshCardView(descriptionCardView);
 
             linearLayout.Invalidate();
             linearLayout.RequestLayout();
+        }
+
+        void RefreshCardView(CardView cardView)
+        {
+            var internalLayout = cardView.GetChildAt(0) as LinearLayoutCompat;
+            for (int i = 0; i < internalLayout.ChildCount; i++)
+            {
+                var subview = internalLayout.GetChildAt(i) as ContactView;
+                if (subview != null)
+                {
+                    subview.Contact = Contact;
+                    subview.ContactPreview = ContactPreview;
+
+                    subview.RefreshView();
+
+                    if (subview.Visibility == ViewStates.Visible)
+                    {
+                        cardView.Visibility = ViewStates.Visible;
+                    }
+
+                    if (i == internalLayout.ChildCount - 1)
+                    {
+                        subview.HideSeparator();
+                    }
+                }
+            }
         }
 
         void RefreshTitle()
