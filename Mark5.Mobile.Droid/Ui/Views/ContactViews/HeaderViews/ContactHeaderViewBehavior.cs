@@ -33,7 +33,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             mStartMarginLeft = ConversionUtils.ConvertDpToPixels(16);
             mEndMargintLeft = ConversionUtils.ConvertDpToPixels(33);
             mMarginRight = ConversionUtils.ConvertDpToPixels(14);
-            mStartMarginBottom = ConversionUtils.ConvertDpToPixels(14); //TODO discuss with Bartosz
+            mStartMarginBottom = ConversionUtils.ConvertDpToPixels(14);
         }
 
         public override bool LayoutDependsOn(CoordinatorLayout parent, Java.Lang.Object child, View dependency)
