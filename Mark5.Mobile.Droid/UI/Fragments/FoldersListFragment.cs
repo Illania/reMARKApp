@@ -49,6 +49,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         readonly Handler searchHandler = new Handler();
 
+
+        FolderListAdapter CurrentAdapter
+        {
+            get { return searchEnabled ? searchAdapter : adapter; }
+        }
+
         #region Overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -416,21 +422,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return true;
         }
 
-        FolderListAdapter CurrentAdapter
-        {
-            get { return searchEnabled ? searchAdapter : adapter; }
-        }
-
-        static class MenuItemActions
-        {
-            public const int AddToFavourites = 10;
-            public const int RemoveFromFavourites = 20;
-            public const int Subscribe = 30;
-            public const int Unsubscribe = 40;
-            public const int EnableOffline = 50;
-            public const int DisableOffline = 60;
-        }
-
         #endregion
 
         #region Folder actions
@@ -663,6 +654,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public Folder Folder { get; set; }
             public Folder FavouriteRootFolder { get; set; }
             public List<int> SelectedItemPositions { get; set; }
+        }
+
+        #endregion
+
+        #region MenuItemActions
+
+        static class MenuItemActions
+        {
+            public const int AddToFavourites = 10;
+            public const int RemoveFromFavourites = 20;
+            public const int Subscribe = 30;
+            public const int Unsubscribe = 40;
+            public const int EnableOffline = 50;
+            public const int DisableOffline = 60;
         }
 
         #endregion
