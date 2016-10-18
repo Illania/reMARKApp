@@ -676,7 +676,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 if (Document.ReadByUserNames.Count > 0)
                 {
                     line3.Visibility = ViewStates.Visible;
-                    line3.Text = Context.GetString(Resource.String.read_by_prefix) + " " + string.Join(", ", Document.ReadByUserNames.Values.OrderBy(s => s)).ToUpper();
+                    line3.Text = $"{Context.GetString(Resource.String.read_by_prefix)} {string.Join(", ", Document.ReadByUserNames.Values.OrderBy(s => s)).ToUpper()}";
                 }
                 else
                 {

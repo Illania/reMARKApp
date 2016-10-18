@@ -229,6 +229,9 @@
     <Compile Include="Utilities\PushNotifications\GcmListenerService.cs" />
     <Compile Include="Utilities\PushNotifications\InstanceIdListenerService.cs" />
     <Compile Include="Utilities\PushNotifications\RegistrationIntentService.cs" />
+    <Compile Include="Ui\Activities\ObjectActionsActivity.cs" />
+    <Compile Include="Ui\Fragments\ObjectActionsFragment.cs" />
+    <Compile Include="Ui\Views\ObjectActionsView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
