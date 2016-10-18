@@ -15,7 +15,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         public ShortIdSubview(Context context) :
             base(context)
         {
-            Title = "Short Id"; //TODO check
+            Title = "Short Id";
         }
 
         public override void RefreshView()

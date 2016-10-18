@@ -87,7 +87,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                     descriptionTextView.Text = descriptionText;
                     var descriptionTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent, 1.0f);
                     descriptionTextViewLayoutParams.TopMargin = ConversionUtils.ConvertDpToPixels(2);
-                    descriptionTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight); //TODO decide if it makes sense to modify it when primary
+                    descriptionTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
                     AddView(descriptionTextView, descriptionTextViewLayoutParams);
                 }
             }
