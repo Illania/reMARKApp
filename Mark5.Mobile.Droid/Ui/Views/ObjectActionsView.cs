@@ -15,6 +15,10 @@ using Android.OS;
 using Android.Graphics;
 using Android.Support.V4.Content;
 using Mark5.Mobile.Droid.Ui.Views.Common;
+using System;
+using System.Linq;
+using Mark5.Mobile.Droid.Utilities;
+using Android.Text.Format;
 
 namespace Mark5.Mobile.Droid.Ui.Views
 {
@@ -86,7 +90,7 @@ namespace Mark5.Mobile.Droid.Ui.Views
                 var objectAction = objectActions[i];
                 var isNotLast = i != objectActions.Length - 1;
 
-                innerLayout.AddView(new ObjectActionView(Context, objectAction, distanceNormal));
+                innerLayout.AddView(new ObjectActionView(Context, objectAction, distanceVeryLarge, distanceNormal));
 
                 if (isNotLast)
                 {
@@ -98,10 +102,56 @@ namespace Mark5.Mobile.Droid.Ui.Views
         class ObjectActionView : LinearLayoutCompat
         {
 
-            public ObjectActionView(Context context, ObjectAction objectAction, int distanceNormal)
+            public ObjectActionView(Context context, ObjectAction objectAction, int distanceVeryLarge, int distanceNormal)
                 : base(context)
             {
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+                Orientation = Vertical;
+                SetPadding(distanceVeryLarge, distanceNormal, distanceVeryLarge, distanceNormal);
 
+                var titleView = new AppCompatTextView(Context)
+                {
+                    LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                    Text = objectAction.Description
+                };
+                if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+                {
+#pragma warning disable CS0618 // Type or member is obsolete
+                    titleView.SetTextAppearance(Context, Resource.Style.fontPrimary);
+#pragma warning restore CS0618 // Type or member is obsolete
+                }
+                else
+                {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                    titleView.SetTextAppearance(Resource.Style.fontPrimary);
+#pragma warning restore XA0001 // Find issues with Android API usage
+                }
+                AddView(titleView);
+
+                var actionTime = objectAction.ActionTime.ToServerTime();
+
+                var dfo = DateFormat.GetDateFormatOrder(context);
+                var actionDateString = actionTime.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
+                var actionTimeString = DateFormat.Is24HourFormat(context) ? actionTime.ToString("HH:mm") : actionTime.ToString("hh:mm tt");
+
+                var subtitleView = new AppCompatTextView(Context)
+                {
+                    LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                    Text = $"{Context.GetString(Resource.String.by)} {objectAction.Username} {Context.GetString(Resource.String.on)} {actionDateString} {actionTimeString}"
+                };
+                if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+                {
+#pragma warning disable CS0618 // Type or member is obsolete
+                    subtitleView.SetTextAppearance(Context, Resource.Style.fontSmallLight);
+#pragma warning restore CS0618 // Type or member is obsolete
+                }
+                else
+                {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                    subtitleView.SetTextAppearance(Resource.Style.fontSmallLight);
+#pragma warning restore XA0001 // Find issues with Android API usage
+                }
+                AddView(subtitleView);
             }
         }
 
