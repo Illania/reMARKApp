@@ -7,9 +7,10 @@
 //
 using System;
 using System.Collections.Generic;
-using Mark5.Mobile.Common.Utilities;
-using SQLite;
 using System.Linq;
+using Mark5.Mobile.Common.Utilities;
+using PCLStorage;
+using SQLite;
 
 namespace Mark5.Mobile.Common.Model
 {
@@ -17,6 +18,7 @@ namespace Mark5.Mobile.Common.Model
     [Table("Folder")]
     public class Folder : ICopiable<Folder>
     {
+        public static char PathSeparator = PortablePath.DirectorySeparatorChar;
 
         [Column("Id"), PrimaryKey]
         public int Id { get; set; } = -1;
@@ -41,6 +43,18 @@ namespace Mark5.Mobile.Common.Model
 
         [Column("HasSubFolders")]
         public bool HasSubFolders { get; set; }
+
+        [Column("Path")]
+        public string Path { get; set; }
+
+        [Ignore]
+        public bool Local
+        {
+            get
+            {
+                return documentsLocalRootFolder.SubFolders.Contains(this);
+            }
+        }
 
         List<Folder> subFolders;
 
@@ -102,7 +116,9 @@ namespace Mark5.Mobile.Common.Model
                 Type = Type,
                 InternalType = InternalType,
                 HasSubFolders = HasSubFolders,
+                Subscribed = Subscribed,
                 Position = Position,
+                Path = Path,
                 OptionalParameters = OptionalParameters?.ShallowCopy()
             };
         }
@@ -143,11 +159,52 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true,
         };
 
+        readonly static Folder documentsFavoriteRootFolder = new Folder
+        {
+            Id = -110,
+            Guid = new Guid("{00000000-0000-0000-0000-000000000110}"),
+            Name = "DOCUMENTS_FAVORITE_ROOT",
+            Module = ModuleType.Documents,
+            Type = FolderType.None,
+            HasSubFolders = true,
+        };
+
+        readonly static Folder documentsOutgoingFolder = new Folder
+        {
+            Id = -121,
+            Guid = new Guid("{00000000-0000-0000-0000-000000000121}"),
+            Name = "Outgoing",
+            Module = ModuleType.Documents,
+            Type = FolderType.None,
+            HasSubFolders = false,
+        };
+
+        readonly static Folder documentsLocalRootFolder = new Folder
+        {
+            Id = -120,
+            Guid = new Guid("{00000000-0000-0000-0000-000000000120}"),
+            Name = "DOCUMENTS_LOCAL_ROOT",
+            Module = ModuleType.Documents,
+            Type = FolderType.None,
+            HasSubFolders = true,
+            SubFolders = { documentsOutgoingFolder },
+        };
+
         readonly static Folder contactsRootFolder = new Folder
         {
             Id = -200,
             Guid = new Guid("{00000000-0000-0000-0000-000000000200}"),
             Name = "CONTACTS_ROOT",
+            Module = ModuleType.Contacts,
+            Type = FolderType.None,
+            HasSubFolders = true,
+        };
+
+        readonly static Folder contactsFavoriteRootFolder = new Folder
+        {
+            Id = -210,
+            Guid = new Guid("{00000000-0000-0000-0000-000000000210}"),
+            Name = "CONTACTS_FAVORITE_ROOT",
             Module = ModuleType.Contacts,
             Type = FolderType.None,
             HasSubFolders = true,
@@ -163,6 +220,16 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true,
         };
 
+        readonly static Folder shortcodesFavoriteRootFolder = new Folder
+        {
+            Id = -310,
+            Guid = new Guid("{00000000-0000-0000-0000-000000000310}"),
+            Name = "SHORTCODES_FAVORITE_ROOT",
+            Module = ModuleType.Shortcodes,
+            Type = FolderType.None,
+            HasSubFolders = true,
+        };
+
         readonly static Folder calendarRootFolder = new Folder
         {
             Id = -400,
@@ -173,18 +240,39 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true,
         };
 
-        public static Folder RootPerModule(ModuleType module)
+        readonly static Folder calendarFavoriteRootFolder = new Folder
+        {
+            Id = -410,
+            Guid = new Guid("{00000000-0000-0000-0000-000000000410}"),
+            Name = "CALENDAR_FAVORITE_ROOT",
+            Module = ModuleType.Calendar,
+            Type = FolderType.None,
+            HasSubFolders = true,
+        };
+
+        public static Folder RootPerModule(ModuleType module, bool favorite = false)
         {
             switch (module)
             {
                 case ModuleType.Documents:
-                    return documentsRootFolder;
+                    return favorite ? documentsFavoriteRootFolder : documentsRootFolder;
                 case ModuleType.Contacts:
-                    return contactsRootFolder;
+                    return favorite ? contactsFavoriteRootFolder : contactsRootFolder;
                 case ModuleType.Shortcodes:
-                    return shortcodesRootFolder;
+                    return favorite ? shortcodesFavoriteRootFolder : shortcodesRootFolder;
                 case ModuleType.Calendar:
-                    return calendarRootFolder;
+                    return favorite ? calendarFavoriteRootFolder : calendarRootFolder;
+                default:
+                    throw new ArgumentException("Input module not valid");
+            }
+        }
+
+        public static Folder LocalRootPerModule(ModuleType module)
+        {
+            switch (module)
+            {
+                case ModuleType.Documents:
+                    return documentsLocalRootFolder;
                 default:
                     throw new ArgumentException("Input module not valid");
             }

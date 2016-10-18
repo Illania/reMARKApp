@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.Graphics.Drawables.Shapes;
@@ -22,6 +23,8 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -233,7 +236,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (actionMode == null)
             {
-                Android.Widget.Toast.MakeText(Activity, "Contact clicked!", Android.Widget.ToastLength.Short).Show();
+                var i = new Intent(Activity, typeof(ContactActivity));
+                i.PutExtra(ContactActivity.ContactPreviewIntentKey, SerializationUtils.Serialize(contactPreview));
+                i.PutExtra(ContactActivity.FolderIntentKey, SerializationUtils.Serialize(Folder));
+                StartActivity(i);
             }
             else
             {

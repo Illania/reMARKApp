@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Containers;
 
 namespace Mark5.Mobile.Common.Managers
 {
@@ -25,6 +26,10 @@ namespace Mark5.Mobile.Common.Managers
         Task<Contact> GetContactAsync(Folder folder, int contactId, SourceType sourceType = SourceType.Auto);
 
         Task<Contact> GetContactAsync(int folderId, int contactId, SourceType sourceType = SourceType.Auto);
+
+        Task<ContactContainer> GetContactWithPreviewAsync(Folder folder, int contactId, SourceType sourceType = SourceType.Auto);
+
+        Task<ContactContainer> GetContactWithPreviewAsync(int folderId, int contactId, SourceType sourceType = SourceType.Auto);
 
         Task<bool> CreteOrUpdateContactAsync(Contact contact, ContactPreview contactPreview, int parentObjectId, SourceType sourceType = SourceType.Auto);
 

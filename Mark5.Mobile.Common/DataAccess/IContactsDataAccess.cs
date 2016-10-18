@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Containers;
 
 namespace Mark5.Mobile.Common.DataAccess
 {
@@ -21,7 +22,11 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task SaveContactAsync(Contact contact);
 
+        Task SaveContactWithPreviewAsync(ContactContainer container);
+
         Task<Contact> GetContactAsync(int contactId);
+
+        Task<ContactContainer> GetContactWithPreviewAsync(int contactId);
 
         Task RemoveFromFolderAsync(List<ContactPreview> contactPreviews, Folder folder);
 

@@ -98,4 +98,5 @@
 	<string name="dialog_update_config_title">Updating configuration</string>
 	<string name="dialog_logout_title">Log out</string>
 	<string name="dialog_logout_content">MARK5 will be shutdown after your are logged out. All personal settings will be lost and you will have to start MARK5 again manually. Do you want to continue?</string>
+	<string name="push_notification_token">push_notification_token</string>
 </resources>

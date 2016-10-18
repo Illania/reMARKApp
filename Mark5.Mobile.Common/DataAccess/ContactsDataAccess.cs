@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Links;
 
 namespace Mark5.Mobile.Common.DataAccess
@@ -48,6 +49,7 @@ namespace Mark5.Mobile.Common.DataAccess
                 throw new DataAccessException("Error inserting contacts.", ex);
             }
         }
+
         public async Task<List<ContactPreview>> GetContactPreviewsAsync(Folder folder, int startRowId, int maxItems)
         {
             try
@@ -133,6 +135,53 @@ namespace Mark5.Mobile.Common.DataAccess
             catch (Exception ex) when (!(ex is DataAccessException))
             {
                 throw new DataAccessException("Error getting contact.", ex);
+            }
+        }
+
+        public async Task SaveContactWithPreviewAsync(ContactContainer container)
+        {
+            try
+            {
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    c.InsertOrReplace(container.Contact);
+                    c.InsertOrReplace(container.ContactPreview);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error saving contact with preview.", ex);
+            }
+        }
+
+        public async Task<ContactContainer> GetContactWithPreviewAsync(int contactId)
+        {
+            try
+            {
+                ContactContainer container = null;
+
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    var contact = c.Find<Contact>(contactId);
+                    if (contact == null)
+                    {
+                        throw new DataNotFoundException("Contact could not be found.");
+                    }
+
+                    var contactPreview = c.Find<ContactPreview>(contactId);
+                    if (contactPreview == null)
+                    {
+                        throw new DataNotFoundException("Contact preview could not be found.");
+                    }
+
+                    container = new ContactContainer(contactPreview, contact);
+                });
+
+                return container;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting contact with preview.", ex);
             }
         }
 
