@@ -341,12 +341,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            if (ContactPreview != null)
-            {
-                return $"{nameof(ContactViewFragment)} [contactPreview.id={ContactPreview.Id}, contactPreview.name={ContactPreview.Name}]";
-            }
-
-            return $"{nameof(ContactViewFragment)} [contactId={ContactId}, folderId={FolderId}]";
+            return $"{nameof(ContactViewFragment)} [contactId={ContactPreview?.Id ?? ContactId}, contactName={ContactPreview?.Name}, folderId={FolderId}]";
         }
 
         #endregion
