@@ -28,6 +28,7 @@ namespace Mark5.Mobile.Common.Storage
             public const string SystemSettings = "systemSettings.json";
             public const string SystemUserDepartments = "systemUserDepartments.json";
             public const string FavoriteFolders = "favoriteFolders.json";
+            public const string OfflineFolders = "offlineFolders.json";
             public const string NotificationSettings = "notificationSettings.json";
             public const string LastCacheCleanUp = "lastCacheCleanUp.json";
 
@@ -46,6 +47,7 @@ namespace Mark5.Mobile.Common.Storage
             [Filenames.SystemSettings] = new SemaphoreSlim(1),
             [Filenames.SystemUserDepartments] = new SemaphoreSlim(1),
             [Filenames.FavoriteFolders] = new SemaphoreSlim(1),
+            [Filenames.OfflineFolders] = new SemaphoreSlim(1),
             [Filenames.NotificationSettings] = new SemaphoreSlim(1),
             [Filenames.LastCacheCleanUp] = new SemaphoreSlim(1)
         }.ToImmutableDictionary();
@@ -112,12 +114,28 @@ namespace Mark5.Mobile.Common.Storage
 
         public static async Task<Dictionary<ModuleType, List<Folder>>> GetFavoriteFoldersAsync(CancellationToken ct = default(CancellationToken))
         {
-            return await GetAsync<Dictionary<ModuleType, List<Folder>>>(Filenames.FavoriteFolders, ct);
+            var favorites = await GetAsync<Dictionary<ModuleType, List<Folder>>>(Filenames.FavoriteFolders, ct);
+            return favorites ?? new Dictionary<ModuleType, List<Folder>>();
         }
 
         public static async Task SaveFavoriteFoldersAsync(Dictionary<ModuleType, List<Folder>> favoriteFolders, CancellationToken ct = default(CancellationToken))
         {
             await SaveAsync(favoriteFolders, Filenames.FavoriteFolders, ct);
+        }
+
+        #endregion
+
+        #region Offline folders
+
+        public static async Task<Dictionary<ModuleType, List<Folder>>> GetOfflineFoldersAsync(CancellationToken ct = default(CancellationToken))
+        {
+            var offlines = await GetAsync<Dictionary<ModuleType, List<Folder>>>(Filenames.OfflineFolders, ct);
+            return offlines ?? new Dictionary<ModuleType, List<Folder>>();
+        }
+
+        public static async Task SaveOfflineFoldersAsync(Dictionary<ModuleType, List<Folder>> favoriteFolders, CancellationToken ct = default(CancellationToken))
+        {
+            await SaveAsync(favoriteFolders, Filenames.OfflineFolders, ct);
         }
 
         #endregion

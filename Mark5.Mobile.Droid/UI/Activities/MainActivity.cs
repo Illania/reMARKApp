@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.Content;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.App;
@@ -21,6 +22,7 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
+using Mark5.Mobile.Droid.Utilities.PushNotifications;
 
 namespace Mark5.Mobile.Droid.Ui.Activity
 {
@@ -28,7 +30,6 @@ namespace Mark5.Mobile.Droid.Ui.Activity
     [Android.App.Activity]
     public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FragmentManager.IOnBackStackChangedListener
     {
-
         Toolbar toolbar;
         DrawerLayout drawer;
         SmoothActionBarDrawerToggle drawerToggle;
@@ -88,6 +89,9 @@ namespace Mark5.Mobile.Droid.Ui.Activity
                 var initialMenuItem = navigationView.Menu.FindItem(Resource.Id.nav_documents);
                 initialMenuItem.SetChecked(true);
                 OnNavigationItemSelected(initialMenuItem);
+
+                var registrationIntent = new Intent(this, typeof(RegistrationIntentService));
+                StartService(registrationIntent);
 
                 Task.Run(async () =>
                 {

@@ -82,4 +82,15 @@
 	<style name="fontTinyLight" parent="TextAppearance.AppCompat.Caption">
 		<item name="android:textSize">12sp</item>
 	</style>
+	<style name="contactViewHeaderTitle" parent="TextAppearance.AppCompat.Body2">
+		<item name="android:textSize">18sp</item>
+		<item name="android:textColor">@color/white</item>
+	</style>
+	<style name="contactViewHeaderTitleLarge" parent="contactViewHeaderTitle">
+		<item name="android:textSize">22sp</item>
+	</style>
+	<style name="contactViewHeaderSubtitle" parent="TextAppearance.AppCompat.Body2">
+		<item name="android:textSize">16sp</item>
+		<item name="android:textColor">@color/white</item>
+	</style>
 </resources>
