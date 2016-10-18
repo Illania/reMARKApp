@@ -1,5 +1,5 @@
 ﻿//
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: CommunicationAddressesSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
@@ -23,7 +23,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         public CommunicationAddressesSubview(Android.Content.Context context, CommunicationAddressType type) : base(context)
         {
             addressType = type;
-            SetTitle(type.ToString());
+            Title = type.ToString();
             iconImageView.SetImageResource(Resource.Drawable.email);
         }
 

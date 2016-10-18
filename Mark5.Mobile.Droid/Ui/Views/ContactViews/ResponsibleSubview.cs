@@ -1,5 +1,5 @@
 ﻿//
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: ResponsibleSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
@@ -7,6 +7,7 @@
 //
 using System;
 using System.Linq;
+using Android.Content;
 using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
@@ -15,9 +16,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
     {
         public event EventHandler<int> ContactClicked = delegate { };
 
-        public ResponsibleSubview(Android.Content.Context context) : base(context)
+        public ResponsibleSubview(Context context) : base(context)
         {
-            SetTitle("Responsible Users"); //TODO check
+            Title = "Responsible Users";
             iconImageView.SetImageResource(Resource.Drawable.email);
         }
 
@@ -42,8 +43,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
         class ResponsibleSubSubview : CommunicationCardSubSubview
         {
-
-            public ResponsibleSubSubview(Android.Content.Context context, ResponsibleSubview parentView, int responsibleUserId, string responsibleUserName)
+            public ResponsibleSubSubview(Context context, ResponsibleSubview parentView, int responsibleUserId, string responsibleUserName)
                 : base(context, responsibleUserName, null)
             {
                 Click += (sender, e) => parentView.ContactClicked(this, responsibleUserId);

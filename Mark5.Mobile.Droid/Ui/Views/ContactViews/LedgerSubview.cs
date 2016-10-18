@@ -1,5 +1,5 @@
 ﻿//
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: LedgerSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
@@ -16,7 +16,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         public LedgerSubview(Context context) :
             base(context)
         {
-            SetTitle("Ledger");
+            Title = "Ledger";
         }
 
         public override void RefreshView()
@@ -24,7 +24,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             if (!string.IsNullOrEmpty(Contact?.Ledger))
             {
                 Visibility = ViewStates.Visible;
-                SetContent(Contact.Ledger);
+                Content = Contact.Ledger;
             }
             else
             {

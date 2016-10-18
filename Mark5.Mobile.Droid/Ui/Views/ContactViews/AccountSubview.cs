@@ -1,5 +1,5 @@
 ﻿//
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: AccountSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
@@ -14,7 +14,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
     {
         public AccountSubview(Android.Content.Context context) : base(context)
         {
-            SetTitle("Account");
+            Title = "Account";
         }
 
         public override void RefreshView()
@@ -22,7 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             if (!string.IsNullOrEmpty(Contact?.Account))
             {
                 Visibility = ViewStates.Visible;
-                SetContent(Contact.Account);
+                Content = Contact.Account;
             }
             else
             {

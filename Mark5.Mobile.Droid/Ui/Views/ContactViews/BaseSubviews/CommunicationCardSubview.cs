@@ -1,5 +1,5 @@
 ﻿//
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: ContactViewBaseSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
@@ -19,6 +19,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         AppCompatTextView titleTextView;
         protected LinearLayoutCompat contentLayout;
         protected AppCompatImageView iconImageView;
+
+        public string Title
+        {
+            set
+            {
+                titleTextView.Text = value;
+            }
+        }
 
         protected CommunicationCardSubview(Context context) : base(context)
         {
@@ -56,11 +64,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             contentExternalLayout.AddView(Divider);
 
             titleTextView = new AppCompatTextView(Context);
-        }
-
-        public void SetTitle(string title)
-        {
-            titleTextView.Text = title;
         }
 
         protected class CommunicationCardSubSubview : LinearLayoutCompat

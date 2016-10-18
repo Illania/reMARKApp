@@ -1,5 +1,5 @@
 //
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: ContactViewFragment.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
@@ -21,6 +21,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.ContactViews;
@@ -246,7 +247,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             progress.Visibility = ViewStates.Gone;
             scrollView.Visibility = ViewStates.Visible;
 
-            foreach (var contactSubview in communicationSubviews.Union(descriptionSubviews).Union(physicalAddressSubviews))
+            foreach (var contactSubview in communicationSubviews.Concat(descriptionSubviews).Concat(physicalAddressSubviews))
             {
                 contactSubview.Contact = Contact;
                 contactSubview.ContactPreview = ContactPreview;
@@ -254,20 +255,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 contactSubview.RefreshView();
             }
 
-            if (communicationSubviews.Any(s => s.Visible))
+            if (communicationSubviews.Any(s => s.Visibility == ViewStates.Visible))
             {
                 communicationCardView.Visibility = ViewStates.Visible;
-                communicationSubviews.Last(s => s.Visible).HideSeparator();
+                communicationSubviews.Last(s => s.Visibility == ViewStates.Visible).HideSeparator();
             }
-            if (descriptionSubviews.Any(s => s.Visible))
+            if (descriptionSubviews.Any(s => s.Visibility == ViewStates.Visible))
             {
                 descriptionCardView.Visibility = ViewStates.Visible;
-                descriptionSubviews.Last(s => s.Visible).HideSeparator();
+                descriptionSubviews.Last(s => s.Visibility == ViewStates.Visible).HideSeparator();
             }
-            if (physicalAddressSubviews.Any(s => s.Visible))
+            if (physicalAddressSubviews.Any(s => s.Visibility == ViewStates.Visible))
             {
                 physicalAddressCardView.Visibility = ViewStates.Visible;
-                physicalAddressSubviews.Last(s => s.Visible).HideSeparator();
+                physicalAddressSubviews.Last(s => s.Visibility == ViewStates.Visible).HideSeparator();
             }
 
             linearLayout.Invalidate();
@@ -276,7 +277,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void RefreshTitle()
         {
-            ((Activities.ContactActivity)Activity).SetTitles(ContactPreview?.Name, ContactPreview?.CompanyName);
+            ((ContactActivity)Activity).SetTitles(ContactPreview?.Name, ContactPreview?.CompanyName);
             descriptionCardTitle.Text = $"About {ContactPreview?.Name}";
         }
 
@@ -302,12 +303,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void ResponsibleUserClicked(object sender, int contactId)
         {
-            //Need to fill later
+            //TODO
         }
 
         void AddressClicked(object sender, CommunicationAddress e)
         {
-            //Need to fill later
+            //TODO 
         }
 
         #endregion

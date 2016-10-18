@@ -1,5 +1,5 @@
 ﻿//
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: WebPageSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
@@ -14,15 +14,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
     {
         public WebPageSubview(Android.Content.Context context) : base(context)
         {
-            SetTitle("Web page");
+            Title = "Web page";
         }
 
         public override void RefreshView()
         {
-            if (!string.IsNullOrEmpty(Contact?.WebPageAddress))
+            if (!string.IsNullOrWhiteSpace(Contact?.WebPageAddress))
             {
                 Visibility = ViewStates.Visible;
-                SetContent(Contact.WebPageAddress);
+                Content = Contact.WebPageAddress;
             }
             else
             {

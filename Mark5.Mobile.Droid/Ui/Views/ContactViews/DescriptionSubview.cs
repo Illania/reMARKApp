@@ -1,5 +1,5 @@
 ﻿//
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: DescriptionSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
@@ -13,7 +13,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
     {
         public DescriptionSubview(Android.Content.Context context) : base(context)
         {
-            SetTitle("Description");
+            Title = "Description";
         }
 
         public override void RefreshView()
@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             if (!string.IsNullOrEmpty(ContactPreview?.Description))
             {
                 Visibility = ViewStates.Visible;
-                SetContent(ContactPreview.Description);
+                Content = ContactPreview.Description;
             }
             else
             {

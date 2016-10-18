@@ -1,5 +1,5 @@
 ﻿//
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: ContactViewBaseTextSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
@@ -17,6 +17,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
     {
         readonly AppCompatTextView titleTextView;
         readonly AppCompatTextView contentTextView;
+
+        public string Content
+        {
+            set
+            {
+                contentTextView.Text = value;
+            }
+        }
+
+        public string Title
+        {
+            set
+            {
+                titleTextView.Text = value;
+            }
+        }
 
         protected DescriptionCardSubview(Context context) : base(context)
         {
@@ -41,16 +57,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
             Divider = new Divider(Context);
             AddView(Divider);
-        }
-
-        public void SetContent(string title)
-        {
-            contentTextView.Text = title;
-        }
-
-        public void SetTitle(string title)
-        {
-            titleTextView.Text = title;
         }
     }
 

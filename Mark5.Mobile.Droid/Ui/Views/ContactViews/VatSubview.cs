@@ -1,5 +1,5 @@
 ﻿//
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: VatSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
@@ -13,15 +13,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
     {
         public VatSubview(Android.Content.Context context) : base(context)
         {
-            SetTitle("VAT");
+            Title = "VAT";
         }
 
         public override void RefreshView()
         {
-            if (!string.IsNullOrEmpty(Contact?.Vat))
+            if (!string.IsNullOrWhiteSpace(Contact?.Vat))
             {
                 Visibility = ViewStates.Visible;
-                SetContent(Contact.Vat);
+                Content = Contact.Vat;
             }
             else
             {

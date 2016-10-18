@@ -1,5 +1,5 @@
 ﻿//
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: ContactViewActivity.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
@@ -87,11 +87,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         public void SetTitles(string title, string subtitle)
         {
-            RunOnUiThreadIfNecessary(() =>
-            {
-                toolbarHeaderView.SetTitles(title, subtitle);
-                floatHeaderView.SetTitles(title, subtitle);
-            });
+            toolbarHeaderView.SetTitles(title, subtitle);
+            floatHeaderView.SetTitles(title, subtitle);
         }
 
         class AppBarListener : Java.Lang.Object, AppBarLayout.IOnOffsetChangedListener

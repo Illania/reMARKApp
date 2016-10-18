@@ -1,5 +1,5 @@
 ﻿//
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: HeaderViewBehavior.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //

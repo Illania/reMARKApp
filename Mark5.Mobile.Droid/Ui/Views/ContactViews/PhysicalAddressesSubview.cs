@@ -1,5 +1,5 @@
 ﻿//
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: PhysicalAddressesSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //

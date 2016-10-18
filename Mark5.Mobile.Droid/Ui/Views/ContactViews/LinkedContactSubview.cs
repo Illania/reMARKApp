@@ -1,5 +1,5 @@
 ﻿//
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: LinkedContactSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
@@ -22,7 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         public LinkedContactSubview(Android.Content.Context context, LinkedContactType type) : base(context)
         {
             linkedContactType = type;
-            SetTitle(type.ToString());
+            Title = type.ToString();
             iconImageView.SetImageResource(Resource.Drawable.email);
         }
 

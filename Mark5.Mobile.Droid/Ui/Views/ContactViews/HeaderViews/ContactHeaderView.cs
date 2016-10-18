@@ -1,5 +1,5 @@
 ﻿//
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: HeaderView.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
@@ -56,7 +56,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         public void SetTitles(string title, string subtitle)
         {
             titleTextView.Text = title;
-            if (!string.IsNullOrEmpty(subtitle))
+            if (!string.IsNullOrWhiteSpace(subtitle))
             {
                 subtitleTextView.Text = subtitle;
                 subtitleTextView.Visibility = ViewStates.Visible;

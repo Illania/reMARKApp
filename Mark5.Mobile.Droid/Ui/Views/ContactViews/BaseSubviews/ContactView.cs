@@ -1,5 +1,5 @@
 ﻿//
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: BaseCardSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
@@ -25,14 +25,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         public ContactPreview ContactPreview { get; set; }
         public Contact Contact { get; set; }
 
-        public bool Visible
-        {
-            get
-            {
-                return Visibility == ViewStates.Visible;
-            }
-        }
-
         protected ContactView(Context context) : base(context)
         {
             DistanceVeryLarge = ConversionUtils.ConvertDpToPixels(24);
@@ -46,6 +38,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             if (Divider != null)
             {
                 Divider.Visibility = ViewStates.Gone;
+            }
+        }
+
+        public void ShowSeparator()
+        {
+            if (Divider != null)
+            {
+                Divider.Visibility = ViewStates.Visible;
             }
         }
 

@@ -1,5 +1,5 @@
 ﻿//
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: ShortIdSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
@@ -15,15 +15,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         public ShortIdSubview(Context context) :
             base(context)
         {
-            SetTitle("Short Id"); //TODO check
+            Title = "Short Id"; //TODO check
         }
 
         public override void RefreshView()
         {
-            if (!string.IsNullOrEmpty(ContactPreview?.ShortId))
+            if (!string.IsNullOrWhiteSpace(ContactPreview?.ShortId))
             {
                 Visibility = ViewStates.Visible;
-                SetContent(ContactPreview?.ShortId);
+                Content = ContactPreview?.ShortId;
             }
             else
             {
