@@ -67,6 +67,14 @@ namespace Mark5.Mobile.Droid.Ui.Activity
 
             authenticator = AuthenticatorFactory.Create();
 
+            if (savedInstanceState != null)
+            {
+                usernameEditText.Text = savedInstanceState.GetString("username");
+                passwordEditText.Text = savedInstanceState.GetString("password");
+                hostnameEditText.Text = savedInstanceState.GetString("hostname");
+                portEditText.SetSelection(savedInstanceState.GetInt("ssl"));
+            }
+
             CommonConfig.Logger.Info($"Created {nameof(LoginActivity)}");
         }
 
@@ -74,25 +82,33 @@ namespace Mark5.Mobile.Droid.Ui.Activity
         {
             base.OnStart();
 
-            CommonConfig.Logger.Info($"Starting {nameof(LoginActivity)}...");
-
-            Task.Run(async () =>
-            {
-                return await authenticator.GetConnectionInfoAsync();
-            }).ContinueWith(t =>
-            {
-                var ci = t.Result;
-
-                usernameEditText.Text = ci?.Username;
-                passwordEditText.Text = string.Empty;
-                hostnameEditText.Text = ci?.Hostname;
-                portEditText.Text = ci?.Port.ToString();
-                sslSpinner.SetSelection((int?)ci?.SslMode ?? 0);
-
-                loginButton.Enabled = true;
-            }, TaskScheduler.FromCurrentSynchronizationContext());
-
             CommonConfig.Logger.Info($"Started {nameof(LoginActivity)}");
+        }
+
+        protected override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            outState.PutString("username", usernameEditText.Text);
+            outState.PutString("password", passwordEditText.Text);
+            outState.PutString("hostname", hostnameEditText.Text);
+            outState.PutString("port", portEditText.Text);
+            outState.PutInt("ssl", sslSpinner.SelectedItemPosition);
+        }
+
+        protected override void OnRestoreInstanceState(Bundle savedInstanceState)
+        {
+            base.OnRestoreInstanceState(savedInstanceState);
+
+            usernameEditText.Text = savedInstanceState.GetString("username");
+            passwordEditText.Text = savedInstanceState.GetString("password");
+            hostnameEditText.Text = savedInstanceState.GetString("hostname");
+            portEditText.SetSelection(savedInstanceState.GetInt("ssl"));
+        }
+
+        public override void OnRestoreInstanceState(Bundle savedInstanceState, PersistableBundle persistentState)
+        {
+            base.OnRestoreInstanceState(savedInstanceState, persistentState);
         }
 
         async void LoginButton_Click(object sender, EventArgs e)
