@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             : base(context)
         {
             Orientation = Vertical;
-            SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceNormal);
+            SetPadding(DistanceLarge, DistanceNormal, DistanceLarge, DistanceNormal);
 
             var fromToAdapter = ArrayAdapter.CreateFromResource(context, Resource.Array.search_from_to, Android.Resource.Layout.SimpleSpinnerItem);
             fromToAdapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);

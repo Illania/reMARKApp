@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             : base(context)
         {
             Orientation = Vertical;
-            SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceNormal);
+            SetPadding(DistanceLarge, DistanceNormal, DistanceLarge, DistanceNormal);
 
             var subjectMessageAdapter = ArrayAdapter.CreateFromResource(context, Resource.Array.search_subject_message, Android.Resource.Layout.SimpleSpinnerItem);
             subjectMessageAdapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
