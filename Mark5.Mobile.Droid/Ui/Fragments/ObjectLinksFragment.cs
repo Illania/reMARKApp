@@ -1,19 +1,19 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: ObjectActionsFragment.cs
+// File: ObjectLinksFragment.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
+using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
@@ -21,12 +21,12 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views;
-using Mark5.Mobile.Droid.Utilities;
+using System.Linq;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
 
-    public class ObjectActionsFragment : RetainableStateFragment
+    public class ObjectLinksFragment : RetainableStateFragment
     {
 
         public IBusinessEntity BusinessEntity
@@ -37,7 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public Action CloseRequest { get; set; }
 
-        List<ObjectAction> objectActions;
+        List<ObjectLink> objectLinks;
 
         ProgressBar progress;
         ScrollView scrollView;
@@ -45,7 +45,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(ObjectActionsFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity.objectType={BusinessEntity?.ObjectType}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(ObjectLinksFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity.objectType={BusinessEntity?.ObjectType}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout, container, false);
             rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
@@ -53,7 +53,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
-            var padding = ConversionUtils.ConvertDpToPixels(10.0f);
+            var padding = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 10.0f, Resources.DisplayMetrics) + 0.5f);
             linearLayout.SetPadding(padding, padding, padding, padding);
 
             return rootView;
@@ -63,9 +63,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.actions);
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.links);
 
-            CommonConfig.Logger.Info($"Created {nameof(ObjectActionsFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity.objectType={BusinessEntity?.ObjectType}]...");
+            CommonConfig.Logger.Info($"Created {nameof(ObjectLinksFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity.objectType={BusinessEntity?.ObjectType}]...");
         }
 
         public override async void OnResume()
@@ -79,9 +79,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             try
             {
-                if (objectActions == null)
+                if (objectLinks == null)
                 {
-                    objectActions = await Managers.CommonActionsManager.GetObjectActionsAsync(BusinessEntity);
+                    objectLinks = await Managers.CommonActionsManager.GetObjectLinksAsync(BusinessEntity);
                 }
 
                 RefreshView();
@@ -103,11 +103,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout.RemoveViews(0, linearLayout.ChildCount);
 
-            var grouppedObjectActions = objectActions.OrderBy(oa => oa.ActionType).ThenBy(oa => oa.ActionTime).GroupBy(oa => oa.ActionType);
+            var grouppedObjectLinks = objectLinks.OrderBy(oa => oa.TypeInfo.DescriptionComplex).GroupBy(oa => oa.TypeInfo.DescriptionComplex);
 
-            foreach (var grouppedObjectAction in grouppedObjectActions)
+            foreach (var grouppedObjectLink in grouppedObjectLinks)
             {
-                linearLayout.AddView(new ObjectActionsView(Context, grouppedObjectAction.Key, grouppedObjectAction.ToArray()));
+                linearLayout.AddView(new ObjectLinksView(Context, grouppedObjectLink.Key, grouppedObjectLink.ToArray()));
             }
 
             linearLayout.Invalidate();
@@ -116,34 +116,34 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            return new ObjectActionsFragmentState
+            return new ObjectLinksFragmentState
             {
                 BusinessEntity = BusinessEntity,
-                ObjectActions = objectActions
+                ObjectLinks = objectLinks
             };
         }
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var oafs = restoredState as ObjectActionsFragmentState;
+            var oafs = restoredState as ObjectLinksFragmentState;
             if (oafs != null)
             {
                 BusinessEntity = oafs.BusinessEntity;
-                objectActions = oafs.ObjectActions;
+                objectLinks = oafs.ObjectLinks;
             }
         }
 
         public override string GenerateTag()
         {
-            return $"{nameof(ObjectActionsFragment)} [businessEntity.id={BusinessEntity.Id}, businessEntity.objectType={BusinessEntity.ObjectType}]";
+            return $"{nameof(ObjectLinksFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity?.objectType={BusinessEntity.ObjectType}]";
         }
 
-        class ObjectActionsFragmentState : IRetainableState
+        class ObjectLinksFragmentState : IRetainableState
         {
 
             public IBusinessEntity BusinessEntity { get; set; }
 
-            public List<ObjectAction> ObjectActions { get; set; }
+            public List<ObjectLink> ObjectLinks { get; set; }
         }
     }
 }

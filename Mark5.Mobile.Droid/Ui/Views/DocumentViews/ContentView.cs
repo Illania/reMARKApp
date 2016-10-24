@@ -5,15 +5,12 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using Android.Content;
-using Android.Net;
 using Android.Support.V4.View;
 using Android.Views;
 using Android.Webkit;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Utilities;
-using Android.Text.Util;
-using Android.Text;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
@@ -99,9 +96,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         class CustomWebViewClient : WebViewClient
         {
 
+            [Obsolete]
             public override bool ShouldOverrideUrlLoading(WebView view, string url)
             {
-                view.Context.StartActivity(new Intent(Intent.ActionView, Uri.Parse(url)));
+                view.Context.StartActivity(new Intent(Intent.ActionView, Android.Net.Uri.Parse(url)));
                 return true;
             }
         }

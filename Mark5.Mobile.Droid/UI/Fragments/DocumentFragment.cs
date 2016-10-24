@@ -166,6 +166,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
+            if (item.ItemId == 90)
+            {
+                var i = new Intent(Activity, typeof(ObjectLinksActivity));
+                i.PutExtra(ObjectLinksActivity.BusinessEntityTypeIntentKey, SerializationUtils.Serialize(DocumentPreview.GetType()));
+                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(DocumentPreview));
+                StartActivity(i);
+
+                return true;
+            }
+
             return base.OnOptionsItemSelected(item);
         }
 

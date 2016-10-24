@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Mark5.Mobile.Droid</RootNamespace>
     <AssemblyName>Mark5.Mobile.Droid</AssemblyName>
-    <TargetFrameworkVersion>v6.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v7.0</TargetFrameworkVersion>
     <AndroidApplication>True</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
     <AndroidResgenClass>Resource</AndroidResgenClass>
@@ -232,6 +232,9 @@
     <Compile Include="Ui\Activities\ObjectActionsActivity.cs" />
     <Compile Include="Ui\Fragments\ObjectActionsFragment.cs" />
     <Compile Include="Ui\Views\ObjectActionsView.cs" />
+    <Compile Include="Ui\Activities\ObjectLinksActivity.cs" />
+    <Compile Include="Ui\Fragments\ObjectLinksFragment.cs" />
+    <Compile Include="Ui\Views\ObjectLinksView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
