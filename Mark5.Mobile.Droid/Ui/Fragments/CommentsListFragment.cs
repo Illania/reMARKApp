@@ -134,16 +134,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 editDialogBuilder.SetView(container);
 
-                editDialogBuilder.SetTitle("New Comment Message");
+                editDialogBuilder.SetTitle(Resource.String.edit_comment_message);
 
-                IDialogInterfaceOnClickListener test = null;
-                editDialogBuilder.SetPositiveButton("Confirm", test);
-                editDialogBuilder.SetNegativeButton("Cancel", test);
+                editDialogBuilder.SetPositiveButton(Resource.String.confirm, (sender, e) => EditComment(comment, editTextView.Text));
+                editDialogBuilder.SetNegativeButton(Resource.String.cancel, (sender, e) => { });
                 editDialogBuilder.Show();
             }
             else if (item.ItemId == MenuItemActions.DeleteComment)
             {
-                DeleteComment(comment);
+                var deleteDialogBuilder = new AlertDialog.Builder(Context);
+
+                deleteDialogBuilder.SetTitle(Resource.String.confirm_comment_deletion);
+
+                deleteDialogBuilder.SetPositiveButton(Resource.String.confirm, (sender, e) => DeleteComment(comment));
+                deleteDialogBuilder.SetNegativeButton(Resource.String.cancel, (sender, e) => { });
+                deleteDialogBuilder.Show();
             }
 
             return true;
@@ -230,13 +235,52 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                  if (t.IsFaulted)
                  {
-                     CommonConfig.Logger.Error($"Failed to deleteComment attachment [entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
+                     CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
                      await Dialogs.ShowErrorDialogAsync(Context, t.Exception.InnerException);
                  }
                  else
                  {
                      adapter.RemoveItem(comment);
-                     recyclerView.SmoothScrollToPosition(adapter.ItemCount);
+                 }
+
+             }, TaskScheduler.FromCurrentSynchronizationContext());
+
+        }
+
+        void EditComment(Comment comment, string newContent)
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.editing_comment, Resource.String.please_wait);
+            var newComment = comment.ShallowCopy();
+            newComment.Content = newContent;
+
+            Task.Run(async () =>
+             {
+                 switch (Entity.ObjectType)
+                 {
+                     case ObjectType.Document:
+                         var document = Entity as Document;
+                         await Managers.DocumentsManager.EditComment(document, newComment);
+                         PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
+                         break;
+                     case ObjectType.Contact:
+                         var contact = Entity as Contact;
+                         await Managers.ContactsManager.EditComment(contact, newComment);
+                         break;
+                     default:
+                         throw new ArgumentException("The input business entity does not have comments defined in the model");
+                 }
+             }).ContinueWith(async t =>
+             {
+                 dismissAction();
+
+                 if (t.IsFaulted)
+                 {
+                     CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
+                     await Dialogs.ShowErrorDialogAsync(Context, t.Exception.InnerException);
+                 }
+                 else
+                 {
+                     adapter.EditItem(newComment);
                  }
 
              }, TaskScheduler.FromCurrentSynchronizationContext());

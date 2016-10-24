@@ -95,4 +95,8 @@
 	<string name="delete">Delete</string>
 	<string name="by">by</string>
 	<string name="on">on</string>
+	<string name="confirm">Confirm</string>
+	<string name="cancel">Cancel</string>
+	<string name="confirm_comment_deletion">Confirm comment deletion</string>
+	<string name="edit_comment_message">Edit comment message</string>
 </resources>

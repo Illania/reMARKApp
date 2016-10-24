@@ -161,14 +161,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            if (item.ItemId == 70) //TODO need to complete with other options
+            if (item.ItemId == 70)
             {
                 var i = new Intent(Activity, typeof(CommentsListActivity));
                 i.PutExtra(CommentsListActivity.EntityIntentKey, SerializationUtils.Serialize(Document));
                 Activity.StartActivityForResult(i, RequestCodes.CommentsRequest); //Need to use activity, otherwise the request code is changed is changed by the enclosing activity
             }
-            return true;
-            if (item.ItemId == 80)
+            else if (item.ItemId == 80)
             {
                 var i = new Intent(Activity, typeof(ObjectActionsActivity));
                 i.PutExtra(ObjectActionsActivity.BusinessEntityTypeIntentKey, SerializationUtils.Serialize(DocumentPreview.GetType()));
