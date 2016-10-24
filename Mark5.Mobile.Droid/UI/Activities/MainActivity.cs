@@ -20,6 +20,8 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using Mark5.Mobile.Droid.Utilities.PushNotifications;
@@ -81,7 +83,6 @@ namespace Mark5.Mobile.Droid.Ui.Activity
                         [Resource.Id.nav_documents] = new ModulesMenuItemContent(ModuleType.Documents),
                         [Resource.Id.nav_contacts] = new ModulesMenuItemContent(ModuleType.Contacts),
                         [Resource.Id.nav_shortcodes] = new ModulesMenuItemContent(ModuleType.Shortcodes),
-                        [Resource.Id.nav_calendar] = new ModulesMenuItemContent(ModuleType.Calendar),
                         [Resource.Id.nav_settings] = new PreferencesMenuItemContent()
                     }
                 };
@@ -180,6 +181,14 @@ namespace Mark5.Mobile.Droid.Ui.Activity
             {
                 if (lastSelectedItem != menuItem)
                 {
+                    if (menuItem.ItemId == Resource.Id.nav_search)
+                    {
+                        var i = new Intent(this, typeof(SearchActivity));
+                        i.PutExtra(SearchActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
+                        StartActivity(i);
+                        return;
+                    }
+
                     if (lastSelectedItem != null)
                     {
                         stateFragment.State.MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);

@@ -235,6 +235,12 @@
     <Compile Include="Ui\Activities\ObjectLinksActivity.cs" />
     <Compile Include="Ui\Fragments\ObjectLinksFragment.cs" />
     <Compile Include="Ui\Views\ObjectLinksView.cs" />
+    <Compile Include="Ui\Activities\SearchActivity.cs" />
+    <Compile Include="Ui\Fragments\DocumentsSearchFragment.cs" />
+    <Compile Include="Ui\Fragments\ContactsSearchFragment.cs" />
+    <Compile Include="Ui\Fragments\ShortcodesSearchFragment.cs" />
+    <Compile Include="Ui\Views\DocumentsSearchViews\DocumentsSearchView.cs" />
+    <Compile Include="Ui\Views\DocumentsSearchViews\FromToSearchView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -390,6 +396,7 @@
     <Folder Include="Ui\Views\ContactViews\HeaderViews\" />
     <Folder Include="Ui\Common\BusMesseges\" />
     <Folder Include="Ui\Views\ShortcodeViews\" />
+    <Folder Include="Ui\Views\DocumentsSearchViews\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">

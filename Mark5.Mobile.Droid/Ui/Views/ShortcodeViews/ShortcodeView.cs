@@ -30,25 +30,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
 
         protected LinearLayoutCompat InnerLayout;
 
-        public ShortcodeView(Context context, IAttributeSet attrs, int defStyleAttr)
-            : base(context, attrs, defStyleAttr)
-        {
-            Init();
-        }
-
-        public ShortcodeView(Context context, IAttributeSet attrs)
-            : base(context, attrs)
-        {
-            Init();
-        }
-
         protected ShortcodeView(Context context)
             : base(context)
-        {
-            Init();
-        }
-
-        void Init()
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             Elevation = ConversionUtils.ConvertDpToPixels(2.0f);

@@ -12,8 +12,10 @@ using Android.Widget;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
+
     public static class ViewUtilities
     {
+
         public static void SetTextAppearanceCompat(this TextView view, Context context, int resourceId)
         {
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)

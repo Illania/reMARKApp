@@ -6,11 +6,11 @@
 // Copyright (c) 2016 Nordic IT
 //
 using Android.Content;
-using Android.OS;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
+using Android.Widget;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
@@ -18,7 +18,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
     public class SubjectView : DocumentView
     {
 
-        AppCompatTextView subjectView;
+        AppCompatTextView fromToModeSpinner;
 
         public SubjectView(Context context)
             : base(context)
@@ -31,13 +31,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             Orientation = Horizontal;
             SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceNormal);
 
-            subjectView = new AppCompatTextView(Context)
+            fromToModeSpinner = new AppCompatTextView(Context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
-            subjectView.SetTextAppearanceCompat(Context, Resource.Style.fontTitle);
+            fromToModeSpinner.SetTextAppearanceCompat(Context, Resource.Style.fontTitle);
 
-            AddView(subjectView);
+            AddView(fromToModeSpinner);
         }
 
         public override void RefreshView()
@@ -46,13 +46,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 Visibility = ViewStates.Visible;
 
-                subjectView.Text = string.IsNullOrWhiteSpace(DocumentPreview.Subject) ? Context.GetString(Resource.String.no_subject) : DocumentPreview.Subject;
+                fromToModeSpinner.Text = string.IsNullOrWhiteSpace(DocumentPreview.Subject) ? Context.GetString(Resource.String.no_subject) : DocumentPreview.Subject;
             }
             else
             {
                 Visibility = ViewStates.Gone;
 
-                subjectView.Text = string.Empty;
+                fromToModeSpinner.Text = string.Empty;
             }
         }
     }

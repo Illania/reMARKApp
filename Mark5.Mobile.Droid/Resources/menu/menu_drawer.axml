@@ -7,7 +7,6 @@
 		<item android:id="@+id/nav_documents" android:title="@string/documents" android:icon="@mipmap/nav_documents" />
 		<item android:id="@+id/nav_contacts" android:title="@string/contacts" android:icon="@mipmap/nav_contacts" />
 		<item android:id="@+id/nav_shortcodes" android:title="@string/shortcodes" android:icon="@mipmap/nav_shortcodes" />
-		<item android:id="@+id/nav_calendar" android:title="@string/calendar" android:icon="@mipmap/nav_calendar" />
 	</group>
 	<group android:id="@+id/nav_group_settings" android:checkableBehavior="single">
 		<item android:id="@+id/nav_settings" android:title="@string/settings" android:icon="@mipmap/nav_settings" />
