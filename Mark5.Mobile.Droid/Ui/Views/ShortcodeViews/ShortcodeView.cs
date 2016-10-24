@@ -10,6 +10,7 @@ using Android.Support.V7.Widget;
 using Android.Util;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
 {
@@ -50,14 +51,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
         void Init()
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            Elevation = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 2.0f, Resources.DisplayMetrics) + 0.5f);
-            Radius = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 2.0f, Resources.DisplayMetrics) + 0.5f);
+            Elevation = ConversionUtils.ConvertDpToPixels(2.0f);
+            Radius = ConversionUtils.ConvertDpToPixels(2.0f);
             UseCompatPadding = true;
 
-            DistanceVeryLarge = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 24.0f, Resources.DisplayMetrics) + 0.5f);
-            DistanceLarge = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 16.0f, Resources.DisplayMetrics) + 0.5f);
-            DistanceNormal = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 8.0f, Resources.DisplayMetrics) + 0.5f);
-            DistanceSmall = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 4.0f, Resources.DisplayMetrics) + 0.5f);
+            DistanceVeryLarge = ConversionUtils.ConvertDpToPixels(24.0f);
+            DistanceLarge = ConversionUtils.ConvertDpToPixels(16.0f);
+            DistanceNormal = ConversionUtils.ConvertDpToPixels(8.0f);
+            DistanceSmall = ConversionUtils.ConvertDpToPixels(4.0f);
 
             Visibility = ViewStates.Gone;
 

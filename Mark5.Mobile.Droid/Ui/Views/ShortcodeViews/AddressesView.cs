@@ -9,12 +9,12 @@ using System;
 using System.Linq;
 using Android.Content;
 using Android.Graphics;
-using Android.OS;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Views.Common;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
 {
@@ -44,18 +44,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
                 },
                 Text = type.ToString()
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                titleView.SetTextAppearance(Context, Resource.Style.fontLarge);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                titleView.SetTextAppearance(Resource.Style.fontLarge);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+
+            titleView.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
             titleView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
             titleView.SetPadding(DistanceLarge, 0, DistanceNormal, 0);
             InnerLayout.AddView(titleView);
@@ -114,18 +104,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                     Text = address.Address
                 };
-                if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-                {
-#pragma warning disable CS0618 // Type or member is obsolete
-                    addressView.SetTextAppearance(Context, Resource.Style.fontPrimary);
-#pragma warning restore CS0618 // Type or member is obsolete
-                }
-                else
-                {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                    addressView.SetTextAppearance(Resource.Style.fontPrimary);
-#pragma warning restore XA0001 // Find issues with Android API usage
-                }
+
+                addressView.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
                 AddView(addressView);
 
                 if (!string.IsNullOrWhiteSpace(address.Name))
@@ -135,18 +115,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
                         LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                         Text = address.Name
                     };
-                    if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-                    {
-#pragma warning disable CS0618 // Type or member is obsolete
-                        nameView.SetTextAppearance(Context, Resource.Style.fontSmallLight);
-#pragma warning restore CS0618 // Type or member is obsolete
-                    }
-                    else
-                    {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                        nameView.SetTextAppearance(Resource.Style.fontSmallLight);
-#pragma warning restore XA0001 // Find issues with Android API usage
-                    }
+
+                    nameView.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
                     AddView(nameView);
                 }
             }

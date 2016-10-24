@@ -10,6 +10,7 @@ using Android.Support.V7.Widget;
 using Android.Util;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
@@ -48,9 +49,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
-            DistanceLarge = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 16.0f, Resources.DisplayMetrics) + 0.5f);
-            DistanceNormal = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 8.0f, Resources.DisplayMetrics) + 0.5f);
-            DistanceSmall = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 4.0f, Resources.DisplayMetrics) + 0.5f);
+            DistanceLarge = ConversionUtils.ConvertDpToPixels(16.0f);
+            DistanceNormal = ConversionUtils.ConvertDpToPixels(8.0f);
+            DistanceSmall = ConversionUtils.ConvertDpToPixels(4.0f);
 
             Visibility = ViewStates.Gone;
         }
