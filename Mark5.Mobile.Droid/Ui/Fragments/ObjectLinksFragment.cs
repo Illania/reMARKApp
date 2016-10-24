@@ -45,7 +45,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(ObjectLinksFragment)} [businessEntity.id={BusinessEntity.Id}, businessEntity.objectType={BusinessEntity.ObjectType}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(ObjectLinksFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity.objectType={BusinessEntity?.ObjectType}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout, container, false);
             rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
@@ -65,7 +65,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.links);
 
-            CommonConfig.Logger.Info($"Created {nameof(ObjectLinksFragment)} [businessEntity.id={BusinessEntity.Id}, businessEntity.objectType={BusinessEntity.ObjectType}]...");
+            CommonConfig.Logger.Info($"Created {nameof(ObjectLinksFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity.objectType={BusinessEntity?.ObjectType}]...");
         }
 
         public override async void OnResume()
@@ -103,7 +103,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout.RemoveViews(0, linearLayout.ChildCount);
 
-            var grouppedObjectLinks = objectLinks.OrderBy(oa => oa.TypeInfo.DescriptionAction).GroupBy(oa => oa.TypeInfo.DescriptionAction);
+            var grouppedObjectLinks = objectLinks.OrderBy(oa => oa.TypeInfo.DescriptionComplex).GroupBy(oa => oa.TypeInfo.DescriptionComplex);
 
             foreach (var grouppedObjectLink in grouppedObjectLinks)
             {
@@ -135,7 +135,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(ObjectLinksFragment)} [businessEntity.id={BusinessEntity.Id}, businessEntity.objectType={BusinessEntity.ObjectType}]";
+            return $"{nameof(ObjectLinksFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity?.objectType={BusinessEntity.ObjectType}]";
         }
 
         class ObjectLinksFragmentState : IRetainableState

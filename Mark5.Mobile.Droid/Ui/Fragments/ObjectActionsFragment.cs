@@ -45,7 +45,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(ObjectActionsFragment)} [businessEntity.id={BusinessEntity.Id}, businessEntity.objectType={BusinessEntity.ObjectType}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(ObjectActionsFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity.objectType={BusinessEntity?.ObjectType}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout, container, false);
             rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
@@ -65,7 +65,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.actions);
 
-            CommonConfig.Logger.Info($"Created {nameof(ObjectActionsFragment)} [businessEntity.id={BusinessEntity.Id}, businessEntity.objectType={BusinessEntity.ObjectType}]...");
+            CommonConfig.Logger.Info($"Created {nameof(ObjectActionsFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity.objectType={BusinessEntity?.ObjectType}]...");
         }
 
         public override async void OnResume()

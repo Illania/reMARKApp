@@ -107,7 +107,7 @@ namespace Mark5.Mobile.Droid.Ui.Views
                 var titleView = new AppCompatTextView(Context)
                 {
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                    Text = objectLink.Description
+                    Text = objectLink.IsReverse ? objectLink.TypeInfo.DescriptionComplexReverse : objectLink.TypeInfo.DescriptionComplex
                 };
                 if (Build.VERSION.SdkInt < BuildVersionCodes.M)
                 {
@@ -126,7 +126,7 @@ namespace Mark5.Mobile.Droid.Ui.Views
                 var subtitleView = new AppCompatTextView(Context)
                 {
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                    Text = objectLink.TypeInfo.DescriptionComplex
+                    Text = objectLink.IsReverse ? $"{objectLink.TypeInfo.FromType} (ID: {objectLink.FromObjectId})" : $"{objectLink.TypeInfo.ToType} (ID: {objectLink.ToObjectId})"
                 };
                 if (Build.VERSION.SdkInt < BuildVersionCodes.M)
                 {
