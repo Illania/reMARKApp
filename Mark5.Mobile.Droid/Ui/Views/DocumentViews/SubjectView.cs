@@ -10,6 +10,7 @@ using Android.OS;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
@@ -34,18 +35,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                subjectView.SetTextAppearance(Context, Resource.Style.fontTitle);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                subjectView.SetTextAppearance(Resource.Style.fontTitle);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            subjectView.SetTextAppearanceCompat(Context, Resource.Style.fontTitle);
+
             AddView(subjectView);
         }
 

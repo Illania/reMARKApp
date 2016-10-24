@@ -7,11 +7,9 @@
 //
 using Android.Content;
 using Android.Graphics;
-using Android.OS;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Text.Format;
-using Android.Util;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -39,14 +37,14 @@ namespace Mark5.Mobile.Droid.Ui.Views
         void InitializeView(string title, ObjectAction[] objectActions)
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            Elevation = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 2.0f, Resources.DisplayMetrics) + 0.5f);
-            Radius = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 2.0f, Resources.DisplayMetrics) + 0.5f);
+            Elevation = ConversionUtils.ConvertDpToPixels(2.0f);
+            Radius = ConversionUtils.ConvertDpToPixels(2.0f);
             UseCompatPadding = true;
 
-            distanceVeryLarge = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 24.0f, Resources.DisplayMetrics) + 0.5f);
-            distanceLarge = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 16.0f, Resources.DisplayMetrics) + 0.5f);
-            distanceNormal = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 8.0f, Resources.DisplayMetrics) + 0.5f);
-            distanceSmall = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 4.0f, Resources.DisplayMetrics) + 0.5f);
+            distanceVeryLarge = ConversionUtils.ConvertDpToPixels(24.0f);
+            distanceLarge = ConversionUtils.ConvertDpToPixels(16.0f);
+            distanceNormal = ConversionUtils.ConvertDpToPixels(8.0f);
+            distanceSmall = ConversionUtils.ConvertDpToPixels(4.0f);
 
             innerLayout = new LinearLayoutCompat(Context)
             {
@@ -64,18 +62,8 @@ namespace Mark5.Mobile.Droid.Ui.Views
                 },
                 Text = title
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                titleView.SetTextAppearance(Context, Resource.Style.fontLarge);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                titleView.SetTextAppearance(Resource.Style.fontLarge);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            titleView.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
+
             titleView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
             titleView.SetPadding(distanceLarge, 0, distanceNormal, 0);
             innerLayout.AddView(titleView);
@@ -111,18 +99,8 @@ namespace Mark5.Mobile.Droid.Ui.Views
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                     Text = objectAction.Description
                 };
-                if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-                {
-#pragma warning disable CS0618 // Type or member is obsolete
-                    titleView.SetTextAppearance(Context, Resource.Style.fontPrimary);
-#pragma warning restore CS0618 // Type or member is obsolete
-                }
-                else
-                {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                    titleView.SetTextAppearance(Resource.Style.fontPrimary);
-#pragma warning restore XA0001 // Find issues with Android API usage
-                }
+                titleView.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+
                 AddView(titleView);
 
                 var actionTime = objectAction.ActionTime.ToServerTime();
@@ -136,18 +114,8 @@ namespace Mark5.Mobile.Droid.Ui.Views
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                     Text = $"{Context.GetString(Resource.String.by)} {objectAction.Username} {Context.GetString(Resource.String.on)} {actionDateString} {actionTimeString}"
                 };
-                if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-                {
-#pragma warning disable CS0618 // Type or member is obsolete
-                    subtitleView.SetTextAppearance(Context, Resource.Style.fontSmallLight);
-#pragma warning restore CS0618 // Type or member is obsolete
-                }
-                else
-                {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                    subtitleView.SetTextAppearance(Resource.Style.fontSmallLight);
-#pragma warning restore XA0001 // Find issues with Android API usage
-                }
+                subtitleView.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
+
                 AddView(subtitleView);
             }
         }

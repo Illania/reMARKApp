@@ -97,25 +97,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             compactLayout.SetGravity((int)GravityFlags.CenterVertical);
             AddView(compactLayout);
 
-            var size = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 40.0f, Resources.DisplayMetrics) + 0.5f);
+            var size = ConversionUtils.ConvertDpToPixels(40.0f);
             letter = new AppCompatTextView(Context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(size, size),
                 Background = ContextCompat.GetDrawable(Context, Resource.Drawable.circle),
                 Gravity = GravityFlags.Center
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                letter.SetTextAppearance(Context, Resource.Style.fontLarge);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                letter.SetTextAppearance(Resource.Style.fontLarge);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            letter.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
+
             letter.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.white)));
             compactLayout.AddView(letter);
 
@@ -133,18 +123,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 Ellipsize = TextUtils.TruncateAt.End
             };
             line1.SetSingleLine(true);
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                line1.SetTextAppearance(Context, Resource.Style.fontPrimary);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                line1.SetTextAppearance(Resource.Style.fontPrimary);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            line1.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+
             innerLayout.AddView(line1);
 
             line2 = new AppCompatTextView(Context)
@@ -153,18 +133,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 Ellipsize = TextUtils.TruncateAt.End
             };
             line2.SetSingleLine(true);
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                line2.SetTextAppearance(Context, Resource.Style.fontSmallLight);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                line2.SetTextAppearance(Resource.Style.fontSmallLight);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            line2.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
+
             innerLayout.AddView(line2);
 
             line3 = new AppCompatTextView(Context)
@@ -173,18 +143,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 Ellipsize = TextUtils.TruncateAt.End
             };
             line3.SetSingleLine(true);
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                line3.SetTextAppearance(Context, Resource.Style.fontSmallLight);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                line3.SetTextAppearance(Resource.Style.fontSmallLight);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            line3.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
+
             innerLayout.AddView(line3);
 
             line4 = new AppCompatTextView(Context)
@@ -193,18 +153,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 Ellipsize = TextUtils.TruncateAt.End
             };
             line4.SetSingleLine(true);
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                line4.SetTextAppearance(Context, Resource.Style.fontSmallLight);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                line4.SetTextAppearance(Resource.Style.fontSmallLight);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            line4.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
+
             innerLayout.AddView(line4);
 
             showButton = new AppCompatButton(Context, null, Resource.Style.Widget_AppCompat_Button_Borderless_Colored)
@@ -212,18 +162,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                 Text = Context.GetString(Resource.String.show_details)
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                showButton.SetTextAppearance(Context, Resource.Style.fontSmall);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                showButton.SetTextAppearance(Resource.Style.fontSmall);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            showButton.SetTextAppearanceCompat(Context, Resource.Style.fontSmall);
+
             showButton.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.brown)));
             innerLayout.AddView(showButton);
         }
@@ -242,32 +182,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 Text = Context.GetString(Resource.String.lines)
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                lineLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                lineLabel.SetTextAppearance(Resource.Style.fontPrimary);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            lineLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+
             tableRowLine.AddView(lineLabel);
             lineValue = new AppCompatTextView(Context);
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                lineValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                lineValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            lineValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+
             lineValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
             tableRowLine.AddView(lineValue);
             extendedLayout.AddView(tableRowLine);
@@ -278,32 +198,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 Text = Context.GetString(Resource.String.reference)
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                referenceNumberLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                referenceNumberLabel.SetTextAppearance(Resource.Style.fontPrimary);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            referenceNumberLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+
             tableRowReferenceNumber.AddView(referenceNumberLabel);
             referenceNumberValue = new AppCompatTextView(Context);
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                referenceNumberValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                referenceNumberValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            referenceNumberValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+
             referenceNumberValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
             tableRowReferenceNumber.AddView(referenceNumberValue);
             extendedLayout.AddView(tableRowReferenceNumber);
@@ -314,32 +214,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 Text = Context.GetString(Resource.String.from)
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                fromLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                fromLabel.SetTextAppearance(Resource.Style.fontPrimary);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            fromLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+
             tableRowFrom.AddView(fromLabel);
             fromValue = new AppCompatTextView(Context);
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                fromValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                fromValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            fromValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+
             fromValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
             tableRowFrom.AddView(fromValue);
             extendedLayout.AddView(tableRowFrom);
@@ -350,32 +230,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 Text = Context.GetString(Resource.String.to)
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                toLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                toLabel.SetTextAppearance(Resource.Style.fontPrimary);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            toLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+
             tableRowTo.AddView(toLabel);
             toValue = new AppCompatTextView(Context);
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                toValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                toValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            toValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+
             toValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
             tableRowTo.AddView(toValue);
             extendedLayout.AddView(tableRowTo);
@@ -386,32 +246,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 Text = Context.GetString(Resource.String.cc)
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                ccLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                ccLabel.SetTextAppearance(Resource.Style.fontPrimary);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            ccLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+
             tableRowCc.AddView(ccLabel);
             ccValue = new AppCompatTextView(Context);
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                ccValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                ccValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            ccValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+
             ccValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
             tableRowCc.AddView(ccValue);
             extendedLayout.AddView(tableRowCc);
@@ -422,32 +262,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 Text = Context.GetString(Resource.String.bcc)
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                bccLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                bccLabel.SetTextAppearance(Resource.Style.fontPrimary);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            bccLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+
             tableRowBcc.AddView(bccLabel);
             bccValue = new AppCompatTextView(Context);
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                bccValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                bccValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            bccValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+
             bccValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
             tableRowBcc.AddView(bccValue);
             extendedLayout.AddView(tableRowBcc);
@@ -458,32 +278,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 Text = Context.GetString(Resource.String.reply_to)
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                replyToLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                replyToLabel.SetTextAppearance(Resource.Style.fontPrimary);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            replyToLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+
             tableRowReplyTo.AddView(replyToLabel);
             replyToValue = new AppCompatTextView(Context);
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                replyToValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                replyToValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            replyToValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+
             replyToValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
             tableRowReplyTo.AddView(replyToValue);
             extendedLayout.AddView(tableRowReplyTo);
@@ -494,32 +294,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 Text = Context.GetString(Resource.String.read_by)
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                readByLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                readByLabel.SetTextAppearance(Resource.Style.fontPrimary);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            readByLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+
             tableRowReadBy.AddView(readByLabel);
             readByValue = new AppCompatTextView(Context);
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                readByValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                readByValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            readByValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+
             readByValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
             tableRowReadBy.AddView(readByValue);
             extendedLayout.AddView(tableRowReadBy);
@@ -530,32 +310,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 Text = Context.GetString(Resource.String.date)
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                dateReceivedLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                dateReceivedLabel.SetTextAppearance(Resource.Style.fontPrimary);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            dateReceivedLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+
             tableRowDateReceived.AddView(dateReceivedLabel);
             dateReceivedValue = new AppCompatTextView(Context);
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                dateReceivedValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                dateReceivedValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            dateReceivedValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+
             dateReceivedValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
             tableRowDateReceived.AddView(dateReceivedValue);
             extendedLayout.AddView(tableRowDateReceived);
@@ -566,32 +326,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 Text = Context.GetString(Resource.String.creator)
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                creatorLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                creatorLabel.SetTextAppearance(Resource.Style.fontPrimary);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            creatorLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+
             tableRowCreator.AddView(creatorLabel);
             creatorValue = new AppCompatTextView(Context);
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                creatorValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                creatorValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            creatorValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+
             creatorValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
             tableRowCreator.AddView(creatorValue);
             extendedLayout.AddView(tableRowCreator);
@@ -601,18 +341,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                 Text = Context.GetString(Resource.String.hide_details)
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                hideButton.SetTextAppearance(Context, Resource.Style.fontSmall);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                hideButton.SetTextAppearance(Resource.Style.fontSmall);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            hideButton.SetTextAppearanceCompat(Context, Resource.Style.fontSmall);
+
             hideButton.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
             hideButton.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.brown)));
             extendedLayout.AddView(hideButton);
@@ -796,35 +526,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                     {
                         Text = extraField.Key.Name + ":"
                     };
-                    if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-                    {
-#pragma warning disable CS0618 // Type or member is obsolete
-                        extraFieldLabel.SetTextAppearance(Context, Resource.Style.fontPrimary);
-#pragma warning restore CS0618 // Type or member is obsolete
-                    }
-                    else
-                    {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                        extraFieldLabel.SetTextAppearance(Resource.Style.fontPrimary);
-#pragma warning restore XA0001 // Find issues with Android API usage
-                    }
+                    extraFieldLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+
                     tableRowExtraField.AddView(extraFieldLabel);
                     var extraFieldValue = new AppCompatTextView(Context)
                     {
                         Text = extraField.Value
                     };
-                    if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-                    {
-#pragma warning disable CS0618 // Type or member is obsolete
-                        extraFieldValue.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
-#pragma warning restore CS0618 // Type or member is obsolete
-                    }
-                    else
-                    {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                        extraFieldValue.SetTextAppearance(Resource.Style.fontPrimaryLight);
-#pragma warning restore XA0001 // Find issues with Android API usage
-                    }
+                    extraFieldValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+
                     extraFieldValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
                     tableRowExtraField.AddView(extraFieldValue);
                     extendedLayout.AddView(tableRowExtraField, extendedLayout.ChildCount - 1);
