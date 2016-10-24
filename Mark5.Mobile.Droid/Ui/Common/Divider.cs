@@ -11,6 +11,7 @@ using Android.Support.V4.Content;
 using Android.Util;
 using Android.Views;
 using Android.Support.V7.Widget;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.Common
 {
@@ -21,7 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
         public Divider(Context context)
             : base(context)
         {
-            LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 0.5f, Resources.DisplayMetrics) + 0.5f));
+            LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ConversionUtils.ConvertDpToPixels(0.5f));
             SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
         }
 
@@ -32,7 +33,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
 
             var inner = new View(Context)
             {
-                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 0.5f, Resources.DisplayMetrics) + 0.5f))
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ConversionUtils.ConvertDpToPixels(0.5f))
                 {
                     LeftMargin = leftMargin,
                     TopMargin = topMargin,

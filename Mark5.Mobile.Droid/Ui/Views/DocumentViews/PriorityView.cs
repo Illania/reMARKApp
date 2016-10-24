@@ -7,11 +7,11 @@
 //
 using Android.Content;
 using Android.Graphics;
-using Android.OS;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
@@ -35,18 +35,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                 Gravity = GravityFlags.Center
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                message.SetTextAppearance(Context, Resource.Style.fontSmall);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                message.SetTextAppearance(Resource.Style.fontSmall);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            message.SetTextAppearanceCompat(Context, Resource.Style.fontSmall);
+
             AddView(message);
         }
 

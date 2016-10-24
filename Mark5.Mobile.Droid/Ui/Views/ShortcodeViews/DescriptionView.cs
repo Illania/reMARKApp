@@ -7,10 +7,10 @@
 //
 using Android.Content;
 using Android.Graphics;
-using Android.OS;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
 {
@@ -39,18 +39,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
                 },
                 Text = Context.GetString(Resource.String.description)
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                titleView.SetTextAppearance(Context, Resource.Style.fontLarge);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                titleView.SetTextAppearance(Resource.Style.fontLarge);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            titleView.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
+
             titleView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
             InnerLayout.AddView(titleView);
 
@@ -58,18 +48,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                contentView.SetTextAppearance(Context, Resource.Style.fontPrimaryLight);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                contentView.SetTextAppearance(Resource.Style.fontPrimaryLight);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            contentView.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+
             InnerLayout.AddView(contentView);
         }
 

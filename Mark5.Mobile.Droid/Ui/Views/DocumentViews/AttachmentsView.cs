@@ -16,6 +16,7 @@ using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
@@ -80,10 +81,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             public AttachmentView(Context context, AttachmentDescription attachmentDescription)
                 : base(context)
             {
-                var minimumWidth = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 100.0f, Resources.DisplayMetrics) + 0.5f);
-                var maximumWidth = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 175.0f, Resources.DisplayMetrics) + 0.5f);
-                var margin = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 8.0f, Resources.DisplayMetrics) + 0.5f);
-                var innerMargin = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 4.0f, Resources.DisplayMetrics) + 0.5f);
+                var minimumWidth = ConversionUtils.ConvertDpToPixels(100.0f);
+                var maximumWidth = ConversionUtils.ConvertDpToPixels(175.0f);
+                var margin = ConversionUtils.ConvertDpToPixels(8.0f);
+                var innerMargin = ConversionUtils.ConvertDpToPixels(4.0f);
 
                 Orientation = Vertical;
 
@@ -94,7 +95,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                     RightMargin = margin,
                     BottomMargin = margin
                 };
-                Elevation = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 2.0f, Resources.DisplayMetrics) + 0.5f);
+                Elevation = ConversionUtils.ConvertDpToPixels(2.0f);
+
                 SetBackgroundResource(Resource.Drawable.rounded_background);
 
                 Clickable = true;
@@ -112,18 +114,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 title.SetMinWidth(minimumWidth);
                 title.SetMaxWidth(maximumWidth);
                 title.SetSingleLine(true);
-                if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-                {
-#pragma warning disable CS0618 // Type or member is obsolete
-                    title.SetTextAppearance(Context, Resource.Style.fontPrimary);
-#pragma warning restore CS0618 // Type or member is obsolete
-                }
-                else
-                {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                    title.SetTextAppearance(Resource.Style.fontPrimary);
-#pragma warning restore XA0001 // Find issues with Android API usage
-                }
+                title.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+
                 AddView(title);
 
                 var innerLayout = new LinearLayoutCompat(Context)
@@ -145,18 +137,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                     Gravity = GravityFlags.Start
                 };
                 extension.SetSingleLine(true);
-                if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-                {
-#pragma warning disable CS0618 // Type or member is obsolete
-                    extension.SetTextAppearance(Context, Resource.Style.fontTiny);
-#pragma warning restore CS0618 // Type or member is obsolete
-                }
-                else
-                {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                    extension.SetTextAppearance(Resource.Style.fontTiny);
-#pragma warning restore XA0001 // Find issues with Android API usage
-                }
+                extension.SetTextAppearanceCompat(Context, Resource.Style.fontTiny);
+
                 innerLayout.AddView(extension);
 
                 var size = new AppCompatTextView(Context)
@@ -169,18 +151,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                     Gravity = GravityFlags.End
                 };
                 size.SetSingleLine(true);
-                if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-                {
-#pragma warning disable CS0618 // Type or member is obsolete
-                    size.SetTextAppearance(Context, Resource.Style.fontTinyLight);
-#pragma warning restore CS0618 // Type or member is obsolete
-                }
-                else
-                {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                    size.SetTextAppearance(Resource.Style.fontTinyLight);
-#pragma warning restore XA0001 // Find issues with Android API usage
-                }
+                size.SetTextAppearanceCompat(Context, Resource.Style.fontTinyLight);
+
                 innerLayout.AddView(size);
             }
         }
