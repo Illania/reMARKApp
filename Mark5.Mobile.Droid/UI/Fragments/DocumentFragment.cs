@@ -168,6 +168,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Activity.StartActivityForResult(i, RequestCodes.CommentsRequest); //Need to use activity, otherwise the request code is changed is changed by the enclosing activity
             }
             return true;
+            if (item.ItemId == 80)
+            {
+                var i = new Intent(Activity, typeof(ObjectActionsActivity));
+                i.PutExtra(ObjectActionsActivity.BusinessEntityTypeIntentKey, SerializationUtils.Serialize(DocumentPreview.GetType()));
+                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(DocumentPreview));
+                StartActivity(i);
+
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
         }
 
         async void AttachmentsView_AttachmentClicked(object sender, AttachmentDescription attachmentDescription)

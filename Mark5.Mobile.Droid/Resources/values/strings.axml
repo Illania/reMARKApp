@@ -93,4 +93,6 @@
 	<string name="add_comment_hint">Insert new comment</string>
 	<string name="edit">Edit</string>
 	<string name="delete">Delete</string>
+	<string name="by">by</string>
+	<string name="on">on</string>
 </resources>

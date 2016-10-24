@@ -233,6 +233,9 @@
     <Compile Include="Ui\Fragments\CommentsListFragment.cs" />
     <Compile Include="Ui\Common\BusMesseges\DocumentPreviewCommentCountChangedMessage.cs" />
     <Compile Include="Ui\Common\ActionOnCreateContextMenuListener.cs" />
+    <Compile Include="Ui\Activities\ObjectActionsActivity.cs" />
+    <Compile Include="Ui\Fragments\ObjectActionsFragment.cs" />
+    <Compile Include="Ui\Views\ObjectActionsView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
