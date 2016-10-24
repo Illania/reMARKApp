@@ -36,6 +36,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
+            linearLayout.AddView(new ReferenceNumberSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new FromToSearchView(Context));
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new SubjectMessageSearchView(Context));

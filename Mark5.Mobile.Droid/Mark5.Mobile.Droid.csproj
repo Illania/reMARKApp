@@ -242,6 +242,7 @@
     <Compile Include="Ui\Views\DocumentsSearchViews\DocumentsSearchView.cs" />
     <Compile Include="Ui\Views\DocumentsSearchViews\FromToSearchView.cs" />
     <Compile Include="Ui\Views\DocumentsSearchViews\SubjectMessageSearchView.cs" />
+    <Compile Include="Ui\Views\DocumentsSearchViews\ReferenceNumberSearchView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
