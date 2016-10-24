@@ -5,16 +5,12 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using Android.Content;
-using Android.Net;
 using Android.Support.V4.View;
 using Android.Views;
 using Android.Webkit;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Utilities;
-using Android.Text.Util;
-using Android.Text;
-using System;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
