@@ -91,4 +91,15 @@
 	<string name="search_documents">Search documents</string>
 	<string name="search_contacts">Search contacts</string>
 	<string name="search_shortcodes">Search shortcodes</string>
+	<string name="type_search_query">Type search query</string>
+	<string-array name="search_from_to">
+		<item>Search in From</item>
+		<item>Search in To</item>
+		<item>Search in From and To</item>
+	</string-array>
+	<string-array name="search_subject_message">
+		<item>Search in Subject or Message</item>
+		<item>Search in Subject</item>
+		<item>Search in Message</item>
+	</string-array>
 </resources>

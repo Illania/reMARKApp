@@ -5,18 +5,18 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System.Collections.Generic;
 using Android.Content;
-using Mark5.Mobile.Common.Model;
+using Android.Support.Design.Widget;
 using Android.Support.V7.Widget;
-using Mark5.Mobile.Droid.Utilities;
 using Android.Views;
 using Android.Widget;
-using Java.Lang;
-using System;
-using System.Collections.Generic;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
 {
+
     public class FromToSearchView : DocumentsSearchView
     {
 
@@ -26,15 +26,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
         public FromToSearchView(Context context)
             : base(context)
         {
-            Orientation = Horizontal;
+            Orientation = Vertical;
             SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceNormal);
 
-            var fromToAdapter = new ArrayAdapter<string>(context, Android.Resource.Layout.SimpleSpinnerItem, new List<string> { "From", "To", "From and To" });
+            var fromToAdapter = ArrayAdapter.CreateFromResource(context, Resource.Array.search_from_to, Android.Resource.Layout.SimpleSpinnerItem);
             fromToAdapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
 
             fromToSpinner = new AppCompatSpinner(context)
             {
-                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent),
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                 Adapter = fromToAdapter
             };
             fromToSpinner.SetSelection(2);
@@ -42,9 +42,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
 
             fromToField = new AppCompatEditText(context)
             {
-                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
             };
             fromToField.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
+            fromToField.SetHint(Resource.String.type_search_query);
             AddView(fromToField);
         }
 

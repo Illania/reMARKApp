@@ -38,6 +38,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout.AddView(new FromToSearchView(Context));
             linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new SubjectMessageSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
 
             progress.Visibility = ViewStates.Gone;
             scrollView.Visibility = ViewStates.Visible;
