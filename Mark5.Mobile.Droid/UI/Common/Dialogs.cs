@@ -6,12 +6,12 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AFollestad.MaterialDialogs;
 using Android.Content;
-using System.Threading;
-using System.Collections.Generic;
-using System.Linq;
 using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Common

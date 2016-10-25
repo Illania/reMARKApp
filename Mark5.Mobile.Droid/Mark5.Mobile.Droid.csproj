@@ -251,6 +251,10 @@
     <Compile Include="Ui\Views\DocumentsSearchViews\PrioritiesSearchView.cs" />
     <Compile Include="Ui\Views\DocumentsSearchViews\DocumentDirectionsSearchView.cs" />
     <Compile Include="ProcessedSearchView.cs" />
+    <Compile Include="Ui\Views\DocumentsSearchViews\UnreadOnlySearchView.cs" />
+    <Compile Include="Ui\Views\DocumentsSearchViews\SearchInAttachmentsSearchView.cs" />
+    <Compile Include="Ui\Views\DocumentsSearchViews\PartialWordsSearchView.cs" />
+    <Compile Include="Ui\Views\DocumentsSearchViews\WithAttachmentsOnlySearchView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

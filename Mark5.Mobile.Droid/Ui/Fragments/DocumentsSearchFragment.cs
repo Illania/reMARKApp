@@ -42,6 +42,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new SubjectMessageSearchView(Context));
             linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new PartialWordsSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new UnreadOnlySearchView(Context));
+            linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new DocumentDirectionsSearchView(Context));
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new PrioritiesSearchView(Context));
@@ -52,10 +56,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new AttachmentNamesSearchView(Context));
             linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new SearchInAttachmentsSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new WithAttachmentsOnlySearchView(Context));
+            linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ProcessedSearchView(Context));
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ExtraFieldsSearchView(Context));
             linearLayout.AddView(new Divider(Context));
+            // TODO Folders and Categories are missing
 
             progress.Visibility = ViewStates.Gone;
             scrollView.Visibility = ViewStates.Visible;

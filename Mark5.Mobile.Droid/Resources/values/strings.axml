@@ -116,4 +116,8 @@
 	<string name="search_processed_none_selected">All</string>
 	<string name="search_processed_true">Handled</string>
 	<string name="search_processed_false">Unhandled</string>
+	<string name="search_unread_only">Unread documents only</string>
+	<string name="search_in_attachments">Search inside attachments</string>
+	<string name="search_partial">Partial words search</string>
+	<string name="search_with_attachments_only">Only documents with attachments</string>
 </resources>
