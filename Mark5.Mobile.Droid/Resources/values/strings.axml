@@ -120,4 +120,7 @@
 	<string name="search_in_attachments">Search inside attachments</string>
 	<string name="search_partial">Partial words search</string>
 	<string name="search_with_attachments_only">Only documents with attachments</string>
+	<string name="search_folders">Folders</string>
+	<string name="search_categories">Categories</string>
+	<string name="search_must_have_categories">Must have categories</string>
 </resources>

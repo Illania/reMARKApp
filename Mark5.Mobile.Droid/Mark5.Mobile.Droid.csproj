@@ -255,6 +255,9 @@
     <Compile Include="Ui\Views\DocumentsSearchViews\SearchInAttachmentsSearchView.cs" />
     <Compile Include="Ui\Views\DocumentsSearchViews\PartialWordsSearchView.cs" />
     <Compile Include="Ui\Views\DocumentsSearchViews\WithAttachmentsOnlySearchView.cs" />
+    <Compile Include="Ui\Views\DocumentsSearchViews\FoldersSearchView.cs" />
+    <Compile Include="Ui\Views\DocumentsSearchViews\CategoriesSearchView.cs" />
+    <Compile Include="Ui\Views\DocumentsSearchViews\MustHaveCategoriesSearchView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

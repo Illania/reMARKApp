@@ -62,9 +62,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ProcessedSearchView(Context));
             linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new FoldersSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new CategoriesSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new MustHaveCategoriesSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ExtraFieldsSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            // TODO Folders and Categories are missing
 
             progress.Visibility = ViewStates.Gone;
             scrollView.Visibility = ViewStates.Visible;
