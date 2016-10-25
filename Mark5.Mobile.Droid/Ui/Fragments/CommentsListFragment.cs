@@ -144,7 +144,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var deleteDialogBuilder = new AlertDialog.Builder(Context);
 
-                deleteDialogBuilder.SetTitle(Resource.String.confirm_comment_deletion);
+                deleteDialogBuilder.SetTitle(Resource.String.confirm_comment_deletion_title);
+                deleteDialogBuilder.SetMessage(Resource.String.confirm_comment_deletion_content);
 
                 deleteDialogBuilder.SetPositiveButton(Resource.String.confirm, (sender, e) => DeleteComment(comment));
                 deleteDialogBuilder.SetNegativeButton(Resource.String.cancel, (sender, e) => { });
@@ -378,7 +379,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var comment = commentsInView[position];
                 var commentFromCurrentUser = ServerConfig.SystemSettings.UserInfo.User.Id == comment.UserId;
 
-                if (commentFromCurrentUser) //TODO !!!!! This needs to be negated, it's just for testing
+                if (commentFromCurrentUser)
                 {
                     cvh.ItemView.SetOnCreateContextMenuListener(new ActionOnCreateContextMenuListener(action));
                 }

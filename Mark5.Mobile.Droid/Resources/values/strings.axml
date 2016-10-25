@@ -97,6 +97,7 @@
 	<string name="on">on</string>
 	<string name="confirm">Confirm</string>
 	<string name="cancel">Cancel</string>
-	<string name="confirm_comment_deletion">Confirm comment deletion</string>
+	<string name="confirm_comment_deletion_title">Confirm comment deletion</string>
+	<string name="confirm_comment_deletion_content">Are you sure you want to delete the comment?</string>
 	<string name="edit_comment_message">Edit comment message</string>
 </resources>
