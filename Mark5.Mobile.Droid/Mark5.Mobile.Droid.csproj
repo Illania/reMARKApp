@@ -258,6 +258,8 @@
     <Compile Include="Ui\Views\DocumentsSearchViews\FoldersSearchView.cs" />
     <Compile Include="Ui\Views\DocumentsSearchViews\CategoriesSearchView.cs" />
     <Compile Include="Ui\Views\DocumentsSearchViews\MustHaveCategoriesSearchView.cs" />
+    <Compile Include="Ui\Views\DocumentsSearchViews\DateRangeSearchView.cs" />
+    <Compile Include="Ui\Common\CustomArrayAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

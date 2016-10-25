@@ -27,7 +27,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
 
             referenceNumberField = new AppCompatEditText(context)
             {
-                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                {
+                    LeftMargin = -DistanceSmall
+                }
             };
             referenceNumberField.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             referenceNumberField.SetHint(Resource.String.search_reference_number);

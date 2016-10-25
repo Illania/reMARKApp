@@ -27,7 +27,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
 
             extraFieldsField = new AppCompatEditText(context)
             {
-                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                {
+                    LeftMargin = -DistanceSmall
+                }
             };
             extraFieldsField.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             extraFieldsField.SetHint(Resource.String.search_extra_fields);

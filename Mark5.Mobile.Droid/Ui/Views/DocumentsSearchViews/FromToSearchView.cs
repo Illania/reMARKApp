@@ -8,8 +8,8 @@
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
-using Android.Widget;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
@@ -27,20 +27,20 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             Orientation = Vertical;
             SetPadding(DistanceLarge, DistanceNormal, DistanceLarge, DistanceNormal);
 
-            var fromToAdapter = ArrayAdapter.CreateFromResource(context, Resource.Array.search_from_to, Android.Resource.Layout.SimpleSpinnerItem);
-            fromToAdapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
-
             fromToSpinner = new AppCompatSpinner(context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                Adapter = fromToAdapter
+                Adapter = CustomArrayAdapter.Create(context, Resource.Array.search_from_to, Android.Resource.Layout.SimpleSpinnerItem, Android.Resource.Layout.SimpleSpinnerDropDownItem)
             };
             fromToSpinner.SetSelection(2);
             AddView(fromToSpinner);
 
             fromToField = new AppCompatEditText(context)
             {
-                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                {
+                    LeftMargin = -DistanceSmall
+                }
             };
             fromToField.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             fromToField.SetHint(Resource.String.type_search_query);

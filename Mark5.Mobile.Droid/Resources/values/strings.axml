@@ -123,4 +123,10 @@
 	<string name="search_folders">Folders</string>
 	<string name="search_categories">Categories</string>
 	<string name="search_must_have_categories">Must have categories</string>
+	<string-array name="search_date_range_type">
+		<item>Any time</item>
+		<item>Today</item>
+		<item>Yesterday</item>
+		<item>Custom</item>
+	</string-array>
 </resources>

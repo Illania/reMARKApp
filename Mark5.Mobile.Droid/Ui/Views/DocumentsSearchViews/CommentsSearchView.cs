@@ -27,7 +27,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
 
             commentsField = new AppCompatEditText(context)
             {
-                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                {
+                    LeftMargin = -DistanceSmall
+                }
             };
             commentsField.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             commentsField.SetHint(Resource.String.search_comments);

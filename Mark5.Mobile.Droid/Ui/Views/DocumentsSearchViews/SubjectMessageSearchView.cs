@@ -10,6 +10,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
@@ -33,14 +34,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             subjectMessageSpinner = new AppCompatSpinner(context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                Adapter = subjectMessageAdapter
+                Adapter = CustomArrayAdapter.Create(context, Resource.Array.search_subject_message, Android.Resource.Layout.SimpleSpinnerItem, Android.Resource.Layout.SimpleSpinnerDropDownItem)
             };
             subjectMessageSpinner.SetSelection(0);
             AddView(subjectMessageSpinner);
 
             subjectMessageField = new AppCompatEditText(context)
             {
-                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                {
+                    LeftMargin = -DistanceSmall
+                }
             };
             subjectMessageField.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             subjectMessageField.SetHint(Resource.String.type_search_query);
