@@ -91,8 +91,8 @@
 	<string name="search_documents">Search documents</string>
 	<string name="search_contacts">Search contacts</string>
 	<string name="search_shortcodes">Search shortcodes</string>
-	<string name="type_search_query">Type search query</string>
-	<string name="search_reference_number">Search by reference number</string>
+	<string name="type_search_query">Search query</string>
+	<string name="search_reference_number">Reference number</string>
 	<string-array name="search_from_to">
 		<item>Search in From</item>
 		<item>Search in To</item>
@@ -103,9 +103,9 @@
 		<item>Search in Subject</item>
 		<item>Search in Message</item>
 	</string-array>
-	<string name="search_comments">Search in comments</string>
-	<string name="search_extra_fields">Search in extra fields</string>
-	<string name="search_attachment_names">Search in attachment names</string>
+	<string name="search_comments">Comments</string>
+	<string name="search_extra_fields">Extra Fields</string>
+	<string name="search_attachment_names">Attachment names</string>
 	<string name="search_lines">Lines</string>
 	<string name="search_lines_none_selected">Any line</string>
 	<string name="search_priorities">Priority</string>
