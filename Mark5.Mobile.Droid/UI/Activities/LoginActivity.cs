@@ -58,7 +58,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
             portEditText = FindViewById<TextInputEditText>(Resource.Id.port_edit_text);
             portEditText.TextChanged += (sender, e) => portEditText.Error = null;
             sslSpinner = FindViewById<AppCompatSpinner>(Resource.Id.ssl_spinner);
-            sslSpinner.Adapter = CustomArrayAdapter.Create(this, Resource.Array.ssl_modes, Android.Resource.Layout.SimpleSpinnerItem, Android.Resource.Layout.SimpleSpinnerDropDownItem);
+            sslSpinner.Adapter = CustomArrayAdapter.CreateWithLeftPaddingMatchingEditText(this, Resource.Array.ssl_modes, Android.Resource.Layout.SimpleSpinnerItem, Resource.Layout.support_simple_spinner_dropdown_item);
             loginButton = FindViewById<AppCompatButton>(Resource.Id.login_button);
             loginButton.Enabled = false;
             loginButton.Click += LoginButton_Click;

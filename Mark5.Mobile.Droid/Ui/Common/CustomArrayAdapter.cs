@@ -9,6 +9,7 @@ using Android.Views;
 using Android.Widget;
 using Android.Content;
 using System.Collections;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
@@ -16,24 +17,34 @@ namespace Mark5.Mobile.Droid.Ui.Common
     public class CustomArrayAdapter : ArrayAdapter
     {
 
-
-        public static CustomArrayAdapter Create(Context context, int textArrayResId, int textViewResId, int dropDownViewResId)
+        public static ArrayAdapter CreateWithoutLeftPadding(Context context, int textArrayResId, int textViewResId, int dropDownViewResId)
         {
             var strings = context.Resources.GetStringArray(textArrayResId);
-            var adapter = new CustomArrayAdapter(context, textViewResId, strings);
+            var adapter = new CustomArrayAdapter(context, textViewResId, strings, 0);
             adapter.SetDropDownViewResource(dropDownViewResId);
             return adapter;
         }
 
-        public CustomArrayAdapter(Context context, int textViewResId, IList objects)
+        public static ArrayAdapter CreateWithLeftPaddingMatchingEditText(Context context, int textArrayResId, int textViewResId, int dropDownViewResId)
+        {
+            var strings = context.Resources.GetStringArray(textArrayResId);
+            var adapter = new CustomArrayAdapter(context, textViewResId, strings, ConversionUtils.ConvertDpToPixels(4f));
+            adapter.SetDropDownViewResource(dropDownViewResId);
+            return adapter;
+        }
+
+        readonly int leftPadding;
+
+        public CustomArrayAdapter(Context context, int textViewResId, IList objects, int leftPadding)
             : base(context, textViewResId, objects)
         {
+            this.leftPadding = leftPadding;
         }
 
         public override View GetView(int position, View convertView, ViewGroup parent)
         {
             var view = base.GetView(position, convertView, parent);
-            view.SetPadding(0, view.PaddingTop, view.PaddingRight, view.PaddingBottom);
+            view.SetPadding(leftPadding, view.PaddingTop, view.PaddingRight, view.PaddingBottom);
             return view;
         }
     }

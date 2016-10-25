@@ -28,13 +28,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             Orientation = Vertical;
             SetPadding(DistanceLarge, DistanceNormal, DistanceLarge, DistanceNormal);
 
-            var subjectMessageAdapter = ArrayAdapter.CreateFromResource(context, Resource.Array.search_subject_message, Android.Resource.Layout.SimpleSpinnerItem);
-            subjectMessageAdapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
-
             subjectMessageSpinner = new AppCompatSpinner(context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                Adapter = CustomArrayAdapter.Create(context, Resource.Array.search_subject_message, Android.Resource.Layout.SimpleSpinnerItem, Android.Resource.Layout.SimpleSpinnerDropDownItem)
+                Adapter = CustomArrayAdapter.CreateWithoutLeftPadding(context, Resource.Array.search_subject_message, Android.Resource.Layout.SimpleSpinnerItem, Resource.Layout.support_simple_spinner_dropdown_item)
             };
             subjectMessageSpinner.SetSelection(0);
             AddView(subjectMessageSpinner);

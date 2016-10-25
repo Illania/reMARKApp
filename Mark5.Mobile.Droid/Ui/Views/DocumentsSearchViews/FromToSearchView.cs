@@ -30,7 +30,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             fromToSpinner = new AppCompatSpinner(context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                Adapter = CustomArrayAdapter.Create(context, Resource.Array.search_from_to, Android.Resource.Layout.SimpleSpinnerItem, Android.Resource.Layout.SimpleSpinnerDropDownItem)
+                Adapter = CustomArrayAdapter.CreateWithoutLeftPadding(context, Resource.Array.search_from_to, Android.Resource.Layout.SimpleSpinnerItem, Resource.Layout.support_simple_spinner_dropdown_item)
             };
             fromToSpinner.SetSelection(2);
             AddView(fromToSpinner);
