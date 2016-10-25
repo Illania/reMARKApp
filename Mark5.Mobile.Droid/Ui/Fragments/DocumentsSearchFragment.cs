@@ -42,6 +42,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new SubjectMessageSearchView(Context));
             linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new DocumentDirectionsSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new PrioritiesSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new LinesSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new CommentsSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new AttachmentNamesSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ProcessedSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ExtraFieldsSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
 
             progress.Visibility = ViewStates.Gone;
             scrollView.Visibility = ViewStates.Visible;

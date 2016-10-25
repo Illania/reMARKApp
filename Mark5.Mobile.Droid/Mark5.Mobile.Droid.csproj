@@ -243,6 +243,14 @@
     <Compile Include="Ui\Views\DocumentsSearchViews\FromToSearchView.cs" />
     <Compile Include="Ui\Views\DocumentsSearchViews\SubjectMessageSearchView.cs" />
     <Compile Include="Ui\Views\DocumentsSearchViews\ReferenceNumberSearchView.cs" />
+    <Compile Include="Ui\Views\DocumentsSearchViews\CommentsSearchView.cs" />
+    <Compile Include="Ui\Views\DocumentsSearchViews\ExtraFieldsSearchView.cs" />
+    <Compile Include="Ui\Views\DocumentsSearchViews\AttachmentNamesSearchView.cs" />
+    <Compile Include="Ui\Views\DocumentsSearchViews\LinesSearchView.cs" />
+    <Compile Include="Utilities\LambdaEqualityComparer.cs" />
+    <Compile Include="Ui\Views\DocumentsSearchViews\PrioritiesSearchView.cs" />
+    <Compile Include="Ui\Views\DocumentsSearchViews\DocumentDirectionsSearchView.cs" />
+    <Compile Include="ProcessedSearchView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
