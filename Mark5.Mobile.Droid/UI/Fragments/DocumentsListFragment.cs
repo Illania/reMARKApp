@@ -442,23 +442,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         static bool MatchesQuery(DocumentPreview dp, string query)
         {
-            if (dp.Subject.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
+            if (dp.Subject.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
             {
                 return true;
             }
-            if (dp.Preview.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
+            if (dp.Preview.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
             {
                 return true;
             }
-            if (dp.Addresses.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0))
+            if (dp.Addresses.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
             {
                 return true;
             }
-            if (dp.Addresses.Any(da => da.Address.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0))
+            if (dp.Addresses.Any(da => da.Address.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
             {
                 return true;
             }
-            if (dp.Categories.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0))
+            if (dp.Categories.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
             {
                 return true;
             }
