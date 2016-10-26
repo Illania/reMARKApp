@@ -5,12 +5,11 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
 using Android.Content;
 using Android.OS;
 using Android.Widget;
 
-namespace Mark5.Mobile.Droid.Utilities
+namespace Mark5.Mobile.Droid.Ui.Common
 {
 
     public static class ViewUtilities

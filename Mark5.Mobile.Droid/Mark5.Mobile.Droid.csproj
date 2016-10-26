@@ -205,7 +205,6 @@
     <Compile Include="Ui\Views\ContactViews\ResponsibleSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\ShortIdSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\LinkedContactSubview.cs" />
-    <Compile Include="Utilities\ViewUtilities.cs" />
     <Compile Include="Ui\Views\ContactViews\BaseSubviews\ContactView.cs" />
     <Compile Include="Ui\Views\ContactViews\HeaderViews\ContactHeaderView.cs" />
     <Compile Include="Ui\Views\ContactViews\HeaderViews\ContactHeaderViewBehavior.cs" />
@@ -254,6 +253,7 @@
     <Compile Include="Ui\Views\DocumentsSearchViews\MustHaveCategoriesSearchView.cs" />
     <Compile Include="Ui\Views\DocumentsSearchViews\DateRangeSearchView.cs" />
     <Compile Include="Ui\Common\CustomArrayAdapter.cs" />
+    <Compile Include="Ui\Common\ViewUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

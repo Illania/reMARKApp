@@ -24,7 +24,7 @@ namespace Mark5.Mobile.Common.Model
 
         public int PreceedingDocumentFolderId { get; set; } = -1;
 
-        public DateTime SendOn { get; set; }
+        public long SendOnTimestamp { get; set; } = -1;
 
         public bool ConfirmRead { get; set; }
 

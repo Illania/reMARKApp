@@ -103,7 +103,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout.RemoveViews(0, linearLayout.ChildCount);
 
-            var grouppedObjectActions = objectActions.OrderBy(oa => oa.ActionType).ThenBy(oa => oa.ActionTime).GroupBy(oa => oa.ActionType);
+            var grouppedObjectActions = objectActions.OrderBy(oa => oa.ActionType).ThenBy(oa => oa.ActionTimeTimestamp).GroupBy(oa => oa.ActionType);
 
             foreach (var grouppedObjectAction in grouppedObjectActions)
             {

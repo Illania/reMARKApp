@@ -17,7 +17,7 @@ namespace Mark5.Mobile.Common.Model
 
         public Guid Guid { get; set; }
 
-        public DateTime DateAdded { get; set; }
+        public long DateAddedTimestamp { get; set; } = -1;
 
         public int UserId { get; set; }
 

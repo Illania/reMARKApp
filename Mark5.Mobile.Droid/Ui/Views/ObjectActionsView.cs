@@ -9,9 +9,10 @@ using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
-using Android.Text.Format;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -103,16 +104,12 @@ namespace Mark5.Mobile.Droid.Ui.Views
 
                 AddView(titleView);
 
-                var actionTime = objectAction.ActionTime.ToServerTime();
-
-                var dfo = DateFormat.GetDateFormatOrder(context);
-                var actionDateString = actionTime.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
-                var actionTimeString = DateFormat.Is24HourFormat(context) ? actionTime.ToString("HH:mm") : actionTime.ToString("hh:mm tt");
+                var processedActionTimeTimestamp = objectAction.ActionTimeTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime().ConvertDateTimeToTimestampMilliseconds();
 
                 var subtitleView = new AppCompatTextView(Context)
                 {
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                    Text = $"{Context.GetString(Resource.String.by)} {objectAction.Username} {Context.GetString(Resource.String.on)} {actionDateString} {actionTimeString}"
+                    Text = $"{Context.GetString(Resource.String.by)} {objectAction.Username} {Context.GetString(Resource.String.on)} {processedActionTimeTimestamp.FormatServerTimestampAsTimeAndDateString(context)}"
                 };
                 subtitleView.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
 

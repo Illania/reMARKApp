@@ -23,7 +23,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         {
             linkedContactType = type;
             Title = type.ToString();
-            iconImageView.SetImageResource(Resource.Drawable.email);
+            IconImageView.SetImageResource(Resource.Drawable.email);
         }
 
         public override void RefreshView()
@@ -53,12 +53,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             {
                 Visibility = ViewStates.Visible;
 
-                contentLayout.RemoveAllViews();
+                ContentLayout.RemoveAllViews();
                 foreach (var contact in contacts)
                 {
 
                     var subsubview = new LinkedContactSubSubview(Context, this, contact);
-                    contentLayout.AddView(subsubview);
+                    ContentLayout.AddView(subsubview);
                 }
             }
             else

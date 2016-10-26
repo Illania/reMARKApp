@@ -24,20 +24,20 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         {
             addressType = type;
             Title = type.ToString();
-            iconImageView.SetImageResource(Resource.Drawable.email);
+            IconImageView.SetImageResource(Resource.Drawable.email);
         }
 
         public override void RefreshView()
         {
             if (Contact.PreferrableType == addressType)
             {
-                iconImageView.SetColorFilter(new Android.Graphics.Color(ContextCompat.GetColor(Context, Resource.Color.brown)));
+                IconImageView.SetColorFilter(new Android.Graphics.Color(ContextCompat.GetColor(Context, Resource.Color.brown)));
             }
 
             var communicationAddressesForType = Contact?.CommunicationAddresses.Where(ca => ca.Type == addressType);
             if (Contact != null && communicationAddressesForType.Any())
             {
-                contentLayout.RemoveAllViews();
+                ContentLayout.RemoveAllViews();
                 Visibility = ViewStates.Visible;
 
                 foreach (var communicationAddress in communicationAddressesForType.OrderBy(ad => ad.IsPrimary != true))
@@ -46,13 +46,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                     {
                         var handleAndType = ParseIm(communicationAddress.Address);
                         var subsubview = new CommunicationAddressesSubSubview(Context, this, communicationAddress, handleAndType.Item1, handleAndType.Item2);
-                        contentLayout.AddView(subsubview);
+                        ContentLayout.AddView(subsubview);
                     }
                     else
                     {
                         var formattedAddress = FormatAddress(communicationAddress.Address);
                         var subsubview = new CommunicationAddressesSubSubview(Context, this, communicationAddress, formattedAddress, communicationAddress.Description);
-                        contentLayout.AddView(subsubview);
+                        ContentLayout.AddView(subsubview);
                     }
                 }
             }

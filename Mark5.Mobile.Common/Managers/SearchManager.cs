@@ -14,6 +14,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Converters;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Common.Managers
 {
@@ -67,8 +68,8 @@ namespace Mark5.Mobile.Common.Managers
                     CreatorGuids = criteria.CreatorGuids.ToList(),
                     DateRange = {
                         Enabled = criteria.DateRange?.Enabled ?? false,
-                        Start = criteria.DateRange?.Start ?? default(DateTime),
-                        End = criteria.DateRange?.End ?? default(DateTime),
+                        Start = criteria.DateRange?.StartTimestamp.ConvertTimestampMillisecondsToDateTime() ?? default(DateTime),
+                        End = criteria.DateRange?.EndTimestamp.ConvertTimestampMillisecondsToDateTime() ?? default(DateTime)
                     },
                     Comment = criteria.Comment,
                     AttachmentName = criteria.AttachmentName,
@@ -112,7 +113,7 @@ namespace Mark5.Mobile.Common.Managers
                     MustHaveCategoriesIds = criteria.MustHaveCategoryIds.ToList(),
                     Comment = criteria.Comment,
                     FiledInFolderType = criteria.FiledInFolderType.ConvertEnum<DataContract.FiledInFolderType>(),
-                    FiledInFolderFolderType = criteria.FiledInFolderFolderType.ConvertEnum<DataContract.FiledInFolderFolderType>(),
+                    FiledInFolderFolderType = criteria.FiledInFolderFolderType.ConvertEnum<DataContract.FiledInFolderFolderType>()
                 });
 
                 return new SearchContactsResult
@@ -147,20 +148,19 @@ namespace Mark5.Mobile.Common.Managers
                     ParticipantUserIds = criteria.ParticipantUserIds,
                     DateRange = {
                         Enabled = criteria.DateRange?.Enabled ?? false,
-                        Start = criteria.DateRange?.Start ?? default(DateTime),
-                        End = criteria.DateRange?.End ?? default(DateTime),
+                        Start = criteria.DateRange?.StartTimestamp.ConvertTimestampMillisecondsToDateTime() ?? default(DateTime),
+                        End = criteria.DateRange?.EndTimestamp.ConvertTimestampMillisecondsToDateTime() ?? default(DateTime)
                     },
                     FiledInFolderType = criteria.FiledInFolderType.ConvertEnum<DataContract.FiledInFolderType>(),
                     FiledInFolderFolderType = criteria.FiledInFolderFolderType.ConvertEnum<DataContract.FiledInFolderFolderType>(),
-                    FiledInFolderIds = criteria.FiledInFolderIds,
+                    FiledInFolderIds = criteria.FiledInFolderIds
                 });
 
                 return new SearchCalendarTasksResult
                 {
                     SearchId = result.SearchId,
-                    CalendarTasks = result.CalendarTasks.WhereNotNull().Select(ct => ct.Convert()).ToList(),
+                    CalendarTasks = result.CalendarTasks.WhereNotNull().Select(ct => ct.Convert()).ToList()
                 };
-
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
@@ -188,20 +188,19 @@ namespace Mark5.Mobile.Common.Managers
                     ParticipantUserIds = criteria.ParticipantUserIds,
                     DateRange = {
                         Enabled = criteria.DateRange?.Enabled ?? false,
-                        Start = criteria.DateRange?.Start ?? default(DateTime),
-                        End = criteria.DateRange?.End ?? default(DateTime),
+                        Start = criteria.DateRange?.StartTimestamp.ConvertTimestampMillisecondsToDateTime() ?? default(DateTime),
+                        End = criteria.DateRange?.EndTimestamp.ConvertTimestampMillisecondsToDateTime() ?? default(DateTime)
                     },
                     FiledInFolderType = criteria.FiledInFolderType.ConvertEnum<DataContract.FiledInFolderType>(),
                     FiledInFolderFolderType = criteria.FiledInFolderFolderType.ConvertEnum<DataContract.FiledInFolderFolderType>(),
-                    FiledInFolderIds = criteria.FiledInFolderIds,
+                    FiledInFolderIds = criteria.FiledInFolderIds
                 });
 
                 return new SearchCalendarAppointmentsResult
                 {
                     SearchId = result.SearchId,
-                    CalendarAppointments = result.CalendarAppointments.WhereNotNull().Select(ct => ct.Convert()).ToList(),
+                    CalendarAppointments = result.CalendarAppointments.WhereNotNull().Select(ct => ct.Convert()).ToList()
                 };
-
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
@@ -220,7 +219,7 @@ namespace Mark5.Mobile.Common.Managers
                     Description = criteria.Description,
                     Address = criteria.Address,
                     FiledInFolderType = criteria.FiledInFolderType.ConvertEnum<DataContract.FiledInFolderType>(),
-                    FiledInFolderFolderType = criteria.FiledInFolderFolderType.ConvertEnum<DataContract.FiledInFolderFolderType>(),
+                    FiledInFolderFolderType = criteria.FiledInFolderFolderType.ConvertEnum<DataContract.FiledInFolderFolderType>()
                 });
 
                 return new SearchShortcodesResult
@@ -296,7 +295,7 @@ namespace Mark5.Mobile.Common.Managers
                 {
                     Token = Token,
                     FolderId = searchId,
-                    CalendarTaskId = taskId,
+                    CalendarTaskId = taskId
                 });
 
                 return result.CalendarTask.Convert();
@@ -313,7 +312,7 @@ namespace Mark5.Mobile.Common.Managers
                 {
                     Token = Token,
                     FolderId = searchId,
-                    CalendarAppointmentId = appointmentId,
+                    CalendarAppointmentId = appointmentId
                 });
 
                 return result.CalendarAppointment.Convert();

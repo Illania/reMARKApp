@@ -193,7 +193,7 @@ namespace Mark5.Mobile.Common.Managers
                         }
 
                         await Managers.DocumentsManager.SendDocumentAsync(document, documentPreview, info.Flag, info.PrecedingDocumentId,
-                                                                                   info.PrecedingDocumentFolderId, info.SendOn,
+                                                                                   info.PrecedingDocumentFolderId, info.SendOnTimestamp,
                                                                                    info.ConfirmRead, info.ConfirmDelivery, attachmentGuids);
 
                         sendSuccessful = true;

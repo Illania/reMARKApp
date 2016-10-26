@@ -8,9 +8,9 @@
 using System;
 using Android.Content;
 using Android.Support.V7.Widget;
-using Android.Text.Format;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -25,10 +25,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
         readonly AppCompatTextView dateRangeFrom;
         readonly AppCompatTextView dateRangeTo;
 
-        readonly char[] dfo;
-
-        DateTime from;
-        DateTime to;
+        long fromTimestamp;
+        long toTimestamp;
 
         public DateRangeSearchView(Context context)
             : base(context)
@@ -56,8 +54,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             fromToLayout.Visibility = ViewStates.Gone;
             AddView(fromToLayout);
 
-            dfo = DateFormat.GetDateFormatOrder(Context);
-
             dateRangeFrom = new AppCompatTextView(context, null, Resource.Attribute.spinnerStyle)
             {
                 LayoutParameters = new LayoutParams(-1, ViewGroup.LayoutParams.WrapContent)
@@ -70,7 +66,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             dateRangeFrom.Clickable = true;
             dateRangeFrom.Click += async (sender, e) =>
             {
-                from = await Dialogs.ShowDatePicker(context, from, maxDate: to);
+                fromTimestamp = await Dialogs.ShowDatePicker(context, fromTimestamp, maxTimestamp: toTimestamp);
                 UpdateFromToFields();
             };
             fromToLayout.AddView(dateRangeFrom);
@@ -87,7 +83,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             dateRangeTo.Clickable = true;
             dateRangeTo.Click += async (sender, e) =>
             {
-                to = await Dialogs.ShowDatePicker(context, to, from);
+                toTimestamp = await Dialogs.ShowDatePicker(context, toTimestamp, fromTimestamp);
                 UpdateFromToFields();
             };
             fromToLayout.AddView(dateRangeTo);
@@ -100,35 +96,34 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             if (mode == 0)
             {
                 fromToLayout.Visibility = ViewStates.Gone;
-                from = default(DateTime);
-                to = default(DateTime);
+                fromTimestamp = -1;
+                toTimestamp = -1;
             }
             if (mode == 1)
             {
                 fromToLayout.Visibility = ViewStates.Gone;
-                var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified).Date;
-                from = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0, DateTimeKind.Unspecified);
-                to = new DateTime(now.Year, now.Month, now.Day, 23, 59, 59, DateTimeKind.Unspecified);
+                var now = DateTime.UtcNow.Date;
+                fromTimestamp = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0, DateTimeKind.Utc).ConvertDateTimeToTimestampMilliseconds();
+                toTimestamp = new DateTime(now.Year, now.Month, now.Day, 23, 59, 59, DateTimeKind.Utc).ConvertDateTimeToTimestampMilliseconds();
             }
             if (mode == 2)
             {
                 fromToLayout.Visibility = ViewStates.Gone;
-                var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified).Date;
-                var yesterday = now.AddDays(-1);
-                from = new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 0, 0, 0, DateTimeKind.Unspecified);
-                to = new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 23, 59, 59, DateTimeKind.Unspecified);
+                var yesterday = DateTime.UtcNow.Date.AddDays(-1);
+                fromTimestamp = new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 0, 0, 0, DateTimeKind.Utc).ConvertDateTimeToTimestampMilliseconds();
+                toTimestamp = new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 23, 59, 59, DateTimeKind.Utc).ConvertDateTimeToTimestampMilliseconds();
             }
             if (mode == 3)
             {
                 fromToLayout.Visibility = ViewStates.Visible;
-                var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified).Date;
+                var now = DateTime.UtcNow.Date;
                 var weekAgo = now.AddDays(-7);
-                from = new DateTime(weekAgo.Year, weekAgo.Month, weekAgo.Day, 0, 0, 0, DateTimeKind.Unspecified);
-                to = new DateTime(now.Year, now.Month, now.Day, 23, 59, 59, DateTimeKind.Unspecified);
+                fromTimestamp = new DateTime(weekAgo.Year, weekAgo.Month, weekAgo.Day, 0, 0, 0, DateTimeKind.Utc).ConvertDateTimeToTimestampMilliseconds();
+                toTimestamp = new DateTime(now.Year, now.Month, now.Day, 23, 59, 59, DateTimeKind.Utc).ConvertDateTimeToTimestampMilliseconds();
             }
 
-            dateRangeFrom.Text = from.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
-            dateRangeTo.Text = to.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
+            dateRangeFrom.Text = fromTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime().ConvertDateTimeToTimestampMilliseconds().FormatServerTimestampAsDateString(Context);
+            dateRangeTo.Text = toTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime().ConvertDateTimeToTimestampMilliseconds().FormatServerTimestampAsDateString(Context);
         }
 
         public override void SetFromCriteria(SearchDocumentsCriteria criteria)
@@ -139,8 +134,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             }
             else
             {
-                from = criteria.DateRange.Start;
-                to = criteria.DateRange.End;
+                fromTimestamp = criteria.DateRange.StartTimestamp;
+                toTimestamp = criteria.DateRange.EndTimestamp;
                 UpdateFromToFields(3);
             }
         }
@@ -150,8 +145,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             criteria.DateRange = new DateRange
             {
                 Enabled = dateRangeType.SelectedItemPosition != 0,
-                Start = from,
-                End = to
+                StartTimestamp = fromTimestamp,
+                EndTimestamp = toTimestamp
             };
         }
     }

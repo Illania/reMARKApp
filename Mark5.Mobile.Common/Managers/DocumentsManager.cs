@@ -18,6 +18,7 @@ using Mark5.Mobile.Common.Storage;
 using Mark5.ServiceReference.AppService;
 using Mark5.ServiceReference.FileTransferService;
 using DataContract = Mark5.ServiceReference.DataContract;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Common.Managers
 {
@@ -137,7 +138,7 @@ namespace Mark5.Mobile.Common.Managers
         }
 
         public async Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
-                                           DateTime sendOn, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto)
+                                           long sendOnTimestamp, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
@@ -149,7 +150,7 @@ namespace Mark5.Mobile.Common.Managers
                     CreationModeFlag = flag.ConvertEnum<DataContract.DocumentCreationModeFlag>(),
                     PreceedingDocumentId = precedingDocumentId,
                     PreceedingDocumentFolderId = precedingDocumentFolderId,
-                    SendOn = sendOn.ConvertToUTC(),
+                    SendOn = sendOnTimestamp.ConvertTimestampMillisecondsToDateTime(),
                     ConfirmRead = confirmRead,
                     ConfirmDelivery = confirmDelivery,
                     TemporaryAttachmentGuids = temporaryAttachmentGuids
@@ -168,14 +169,14 @@ namespace Mark5.Mobile.Common.Managers
         }
 
         public async Task InsertDocumentInOutgoingAsync(Guid id, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
-                                                       DateTime sendOn, bool confirmRead, bool confirmDelivery, SourceType sourceType = SourceType.Auto)
+                                                       long sendOnTimestamp, bool confirmRead, bool confirmDelivery, SourceType sourceType = SourceType.Auto)
         {
             var outgoingDocumentInfo = new OutgoingDocumentInfo
             {
                 Flag = flag,
                 PrecedingDocumentId = precedingDocumentId,
                 PrecedingDocumentFolderId = precedingDocumentFolderId,
-                SendOn = sendOn,
+                SendOnTimestamp = sendOnTimestamp,
                 ConfirmRead = confirmRead,
                 ConfirmDelivery = confirmDelivery,
                 Identifier = id
