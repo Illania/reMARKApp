@@ -13,6 +13,9 @@ using System.Threading.Tasks;
 using AFollestad.MaterialDialogs;
 using Android.Content;
 using Android.Views;
+using Android.Support.V4.App;
+using Android.Widget;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
@@ -108,6 +111,26 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Content(ex.Message);
             builder.PositiveText(Resource.String.ok);
             builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
+            builder.Show();
+            return tcs.Task;
+        }
+
+        public static Task<DateTime> ShowDatePicker(Context context, DateTime initialDate = default(DateTime), DateTime minDate = default(DateTime), DateTime maxDate = default(DateTime))
+        {
+            var tcs = new TaskCompletionSource<DateTime>();
+            var datePicker = new DatePicker(context);
+            if (initialDate != default(DateTime)) datePicker.DateTime = initialDate;
+            if (minDate != default(DateTime)) datePicker.MinDate = minDate.ToJavaTimeStamp();
+            if (maxDate != default(DateTime)) datePicker.MaxDate = maxDate.ToJavaTimeStamp();
+            var builder = new MaterialDialog.Builder(context);
+            builder.CustomView(datePicker, false);
+            builder.PositiveText(Resource.String.ok);
+            builder.OnPositive(new SingleButtonCallback(() =>
+            {
+                tcs.SetResult(datePicker.DateTime);
+            }));
+            builder.NegativeText(Resource.String.cancel);
+            builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(initialDate)));
             builder.Show();
             return tcs.Task;
         }
@@ -225,6 +248,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
         }
 
         #endregion
+
     }
 }
 

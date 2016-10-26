@@ -67,7 +67,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
                 }
             };
             dateRangeFrom.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
-            dateRangeFrom.Text = from.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
+            dateRangeFrom.Clickable = true;
+            dateRangeFrom.Click += async (sender, e) =>
+            {
+                from = await Dialogs.ShowDatePicker(context, from, maxDate: to);
+                UpdateFromToFields();
+            };
             fromToLayout.AddView(dateRangeFrom);
 
             dateRangeTo = new AppCompatTextView(context, null, Resource.Attribute.spinnerStyle)
@@ -79,29 +84,35 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
                 }
             };
             dateRangeTo.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
-            dateRangeTo.Text = to.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
+            dateRangeTo.Clickable = true;
+            dateRangeTo.Click += async (sender, e) =>
+            {
+                to = await Dialogs.ShowDatePicker(context, to, from);
+                UpdateFromToFields();
+            };
             fromToLayout.AddView(dateRangeTo);
 
             UpdateFromToFields(dateRangeType.SelectedItemPosition);
         }
 
-        void UpdateFromToFields(int mode)
+        void UpdateFromToFields(int mode = -1)
         {
-            fromToLayout.Visibility = mode == 3 ? ViewStates.Visible : ViewStates.Gone;
-
             if (mode == 0)
             {
+                fromToLayout.Visibility = ViewStates.Gone;
                 from = default(DateTime);
                 to = default(DateTime);
             }
             if (mode == 1)
             {
+                fromToLayout.Visibility = ViewStates.Gone;
                 var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified).Date;
                 from = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0, DateTimeKind.Unspecified);
                 to = new DateTime(now.Year, now.Month, now.Day, 23, 59, 59, DateTimeKind.Unspecified);
             }
             if (mode == 2)
             {
+                fromToLayout.Visibility = ViewStates.Gone;
                 var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified).Date;
                 var yesterday = now.AddDays(-1);
                 from = new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 0, 0, 0, DateTimeKind.Unspecified);
@@ -109,11 +120,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             }
             if (mode == 3)
             {
+                fromToLayout.Visibility = ViewStates.Visible;
                 var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified).Date;
                 var weekAgo = now.AddDays(-7);
                 from = new DateTime(weekAgo.Year, weekAgo.Month, weekAgo.Day, 0, 0, 0, DateTimeKind.Unspecified);
                 to = new DateTime(now.Year, now.Month, now.Day, 23, 59, 59, DateTimeKind.Unspecified);
             }
+
+            dateRangeFrom.Text = from.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
+            dateRangeTo.Text = to.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
         }
 
         public override void SetFromCriteria(SearchDocumentsCriteria criteria)
