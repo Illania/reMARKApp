@@ -120,11 +120,36 @@ namespace Mark5.Mobile.Droid
                 return;
             }
 
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.updating_categories, Resource.String.please_wait);
+
             Task.Run(async () =>
             {
-
+                switch (BusinessEntityPreview.ObjectType)
+                {
+                    case ObjectType.Document:
+                        var documentPreview = BusinessEntityPreview as DocumentPreview;
+                        await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, selectedCategories.Values.ToList());
+                        break;
+                    case ObjectType.Contact:
+                        var contactPreview = BusinessEntityPreview as ContactPreview;
+                        await Managers.ContactsManager.SetCategoriesAsync(contactPreview, selectedCategories.Values.ToList());
+                        break;
+                    default:
+                        throw new ArgumentException("The business entity provided does not have categories in the model");
+                }
             }).ContinueWith(t =>
-            { });
+                    {
+                        dismissAction();
+                        if (t.IsFaulted)
+                        {
+                            CommonConfig.Logger.Error($"Update of categories failed", t.Exception);
+                            Dialogs.ShowErrorDialog(Activity, t.Exception);
+                        }
+                        else
+                        {
+                        }
+
+                    });
         }
 
         #region Refresh methods

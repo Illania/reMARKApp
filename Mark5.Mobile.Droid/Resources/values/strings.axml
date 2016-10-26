@@ -91,4 +91,5 @@
 	<string name="on">on</string>
 	<string name="edit">Edit</string>
 	<string name="done">Done</string>
+	<string name="updating_categories">Updating Categories</string>
 </resources>
