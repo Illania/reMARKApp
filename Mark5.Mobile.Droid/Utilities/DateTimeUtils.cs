@@ -68,14 +68,14 @@ namespace Mark5.Mobile.Droid.Utilities
         /// </summary>
         public static string FormatServerTimestampAsCompactShortDateTimeString(this long timestamp, Context context)
         {
-            var serverTimestamp = timestamp.ConvertTimestampMillisecondsToDateTime().ConvertServerTimeToUtc();
+            var serverTimezone = timestamp.ConvertTimestampMillisecondsToDateTime().ConvertServerTimeToUtc();
             var nowUtc = DateTime.UtcNow;
 
-            if (serverTimestamp.Date == nowUtc.Date)
+            if (serverTimezone.Date == nowUtc.Date)
             {
                 return timestamp.FormatServerTimestampAsTimeString(context);
             }
-            if (serverTimestamp.Date == nowUtc.Date.AddDays(-1))
+            if (serverTimezone.Date == nowUtc.Date.AddDays(-1))
             {
                 return context.GetString(Resource.String.yesterday);
             }
@@ -89,14 +89,14 @@ namespace Mark5.Mobile.Droid.Utilities
         /// </summary>
         public static string FormatServerTimestampAsCompactLongDateTimeString(this long timestamp, Context context)
         {
-            var serverTimestamp = timestamp.ConvertTimestampMillisecondsToDateTime().ConvertServerTimeToUtc();
+            var serverTimezone = timestamp.ConvertTimestampMillisecondsToDateTime().ConvertServerTimeToUtc();
             var nowUtc = DateTime.UtcNow;
 
-            if (serverTimestamp.Date == nowUtc.Date)
+            if (serverTimezone.Date == nowUtc.Date)
             {
                 return timestamp.FormatServerTimestampAsTimeString(context) + ", " + context.GetString(Resource.String.today);
             }
-            if (serverTimestamp.Date == nowUtc.Date.AddDays(-1))
+            if (serverTimezone.Date == nowUtc.Date.AddDays(-1))
             {
                 return timestamp.FormatServerTimestampAsTimeString(context) + ", " + context.GetString(Resource.String.yesterday);
             }
