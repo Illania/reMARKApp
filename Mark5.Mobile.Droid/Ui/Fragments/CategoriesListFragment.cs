@@ -1,5 +1,5 @@
 ﻿//
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: CategoriesListFragment.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
@@ -53,10 +53,10 @@ namespace Mark5.Mobile.Droid
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
-            adapter = new CategoriesListAdapter();
+            adapter = new CategoriesListAdapter(null);
             recyclerView.SetAdapter(adapter);
 
-            searchAdapter = new CategoriesListAdapter();
+            searchAdapter = new CategoriesListAdapter(null);
 
             HasOptionsMenu = true;
 
@@ -87,7 +87,7 @@ namespace Mark5.Mobile.Droid
         {
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
-            menu.Add(Menu.None, 10, 10, "Edit");
+            menu.Add(Menu.None, 10, 10, Resource.String.edit);
 
             var searchItem = menu.FindItem(Resource.Id.action_search);
             searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
@@ -95,6 +95,24 @@ namespace Mark5.Mobile.Droid
             searchView.SetOnSearchClickListener(this);
             searchView.SetOnQueryTextListener(this);
             searchView.SetOnCloseListener(this);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == 10)
+            {
+                var ft = Activity.SupportFragmentManager.BeginTransaction();
+                var clf = new AvailableCategoriesListFragment
+                {
+                    BusinessEntityPreview = BusinessEntityPreview
+                };
+                ft.Replace(Resource.Id.fragment_container, clf, clf.GenerateTag());
+                ft.AddToBackStack(null);
+                ft.Commit();
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
         }
 
         void RefreshView()
@@ -203,21 +221,35 @@ namespace Mark5.Mobile.Droid
 
         #region RecyclerView Adapter/ViewHolder
 
-        class CategoriesListAdapter : RecyclerView.Adapter
+        public class CategoriesListAdapter : RecyclerView.Adapter
         {
-            List<Category> categoriesInView = new List<Category>();
+            readonly List<Category> categoriesInView = new List<Category>();
+            readonly Dictionary<int, Category> selectedCategoriesInView;
+            readonly bool selectionEnabled;
 
             public override int ItemCount { get { return categoriesInView.Count; } }
             public List<Category> Items { get { return categoriesInView; } }
+
+            public CategoriesListAdapter(Dictionary<int, Category> selectedCategoriesInView, bool selectionEnabled = false)
+            {
+                this.selectedCategoriesInView = selectedCategoriesInView ?? new Dictionary<int, Category>();
+                this.selectionEnabled = selectionEnabled;
+            }
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
                 var category = categoriesInView[position];
                 var viewHolder = holder as CategoryViewHolder;
 
+                if (selectionEnabled)
+                {
+                    viewHolder.ItemView.SetOnClickListener(new ActionOnClickListener(() => ToggleSelected(category)));
+                }
+
                 viewHolder.Name = category.Name;
                 viewHolder.HexColor = category.HexColor;
                 viewHolder.Description = category.Description;
+                viewHolder.Selected = selectedCategoriesInView.ContainsKey(category.Id);
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -245,9 +277,35 @@ namespace Mark5.Mobile.Droid
                 Clear();
                 AppendItems(items);
             }
+
+            public bool IsSelected(Category category)
+            {
+                return selectedCategoriesInView.ContainsKey(category.Id);
+            }
+
+            public void ToggleSelected(Category category)
+            {
+                var isSelected = IsSelected(category);
+
+                if (isSelected)
+                {
+                    selectedCategoriesInView.Remove(category.Id);
+                }
+                else
+                {
+                    selectedCategoriesInView.Add(category.Id, category);
+                }
+
+                NotifyItemChanged(GetPosition(category));
+            }
+
+            public int GetPosition(Category category)
+            {
+                return categoriesInView.FindIndex(c => c.Id == category.Id);
+            }
         }
 
-        class CategoryViewHolder : RecyclerView.ViewHolder
+        public class CategoryViewHolder : RecyclerView.ViewHolder
         {
             public string Name
             {
@@ -284,15 +342,26 @@ namespace Mark5.Mobile.Droid
                 }
             }
 
+            public bool Selected
+            {
+                set
+                {
+                    selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
+                }
+            }
+
             readonly View colorImageView;
             readonly AppCompatTextView nameTextView;
             readonly AppCompatTextView descriptionTextView;
+            readonly View selectedOverlay;
 
             public CategoryViewHolder(View itemView) : base(itemView)
             {
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_category_name);
                 descriptionTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_categoty_description);
                 colorImageView = itemView.FindViewById<View>(Resource.Id.list_item_category_color);
+                selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
+
             }
         }
 
