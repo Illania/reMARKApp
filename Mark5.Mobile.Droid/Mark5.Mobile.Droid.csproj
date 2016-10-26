@@ -235,6 +235,8 @@
     <Compile Include="Ui\Activities\ObjectLinksActivity.cs" />
     <Compile Include="Ui\Fragments\ObjectLinksFragment.cs" />
     <Compile Include="Ui\Views\ObjectLinksView.cs" />
+    <Compile Include="Ui\Activities\CategoriesListActivity.cs" />
+    <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
