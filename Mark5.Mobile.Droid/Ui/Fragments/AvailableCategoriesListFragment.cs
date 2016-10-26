@@ -147,7 +147,9 @@ namespace Mark5.Mobile.Droid
                         }
                         else
                         {
-                        }
+                            Activity.RunOnUiThread(() => Activity.OnBackPressed());
+                        } //TODO need to send info to the list
+                          //Check what happens when we rotate
 
                     });
         }

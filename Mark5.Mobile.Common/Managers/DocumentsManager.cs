@@ -436,6 +436,9 @@ namespace Mark5.Mobile.Common.Managers
                     CategoryIds = categories.Select(c => c.Id).ToArray()
                 });
 
+                documentPreview.Categories.Clear();
+                documentPreview.Categories.AddRange(categories);
+
                 await documentsDataAccess.SetCategoriesAsync(documentPreview, categories);
 
                 return;

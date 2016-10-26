@@ -220,6 +220,9 @@ namespace Mark5.Mobile.Common.Managers
                     CategoryIds = categories.Select(c => c.Id).ToArray()
                 });
 
+                contactPreview.Categories.Clear();
+                contactPreview.Categories.AddRange(categories);
+
                 await contactsDataAccess.SetCategoriesAsync(contactPreview, categories);
 
                 return;
