@@ -58,6 +58,8 @@ namespace Mark5.Mobile.Droid
 
             searchAdapter = new CategoriesListAdapter(null);
 
+            ((BaseAppCompatActivity)Activity).SupportActionBar.SetDisplayHomeAsUpEnabled(true);
+
             HasOptionsMenu = true;
 
             return rootView;
@@ -69,7 +71,7 @@ namespace Mark5.Mobile.Droid
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.categories);
 
-            CommonConfig.Logger.Info($"Created {nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview.Id}, businessEntity.objectType={BusinessEntityPreview.ObjectType}]");
+            CommonConfig.Logger.Info($"Created {nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
         }
 
         public override void OnResume()
@@ -78,7 +80,7 @@ namespace Mark5.Mobile.Droid
 
             if (adapter.ItemCount < 1)
             {
-                CommonConfig.Logger.Info($"Refreshing {nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview.Id}, businessEntity.objectType={BusinessEntityPreview.ObjectType}]");
+                CommonConfig.Logger.Info($"Refreshing {nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
                 RefreshView();
             }
         }
@@ -87,7 +89,8 @@ namespace Mark5.Mobile.Droid
         {
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
-            menu.Add(Menu.None, 10, 10, Resource.String.edit);
+            var item = menu.Add(Menu.None, 10, 10, Resource.String.edit);
+            item.SetShowAsAction(ShowAsAction.Always);
 
             var searchItem = menu.FindItem(Resource.Id.action_search);
             searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
@@ -209,7 +212,7 @@ namespace Mark5.Mobile.Droid
 
         public override string GenerateTag()
         {
-            return $"{nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview.Id}, businessEntity.objectType={BusinessEntityPreview.ObjectType}]";
+            return $"{nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]";
         }
 
         class CategoriesListFragmentState : IRetainableState
@@ -226,9 +229,11 @@ namespace Mark5.Mobile.Droid
             readonly List<Category> categoriesInView = new List<Category>();
             readonly Dictionary<int, Category> selectedCategoriesInView;
             readonly bool selectionEnabled;
+            bool categoriesModified;
 
             public override int ItemCount { get { return categoriesInView.Count; } }
             public List<Category> Items { get { return categoriesInView; } }
+            public bool CategoriesModified { get { return categoriesModified; } }
 
             public CategoriesListAdapter(Dictionary<int, Category> selectedCategoriesInView, bool selectionEnabled = false)
             {
@@ -296,6 +301,7 @@ namespace Mark5.Mobile.Droid
                     selectedCategoriesInView.Add(category.Id, category);
                 }
 
+                categoriesModified = true;
                 NotifyItemChanged(GetPosition(category));
             }
 

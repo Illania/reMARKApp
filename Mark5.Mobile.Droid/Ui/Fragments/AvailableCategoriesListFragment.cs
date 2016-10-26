@@ -61,6 +61,8 @@ namespace Mark5.Mobile.Droid
 
             HasOptionsMenu = true;
 
+            ((BaseAppCompatActivity)Activity).SupportActionBar.SetDisplayHomeAsUpEnabled(false);
+
             return rootView;
         }
 
@@ -70,7 +72,7 @@ namespace Mark5.Mobile.Droid
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.categories);
 
-            CommonConfig.Logger.Info($"Created {nameof(AvailableCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview.Id}, businessEntity.objectType={BusinessEntityPreview.ObjectType}]");
+            CommonConfig.Logger.Info($"Created {nameof(AvailableCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
         }
 
         public override async void OnResume()
@@ -79,7 +81,7 @@ namespace Mark5.Mobile.Droid
 
             if (adapter.ItemCount < 1)
             {
-                CommonConfig.Logger.Info($"Refreshing {nameof(AvailableCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview.Id}, businessEntity.objectType={BusinessEntityPreview.ObjectType}]");
+                CommonConfig.Logger.Info($"Refreshing {nameof(AvailableCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
                 await RefreshData();
             }
         }
@@ -88,7 +90,8 @@ namespace Mark5.Mobile.Droid
         {
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
-            menu.Add(Menu.None, 10, 10, "Edit");
+            var item = menu.Add(Menu.None, 10, 10, Resource.String.done);
+            item.SetShowAsAction(ShowAsAction.Always);
 
             var searchItem = menu.FindItem(Resource.Id.action_search);
             searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
@@ -96,6 +99,32 @@ namespace Mark5.Mobile.Droid
             searchView.SetOnSearchClickListener(this);
             searchView.SetOnQueryTextListener(this);
             searchView.SetOnCloseListener(this);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == 10)
+            {
+                UpdateEntityCategories();
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
+        }
+
+        void UpdateEntityCategories()
+        {
+            if (!adapter.CategoriesModified)
+            {
+                Activity.OnBackPressed();
+                return;
+            }
+
+            Task.Run(async () =>
+            {
+
+            }).ContinueWith(t =>
+            { });
         }
 
         #region Refresh methods
@@ -108,11 +137,9 @@ namespace Mark5.Mobile.Droid
                 switch (BusinessEntityPreview.ObjectType)
                 {
                     case ObjectType.Document:
-                        var documentPreview = BusinessEntityPreview as DocumentPreview;
                         availableCategories = await Managers.DocumentsManager.GetAllCategoriesAsync();
                         break;
                     case ObjectType.Contact:
-                        var contactPreview = BusinessEntityPreview as ContactPreview;
                         availableCategories = await Managers.ContactsManager.GetAllCategoriesAsync();
                         break;
                     default:
