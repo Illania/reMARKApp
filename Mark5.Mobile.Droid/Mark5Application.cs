@@ -37,8 +37,6 @@ namespace Mark5.Mobile.Droid
         {
             base.OnCreate();
 
-            //UK.CO.Chrisjenx.Calligraphy.CalligraphyConfig.InitDefault(new UK.CO.Chrisjenx.Calligraphy.CalligraphyConfig.Builder().SetDefaultFontPath("fonts/Avenir-Book.ttf").Build());
-
             Task.Run(async () =>
             {
                 var mainFolder = FileSystem.Current.LocalStorage;

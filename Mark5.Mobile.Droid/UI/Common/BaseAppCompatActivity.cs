@@ -18,7 +18,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         protected override void AttachBaseContext(Context @base)
         {
-            //base.AttachBaseContext(UK.CO.Chrisjenx.Calligraphy.CalligraphyContextWrapper.Wrap(@base));
             base.AttachBaseContext(@base);
         }
 

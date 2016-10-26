@@ -26,7 +26,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
         {
             var tcs = new TaskCompletionSource<bool>();
             var builder = new MaterialDialog.Builder(context);
-            //builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
             builder.Title(titleId);
             builder.Content(contentId);
             builder.PositiveText(Resource.String.yes);
@@ -41,7 +40,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
         {
             var tcs = new TaskCompletionSource<bool>();
             var builder = new MaterialDialog.Builder(context);
-            //builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
             builder.Title(titleId);
             builder.Content(contentId);
             builder.PositiveText(Resource.String.ok);
@@ -54,7 +52,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
         {
             var tcs = new TaskCompletionSource<T>();
             var builder = new MaterialDialog.Builder(context);
-            //builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
             builder.Title(titleId);
             builder.Items(values.Select(t => { return displayText == null ? t.ToString() : displayText(t); }).ToArray());
             builder.ItemsCallbackSingleChoice(-1, new SingleChoiceCallback(si =>
@@ -79,7 +76,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var tcs = new TaskCompletionSource<List<T>>();
             var result = new List<T>();
             var builder = new MaterialDialog.Builder(context);
-            //builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
             builder.Title(titleId);
             builder.Items(values.Select(t => { return displayText == null ? t.ToString() : displayText(t); }).ToArray());
             builder.ItemsCallbackMultiChoice(null, new MultiChoiceCallback(si =>
@@ -108,7 +104,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
         {
             var tcs = new TaskCompletionSource<bool>();
             var builder = new MaterialDialog.Builder(context);
-            //builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
             builder.Title(Resource.String.error);
             builder.Content(ex.Message);
             builder.PositiveText(Resource.String.ok);
@@ -124,7 +119,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
         public static void ShowYesNoDialog(Context context, int titleId, int contentId, Action positiveAction, Action negativeAction = null)
         {
             var builder = new MaterialDialog.Builder(context);
-            //builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
             builder.Title(titleId);
             builder.Content(contentId);
             builder.PositiveText(Resource.String.yes);
@@ -138,7 +132,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
         public static void ShowConfirmDialog(Context context, int titleId, int contentId, Action action = null)
         {
             var builder = new MaterialDialog.Builder(context);
-            //builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
             builder.Title(titleId);
             builder.Content(contentId);
             builder.PositiveText(Resource.String.ok);
@@ -150,7 +143,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
         public static void ShowErrorDialog(Context context, Exception ex, Action action = null)
         {
             var builder = new MaterialDialog.Builder(context);
-            //builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
             builder.Title(Resource.String.error);
             builder.Content(ex.Message);
             builder.PositiveText(Resource.String.ok);
@@ -162,7 +154,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
         public static Action ShowInfiniteProgressDialog(Context context, int titleId, int contentId, CancellationTokenSource cts = null)
         {
             var builder = new MaterialDialog.Builder(context);
-            //builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
             builder.Title(titleId);
             builder.Content(contentId);
             builder.Progress(true, -1);
