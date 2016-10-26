@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
 using Android.Support.V4.Widget;
@@ -21,6 +22,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -73,6 +75,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(communicationCardView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
             linearLayout.AddView(physicalAddressCardView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
             linearLayout.AddView(descriptionCardView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+
+            HasOptionsMenu = true;
 
             return rootView;
         }
@@ -195,6 +199,65 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             descriptionSubviews.ForEach(descriptionCardViewInternalLayout.AddView);
         }
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
+            menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments);
+            menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.actions);
+            menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == MenuItemActions.Categories)
+            {
+                var i = new Intent(Activity, typeof(CategoriesListActivity));
+                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(ContactPreview));
+                StartActivity(i);
+
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.Comments)
+            {
+                //TODO to fill
+            }
+
+            if (item.ItemId == MenuItemActions.Actions)
+            {
+                var i = new Intent(Activity, typeof(ObjectActionsActivity));
+                i.PutExtra(ObjectActionsActivity.BusinessEntityTypeIntentKey, SerializationUtils.Serialize(ContactPreview.GetType()));
+                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(ContactPreview));
+                StartActivity(i); //TODO ask Bartosz why needs to send the type
+
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.Links)
+            {
+                var i = new Intent(Activity, typeof(ObjectLinksActivity));
+                i.PutExtra(ObjectLinksActivity.BusinessEntityTypeIntentKey, SerializationUtils.Serialize(ContactPreview.GetType()));
+                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(ContactPreview));
+                StartActivity(i);
+
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
+        }
+
+        #region MenuItemActions
+
+        static class MenuItemActions
+        {
+            public const int Categories = 10;
+            public const int Comments = 20;
+            public const int Actions = 30;
+            public const int Links = 40;
+        }
+
+        #endregion
 
         #endregion
 
