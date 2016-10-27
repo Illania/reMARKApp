@@ -20,7 +20,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
 
 namespace Mark5.Mobile.Droid
 {
@@ -55,10 +54,12 @@ namespace Mark5.Mobile.Droid
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
-            adapter = new CategoriesListFragment.CategoriesListAdapter(selectedCategories, true);
+            adapter = new CategoriesListFragment.CategoriesListAdapter(true);
+            adapter.SelectedCategoriesInView = selectedCategories;
             recyclerView.SetAdapter(adapter);
 
-            searchAdapter = new CategoriesListFragment.CategoriesListAdapter(selectedCategories, true);
+            searchAdapter = new CategoriesListFragment.CategoriesListAdapter(true);
+            searchAdapter.SelectedCategoriesInView = selectedCategories;
 
             HasOptionsMenu = true;
 
@@ -197,21 +198,24 @@ namespace Mark5.Mobile.Droid
 
         void RefreshView(List<Category> availableCategories)
         {
-            switch (BusinessEntityPreview.ObjectType)
+            if (selectedCategories.Count == 0)
             {
-                case ObjectType.Document:
-                    var documentPreview = BusinessEntityPreview as DocumentPreview;
-                    documentPreview.Categories.ForEach(c => selectedCategories.Add(c.Id, c));
-                    break;
-                case ObjectType.Contact:
-                    var contactPreview = BusinessEntityPreview as ContactPreview;
-                    contactPreview.Categories.ForEach(c => selectedCategories.Add(c.Id, c));
-                    break;
-                default:
-                    throw new ArgumentException("The business entity provided does not have categories in the model");
+                switch (BusinessEntityPreview.ObjectType)
+                {
+                    case ObjectType.Document:
+                        var documentPreview = BusinessEntityPreview as DocumentPreview;
+                        documentPreview.Categories.ForEach(c => selectedCategories.Add(c.Id, c));
+                        break;
+                    case ObjectType.Contact:
+                        var contactPreview = BusinessEntityPreview as ContactPreview;
+                        contactPreview.Categories.ForEach(c => selectedCategories.Add(c.Id, c));
+                        break;
+                    default:
+                        throw new ArgumentException("The business entity provided does not have categories in the model");
+                }
             }
 
-            adapter.AppendItems(availableCategories);
+            adapter.SetItems(availableCategories);
         }
 
         #endregion
@@ -280,6 +284,8 @@ namespace Mark5.Mobile.Droid
             {
                 BusinessEntityPreview = BusinessEntityPreview,
                 SelectedCategories = selectedCategories,
+                AvailableCategories = adapter.Items,
+                CategoriesModified = adapter.CategoriesModified,
             };
         }
 
@@ -290,6 +296,9 @@ namespace Mark5.Mobile.Droid
             {
                 BusinessEntityPreview = clfs.BusinessEntityPreview;
                 selectedCategories = clfs.SelectedCategories;
+                adapter.SelectedCategoriesInView = selectedCategories;
+                adapter.SetItems(clfs.AvailableCategories);
+                adapter.CategoriesModified = clfs.CategoriesModified;
             }
         }
 
@@ -302,6 +311,9 @@ namespace Mark5.Mobile.Droid
         {
             public BusinessEntityPreview BusinessEntityPreview { get; set; }
             public Dictionary<int, Category> SelectedCategories { get; set; }
+            public List<Category> AvailableCategories { get; set; }
+            public bool CategoriesModified { get; set; }
+
         }
 
         #endregion

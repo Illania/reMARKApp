@@ -71,9 +71,12 @@ namespace Mark5.Mobile.Droid
 
         public override void OnBackPressed()
         {
-            var intent = new Intent();
-            intent.PutExtra(CategoriesResultKey, SerializationUtils.Serialize(clf.Categories));
-            SetResult(Result.Ok, intent);
+            if (clf != null)
+            {
+                var intent = new Intent();
+                intent.PutExtra(CategoriesResultKey, SerializationUtils.Serialize(clf.Categories));
+                SetResult(Result.Ok, intent);
+            }
             base.OnBackPressed();
         }
     }

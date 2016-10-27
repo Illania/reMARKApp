@@ -56,10 +56,10 @@ namespace Mark5.Mobile.Droid
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
-            adapter = new CategoriesListAdapter(null);
+            adapter = new CategoriesListAdapter();
             recyclerView.SetAdapter(adapter);
 
-            searchAdapter = new CategoriesListAdapter(null);
+            searchAdapter = new CategoriesListAdapter();
 
             ((BaseAppCompatActivity)Activity).SupportActionBar.SetDisplayHomeAsUpEnabled(true);
 
@@ -127,11 +127,11 @@ namespace Mark5.Mobile.Droid
             {
                 case ObjectType.Document:
                     var documentPreview = BusinessEntityPreview as DocumentPreview;
-                    adapter.AppendItems(documentPreview.Categories);
+                    adapter.SetItems(documentPreview.Categories);
                     break;
                 case ObjectType.Contact:
                     var contactPreview = BusinessEntityPreview as ContactPreview;
-                    adapter.AppendItems(contactPreview.Categories);
+                    adapter.SetItems(contactPreview.Categories);
                     break;
                 default:
                     throw new ArgumentException("The business entity provided does not have categories in the model");
@@ -231,17 +231,15 @@ namespace Mark5.Mobile.Droid
         public class CategoriesListAdapter : RecyclerView.Adapter
         {
             readonly List<Category> categoriesInView = new List<Category>();
-            readonly Dictionary<int, Category> selectedCategoriesInView;
             readonly bool selectionEnabled;
-            bool categoriesModified;
 
             public override int ItemCount { get { return categoriesInView.Count; } }
             public List<Category> Items { get { return categoriesInView; } }
-            public bool CategoriesModified { get { return categoriesModified; } }
+            public Dictionary<int, Category> SelectedCategoriesInView { get; set; }
+            public bool CategoriesModified { get; set; }
 
-            public CategoriesListAdapter(Dictionary<int, Category> selectedCategoriesInView, bool selectionEnabled = false)
+            public CategoriesListAdapter(bool selectionEnabled = false)
             {
-                this.selectedCategoriesInView = selectedCategoriesInView ?? new Dictionary<int, Category>();
                 this.selectionEnabled = selectionEnabled;
             }
 
@@ -253,12 +251,12 @@ namespace Mark5.Mobile.Droid
                 if (selectionEnabled)
                 {
                     viewHolder.ItemView.SetOnClickListener(new ActionOnClickListener(() => ToggleSelected(category)));
+                    viewHolder.Selected = SelectedCategoriesInView.ContainsKey(category.Id);
                 }
 
                 viewHolder.Name = category.Name;
                 viewHolder.HexColor = category.HexColor;
                 viewHolder.Description = category.Description;
-                viewHolder.Selected = selectedCategoriesInView.ContainsKey(category.Id);
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -267,10 +265,10 @@ namespace Mark5.Mobile.Droid
                 return new CategoryViewHolder(itemView);
             }
 
-            public void AppendItems(List<Category> categories)
+            public void SetItems(List<Category> categories)
             {
                 var count = categoriesInView.Count;
-                categoriesInView.AddRange(categories);
+                categoriesInView.AddRange(categories.OrderBy(c => c.Name));
                 NotifyItemRangeInserted(count, categories.Count);
             }
 
@@ -284,12 +282,12 @@ namespace Mark5.Mobile.Droid
             public void ReplaceItems(List<Category> items)
             {
                 Clear();
-                AppendItems(items);
+                SetItems(items);
             }
 
             public bool IsSelected(Category category)
             {
-                return selectedCategoriesInView.ContainsKey(category.Id);
+                return SelectedCategoriesInView.ContainsKey(category.Id);
             }
 
             public void ToggleSelected(Category category)
@@ -298,14 +296,14 @@ namespace Mark5.Mobile.Droid
 
                 if (isSelected)
                 {
-                    selectedCategoriesInView.Remove(category.Id);
+                    SelectedCategoriesInView.Remove(category.Id);
                 }
                 else
                 {
-                    selectedCategoriesInView.Add(category.Id, category);
+                    SelectedCategoriesInView.Add(category.Id, category);
                 }
 
-                categoriesModified = true;
+                CategoriesModified = true;
                 NotifyItemChanged(GetPosition(category));
             }
 
@@ -371,7 +369,6 @@ namespace Mark5.Mobile.Droid
                 descriptionTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_categoty_description);
                 colorImageView = itemView.FindViewById<View>(Resource.Id.list_item_category_color);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
-
             }
         }
 
