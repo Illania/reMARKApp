@@ -1,0 +1,36 @@
+﻿//
+// Project: 
+// File: DocumentPreviewCategoriesChangedMessage.cs
+// Author: Ferdinando Papale fp@nordic-it.com
+//
+// Copyright (c) 2016 Nordic IT
+//
+using System;
+using System.Collections.Generic;
+using Mark5.Mobile.Common.Model;
+using TinyMessenger;
+
+namespace Mark5.Mobile.Droid
+{
+    public class DocumentPreviewCategoriesChangedMessage : TinyMessageBase
+    {
+        public int DocumentPreviewId
+        {
+            get;
+            private set;
+        }
+
+        public List<Category> Categories
+        {
+            get;
+            private set;
+        }
+
+        public DocumentPreviewCategoriesChangedMessage(object sender, int documentPreviewId, List<Category> categories)
+            : base(sender)
+        {
+            DocumentPreviewId = documentPreviewId;
+            Categories = categories;
+        }
+    }
+}

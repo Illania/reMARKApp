@@ -31,6 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         DocumentsListFragment dlf;
 
         TinyMessageSubscriptionToken readStatusToken;
+        TinyMessageSubscriptionToken categoriesToken;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -70,6 +71,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     dlf.UpdateReadStatus(m);
                 }
             });
+
+            categoriesToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewCategoriesChangedMessage>(m =>
+            {
+                if (dlf != null && m.Sender != dlf)
+                {
+                    dlf.UpdateCategories(m);
+                }
+            });
         }
 
         protected override void OnDestroy()
@@ -77,6 +86,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.OnDestroy();
 
             if (readStatusToken != null) PlatformConfig.MessengerHub.Unsubscribe<DocumentPreviewReadStatusChangedMessage>(readStatusToken);
+            if (categoriesToken != null) PlatformConfig.MessengerHub.Unsubscribe<DocumentPreviewCategoriesChangedMessage>(categoriesToken);
+
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)

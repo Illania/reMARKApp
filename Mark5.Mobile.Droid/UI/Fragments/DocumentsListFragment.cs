@@ -115,6 +115,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await RefreshData();
             }
+            //else
+            //{
+            //    adapter.NotifyDataSetChanged();
+            //}
 
             if (!IsAdded || IsDetached || IsRemoving) return;
 
@@ -502,6 +506,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 dp.IsReadByCurrent = m.IsReadByCurrent;
                 dp.IsReadByAnyone = m.IsReadByAnyone;
                 searchAdapter.NotifyItemChanged(position);
+            }
+        }
+
+        public void UpdateCategories(DocumentPreviewCategoriesChangedMessage m)
+        {
+            var position = adapter.GetPosition(m.DocumentPreviewId);
+            if (position >= 0)
+            {
+                var dp = adapter.Items[position];
+                dp.Categories.Clear();
+                dp.Categories.AddRange(m.Categories);
+                //var a = new Java.Lang.Runnable(() => adapter.NotifyItemChanged(position));
+                //a.Run();
+
+                Activity.RunOnUiThread(() => adapter.NotifyItemChanged(position));
+            }
+
+            position = searchAdapter.GetPosition(m.DocumentPreviewId);
+            if (position >= 0)
+            {
+                var dp = searchAdapter.Items[position];
+                dp.Categories.Clear();
+                dp.Categories.AddRange(m.Categories);
+                //searchAdapter.NotifyItemChanged(position);
             }
         }
 

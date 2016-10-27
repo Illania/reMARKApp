@@ -20,6 +20,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
 
 namespace Mark5.Mobile.Droid
 {
@@ -147,6 +148,23 @@ namespace Mark5.Mobile.Droid
                         }
                         else
                         {
+
+                            switch (BusinessEntityPreview.ObjectType)
+                            {
+                                case ObjectType.Document:
+                                    var documentPreview = BusinessEntityPreview as DocumentPreview;
+                                    PlatformConfig.MessengerHub.Publish(new DocumentPreviewCategoriesChangedMessage(this, documentPreview.Id, documentPreview.Categories));
+                                    break;
+                                case ObjectType.Contact:
+                                    var contactPreview = BusinessEntityPreview as ContactPreview;
+                                    //await Managers.ContactsManager.SetCategoriesAsync(contactPreview, selectedCategories.Values.ToList());
+                                    break;
+                                default:
+                                    throw new ArgumentException("The business entity provided does not have categories in the model");
+                            }
+
+
+
                             Activity.RunOnUiThread(() => Activity.OnBackPressed());
                         } //TODO need to send info to the list
                           //Check what happens when we rotate
