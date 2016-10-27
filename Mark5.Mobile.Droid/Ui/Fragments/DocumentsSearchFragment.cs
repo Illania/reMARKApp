@@ -15,6 +15,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Views.Common;
+using Android.Support.Design.Widget;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {

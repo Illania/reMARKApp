@@ -12,6 +12,7 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.Design.Widget;
+using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
@@ -25,7 +26,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
 {
 
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
-    public class LoginActivity : BaseAppCompatActivity
+    public class LoginActivity : AppCompatActivity
     {
 
         TextInputEditText usernameEditText;

@@ -16,9 +16,11 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
+
     [Register("contact.ContactHeaderViewBehavior")]
     public class ContactHeaderViewBehavior : CoordinatorLayout.Behavior
     {
+
         readonly Context mContext;
 
         int mStartMarginLeft;

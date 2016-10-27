@@ -14,9 +14,11 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
+
     [Register("contact.ContactHeaderView")]
     public class ContactHeaderView : LinearLayoutCompat
     {
+
         AppCompatTextView titleTextView;
         AppCompatTextView subtitleTextView;
 

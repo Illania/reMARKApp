@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: ContactViewActivity.cs
 // Author: Ferdinando Papale fp@nordic-it.com
@@ -9,20 +9,22 @@ using System;
 using Android.App;
 using Android.OS;
 using Android.Support.Design.Widget;
+using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using Mark5.Mobile.Droid.Ui.Views.ContactViews;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
+
     [Activity]
-    public class ContactActivity : BaseAppCompatActivity
+    public class ContactActivity : AppCompatActivity
     {
+
         public const string ContactPreviewIntentKey = "ContactPreview_0da27d12-4d29-4f44-8dbf-2e28d7f93aae";
         public const string FolderIntentKey = "Folder_88a33f0b-ebbf-4eed-b33d-49fba4f43f15";
 
@@ -37,7 +39,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Creating {nameof(ContactActivity)}...");
 
-            SetContentView(Resource.Layout.base_layout_collapsing);
+            SetContentView(Resource.Layout.base_layout_contact);
 
             toolbar = FindViewById<Toolbar>(Resource.Id.collapsing_toolbar);
             SetSupportActionBar(toolbar);

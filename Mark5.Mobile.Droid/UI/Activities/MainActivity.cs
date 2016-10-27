@@ -14,6 +14,7 @@ using Android.Support.Design.Widget;
 using Android.Support.V4.App;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
+using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
@@ -30,7 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
 {
 
     [Android.App.Activity]
-    public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FragmentManager.IOnBackStackChangedListener
+    public class MainActivity : AppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FragmentManager.IOnBackStackChangedListener
     {
         Toolbar toolbar;
         DrawerLayout drawer;
@@ -50,7 +51,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
 
             CommonConfig.Logger.Info($"Starting {nameof(MainActivity)}...");
 
-            SetContentView(Resource.Layout.activity_main);
+            SetContentView(Resource.Layout.base_layout_nav);
 
             toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);

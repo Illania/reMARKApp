@@ -53,7 +53,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         FolderListAdapter CurrentAdapter
         {
-            get { return searchEnabled ? searchAdapter : adapter; }
+            get
+            {
+                return searchEnabled ? searchAdapter : adapter;
+            }
         }
 
         #region Overrides

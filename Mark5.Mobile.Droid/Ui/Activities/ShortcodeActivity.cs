@@ -1,25 +1,24 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: ShortcodeActivity.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
-
 using Android.App;
 using Android.OS;
+using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Activity]
-    public class ShortcodeActivity : BaseAppCompatActivity
+    public class ShortcodeActivity : AppCompatActivity
     {
 
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";

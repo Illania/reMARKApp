@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: SearchDocumentsActivity.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -7,19 +7,19 @@
 //
 using Android.App;
 using Android.OS;
+using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
-    [Activity]
-    public class SearchActivity : BaseAppCompatActivity
+    [Activity(WindowSoftInputMode = SoftInput.AdjustResize)]
+    public class SearchActivity : AppCompatActivity
     {
 
         public const string ModuleIntentKey = "Module_d1dbd7d8-045d-48c0-b72c-618107935279";
