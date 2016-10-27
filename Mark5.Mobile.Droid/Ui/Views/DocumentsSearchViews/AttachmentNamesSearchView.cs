@@ -43,12 +43,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             textInputLayout.AddView(attachmentNamesField);
         }
 
-        public override void SetFromCriteria(SearchDocumentsCriteria criteria)
+        public override void FromCriteria(SearchDocumentsCriteria criteria)
         {
             attachmentNamesField.Text = criteria.Comment;
         }
 
-        public override void UpdateCriteria(SearchDocumentsCriteria criteria)
+        public override void ToCriteria(SearchDocumentsCriteria criteria)
         {
             criteria.Comment = attachmentNamesField.Text;
         }

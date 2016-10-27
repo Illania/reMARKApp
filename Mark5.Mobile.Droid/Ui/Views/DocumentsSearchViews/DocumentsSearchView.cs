@@ -32,8 +32,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             DistanceSmall = ConversionUtils.ConvertDpToPixels(4.0f);
         }
 
-        public abstract void SetFromCriteria(SearchDocumentsCriteria criteria);
+        public abstract void FromCriteria(SearchDocumentsCriteria criteria);
 
-        public abstract void UpdateCriteria(SearchDocumentsCriteria criteria);
+        public abstract void ToCriteria(SearchDocumentsCriteria criteria);
     }
 }

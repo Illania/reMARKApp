@@ -71,13 +71,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             }
         }
 
-        public override void SetFromCriteria(SearchDocumentsCriteria criteria)
+        public override void FromCriteria(SearchDocumentsCriteria criteria)
         {
             SelectedLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Where(l => criteria.LineGuids.Contains(l.Guid)).ToList();
             UpdateSubtitle();
         }
 
-        public override void UpdateCriteria(SearchDocumentsCriteria criteria)
+        public override void ToCriteria(SearchDocumentsCriteria criteria)
         {
             criteria.LineGuids = SelectedLines.Select(l => l.Guid).ToList();
         }

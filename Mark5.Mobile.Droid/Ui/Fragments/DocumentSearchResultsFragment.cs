@@ -24,6 +24,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -35,7 +36,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public SearchDocumentsCriteria Criteria { get; set; }
 
-        CoordinatorLayout coordinatorLayout;
+        int searchId;
+
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         DocumentSearchResultsAdapter adapter;
@@ -48,9 +50,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
-            coordinatorLayout = (CoordinatorLayout)container.Parent;
-
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
+            refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
             refreshLayout.Enabled = false;
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
@@ -105,6 +106,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return new DocumentSearchResultsFragmentState
             {
                 Criteria = Criteria,
+                SearchId = searchId,
                 DocumentPreviews = adapter.Items
             };
         }
@@ -117,6 +119,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Info($"Restoring state [dlfs.criteria={dlfs.Criteria}, dlfs.items.count={dlfs.DocumentPreviews?.Count}]...");
 
                 Criteria = dlfs.Criteria;
+                searchId = dlfs.SearchId;
                 adapter.AppendItems(dlfs.DocumentPreviews);
             }
         }
@@ -138,8 +141,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 refreshLayout.Post(() => refreshLayout.Refreshing = true); //Bug: fixed in support library v 24.2.0 (issue 77712)
 
-                var documentPreviews = await Managers.SearchManager.SearchDocumentsAsync(Criteria);
-                adapter.AppendItems(documentPreviews.DocumentPreviews);
+                var searchResults = await Managers.SearchManager.SearchDocumentsAsync(Criteria);
+                searchId = searchResults.SearchId;
+                adapter.AppendItems(searchResults.DocumentPreviews);
             }
             catch (Exception ex)
             {
@@ -161,10 +165,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Adapter_ItemClicked(object sender, DocumentPreview documentPreview)
         {
-            /*var i = new Intent(Activity, typeof(DocumentActivity));
-            i.PutExtra(DocumentActivity.FolderIntentKey, SerializationUtils.Serialize(Folder));
+            var i = new Intent(Activity, typeof(DocumentActivity));
+            i.PutExtra(DocumentActivity.SearchIdIntentKey, searchId);
             i.PutExtra(DocumentActivity.DocumentPreviewIntentKey, SerializationUtils.Serialize(documentPreview));
-            StartActivity(i);*/
+            i.PutExtra(DocumentActivity.ReadOnlyModeIntentKey, true);
+            StartActivity(i);
         }
 
         #endregion
@@ -173,6 +178,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class DocumentSearchResultsFragmentState : IRetainableState
         {
+
+            public int SearchId { get; set; }
 
             public SearchDocumentsCriteria Criteria { get; set; }
 

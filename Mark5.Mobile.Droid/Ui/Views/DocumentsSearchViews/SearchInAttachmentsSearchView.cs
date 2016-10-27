@@ -61,12 +61,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             rl.AddView(searchInAttachmentsTitle, rlp1);
         }
 
-        public override void SetFromCriteria(SearchDocumentsCriteria criteria)
+        public override void FromCriteria(SearchDocumentsCriteria criteria)
         {
             searchInAttachmentsCheckbox.Checked = criteria.SearchInAttachments;
         }
 
-        public override void UpdateCriteria(SearchDocumentsCriteria criteria)
+        public override void ToCriteria(SearchDocumentsCriteria criteria)
         {
             criteria.SearchInAttachments = searchInAttachmentsCheckbox.Checked;
         }

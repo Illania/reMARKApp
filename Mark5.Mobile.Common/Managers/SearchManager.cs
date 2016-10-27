@@ -22,6 +22,8 @@ namespace Mark5.Mobile.Common.Managers
     class SearchManager : AbstractManager, ISearchManager
     {
 
+        public DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; } = DocumentBodyTypeRequest.HtmlOnly;
+
         public SearchManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy)
                 : base(connectionInfo, appServiceProxy)
         {
@@ -232,7 +234,7 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<Document> GetDocumentAsync(int searchId, int documentId, DocumentBodyTypeRequest bodyType, SourceType sourceType = SourceType.Auto)
+        public async Task<Document> GetDocumentAsync(int searchId, DocumentPreview documentPreview, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
@@ -240,8 +242,8 @@ namespace Mark5.Mobile.Common.Managers
                 {
                     Token = Token,
                     FolderId = searchId,
-                    DocumentId = documentId,
-                    BodyRequest = bodyType.ConvertEnum<DataContract.DocumentBodyTypeRequest>(),
+                    DocumentId = documentPreview.Id,
+                    BodyRequest = DocumentBodyTypeRequest.ConvertEnum<DataContract.DocumentBodyTypeRequest>(),
                     IncludePreview = false
                 });
 
@@ -251,7 +253,7 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<Contact> GetContactAsync(int searchId, int contactId, SourceType sourceType = SourceType.Auto)
+        public async Task<Contact> GetContactAsync(int searchId, ContactPreview contactPreview, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
@@ -259,7 +261,7 @@ namespace Mark5.Mobile.Common.Managers
                 {
                     Token = Token,
                     FolderId = searchId,
-                    ContactId = contactId,
+                    ContactId = contactPreview.Id,
                     IncludePreview = false
                 });
 
@@ -269,7 +271,7 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<Shortcode> GetShortcodeAsync(int searchId, int shortcodeId, SourceType sourceType = SourceType.Auto)
+        public async Task<Shortcode> GetShortcodeAsync(int searchId, ShortcodePreview shortcodePreview, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
@@ -277,7 +279,7 @@ namespace Mark5.Mobile.Common.Managers
                 {
                     Token = Token,
                     FolderId = searchId,
-                    ShortcodeId = shortcodeId,
+                    ShortcodeId = shortcodePreview.Id,
                     IncludePreview = false
                 });
 

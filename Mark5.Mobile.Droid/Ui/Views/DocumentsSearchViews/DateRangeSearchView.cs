@@ -126,7 +126,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             dateRangeTo.Text = toTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime().ConvertDateTimeToTimestampMilliseconds().FormatServerTimestampAsDateString(Context);
         }
 
-        public override void SetFromCriteria(SearchDocumentsCriteria criteria)
+        public override void FromCriteria(SearchDocumentsCriteria criteria)
         {
             if (criteria.DateRange == null || !criteria.DateRange.Enabled)
             {
@@ -140,7 +140,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             }
         }
 
-        public override void UpdateCriteria(SearchDocumentsCriteria criteria)
+        public override void ToCriteria(SearchDocumentsCriteria criteria)
         {
             criteria.DateRange = new DateRange
             {

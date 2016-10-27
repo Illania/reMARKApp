@@ -23,7 +23,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     {
 
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
+        public const string SearchIdIntentKey = "SearchId_fe483a14-0042-4fe2-a887-c232b332a715";
         public const string DocumentPreviewIntentKey = "DocumentPreview_0bd291a4-22a5-431c-ad6e-4c8b273eeb98";
+        public const string ReadOnlyModeIntentKey = "ReadOnlyMode_c23890cf-06fc-45d7-86c8-76c4c8027daf";
 
         Toolbar toolbar;
 
@@ -43,13 +45,17 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+                var searchId = Intent.Extras.GetInt(SearchIdIntentKey);
                 var documentPreview = SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
+                var readonlyMode = Intent.Extras.GetBoolean(ReadOnlyModeIntentKey);
                 var ft = SupportFragmentManager.BeginTransaction();
                 var df = new DocumentFragment
                 {
                     Folder = folder,
+                    SearchId = searchId,
                     DocumentPreview = documentPreview,
-                    CloseRequest = OnBackPressed
+                    CloseRequest = OnBackPressed,
+                    ReadOnlyMode = readonlyMode
                 };
                 ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
                 ft.Commit();

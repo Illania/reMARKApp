@@ -65,7 +65,9 @@ namespace Mark5.Mobile.Common.Managers
 
         Task DeleteComment(Document document, Comment comment, SourceType sourceType = SourceType.Auto);
 
-        Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, Document document, Folder folder, bool checkMD5 = false, SourceType sourceType = SourceType.Auto);
+        Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, Folder folder, Document document, bool checkMD5 = false, SourceType sourceType = SourceType.Auto);
+
+        Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, int folderId, Document document, bool checkMD5 = false, SourceType sourceType = SourceType.Auto);
 
         Task<Guid> UploadTemporaryAttachmentAsync(Attachment attachment, SourceType sourceType = SourceType.Auto);
     }

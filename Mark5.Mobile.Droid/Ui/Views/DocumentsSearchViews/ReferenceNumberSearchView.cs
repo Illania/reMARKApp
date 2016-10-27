@@ -43,12 +43,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             textInputLayout.AddView(referenceNumberField);
         }
 
-        public override void SetFromCriteria(SearchDocumentsCriteria criteria)
+        public override void FromCriteria(SearchDocumentsCriteria criteria)
         {
             referenceNumberField.Text = criteria.Reference;
         }
 
-        public override void UpdateCriteria(SearchDocumentsCriteria criteria)
+        public override void ToCriteria(SearchDocumentsCriteria criteria)
         {
             criteria.Reference = referenceNumberField.Text;
         }

@@ -61,12 +61,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             rl.AddView(withAttachmentsOnlyTitle, rlp1);
         }
 
-        public override void SetFromCriteria(SearchDocumentsCriteria criteria)
+        public override void FromCriteria(SearchDocumentsCriteria criteria)
         {
             withAttachmentsOnlyCheckbox.Checked = criteria.HavingAttachmentsOnly;
         }
 
-        public override void UpdateCriteria(SearchDocumentsCriteria criteria)
+        public override void ToCriteria(SearchDocumentsCriteria criteria)
         {
             criteria.HavingAttachmentsOnly = withAttachmentsOnlyCheckbox.Checked;
         }

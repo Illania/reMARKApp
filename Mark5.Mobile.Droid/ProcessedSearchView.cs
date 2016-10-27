@@ -72,13 +72,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             return Context.GetString(Resource.String.search_processed_false);
         }
 
-        public override void SetFromCriteria(SearchDocumentsCriteria criteria)
+        public override void FromCriteria(SearchDocumentsCriteria criteria)
         {
             SelectedProcessed = criteria.Processed;
             processedSubtitle.Text = TextForValue(SelectedProcessed);
         }
 
-        public override void UpdateCriteria(SearchDocumentsCriteria criteria)
+        public override void ToCriteria(SearchDocumentsCriteria criteria)
         {
             criteria.Processed = SelectedProcessed;
         }

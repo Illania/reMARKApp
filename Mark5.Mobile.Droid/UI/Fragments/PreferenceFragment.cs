@@ -111,6 +111,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (key == GetString(Resource.String.pref_key_documents_download_as_plaintext))
             {
                 Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
             }
             if (key == GetString(Resource.String.pref_key_contacts_synchronised))
             {

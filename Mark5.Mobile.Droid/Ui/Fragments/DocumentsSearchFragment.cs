@@ -18,7 +18,6 @@ using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Common.Utilities;
-using Android.Locations;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -120,27 +119,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var dsv = linearLayout.GetChildAt(i) as DocumentsSearchView;
                 if (dsv != null)
                 {
-                    dsv.UpdateCriteria(criteria);
+                    dsv.ToCriteria(criteria);
                 }
             }
 
             return criteria;
         }
 
-        public override IRetainableState OnRetainInstanceState()
+        void SetCriteria(SearchDocumentsCriteria criteria)
         {
-            var criteria = new SearchDocumentsCriteria();
-
             for (var i = 0; i < linearLayout.ChildCount; i++)
             {
                 var dsv = linearLayout.GetChildAt(i) as DocumentsSearchView;
                 if (dsv != null)
                 {
-                    dsv.UpdateCriteria(criteria);
+                    dsv.FromCriteria(criteria);
                 }
             }
+        }
 
-            return new DocumentsSearchFragmentState { Criteria = criteria };
+        public override IRetainableState OnRetainInstanceState()
+        {
+            return new DocumentsSearchFragmentState { Criteria = GetCriteria() };
         }
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
@@ -148,14 +148,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var dsfs = restoredState as DocumentsSearchFragmentState;
             if (dsfs != null)
             {
-                for (var i = 0; i < linearLayout.ChildCount; i++)
-                {
-                    var dsv = linearLayout.GetChildAt(i) as DocumentsSearchView;
-                    if (dsv != null)
-                    {
-                        dsv.SetFromCriteria(dsfs.Criteria);
-                    }
-                }
+                SetCriteria(dsfs.Criteria);
             }
         }
 

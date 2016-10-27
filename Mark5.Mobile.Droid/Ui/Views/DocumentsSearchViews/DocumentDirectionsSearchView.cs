@@ -70,13 +70,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             }
         }
 
-        public override void SetFromCriteria(SearchDocumentsCriteria criteria)
+        public override void FromCriteria(SearchDocumentsCriteria criteria)
         {
             SelectedDocumentDirections = criteria.Directions;
             UpdateSubtitle();
         }
 
-        public override void UpdateCriteria(SearchDocumentsCriteria criteria)
+        public override void ToCriteria(SearchDocumentsCriteria criteria)
         {
             criteria.Directions = SelectedDocumentDirections;
         }

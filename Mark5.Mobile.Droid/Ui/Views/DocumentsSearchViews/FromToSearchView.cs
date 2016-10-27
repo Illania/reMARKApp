@@ -47,13 +47,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             AddView(fromToField);
         }
 
-        public override void SetFromCriteria(SearchDocumentsCriteria criteria)
+        public override void FromCriteria(SearchDocumentsCriteria criteria)
         {
             fromToSpinner.SetSelection((int)criteria.FromToClause);
             fromToField.Text = criteria.FromToField;
         }
 
-        public override void UpdateCriteria(SearchDocumentsCriteria criteria)
+        public override void ToCriteria(SearchDocumentsCriteria criteria)
         {
             criteria.FromToClause = (FromToClause)fromToSpinner.SelectedItemPosition;
             criteria.FromToField = fromToField.Text;

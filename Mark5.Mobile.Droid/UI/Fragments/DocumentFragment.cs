@@ -40,6 +40,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public Folder Folder { get; set; }
 
+        public int SearchId { get; set; }
+
         public int? DocumentId { get; set; }
 
         public DocumentPreview DocumentPreview { get; set; }
@@ -47,6 +49,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public Document Document { get; set; }
 
         public Action CloseRequest { get; set; }
+
+        public bool ReadOnlyMode { get; set; }
 
         ProgressBar progress;
         ScrollView scrollView;
@@ -56,7 +60,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}...");
+            CommonConfig.Logger.Info($"Creating {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}, readOnlyMode={ReadOnlyMode}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout, container, false);
 
@@ -88,7 +92,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = string.Empty;
 
-            CommonConfig.Logger.Info($"Created {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}]");
+            CommonConfig.Logger.Info($"Created {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}, readOnlyMode={ReadOnlyMode}]");
         }
 
         public override async void OnResume()
@@ -97,6 +101,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             await RefreshData();
 
+            if (ReadOnlyMode) return;
             if (!IsAdded || IsDetached || IsRemoving) return;
 
             MarkAsReadIfNecessary();
@@ -111,6 +116,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
+            if (ReadOnlyMode) return;
+
             if (!DocumentPreview.IsReadByCurrent)
             {
                 menu.Add(Menu.None, 10, 10, Resource.String.mark_as_read);
@@ -185,7 +192,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, Folder, false, SourceType.Local);
+                string path = null;
+
+                if (Folder != null)
+                {
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Folder, Document, false, SourceType.Local);
+                }
+                if (SearchId <= -999)
+                {
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, SearchId, Document, false, SourceType.Local);
+                }
+
                 if (string.IsNullOrWhiteSpace(path))
                 {
                     if (attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes
@@ -197,7 +214,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         return;
                     }
 
-                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, Folder, false, SourceType.Remote);
+                    if (Folder != null)
+                    {
+                        path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Folder, Document, false, SourceType.Remote);
+                    }
+                    if (SearchId <= -999)
+                    {
+                        path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, SearchId, Document, false, SourceType.Remote);
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    throw new Exception("Unable to get attachment path.");
                 }
 
                 var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
@@ -211,7 +240,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to view attachment [document.Id={Document.Id}, attachment.Id={attachmentDescription.Id}, attachment.Name={attachmentDescription.Name}", ex);
+                CommonConfig.Logger.Error($"Failed to view attachment [document.Id={Document.Id}, attachment.Id={attachmentDescription?.Id}, attachment.Name={attachmentDescription?.Name}", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(Context, ex);
@@ -228,7 +257,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, Folder, false, SourceType.Local);
+                string path = null;
+
+                if (Folder != null)
+                {
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Folder, Document, false, SourceType.Local);
+                }
+                if (SearchId <= -999)
+                {
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, SearchId, Document, false, SourceType.Local);
+                }
+
                 if (string.IsNullOrWhiteSpace(path))
                 {
                     if (attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes
@@ -240,7 +279,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         return;
                     }
 
-                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, Folder, false, SourceType.Remote);
+                    if (Folder != null)
+                    {
+                        path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Folder, Document, false, SourceType.Remote);
+                    }
+                    if (SearchId <= -999)
+                    {
+                        path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, SearchId, Document, false, SourceType.Remote);
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    throw new Exception("Unable to get attachment path.");
                 }
 
                 var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
@@ -250,7 +301,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to share attachment [document.Id={Document.Id}, attachment.Id={attachmentDescription.Id}, attachment.Name={attachmentDescription.Name}", ex);
+                CommonConfig.Logger.Error($"Failed to share attachment [document.Id={Document.Id}, attachment.Id={attachmentDescription?.Id}, attachment.Name={attachmentDescription?.Name}", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(Context, ex);
@@ -265,23 +316,34 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             try
             {
-                if (DocumentId.HasValue && DocumentPreview == null && Document == null)
+                if (Folder != null || FolderId.HasValue)
                 {
-                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(FolderId ?? Folder.Id, DocumentId.Value);
-                    DocumentPreview = container.DocumentPreview;
-                    Document = container.Document;
+                    if (DocumentId.HasValue && DocumentPreview == null && Document == null)
+                    {
+                        var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(FolderId ?? Folder.Id, DocumentId.Value);
+                        DocumentPreview = container.DocumentPreview;
+                        Document = container.Document;
+                    }
+
+                    if (DocumentPreview != null && Document == null)
+                    {
+                        Document = await Managers.DocumentsManager.GetDocumentAsync(FolderId ?? Folder.Id, DocumentPreview.Id);
+                    }
                 }
 
-                if (DocumentPreview != null && Document == null)
+                if (SearchId <= -999)
                 {
-                    Document = await Managers.DocumentsManager.GetDocumentAsync(FolderId ?? Folder.Id, DocumentPreview.Id);
+                    if (DocumentPreview != null && Document == null)
+                    {
+                        Document = await Managers.SearchManager.GetDocumentAsync(SearchId, DocumentPreview);
+                    }
                 }
 
                 RefreshView();
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Downloading document failed [folder.name={Folder?.Name}, folder.id={FolderId ?? Folder?.Id}, documentId={DocumentId ?? DocumentPreview?.Id}]", ex);
+                CommonConfig.Logger.Error($"Downloading document failed [folder.name={Folder?.Name}, searchId={SearchId}, folder.id={FolderId ?? Folder?.Id}, documentId={DocumentId ?? DocumentPreview?.Id}, readOnlyMode={ReadOnlyMode}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
@@ -390,10 +452,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             return new DocumentFragmentState
             {
+                FolderId = FolderId,
                 Folder = Folder,
+                SearchId = SearchId,
                 DocumentId = DocumentId,
                 DocumentPreview = DocumentPreview,
-                Document = Document
+                Document = Document,
+                ReadOnlyMode = ReadOnlyMode
             };
         }
 
@@ -402,10 +467,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var dfs = restoredState as DocumentFragmentState;
             if (dfs != null)
             {
+                FolderId = dfs.FolderId;
                 Folder = dfs.Folder;
+                SearchId = dfs.SearchId;
                 DocumentId = dfs.DocumentId;
                 DocumentPreview = dfs.DocumentPreview;
                 Document = dfs.Document;
+                ReadOnlyMode = dfs.ReadOnlyMode;
             }
         }
 
@@ -417,13 +485,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         class DocumentFragmentState : IRetainableState
         {
 
+            public int? FolderId { get; set; }
+
             public Folder Folder { get; set; }
+
+            public int SearchId { get; set; }
 
             public int? DocumentId { get; set; }
 
             public DocumentPreview DocumentPreview { get; set; }
 
             public Document Document { get; set; }
+
+            public bool ReadOnlyMode { get; set; }
         }
     }
 }
