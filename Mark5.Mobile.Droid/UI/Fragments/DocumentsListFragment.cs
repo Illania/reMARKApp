@@ -51,6 +51,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ActionMode actionMode;
         SearchView searchView;
 
+        bool adapterNeedsRefresh;
+        bool searchAdapterNeedsRefresh;
+
         readonly Handler searchHandler = new Handler();
 
         AutoRefreshWorker autoRefreshWorker;
@@ -117,7 +120,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             else
             {
-                adapter.NotifyDataSetChanged();
+                if (adapterNeedsRefresh)
+                {
+                    adapterNeedsRefresh = false;
+                    adapter.NotifyDataSetChanged();
+                }
+                if (searchAdapterNeedsRefresh)
+                {
+                    searchAdapterNeedsRefresh = false;
+                    searchAdapter.NotifyDataSetChanged();
+                }
             }
 
             if (!IsAdded || IsDetached || IsRemoving) return;
@@ -493,15 +505,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var position = adapter.GetPosition(m.DocumentPreviewId);
             if (position >= 0)
             {
+                adapterNeedsRefresh = true;
                 var dp = adapter.Items[position];
                 dp.IsReadByCurrent = m.IsReadByCurrent;
                 dp.IsReadByAnyone = m.IsReadByAnyone;
-                adapter.NotifyItemChanged(position);
             }
 
             position = searchAdapter.GetPosition(m.DocumentPreviewId);
             if (position >= 0)
             {
+                searchAdapterNeedsRefresh = true;
                 var dp = searchAdapter.Items[position];
                 dp.IsReadByCurrent = m.IsReadByCurrent;
                 dp.IsReadByAnyone = m.IsReadByAnyone;
@@ -514,19 +527,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var position = adapter.GetPosition(m.DocumentPreviewId);
             if (position >= 0)
             {
+                adapterNeedsRefresh = true;
                 var dp = adapter.Items[position];
                 dp.Categories.Clear();
                 dp.Categories.AddRange(m.Categories);
-                //adapter.NotifyItemChanged(position);
             }
 
             position = searchAdapter.GetPosition(m.DocumentPreviewId);
             if (position >= 0)
             {
+                searchAdapterNeedsRefresh = true;
                 var dp = searchAdapter.Items[position];
                 dp.Categories.Clear();
                 dp.Categories.AddRange(m.Categories);
-                //searchAdapter.NotifyItemChanged(position);
             }
         }
 
