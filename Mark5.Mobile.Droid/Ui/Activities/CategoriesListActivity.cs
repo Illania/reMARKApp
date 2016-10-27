@@ -7,6 +7,7 @@
 //
 
 using Android.App;
+using Android.Content;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
@@ -20,8 +21,10 @@ namespace Mark5.Mobile.Droid
     public class CategoriesListActivity : BaseAppCompatActivity
     {
         public const string BusinessEntityPreviewIntentKey = "BusinessEntityPreview_43dc8df1-dc88-4e39-81d6-59ea495c35ff";
+        public const string CategoriesResultKey = "CategoriesResult_0b8c55ac-2dbe-441e-af92-daa330d040fe";
 
         Toolbar toolbar;
+        CategoriesListFragment clf;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -40,7 +43,7 @@ namespace Mark5.Mobile.Droid
             {
                 var bep = SerializationUtils.Deserialize<BusinessEntityPreview>(Intent.Extras.GetString(BusinessEntityPreviewIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                var clf = new CategoriesListFragment
+                clf = new CategoriesListFragment
                 {
                     BusinessEntityPreview = bep
                 };
@@ -64,6 +67,14 @@ namespace Mark5.Mobile.Droid
             }
 
             return base.OnOptionsItemSelected(item);
+        }
+
+        public override void OnBackPressed()
+        {
+            var intent = new Intent();
+            intent.PutExtra(CategoriesResultKey, SerializationUtils.Serialize(clf.Categories));
+            SetResult(Result.Ok, intent);
+            base.OnBackPressed();
         }
     }
 }

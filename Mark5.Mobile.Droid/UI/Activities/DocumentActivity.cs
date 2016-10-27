@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 
+using System.Collections.Generic;
 using Android.App;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -26,6 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string DocumentPreviewIntentKey = "DocumentPreview_0bd291a4-22a5-431c-ad6e-4c8b273eeb98";
 
         Toolbar toolbar;
+        DocumentFragment df;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -45,7 +47,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
                 var documentPreview = SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                var df = new DocumentFragment
+                df = new DocumentFragment
                 {
                     Folder = folder,
                     DocumentPreview = documentPreview,
@@ -59,6 +61,18 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             else
             {
                 CommonConfig.Logger.Info($"Restored {nameof(DocumentActivity)}");
+            }
+        }
+
+        protected override void OnActivityResult(int requestCode, Result resultCode, Android.Content.Intent data)
+        {
+            if (resultCode == Result.Ok && df != null)
+            {
+                if (requestCode == DocumentFragment.RequestCodes.CategoriesRequest)
+                {
+                    var categories = SerializationUtils.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
+                    df.UpdateCategories(categories);
+                }
             }
         }
 

@@ -26,10 +26,13 @@ namespace Mark5.Mobile.Droid
 {
     public class CategoriesListFragment : RetainableStateFragment, View.IOnClickListener, SearchView.IOnQueryTextListener, SearchView.IOnCloseListener
     {
-        public BusinessEntityPreview BusinessEntityPreview
+        public BusinessEntityPreview BusinessEntityPreview { get; set; }
+        public List<Category> Categories
         {
-            get;
-            set;
+            get
+            {
+                return adapter.Items;
+            }
         }
 
         RecyclerView recyclerView;

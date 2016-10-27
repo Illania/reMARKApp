@@ -7,6 +7,7 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
@@ -33,6 +34,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
     public class DocumentFragment : RetainableStateFragment
     {
+        public static class RequestCodes
+        {
+            public static int CategoriesRequest = 2;
+        }
 
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
@@ -180,7 +185,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var i = new Intent(Activity, typeof(CategoriesListActivity));
                 i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(DocumentPreview));
-                StartActivity(i);
+                Activity.StartActivityForResult(i, RequestCodes.CategoriesRequest);
 
                 return true;
             }
@@ -393,6 +398,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     CommonConfig.Logger.Error($"Marking document as read failed [folder.name={f?.Name}, folder.id={f?.Id}, documentPreviewId={dp?.Id}]", ex);
                 }
             });
+        }
+
+        public void UpdateCategories(List<Category> categories)
+        {
+            if (DocumentPreview != null)
+            {
+                DocumentPreview.Categories.Clear();
+                DocumentPreview.Categories.AddRange(categories);
+            }
         }
 
         public override IRetainableState OnRetainInstanceState()
