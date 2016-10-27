@@ -18,7 +18,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
-    [Activity(WindowSoftInputMode = SoftInput.AdjustResize)]
+    [Activity]
     public class SearchActivity : AppCompatActivity
     {
 
