@@ -216,7 +216,7 @@ namespace Mark5.Mobile.Common.Managers
                 {
                     Token = Token,
                     ObjectId = contactPreview.Id,
-                    ObjectType = DataContract.ObjectType.Document,
+                    ObjectType = DataContract.ObjectType.Contact,
                     CategoryIds = categories.Select(c => c.Id).ToArray()
                 });
 

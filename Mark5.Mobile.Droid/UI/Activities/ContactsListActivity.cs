@@ -14,6 +14,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
+using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -21,10 +22,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity]
     public class ContactsListActivity : BaseAppCompatActivity
     {
-
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
 
         Toolbar toolbar;
+        ContactsListFragment clf;
+
+        TinyMessageSubscriptionToken categoriesToken;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -43,11 +46,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                var dlf = new ContactsListFragment
+                clf = new ContactsListFragment
                 {
                     Folder = folder
                 };
-                ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, clf, clf.GenerateTag());
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ContactsListActivity)}");
@@ -56,6 +59,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 CommonConfig.Logger.Info($"Restored {nameof(ContactsListActivity)}");
             }
+
+            categoriesToken = PlatformConfig.MessengerHub.Subscribe<ContactPreviewCategoriesChangedMessage>(m =>
+            {
+                if (clf != null && m.Sender != clf)
+                {
+                    clf.UpdateCategories(m);
+                }
+            });
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)

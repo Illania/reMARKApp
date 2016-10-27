@@ -33,6 +33,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ContactViewFragment : RetainableStateFragment
     {
+        public static class RequestCodes
+        {
+            public static int CategoriesRequest = 2;
+        }
 
         public ContactPreview ContactPreview { get; set; }
         public Contact Contact { get; set; }
@@ -214,7 +218,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var i = new Intent(Activity, typeof(CategoriesListActivity));
                 i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(ContactPreview));
-                StartActivity(i);
+                Activity.StartActivityForResult(i, RequestCodes.CategoriesRequest);
 
                 return true;
             }
@@ -245,6 +249,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             return base.OnOptionsItemSelected(item);
+        }
+
+        public void UpdateCategories(List<Category> categories)
+        {
+            if (ContactPreview != null)
+            {
+                ContactPreview.Categories.Clear();
+                ContactPreview.Categories.AddRange(categories);
+            }
         }
 
         #region MenuItemActions

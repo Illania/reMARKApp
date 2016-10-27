@@ -44,7 +44,7 @@ namespace Mark5.Mobile.Droid
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(AvailableCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview.Id}, businessEntity.objectType={BusinessEntityPreview.ObjectType}]");
+            CommonConfig.Logger.Info($"Creating {nameof(AvailableCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
@@ -144,11 +144,10 @@ namespace Mark5.Mobile.Droid
                         if (t.IsFaulted)
                         {
                             CommonConfig.Logger.Error($"Update of categories failed", t.Exception);
-                            Dialogs.ShowErrorDialog(Activity, t.Exception);
+                            Activity.RunOnUiThread(() => Dialogs.ShowErrorDialog(Activity, t.Exception));
                         }
                         else
                         {
-
                             switch (BusinessEntityPreview.ObjectType)
                             {
                                 case ObjectType.Document:
@@ -157,18 +156,14 @@ namespace Mark5.Mobile.Droid
                                     break;
                                 case ObjectType.Contact:
                                     var contactPreview = BusinessEntityPreview as ContactPreview;
-                                    //await Managers.ContactsManager.SetCategoriesAsync(contactPreview, selectedCategories.Values.ToList());
+                                    PlatformConfig.MessengerHub.Publish(new ContactPreviewCategoriesChangedMessage(this, contactPreview.Id, contactPreview.Categories));
                                     break;
                                 default:
                                     throw new ArgumentException("The business entity provided does not have categories in the model");
                             }
 
-
-
                             Activity.RunOnUiThread(() => Activity.OnBackPressed());
-                        } //TODO need to send info to the list
-                          //Check what happens when we rotate
-
+                        }
                     });
         }
 
@@ -283,7 +278,8 @@ namespace Mark5.Mobile.Droid
         {
             return new AvailableCategoriesListFragmentState
             {
-                BusinessEntityPreview = BusinessEntityPreview, //TODO need to save also the selected and the available 
+                BusinessEntityPreview = BusinessEntityPreview,
+                SelectedCategories = selectedCategories,
             };
         }
 
@@ -293,6 +289,7 @@ namespace Mark5.Mobile.Droid
             if (clfs != null)
             {
                 BusinessEntityPreview = clfs.BusinessEntityPreview;
+                selectedCategories = clfs.SelectedCategories;
             }
         }
 
@@ -304,6 +301,7 @@ namespace Mark5.Mobile.Droid
         class AvailableCategoriesListFragmentState : IRetainableState
         {
             public BusinessEntityPreview BusinessEntityPreview { get; set; }
+            public Dictionary<int, Category> SelectedCategories { get; set; }
         }
 
         #endregion

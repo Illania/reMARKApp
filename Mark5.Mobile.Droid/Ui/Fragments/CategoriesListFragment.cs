@@ -45,7 +45,7 @@ namespace Mark5.Mobile.Droid
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview.Id}, businessEntity.objectType={BusinessEntityPreview.ObjectType}]");
+            CommonConfig.Logger.Info($"Creating {nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
@@ -137,6 +137,7 @@ namespace Mark5.Mobile.Droid
                     throw new ArgumentException("The business entity provided does not have categories in the model");
             }
         }
+
 
         #region Search
 

@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.Collections.Generic;
 using Android.App;
 using Android.OS;
 using Android.Support.Design.Widget;
@@ -28,6 +29,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         ContactHeaderView toolbarHeaderView;
         ContactHeaderView floatHeaderView;
+
+        ContactViewFragment cvf;
 
         Toolbar toolbar;
 
@@ -57,12 +60,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
 
                 var ft = SupportFragmentManager.BeginTransaction();
-                var dlf = new ContactViewFragment
+                cvf = new ContactViewFragment
                 {
                     ContactPreview = contactPreview,
                     Folder = folder,
                 };
-                ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, cvf, cvf.GenerateTag());
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ContactActivity)}");
@@ -84,6 +87,17 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             return base.OnOptionsItemSelected(item);
         }
 
+        protected override void OnActivityResult(int requestCode, Result resultCode, Android.Content.Intent data)
+        {
+            if (resultCode == Result.Ok && cvf != null)
+            {
+                if (requestCode == ContactViewFragment.RequestCodes.CategoriesRequest)
+                {
+                    var categories = SerializationUtils.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
+                    cvf.UpdateCategories(categories);
+                }
+            }
+        }
 
         public void SetTitles(string title, string subtitle)
         {
