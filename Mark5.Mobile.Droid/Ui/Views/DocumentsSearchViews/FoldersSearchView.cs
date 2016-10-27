@@ -60,7 +60,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
 
         public override void UpdateCriteria(SearchDocumentsCriteria criteria)
         {
-            // TODO
+            criteria.FiledInFolderFolderType = FiledInFolderFolderType.Any;
         }
     }
 }

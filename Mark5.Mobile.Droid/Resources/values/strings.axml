@@ -88,9 +88,13 @@
 	<string name="description">Description</string>
 	<string name="by">by</string>
 	<string name="on">on</string>
+	<string name="search">Search</string>
 	<string name="search_documents">Search documents</string>
+	<string name="search_documents_result">Search results</string>
 	<string name="search_contacts">Search contacts</string>
+	<string name="search_contacts_results">Search results</string>
 	<string name="search_shortcodes">Search shortcodes</string>
+	<string name="search_shortcodes_results">Search result</string>
 	<string name="type_search_query">Search query</string>
 	<string name="search_reference_number">Reference number</string>
 	<string-array name="search_from_to">

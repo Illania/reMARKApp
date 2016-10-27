@@ -1,6 +1,6 @@
-//
+﻿//
 // Project: Mark5.Mobile.Droid
-// File: SearchDocumentsActivity.cs
+// File: SearchResultsDocumentsActivity.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -19,10 +19,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Activity]
-    public class SearchActivity : AppCompatActivity
+    public class SearchResultsActivity : AppCompatActivity
     {
 
-        public const string ModuleIntentKey = "Module_d1dbd7d8-045d-48c0-b72c-618107935279";
+        public const string ModuleIntentKey = "Module_fb7022b2-d795-4a22-8f94-052397d50b17";
+        public const string CriteriaIntentKey = "Criteria_6f536c40-9c1b-4996-a60a-bf94df1613a7";
 
         Toolbar toolbar;
 
@@ -30,7 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             base.OnCreate(savedInstanceState);
 
-            CommonConfig.Logger.Info($"Creating {nameof(SearchActivity)}...");
+            CommonConfig.Logger.Info($"Creating {nameof(SearchResultsActivity)}...");
 
             SetTitle(Resource.String.search);
             SetContentView(Resource.Layout.base_layout);
@@ -45,33 +46,48 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (moduleType == ModuleType.Documents)
                 {
+                    var criteria = SerializationUtils.Deserialize<SearchDocumentsCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
+
                     var ft = SupportFragmentManager.BeginTransaction();
-                    var dlf = new DocumentsSearchFragment();
+                    var dlf = new DocumentSearchResultsFragment
+                    {
+                        Criteria = criteria
+                    };
                     ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
                     ft.Commit();
                 }
 
                 if (moduleType == ModuleType.Contacts)
                 {
+                    var criteria = SerializationUtils.Deserialize<SearchContactsCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
+
                     var ft = SupportFragmentManager.BeginTransaction();
-                    var dlf = new ContactsSearchFragment();
+                    var dlf = new ContactSearchResultsFragment
+                    {
+                        Criteria = criteria
+                    };
                     ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
                     ft.Commit();
                 }
 
                 if (moduleType == ModuleType.Shortcodes)
                 {
+                    var criteria = SerializationUtils.Deserialize<SearchShortcodesCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
+
                     var ft = SupportFragmentManager.BeginTransaction();
-                    var dlf = new ShortcodesSearchFragment();
+                    var dlf = new ShortcodeSearchResultsFragment
+                    {
+                        Criteria = criteria
+                    };
                     ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
                     ft.Commit();
                 }
 
-                CommonConfig.Logger.Info($"Created {nameof(SearchActivity)} [moduleType={moduleType}]");
+                CommonConfig.Logger.Info($"Created {nameof(SearchResultsActivity)} [moduleType={moduleType}]");
             }
             else
             {
-                CommonConfig.Logger.Info($"Restored {nameof(SearchActivity)}");
+                CommonConfig.Logger.Info($"Restored {nameof(SearchResultsActivity)}");
             }
         }
 
