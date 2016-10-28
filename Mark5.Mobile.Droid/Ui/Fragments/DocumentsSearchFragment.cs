@@ -15,7 +15,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
-using Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews;
+using Mark5.Mobile.Droid.Ui.Views.SearchViews;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Common.Utilities;
 using System.Linq;
@@ -46,11 +46,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new SubjectMessageSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new DateRangeSearchView(Context));
+            linearLayout.AddView(new DocumentReceivedDateRangeSearchView(Context));
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new UnreadOnlySearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new DocumentDirectionsSearchView(Context));
+            linearLayout.AddView(new DirectionsSearchView(Context));
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new PrioritiesSearchView(Context));
             linearLayout.AddView(new Divider(Context));
@@ -64,11 +64,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new WithAttachmentsOnlySearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new CategoriesSearchView(Context));
+            linearLayout.AddView(new DocumentCategoriesSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new MustHaveCategoriesSearchView(Context));
+            linearLayout.AddView(new DocumentMustHaveCategoriesSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new FoldersSearchView(Context));
+            linearLayout.AddView(new DocumentFoldersSearchView(Context));
             linearLayout.AddView(new Divider(Context));
 
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
@@ -127,7 +127,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             for (var i = 0; i < linearLayout.ChildCount; i++)
             {
-                var dsv = linearLayout.GetChildAt(i) as DocumentsSearchView;
+                var dsv = linearLayout.GetChildAt(i) as AbstractSearchView<SearchDocumentsCriteria>;
                 if (dsv != null)
                 {
                     dsv.ToCriteria(criteria);
@@ -141,7 +141,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             for (var i = 0; i < linearLayout.ChildCount; i++)
             {
-                var dsv = linearLayout.GetChildAt(i) as DocumentsSearchView;
+                var dsv = linearLayout.GetChildAt(i) as AbstractSearchView<SearchDocumentsCriteria>; ;
                 if (dsv != null)
                 {
                     dsv.FromCriteria(criteria);

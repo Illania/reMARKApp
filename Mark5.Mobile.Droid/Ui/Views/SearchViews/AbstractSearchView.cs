@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: DocumentsSearchView.cs
+// File: AbstractSearchView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -8,13 +8,12 @@
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
-using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
 
-namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
+namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
 
-    public abstract class DocumentsSearchView : LinearLayoutCompat
+    public abstract class AbstractSearchView<T> : LinearLayoutCompat
     {
 
         protected int DistanceNone;
@@ -22,7 +21,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
         protected int DistanceNormal;
         protected int DistanceSmall;
 
-        protected DocumentsSearchView(Context context)
+        protected AbstractSearchView(Context context)
             : base(context)
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
@@ -32,8 +31,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             DistanceSmall = ConversionUtils.ConvertDpToPixels(4.0f);
         }
 
-        public abstract void FromCriteria(SearchDocumentsCriteria criteria);
+        public abstract void FromCriteria(T criteria);
 
-        public abstract void ToCriteria(SearchDocumentsCriteria criteria);
+        public abstract void ToCriteria(T criteria);
     }
 }

@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: ExtraFieldsSearchView.cs
+// File: AbstractEditTextSearchView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -8,18 +8,17 @@
 using Android.Content;
 using Android.Support.Design.Widget;
 using Android.Views;
-using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 
-namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
+namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
 
-    public class ExtraFieldsSearchView : DocumentsSearchView
+    public abstract class AbstractEditTextSearchView<T> : AbstractSearchView<T>
     {
 
-        readonly TextInputEditText extraFieldsField;
+        protected readonly TextInputEditText EditText;
 
-        public ExtraFieldsSearchView(Context context)
+        protected AbstractEditTextSearchView(Context context)
             : base(context)
         {
             Orientation = Vertical;
@@ -34,23 +33,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             };
             AddView(textInputLayout);
 
-            extraFieldsField = new TextInputEditText(context)
+            EditText = new TextInputEditText(context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
-            extraFieldsField.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
-            extraFieldsField.SetHint(Resource.String.search_extra_fields);
-            textInputLayout.AddView(extraFieldsField);
-        }
-
-        public override void FromCriteria(SearchDocumentsCriteria criteria)
-        {
-            extraFieldsField.Text = criteria.Comment;
-        }
-
-        public override void ToCriteria(SearchDocumentsCriteria criteria)
-        {
-            criteria.Comment = extraFieldsField.Text;
+            EditText.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
+            textInputLayout.AddView(EditText);
         }
     }
 }

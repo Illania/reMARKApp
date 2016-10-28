@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -29,13 +28,13 @@
     <ConsolePause>false</ConsolePause>
     <AndroidLinkMode>None</AndroidLinkMode>
     <AndroidSupportedAbis>armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
-<AndroidKeyStore>True</AndroidKeyStore>
-<AndroidSigningKeyStore>../../extra/App Development Certificates/Android/default.keystore</AndroidSigningKeyStore>
-<AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
-<AndroidSigningKeyAlias>default -tsa https://timestamp.geotrust.com/tsa</AndroidSigningKeyAlias>
-<AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
-<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-<AndroidHttpClientHandlerType></AndroidHttpClientHandlerType>
+    <AndroidKeyStore>True</AndroidKeyStore>
+    <AndroidSigningKeyStore>../../extra/App Development Certificates/Android/default.keystore</AndroidSigningKeyStore>
+    <AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
+    <AndroidSigningKeyAlias>default -tsa https://timestamp.geotrust.com/tsa</AndroidSigningKeyAlias>
+    <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <AndroidHttpClientHandlerType></AndroidHttpClientHandlerType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -43,14 +42,14 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-<AndroidSupportedAbis>armeabi-v7a;arm64-v8a;armeabi</AndroidSupportedAbis>
-<AndroidKeyStore>True</AndroidKeyStore>
-<AndroidSigningKeyStore>../../extra/App Development Certificates/Android/default.keystore</AndroidSigningKeyStore>
-<AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
-<AndroidSigningKeyAlias>default -tsa https://timestamp.geotrust.com/tsa</AndroidSigningKeyAlias>
-<AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
-<AndroidLinkSkip>System.Runtime;System.Collections;System.Runtime.Serialization</AndroidLinkSkip>
-<AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
+    <AndroidSupportedAbis>armeabi-v7a;arm64-v8a;armeabi</AndroidSupportedAbis>
+    <AndroidKeyStore>True</AndroidKeyStore>
+    <AndroidSigningKeyStore>../../extra/App Development Certificates/Android/default.keystore</AndroidSigningKeyStore>
+    <AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
+    <AndroidSigningKeyAlias>default -tsa https://timestamp.geotrust.com/tsa</AndroidSigningKeyAlias>
+    <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
+    <AndroidLinkSkip>System.Runtime;System.Collections;System.Runtime.Serialization</AndroidLinkSkip>
+    <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -231,33 +230,42 @@
     <Compile Include="Ui\Fragments\DocumentsSearchFragment.cs" />
     <Compile Include="Ui\Fragments\ContactsSearchFragment.cs" />
     <Compile Include="Ui\Fragments\ShortcodesSearchFragment.cs" />
-    <Compile Include="Ui\Views\DocumentsSearchViews\DocumentsSearchView.cs" />
-    <Compile Include="Ui\Views\DocumentsSearchViews\FromToSearchView.cs" />
-    <Compile Include="Ui\Views\DocumentsSearchViews\SubjectMessageSearchView.cs" />
-    <Compile Include="Ui\Views\DocumentsSearchViews\ReferenceNumberSearchView.cs" />
-    <Compile Include="Ui\Views\DocumentsSearchViews\CommentsSearchView.cs" />
-    <Compile Include="Ui\Views\DocumentsSearchViews\ExtraFieldsSearchView.cs" />
-    <Compile Include="Ui\Views\DocumentsSearchViews\AttachmentNamesSearchView.cs" />
-    <Compile Include="Ui\Views\DocumentsSearchViews\LinesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\FromToSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\SubjectMessageSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ReferenceNumberSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\CommentsSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ExtraFieldsSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractEditTextSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AttachmentNamesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\LinesSearchView.cs" />
     <Compile Include="Utilities\LambdaEqualityComparer.cs" />
-    <Compile Include="Ui\Views\DocumentsSearchViews\PrioritiesSearchView.cs" />
-    <Compile Include="Ui\Views\DocumentsSearchViews\DocumentDirectionsSearchView.cs" />
-    <Compile Include="HandledSearchView.cs" />
-    <Compile Include="Ui\Views\DocumentsSearchViews\UnreadOnlySearchView.cs" />
-    <Compile Include="Ui\Views\DocumentsSearchViews\SearchInAttachmentsSearchView.cs" />
-    <Compile Include="Ui\Views\DocumentsSearchViews\PartialWordsSearchView.cs" />
-    <Compile Include="Ui\Views\DocumentsSearchViews\WithAttachmentsOnlySearchView.cs" />
-    <Compile Include="Ui\Views\DocumentsSearchViews\FoldersSearchView.cs" />
-    <Compile Include="Ui\Views\DocumentsSearchViews\CategoriesSearchView.cs" />
-    <Compile Include="Ui\Views\DocumentsSearchViews\MustHaveCategoriesSearchView.cs" />
-    <Compile Include="Ui\Views\DocumentsSearchViews\DateRangeSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\PrioritiesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DirectionsSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\UnreadOnlySearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\SearchInAttachmentsSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\PartialWordsSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\WithAttachmentsOnlySearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\FoldersSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractCategoriesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractMustHaveCategoriesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractDateRangeSearchView.cs" />
     <Compile Include="Ui\Common\CustomArrayAdapter.cs" />
     <Compile Include="Ui\Common\ViewUtilities.cs" />
     <Compile Include="Ui\Activities\SearchResultsActivity.cs" />
     <Compile Include="Ui\Fragments\DocumentSearchResultsFragment.cs" />
     <Compile Include="Ui\Fragments\ContactSearchResultsFragment.cs" />
     <Compile Include="ShortcodeSearchResultsFragment.cs" />
-    <Compile Include="Ui\Views\DocumentsSearchViews\MaxDocumentsSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\MaxDocumentsSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\HandledSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractCheckboxSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractSingleChoiceSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractMultiChoiceSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentReceivedDateRangeSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentFoldersSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentCategoriesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentMustHaveCategoriesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractSpinnerEditTextSearchView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -413,7 +421,7 @@
     <Folder Include="Ui\Views\ContactViews\HeaderViews\" />
     <Folder Include="Ui\Common\BusMesseges\" />
     <Folder Include="Ui\Views\ShortcodeViews\" />
-    <Folder Include="Ui\Views\DocumentsSearchViews\" />
+    <Folder Include="Ui\Views\SearchViews\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">

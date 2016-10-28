@@ -8,19 +8,18 @@
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
-using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 
-namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
+namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
 
-    public class FoldersSearchView : DocumentsSearchView
+    public abstract class FoldersSearchView<T> : AbstractSearchView<T>
     {
 
         readonly AppCompatTextView foldersTitle;
         readonly AppCompatTextView foldersSubtitle;
 
-        public FoldersSearchView(Context context)
+        protected FoldersSearchView(Context context)
             : base(context)
         {
             Orientation = Vertical;
@@ -51,16 +50,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             foldersSubtitle.SetText(Resource.String.search_folders);
             foldersSubtitle.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
             AddView(foldersSubtitle);
-        }
-
-        public override void FromCriteria(SearchDocumentsCriteria criteria)
-        {
-            // TODO
-        }
-
-        public override void ToCriteria(SearchDocumentsCriteria criteria)
-        {
-            criteria.FiledInFolderFolderType = FiledInFolderFolderType.Any;
         }
     }
 }
