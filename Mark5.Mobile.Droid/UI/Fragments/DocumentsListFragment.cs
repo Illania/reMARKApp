@@ -51,8 +51,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ActionMode actionMode;
         SearchView searchView;
 
-        bool adapterNeedsRefresh;
-        bool searchAdapterNeedsRefresh;
+        bool shouldNotifyAdapter;
+        bool shouldNotifySearchAdapter;
 
         readonly Handler searchHandler = new Handler();
 
@@ -118,18 +118,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await RefreshData();
             }
-            else
+
+            if (shouldNotifyAdapter)
             {
-                if (adapterNeedsRefresh)
-                {
-                    adapterNeedsRefresh = false;
-                    adapter.NotifyDataSetChanged();
-                }
-                if (searchAdapterNeedsRefresh)
-                {
-                    searchAdapterNeedsRefresh = false;
-                    searchAdapter.NotifyDataSetChanged();
-                }
+                shouldNotifyAdapter = false;
+                adapter.NotifyDataSetChanged();
+            }
+            if (shouldNotifySearchAdapter)
+            {
+                shouldNotifySearchAdapter = false;
+                searchAdapter.NotifyDataSetChanged();
             }
 
             if (!IsAdded || IsDetached || IsRemoving) return;
@@ -505,7 +503,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var position = adapter.GetPosition(m.DocumentPreviewId);
             if (position >= 0)
             {
-                adapterNeedsRefresh = true;
+                shouldNotifyAdapter = true;
                 var dp = adapter.Items[position];
                 dp.IsReadByCurrent = m.IsReadByCurrent;
                 dp.IsReadByAnyone = m.IsReadByAnyone;
@@ -514,7 +512,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             position = searchAdapter.GetPosition(m.DocumentPreviewId);
             if (position >= 0)
             {
-                searchAdapterNeedsRefresh = true;
+                shouldNotifySearchAdapter = true;
                 var dp = searchAdapter.Items[position];
                 dp.IsReadByCurrent = m.IsReadByCurrent;
                 dp.IsReadByAnyone = m.IsReadByAnyone;
@@ -527,7 +525,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var position = adapter.GetPosition(m.DocumentPreviewId);
             if (position >= 0)
             {
-                adapterNeedsRefresh = true;
+                shouldNotifyAdapter = true;
                 var dp = adapter.Items[position];
                 dp.Categories.Clear();
                 dp.Categories.AddRange(m.Categories);
@@ -536,7 +534,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             position = searchAdapter.GetPosition(m.DocumentPreviewId);
             if (position >= 0)
             {
-                searchAdapterNeedsRefresh = true;
+                shouldNotifySearchAdapter = true;
                 var dp = searchAdapter.Items[position];
                 dp.Categories.Clear();
                 dp.Categories.AddRange(m.Categories);

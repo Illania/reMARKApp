@@ -402,11 +402,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void UpdateCategories(List<Category> categories)
         {
-            if (DocumentPreview != null)
-            {
-                DocumentPreview.Categories.Clear();
-                DocumentPreview.Categories.AddRange(categories);
-            }
+            DocumentPreview?.Categories.Clear();
+            DocumentPreview?.Categories.AddRange(categories);
         }
 
         public override IRetainableState OnRetainInstanceState()

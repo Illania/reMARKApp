@@ -145,7 +145,7 @@ namespace Mark5.Mobile.Droid
                         if (t.IsFaulted)
                         {
                             CommonConfig.Logger.Error($"Update of categories failed", t.Exception);
-                            Activity.RunOnUiThread(() => Dialogs.ShowErrorDialog(Activity, t.Exception));
+                            Dialogs.ShowErrorDialog(Activity, t.Exception);
                         }
                         else
                         {
@@ -163,9 +163,9 @@ namespace Mark5.Mobile.Droid
                                     throw new ArgumentException("The business entity provided does not have categories in the model");
                             }
 
-                            Activity.RunOnUiThread(() => Activity.OnBackPressed());
+                            Activity.OnBackPressed();
                         }
-                    });
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         #region Refresh methods

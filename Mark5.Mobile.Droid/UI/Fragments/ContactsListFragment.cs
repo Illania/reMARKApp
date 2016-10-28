@@ -48,8 +48,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ActionMode actionMode;
         SearchView searchView;
 
-        bool adapterNeedsRefresh;
-        bool searchAdapterNeedsRefresh;
+        bool shouldNotifyAdapter;
+        bool shouldNotifySearchAdapter;
 
         CancellationTokenSource cts;
 
@@ -114,18 +114,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 RefreshData();
             }
-            else
+
+            if (shouldNotifyAdapter)
             {
-                if (adapterNeedsRefresh)
-                {
-                    adapterNeedsRefresh = false;
-                    adapter.NotifyDataSetChanged();
-                }
-                if (searchAdapterNeedsRefresh)
-                {
-                    searchAdapterNeedsRefresh = false;
-                    searchAdapter.NotifyDataSetChanged();
-                }
+                shouldNotifyAdapter = false;
+                adapter.NotifyDataSetChanged();
+            }
+            if (shouldNotifySearchAdapter)
+            {
+                shouldNotifySearchAdapter = false;
+                searchAdapter.NotifyDataSetChanged();
             }
         }
 
@@ -253,7 +251,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var position = adapter.GetPosition(m.ContactPreviewId);
             if (position >= 0)
             {
-                adapterNeedsRefresh = true;
+                shouldNotifyAdapter = true;
                 var cp = adapter.Items[position];
                 cp.Categories.Clear();
                 cp.Categories.AddRange(m.Categories);
@@ -262,7 +260,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             position = searchAdapter.GetPosition(m.ContactPreviewId);
             if (position >= 0)
             {
-                searchAdapterNeedsRefresh = true;
+                shouldNotifySearchAdapter = true;
                 var cp = searchAdapter.Items[position];
                 cp.Categories.Clear();
                 cp.Categories.AddRange(m.Categories);
