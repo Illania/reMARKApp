@@ -461,6 +461,8 @@ namespace Mark5.Mobile.Common.Managers
 
                 var comment = result.Comment.Convert();
 
+                document.Comments.Add(comment);
+
                 await documentsDataAccess.AddCommentAsync(document, comment);
 
                 return comment;
@@ -487,6 +489,11 @@ namespace Mark5.Mobile.Common.Managers
                 if (editSuccess)
                 {
                     await documentsDataAccess.AddCommentAsync(document, comment);
+                    var index = document.Comments.FindIndex(c => c.Id == comment.Id);
+                    if (index >= 0)
+                    {
+                        document.Comments[index] = comment;
+                    }
                 }
 
                 return editSuccess;
@@ -507,6 +514,7 @@ namespace Mark5.Mobile.Common.Managers
                     ObjectType = DataContract.ObjectType.Document
                 });
 
+                document.Comments.Remove(comment);
                 await documentsDataAccess.DeleteCommentAsync(document, comment);
 
                 return;

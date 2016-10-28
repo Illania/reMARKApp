@@ -229,6 +229,10 @@
     <Compile Include="Utilities\PushNotifications\GcmListenerService.cs" />
     <Compile Include="Utilities\PushNotifications\InstanceIdListenerService.cs" />
     <Compile Include="Utilities\PushNotifications\RegistrationIntentService.cs" />
+    <Compile Include="Ui\Activities\CommentsListActivity.cs" />
+    <Compile Include="Ui\Fragments\CommentsListFragment.cs" />
+    <Compile Include="Ui\Common\BusMesseges\DocumentPreviewCommentCountChangedMessage.cs" />
+    <Compile Include="Ui\Common\ActionOnCreateContextMenuListener.cs" />
     <Compile Include="Ui\Activities\ObjectActionsActivity.cs" />
     <Compile Include="Ui\Fragments\ObjectActionsFragment.cs" />
     <Compile Include="Ui\Views\ObjectActionsView.cs" />
@@ -369,6 +373,12 @@
     <AndroidResource Include="Resources\layout\base_layout_collapsing.axml" />
     <AndroidResource Include="Resources\drawable\rounded_background.xml" />
     <AndroidResource Include="Resources\xml\filepaths.xml" />
+    <AndroidResource Include="Resources\layout\list_item_comments.axml" />
+    <AndroidResource Include="Resources\layout\list_comments.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\send.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\send.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\send.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\send.png" />
     <AndroidResource Include="Resources\layout\linear_layout_nested.axml" />
     <AndroidResource Include="Resources\layout\list_item_categories.axml" />
   </ItemGroup>

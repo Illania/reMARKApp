@@ -35,6 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         public static class RequestCodes
         {
+            public static int CommentsRequest = 1;
             public static int CategoriesRequest = 2;
         }
 
@@ -204,6 +205,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             descriptionSubviews.ForEach(descriptionCardViewInternalLayout.AddView);
         }
 
+        #endregion
+
+        #region Options menu
+
+
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
@@ -222,12 +228,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
-
             if (item.ItemId == MenuItemActions.Comments)
             {
-                //TODO to fill
-            }
+                var i = new Intent(Activity, typeof(CommentsListActivity));
+                i.PutExtra(CommentsListActivity.EntityIntentKey, SerializationUtils.Serialize(Contact));
+                Activity.StartActivityForResult(i, RequestCodes.CommentsRequest);
 
+                return true;
+            }
             if (item.ItemId == MenuItemActions.Actions)
             {
                 var i = new Intent(Activity, typeof(ObjectActionsActivity));
@@ -237,7 +245,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
-
             if (item.ItemId == MenuItemActions.Links)
             {
                 var i = new Intent(Activity, typeof(ObjectLinksActivity));
@@ -251,13 +258,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return base.OnOptionsItemSelected(item);
         }
 
-        public void UpdateCategories(List<Category> categories)
+        public override void OnPrepareOptionsMenu(IMenu menu)
         {
-            ContactPreview?.Categories.Clear();
-            ContactPreview?.Categories.AddRange(categories);
+            var commentsMenuItem = menu.FindItem(MenuItemActions.Comments);
+            commentsMenuItem.SetEnabled(Contact != null);
         }
-
-        #region MenuItemActions
 
         static class MenuItemActions
         {
@@ -266,8 +271,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int Actions = 30;
             public const int Links = 40;
         }
-
-        #endregion
 
         #endregion
 
@@ -384,6 +387,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void AddressClicked(object sender, CommunicationAddress e)
         {
             //TODO 
+        }
+
+        #endregion
+
+        #region Update methods
+
+        public void UpdateCategories(List<Category> categories)
+        {
+            ContactPreview?.Categories.Clear();
+            ContactPreview?.Categories.AddRange(categories);
+        }
+
+        public void UpdateComments(List<Comment> comments)
+        {
+            if (ContactPreview != null)
+            {
+                ContactPreview.CommentsCount = comments.Count;
+                Contact.Comments.Clear();
+                Contact.Comments.AddRange(comments);
+            }
         }
 
         #endregion
