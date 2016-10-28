@@ -120,7 +120,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
                 {
                     CommonConfig.Logger.Info($"Invalid password was entered: {password}");
 
-                    passwordEditText.Error = GetText(Resource.String.passowrd_invalid);
+                    passwordEditText.Error = GetText(Resource.String.password_invalid);
                     errors = true;
                 }
                 if (!Validator.IsHostNameValid(hostname))
