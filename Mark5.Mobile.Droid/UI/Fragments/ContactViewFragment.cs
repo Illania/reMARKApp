@@ -213,6 +213,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
         }
 
+        public override void OnPrepareOptionsMenu(IMenu menu)
+        {
+            var commentsMenuItem = menu.FindItem(MenuItemActions.Comments);
+            commentsMenuItem.SetEnabled(Contact != null);
+        }
+
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if (item.ItemId == MenuItemActions.Categories)
@@ -224,7 +230,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var i = new Intent(Activity, typeof(CommentsListActivity));
                 i.PutExtra(CommentsListActivity.EntityIntentKey, SerializationUtils.Serialize(Contact));
-                Activity.StartActivityForResult(i, RequestCodes.CategoriesRequest);
+                Activity.StartActivityForResult(i, RequestCodes.CommentsRequest);
 
                 return true;
             }

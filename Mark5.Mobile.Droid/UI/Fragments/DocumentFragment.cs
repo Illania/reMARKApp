@@ -159,6 +159,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public override void OnPrepareOptionsMenu(IMenu menu)
+        {
+            var commentsMenuItem = menu.FindItem(70);
+            commentsMenuItem.SetEnabled(Document != null);
+        }
+
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if (item.ItemId == 70)
