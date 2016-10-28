@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.Collections.Generic;
 using Android.App;
 using Android.OS;
 using Android.Support.Design.Widget;
@@ -26,8 +27,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string ContactPreviewIntentKey = "ContactPreview_0da27d12-4d29-4f44-8dbf-2e28d7f93aae";
         public const string FolderIntentKey = "Folder_88a33f0b-ebbf-4eed-b33d-49fba4f43f15";
 
+        string fragmentTagKey = "fragmentTagKey";
+
         ContactHeaderView toolbarHeaderView;
         ContactHeaderView floatHeaderView;
+        string fragmentTag;
+
+
+        ContactViewFragment cvf;
 
         Toolbar toolbar;
 
@@ -57,20 +64,29 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
 
                 var ft = SupportFragmentManager.BeginTransaction();
-                var dlf = new ContactViewFragment
+                cvf = new ContactViewFragment
                 {
                     ContactPreview = contactPreview,
                     Folder = folder,
                 };
-                ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
+                fragmentTag = cvf.GenerateTag();
+                ft.Replace(Resource.Id.fragment_container, cvf, fragmentTag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ContactActivity)}");
             }
             else
             {
+                fragmentTag = savedInstanceState.GetString(fragmentTagKey);
+                cvf = SupportFragmentManager.FindFragmentByTag(fragmentTag) as ContactViewFragment;
                 CommonConfig.Logger.Info($"Restored {nameof(ContactActivity)}");
             }
+        }
+
+        protected override void OnSaveInstanceState(Bundle outState)
+        {
+            outState.PutString(fragmentTagKey, fragmentTag);
+            base.OnSaveInstanceState(outState);
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -84,6 +100,21 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             return base.OnOptionsItemSelected(item);
         }
 
+        protected override void OnActivityResult(int requestCode, Result resultCode, Android.Content.Intent data)
+        {
+            if (resultCode == Result.Ok && cvf != null)
+            {
+                if (requestCode == ContactViewFragment.RequestCodes.CommentsRequest)
+                {
+                    var comments = SerializationUtils.Deserialize<List<Comment>>(data.GetStringExtra(CommentsListActivity.CommentsResultKey));
+                    cvf.UpdateComments(comments);
+                }
+                if (requestCode == ContactViewFragment.RequestCodes.CategoriesRequest)
+                {
+                    //TODO
+                }
+            }
+        }
 
         public void SetTitles(string title, string subtitle)
         {

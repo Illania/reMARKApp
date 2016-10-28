@@ -24,7 +24,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string EntityIntentKey = "EntityIntent_20c8514c-b644-47db-842f-f2df4204d93a";
         public const string CommentsResultKey = "CommentsResult_593d8c70-d45c-425e-8e36-7389e3cc0c62";
 
+        string fragmentTagKey = "fragmentTagKey";
+
         CommentsListFragment cf;
+        string fragmentTag;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -47,15 +50,24 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
                     Entity = businessEntity,
                 };
-                ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
+                fragmentTag = cf.GenerateTag();
+                ft.Replace(Resource.Id.fragment_container, cf, fragmentTag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(CommentsListActivity)}");
             }
             else
             {
+                fragmentTag = savedInstanceState.GetString(fragmentTagKey);
+                cf = SupportFragmentManager.FindFragmentByTag(fragmentTag) as CommentsListFragment;
                 CommonConfig.Logger.Info($"Restored {nameof(CommentsListActivity)}");
             }
+        }
+
+        protected override void OnSaveInstanceState(Bundle outState)
+        {
+            outState.PutString(fragmentTagKey, fragmentTag);
+            base.OnSaveInstanceState(outState);
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -74,7 +86,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             var intent = new Intent();
             intent.PutExtra(CommentsResultKey, SerializationUtils.Serialize(cf.Comments));
             SetResult(Result.Ok, intent);
-            Finish();
+            base.OnBackPressed();
         }
     }
 }

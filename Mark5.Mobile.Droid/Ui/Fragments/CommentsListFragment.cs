@@ -93,11 +93,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"No elements - will refresh...");
 
-                RefreshData();
+                RefreshView();
             }
         }
 
-        public void RefreshData()
+        public void RefreshView()
         {
             switch (Entity.ObjectType)
             {
@@ -316,7 +316,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Entity = cfs.Entity;
                 addCommentEditText.Text = cfs.AddCommentText;
 
-                RefreshData();
+                RefreshView();
             }
         }
 

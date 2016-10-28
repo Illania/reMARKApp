@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
 using Android.Support.V4.Widget;
@@ -21,6 +22,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -31,6 +33,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ContactViewFragment : RetainableStateFragment
     {
+        public static class RequestCodes
+        {
+            public static int CommentsRequest = 1;
+            public static int CategoriesRequest = 2;
+        }
 
         public ContactPreview ContactPreview { get; set; }
         public Contact Contact { get; set; }
@@ -73,6 +80,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(communicationCardView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
             linearLayout.AddView(physicalAddressCardView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
             linearLayout.AddView(descriptionCardView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+
+            HasOptionsMenu = true;
 
             return rootView;
         }
@@ -194,6 +203,65 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             descriptionCardViewInternalLayout.AddView(new Divider(Context));
 
             descriptionSubviews.ForEach(descriptionCardViewInternalLayout.AddView);
+        }
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
+            menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments);
+            menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.actions);
+            menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == MenuItemActions.Categories)
+            {
+                //TODO
+            }
+
+            if (item.ItemId == MenuItemActions.Comments)
+            {
+                var i = new Intent(Activity, typeof(CommentsListActivity));
+                i.PutExtra(CommentsListActivity.EntityIntentKey, SerializationUtils.Serialize(Contact));
+                Activity.StartActivityForResult(i, RequestCodes.CategoriesRequest);
+
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.Actions)
+            {
+                //TODO
+            }
+
+            if (item.ItemId == MenuItemActions.Links)
+            {
+                //TODO
+            }
+
+            return base.OnOptionsItemSelected(item);
+        }
+
+        public void UpdateComments(List<Comment> comments)
+        {
+            if (ContactPreview != null)
+            {
+                ContactPreview.CommentsCount = comments.Count;
+                Contact.Comments.Clear();
+                Contact.Comments.AddRange(comments);
+            }
+        }
+
+        #endregion
+
+        #region MenuItemActions
+
+        static class MenuItemActions
+        {
+            public const int Categories = 10;
+            public const int Comments = 20;
+            public const int Actions = 30;
+            public const int Links = 40;
         }
 
         #endregion

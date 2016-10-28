@@ -1,5 +1,5 @@
 ﻿//
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: DocumentPreviewCommentCountChangedMessage.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
