@@ -1,5 +1,5 @@
 ﻿//
-// Project: 
+// Project: Mark5.Mobile.Droid
 // File: CategoriesListActivity.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
@@ -32,7 +32,7 @@ namespace Mark5.Mobile.Droid
 
             CommonConfig.Logger.Info($"Creating {nameof(CategoriesListActivity)}...");
 
-            SetTitle(Resource.String.document);
+            SetTitle(Resource.String.categories);
             SetContentView(Resource.Layout.base_layout);
 
             toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);

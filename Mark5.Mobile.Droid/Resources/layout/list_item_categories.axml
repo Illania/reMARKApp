@@ -28,7 +28,7 @@
             android:gravity="center_vertical"
             android:id="@+id/list_item_category_color" />
         <android.support.v7.widget.LinearLayoutCompat
-            android:id="@+id/nameDescriptionLayout"
+            android:id="@+id/list_item_category_name_description_layout"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="vertical"
