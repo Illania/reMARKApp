@@ -101,7 +101,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             await RefreshData();
 
-            if (ReadOnlyMode) return;
             if (!IsAdded || IsDetached || IsRemoving) return;
 
             MarkAsReadIfNecessary();
@@ -438,7 +437,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         if (!IsAdded || IsDetached || IsRemoving) return;
 
                         RefreshView<RecipentsView>();
-                        PlatformConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, f.Id, dp.Id, dp.IsReadByCurrent, dp.IsReadByAnyone));
+                        PlatformConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, dp.Id, dp.IsReadByCurrent, dp.IsReadByAnyone));
                     });
                 }
                 catch (Exception ex)

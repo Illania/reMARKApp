@@ -242,7 +242,7 @@
     <Compile Include="Utilities\LambdaEqualityComparer.cs" />
     <Compile Include="Ui\Views\DocumentsSearchViews\PrioritiesSearchView.cs" />
     <Compile Include="Ui\Views\DocumentsSearchViews\DocumentDirectionsSearchView.cs" />
-    <Compile Include="ProcessedSearchView.cs" />
+    <Compile Include="HandledSearchView.cs" />
     <Compile Include="Ui\Views\DocumentsSearchViews\UnreadOnlySearchView.cs" />
     <Compile Include="Ui\Views\DocumentsSearchViews\SearchInAttachmentsSearchView.cs" />
     <Compile Include="Ui\Views\DocumentsSearchViews\PartialWordsSearchView.cs" />
@@ -257,6 +257,7 @@
     <Compile Include="Ui\Fragments\DocumentSearchResultsFragment.cs" />
     <Compile Include="Ui\Fragments\ContactSearchResultsFragment.cs" />
     <Compile Include="ShortcodeSearchResultsFragment.cs" />
+    <Compile Include="Ui\Views\DocumentsSearchViews\MaxDocumentsSearchView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

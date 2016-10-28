@@ -116,10 +116,10 @@
 	<string name="search_priorities_none_selected">Any priority</string>
 	<string name="search_document_directions">Direction</string>
 	<string name="search_document_directions_none_selected">Any direction</string>
-	<string name="search_processed">Handled</string>
-	<string name="search_processed_none_selected">All</string>
-	<string name="search_processed_true">Handled</string>
-	<string name="search_processed_false">Unhandled</string>
+	<string name="search_handled">Handled</string>
+	<string name="search_handled_none_selected">All</string>
+	<string name="search_handled_true">Handled</string>
+	<string name="search_handled_false">Unhandled</string>
 	<string name="search_unread_only">Unread documents only</string>
 	<string name="search_in_attachments">Search inside attachments</string>
 	<string name="search_partial">Partial words search</string>
@@ -133,4 +133,5 @@
 		<item>Yesterday</item>
 		<item>Custom</item>
 	</string-array>
+	<string name="search_max_documents">Maximum documents in results</string>
 </resources>

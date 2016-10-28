@@ -63,12 +63,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
 
         public override void FromCriteria(SearchDocumentsCriteria criteria)
         {
-            unreadOnlyCheckbox.Checked = criteria.Unread;
+            unreadOnlyCheckbox.Checked = criteria.UnreadOnly;
         }
 
         public override void ToCriteria(SearchDocumentsCriteria criteria)
         {
-            criteria.Unread = unreadOnlyCheckbox.Checked;
+            criteria.UnreadOnly = unreadOnlyCheckbox.Checked;
         }
     }
 }

@@ -28,11 +28,11 @@ namespace Mark5.Mobile.Common.Model
 
         public bool SearchInAttachments { get; set; }
 
-        public bool Unread { get; set; }
+        public bool UnreadOnly { get; set; }
 
         public bool PartialWordSearch { get; set; }
 
-        public bool? Processed { get; set; }
+        public bool? Handled { get; set; }
 
         public string Reference { get; set; }
 

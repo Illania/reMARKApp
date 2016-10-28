@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: ProcessedSearchView.cs
+// File: handledSearchView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -16,15 +16,15 @@ using Mark5.Mobile.Droid.Utilities;
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
 {
 
-    public class ProcessedSearchView : DocumentsSearchView
+    public class HandledSearchView : DocumentsSearchView
     {
 
-        readonly AppCompatTextView processedTitle;
-        readonly AppCompatTextView processedSubtitle;
+        readonly AppCompatTextView handledTitle;
+        readonly AppCompatTextView handledSubtitle;
 
-        bool? SelectedProcessed;
+        bool? SelectedHandled;
 
-        public ProcessedSearchView(Context context)
+        public HandledSearchView(Context context)
             : base(context)
         {
             Orientation = Vertical;
@@ -37,50 +37,50 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentsSearchViews
             Clickable = true;
             Click += async (sender, e) =>
             {
-                SelectedProcessed = await Dialogs.ShowSingleSelectDialogAsync(context, Resource.String.search_processed, new List<bool?> { null, true, false }, SelectedProcessed, displayText: TextForValue);
-                processedSubtitle.Text = TextForValue(SelectedProcessed);
+                SelectedHandled = await Dialogs.ShowSingleSelectDialogAsync(context, Resource.String.search_handled, new List<bool?> { null, true, false }, SelectedHandled, displayText: TextForValue);
+                handledSubtitle.Text = TextForValue(SelectedHandled);
             };
 
-            processedTitle = new AppCompatTextView(context)
+            handledTitle = new AppCompatTextView(context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
-            processedTitle.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
-            processedTitle.SetText(Resource.String.search_processed);
-            AddView(processedTitle);
+            handledTitle.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
+            handledTitle.SetText(Resource.String.search_handled);
+            AddView(handledTitle);
 
-            processedSubtitle = new AppCompatTextView(context)
+            handledSubtitle = new AppCompatTextView(context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
-            processedSubtitle.Text = TextForValue(SelectedProcessed);
-            processedSubtitle.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
-            AddView(processedSubtitle);
+            handledSubtitle.Text = TextForValue(SelectedHandled);
+            handledSubtitle.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
+            AddView(handledSubtitle);
         }
 
         string TextForValue(bool? value)
         {
             if (value == null)
             {
-                return Context.GetString(Resource.String.search_processed_none_selected);
+                return Context.GetString(Resource.String.search_handled_none_selected);
             }
             if (value.Value)
             {
-                return Context.GetString(Resource.String.search_processed_true);
+                return Context.GetString(Resource.String.search_handled_true);
             }
 
-            return Context.GetString(Resource.String.search_processed_false);
+            return Context.GetString(Resource.String.search_handled_false);
         }
 
         public override void FromCriteria(SearchDocumentsCriteria criteria)
         {
-            SelectedProcessed = criteria.Processed;
-            processedSubtitle.Text = TextForValue(SelectedProcessed);
+            SelectedHandled = criteria.Handled;
+            handledSubtitle.Text = TextForValue(SelectedHandled);
         }
 
         public override void ToCriteria(SearchDocumentsCriteria criteria)
         {
-            criteria.Processed = SelectedProcessed;
+            criteria.Handled = SelectedHandled;
         }
     }
 }
