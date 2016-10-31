@@ -47,7 +47,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
                 var searchId = Intent.Extras.GetInt(SearchIdIntentKey);
                 var documentPreview = SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
-                var readonlyMode = Intent.Extras.GetBoolean(ReadOnlyModeIntentKey);
+                var readOnlyMode = Intent.Extras.GetBoolean(ReadOnlyModeIntentKey);
                 var ft = SupportFragmentManager.BeginTransaction();
                 var df = new DocumentFragment
                 {
@@ -55,7 +55,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     SearchId = searchId,
                     DocumentPreview = documentPreview,
                     CloseRequest = OnBackPressed,
-                    ReadOnlyMode = readonlyMode
+                    ReadOnlyMode = readOnlyMode
                 };
                 ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
                 ft.Commit();

@@ -37,19 +37,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
         public int? FolderId { get; set; }
-
         public Folder Folder { get; set; }
-
         public int SearchId { get; set; }
-
         public int? DocumentId { get; set; }
-
         public DocumentPreview DocumentPreview { get; set; }
-
         public Document Document { get; set; }
-
         public Action CloseRequest { get; set; }
-
         public bool ReadOnlyMode { get; set; }
 
         ProgressBar progress;

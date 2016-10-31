@@ -29,14 +29,21 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class ContactViewFragment : RetainableStateFragment
+
+    public class ContactFragment : RetainableStateFragment
     {
 
+        const float CardElevation = 2.0f;
+        const float CardRadius = 2.0f;
+
+        public int? FolderId { get; set; }
+        public Folder Folder { get; set; }
+        public int SearchId { get; set; }
+        public int? ContactId { get; set; }
         public ContactPreview ContactPreview { get; set; }
         public Contact Contact { get; set; }
-        public Folder Folder { get; set; }
-        public int? FolderId { get; set; }
-        public int? ContactId { get; set; }
+        public Action CloseRequest { get; set; }
+        public bool ReadOnlyMode { get; set; }
 
         ProgressBar progress;
         NestedScrollView scrollView;
@@ -48,12 +55,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         AppCompatTextView descriptionCardTitle;
 
-        const float cardElevation = 2.0f;
-        const float cardRadius = 2.0f;
-
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(ContactViewFragment)} [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}, ...");
+            CommonConfig.Logger.Info($"Creating {nameof(ContactFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, contact.id={ContactId ?? ContactPreview?.Id}, readOnlyMode={ReadOnlyMode} ...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_contact, container, false);
             rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
@@ -81,13 +85,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            CommonConfig.Logger.Info($"Created {nameof(ContactViewFragment)} [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}, ...");
+            CommonConfig.Logger.Info($"Created {nameof(ContactFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, contact.id={ContactId ?? ContactPreview?.Id}, readOnlyMode={ReadOnlyMode}...");
         }
 
         public override async void OnResume()
         {
             base.OnResume();
+
             await RefreshData();
+        }
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            if (ReadOnlyMode) return;
+
+            // TODO add actions
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            // TODO add actions
+
+            return base.OnOptionsItemSelected(item);
         }
 
         #region Card preparation
@@ -116,8 +135,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             communicationCardView = new CardView(Context);
             communicationCardView.Visibility = ViewStates.Gone;
-            communicationCardView.Elevation = cardElevation;
-            communicationCardView.Radius = cardRadius;
+            communicationCardView.Elevation = CardElevation;
+            communicationCardView.Radius = CardRadius;
             communicationCardView.UseCompatPadding = true;
 
             var communicationCardInternalLayout = new LinearLayoutCompat(Context);
@@ -139,8 +158,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             physicalAddressCardView = new CardView(Context);
             physicalAddressCardView.Visibility = ViewStates.Gone;
-            physicalAddressCardView.Elevation = cardElevation;
-            physicalAddressCardView.Radius = cardRadius;
+            physicalAddressCardView.Elevation = CardElevation;
+            physicalAddressCardView.Radius = CardRadius;
             physicalAddressCardView.UseCompatPadding = true;
 
             var physicalAddressCardInternalLayout = new LinearLayoutCompat(Context);
@@ -177,8 +196,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             descriptionCardView = new CardView(Context);
             descriptionCardView.Visibility = ViewStates.Gone;
-            descriptionCardView.Elevation = cardElevation;
-            descriptionCardView.Radius = cardRadius;
+            descriptionCardView.Elevation = CardElevation;
+            descriptionCardView.Radius = CardRadius;
             descriptionCardView.UseCompatPadding = true;
 
             var descriptionCardViewInternalLayout = new LinearLayoutCompat(Context);
@@ -202,39 +221,41 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task RefreshData()
         {
-            if (ContactId.HasValue && ContactPreview == null && Contact == null)
+            try
             {
-                try
+                if (Folder != null || FolderId.HasValue)
                 {
-                    var container = await Managers.ContactsManager.GetContactWithPreviewAsync(FolderId.Value, ContactId.Value);
-                    Contact = container.Contact;
-                    ContactPreview = container.ContactPreview;
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error($"Downloading contact and contact preview failed [folderId={FolderId.Value}, contactId={ContactId.Value}]", ex);
-                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                    Activity.OnBackPressed();
-                    return;
-                }
-            }
+                    if (ContactId.HasValue && ContactPreview == null && Contact == null)
+                    {
+                        var container = await Managers.ContactsManager.GetContactWithPreviewAsync(FolderId ?? Folder.Id, ContactId.Value);
+                        ContactPreview = container.ContactPreview;
+                        Contact = container.Contact;
+                    }
 
-            if (ContactPreview != null && Contact == null)
+                    if (ContactPreview != null && Contact == null)
+                    {
+                        Contact = await Managers.ContactsManager.GetContactAsync(FolderId ?? Folder.Id, ContactPreview.Id);
+                    }
+                }
+
+                if (SearchId <= -999)
+                {
+                    if (ContactPreview != null && Contact == null)
+                    {
+                        Contact = await Managers.SearchManager.GetContactAsync(SearchId, ContactPreview);
+                    }
+                }
+
+                RefreshView();
+            }
+            catch (Exception ex)
             {
-                try
-                {
-                    Contact = await Managers.ContactsManager.GetContactAsync(Folder, ContactPreview.Id);
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error($"Downloading contact failed [folder.name={Folder.Name}, contact.id={ContactPreview.Id}]", ex);
-                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                    Activity.OnBackPressed();
-                    return;
-                }
-            }
+                CommonConfig.Logger.Error($"Downloading contact failed [folder.name={Folder?.Name}, searchId={SearchId}, folder.id={FolderId ?? Folder?.Id}, contactId={ContactId ?? ContactPreview?.Id}, readOnlyMode={ReadOnlyMode}]", ex);
 
-            RefreshView();
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+
+                if (CloseRequest != null) CloseRequest();
+            }
         }
 
         void RefreshView()
@@ -292,10 +313,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
             var ft = fragmentManager.BeginTransaction();
 
-            var cvf = new ContactViewFragment
+            var cvf = new ContactFragment
             {
                 ContactPreview = e,
-                Folder = Folder,
+                Folder = Folder
             };
 
             ft.Replace(Resource.Id.fragment_container, cvf, cvf.GenerateTag());
@@ -321,10 +342,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             return new ContactViewFragmentState
             {
+                FolderId = FolderId,
+                Folder = Folder,
+                SearchId = SearchId,
+                ContactId = ContactId,
                 Contact = Contact,
                 ContactPreview = ContactPreview,
-                Folder = Folder,
-                ContactId = ContactId,
+                ReadOnlyMode = ReadOnlyMode
             };
         }
 
@@ -334,16 +358,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (cvfs != null)
             {
+                FolderId = cvfs.FolderId;
+                Folder = cvfs.Folder;
+                SearchId = cvfs.SearchId;
                 Contact = cvfs.Contact;
                 ContactPreview = cvfs.ContactPreview;
-                Folder = cvfs.Folder;
                 ContactId = cvfs.ContactId;
+                ReadOnlyMode = cvfs.ReadOnlyMode;
             }
         }
 
         public override string GenerateTag()
         {
-            return $"{nameof(ContactViewFragment)} [contactId={ContactPreview?.Id ?? ContactId}, contactName={ContactPreview?.Name}, folderId={FolderId}]";
+            return $"{nameof(ContactFragment)} [contactId={ContactPreview?.Id ?? ContactId}]";
         }
 
         #endregion
@@ -352,10 +379,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ContactViewFragmentState : IRetainableState
         {
-            public Contact Contact { get; set; }
-            public ContactPreview ContactPreview { get; set; }
+
+            public int? FolderId { get; set; }
+
             public Folder Folder { get; set; }
+
+            public int SearchId { get; set; }
+
             public int? ContactId { get; set; }
+
+            public Contact Contact { get; set; }
+
+            public ContactPreview ContactPreview { get; set; }
+
+            public bool ReadOnlyMode { get; set; }
         }
 
         #endregion
