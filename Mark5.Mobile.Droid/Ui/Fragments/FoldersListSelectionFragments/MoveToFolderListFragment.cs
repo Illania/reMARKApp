@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                await Managers.CommonActionsManager.CopyToFolder(new List<IBusinessEntity> { BusinessEntity }, toFolder);
+                await Managers.CommonActionsManager.MoveToFolder(new List<IBusinessEntity> { BusinessEntity }, FromFolder, toFolder);
             }
             catch (Exception ex)
             {
