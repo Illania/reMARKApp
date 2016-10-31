@@ -409,56 +409,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
-
-        class AutoRefreshWorker
-        {
-
-            CancellationTokenSource cts;
-
-            readonly Func<int, Task> work;
-            readonly Func<DocumentPreview> firstOrDefaultItem;
-            readonly int intervalMs;
-
-            readonly object lockObj = new object();
-
-            public AutoRefreshWorker(Func<int, Task> work, Func<DocumentPreview> firstOrDefaultItem, int intervalMs)
-            {
-                this.work = work;
-                this.firstOrDefaultItem = firstOrDefaultItem;
-                this.intervalMs = intervalMs;
-            }
-
-            public void Start()
-            {
-                lock (lockObj)
-                {
-                    cts?.Cancel();
-                    cts = new CancellationTokenSource();
-                    Task.Run(async () =>
-                    {
-                        while (true)
-                        {
-                            await Task.Delay(intervalMs);
-                            if (cts.IsCancellationRequested) break;
-
-                            var first = firstOrDefaultItem();
-                            if (first != null)
-                            {
-                                await work(first.Id);
-                            }
-                        }
-                    });
-                }
-            }
-
-            public void Stop()
-            {
-                lock (lockObj)
-                {
-                    cts?.Cancel();
-                }
-            }
-        }
     }
 }
 

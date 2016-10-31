@@ -92,9 +92,9 @@
 	<string name="search_documents">Search documents</string>
 	<string name="search_documents_result">Search results</string>
 	<string name="search_contacts">Search contacts</string>
-	<string name="search_contacts_results">Search results</string>
+	<string name="search_contacts_result">Search results</string>
 	<string name="search_shortcodes">Search shortcodes</string>
-	<string name="search_shortcodes_results">Search result</string>
+	<string name="search_shortcodes_result">Search result</string>
 	<string name="type_search_query">Search query</string>
 	<string name="search_folders">Folders</string>
 	<string name="search_categories">Categories</string>

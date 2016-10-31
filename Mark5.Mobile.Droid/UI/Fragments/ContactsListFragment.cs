@@ -577,7 +577,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 set
                 {
                     nameTextView.Text = value;
-                    letterTextView.Text = value.Substring(0, 1).ToUpper();
+                    letterTextView.Text = value.SafeSubstring(0, 1).ToUpper();
 
                     var sd = new ShapeDrawable(new OvalShape());
                     sd.Paint.Color = new Color(ContextCompat.GetColor(ItemView.Context, colors[Math.Abs(value.GetHashCode() % colors.Length)]));
