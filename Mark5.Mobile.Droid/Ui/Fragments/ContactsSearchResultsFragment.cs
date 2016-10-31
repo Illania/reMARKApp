@@ -197,14 +197,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            public List<ContactPreview> SelectedItems
-            {
-                get
-                {
-                    return selectedContactsInView.Values.ToList();
-                }
-            }
-
             public override int ItemCount
             {
                 get
@@ -213,19 +205,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            public int SelectedItemCount
-            {
-                get
-                {
-                    return selectedContactsInView.Count;
-                }
-            }
-
             readonly List<ContactPreview> contactPreviewsInView = new List<ContactPreview>(1000);
             readonly Dictionary<int, ContactPreview> selectedContactsInView = new Dictionary<int, ContactPreview>();
 
             public event EventHandler<ContactPreview> ItemClicked = delegate { };
-            public event EventHandler<ContactPreview> ItemLongClicked = delegate { };
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
@@ -235,7 +218,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var cp = contactPreviewsInView[position];
 
                 cpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, cp)));
-                cpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, cp)));
 
                 cpvh.Name = cp.Name;
                 cpvh.Description = cp.Description;
