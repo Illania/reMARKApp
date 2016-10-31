@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: DocumentCategoriesSearchView.cs
+// File: ContactMustHaveCategories.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -11,20 +11,20 @@ using Mark5.Mobile.Common.Model;
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
 
-    public class DocumentCategoriesSearchView : AbstractCategoriesSearchView<SearchDocumentsCriteria>
+    public class ContactMustHaveCategoriesSearchView : AbstractMustHaveCategoriesSearchView<SearchContactsCriteria>
     {
 
-        public DocumentCategoriesSearchView(Context context)
+        public ContactMustHaveCategoriesSearchView(Context context)
             : base(context)
         {
         }
 
-        public override void FromCriteria(SearchDocumentsCriteria criteria)
+        public override void FromCriteria(SearchContactsCriteria criteria)
         {
             // TODO
         }
 
-        public override void ToCriteria(SearchDocumentsCriteria criteria)
+        public override void ToCriteria(SearchContactsCriteria criteria)
         {
             // TODO
         }

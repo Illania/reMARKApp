@@ -139,6 +139,8 @@
 	<string name="search_contact_last_name">Last name</string>
 	<string name="search_contact_shortid">Short ID</string>
 	<string name="search_contact_description">Description</string>
+	<string name="search_contact_types">Type</string>
+	<string name="search_contact_types_none_selected">All</string>
 	<string name="search_contact_post_address">Post address</string>
 	<string name="search_contact_com_address">Communication address</string>
 	<string name="search_contact_comment">Comment</string>

@@ -283,6 +283,9 @@
     <Compile Include="Ui\Views\SearchViews\ContactCommentSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactVatSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactLedgerSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactTypeSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactMustHaveCategoriesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactCategoriesSearchView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

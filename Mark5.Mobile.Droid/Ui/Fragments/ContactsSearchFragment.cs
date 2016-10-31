@@ -49,6 +49,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ContactDescriptionSearchView(Context));
             linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactTypeSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ContactComAddressSearchView(Context));
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ContactPostAddressSearchView(Context));
@@ -58,6 +60,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new ContactVatSearchView(Context));
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ContactLedgerSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactCategoriesSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactMustHaveCategoriesSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactFoldersSearchView(Context));
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new MaxContactsSearchView(Context));
 
