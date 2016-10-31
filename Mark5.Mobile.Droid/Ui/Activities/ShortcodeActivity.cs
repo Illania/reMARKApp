@@ -22,7 +22,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     {
 
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
+        public const string SearchIdIntentKey = "SearchId_17ad833a-b475-4835-8f81-87fe435ed75d";
         public const string ShortcodePreviewIntentKey = "ShortcodePreview_0bd291a4-22a5-431c-ad6e-4c8b273eeb98";
+        public const string ReadOnlyModeIntentKey = "ReadOnlyMode_5676137e-22ab-4bf9-bff5-de812892c121";
 
         Toolbar toolbar;
 
@@ -42,15 +44,19 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+                var searchId = Intent.Extras.GetInt(SearchIdIntentKey);
                 var shortcodePreview = SerializationUtils.Deserialize<ShortcodePreview>(Intent.Extras.GetString(ShortcodePreviewIntentKey));
+                var readOnlyMode = Intent.Extras.GetBoolean(ReadOnlyModeIntentKey);
                 var ft = SupportFragmentManager.BeginTransaction();
-                var df = new ShortcodeFragment
+                var sf = new ShortcodeFragment
                 {
                     Folder = folder,
+                    SearchId = searchId,
                     ShortcodePreview = shortcodePreview,
+                    ReadOnlyMode = readOnlyMode,
                     CloseRequest = OnBackPressed
                 };
-                ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, sf, sf.GenerateTag());
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ShortcodeActivity)}");

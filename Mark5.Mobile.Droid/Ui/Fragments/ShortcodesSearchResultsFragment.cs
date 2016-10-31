@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.Graphics.Drawables.Shapes;
@@ -22,6 +23,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -161,11 +163,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Adapter_ItemClicked(object sender, ShortcodePreview shortcodePreview)
         {
-            //var i = new Intent(Activity, typeof(ShortcodeActivity));
-            //i.PutExtra(ShortcodeActivity.SearchIdIntentKey, searchId);
-            //i.PutExtra(ShortcodeActivity.ShortcodePreviewIntentKey, SerializationUtils.Serialize(shortcodePreview));
-            //i.PutExtra(ShortcodeActivity.ReadOnlyModeIntentKey, true);
-            //StartActivity(i);
+            var i = new Intent(Activity, typeof(ShortcodeActivity));
+            i.PutExtra(ShortcodeActivity.SearchIdIntentKey, searchId);
+            i.PutExtra(ShortcodeActivity.ShortcodePreviewIntentKey, SerializationUtils.Serialize(shortcodePreview));
+            i.PutExtra(ShortcodeActivity.ReadOnlyModeIntentKey, true);
+            StartActivity(i);
         }
 
         #endregion

@@ -340,7 +340,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            return new ContactViewFragmentState
+            return new ContactFragmentState
             {
                 FolderId = FolderId,
                 Folder = Folder,
@@ -354,17 +354,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var cvfs = restoredState as ContactViewFragmentState;
-
-            if (cvfs != null)
+            var cfs = restoredState as ContactFragmentState;
+            if (cfs != null)
             {
-                FolderId = cvfs.FolderId;
-                Folder = cvfs.Folder;
-                SearchId = cvfs.SearchId;
-                Contact = cvfs.Contact;
-                ContactPreview = cvfs.ContactPreview;
-                ContactId = cvfs.ContactId;
-                ReadOnlyMode = cvfs.ReadOnlyMode;
+                FolderId = cfs.FolderId;
+                Folder = cfs.Folder;
+                SearchId = cfs.SearchId;
+                Contact = cfs.Contact;
+                ContactPreview = cfs.ContactPreview;
+                ContactId = cfs.ContactId;
+                ReadOnlyMode = cfs.ReadOnlyMode;
             }
         }
 
@@ -377,7 +376,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region State
 
-        class ContactViewFragmentState : IRetainableState
+        class ContactFragmentState : IRetainableState
         {
 
             public int? FolderId { get; set; }
