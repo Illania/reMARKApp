@@ -134,4 +134,8 @@
 		<item>Custom</item>
 	</string-array>
 	<string name="search_max_documents">Maximum documents in results</string>
+	<string name="search_shortcode_name">Name</string>
+	<string name="search_shortcode_description">Description</string>
+	<string name="search_shortcode_address">Address</string>
+	<string name="search_max_shortcodes">Maximum shortcodes in results</string>
 </resources>

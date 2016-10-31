@@ -15,7 +15,6 @@ using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
-using Android.Support.Design.Widget;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -31,7 +30,7 @@ using Mark5.Mobile.Droid.Utilities;
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
 
-    public class DocumentSearchResultsFragment : RetainableStateFragment
+    public class DocumentsSearchResultsFragment : RetainableStateFragment
     {
 
         public SearchDocumentsCriteria Criteria { get; set; }
@@ -46,7 +45,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(DocumentSearchResultsFragment)} [criteria={Criteria}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(DocumentsSearchResultsFragment)} [criteria={Criteria}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
@@ -71,14 +70,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_documents_result);
 
-            CommonConfig.Logger.Info($"Created {nameof(DocumentSearchResultsFragment)} [criteria={Criteria}]");
+            CommonConfig.Logger.Info($"Created {nameof(DocumentsSearchResultsFragment)} [criteria={Criteria}]");
         }
 
         public override async void OnResume()
         {
             base.OnResume();
 
-            CommonConfig.Logger.Info($"Resuming {nameof(DocumentSearchResultsFragment)} [criteria={Criteria}]...");
+            CommonConfig.Logger.Info($"Resuming {nameof(DocumentsSearchResultsFragment)} [criteria={Criteria}]...");
 
             if (adapter.ItemCount < 1)
             {
@@ -92,7 +91,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnPause();
 
-            CommonConfig.Logger.Info($"Pausing {nameof(DocumentSearchResultsFragment)} [criteria={Criteria}]...");
+            CommonConfig.Logger.Info($"Pausing {nameof(DocumentsSearchResultsFragment)} [criteria={Criteria}]...");
         }
 
         #endregion
@@ -126,7 +125,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(DocumentSearchResultsFragment)}]";
+            return $"{nameof(DocumentsSearchResultsFragment)}]";
         }
 
         #endregion

@@ -185,7 +185,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
                     if (menuItem.ItemId == Resource.Id.nav_search)
                     {
                         var i = new Intent(this, typeof(SearchActivity));
-                        i.PutExtra(SearchActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
+                        i.PutExtra(SearchActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
                         StartActivity(i);
                         return;
                     }

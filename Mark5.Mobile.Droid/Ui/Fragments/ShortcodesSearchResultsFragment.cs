@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: ContactSearchResultsFragment.cs
+// File: ShortcodeSearchResultsFragment.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -8,13 +8,12 @@
 using System;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Common.Model;
-
-namespace Mark5.Mobile.Droid.Ui.Fragments
+namespace Mark5.Mobile.Droid
 {
-    public class ContactSearchResultsFragment : RetainableStateFragment
+    public class ShortcodesSearchResultsFragment : RetainableStateFragment
     {
 
-        public SearchContactsCriteria Criteria { get; set; }
+        public SearchShortcodesCriteria Criteria { get; set; }
 
         public override string GenerateTag()
         {

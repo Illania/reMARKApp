@@ -49,7 +49,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var criteria = SerializationUtils.Deserialize<SearchDocumentsCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
 
                     var ft = SupportFragmentManager.BeginTransaction();
-                    var dlf = new DocumentSearchResultsFragment
+                    var dlf = new DocumentsSearchResultsFragment
                     {
                         Criteria = criteria
                     };
@@ -62,7 +62,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var criteria = SerializationUtils.Deserialize<SearchContactsCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
 
                     var ft = SupportFragmentManager.BeginTransaction();
-                    var dlf = new ContactSearchResultsFragment
+                    var dlf = new ContactsSearchResultsFragment
                     {
                         Criteria = criteria
                     };
@@ -75,7 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var criteria = SerializationUtils.Deserialize<SearchShortcodesCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
 
                     var ft = SupportFragmentManager.BeginTransaction();
-                    var dlf = new ShortcodeSearchResultsFragment
+                    var dlf = new ShortcodesSearchResultsFragment
                     {
                         Criteria = criteria
                     };
