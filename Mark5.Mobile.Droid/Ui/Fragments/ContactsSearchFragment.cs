@@ -16,6 +16,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.SearchViews;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -37,6 +38,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
+
+            linearLayout.AddView(new ContactNameSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactFirstNameSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactLastNameSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactShortIdSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactDescriptionSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactComAddressSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactPostAddressSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactCommentSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactVatSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactLedgerSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new MaxContactsSearchView(Context));
 
             progress.Visibility = ViewStates.Gone;
             scrollView.Visibility = ViewStates.Visible;

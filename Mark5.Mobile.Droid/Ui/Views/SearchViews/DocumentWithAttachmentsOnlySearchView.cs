@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: DocumentFoldersSearchView.cs
+// File: WithAttachmentsOnlySearchView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -10,22 +10,24 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
-    public class DocumentFoldersSearchView : AbstractFoldersSearchView<SearchDocumentsCriteria>
+
+    public class DocumentWithAttachmentsOnlySearchView : AbstractCheckboxSearchView<SearchDocumentsCriteria>
     {
 
-        public DocumentFoldersSearchView(Context context)
+        public DocumentWithAttachmentsOnlySearchView(Context context)
             : base(context)
         {
+            TitleTextView.SetText(Resource.String.search_document_with_attachments_only);
         }
 
         public override void FromCriteria(SearchDocumentsCriteria criteria)
         {
-            // TODO
+            Checkbox.Checked = criteria.HavingAttachmentsOnly;
         }
 
         public override void ToCriteria(SearchDocumentsCriteria criteria)
         {
-            criteria.FiledInFolderFolderType = FiledInFolderFolderType.Any;
+            criteria.HavingAttachmentsOnly = Checkbox.Checked;
         }
     }
 }

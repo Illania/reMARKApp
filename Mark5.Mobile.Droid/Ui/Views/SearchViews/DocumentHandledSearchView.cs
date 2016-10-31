@@ -12,15 +12,15 @@ using Mark5.Mobile.Common.Model;
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
 
-    public class HandledSearchView : AbstractSingleChoiceSearchView<SearchDocumentsCriteria, bool?>
+    public class DocumentHandledSearchView : AbstractSingleChoiceSearchView<SearchDocumentsCriteria, bool?>
     {
 
-        public HandledSearchView(Context context)
+        public DocumentHandledSearchView(Context context)
             : base(context)
         {
-            TitleTextView.SetText(Resource.String.search_handled);
+            TitleTextView.SetText(Resource.String.search_document_handled);
 
-            DialogTitle = Resource.String.search_handled;
+            DialogTitle = Resource.String.search_document_handled;
             Values = new List<bool?> { null, true, false };
             DisplayText = TextForValue;
             SelectedValue = null;
@@ -32,14 +32,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         {
             if (value == null)
             {
-                return Context.GetString(Resource.String.search_handled_none_selected);
+                return Context.GetString(Resource.String.search_document_handled_none_selected);
             }
             if (value.Value)
             {
-                return Context.GetString(Resource.String.search_handled_true);
+                return Context.GetString(Resource.String.search_document_handled_true);
             }
 
-            return Context.GetString(Resource.String.search_handled_false);
+            return Context.GetString(Resource.String.search_document_handled_false);
         }
 
         public override void FromCriteria(SearchDocumentsCriteria criteria)

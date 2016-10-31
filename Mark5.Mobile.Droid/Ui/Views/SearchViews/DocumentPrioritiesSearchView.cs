@@ -12,17 +12,17 @@ using Mark5.Mobile.Common.Model;
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
 
-    public class PrioritiesSearchView : AbstractMultiChoiceSearchView<SearchDocumentsCriteria, Priority>
+    public class DocumentPrioritiesSearchView : AbstractMultiChoiceSearchView<SearchDocumentsCriteria, Priority>
     {
 
-        public PrioritiesSearchView(Context context)
+        public DocumentPrioritiesSearchView(Context context)
             : base(context)
         {
-            TitleTextView.SetText(Resource.String.search_priorities);
+            TitleTextView.SetText(Resource.String.search_document_priorities);
 
-            NoSelectionText = Resource.String.search_priorities_none_selected;
+            NoSelectionText = Resource.String.search_document_priorities_none_selected;
 
-            DialogTitle = Resource.String.search_priorities;
+            DialogTitle = Resource.String.search_document_priorities;
             Values = new List<Priority> { Priority.Low, Priority.Normal, Priority.Urgent };
 
             UpdateSubtitle();

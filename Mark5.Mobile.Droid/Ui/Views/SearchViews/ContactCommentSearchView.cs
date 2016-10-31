@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: ExtraFieldsSearchView.cs
+// File: ContactCommentSearchView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -11,21 +11,21 @@ using Mark5.Mobile.Common.Model;
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
 
-    public class ExtraFieldsSearchView : AbstractEditTextSearchView<SearchDocumentsCriteria>
+    public class ContactCommentSearchView : AbstractEditTextSearchView<SearchContactsCriteria>
     {
 
-        public ExtraFieldsSearchView(Context context)
+        public ContactCommentSearchView(Context context)
             : base(context)
         {
-            EditText.SetHint(Resource.String.search_extra_fields);
+            EditText.SetHint(Resource.String.search_contact_name);
         }
 
-        public override void FromCriteria(SearchDocumentsCriteria criteria)
+        public override void FromCriteria(SearchContactsCriteria criteria)
         {
             EditText.Text = criteria.Comment;
         }
 
-        public override void ToCriteria(SearchDocumentsCriteria criteria)
+        public override void ToCriteria(SearchContactsCriteria criteria)
         {
             criteria.Comment = EditText.Text;
         }

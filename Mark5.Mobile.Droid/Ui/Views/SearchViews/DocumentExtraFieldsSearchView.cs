@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: AttachmentNamesSearchView.cs
+// File: ExtraFieldsSearchView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -11,13 +11,13 @@ using Mark5.Mobile.Common.Model;
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
 
-    public class AttachmentNamesSearchView : AbstractEditTextSearchView<SearchDocumentsCriteria>
+    public class DocumentExtraFieldsSearchView : AbstractEditTextSearchView<SearchDocumentsCriteria>
     {
 
-        public AttachmentNamesSearchView(Context context)
+        public DocumentExtraFieldsSearchView(Context context)
             : base(context)
         {
-            EditText.SetHint(Resource.String.search_attachment_names);
+            EditText.SetHint(Resource.String.search_document_extra_fields);
         }
 
         public override void FromCriteria(SearchDocumentsCriteria criteria)

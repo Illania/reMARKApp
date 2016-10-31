@@ -12,10 +12,10 @@ using Mark5.Mobile.Common.Model;
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
 
-    public class DirectionsSearchView : AbstractMultiChoiceSearchView<SearchDocumentsCriteria, DocumentDirection>
+    public class DocumentDirectionsSearchView : AbstractMultiChoiceSearchView<SearchDocumentsCriteria, DocumentDirection>
     {
 
-        public DirectionsSearchView(Context context)
+        public DocumentDirectionsSearchView(Context context)
             : base(context)
         {
             TitleTextView.SetText(Resource.String.search_document_directions);

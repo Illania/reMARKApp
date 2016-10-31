@@ -10,7 +10,7 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
-    public class ShortcodeFoldersSearchView : FoldersSearchView<SearchShortcodesCriteria>
+    public class ShortcodeFoldersSearchView : AbstractFoldersSearchView<SearchShortcodesCriteria>
     {
 
         public ShortcodeFoldersSearchView(Context context)

@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: WithAttachmentsOnlySearchView.cs
+// File: ReferenceNumberSearchView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -11,23 +11,23 @@ using Mark5.Mobile.Common.Model;
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
 
-    public class WithAttachmentsOnlySearchView : AbstractCheckboxSearchView<SearchDocumentsCriteria>
+    public class DocumentReferenceNumberSearchView : AbstractEditTextSearchView<SearchDocumentsCriteria>
     {
 
-        public WithAttachmentsOnlySearchView(Context context)
+        public DocumentReferenceNumberSearchView(Context context)
             : base(context)
         {
-            TitleTextView.SetText(Resource.String.search_with_attachments_only);
+            EditText.SetHint(Resource.String.search_document_reference_number);
         }
 
         public override void FromCriteria(SearchDocumentsCriteria criteria)
         {
-            Checkbox.Checked = criteria.HavingAttachmentsOnly;
+            EditText.Text = criteria.Reference;
         }
 
         public override void ToCriteria(SearchDocumentsCriteria criteria)
         {
-            criteria.HavingAttachmentsOnly = Checkbox.Checked;
+            criteria.Reference = EditText.Text;
         }
     }
 }

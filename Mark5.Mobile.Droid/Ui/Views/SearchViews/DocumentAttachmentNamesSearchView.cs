@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: UnreadOnlySearchView.cs
+// File: AttachmentNamesSearchView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -11,23 +11,23 @@ using Mark5.Mobile.Common.Model;
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
 
-    public class UnreadOnlySearchView : AbstractCheckboxSearchView<SearchDocumentsCriteria>
+    public class DocumentAttachmentNamesSearchView : AbstractEditTextSearchView<SearchDocumentsCriteria>
     {
 
-        public UnreadOnlySearchView(Context context)
+        public DocumentAttachmentNamesSearchView(Context context)
             : base(context)
         {
-            TitleTextView.SetText(Resource.String.search_unread_only);
+            EditText.SetHint(Resource.String.search_document_attachment_names);
         }
 
         public override void FromCriteria(SearchDocumentsCriteria criteria)
         {
-            Checkbox.Checked = criteria.UnreadOnly;
+            EditText.Text = criteria.Comment;
         }
 
         public override void ToCriteria(SearchDocumentsCriteria criteria)
         {
-            criteria.UnreadOnly = Checkbox.Checked;
+            criteria.Comment = EditText.Text;
         }
     }
 }

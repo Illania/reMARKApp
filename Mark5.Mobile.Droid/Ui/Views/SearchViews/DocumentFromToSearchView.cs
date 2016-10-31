@@ -12,13 +12,13 @@ using Mark5.Mobile.Droid.Ui.Common;
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
 
-    public class FromToSearchView : AbstractSpinnerEditTextSearchView<SearchDocumentsCriteria>
+    public class DocumentFromToSearchView : AbstractSpinnerEditTextSearchView<SearchDocumentsCriteria>
     {
 
-        public FromToSearchView(Context context)
+        public DocumentFromToSearchView(Context context)
             : base(context)
         {
-            Spinner.Adapter = CustomArrayAdapter.CreateWithoutLeftPadding(context, Resource.Array.search_from_to, Android.Resource.Layout.SimpleSpinnerItem, Resource.Layout.support_simple_spinner_dropdown_item);
+            Spinner.Adapter = CustomArrayAdapter.CreateWithoutLeftPadding(context, Resource.Array.search_document_from_to, Android.Resource.Layout.SimpleSpinnerItem, Resource.Layout.support_simple_spinner_dropdown_item);
         }
 
         public override void FromCriteria(SearchDocumentsCriteria criteria)

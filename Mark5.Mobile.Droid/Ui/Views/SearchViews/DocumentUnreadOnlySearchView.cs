@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: PartialWordsSearchView.cs
+// File: UnreadOnlySearchView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -11,23 +11,23 @@ using Mark5.Mobile.Common.Model;
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
 
-    public class PartialWordsSearchView : AbstractCheckboxSearchView<SearchDocumentsCriteria>
+    public class DocumentUnreadOnlySearchView : AbstractCheckboxSearchView<SearchDocumentsCriteria>
     {
 
-        public PartialWordsSearchView(Context context)
+        public DocumentUnreadOnlySearchView(Context context)
             : base(context)
         {
-            TitleTextView.SetText(Resource.String.search_partial);
+            TitleTextView.SetText(Resource.String.search_document_unread_only);
         }
 
         public override void FromCriteria(SearchDocumentsCriteria criteria)
         {
-            Checkbox.Checked = criteria.PartialWordSearch;
+            Checkbox.Checked = criteria.UnreadOnly;
         }
 
         public override void ToCriteria(SearchDocumentsCriteria criteria)
         {
-            criteria.PartialWordSearch = Checkbox.Checked;
+            criteria.UnreadOnly = Checkbox.Checked;
         }
     }
 }

@@ -13,13 +13,13 @@ using Mark5.Mobile.Droid.Ui.Common;
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
 
-    public abstract class FoldersSearchView<T> : AbstractSearchView<T>
+    public abstract class AbstractFoldersSearchView<T> : AbstractSearchView<T>
     {
 
         readonly AppCompatTextView foldersTitle;
         readonly AppCompatTextView foldersSubtitle;
 
-        protected FoldersSearchView(Context context)
+        protected AbstractFoldersSearchView(Context context)
             : base(context)
         {
             Orientation = Vertical;

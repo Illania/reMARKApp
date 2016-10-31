@@ -11,13 +11,13 @@ using Mark5.Mobile.Common.Model;
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
 
-    public class CommentsSearchView : AbstractEditTextSearchView<SearchDocumentsCriteria>
+    public class DocumentCommentsSearchView : AbstractEditTextSearchView<SearchDocumentsCriteria>
     {
 
-        public CommentsSearchView(Context context)
+        public DocumentCommentsSearchView(Context context)
             : base(context)
         {
-            EditText.SetHint(Resource.String.search_comments);
+            EditText.SetHint(Resource.String.search_document_comments);
         }
 
         public override void FromCriteria(SearchDocumentsCriteria criteria)

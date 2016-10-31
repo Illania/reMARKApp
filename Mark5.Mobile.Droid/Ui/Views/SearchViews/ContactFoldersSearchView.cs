@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: DocumentFoldersSearchView.cs
+// File: ContactFoldersSearchView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -10,20 +10,20 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
-    public class DocumentFoldersSearchView : AbstractFoldersSearchView<SearchDocumentsCriteria>
+    public class ContactFoldersSearchView : AbstractFoldersSearchView<SearchContactsCriteria>
     {
 
-        public DocumentFoldersSearchView(Context context)
+        public ContactFoldersSearchView(Context context)
             : base(context)
         {
         }
 
-        public override void FromCriteria(SearchDocumentsCriteria criteria)
+        public override void FromCriteria(SearchContactsCriteria criteria)
         {
             // TODO
         }
 
-        public override void ToCriteria(SearchDocumentsCriteria criteria)
+        public override void ToCriteria(SearchContactsCriteria criteria)
         {
             criteria.FiledInFolderFolderType = FiledInFolderFolderType.Any;
         }

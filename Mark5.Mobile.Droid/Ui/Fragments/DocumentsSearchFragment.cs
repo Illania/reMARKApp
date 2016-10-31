@@ -40,29 +40,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
-            linearLayout.AddView(new ReferenceNumberSearchView(Context));
+            linearLayout.AddView(new DocumentReferenceNumberSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new FromToSearchView(Context));
+            linearLayout.AddView(new DocumentFromToSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new SubjectMessageSearchView(Context));
+            linearLayout.AddView(new DocumentSubjectMessageSearchView(Context));
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new DocumentReceivedDateRangeSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new UnreadOnlySearchView(Context));
+            linearLayout.AddView(new DocumentUnreadOnlySearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new DirectionsSearchView(Context));
+            linearLayout.AddView(new DocumentDirectionsSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new PrioritiesSearchView(Context));
+            linearLayout.AddView(new DocumentPrioritiesSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new LinesSearchView(Context));
+            linearLayout.AddView(new DocumentLinesSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new CommentsSearchView(Context));
+            linearLayout.AddView(new DocumentCommentsSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new AttachmentNamesSearchView(Context));
+            linearLayout.AddView(new DocumentAttachmentNamesSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new SearchInAttachmentsSearchView(Context));
+            linearLayout.AddView(new DocumentSearchInAttachmentsSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new WithAttachmentsOnlySearchView(Context));
+            linearLayout.AddView(new DocumentWithAttachmentsOnlySearchView(Context));
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new DocumentCategoriesSearchView(Context));
             linearLayout.AddView(new Divider(Context));
@@ -73,17 +73,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
             {
-                linearLayout.AddView(new HandledSearchView(Context));
+                linearLayout.AddView(new DocumentHandledSearchView(Context));
                 linearLayout.AddView(new Divider(Context));
             }
 
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.ExtraFieldInfos.Any())
             {
-                linearLayout.AddView(new ExtraFieldsSearchView(Context));
+                linearLayout.AddView(new DocumentExtraFieldsSearchView(Context));
                 linearLayout.AddView(new Divider(Context));
             }
 
-            linearLayout.AddView(new PartialWordsSearchView(Context));
+            linearLayout.AddView(new DocumentPartialWordsSearchView(Context));
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new MaxDocumentsSearchView(Context));
 

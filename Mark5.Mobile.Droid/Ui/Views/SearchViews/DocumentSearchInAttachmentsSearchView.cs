@@ -11,13 +11,13 @@ using Mark5.Mobile.Common.Model;
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
 
-    public class SearchInAttachmentsSearchView : AbstractCheckboxSearchView<SearchDocumentsCriteria>
+    public class DocumentSearchInAttachmentsSearchView : AbstractCheckboxSearchView<SearchDocumentsCriteria>
     {
 
-        public SearchInAttachmentsSearchView(Context context)
+        public DocumentSearchInAttachmentsSearchView(Context context)
             : base(context)
         {
-            TitleTextView.SetText(Resource.String.search_in_attachments);
+            TitleTextView.SetText(Resource.String.search_document_in_attachments);
         }
 
         public override void FromCriteria(SearchDocumentsCriteria criteria)
