@@ -418,6 +418,7 @@
     <AndroidResource Include="Resources\drawable\rounded_background.xml" />
     <AndroidResource Include="Resources\xml\filepaths.xml" />
     <AndroidResource Include="Resources\layout\linear_layout_contact.axml" />
+    <AndroidResource Include="Resources\layout\list_item_documents_external.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
