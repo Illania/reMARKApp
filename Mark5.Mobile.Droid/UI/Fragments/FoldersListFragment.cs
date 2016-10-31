@@ -245,10 +245,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
 
-            var foldersListFragment = new FoldersListFragment
-            {
-                Folder = folder,
-            };
+            var foldersListFragment = GetFolderFragment(folder);
 
             var tag = foldersListFragment.GenerateTag();
             var ft = fragmentManager.BeginTransaction();
@@ -256,6 +253,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ft.Replace(Resource.Id.fragment_container, foldersListFragment, tag);
             ft.AddToBackStack(tag);
             ft.Commit();
+        }
+
+        protected virtual RetainableStateFragment GetFolderFragment(Folder folder)
+        {
+            return new FoldersListFragment
+            {
+                Folder = folder,
+            };
         }
 
         #endregion

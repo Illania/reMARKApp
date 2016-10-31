@@ -91,4 +91,6 @@
 	<string name="description">Description</string>
 	<string name="by">by</string>
 	<string name="on">on</string>
+	<string name="confirm_copy_to_folder">Confirm copy to folder</string>
+	<string name="confirm_move_to_folder">Confirm move to folder</string>
 </resources>

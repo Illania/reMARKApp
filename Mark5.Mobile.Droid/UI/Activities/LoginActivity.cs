@@ -62,7 +62,6 @@ namespace Mark5.Mobile.Droid.Ui.Activity
             sslSpinnerAdapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
             sslSpinner.Adapter = sslSpinnerAdapter;
             loginButton = FindViewById<AppCompatButton>(Resource.Id.login_button);
-            loginButton.Enabled = false;
             loginButton.Click += LoginButton_Click;
 
             authenticator = AuthenticatorFactory.Create();
@@ -84,6 +83,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
 
             CommonConfig.Logger.Info($"Started {nameof(LoginActivity)}");
         }
+
 
         protected override void OnSaveInstanceState(Bundle outState)
         {

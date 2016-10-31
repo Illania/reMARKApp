@@ -20,6 +20,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         public BusinessEntity BusinessEntity { get; set; }  //TODO Need to save this 
 
+        protected override RetainableStateFragment GetFolderFragment(Folder folder)
+        {
+            return new CopyToFolderListFragment
+            {
+                BusinessEntity = BusinessEntity,
+                Folder = folder,
+            };
+        }
+
         protected override async void Adapter_ItemClicked(object sender, int position)
         {
             var folder = CurrentAdapter.GetItemAtPosition(position);
@@ -30,6 +39,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"Copying business entity to folder [businessEntity.Id={BusinessEntity.Id}, businessEntity.Type={BusinessEntity.ObjectType}, folder.Id={folder.Id}]");
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_folder, Resource.String.please_wait);
+
+            var confirmed = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.warning, Resource.String.confirm_copy_to_folder);
 
             try
             {
@@ -45,6 +56,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             finally
             {
                 dismissAction();
+                Activity.Finish();
             }
         }
 

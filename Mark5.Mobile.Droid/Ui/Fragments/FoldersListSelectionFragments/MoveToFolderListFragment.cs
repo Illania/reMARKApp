@@ -21,6 +21,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public BusinessEntity BusinessEntity { get; set; }  //TODO Need to save this 
         public Folder FromFolder { get; set; }  //TODO Need to save this 
 
+        protected override RetainableStateFragment GetFolderFragment(Folder folder)
+        {
+            return new MoveToFolderListFragment
+            {
+                BusinessEntity = BusinessEntity,
+                FromFolder = FromFolder,
+                Folder = folder,
+            };
+        }
+
         protected override async void Adapter_ItemClicked(object sender, int position)
         {
             var toFolder = CurrentAdapter.GetItemAtPosition(position);

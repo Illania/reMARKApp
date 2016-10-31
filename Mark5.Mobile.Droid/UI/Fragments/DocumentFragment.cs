@@ -160,6 +160,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var i = new Intent(Activity, typeof(FolderListSelectionActivity));
                 i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
                 i.PutExtra(FolderListSelectionActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(Document));
+                i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.CopyToFolderMode);
                 StartActivity(i);
 
                 return true;
