@@ -51,6 +51,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ActionMode actionMode;
         SearchView searchView;
 
+        bool shouldNotifyAdapter;
+        bool shouldNotifySearchAdapter;
+
         readonly Handler searchHandler = new Handler();
 
         AutoRefreshWorker autoRefreshWorker;
@@ -114,6 +117,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Info($"No elements - will refresh...");
 
                 await RefreshData();
+            }
+
+            if (shouldNotifyAdapter)
+            {
+                shouldNotifyAdapter = false;
+                adapter.NotifyDataSetChanged();
+            }
+            if (shouldNotifySearchAdapter)
+            {
+                shouldNotifySearchAdapter = false;
+                searchAdapter.NotifyDataSetChanged();
             }
 
             if (!IsAdded || IsDetached || IsRemoving) return;
@@ -442,23 +456,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         static bool MatchesQuery(DocumentPreview dp, string query)
         {
-            if (dp.Subject.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
+            if (dp.Subject.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
             {
                 return true;
             }
-            if (dp.Preview.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
+            if (dp.Preview.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
             {
                 return true;
             }
-            if (dp.Addresses.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0))
+            if (dp.Addresses.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
             {
                 return true;
             }
-            if (dp.Addresses.Any(da => da.Address.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0))
+            if (dp.Addresses.Any(da => da.Address.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
             {
                 return true;
             }
-            if (dp.Categories.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0))
+            if (dp.Categories.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
             {
                 return true;
             }
@@ -489,9 +503,51 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var position = adapter.GetPosition(m.DocumentPreviewId);
             if (position >= 0)
             {
+                shouldNotifyAdapter = true;
                 var dp = adapter.Items[position];
                 dp.IsReadByCurrent = m.IsReadByCurrent;
                 dp.IsReadByAnyone = m.IsReadByAnyone;
+            }
+
+            position = searchAdapter.GetPosition(m.DocumentPreviewId);
+            if (position >= 0)
+            {
+                shouldNotifySearchAdapter = true;
+                var dp = searchAdapter.Items[position];
+                dp.IsReadByCurrent = m.IsReadByCurrent;
+                dp.IsReadByAnyone = m.IsReadByAnyone;
+                searchAdapter.NotifyItemChanged(position);
+            }
+        }
+
+        public void UpdateCategories(DocumentPreviewCategoriesChangedMessage m)
+        {
+            var position = adapter.GetPosition(m.DocumentPreviewId);
+            if (position >= 0)
+            {
+                shouldNotifyAdapter = true;
+                var dp = adapter.Items[position];
+                dp.Categories.Clear();
+                dp.Categories.AddRange(m.Categories);
+            }
+
+            position = searchAdapter.GetPosition(m.DocumentPreviewId);
+            if (position >= 0)
+            {
+                shouldNotifySearchAdapter = true;
+                var dp = searchAdapter.Items[position];
+                dp.Categories.Clear();
+                dp.Categories.AddRange(m.Categories);
+            }
+        }
+
+        public void UpdateCommentsCount(DocumentPreviewCommentCountChangedMessage m)
+        {
+            var position = adapter.GetPosition(m.DocumentPreviewId);
+            if (position >= 0)
+            {
+                var dp = adapter.Items[position];
+                dp.CommentsCount = m.CommentsCount;
                 adapter.NotifyItemChanged(position);
             }
 
@@ -499,8 +555,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (position >= 0)
             {
                 var dp = searchAdapter.Items[position];
-                dp.IsReadByCurrent = m.IsReadByCurrent;
-                dp.IsReadByAnyone = m.IsReadByAnyone;
+                dp.CommentsCount = m.CommentsCount;
                 searchAdapter.NotifyItemChanged(position);
             }
         }

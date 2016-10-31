@@ -7,6 +7,7 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
@@ -33,6 +34,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
     public class DocumentFragment : RetainableStateFragment
     {
+        public static class RequestCodes
+        {
+            public static int CommentsRequest = 1;
+            public static int CategoriesRequest = 2;
+        }
+
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
         public int? FolderId { get; set; }
@@ -135,7 +142,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             menu.Add(Menu.None, 50, 50, Resource.String.set_priority);
             menu.Add(Menu.None, 60, 60, Resource.String.categories);
-            menu.Add(Menu.None, 70, 90, Resource.String.comments);
+            menu.Add(Menu.None, 70, 70, Resource.String.comments);
             menu.Add(Menu.None, 80, 80, Resource.String.actions);
             menu.Add(Menu.None, 90, 90, Resource.String.links);
 
@@ -153,6 +160,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public override void OnPrepareOptionsMenu(IMenu menu)
+        {
+            var commentsMenuItem = menu.FindItem(70);
+            commentsMenuItem.SetEnabled(Document != null);
+        }
+
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if (item.ItemId == 40)
@@ -166,6 +179,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
+            if (item.ItemId == 60)
+            {
+                var i = new Intent(Activity, typeof(CategoriesListActivity));
+                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(DocumentPreview));
+                Activity.StartActivityForResult(i, RequestCodes.CategoriesRequest);
+
+                return true;
+            }
+            if (item.ItemId == 70)
+            {
+                var i = new Intent(Activity, typeof(CommentsListActivity));
+                i.PutExtra(CommentsListActivity.EntityIntentKey, SerializationUtils.Serialize(Document));
+                Activity.StartActivityForResult(i, RequestCodes.CommentsRequest); //Need to use activity, otherwise the request code is changed is changed by the enclosing activity
+            }
             if (item.ItemId == 80)
             {
                 var i = new Intent(Activity, typeof(ObjectActionsActivity));
@@ -175,7 +202,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
-
             if (item.ItemId == 90)
             {
                 var i = new Intent(Activity, typeof(ObjectLinksActivity));
@@ -185,7 +211,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
-
             return base.OnOptionsItemSelected(item);
         }
 
@@ -394,6 +419,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     CommonConfig.Logger.Error($"Marking document as read failed [folder.name={f?.Name}, folder.id={f?.Id}, documentPreviewId={dp?.Id}]", ex);
                 }
             });
+        }
+
+        public void UpdateCategories(List<Category> categories)
+        {
+            DocumentPreview?.Categories.Clear();
+            DocumentPreview?.Categories.AddRange(categories);
+        }
+
+        public void UpdateComments(List<Comment> comments)
+        {
+            if (Document != null)
+            {
+                Document.Comments.Clear();
+                Document.Comments.AddRange(comments);
+            }
+
+            if (DocumentPreview != null)
+            {
+                DocumentPreview.CommentsCount = comments.Count;
+            }
         }
 
         public override IRetainableState OnRetainInstanceState()
