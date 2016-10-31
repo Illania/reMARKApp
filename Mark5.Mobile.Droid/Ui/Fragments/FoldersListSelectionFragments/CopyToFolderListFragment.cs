@@ -41,6 +41,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_folder, Resource.String.please_wait);
 
             var confirmed = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.warning, Resource.String.confirm_copy_to_folder);
+            if (!confirmed)
+            {
+                return;
+            }
 
             try
             {

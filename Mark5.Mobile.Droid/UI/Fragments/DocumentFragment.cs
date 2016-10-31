@@ -172,7 +172,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var i = new Intent(Activity, typeof(FolderListSelectionActivity));
                 i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
-                i.PutExtra(FolderListSelectionActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(Document));
+                i.PutExtra(FolderListSelectionActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(DocumentPreview));
                 i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.CopyToFolderMode);
                 StartActivity(i);
 
@@ -197,7 +197,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var i = new Intent(Activity, typeof(ObjectActionsActivity));
                 i.PutExtra(ObjectActionsActivity.BusinessEntityTypeIntentKey, SerializationUtils.Serialize(DocumentPreview.GetType()));
-                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(DocumentPreview));
+                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(DocumentPreview)); //TODO remember about this
                 StartActivity(i);
 
                 return true;
