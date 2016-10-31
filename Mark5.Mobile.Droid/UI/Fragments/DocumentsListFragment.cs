@@ -566,6 +566,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class DocumentsListAdapter : RecyclerView.Adapter
         {
+            public static class ViewType
+            {
+                public const int DocumentView = 0;
+                public const int ExternalDocumentView = 1;
+            }
 
             public List<DocumentPreview> Items
             {
@@ -618,64 +623,113 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 this.loadMoreAction = loadMoreAction;
             }
 
+            public override int GetItemViewType(int position)
+            {
+                return documentPreviewsInView[position].Direction == DocumentDirection.External ? ViewType.ExternalDocumentView : ViewType.DocumentView;
+            }
+
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var dpvh = holder as DocumentPreviewViewHolder;
-                if (dpvh == null) return;
-
-                var dp = documentPreviewsInView[position];
-
-                dpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
-                dpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
-
-                if (dp.Direction == DocumentDirection.Incoming)
+                if (holder is DocumentPreviewViewHolder)
                 {
-                    var address = dp.Addresses.FirstOrDefault(da => da.AddressType == DocumentAddressType.From);
-                    dpvh.Recipent = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
+                    var dpvh = holder as DocumentPreviewViewHolder;
+                    var dp = documentPreviewsInView[position];
+
+                    dpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
+                    dpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
+
+                    if (dp.Direction == DocumentDirection.Incoming)
+                    {
+                        var address = dp.Addresses.FirstOrDefault(da => da.AddressType == DocumentAddressType.From);
+                        dpvh.Recipent = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
+                    }
+                    else
+                    {
+                        var address = dp.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType).FirstOrDefault();
+                        dpvh.Recipent = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
+                    }
+
+                    var dateReceived = dp.DateReceived.ToServerTime();
+                    if (DateTime.Now.Date == dateReceived.Date)
+                    {
+                        dpvh.Date = DateFormat.Is24HourFormat(context) ? dateReceived.ToString("HH:mm") : dateReceived.ToString("hh:mm tt");
+                    }
+                    else if (DateTime.Now.AddDays(-1).Date == dateReceived.Date)
+                    {
+                        dpvh.Date = context.GetString(Resource.String.yesterday);
+                    }
+                    else
+                    {
+                        var dfo = DateFormat.GetDateFormatOrder(context);
+                        dpvh.Date = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
+                    }
+
+                    dpvh.Subject = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
+                    dpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
+                    dpvh.Categories = dp.Categories;
+                    dpvh.IncomingIndicator = dp.Direction == DocumentDirection.Incoming;
+                    dpvh.OutgoingIndicator = dp.Direction == DocumentDirection.Outgoing;
+                    dpvh.DraftIndicator = dp.Direction == DocumentDirection.Draft;
+                    dpvh.UnreadIndicator = PlatformConfig.Preferences.UnreadIndicatorMe ? !dp.IsReadByCurrent : !dp.IsReadByAnyone;
+                    dpvh.AttachmentIndicator = dp.AttachmentsCount > 0;
+                    dpvh.CommentIndicator = dp.CommentsCount > 0;
+
+                    dpvh.Selected = selectedDocumentsInView.ContainsKey(dp.Id);
+
+                    if (loadMoreAction != null && position == ItemCount - 1)
+                    {
+                        loadMoreAction(dp.Id);
+                    }
                 }
-                else
+                else if (holder is ExternalDocumentPreviewViewHolder)
                 {
-                    var address = dp.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType).FirstOrDefault();
-                    dpvh.Recipent = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
-                }
+                    var edpvh = holder as ExternalDocumentPreviewViewHolder;
+                    var dp = documentPreviewsInView[position];
 
-                var dateReceived = dp.DateReceived.ToServerTime();
-                if (DateTime.Now.Date == dateReceived.Date)
-                {
-                    dpvh.Date = DateFormat.Is24HourFormat(context) ? dateReceived.ToString("HH:mm") : dateReceived.ToString("hh:mm tt");
-                }
-                else if (DateTime.Now.AddDays(-1).Date == dateReceived.Date)
-                {
-                    dpvh.Date = context.GetString(Resource.String.yesterday);
-                }
-                else
-                {
-                    var dfo = DateFormat.GetDateFormatOrder(context);
-                    dpvh.Date = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
-                }
+                    edpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
+                    edpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
 
-                dpvh.Subject = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
-                dpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
-                dpvh.Categories = dp.Categories;
-                dpvh.IncomingIndicator = dp.Direction == DocumentDirection.Incoming;
-                dpvh.OutgoingIndicator = dp.Direction == DocumentDirection.Outgoing;
-                dpvh.DraftIndicator = dp.Direction == DocumentDirection.Draft;
-                dpvh.UnreadIndicator = PlatformConfig.Preferences.UnreadIndicatorMe ? !dp.IsReadByCurrent : !dp.IsReadByAnyone;
-                dpvh.AttachmentIndicator = dp.AttachmentsCount > 0;
-                dpvh.CommentIndicator = dp.CommentsCount > 0;
+                    var dateReceived = dp.DateReceived.ToServerTime();
+                    if (DateTime.Now.Date == dateReceived.Date)
+                    {
+                        edpvh.Date = DateFormat.Is24HourFormat(context) ? dateReceived.ToString("HH:mm") : dateReceived.ToString("hh:mm tt");
+                    }
+                    else if (DateTime.Now.AddDays(-1).Date == dateReceived.Date)
+                    {
+                        edpvh.Date = context.GetString(Resource.String.yesterday);
+                    }
+                    else
+                    {
+                        var dfo = DateFormat.GetDateFormatOrder(context);
+                        edpvh.Date = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
+                    }
 
-                dpvh.Selected = selectedDocumentsInView.ContainsKey(dp.Id);
+                    edpvh.Name = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
+                    edpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
+                    edpvh.Categories = dp.Categories;
+                    edpvh.CommentIndicator = dp.CommentsCount > 0;
 
-                if (loadMoreAction != null && position == ItemCount - 1)
-                {
-                    loadMoreAction(dp.Id);
+                    edpvh.Selected = selectedDocumentsInView.ContainsKey(dp.Id);
+
+                    if (loadMoreAction != null && position == ItemCount - 1)
+                    {
+                        loadMoreAction(dp.Id);
+                    }
                 }
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
             {
-                var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_documents, parent, false);
-                return new DocumentPreviewViewHolder(itemView);
+                if (viewType == ViewType.DocumentView)
+                {
+                    var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_documents, parent, false);
+                    return new DocumentPreviewViewHolder(itemView);
+                }
+                else //ExternalDocumentView
+                {
+                    var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_documents_external, parent, false);
+                    return new ExternalDocumentPreviewViewHolder(itemView);
+                }
             }
 
             public void PrependItems(List<DocumentPreview> items)
@@ -901,6 +955,86 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 unreadImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_unread);
                 attachmentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_attachment);
                 commentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_comment);
+                selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
+            }
+        }
+
+        class ExternalDocumentPreviewViewHolder : RecyclerView.ViewHolder
+        {
+
+            public string Name
+            {
+                set
+                {
+                    nameTextView.Text = value;
+                }
+            }
+
+            public string Date
+            {
+                set
+                {
+                    dateTextView.Text = value;
+                }
+            }
+
+            public string Preview
+            {
+                set
+                {
+                    previewTextView.Text = value;
+                }
+            }
+
+            public List<Category> Categories
+            {
+                set
+                {
+                    categoriesLayout.RemoveAllViews();
+
+                    foreach (var hexColor in value.Select(c => c.HexColor))
+                    {
+                        var view = new View(ItemView.Context)
+                        {
+                            LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent, 1f),
+                            Background = new ColorDrawable(Color.ParseColor(hexColor))
+                        };
+                        categoriesLayout.AddView(view);
+                    }
+                }
+            }
+
+            public bool CommentIndicator
+            {
+                set
+                {
+                    commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
+                }
+            }
+
+            public bool Selected
+            {
+                set
+                {
+                    selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
+                }
+            }
+
+            readonly AppCompatTextView nameTextView;
+            readonly AppCompatTextView dateTextView;
+            readonly AppCompatTextView previewTextView;
+            readonly LinearLayoutCompat categoriesLayout;
+            readonly AppCompatImageView commentImageView;
+            readonly View selectedOverlay;
+
+            public ExternalDocumentPreviewViewHolder(View itemView)
+                    : base(itemView)
+            {
+                nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_external_name);
+                dateTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_external_date);
+                previewTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_external_preview);
+                categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_external_categories);
+                commentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_external_comment);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
             }
         }
