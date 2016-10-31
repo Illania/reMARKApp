@@ -33,7 +33,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
     public class DocumentFragment : RetainableStateFragment
     {
-
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
         public int? FolderId { get; set; }
@@ -156,6 +155,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
+            if (item.ItemId == 40)
+            {
+                var i = new Intent(Activity, typeof(FolderListSelectionActivity));
+                i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
+                i.PutExtra(FolderListSelectionActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(Document));
+                StartActivity(i);
+
+                return true;
+            }
+
             if (item.ItemId == 80)
             {
                 var i = new Intent(Activity, typeof(ObjectActionsActivity));

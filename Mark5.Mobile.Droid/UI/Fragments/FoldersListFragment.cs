@@ -34,7 +34,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback, View.IOnClickListener, SearchView.IOnQueryTextListener, SearchView.IOnCloseListener
     {
-
         public Folder Folder { get; set; }
 
         FolderListAdapter adapter;
@@ -50,8 +49,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         readonly Handler searchHandler = new Handler();
 
-
-        FolderListAdapter CurrentAdapter
+        protected FolderListAdapter CurrentAdapter
         {
             get { return searchEnabled ? searchAdapter : adapter; }
         }
@@ -269,7 +267,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             NavigateInFolder(CurrentAdapter.GetItemAtPosition(position));
         }
 
-        void Adapter_ItemClicked(object sender, int position)
+        protected virtual void Adapter_ItemClicked(object sender, int position)
         {
             if (actionMode == null)
             {
@@ -305,7 +303,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        void Adapter_ItemLongClicked(object sender, int position)
+        protected virtual void Adapter_ItemLongClicked(object sender, int position)
         {
             if (!IsSelectionValid(position))
             {
@@ -672,6 +670,461 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
+
+        #region RecyclerView Adapter
+
+        protected class FolderListAdapter : RecyclerView.Adapter
+        {
+            public static class ViewType
+            {
+                public const int FolderView = 0;
+                public const int SectionView = 1;
+            }
+
+            static readonly int[] colors = { Resource.Color.darkerblue, Resource.Color.darkblue, Resource.Color.blue };
+
+            protected List<Section> sectionsInView = new List<Section>();
+            protected Dictionary<Section, List<Folder>> foldersInSection = new Dictionary<Section, List<Folder>>();
+
+            readonly RecyclerView parentView;
+            readonly List<int> selectedItemPositions = new List<int>();
+            readonly int sectionHeight;
+            readonly Context context;
+
+            public event EventHandler<int> ExpandIconClicked = delegate { };
+            public event EventHandler<int> ItemClicked = delegate { };
+            public event EventHandler<int> ItemLongClicked = delegate { };
+
+            public FolderListAdapter(Context context, RecyclerView parentRecyclerView)
+            {
+                parentView = parentRecyclerView;
+                sectionHeight = ConversionUtils.ConvertDpToPixels(48);
+                this.context = context;
+            }
+
+            public override int ItemCount
+            {
+                get
+                {
+                    return foldersInSection.Sum(f => f.Value.Count) + (sectionsInView.Count == 1 ? 0 : sectionsInView.Count);
+                }
+            }
+
+            public int SelectedItemsCount
+            {
+                get
+                {
+                    return selectedItemPositions.Count;
+                }
+            }
+
+            public List<int> SelectedItemPositions
+            {
+                get
+                {
+                    return selectedItemPositions;
+                }
+            }
+
+            #region Overrides
+
+            public override int GetItemViewType(int position)
+            {
+                return SectionsPositionToSection().ContainsKey(position) ? ViewType.SectionView : ViewType.FolderView;
+            }
+
+            public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
+            {
+                //Binding of actual parameters, the view is already created
+                if (holder is FolderViewHolder)
+                {
+                    var fh = holder as FolderViewHolder;
+                    var folder = GetItemAtPosition(position);
+
+                    fh.FolderNameTitle.Text = folder.Name;
+
+                    var sectionForPosition = GetSectionForPosition(position);
+                    if (sectionForPosition == Section.Favourites || sectionForPosition == Section.None)
+                    {
+                        fh.FolderNameSubTitle.Text = folder.Path;
+                    }
+                    else
+                    {
+                        var isFolderAvailableOffline = AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderOfflineAsync(folder.Module, folder));
+
+                        var subtitleStrings = new List<string>();
+                        if (folder.Subscribed)
+                        {
+                            subtitleStrings.Add("Notifications On");
+                        }
+                        if (isFolderAvailableOffline)
+                        {
+                            subtitleStrings.Add("Available Offline");
+                        }
+
+                        fh.FolderNameSubTitle.Text = string.Join(", ", subtitleStrings);
+                    }
+
+                    fh.FolderNameSubTitle.Visibility = !string.IsNullOrEmpty(fh.FolderNameSubTitle.Text) ? ViewStates.Visible : ViewStates.Gone;
+
+                    fh.ExpandButton.Visibility = (folder.HasSubFolders && sectionForPosition != Section.None) ? ViewStates.Visible : ViewStates.Gone;
+
+                    var color = colors[Math.Abs(folder.Name.GetHashCode() % colors.Length)];
+
+                    var sd = new ShapeDrawable(new OvalShape());
+                    sd.Paint.Color = new Color(ContextCompat.GetColor(context, color));
+                    fh.FolderIcon.Background = sd;
+
+                    if (folder.InternalType == FolderInternalType.Worktray)
+                    {
+                        fh.FolderIcon.SetImageResource(Resource.Drawable.folder_worktray);
+                    }
+                    else if (folder.Type == FolderType.Spam)
+                    {
+                        fh.FolderIcon.SetImageResource(Resource.Drawable.folder_spam);
+                    }
+                    else if (folder.Type == FolderType.Draft)
+                    {
+                        fh.FolderIcon.SetImageResource(Resource.Drawable.folder_draft);
+                    }
+                    else
+                    {
+                        fh.FolderIcon.SetImageResource(Resource.Drawable.folder); //TODO need to add icon for local
+                    }
+
+                    fh.SelectedOverlay.Visibility = IsItemSelected(position) ? ViewStates.Visible : ViewStates.Gone;
+                }
+                else if (holder is SectionViewHolder)
+                {
+                    var sh = holder as SectionViewHolder;
+                    var section = SectionsPositionToSection()[position];
+
+                    if (foldersInSection[section].Any())
+                    {
+                        string title = string.Empty;
+
+                        switch (section)
+                        {
+                            case Section.Favourites:
+                                title = "Favourites";
+                                break;
+                            case Section.Remote:
+                                title = "Remote";
+                                break;
+                            case Section.Local:
+                                title = "Local";
+                                break;
+                        }
+
+                        sh.SectionTitle.Text = title;
+
+                        sh.ItemView.Visibility = ViewStates.Visible;
+                        sh.ItemView.LayoutParameters.Height = sectionHeight;
+                    }
+                    else
+                    {
+                        sh.ItemView.Visibility = ViewStates.Gone;
+                        sh.ItemView.LayoutParameters.Height = 1;
+                    }
+                }
+            }
+
+            public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
+            {
+                if (viewType == ViewType.FolderView)
+                {
+                    View itemView = LayoutInflater.From(parent.Context).
+                                      Inflate(Resource.Layout.list_item_folder, parent, false);
+
+                    var folderViewHolder = new FolderViewHolder(itemView);
+                    folderViewHolder.ExpandClicked += (sender, e) =>
+                    {
+                        var position = parentView.GetChildLayoutPosition(e);
+                        ExpandIconClicked(e, position);
+                    };
+                    folderViewHolder.ItemClicked += (sender, e) =>
+                    {
+                        var position = parentView.GetChildLayoutPosition(e);
+                        ItemClicked(e, position);
+                    };
+                    folderViewHolder.ItemLongClicked += (sender, e) =>
+                    {
+                        var position = parentView.GetChildLayoutPosition(e);
+                        ItemLongClicked(e, position);
+                    };
+                    return folderViewHolder;
+                }
+                else
+                {
+                    View itemView = LayoutInflater.From(parent.Context).
+                                                  Inflate(Resource.Layout.list_item_section, parent, false);
+                    return new SectionViewHolder(itemView);
+                }
+            }
+
+            #endregion
+
+            #region Public methods
+
+            public void Refresh(List<Folder> folders, Section section)
+            {
+                var sectionPosition = SectionsPositionToSection().FirstOrDefault(c => c.Value == section).Key;
+                var offset = sectionsInView.Count == 1 ? 0 : 1;
+
+                var oldItemCount = foldersInSection[section].Count;
+                if (oldItemCount > 0)
+                {
+                    foldersInSection[section].Clear();
+                    NotifyItemRangeRemoved(sectionPosition + offset, oldItemCount);
+                }
+
+                var newItemCount = folders.Count;
+                foldersInSection[section].AddRange(folders);
+                NotifyItemRangeInserted(sectionPosition + offset, newItemCount);
+                if (sectionsInView.Count > 1)
+                {
+                    NotifyItemChanged(sectionPosition);
+                }
+            }
+
+            public void RefreshFolder(Folder folder, bool? subscriptionEnabled = null)
+            {
+                var offset = sectionsInView.Count == 1 ? 0 : 1;
+                var sectionsPositionToSection = SectionsPositionToSection();
+                foreach (var section in sectionsInView)
+                {
+                    var index = foldersInSection[section].FindIndex(f => f.Id == folder.Id);
+                    if (index >= 0)
+                    {
+                        if (subscriptionEnabled.HasValue)
+                        {
+                            foldersInSection[section][index].Subscribed = subscriptionEnabled.Value;
+                        }
+                        var sectionPosition = sectionsPositionToSection.FirstOrDefault(c => c.Value == section).Key;
+                        NotifyItemChanged(sectionPosition + index + offset);
+                    }
+                }
+            }
+
+            public void RefreshFolders(List<Folder> folders, bool? subscriptionEnabled = null)
+            {
+                foreach (var folder in folders)
+                {
+                    RefreshFolder(folder, subscriptionEnabled);
+                }
+            }
+
+            public void ClearSelections()
+            {
+                var selectedItemPositionsCopy = new List<int>(selectedItemPositions);
+                selectedItemPositions.Clear();
+                foreach (var position in selectedItemPositionsCopy)
+                {
+                    NotifyItemChanged(position);
+                }
+            }
+
+            public Folder GetItemAtPosition(int position)
+            {
+                if (sectionsInView.Count == 1)
+                {
+                    return foldersInSection[sectionsInView.First()][position];
+                }
+
+                int sectionPosition = 0;
+                var sectionPositionToSection = SectionsPositionToSection();
+                var sectionPositions = sectionPositionToSection.Keys.ToList();
+                for (int i = sectionPositions.Count - 1; i > 0; i--)
+                {
+                    if (position > sectionPositions[i])
+                    {
+                        sectionPosition = sectionPositions[i];
+                        break;
+                    }
+                }
+
+                var section = sectionPositionToSection[sectionPosition];
+                return foldersInSection[section][position - sectionPosition - 1];
+            }
+
+            public IEnumerable<Folder> GetSelectedItems()
+            {
+                return selectedItemPositions.Select(i => GetItemAtPosition(i));
+            }
+
+            public void TogggleSelection(int position)
+            {
+                if (IsItemSelected(position))
+                {
+                    selectedItemPositions.Remove(position);
+                }
+                else
+                {
+                    selectedItemPositions.Add(position);
+                }
+
+                NotifyItemChanged(position);
+            }
+
+            public Section? GetSectionForSelectedItems()
+            {
+                if (selectedItemPositions.Any())
+                {
+                    return GetSectionForPosition(selectedItemPositions.First());
+                }
+
+                return null;
+            }
+
+            public Section GetSectionForPosition(int position)
+            {
+                if (sectionsInView.Count == 1)
+                {
+                    return sectionsInView[0];
+                }
+
+                var sectionPositions = SectionsPositionToSection();
+
+                Section currentSection = Section.Favourites;
+                foreach (var sectionPosition in sectionPositions.Keys)
+                {
+                    if (position > sectionPosition)
+                    {
+                        currentSection = sectionPositions[sectionPosition];
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                return currentSection;
+            }
+
+            public void SetSelection(List<int> positionList)
+            {
+                ClearSelections();
+                selectedItemPositions.Clear();
+                foreach (var position in positionList)
+                {
+                    selectedItemPositions.Add(position);
+                    NotifyItemChanged(position);
+                }
+            }
+
+            public void SetSections(List<Section> availableSections)
+            {
+                sectionsInView = availableSections;
+                sectionsInView.ForEach(s => foldersInSection[s] = new List<Folder>());
+                NotifyDataSetChanged();
+            }
+
+            #endregion
+
+            #region Utilities
+
+            bool IsItemSelected(int position)
+            {
+                return selectedItemPositions.Contains(position);
+            }
+
+            Dictionary<int, Section> SectionsPositionToSection()
+            {
+                if (sectionsInView.Count <= 1)
+                {
+                    return new Dictionary<int, Section>();
+                }
+
+                var positions = new Dictionary<int, Section>();
+                positions.Add(0, sectionsInView[0]);
+
+                int previousSectionPosition = 0;
+                int previousSectionItemsCount = foldersInSection[sectionsInView[0]].Count;
+                for (int i = 1; i < sectionsInView.Count; i++)
+                {
+                    var sectionPosition = previousSectionPosition + previousSectionItemsCount + 1;
+                    positions.Add(sectionPosition, sectionsInView[i]);
+
+                    previousSectionPosition = sectionPosition;
+                    previousSectionItemsCount = foldersInSection[sectionsInView[i]].Count;
+                }
+
+                return positions;
+            }
+
+            #endregion
+        }
+
+        class SearchFolderListAdapter : FolderListAdapter
+        {
+            public SearchFolderListAdapter(Context context, RecyclerView parentRecyclerView) : base(context, parentRecyclerView)
+            {
+                sectionsInView = new List<Section> { Section.None };
+                foldersInSection[Section.None] = new List<Folder>();
+            }
+
+            public void Clear()
+            {
+                var itemCount = foldersInSection[Section.None].Count;
+                foldersInSection[Section.None].Clear();
+                NotifyItemRangeRemoved(0, itemCount);
+            }
+
+            public void RefreshSearch(List<Folder> folders)
+            {
+                Refresh(folders, Section.None);
+            }
+        }
+
+        #endregion
+
+        #region RecyclerView ViewHolders
+
+        class FolderViewHolder : RecyclerView.ViewHolder
+        {
+            public AppCompatImageButton ExpandButton { get; private set; }
+            public AppCompatTextView FolderNameTitle { get; private set; }
+            public AppCompatTextView FolderNameSubTitle { get; private set; }
+            public AppCompatImageView FolderIcon { get; private set; }
+            public View SelectedOverlay { get; private set; }
+
+            public event EventHandler<View> ExpandClicked = delegate { };
+            public event EventHandler<View> ItemClicked = delegate { };
+            public event EventHandler<View> ItemLongClicked = delegate { };
+
+            public FolderViewHolder(View itemView) : base(itemView)
+            {
+                // Locate and cache view references
+                ExpandButton = itemView.FindViewById<AppCompatImageButton>(Resource.Id.list_item_folder_expand);
+                ExpandButton.Click += (sender, e) => { ExpandClicked(this, itemView); };
+
+                FolderNameTitle = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_folder_name);
+                FolderNameSubTitle = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_folder_subtitle);
+
+                FolderIcon = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_folder_icon);
+
+                var internalContainerLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_folder_internal_Layout);
+                internalContainerLayout.Click += (sender, e) => ItemClicked(this, itemView);
+                internalContainerLayout.LongClick += (sender, e) => ItemLongClicked(this, itemView);
+
+                SelectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
+            }
+        }
+
+        class SectionViewHolder : RecyclerView.ViewHolder
+        {
+            public AppCompatTextView SectionTitle { get; private set; }
+
+            public SectionViewHolder(View itemView) : base(itemView)
+            {
+                // Locate and cache view references
+                SectionTitle = itemView as AppCompatTextView;
+            }
+        }
+
+        #endregion
+
+
     }
 
     public enum Section
@@ -681,461 +1134,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         Remote,
         Local,
     }
-
-    #region RecyclerView Adapter
-
-    class FolderListAdapter : RecyclerView.Adapter
-    {
-        public static class ViewType
-        {
-            public const int FolderView = 0;
-            public const int SectionView = 1;
-        }
-
-        static readonly int[] colors = { Resource.Color.darkerblue, Resource.Color.darkblue, Resource.Color.blue };
-
-        protected List<Section> sectionsInView = new List<Section>();
-        protected Dictionary<Section, List<Folder>> foldersInSection = new Dictionary<Section, List<Folder>>();
-
-        readonly RecyclerView parentView;
-        readonly List<int> selectedItemPositions = new List<int>();
-        readonly int sectionHeight;
-        readonly Context context;
-
-        public event EventHandler<int> ExpandIconClicked = delegate { };
-        public event EventHandler<int> ItemClicked = delegate { };
-        public event EventHandler<int> ItemLongClicked = delegate { };
-
-        public FolderListAdapter(Context context, RecyclerView parentRecyclerView)
-        {
-            parentView = parentRecyclerView;
-            sectionHeight = ConversionUtils.ConvertDpToPixels(48);
-            this.context = context;
-        }
-
-        public override int ItemCount
-        {
-            get
-            {
-                return foldersInSection.Sum(f => f.Value.Count) + (sectionsInView.Count == 1 ? 0 : sectionsInView.Count);
-            }
-        }
-
-        public int SelectedItemsCount
-        {
-            get
-            {
-                return selectedItemPositions.Count;
-            }
-        }
-
-        public List<int> SelectedItemPositions
-        {
-            get
-            {
-                return selectedItemPositions;
-            }
-        }
-
-        #region Overrides
-
-        public override int GetItemViewType(int position)
-        {
-            return SectionsPositionToSection().ContainsKey(position) ? ViewType.SectionView : ViewType.FolderView;
-        }
-
-        public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
-        {
-            //Binding of actual parameters, the view is already created
-            if (holder is FolderViewHolder)
-            {
-                var fh = holder as FolderViewHolder;
-                var folder = GetItemAtPosition(position);
-
-                fh.FolderNameTitle.Text = folder.Name;
-
-                var sectionForPosition = GetSectionForPosition(position);
-                if (sectionForPosition == Section.Favourites || sectionForPosition == Section.None)
-                {
-                    fh.FolderNameSubTitle.Text = folder.Path;
-                }
-                else
-                {
-                    var isFolderAvailableOffline = AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderOfflineAsync(folder.Module, folder));
-
-                    var subtitleStrings = new List<string>();
-                    if (folder.Subscribed)
-                    {
-                        subtitleStrings.Add("Notifications On");
-                    }
-                    if (isFolderAvailableOffline)
-                    {
-                        subtitleStrings.Add("Available Offline");
-                    }
-
-                    fh.FolderNameSubTitle.Text = string.Join(", ", subtitleStrings);
-                }
-
-                fh.FolderNameSubTitle.Visibility = !string.IsNullOrEmpty(fh.FolderNameSubTitle.Text) ? ViewStates.Visible : ViewStates.Gone;
-
-                fh.ExpandButton.Visibility = (folder.HasSubFolders && sectionForPosition != Section.None) ? ViewStates.Visible : ViewStates.Gone;
-
-                var color = colors[Math.Abs(folder.Name.GetHashCode() % colors.Length)];
-
-                var sd = new ShapeDrawable(new OvalShape());
-                sd.Paint.Color = new Color(ContextCompat.GetColor(context, color));
-                fh.FolderIcon.Background = sd;
-
-                if (folder.InternalType == FolderInternalType.Worktray)
-                {
-                    fh.FolderIcon.SetImageResource(Resource.Drawable.folder_worktray);
-                }
-                else if (folder.Type == FolderType.Spam)
-                {
-                    fh.FolderIcon.SetImageResource(Resource.Drawable.folder_spam);
-                }
-                else if (folder.Type == FolderType.Draft)
-                {
-                    fh.FolderIcon.SetImageResource(Resource.Drawable.folder_draft);
-                }
-                else
-                {
-                    fh.FolderIcon.SetImageResource(Resource.Drawable.folder); //TODO need to add icon for local
-                }
-
-                fh.SelectedOverlay.Visibility = IsItemSelected(position) ? ViewStates.Visible : ViewStates.Gone;
-            }
-            else if (holder is SectionViewHolder)
-            {
-                var sh = holder as SectionViewHolder;
-                var section = SectionsPositionToSection()[position];
-
-                if (foldersInSection[section].Any())
-                {
-                    string title = string.Empty;
-
-                    switch (section)
-                    {
-                        case Section.Favourites:
-                            title = "Favourites";
-                            break;
-                        case Section.Remote:
-                            title = "Remote";
-                            break;
-                        case Section.Local:
-                            title = "Local";
-                            break;
-                    }
-
-                    sh.SectionTitle.Text = title;
-
-                    sh.ItemView.Visibility = ViewStates.Visible;
-                    sh.ItemView.LayoutParameters.Height = sectionHeight;
-                }
-                else
-                {
-                    sh.ItemView.Visibility = ViewStates.Gone;
-                    sh.ItemView.LayoutParameters.Height = 1;
-                }
-            }
-        }
-
-        public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
-        {
-            if (viewType == ViewType.FolderView)
-            {
-                View itemView = LayoutInflater.From(parent.Context).
-                                  Inflate(Resource.Layout.list_item_folder, parent, false);
-
-                var folderViewHolder = new FolderViewHolder(itemView);
-                folderViewHolder.ExpandClicked += (sender, e) =>
-                {
-                    var position = parentView.GetChildLayoutPosition(e);
-                    ExpandIconClicked(e, position);
-                };
-                folderViewHolder.ItemClicked += (sender, e) =>
-                {
-                    var position = parentView.GetChildLayoutPosition(e);
-                    ItemClicked(e, position);
-                };
-                folderViewHolder.ItemLongClicked += (sender, e) =>
-                {
-                    var position = parentView.GetChildLayoutPosition(e);
-                    ItemLongClicked(e, position);
-                };
-                return folderViewHolder;
-            }
-            else
-            {
-                View itemView = LayoutInflater.From(parent.Context).
-                                              Inflate(Resource.Layout.list_item_section, parent, false);
-                return new SectionViewHolder(itemView);
-            }
-        }
-
-        #endregion
-
-        #region Public methods
-
-        public void Refresh(List<Folder> folders, Section section)
-        {
-            var sectionPosition = SectionsPositionToSection().FirstOrDefault(c => c.Value == section).Key;
-            var offset = sectionsInView.Count == 1 ? 0 : 1;
-
-            var oldItemCount = foldersInSection[section].Count;
-            if (oldItemCount > 0)
-            {
-                foldersInSection[section].Clear();
-                NotifyItemRangeRemoved(sectionPosition + offset, oldItemCount);
-            }
-
-            var newItemCount = folders.Count;
-            foldersInSection[section].AddRange(folders);
-            NotifyItemRangeInserted(sectionPosition + offset, newItemCount);
-            if (sectionsInView.Count > 1)
-            {
-                NotifyItemChanged(sectionPosition);
-            }
-        }
-
-        public void RefreshFolder(Folder folder, bool? subscriptionEnabled = null)
-        {
-            var offset = sectionsInView.Count == 1 ? 0 : 1;
-            var sectionsPositionToSection = SectionsPositionToSection();
-            foreach (var section in sectionsInView)
-            {
-                var index = foldersInSection[section].FindIndex(f => f.Id == folder.Id);
-                if (index >= 0)
-                {
-                    if (subscriptionEnabled.HasValue)
-                    {
-                        foldersInSection[section][index].Subscribed = subscriptionEnabled.Value;
-                    }
-                    var sectionPosition = sectionsPositionToSection.FirstOrDefault(c => c.Value == section).Key;
-                    NotifyItemChanged(sectionPosition + index + offset);
-                }
-            }
-        }
-
-        public void RefreshFolders(List<Folder> folders, bool? subscriptionEnabled = null)
-        {
-            foreach (var folder in folders)
-            {
-                RefreshFolder(folder, subscriptionEnabled);
-            }
-        }
-
-        public void ClearSelections()
-        {
-            var selectedItemPositionsCopy = new List<int>(selectedItemPositions);
-            selectedItemPositions.Clear();
-            foreach (var position in selectedItemPositionsCopy)
-            {
-                NotifyItemChanged(position);
-            }
-        }
-
-        public Folder GetItemAtPosition(int position)
-        {
-            if (sectionsInView.Count == 1)
-            {
-                return foldersInSection[sectionsInView.First()][position];
-            }
-
-            int sectionPosition = 0;
-            var sectionPositionToSection = SectionsPositionToSection();
-            var sectionPositions = sectionPositionToSection.Keys.ToList();
-            for (int i = sectionPositions.Count - 1; i > 0; i--)
-            {
-                if (position > sectionPositions[i])
-                {
-                    sectionPosition = sectionPositions[i];
-                    break;
-                }
-            }
-
-            var section = sectionPositionToSection[sectionPosition];
-            return foldersInSection[section][position - sectionPosition - 1];
-        }
-
-        public IEnumerable<Folder> GetSelectedItems()
-        {
-            return selectedItemPositions.Select(i => GetItemAtPosition(i));
-        }
-
-        public void TogggleSelection(int position)
-        {
-            if (IsItemSelected(position))
-            {
-                selectedItemPositions.Remove(position);
-            }
-            else
-            {
-                selectedItemPositions.Add(position);
-            }
-
-            NotifyItemChanged(position);
-        }
-
-        public Section? GetSectionForSelectedItems()
-        {
-            if (selectedItemPositions.Any())
-            {
-                return GetSectionForPosition(selectedItemPositions.First());
-            }
-
-            return null;
-        }
-
-        public Section GetSectionForPosition(int position)
-        {
-            if (sectionsInView.Count == 1)
-            {
-                return sectionsInView[0];
-            }
-
-            var sectionPositions = SectionsPositionToSection();
-
-            Section currentSection = Section.Favourites;
-            foreach (var sectionPosition in sectionPositions.Keys)
-            {
-                if (position > sectionPosition)
-                {
-                    currentSection = sectionPositions[sectionPosition];
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            return currentSection;
-        }
-
-        public void SetSelection(List<int> positionList)
-        {
-            ClearSelections();
-            selectedItemPositions.Clear();
-            foreach (var position in positionList)
-            {
-                selectedItemPositions.Add(position);
-                NotifyItemChanged(position);
-            }
-        }
-
-        public void SetSections(List<Section> availableSections)
-        {
-            sectionsInView = availableSections;
-            sectionsInView.ForEach(s => foldersInSection[s] = new List<Folder>());
-            NotifyDataSetChanged();
-        }
-
-        #endregion
-
-        #region Utilities
-
-        bool IsItemSelected(int position)
-        {
-            return selectedItemPositions.Contains(position);
-        }
-
-        Dictionary<int, Section> SectionsPositionToSection()
-        {
-            if (sectionsInView.Count <= 1)
-            {
-                return new Dictionary<int, Section>();
-            }
-
-            var positions = new Dictionary<int, Section>();
-            positions.Add(0, sectionsInView[0]);
-
-            int previousSectionPosition = 0;
-            int previousSectionItemsCount = foldersInSection[sectionsInView[0]].Count;
-            for (int i = 1; i < sectionsInView.Count; i++)
-            {
-                var sectionPosition = previousSectionPosition + previousSectionItemsCount + 1;
-                positions.Add(sectionPosition, sectionsInView[i]);
-
-                previousSectionPosition = sectionPosition;
-                previousSectionItemsCount = foldersInSection[sectionsInView[i]].Count;
-            }
-
-            return positions;
-        }
-
-        #endregion
-    }
-
-    class SearchFolderListAdapter : FolderListAdapter
-    {
-        public SearchFolderListAdapter(Context context, RecyclerView parentRecyclerView) : base(context, parentRecyclerView)
-        {
-            sectionsInView = new List<Section> { Section.None };
-            foldersInSection[Section.None] = new List<Folder>();
-        }
-
-        public void Clear()
-        {
-            var itemCount = foldersInSection[Section.None].Count;
-            foldersInSection[Section.None].Clear();
-            NotifyItemRangeRemoved(0, itemCount);
-        }
-
-        public void RefreshSearch(List<Folder> folders)
-        {
-            Refresh(folders, Section.None);
-        }
-    }
-
-    #endregion
-
-    #region RecyclerView ViewHolders
-
-    class FolderViewHolder : RecyclerView.ViewHolder
-    {
-        public AppCompatImageButton ExpandButton { get; private set; }
-        public AppCompatTextView FolderNameTitle { get; private set; }
-        public AppCompatTextView FolderNameSubTitle { get; private set; }
-        public AppCompatImageView FolderIcon { get; private set; }
-        public View SelectedOverlay { get; private set; }
-
-        public event EventHandler<View> ExpandClicked = delegate { };
-        public event EventHandler<View> ItemClicked = delegate { };
-        public event EventHandler<View> ItemLongClicked = delegate { };
-
-        public FolderViewHolder(View itemView) : base(itemView)
-        {
-            // Locate and cache view references
-            ExpandButton = itemView.FindViewById<AppCompatImageButton>(Resource.Id.list_item_folder_expand);
-            ExpandButton.Click += (sender, e) => { ExpandClicked(this, itemView); };
-
-            FolderNameTitle = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_folder_name);
-            FolderNameSubTitle = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_folder_subtitle);
-
-            FolderIcon = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_folder_icon);
-
-            var internalContainerLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_folder_internal_Layout);
-            internalContainerLayout.Click += (sender, e) => ItemClicked(this, itemView);
-            internalContainerLayout.LongClick += (sender, e) => ItemLongClicked(this, itemView);
-
-            SelectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
-        }
-    }
-
-    class SectionViewHolder : RecyclerView.ViewHolder
-    {
-        public AppCompatTextView SectionTitle { get; private set; }
-
-        public SectionViewHolder(View itemView) : base(itemView)
-        {
-            // Locate and cache view references
-            SectionTitle = itemView as AppCompatTextView;
-        }
-    }
-
-    #endregion
-
-
 
 }
 
