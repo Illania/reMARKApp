@@ -27,12 +27,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string ContactPreviewIntentKey = "ContactPreview_0da27d12-4d29-4f44-8dbf-2e28d7f93aae";
         public const string FolderIntentKey = "Folder_88a33f0b-ebbf-4eed-b33d-49fba4f43f15";
 
-        string fragmentTagKey = "fragmentTagKey";
+        const string cvfFragmentTagKey = "fragmentTagKey";
+        string cvfFragmentTag;
 
         ContactHeaderView toolbarHeaderView;
         ContactHeaderView floatHeaderView;
-        string fragmentTag;
-
 
         ContactViewFragment cvf;
 
@@ -69,23 +68,23 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     ContactPreview = contactPreview,
                     Folder = folder,
                 };
-                fragmentTag = cvf.GenerateTag();
-                ft.Replace(Resource.Id.fragment_container, cvf, fragmentTag);
+                cvfFragmentTag = cvf.GenerateTag();
+                ft.Replace(Resource.Id.fragment_container, cvf, cvfFragmentTag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ContactActivity)}");
             }
             else
             {
-                fragmentTag = savedInstanceState.GetString(fragmentTagKey);
-                cvf = SupportFragmentManager.FindFragmentByTag(fragmentTag) as ContactViewFragment;
+                cvfFragmentTag = savedInstanceState.GetString(cvfFragmentTagKey);
+                cvf = SupportFragmentManager.FindFragmentByTag(cvfFragmentTag) as ContactViewFragment;
                 CommonConfig.Logger.Info($"Restored {nameof(ContactActivity)}");
             }
         }
 
         protected override void OnSaveInstanceState(Bundle outState)
         {
-            outState.PutString(fragmentTagKey, fragmentTag);
+            outState.PutString(cvfFragmentTagKey, cvfFragmentTag);
             base.OnSaveInstanceState(outState);
         }
 

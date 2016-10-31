@@ -26,11 +26,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
         public const string DocumentPreviewIntentKey = "DocumentPreview_0bd291a4-22a5-431c-ad6e-4c8b273eeb98";
 
-        string fragmentTagKey = "fragmentTagKey";
+        const string dfFragmentTagKey = "fragmentTagKey";
+        string dfFragmentTag;
 
         Toolbar toolbar;
         DocumentFragment df;
-        string fragmentTag;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -56,16 +56,16 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     DocumentPreview = documentPreview,
                     CloseRequest = OnBackPressed
                 };
-                fragmentTag = df.GenerateTag();
-                ft.Replace(Resource.Id.fragment_container, df, fragmentTag);
+                dfFragmentTag = df.GenerateTag();
+                ft.Replace(Resource.Id.fragment_container, df, dfFragmentTag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(DocumentActivity)}");
             }
             else
             {
-                fragmentTag = savedInstanceState.GetString(fragmentTagKey);
-                df = SupportFragmentManager.FindFragmentByTag(fragmentTag) as DocumentFragment;
+                dfFragmentTag = savedInstanceState.GetString(dfFragmentTagKey);
+                df = SupportFragmentManager.FindFragmentByTag(dfFragmentTag) as DocumentFragment;
                 CommonConfig.Logger.Info($"Restored {nameof(DocumentActivity)}");
             }
         }
@@ -89,7 +89,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         protected override void OnSaveInstanceState(Bundle outState)
         {
-            outState.PutString(fragmentTagKey, fragmentTag);
+            outState.PutString(dfFragmentTagKey, dfFragmentTag);
             base.OnSaveInstanceState(outState);
         }
 

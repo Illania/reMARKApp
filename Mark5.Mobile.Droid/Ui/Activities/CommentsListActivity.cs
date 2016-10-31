@@ -24,10 +24,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string EntityIntentKey = "EntityIntent_20c8514c-b644-47db-842f-f2df4204d93a";
         public const string CommentsResultKey = "CommentsResult_593d8c70-d45c-425e-8e36-7389e3cc0c62";
 
-        string fragmentTagKey = "fragmentTagKey";
+        const string cfFragmentTagKey = "fragmentTagKey";
+        string cfFragmentTag;
 
         CommentsListFragment cf;
-        string fragmentTag;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
