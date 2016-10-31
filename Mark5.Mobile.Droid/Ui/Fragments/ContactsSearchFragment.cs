@@ -67,6 +67,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ContactFoldersSearchView(Context));
             linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactResponsibleSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new MaxContactsSearchView(Context));
 
             progress.Visibility = ViewStates.Gone;
