@@ -229,12 +229,21 @@
     <Compile Include="Utilities\PushNotifications\GcmListenerService.cs" />
     <Compile Include="Utilities\PushNotifications\InstanceIdListenerService.cs" />
     <Compile Include="Utilities\PushNotifications\RegistrationIntentService.cs" />
+    <Compile Include="Ui\Activities\CommentsListActivity.cs" />
+    <Compile Include="Ui\Fragments\CommentsListFragment.cs" />
+    <Compile Include="Ui\Common\BusMesseges\DocumentPreviewCommentCountChangedMessage.cs" />
+    <Compile Include="Ui\Common\ActionOnCreateContextMenuListener.cs" />
     <Compile Include="Ui\Activities\ObjectActionsActivity.cs" />
     <Compile Include="Ui\Fragments\ObjectActionsFragment.cs" />
     <Compile Include="Ui\Views\ObjectActionsView.cs" />
     <Compile Include="Ui\Activities\ObjectLinksActivity.cs" />
     <Compile Include="Ui\Fragments\ObjectLinksFragment.cs" />
     <Compile Include="Ui\Views\ObjectLinksView.cs" />
+    <Compile Include="Ui\Activities\CategoriesListActivity.cs" />
+    <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
+    <Compile Include="Ui\Fragments\AvailableCategoriesListFragment.cs" />
+    <Compile Include="Ui\Common\BusMesseges\DocumentPreviewCategoriesChangedMessage.cs" />
+    <Compile Include="Ui\Common\BusMesseges\ContactPreviewCategoriesChangedMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -364,7 +373,14 @@
     <AndroidResource Include="Resources\layout\base_layout_collapsing.axml" />
     <AndroidResource Include="Resources\drawable\rounded_background.xml" />
     <AndroidResource Include="Resources\xml\filepaths.xml" />
+    <AndroidResource Include="Resources\layout\list_item_comments.axml" />
+    <AndroidResource Include="Resources\layout\list_comments.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\send.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\send.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\send.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\send.png" />
     <AndroidResource Include="Resources\layout\linear_layout_nested.axml" />
+    <AndroidResource Include="Resources\layout\list_item_categories.axml" />
     <AndroidResource Include="Resources\layout\list_item_documents_external.axml" />
   </ItemGroup>
   <ItemGroup>

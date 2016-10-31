@@ -87,6 +87,20 @@
 	<string name="opening_attachment">Opening attachment</string>
 	<string name="cannot_open_attachment_without_ext">Attachments without extensions cannot be opened</string>
 	<string name="description">Description</string>
+	<string name="adding_comment">Adding comment</string>
+	<string name="deleting_comment">Deleting comment</string>
+	<string name="editing_comment">Editing comment</string>
+	<string name="add_comment_hint">Insert new comment</string>
+	<string name="edit">Edit</string>
+	<string name="delete">Delete</string>
 	<string name="by">by</string>
 	<string name="on">on</string>
+	<string name="edit">Edit</string>
+	<string name="done">Done</string>
+	<string name="updating_categories">Updating Categories</string>
+	<string name="confirm">Confirm</string>
+	<string name="cancel">Cancel</string>
+	<string name="confirm_comment_deletion_title">Confirm comment deletion</string>
+	<string name="confirm_comment_deletion_content">Are you sure you want to delete the comment?</string>
+	<string name="edit_comment_message">Edit comment message</string>
 </resources>
