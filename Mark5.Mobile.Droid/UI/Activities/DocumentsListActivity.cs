@@ -97,7 +97,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (readStatusToken != null) PlatformConfig.MessengerHub.Unsubscribe<DocumentPreviewReadStatusChangedMessage>(readStatusToken);
             if (commentCountToken != null) PlatformConfig.MessengerHub.Unsubscribe<DocumentPreviewCommentCountChangedMessage>(commentCountToken);
             if (categoriesToken != null) PlatformConfig.MessengerHub.Unsubscribe<DocumentPreviewCategoriesChangedMessage>(categoriesToken);
-
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)

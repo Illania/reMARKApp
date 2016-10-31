@@ -69,6 +69,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             });
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            if (categoriesToken != null) PlatformConfig.MessengerHub.Unsubscribe<DocumentPreviewCategoriesChangedMessage>(categoriesToken);
+        }
+
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if (item.ItemId == Android.Resource.Id.Home)
