@@ -18,7 +18,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class MoveToFolderListFragment : FoldersListFragment
     {
-        public BusinessEntity BusinessEntity { get; set; }  //TODO Need to save this 
+        public IBusinessEntity BusinessEntity { get; set; }  //TODO Need to save this 
         public Folder FromFolder { get; set; }  //TODO Need to save this 
 
         protected override RetainableStateFragment GetFolderFragment(Folder folder)
