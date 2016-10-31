@@ -50,23 +50,23 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
                     Entity = businessEntity,
                 };
-                fragmentTag = cf.GenerateTag();
-                ft.Replace(Resource.Id.fragment_container, cf, fragmentTag);
+                cfFragmentTag = cf.GenerateTag();
+                ft.Replace(Resource.Id.fragment_container, cf, cfFragmentTag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(CommentsListActivity)}");
             }
             else
             {
-                fragmentTag = savedInstanceState.GetString(fragmentTagKey);
-                cf = SupportFragmentManager.FindFragmentByTag(fragmentTag) as CommentsListFragment;
+                cfFragmentTag = savedInstanceState.GetString(cfFragmentTagKey);
+                cf = SupportFragmentManager.FindFragmentByTag(cfFragmentTag) as CommentsListFragment;
                 CommonConfig.Logger.Info($"Restored {nameof(CommentsListActivity)}");
             }
         }
 
         protected override void OnSaveInstanceState(Bundle outState)
         {
-            outState.PutString(fragmentTagKey, fragmentTag);
+            outState.PutString(cfFragmentTagKey, cfFragmentTag);
             base.OnSaveInstanceState(outState);
         }
 
