@@ -25,19 +25,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class ShortcodesSearchCriteriaFragment : RetainableStateFragment
     {
 
-        ProgressBar progress;
-        ScrollView scrollView;
         LinearLayoutCompat linearLayout;
+        AppCompatButton searchButton;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(ShortcodesSearchCriteriaFragment)}...");
 
-            var rootView = inflater.Inflate(Resource.Layout.linear_layout, container, false);
+            var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_button, container, false);
 
-            progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
-            scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
+            searchButton = rootView.FindViewById<AppCompatButton>(Resource.Id.button);
 
             linearLayout.AddView(new ShortcodeNameSearchView(Context));
             linearLayout.AddView(new Divider(Context));
@@ -49,10 +47,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new MaxShortcodesSearchView(Context));
 
-            progress.Visibility = ViewStates.Gone;
-            scrollView.Visibility = ViewStates.Visible;
-
-            HasOptionsMenu = true;
+            searchButton.Text = GetString(Resource.String.search);
+            searchButton.Click += (sender, e) =>
+            {
+                var i = new Intent(Activity, typeof(SearchResultsActivity));
+                i.PutExtra(SearchResultsActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
+                i.PutExtra(SearchResultsActivity.CriteriaIntentKey, SerializationUtils.Serialize(GetCriteria()));
+                StartActivity(i);
+            };
 
             return rootView;
         }
@@ -64,23 +66,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             //((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_shortcodes);
 
             CommonConfig.Logger.Info($"Created {nameof(ShortcodesSearchCriteriaFragment)}");
-        }
-
-        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
-        {
-            menu.Add(Menu.None, Menu.None, Menu.First, Resource.String.search);
-            menu.GetItem(0).SetIcon(Android.Resource.Drawable.IcMenuSearch);
-            menu.GetItem(0).SetShowAsAction(ShowAsAction.Always);
-        }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            var i = new Intent(Activity, typeof(SearchResultsActivity));
-            i.PutExtra(SearchResultsActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
-            i.PutExtra(SearchResultsActivity.CriteriaIntentKey, SerializationUtils.Serialize(GetCriteria()));
-            StartActivity(i);
-
-            return true;
         }
 
         SearchShortcodesCriteria GetCriteria()
