@@ -653,7 +653,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        class FolderListFragmentState : IRetainableState
+        protected class FolderListFragmentState : IRetainableState
         {
             public Folder Folder { get; set; }
             public Folder FavouriteRootFolder { get; set; }

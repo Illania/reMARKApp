@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 
+using System.Collections.Generic;
 using Android.App;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -31,7 +32,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         public const string ModuleIntentKey = "ModuleIntent_79a3dba4-bdad-4b11-be42-af6acdf31b4e";
         public const string ModeIntentKey = "Mode_418bec8d-f44d-41b4-bff0-e286dea3d705";
-        public const string BusinessEntityIntentKey = "BusinessEntity_d6047bae-dc5e-4c3e-a302-e33931531baa";
+        public const string BusinessEntitiesIntentKey = "BusinessEntity_d6047bae-dc5e-4c3e-a302-e33931531baa";
         public const string FromFolderIntentKey = "FromFolderIntent_3a68d401-f581-4094-b526-4478cc43d3f4";
 
         public const string FoldersResultKey = "FoldersResult_32e7327a-f02e-4628-850a-6d86e2109b3e";
@@ -55,7 +56,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var listMode = (ModeType)Intent.Extras.GetInt(ModeIntentKey);
                 var moduleType = SerializationUtils.Deserialize<ModuleType>(Intent.Extras.GetString(ModuleIntentKey));
-                var be = Intent.HasExtra(BusinessEntityIntentKey) ? SerializationUtils.Deserialize<IBusinessEntity>(Intent.Extras.GetString(BusinessEntityIntentKey)) : null;
+                var be = Intent.HasExtra(BusinessEntitiesIntentKey) ? SerializationUtils.Deserialize<List<IBusinessEntity>>(Intent.Extras.GetString(BusinessEntitiesIntentKey)) : null;
                 var fromFolder = Intent.HasExtra(FromFolderIntentKey) ? SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FromFolderIntentKey)) : null;
 
                 var ft = SupportFragmentManager.BeginTransaction();
@@ -65,7 +66,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var flf = new CopyToFolderListFragment
                     {
                         Folder = Folder.RootPerModule(moduleType),
-                        BusinessEntity = be,
+                        BusinessEntities = be,
                     };
                     ft.Replace(Resource.Id.fragment_container, flf, flf.GenerateTag());
                 }
@@ -74,7 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var flf = new MoveToFolderListFragment
                     {
                         Folder = Folder.RootPerModule(moduleType),
-                        BusinessEntity = be,
+                        BusinessEntities = be,
                         FromFolder = fromFolder,
                     };
                     ft.Replace(Resource.Id.fragment_container, flf, flf.GenerateTag());

@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
@@ -18,13 +19,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class CopyToFolderListFragment : FoldersListFragment
     {
-        public IBusinessEntity BusinessEntity { get; set; }  //TODO Need to save this 
+        public List<IBusinessEntity> BusinessEntities { get; set; }
 
         protected override RetainableStateFragment GetFolderFragment(Folder folder)
         {
             return new CopyToFolderListFragment
             {
-                BusinessEntity = BusinessEntity,
+                BusinessEntities = BusinessEntities,
                 Folder = folder,
             };
         }
@@ -43,16 +44,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
             }
 
-            CommonConfig.Logger.Info($"Copying business entity to folder [businessEntity.Id={BusinessEntity.Id}, businessEntity.Type={BusinessEntity.ObjectType}, folder.Id={folder.Id}]");
+            CommonConfig.Logger.Info($"Copying business entities to folder [businessEntities.Count={BusinessEntities.Count}, businessEntities.Type={BusinessEntities.First().ObjectType}, folder.Id={folder.Id}]");
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_folder, Resource.String.please_wait);
 
             try
             {
-                await Managers.CommonActionsManager.CopyToFolder(new List<IBusinessEntity> { BusinessEntity }, folder);
+                await Managers.CommonActionsManager.CopyToFolder(BusinessEntities, folder);
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while copying business entity to folder [businessEntity.Id={BusinessEntity.Id}, businessEntity.Type={BusinessEntity.ObjectType}, folder.Id={folder.Id}]", ex);
+                CommonConfig.Logger.Error($"Error while copying business entities to folder [businessEntities.Count={BusinessEntities.Count}, businessEntities.Type={BusinessEntities.First().ObjectType}, folder.Id={folder.Id}]", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(Context, ex);
@@ -64,5 +65,43 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        #region Retained Fragment methods
+
+        public override string GenerateTag()
+        {
+            return base.GenerateTag() + $" / {nameof(CopyToFolderListFragment)} [businessEntities.Count={BusinessEntities.Count}, businessEntities.Type={BusinessEntities.First().ObjectType}]";
+        }
+
+        public override IRetainableState OnRetainInstanceState()
+        {
+            var baseState = base.OnRetainInstanceState() as FolderListFragmentState;
+
+            CommonConfig.Logger.Info($"Retaining state: [businessEntities.Count={BusinessEntities.Count}, businessEntities.Type={BusinessEntities.First().ObjectType}]");
+
+            return new CopyToFolderListFragmentState
+            {
+                Folder = baseState.Folder,
+                SelectedItemPositions = baseState.SelectedItemPositions,
+                BusinessEntity = BusinessEntities,
+            };
+        }
+
+        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
+        {
+            base.OnRetainedInstanceStateRestored(restoredState as FolderListFragmentState);
+            var flfs = restoredState as CopyToFolderListFragmentState;
+            if (flfs != null)
+            {
+                BusinessEntities = flfs.BusinessEntity;
+                CommonConfig.Logger.Info($"Restored state state: [businessEntities.Count={BusinessEntities.Count}, businessEntities.Type={BusinessEntities.First().ObjectType}]");
+            }
+        }
+
+        protected class CopyToFolderListFragmentState : FolderListFragmentState
+        {
+            public List<IBusinessEntity> BusinessEntity { get; set; }
+        }
+
+        #endregion
     }
 }
