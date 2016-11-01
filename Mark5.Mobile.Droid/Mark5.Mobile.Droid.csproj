@@ -248,6 +248,7 @@
     <Compile Include="Ui\Fragments\FoldersListSelectionFragments\CopyToFolderListFragment.cs" />
     <Compile Include="Ui\Fragments\FoldersListSelectionFragments\MoveToFolderListFragment.cs" />
     <Compile Include="Ui\Fragments\FoldersListSelectionFragments\PickerFolderListFragment.cs" />
+    <Compile Include="Ui\Common\BusMesseges\EntityMovedFromFolderMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

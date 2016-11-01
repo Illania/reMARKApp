@@ -197,7 +197,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
-
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
                 var i = new Intent(Activity, typeof(FolderListSelectionActivity));
@@ -209,7 +208,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
-
             if (item.ItemId == MenuItemActions.Categories)
             {
                 var i = new Intent(Activity, typeof(CategoriesListActivity));

@@ -14,6 +14,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -63,6 +64,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             finally
             {
                 dismissAction();
+                PlatformConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, BusinessEntities.First().ObjectType, FromFolder.Id, BusinessEntities.Select(b => b.Id).ToList()));
                 Activity.Finish();
             }
         }
