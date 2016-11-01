@@ -344,49 +344,49 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (currentAdapter.SelectedItems.Any(dp => !dp.IsReadByCurrent))
             {
-                menu.Add(Menu.None, 10, 10, Resource.String.mark_as_read);
+                menu.Add(Menu.None, MenuItemActions.MarkAsRead, MenuItemActions.MarkAsRead, Resource.String.mark_as_read);
             }
 
             if (currentAdapter.SelectedItems.Any(dp => dp.IsReadByCurrent))
             {
-                menu.Add(Menu.None, 11, 11, Resource.String.marks_as_unread);
+                menu.Add(Menu.None, MenuItemActions.MarkAsUnread, MenuItemActions.MarkAsUnread, Resource.String.marks_as_unread);
             }
 
             if (currentAdapter.SelectedItemCount == 1)
             {
-                menu.Add(Menu.None, 20, 20, Resource.String.reply);
-                menu.Add(Menu.None, 21, 21, Resource.String.reply_all);
-                menu.Add(Menu.None, 22, 22, Resource.String.forward);
+                menu.Add(Menu.None, MenuItemActions.Reply, MenuItemActions.Reply, Resource.String.reply);
+                menu.Add(Menu.None, MenuItemActions.ReplyAll, MenuItemActions.ReplyAll, Resource.String.reply_all);
+                menu.Add(Menu.None, MenuItemActions.Forward, MenuItemActions.Forward, Resource.String.forward);
             }
 
-            menu.Add(Menu.None, 30, 30, Resource.String.copy_to_worktray);
-            menu.Add(Menu.None, 40, 40, Resource.String.copy_to_folder);
+            menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
+            menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
 
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static
                 || Folder.InternalType == FolderInternalType.Worktray)
             {
-                menu.Add(Menu.None, 41, 41, Resource.String.move_to_folder);
+                menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
             }
 
-            menu.Add(Menu.None, 50, 50, Resource.String.set_priority);
+            menu.Add(Menu.None, MenuItemActions.SetPriority, MenuItemActions.SetPriority, Resource.String.set_priority);
 
             if (currentAdapter.SelectedItemCount == 1)
             {
-                menu.Add(Menu.None, 60, 60, Resource.String.categories);
+                menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
             }
 
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static
                 || Folder.InternalType == FolderInternalType.Worktray)
             {
-                menu.Add(Menu.None, 70, 70, Resource.String.delete_from_folder);
+                menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
             }
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
                 || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed)
             {
-                menu.Add(Menu.None, 71, 71, Resource.String.delete);
+                menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
             }
 
             return true;
@@ -407,6 +407,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var currentAdapter = (DocumentsListAdapter)recyclerView.GetAdapter();
             currentAdapter.ClearSelections();
             actionMode = null;
+        }
+
+        static class MenuItemActions
+        {
+            public const int MarkAsRead = 10;
+            public const int MarkAsUnread = 11;
+            public const int Reply = 20;
+            public const int ReplyAll = 21;
+            public const int Forward = 22;
+            public const int CopyToWorktray = 30;
+            public const int CopyToFolder = 40;
+            public const int MoveToFolder = 41;
+            public const int SetPriority = 50;
+            public const int Categories = 60;
+            public const int DeleteFromFolder = 70;
+            public const int Delete = 71;
         }
 
         #endregion
