@@ -208,7 +208,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             adapter.Refresh(localRootFolder.SubFolders, Section.Local);
         }
 
-        void RestoreSelection()
+        protected virtual void RestoreSelection()
         {
             CommonConfig.Logger.Info("Restoring selected items");
 
@@ -338,7 +338,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void ToggleSelection(int position)
         {
-            CurrentAdapter.TogggleSelection(position);
+            CurrentAdapter.ToggleSelection(position);
 
             var selectedItemsCount = CurrentAdapter.SelectedItemsCount;
             if (selectedItemsCount == 0)
@@ -957,9 +957,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return selectedItemPositions.Select(i => GetItemAtPosition(i));
             }
 
-            public void TogggleSelection(int position)
+            public bool ToggleSelection(int position)
             {
-                if (IsItemSelected(position))
+                bool isItemSelected = IsItemSelected(position);
+                if (isItemSelected)
                 {
                     selectedItemPositions.Remove(position);
                 }
@@ -969,6 +970,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 NotifyItemChanged(position);
+                return !isItemSelected;
             }
 
             public Section? GetSectionForSelectedItems()
@@ -1022,6 +1024,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 sectionsInView = availableSections;
                 sectionsInView.ForEach(s => foldersInSection[s] = new List<Folder>());
                 NotifyDataSetChanged();
+            }
+
+            public void SetSelectionForFolders(IEnumerable<Folder> folders)
+            {
+                var sectionsPositionToSection = SectionsPositionToSection();
+                var offset = sectionsInView.Count == 1 ? 0 : 1;
+                foreach (var folder in folders)
+                {
+                    foreach (var section in sectionsInView)
+                    {
+                        var sectionPosition = sectionsPositionToSection.FirstOrDefault(c => c.Value == section).Key;
+
+                        var index = foldersInSection[section].FindIndex(f => f.Id == folder.Id);
+                        if (index >= 0)
+                        {
+                            var position = sectionPosition + offset;
+                            if (!IsItemSelected(position))
+                            {
+                                selectedItemPositions.Add(position);
+                                NotifyItemChanged(position);
+                            }
+                        }
+                    }
+                }
             }
 
             #endregion
