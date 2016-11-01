@@ -119,45 +119,64 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (!DocumentPreview.IsReadByCurrent)
             {
-                menu.Add(Menu.None, 10, 10, Resource.String.mark_as_read);
+                menu.Add(Menu.None, MenuItemActions.MarkAsRead, MenuItemActions.MarkAsRead, Resource.String.mark_as_read);
             }
 
             if (DocumentPreview.IsReadByCurrent)
             {
-                menu.Add(Menu.None, 11, 11, Resource.String.marks_as_unread);
+                menu.Add(Menu.None, MenuItemActions.MarkAsUnread, MenuItemActions.MarkAsUnread, Resource.String.marks_as_unread);
             }
 
-            menu.Add(Menu.None, 20, 20, Resource.String.reply);
-            menu.Add(Menu.None, 21, 21, Resource.String.reply_all);
-            menu.Add(Menu.None, 22, 22, Resource.String.forward);
-            menu.Add(Menu.None, 30, 30, Resource.String.copy_to_worktray);
-            menu.Add(Menu.None, 40, 40, Resource.String.copy_to_folder);
+            menu.Add(Menu.None, MenuItemActions.Reply, MenuItemActions.Reply, Resource.String.reply);
+            menu.Add(Menu.None, MenuItemActions.ReplyAll, MenuItemActions.ReplyAll, Resource.String.reply_all);
+            menu.Add(Menu.None, MenuItemActions.Forward, MenuItemActions.Forward, Resource.String.forward);
+            menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
+            menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
 
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static
                 || Folder.InternalType == FolderInternalType.Worktray)
             {
-                menu.Add(Menu.None, 41, 41, Resource.String.move_to_folder);
+                menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
             }
 
-            menu.Add(Menu.None, 50, 50, Resource.String.set_priority);
-            menu.Add(Menu.None, 60, 60, Resource.String.categories);
-            menu.Add(Menu.None, 70, 70, Resource.String.comments);
-            menu.Add(Menu.None, 80, 80, Resource.String.actions);
-            menu.Add(Menu.None, 90, 90, Resource.String.links);
+            menu.Add(Menu.None, MenuItemActions.SetPriority, MenuItemActions.SetPriority, Resource.String.set_priority);
+            menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
+            menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments);
+            menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.actions);
+            menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
 
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static
                 || Folder.InternalType == FolderInternalType.Worktray)
             {
-                menu.Add(Menu.None, 100, 100, Resource.String.delete_from_folder);
+                menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
             }
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
                 || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed)
             {
-                menu.Add(Menu.None, 101, 101, Resource.String.delete);
+                menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
             }
+        }
+
+        static class MenuItemActions
+        {
+            public const int MarkAsRead = 10;
+            public const int MarkAsUnread = 11;
+            public const int Reply = 20;
+            public const int ReplyAll = 21;
+            public const int Forward = 22;
+            public const int CopyToWorktray = 30;
+            public const int CopyToFolder = 40;
+            public const int MoveToFolder = 41;
+            public const int SetPriority = 50;
+            public const int Categories = 60;
+            public const int Comments = 70;
+            public const int Actions = 80;
+            public const int Links = 90;
+            public const int DeleteFromFolder = 100;
+            public const int Delete = 101;
         }
 
         public override void OnPrepareOptionsMenu(IMenu menu)
@@ -168,7 +187,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            if (item.ItemId == 60)
+            if (item.ItemId == MenuItemActions.Categories)
             {
                 var i = new Intent(Activity, typeof(CategoriesListActivity));
                 i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(DocumentPreview));
@@ -176,13 +195,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
-            if (item.ItemId == 70)
+            if (item.ItemId == MenuItemActions.Comments)
             {
                 var i = new Intent(Activity, typeof(CommentsListActivity));
                 i.PutExtra(CommentsListActivity.EntityIntentKey, SerializationUtils.Serialize(Document));
                 Activity.StartActivityForResult(i, RequestCodes.CommentsRequest); //Need to use activity, otherwise the request code is changed is changed by the enclosing activity
             }
-            if (item.ItemId == 80)
+            if (item.ItemId == MenuItemActions.Actions)
             {
                 var i = new Intent(Activity, typeof(ObjectActionsActivity));
                 i.PutExtra(ObjectActionsActivity.BusinessEntityTypeIntentKey, SerializationUtils.Serialize(DocumentPreview.GetType()));
@@ -191,7 +210,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
-            if (item.ItemId == 90)
+            if (item.ItemId == MenuItemActions.Links)
             {
                 var i = new Intent(Activity, typeof(ObjectLinksActivity));
                 i.PutExtra(ObjectLinksActivity.BusinessEntityTypeIntentKey, SerializationUtils.Serialize(DocumentPreview.GetType()));
