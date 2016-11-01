@@ -226,10 +226,9 @@
     <Compile Include="Ui\Activities\ObjectLinksActivity.cs" />
     <Compile Include="Ui\Fragments\ObjectLinksFragment.cs" />
     <Compile Include="Ui\Views\ObjectLinksView.cs" />
-    <Compile Include="Ui\Activities\SearchActivity.cs" />
-    <Compile Include="Ui\Fragments\DocumentsSearchFragment.cs" />
-    <Compile Include="Ui\Fragments\ContactsSearchFragment.cs" />
-    <Compile Include="Ui\Fragments\ShortcodesSearchFragment.cs" />
+    <Compile Include="Ui\Fragments\DocumentsSearchCriteriaFragment.cs" />
+    <Compile Include="Ui\Fragments\ContactsSearchCriteriaFragment.cs" />
+    <Compile Include="Ui\Fragments\ShortcodesSearchCriteriaFragment.cs" />
     <Compile Include="Ui\Views\SearchViews\AbstractSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentFromToSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentSubjectMessageSearchView.cs" />
@@ -288,6 +287,7 @@
     <Compile Include="Ui\Views\SearchViews\ContactCategoriesSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\AbstractButtonSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactResponsibleSearchView.cs" />
+    <Compile Include="Ui\Fragments\SearchFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -419,6 +419,7 @@
     <AndroidResource Include="Resources\xml\filepaths.xml" />
     <AndroidResource Include="Resources\layout\linear_layout_contact.axml" />
     <AndroidResource Include="Resources\layout\list_item_documents_external.axml" />
+    <AndroidResource Include="Resources\layout\pager.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

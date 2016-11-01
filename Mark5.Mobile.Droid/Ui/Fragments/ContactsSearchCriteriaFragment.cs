@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: ShortcodesSearchFragment.cs
+// File: ContactsSearchCriteriaFragment.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -22,7 +22,7 @@ using Mark5.Mobile.Droid.Ui.Views.SearchViews;
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
 
-    public class ShortcodesSearchFragment : RetainableStateFragment
+    public class ContactsSearchCriteriaFragment : RetainableStateFragment
     {
 
         ProgressBar progress;
@@ -31,7 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(ShortcodesSearchFragment)}...");
+            CommonConfig.Logger.Info($"Creating {nameof(ContactsSearchCriteriaFragment)}...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout, container, false);
 
@@ -39,15 +39,37 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
-            linearLayout.AddView(new ShortcodeNameSearchView(Context));
+            linearLayout.AddView(new ContactNameSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new ShortcodeDescriptionSearchView(Context));
+            linearLayout.AddView(new ContactFirstNameSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new ShortcodeAddressSearchView(Context));
+            linearLayout.AddView(new ContactLastNameSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new ShortcodeFoldersSearchView(Context));
+            linearLayout.AddView(new ContactShortIdSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new MaxShortcodesSearchView(Context));
+            linearLayout.AddView(new ContactDescriptionSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactTypeSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactComAddressSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactPostAddressSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactCommentSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactVatSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactLedgerSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactCategoriesSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactMustHaveCategoriesSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactFoldersSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactResponsibleSearchView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new MaxContactsSearchView(Context));
 
             progress.Visibility = ViewStates.Gone;
             scrollView.Visibility = ViewStates.Visible;
@@ -61,9 +83,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_shortcodes);
+            //((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_contacts);
 
-            CommonConfig.Logger.Info($"Created {nameof(ShortcodesSearchFragment)}");
+            CommonConfig.Logger.Info($"Created {nameof(ContactsSearchCriteriaFragment)}");
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -76,20 +98,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             var i = new Intent(Activity, typeof(SearchResultsActivity));
-            i.PutExtra(SearchResultsActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
+            i.PutExtra(SearchResultsActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
             i.PutExtra(SearchResultsActivity.CriteriaIntentKey, SerializationUtils.Serialize(GetCriteria()));
             StartActivity(i);
 
             return true;
         }
 
-        SearchShortcodesCriteria GetCriteria()
+        SearchContactsCriteria GetCriteria()
         {
-            var criteria = new SearchShortcodesCriteria();
+            var criteria = new SearchContactsCriteria();
 
             for (var i = 0; i < linearLayout.ChildCount; i++)
             {
-                var dsv = linearLayout.GetChildAt(i) as AbstractSearchView<SearchShortcodesCriteria>;
+                var dsv = linearLayout.GetChildAt(i) as AbstractSearchView<SearchContactsCriteria>;
                 if (dsv != null)
                 {
                     dsv.ToCriteria(criteria);
@@ -99,11 +121,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return criteria;
         }
 
-        void SetCriteria(SearchShortcodesCriteria criteria)
+        void SetCriteria(SearchContactsCriteria criteria)
         {
             for (var i = 0; i < linearLayout.ChildCount; i++)
             {
-                var dsv = linearLayout.GetChildAt(i) as AbstractSearchView<SearchShortcodesCriteria>;
+                var dsv = linearLayout.GetChildAt(i) as AbstractSearchView<SearchContactsCriteria>;
                 if (dsv != null)
                 {
                     dsv.FromCriteria(criteria);
@@ -113,12 +135,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            return new ShortcodesSearchFragmentState { Criteria = GetCriteria() };
+            return new ContactsSearchFragmentState { Criteria = GetCriteria() };
         }
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var dsfs = restoredState as ShortcodesSearchFragmentState;
+            var dsfs = restoredState as ContactsSearchFragmentState;
             if (dsfs != null)
             {
                 SetCriteria(dsfs.Criteria);
@@ -127,13 +149,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(ShortcodesSearchFragment)}";
+            return $"{nameof(ContactsSearchCriteriaFragment)}";
         }
 
-        class ShortcodesSearchFragmentState : IRetainableState
+        class ContactsSearchFragmentState : IRetainableState
         {
 
-            public SearchShortcodesCriteria Criteria { get; set; }
+            public SearchContactsCriteria Criteria { get; set; }
         }
     }
 }

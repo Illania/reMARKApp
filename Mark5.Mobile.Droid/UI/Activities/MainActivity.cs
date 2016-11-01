@@ -21,8 +21,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using Mark5.Mobile.Droid.Utilities.PushNotifications;
@@ -33,6 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
     [Android.App.Activity]
     public class MainActivity : AppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FragmentManager.IOnBackStackChangedListener
     {
+
         Toolbar toolbar;
         DrawerLayout drawer;
         SmoothActionBarDrawerToggle drawerToggle;
@@ -81,6 +80,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
                 {
                     MenuItemContents = new Dictionary<int, MenuItemContent>
                     {
+                        [Resource.Id.nav_search] = new SearchMenuItemContent(),
                         [Resource.Id.nav_documents] = new ModulesMenuItemContent(ModuleType.Documents),
                         [Resource.Id.nav_contacts] = new ModulesMenuItemContent(ModuleType.Contacts),
                         [Resource.Id.nav_shortcodes] = new ModulesMenuItemContent(ModuleType.Shortcodes),
@@ -182,14 +182,6 @@ namespace Mark5.Mobile.Droid.Ui.Activity
             {
                 if (lastSelectedItem != menuItem)
                 {
-                    if (menuItem.ItemId == Resource.Id.nav_search)
-                    {
-                        var i = new Intent(this, typeof(SearchActivity));
-                        i.PutExtra(SearchActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
-                        StartActivity(i);
-                        return;
-                    }
-
                     if (lastSelectedItem != null)
                     {
                         stateFragment.State.MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
@@ -264,16 +256,16 @@ namespace Mark5.Mobile.Droid.Ui.Activity
             public virtual void RestoreOrCreate(FragmentManager fm) { }
         }
 
-        class PreferencesMenuItemContent : MenuItemContent
+        class SearchMenuItemContent : MenuItemContent
         {
 
             public override void RestoreOrCreate(FragmentManager fm)
             {
                 var ft = fm.BeginTransaction();
-                var pf = new PreferenceFragment();
+                var pf = new SearchFragment();
                 ft.SetTransition(FragmentTransaction.TransitFragmentFade);
-                ft.Replace(Resource.Id.fragment_container, pf, "PreferenceFragment");
-                ft.AddToBackStack("PreferenceFragment");
+                ft.Replace(Resource.Id.fragment_container, pf, "SearchFragment");
+                ft.AddToBackStack("SearchFragment");
                 ft.Commit();
             }
         }
@@ -340,6 +332,20 @@ namespace Mark5.Mobile.Droid.Ui.Activity
                     BackstackStates.Clear();
                     SavedTags.Clear();
                 }
+            }
+        }
+
+        class PreferencesMenuItemContent : MenuItemContent
+        {
+
+            public override void RestoreOrCreate(FragmentManager fm)
+            {
+                var ft = fm.BeginTransaction();
+                var pf = new PreferenceFragment();
+                ft.SetTransition(FragmentTransaction.TransitFragmentFade);
+                ft.Replace(Resource.Id.fragment_container, pf, "PreferenceFragment");
+                ft.AddToBackStack("PreferenceFragment");
+                ft.Commit();
             }
         }
 
