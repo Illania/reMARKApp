@@ -55,7 +55,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"Creating {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}, readOnlyMode={ReadOnlyMode}]...");
 
-            var rootView = inflater.Inflate(Resource.Layout.linear_layout, container, false);
+            var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
 
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);

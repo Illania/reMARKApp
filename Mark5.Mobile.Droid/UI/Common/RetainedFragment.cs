@@ -1,5 +1,6 @@
 using Android.OS;
 using Android.Support.V4.App;
+using System;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
@@ -15,6 +16,8 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         public static RetainedFragment<Y> FindOrCreate(FragmentManager fm, string parentTag)
         {
+            if (string.IsNullOrEmpty(parentTag)) throw new ArgumentNullException(nameof(parentTag));
+
             var f = fm.FindFragmentByTag("RetainedFragment_" + parentTag) as RetainedFragment<Y>;
             if (f == null)
             {

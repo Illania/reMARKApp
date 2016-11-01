@@ -86,7 +86,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int SelectedTab { get; set; }
         }
 
-        class SearchPagerAdapter : FragmentStatePagerAdapter
+        class SearchPagerAdapter : FragmentPagerAdapter
         {
 
             public override int Count
