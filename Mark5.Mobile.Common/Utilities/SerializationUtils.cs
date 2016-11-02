@@ -54,6 +54,11 @@ namespace Mark5.Mobile.Common.Utilities
 
         public static T Deserialize<T>(string str)
         {
+            if (string.IsNullOrWhiteSpace(str))
+            {
+                return default(T);
+            }
+
             using (var sr = new StringReader(str))
             using (var jr = new JsonTextReader(sr))
             {
@@ -65,12 +70,22 @@ namespace Mark5.Mobile.Common.Utilities
         {
             return Task.Run(() =>
             {
+                if (string.IsNullOrWhiteSpace(str))
+                {
+                    return default(T);
+                }
+
                 return Deserialize<T>(str);
             });
         }
 
         public static object Deserialize(string str, Type type)
         {
+            if (string.IsNullOrWhiteSpace(str))
+            {
+                return null;
+            }
+
             using (var sr = new StringReader(str))
             using (var jr = new JsonTextReader(sr))
             {
@@ -82,6 +97,11 @@ namespace Mark5.Mobile.Common.Utilities
         {
             return Task.Run(() =>
             {
+                if (string.IsNullOrWhiteSpace(str))
+                {
+                    return null;
+                }
+
                 return Deserialize(str, type);
             });
         }

@@ -10,6 +10,7 @@ using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
+using Android.Support.V7.App;
 using Android.Views;
 using HockeyApp.Android;
 using Mark5.Mobile.Common;
@@ -19,7 +20,6 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Services;
 using Mark5.Mobile.Droid.Utilities.Hockey;
-using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Activity
 {
@@ -30,7 +30,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
               Theme = "@style/mark5Splash",
               ScreenOrientation = ScreenOrientation.Portrait,
               NoHistory = true)]
-    public class SplashActivity : BaseAppCompatActivity
+    public class SplashActivity : AppCompatActivity
     {
 
         const string HockeyId = "137e2a4fb6384cb3a51de617dd2f5999";
@@ -92,6 +92,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
                 Managers.Initialize(ci);
                 Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
                 Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 var policies = Managers.DownloadManager.DownloadPolicies;
                 policies[ObjectType.Document] = new DownloadFoldersPolicy();
                 if (PlatformConfig.Preferences.SynchroniseContacts)

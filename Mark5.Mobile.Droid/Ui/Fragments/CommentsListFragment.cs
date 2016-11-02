@@ -15,12 +15,12 @@ using Android.OS;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
-using Android.Text.Format;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
 using Mark5.Mobile.Droid.Utilities;
@@ -29,7 +29,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class CommentsListFragment : RetainableStateFragment
     {
+
         public BusinessEntity Entity { get; set; }
+
         public List<Comment> Comments
         {
             get
@@ -114,6 +116,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.SmoothScrollToPosition(adapter.ItemCount);
         }
 
+        #region Options menu
+
+        static class MenuItemActions
+        {
+            public const int EditComment = 10;
+            public const int DeleteComment = 20;
+        }
+
+        public void CreateContextMenu(IContextMenu menu, View view, IContextMenuContextMenuInfo menuInfo)
+        {
+            menu.Add(Menu.None, MenuItemActions.EditComment, MenuItemActions.EditComment, Resource.String.edit);
+            menu.Add(Menu.None, MenuItemActions.DeleteComment, MenuItemActions.DeleteComment, Resource.String.delete);
+
+            var position = recyclerView.GetChildAdapterPosition(view);
+            adapter.SelectedPosition = position;
+        }
+
         public override bool OnContextItemSelected(IMenuItem item)
         {
             var comment = adapter.GetSelectedItem();
@@ -140,7 +159,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 editDialogBuilder.SetNegativeButton(Resource.String.cancel, (sender, e) => { });
                 editDialogBuilder.Show();
             }
-            else if (item.ItemId == MenuItemActions.DeleteComment)
+
+            if (item.ItemId == MenuItemActions.DeleteComment)
             {
                 var deleteDialogBuilder = new AlertDialog.Builder(Context);
 
@@ -155,14 +175,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return true;
         }
 
-        public void CreateContextMenu(IContextMenu menu, View view, IContextMenuContextMenuInfo menuInfo)
-        {
-            menu.Add(Menu.None, MenuItemActions.EditComment, MenuItemActions.EditComment, Resource.String.edit);
-            menu.Add(Menu.None, MenuItemActions.DeleteComment, MenuItemActions.DeleteComment, Resource.String.delete);
-
-            var position = recyclerView.GetChildAdapterPosition(view);
-            adapter.SelectedPosition = position;
-        }
+        #endregion
 
         #region Event handlers
 
@@ -304,7 +317,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return new CommentsFragmentState
             {
                 Entity = Entity,
-                AddCommentText = addCommentEditText.Text,
+                AddCommentText = addCommentEditText.Text
             };
         }
 
@@ -333,16 +346,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-        static class MenuItemActions
-        {
-            public const int EditComment = 10;
-            public const int DeleteComment = 20;
-        }
-
         #region RecyclerView Adapter/ViewHolder
 
         class CommentsListAdapter : RecyclerView.Adapter
         {
+
             public List<Comment> Items
             {
                 get
@@ -385,22 +393,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 cvh.Username = commentFromCurrentUser ? "Me" : comment.UserName;
-
-                var dateReceived = comment.DateAdded.ToServerTime();
-                if (DateTime.Now.Date == dateReceived.Date)
-                {
-                    cvh.Date = DateFormat.Is24HourFormat(context) ? dateReceived.ToString("HH:mm") : dateReceived.ToString("hh:mm tt");
-                }
-                else if (DateTime.Now.AddDays(-1).Date == dateReceived.Date)
-                {
-                    cvh.Date = context.GetString(Resource.String.yesterday);
-                }
-                else
-                {
-                    var dfo = DateFormat.GetDateFormatOrder(context);
-                    cvh.Date = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}"); //TODO copied from documents, should we put this conversion in a common place?
-                }
-
+                cvh.Date = comment.DateAddedTimestamp
+                    .ConvertTimestampMillisecondsToDateTime()
+                    .ConvertUtcToServerTime()
+                    .ConvertDateTimeToTimestampMilliseconds()
+                    .FormatServerTimestampAsCompactShortDateTimeString(context);
                 cvh.Content = comment.Content;
             }
 

@@ -15,6 +15,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Converters;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Common.Managers
 {
@@ -29,7 +30,7 @@ namespace Mark5.Mobile.Common.Managers
             this.calendarDataAccess = calendarDataAccess;
         }
 
-        public async Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(Folder folder, DateTime startDate, DateTime endDate, SourceType sourceType = SourceType.Auto)
+        public async Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(Folder folder, long startDateTimestamp, long endDateTimestamp, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
@@ -40,8 +41,8 @@ namespace Mark5.Mobile.Common.Managers
                     FolderId = folder.Id,
                     GetAppointments = true,
                     GetTasks = false,
-                    StartDate = startDate.ConvertToUTC(),
-                    EndDate = endDate.ConvertToUTC(),
+                    StartDate = startDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                    EndDate = endDateTimestamp.ConvertTimestampMillisecondsToDateTime()
                 });
 
                 var appointments = result.CalendarAppointments.WhereNotNull().Select(a => a.Convert()).ToList();
@@ -55,7 +56,7 @@ namespace Mark5.Mobile.Common.Managers
             {
                 List<CalendarAppointment> appointments = null;
 
-                appointments = await calendarDataAccess.GetCalendarAppointmentsAsync(folder, startDate, endDate);
+                appointments = await calendarDataAccess.GetCalendarAppointmentsAsync(folder, startDateTimestamp, endDateTimestamp);
 
                 return appointments;
             }
@@ -63,7 +64,7 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<List<CalendarTask>> GetCalendarTasksAsync(Folder folder, DateTime startDate, DateTime endDate, SourceType sourceType = SourceType.Auto)
+        public async Task<List<CalendarTask>> GetCalendarTasksAsync(Folder folder, long startDateTimestamp, long endDateTimestamp, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
             {
@@ -73,8 +74,8 @@ namespace Mark5.Mobile.Common.Managers
                     FolderId = folder.Id,
                     GetAppointments = false,
                     GetTasks = true,
-                    StartDate = startDate.ConvertToUTC(),
-                    EndDate = endDate.ConvertToUTC(),
+                    StartDate = startDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                    EndDate = endDateTimestamp.ConvertTimestampMillisecondsToDateTime()
                 });
 
                 var tasks = result.CalendarTasks.WhereNotNull().Select(t => t.Convert()).ToList();
@@ -88,7 +89,7 @@ namespace Mark5.Mobile.Common.Managers
             {
                 List<CalendarTask> tasks = null;
 
-                tasks = await calendarDataAccess.GetCalendarTasksAsync(folder, startDate, endDate);
+                tasks = await calendarDataAccess.GetCalendarTasksAsync(folder, startDateTimestamp, endDateTimestamp);
 
                 return tasks;
             }
@@ -156,7 +157,7 @@ namespace Mark5.Mobile.Common.Managers
                 {
                     Token = Token,
                     FolderId = folder.Id,
-                    CalendarAppointment = calendarAppointment.Convert(),
+                    CalendarAppointment = calendarAppointment.Convert()
                 });
 
                 calendarAppointment.Id = result.Id;
@@ -176,7 +177,7 @@ namespace Mark5.Mobile.Common.Managers
                 {
                     Token = Token,
                     FolderId = folder.Id,
-                    CalendarTask = calendarTask.Convert(),
+                    CalendarTask = calendarTask.Convert()
                 });
 
                 calendarTask.Id = result.Id;

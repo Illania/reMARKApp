@@ -39,11 +39,11 @@ namespace Mark5.Mobile.Common.Model
         [Column("Location")]
         public string Location { get; set; }
 
-        [Column("StartDate")]
-        public DateTime StartDate { get; set; }
+        [Column("StartDateTimestamp")]
+        public long StartDateTimestamp { get; set; } = -1;
 
-        [Column("EndDate")]
-        public DateTime EndDate { get; set; }
+        [Column("EndDateTimestamp")]
+        public long EndDateTimestamp { get; set; } = -1;
 
         [Column("AllDay")]
         public bool AllDay { get; set; }
@@ -89,8 +89,8 @@ namespace Mark5.Mobile.Common.Model
             }
         }
 
-        [Column("ReminderDate")]
-        public DateTime ReminderDate { get; set; }
+        [Column("ReminderDateTimestamp")]
+        public long ReminderDateTimestamp { get; set; } = -1;
 
         [Column("SnoozeDelay")]
         public long SnoozeDelay { get; set; } = -1;
@@ -160,7 +160,7 @@ namespace Mark5.Mobile.Common.Model
 
         public override string ToString()
         {
-            return string.Format("[CalendarAppointment: Subject={0}, Location={1}, StartDate={2}, Status={3}]", Subject, Location, StartDate, Status);
+            return $"[CalendarAppointment: Subject={Subject}, Location={Location}, StartDateTimestamp={StartDateTimestamp}, Status={Status}]";
         }
     }
 }

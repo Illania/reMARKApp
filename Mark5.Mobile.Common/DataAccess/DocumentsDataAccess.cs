@@ -585,7 +585,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     var comments = result.First().Comments;
 
                     comments.Add(comment);
-                    comments = comments.OrderBy(cm => cm.DateAdded).ToList();
+                    comments = comments.OrderBy(cm => cm.DateAddedTimestamp).ToList();
 
                     cmd = c.CreateCommand($"update \"{nameof(Document)}\" " +
                                           $"set \"{nameof(Document.CommentsBytes)}\" = @commentsBytes " +
@@ -629,7 +629,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     comments.RemoveAll(cm => cm.Id == comment.Id);
                     comments.Add(comment);
-                    comments = comments.OrderBy(cm => cm.DateAdded).ToList();
+                    comments = comments.OrderBy(cm => cm.DateAddedTimestamp).ToList();
 
                     cmd = c.CreateCommand($"update \"{nameof(Document)}\" " +
                                           $"set \"{nameof(Document.CommentsBytes)}\" = @commentsBytes " +

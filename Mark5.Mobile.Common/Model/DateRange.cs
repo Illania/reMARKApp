@@ -13,9 +13,9 @@ namespace Mark5.Mobile.Common.Model
     public class DateRange
     {
 
-        public DateTime Start { get; set; }
+        public long StartTimestamp { get; set; } = -1;
 
-        public DateTime End { get; set; }
+        public long EndTimestamp { get; set; } = -1;
 
         public bool Enabled { get; set; }
     }

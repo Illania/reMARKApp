@@ -6,6 +6,7 @@
 	<string name="yes">Yes</string>
 	<string name="no">No</string>
 	<string name="ok">OK</string>
+	<string name="done">Done</string>
 	<string name="cancel">Cancel</string>
 	<string name="filter">Filter...</string>
 	<string name="please_wait">Please wait...</string>
@@ -18,7 +19,7 @@
 	<string name="username">Username</string>
 	<string name="username_invalid">Username is not valid.</string>
 	<string name="password">Password</string>
-	<string name="passowrd_invalid">Password is not valid.</string>
+	<string name="password_invalid">Password is not valid.</string>
 	<string name="hostname">Hostname</string>
 	<string name="hostname_invalid">Hostname is not valid.</string>
 	<string name="port">Port</string>
@@ -45,7 +46,6 @@
 	<string name="contact">Contact</string>
 	<string name="shortcode">Shortcode</string>
 	<string name="shortcodes">Shortcodes</string>
-	<string name="calendar">Calendar</string>
 	<string name="settings">Settings</string>
 	<string name="no_subject">No subject</string>
 	<string name="no_content">No content</string>
@@ -95,12 +95,75 @@
 	<string name="delete">Delete</string>
 	<string name="by">by</string>
 	<string name="on">on</string>
-	<string name="edit">Edit</string>
-	<string name="done">Done</string>
 	<string name="updating_categories">Updating Categories</string>
 	<string name="confirm">Confirm</string>
 	<string name="cancel">Cancel</string>
 	<string name="confirm_comment_deletion_title">Confirm comment deletion</string>
 	<string name="confirm_comment_deletion_content">Are you sure you want to delete the comment?</string>
 	<string name="edit_comment_message">Edit comment message</string>
+	<string name="search">Search</string>
+	<string name="search_documents">Search documents</string>
+	<string name="search_documents_result">Results</string>
+	<string name="search_contacts">Search contacts</string>
+	<string name="search_contacts_result">Results</string>
+	<string name="search_shortcodes">Search shortcodes</string>
+	<string name="search_shortcodes_result">Result</string>
+	<string name="type_search_query">Search query</string>
+	<string name="search_folders">Folders</string>
+	<string name="search_categories">Categories</string>
+	<string name="search_must_have_categories">Must have categories</string>
+	<string-array name="search_date_range_type">
+		<item>Any time</item>
+		<item>Today</item>
+		<item>Yesterday</item>
+		<item>Custom</item>
+	</string-array>
+	<string name="search_document_reference_number">Reference number</string>
+	<string-array name="search_document_from_to">
+		<item>Search in From</item>
+		<item>Search in To</item>
+		<item>Search in From and To</item>
+	</string-array>
+	<string-array name="search_document_subject_message">
+		<item>Search in Subject or Message</item>
+		<item>Search in Subject</item>
+		<item>Search in Message</item>
+	</string-array>
+	<string name="search_document_comments">Comments</string>
+	<string name="search_document_extra_fields">Extra Fields</string>
+	<string name="search_document_attachment_names">Attachment names</string>
+	<string name="search_document_lines">Lines</string>
+	<string name="search_document_lines_none_selected">Any line</string>
+	<string name="search_document_priorities">Priority</string>
+	<string name="search_document_priorities_none_selected">Any priority</string>
+	<string name="search_document_directions">Direction</string>
+	<string name="search_document_directions_none_selected">Any direction</string>
+	<string name="search_document_handled">Handled</string>
+	<string name="search_document_handled_none_selected">All</string>
+	<string name="search_document_handled_true">Handled</string>
+	<string name="search_document_handled_false">Unhandled</string>
+	<string name="search_document_unread_only">Unread documents only</string>
+	<string name="search_document_in_attachments">Search inside attachments</string>
+	<string name="search_document_partial">Partial words search</string>
+	<string name="search_document_with_attachments_only">Only documents with attachments</string>
+	<string name="search_max_documents">Maximum documents in results</string>
+	<string name="search_contact_name">Name</string>
+	<string name="search_contact_first_name">First name</string>
+	<string name="search_contact_last_name">Last name</string>
+	<string name="search_contact_shortid">Short ID</string>
+	<string name="search_contact_description">Description</string>
+	<string name="search_contact_types">Type</string>
+	<string name="search_contact_types_none_selected">All</string>
+	<string name="search_contact_post_address">Post address</string>
+	<string name="search_contact_com_address">Communication address</string>
+	<string name="search_contact_comment">Comment</string>
+	<string name="search_contact_vat">VAT</string>
+	<string name="search_contact_ledger">Ledger</string>
+	<string name="search_contact_responsible">Responsible users</string>
+	<string name="search_contact_responsible_none_selected">Any</string>
+	<string name="search_max_contacts">Maximum contacts in results</string>
+	<string name="search_shortcode_name">Name</string>
+	<string name="search_shortcode_description">Description</string>
+	<string name="search_shortcode_address">Address</string>
+	<string name="search_max_shortcodes">Maximum shortcodes in results</string>
 </resources>

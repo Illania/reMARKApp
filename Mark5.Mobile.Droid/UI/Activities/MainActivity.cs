@@ -14,6 +14,7 @@ using Android.Support.Design.Widget;
 using Android.Support.V4.App;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
+using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
@@ -28,8 +29,9 @@ namespace Mark5.Mobile.Droid.Ui.Activity
 {
 
     [Android.App.Activity]
-    public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FragmentManager.IOnBackStackChangedListener
+    public class MainActivity : AppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FragmentManager.IOnBackStackChangedListener
     {
+
         Toolbar toolbar;
         DrawerLayout drawer;
         SmoothActionBarDrawerToggle drawerToggle;
@@ -48,7 +50,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
 
             CommonConfig.Logger.Info($"Starting {nameof(MainActivity)}...");
 
-            SetContentView(Resource.Layout.activity_main);
+            SetContentView(Resource.Layout.base_layout_nav);
 
             toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);
@@ -78,10 +80,10 @@ namespace Mark5.Mobile.Droid.Ui.Activity
                 {
                     MenuItemContents = new Dictionary<int, MenuItemContent>
                     {
+                        [Resource.Id.nav_search] = new SearchMenuItemContent(),
                         [Resource.Id.nav_documents] = new ModulesMenuItemContent(ModuleType.Documents),
                         [Resource.Id.nav_contacts] = new ModulesMenuItemContent(ModuleType.Contacts),
                         [Resource.Id.nav_shortcodes] = new ModulesMenuItemContent(ModuleType.Shortcodes),
-                        [Resource.Id.nav_calendar] = new ModulesMenuItemContent(ModuleType.Calendar),
                         [Resource.Id.nav_settings] = new PreferencesMenuItemContent()
                     }
                 };
@@ -254,16 +256,16 @@ namespace Mark5.Mobile.Droid.Ui.Activity
             public virtual void RestoreOrCreate(FragmentManager fm) { }
         }
 
-        class PreferencesMenuItemContent : MenuItemContent
+        class SearchMenuItemContent : MenuItemContent
         {
 
             public override void RestoreOrCreate(FragmentManager fm)
             {
                 var ft = fm.BeginTransaction();
-                var pf = new PreferenceFragment();
+                var pf = new SearchFragment();
                 ft.SetTransition(FragmentTransaction.TransitFragmentFade);
-                ft.Replace(Resource.Id.fragment_container, pf, "PreferenceFragment");
-                ft.AddToBackStack("PreferenceFragment");
+                ft.Replace(Resource.Id.fragment_container, pf, "SearchFragment");
+                ft.AddToBackStack("SearchFragment");
                 ft.Commit();
             }
         }
@@ -330,6 +332,20 @@ namespace Mark5.Mobile.Droid.Ui.Activity
                     BackstackStates.Clear();
                     SavedTags.Clear();
                 }
+            }
+        }
+
+        class PreferencesMenuItemContent : MenuItemContent
+        {
+
+            public override void RestoreOrCreate(FragmentManager fm)
+            {
+                var ft = fm.BeginTransaction();
+                var pf = new PreferenceFragment();
+                ft.SetTransition(FragmentTransaction.TransitFragmentFade);
+                ft.Replace(Resource.Id.fragment_container, pf, "PreferenceFragment");
+                ft.AddToBackStack("PreferenceFragment");
+                ft.Commit();
             }
         }
 

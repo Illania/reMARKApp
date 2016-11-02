@@ -9,22 +9,24 @@
 using System.Collections.Generic;
 using Android.App;
 using Android.OS;
+using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Activity]
-    public class DocumentActivity : BaseAppCompatActivity
+    public class DocumentActivity : AppCompatActivity
     {
 
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
+        public const string SearchIdIntentKey = "SearchId_fe483a14-0042-4fe2-a887-c232b332a715";
         public const string DocumentPreviewIntentKey = "DocumentPreview_0bd291a4-22a5-431c-ad6e-4c8b273eeb98";
+        public const string ReadOnlyModeIntentKey = "ReadOnlyMode_c23890cf-06fc-45d7-86c8-76c4c8027daf";
 
         const string dfFragmentTagKey = "fragmentTagKey";
         string dfFragmentTag;
@@ -48,13 +50,17 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+                var searchId = Intent.Extras.GetInt(SearchIdIntentKey);
                 var documentPreview = SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
+                var readOnlyMode = Intent.Extras.GetBoolean(ReadOnlyModeIntentKey);
                 var ft = SupportFragmentManager.BeginTransaction();
                 df = new DocumentFragment
                 {
                     Folder = folder,
+                    SearchId = searchId,
                     DocumentPreview = documentPreview,
-                    CloseRequest = OnBackPressed
+                    CloseRequest = OnBackPressed,
+                    ReadOnlyMode = readOnlyMode
                 };
                 dfFragmentTag = df.GenerateTag();
                 ft.Replace(Resource.Id.fragment_container, df, dfFragmentTag);

@@ -63,8 +63,6 @@ namespace Mark5.Mobile.Droid
 
             HasOptionsMenu = true;
 
-            ((BaseAppCompatActivity)Activity).SupportActionBar.SetDisplayHomeAsUpEnabled(false);
-
             return rootView;
         }
 

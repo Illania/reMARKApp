@@ -27,25 +27,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         protected int DistanceNormal;
         protected int DistanceSmall;
 
-        public DocumentView(Context context, IAttributeSet attrs, int defStyleAttr)
-            : base(context, attrs, defStyleAttr)
-        {
-            Init();
-        }
-
-        public DocumentView(Context context, IAttributeSet attrs)
-            : base(context, attrs)
-        {
-            Init();
-        }
-
         protected DocumentView(Context context)
             : base(context)
-        {
-            Init();
-        }
-
-        void Init()
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 

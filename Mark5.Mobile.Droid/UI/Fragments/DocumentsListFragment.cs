@@ -582,6 +582,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class DocumentsListAdapter : RecyclerView.Adapter
         {
+
             public static class ViewType
             {
                 public const int DocumentView = 0;
@@ -665,22 +666,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         dpvh.Recipent = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
                     }
 
-                    var dateReceived = dp.DateReceived.ToServerTime();
-                    if (DateTime.Now.Date == dateReceived.Date)
-                    {
-                        dpvh.Date = DateFormat.Is24HourFormat(context) ? dateReceived.ToString("HH:mm") : dateReceived.ToString("hh:mm tt");
-                    }
-                    else if (DateTime.Now.AddDays(-1).Date == dateReceived.Date)
-                    {
-                        dpvh.Date = context.GetString(Resource.String.yesterday);
-                    }
-                    else
-                    {
-                        var dfo = DateFormat.GetDateFormatOrder(context);
-                        dpvh.Date = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
-                    }
-
                     dpvh.Subject = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
+                    dpvh.Date = dp.DateReceivedTimestamp
+                        .ConvertTimestampMillisecondsToDateTime()
+                        .ConvertUtcToServerTime()
+                        .ConvertDateTimeToTimestampMilliseconds()
+                        .FormatServerTimestampAsCompactShortDateTimeString(context);
                     dpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                     dpvh.Categories = dp.Categories;
                     dpvh.IncomingIndicator = dp.Direction == DocumentDirection.Incoming;
@@ -705,21 +696,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     edpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
                     edpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
 
-                    var dateReceived = dp.DateReceived.ToServerTime();
-                    if (DateTime.Now.Date == dateReceived.Date)
-                    {
-                        edpvh.Date = DateFormat.Is24HourFormat(context) ? dateReceived.ToString("HH:mm") : dateReceived.ToString("hh:mm tt");
-                    }
-                    else if (DateTime.Now.AddDays(-1).Date == dateReceived.Date)
-                    {
-                        edpvh.Date = context.GetString(Resource.String.yesterday);
-                    }
-                    else
-                    {
-                        var dfo = DateFormat.GetDateFormatOrder(context);
-                        edpvh.Date = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
-                    }
-
+                    edpvh.Date = dp.DateReceivedTimestamp
+                    .ConvertTimestampMillisecondsToDateTime()
+                    .ConvertUtcToServerTime()
+                    .ConvertDateTimeToTimestampMilliseconds()
+                    .FormatServerTimestampAsCompactShortDateTimeString(context);
                     edpvh.Name = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
                     edpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                     edpvh.Categories = dp.Categories;
@@ -741,11 +722,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_documents, parent, false);
                     return new DocumentPreviewViewHolder(itemView);
                 }
-                else //ExternalDocumentView
+
+                if (viewType == ViewType.ExternalDocumentView)
                 {
                     var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_documents_external, parent, false);
                     return new ExternalDocumentPreviewViewHolder(itemView);
                 }
+
+                return null;
             }
 
             public void PrependItems(List<DocumentPreview> items)

@@ -79,37 +79,37 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(Folder folder, DateTime startDate = default(DateTime), DateTime endDate = default(DateTime))
+        public async Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(Folder folder, long startDateTimestamp = -1, long endDateTimestamp = -1)
         {
             try
             {
                 List<CalendarAppointment> appointments = null;
 
                 await calendarDatabase.RunInConnectionAsync(c =>
-                {
-                    var query = c.Table<FolderCalendarAppointmentLink>()
+                        {
+                            var query = c.Table<FolderCalendarAppointmentLink>()
                                  .Where(fcl => fcl.FolderId == folder.Id)
                                  .Join(c.Table<CalendarAppointment>(), fdl => fdl.CalendarAppointmentId, ca => ca.Id, (fdl, ca) => ca);
 
-                    if (startDate != default(DateTime))
-                    {
-                        query = query.Where(ca => ca.StartDate <= endDate); //As on the service
-                    }
-                    if (endDate != default(DateTime))
-                    {
-                        query = query.Where(ca => ca.EndDate >= startDate);
-                    }
+                            if (startDateTimestamp >= 0)
+                            {
+                                query = query.Where(ca => ca.StartDateTimestamp <= endDateTimestamp); //As on the service
+                            }
+                            if (endDateTimestamp >= 0)
+                            {
+                                query = query.Where(ca => ca.EndDateTimestamp >= startDateTimestamp);
+                            }
 
-                    var result = query.ToList();
+                            var result = query.ToList();
 
-                    if (result == null || result.Count < 1)
-                    {
-                        throw new DataNotFoundException("Calendar appointments could not be found.");
-                    }
+                            if (result == null || result.Count < 1)
+                            {
+                                throw new DataNotFoundException("Calendar appointments could not be found.");
+                            }
 
-                    appointments = result;
+                            appointments = result;
 
-                });
+                        });
 
                 return appointments;
             }
@@ -119,7 +119,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<List<CalendarTask>> GetCalendarTasksAsync(Folder folder, DateTime startDate, DateTime endDate)
+        public async Task<List<CalendarTask>> GetCalendarTasksAsync(Folder folder, long startDateTimestamp, long endDateTimestamp)
         {
             try
             {
@@ -131,13 +131,13 @@ namespace Mark5.Mobile.Common.DataAccess
                                  .Where(fcl => fcl.FolderId == folder.Id)
                                  .Join(c.Table<CalendarTask>(), fdl => fdl.CalendarTaskId, ca => ca.Id, (fdl, ca) => ca);
 
-                    if (startDate != default(DateTime))
+                    if (startDateTimestamp >= 0)
                     {
-                        query = query.Where(ca => ca.StartDate <= endDate);
+                        query = query.Where(ca => ca.StartDateTimestamp <= endDateTimestamp);
                     }
-                    if (endDate != default(DateTime))
+                    if (endDateTimestamp >= 0)
                     {
-                        query = query.Where(ca => ca.EndDate >= startDate);
+                        query = query.Where(ca => ca.EndDateTimestamp >= startDateTimestamp);
                     }
 
                     var result = query.ToList();

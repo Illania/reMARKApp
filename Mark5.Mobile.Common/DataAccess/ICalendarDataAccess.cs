@@ -19,9 +19,9 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task<CalendarTask> GetCalendarTaskAsync(int calendarTaskId);
 
-        Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(Folder folder, DateTime startDate, DateTime endDate);
+        Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(Folder folder, long startDateTimestamp, long endDateTimestamp);
 
-        Task<List<CalendarTask>> GetCalendarTasksAsync(Folder folder, DateTime startDate, DateTime endDate);
+        Task<List<CalendarTask>> GetCalendarTasksAsync(Folder folder, long startDateTimestamp, long endDateTimestamp);
 
         Task SaveCalendarAppointmentAsync(CalendarAppointment calendarAppointment);
 

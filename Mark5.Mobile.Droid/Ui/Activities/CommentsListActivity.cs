@@ -8,19 +8,21 @@
 using Android.App;
 using Android.Content;
 using Android.OS;
+using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
+
     [Activity]
-    public class CommentsListActivity : BaseAppCompatActivity
+    public class CommentsListActivity : AppCompatActivity
     {
+
         public const string EntityIntentKey = "EntityIntent_20c8514c-b644-47db-842f-f2df4204d93a";
         public const string CommentsResultKey = "CommentsResult_593d8c70-d45c-425e-8e36-7389e3cc0c62";
 

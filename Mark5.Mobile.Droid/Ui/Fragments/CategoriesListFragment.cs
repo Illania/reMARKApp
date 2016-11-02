@@ -62,8 +62,6 @@ namespace Mark5.Mobile.Droid
 
             searchAdapter = new CategoriesListAdapter();
 
-            ((BaseAppCompatActivity)Activity).SupportActionBar.SetDisplayHomeAsUpEnabled(true);
-
             HasOptionsMenu = true;
 
             return rootView;

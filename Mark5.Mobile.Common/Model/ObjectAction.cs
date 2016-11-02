@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Common.Model
 
         public string Description { get; set; }
 
-        public DateTime ActionTime { get; set; }
+        public long ActionTimeTimestamp { get; set; } = -1;
     }
 }
 

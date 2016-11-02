@@ -369,7 +369,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     comments.RemoveAll(cm => cm.Id == comment.Id);
                     comments.Add(comment);
-                    comments = comments.OrderBy(cm => cm.DateAdded).ToList();
+                    comments = comments.OrderBy(cm => cm.DateAddedTimestamp).ToList();
 
                     cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " +
                                           $"set \"{nameof(Contact.CommentsBytes)}\" = @commentsBytes " +

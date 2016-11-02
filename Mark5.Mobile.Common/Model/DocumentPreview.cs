@@ -102,8 +102,8 @@ namespace Mark5.Mobile.Common.Model
             }
         }
 
-        [Column("DateReceived")]
-        public DateTime DateReceived { get; set; }
+        [Column("DateReceivedTimestamp")]
+        public long DateReceivedTimestamp { get; set; } = -1;
 
         [Column("CreatorId")]
         public int CreatorId { get; set; }
@@ -143,7 +143,7 @@ namespace Mark5.Mobile.Common.Model
 
         public override string ToString()
         {
-            return $"[DocumentPreview: Id={Id}, ReferenceNumber={ReferenceNumber}, Subject={Subject}, DateReceived={DateReceived}]";
+            return $"[DocumentPreview: Id={Id}, ReferenceNumber={ReferenceNumber}, Subject={Subject}, DateReceivedTimestamp={DateReceivedTimestamp}]";
         }
     }
 }

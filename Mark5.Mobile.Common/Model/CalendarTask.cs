@@ -37,11 +37,11 @@ namespace Mark5.Mobile.Common.Model
         [Column("Subject")]
         public string Subject { get; set; }
 
-        [Column("StartDate")]
-        public DateTime StartDate { get; set; }
+        [Column("StartDateTimestamp")]
+        public long StartDateTimestamp { get; set; } = -1;
 
-        [Column("EndDate")]
-        public DateTime EndDate { get; set; }
+        [Column("EndDateTimestamp")]
+        public long EndDateTimestamp { get; set; } = -1;
 
         [Column("Private")]
         public bool Private { get; set; }
@@ -61,8 +61,8 @@ namespace Mark5.Mobile.Common.Model
         [Column("Type")]
         public CalendarOccurenceType Type { get; set; }
 
-        [Column("ReminderDate")]
-        public DateTime ReminderDate { get; set; }
+        [Column("ReminderDateTimestamp")]
+        public long ReminderDateTimestamp { get; set; } = -1;
 
         [Column("SnoozeDelay")]
         public long SnoozeDelay { get; set; } = -1;
@@ -223,7 +223,7 @@ namespace Mark5.Mobile.Common.Model
 
         public override string ToString()
         {
-            return string.Format("[CalendarTask: Subject={0}, StartDate={1}, EndDate={2}, Status={3}]", Subject, StartDate, EndDate, Status);
+            return $"[CalendarTask: Subject={Subject}, StartDateTimestamp={StartDateTimestamp}, EndDateTimestamp={EndDateTimestamp}, Status={Status}]";
         }
     }
 }

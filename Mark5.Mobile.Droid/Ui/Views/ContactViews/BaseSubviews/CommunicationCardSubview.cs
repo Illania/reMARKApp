@@ -9,6 +9,7 @@ using Android.Content;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
+using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -16,9 +17,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
     public abstract class CommunicationCardSubview : ContactView
     {
-        AppCompatTextView titleTextView;
-        protected LinearLayoutCompat contentLayout;
-        protected AppCompatImageView iconImageView;
+        readonly AppCompatTextView titleTextView;
+        protected readonly LinearLayoutCompat ContentLayout;
+        protected readonly AppCompatImageView IconImageView;
 
         public string Title
         {
@@ -28,7 +29,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             }
         }
 
-        protected CommunicationCardSubview(Context context) : base(context)
+        protected CommunicationCardSubview(Context context)
+            : base(context)
         {
             Orientation = Vertical;
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
@@ -45,20 +47,20 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
             internalLayout.AddView(iconImageViewLayout);
 
-            iconImageView = new AppCompatImageView(context);
-            iconImageView.SetColorFilter(new Android.Graphics.Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
-            iconImageViewLayout.AddView(iconImageView, new LayoutParams(DistanceVeryLarge, DistanceVeryLarge));
+            IconImageView = new AppCompatImageView(context);
+            IconImageView.SetColorFilter(new Android.Graphics.Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            iconImageViewLayout.AddView(IconImageView, new LayoutParams(DistanceVeryLarge, DistanceVeryLarge));
 
             var contentExternalLayout = new LinearLayoutCompat(context);
             contentExternalLayout.Orientation = Vertical;
             contentExternalLayout.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             internalLayout.AddView(contentExternalLayout);
 
-            contentLayout = new LinearLayoutCompat(context);
-            contentLayout.Orientation = Vertical;
-            contentLayout.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1.0f);
+            ContentLayout = new LinearLayoutCompat(context);
+            ContentLayout.Orientation = Vertical;
+            ContentLayout.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1.0f);
 
-            contentExternalLayout.AddView(contentLayout);
+            contentExternalLayout.AddView(ContentLayout);
 
             Divider = new Divider(Context);
             contentExternalLayout.AddView(Divider);
