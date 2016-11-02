@@ -166,4 +166,5 @@
 	<string name="search_shortcode_description">Description</string>
 	<string name="search_shortcode_address">Address</string>
 	<string name="search_max_shortcodes">Maximum shortcodes in results</string>
+	<string name="select_users">Select users</string>
 </resources>
