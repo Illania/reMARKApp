@@ -36,8 +36,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         public Folder Folder { get; set; }
 
-        FolderListAdapter adapter;
-        SearchFolderListAdapter searchAdapter;
+        protected FolderListAdapter adapter;
+        protected SearchFolderListAdapter searchAdapter;
         SearchView searchView;
         RecyclerView recyclerView;
         SwipeRefreshLayout refreshLayout;
@@ -47,7 +47,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool searchEnabled;
 
-        readonly Handler searchHandler = new Handler();
+        protected readonly Handler searchHandler = new Handler();
 
         protected FolderListAdapter CurrentAdapter
         {
@@ -356,7 +356,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region ActionMode callbacks
 
-        bool ActionMode.ICallback.OnActionItemClicked(ActionMode mode, IMenuItem item)
+        public virtual bool OnActionItemClicked(ActionMode mode, IMenuItem item)
         {
             switch (item.ItemId)
             {
@@ -383,12 +383,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return true;
         }
 
-        bool ActionMode.ICallback.OnCreateActionMode(ActionMode mode, IMenu menu)
+        static class MenuItemActions
+        {
+            public const int AddToFavourites = 10;
+            public const int RemoveFromFavourites = 20;
+            public const int Subscribe = 30;
+            public const int Unsubscribe = 40;
+            public const int EnableOffline = 50;
+            public const int DisableOffline = 60;
+        }
+
+        public bool OnCreateActionMode(ActionMode mode, IMenu menu)
         {
             return true;
         }
 
-        void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
+        public void OnDestroyActionMode(ActionMode mode)
         {
             if (actionMode != null)
             {
@@ -397,7 +407,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
+        public virtual bool OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
             var selectedFolders = CurrentAdapter.GetSelectedItems().ToList();
             if (!selectedFolders.Any())
@@ -448,7 +458,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             var module = selectedFolders.First().Module;
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(this.Activity, enabled ? Resource.String.subscribing_folders : Resource.String.unsubscribing_folders, Resource.String.please_wait);
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, enabled ? Resource.String.subscribing_folders : Resource.String.unsubscribing_folders, Resource.String.please_wait);
 
             Task.Run(async () =>
             {
@@ -571,7 +581,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Filtering 
 
-        void View.IOnClickListener.OnClick(View v)
+        public void OnClick(View v)
         {
             if (v == searchView)
             {
@@ -582,7 +592,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        bool SearchView.IOnQueryTextListener.OnQueryTextChange(string newText)
+        virtual public bool OnQueryTextChange(string newText)
         {
             searchHandler.RemoveCallbacksAndMessages(null);
             searchHandler.PostDelayed(() =>
@@ -600,12 +610,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return false;
         }
 
-        bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string query)
+        public bool OnQueryTextSubmit(string query)
         {
             return false;
         }
 
-        bool SearchView.IOnCloseListener.OnClose()
+        virtual public bool OnClose()
         {
             searchAdapter.Clear();
             recyclerView.SwapAdapter(adapter, true);
@@ -614,7 +624,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return false;
         }
 
-        List<Folder> GetMatchingFolders(string query)
+        protected List<Folder> GetMatchingFolders(string query)
         {
             var folder = Folder.RootPerModule(Folder.Module);
             var flattenedFolders = folder.SubFolders.Flatten(f => f.SubFolders);
@@ -662,20 +672,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-        #region MenuItemActions
-
-        static class MenuItemActions
-        {
-            public const int AddToFavourites = 10;
-            public const int RemoveFromFavourites = 20;
-            public const int Subscribe = 30;
-            public const int Unsubscribe = 40;
-            public const int EnableOffline = 50;
-            public const int DisableOffline = 60;
-        }
-
-        #endregion
-
         #region RecyclerView Adapter
 
         protected class FolderListAdapter : RecyclerView.Adapter
@@ -692,7 +688,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             protected Dictionary<Section, List<Folder>> foldersInSection = new Dictionary<Section, List<Folder>>();
 
             readonly RecyclerView parentView;
-            readonly List<int> selectedItemPositions = new List<int>();
+            readonly HashSet<int> selectedItemPositions = new HashSet<int>();
             readonly int sectionHeight;
             readonly Context context;
 
@@ -727,7 +723,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 get
                 {
-                    return selectedItemPositions;
+                    return selectedItemPositions.ToList();
                 }
             }
 
@@ -1039,12 +1035,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         var index = foldersInSection[section].FindIndex(f => f.Id == folder.Id);
                         if (index >= 0)
                         {
-                            var position = sectionPosition + offset;
-                            if (!IsItemSelected(position))
-                            {
-                                selectedItemPositions.Add(position);
-                                NotifyItemChanged(position);
-                            }
+                            var position = sectionPosition + offset + index;
+                            selectedItemPositions.Add(position);
+                            NotifyItemChanged(position);
                         }
                     }
                 }
@@ -1086,7 +1079,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             #endregion
         }
 
-        class SearchFolderListAdapter : FolderListAdapter
+        protected class SearchFolderListAdapter : FolderListAdapter
         {
             public SearchFolderListAdapter(Context context, RecyclerView parentRecyclerView) : base(context, parentRecyclerView)
             {

@@ -6,15 +6,16 @@
 // Copyright (c) 2016 Nordic IT
 //
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using Android.App;
+using Android.Content;
+using Android.Views;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -35,12 +36,35 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             };
         }
 
-        protected override void RestoreSelection()
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
-            base.RestoreSelection();
-            CurrentAdapter.SetSelectionForFolders(SelectedFolders);
+            base.OnCreateOptionsMenu(menu, inflater);
+
+            var item = menu.Add(Menu.None, 10, 10, Resource.String.done);
+            item.SetShowAsAction(ShowAsAction.Always);
         }
 
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == 10)
+            {
+                var intent = new Intent();
+                intent.PutExtra(FolderListSelectionActivity.FoldersResultKey, SerializationUtils.Serialize(SelectedFolders.ToList()));
+                Activity.SetResult(Result.Ok, intent);
+                Activity.Finish();
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
+        }
+
+        protected override void RestoreSelection()
+        {
+            if (SelectedFolders.Any())
+            {
+                CurrentAdapter.SetSelectionForFolders(SelectedFolders);
+            }
+        }
 
         protected override void Adapter_ItemClicked(object sender, int position)
         {
@@ -65,6 +89,37 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 SelectedFolders.Remove(folder);
             }
         }
+
+        #region Filtering 
+
+        override public bool OnQueryTextChange(string newText)
+        {
+            searchHandler.RemoveCallbacksAndMessages(null);
+            searchHandler.PostDelayed(() =>
+            {
+                if (string.IsNullOrWhiteSpace(newText))
+                {
+                    searchAdapter.Clear();
+                }
+                else
+                {
+                    var matchingFolders = GetMatchingFolders(newText);
+                    searchAdapter.RefreshSearch(matchingFolders);
+                    searchAdapter.ClearSelections();
+                    searchAdapter.SetSelectionForFolders(SelectedFolders);
+                }
+            }, 500);
+            return false;
+        }
+
+        override public bool OnClose()
+        {
+            var result = base.OnClose();
+            adapter.SetSelectionForFolders(SelectedFolders);
+            return result;
+        }
+
+        #endregion
 
         #region Retained Fragment methods
 
