@@ -21,6 +21,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickerFolderListFragment : FoldersListFragment
     {
+        override public bool LocalSectionAvailable { get; set; } = false;
+
         public HashSet<Folder> SelectedFolders
         {
             get;

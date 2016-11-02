@@ -35,6 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback, View.IOnClickListener, SearchView.IOnQueryTextListener, SearchView.IOnCloseListener
     {
         public Folder Folder { get; set; }
+        virtual public bool LocalSectionAvailable { get; set; } = true;
 
         protected FolderListAdapter adapter;
         protected SearchFolderListAdapter searchAdapter;
@@ -228,7 +229,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Folder.Root)
             {
                 availableSections = new List<Section> { Section.Favourites, Section.Remote };
-                if (Folder.Module == ModuleType.Documents)
+                if (Folder.Module == ModuleType.Documents && LocalSectionAvailable)
                 {
                     availableSections.Add(Section.Local);
                 }

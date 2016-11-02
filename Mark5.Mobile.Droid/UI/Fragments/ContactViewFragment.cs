@@ -318,12 +318,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return base.OnOptionsItemSelected(item);
         }
 
-        public override void OnPrepareOptionsMenu(IMenu menu)
-        {
-            var commentsMenuItem = menu.FindItem(MenuItemActions.Comments);
-            commentsMenuItem.SetEnabled(Contact != null);
-        }
-
         #endregion
 
         #region Refresh methods

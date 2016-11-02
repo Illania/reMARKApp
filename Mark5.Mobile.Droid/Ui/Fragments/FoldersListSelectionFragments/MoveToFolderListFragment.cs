@@ -22,6 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         public List<IBusinessEntity> BusinessEntities { get; set; }
         public Folder FromFolder { get; set; }
+        override public bool LocalSectionAvailable { get; set; } = false;
 
         protected override RetainableStateFragment GetFolderFragment(Folder folder)
         {

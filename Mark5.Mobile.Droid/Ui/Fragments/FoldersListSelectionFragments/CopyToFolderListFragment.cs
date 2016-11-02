@@ -20,6 +20,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class CopyToFolderListFragment : FoldersListFragment
     {
         public List<IBusinessEntity> BusinessEntities { get; set; }
+        override public bool LocalSectionAvailable { get; set; } = false;
 
         protected override RetainableStateFragment GetFolderFragment(Folder folder)
         {
