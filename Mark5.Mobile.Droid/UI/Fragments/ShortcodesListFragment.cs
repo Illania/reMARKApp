@@ -122,11 +122,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (shouldNotifyAdapter)
             {
                 shouldNotifyAdapter = false;
+                actionMode?.Finish();
+                actionMode = null;
                 adapter.NotifyDataSetChanged();
             }
             if (shouldNotifySearchAdapter)
             {
                 shouldNotifySearchAdapter = false;
+                actionMode?.Finish();
+                actionMode = null;
                 searchAdapter.NotifyDataSetChanged();
             }
         }
@@ -391,7 +395,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     shouldNotifySearchAdapter = true;
                     searchAdapter.RemoveItemsAtIndex(position);
-                    adapter.ClearSelections(false);
+                    searchAdapter.ClearSelections(false);
                 }
             }
         }
