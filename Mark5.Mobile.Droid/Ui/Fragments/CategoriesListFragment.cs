@@ -343,10 +343,12 @@ namespace Mark5.Mobile.Droid
             {
                 set
                 {
-                    var sd = new ShapeDrawable(new OvalShape());
-                    sd.Paint.Color = Color.ParseColor(value);
+                    var gd = new GradientDrawable();
+                    gd.SetShape(ShapeType.Oval);
+                    gd.SetStroke(1, Color.Black);
+                    gd.SetColor(Color.ParseColor(value));
 
-                    colorImageView.Background = sd;
+                    colorImageView.Background = gd;
                 }
             }
 
