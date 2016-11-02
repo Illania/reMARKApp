@@ -21,6 +21,7 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid
 {
@@ -345,7 +346,7 @@ namespace Mark5.Mobile.Droid
                 {
                     var gd = new GradientDrawable();
                     gd.SetShape(ShapeType.Oval);
-                    gd.SetStroke(1, Color.Black);
+                    gd.SetStroke(ConversionUtils.ConvertDpToPixels(1), Color.Black);
                     gd.SetColor(Color.ParseColor(value));
 
                     colorImageView.Background = gd;
