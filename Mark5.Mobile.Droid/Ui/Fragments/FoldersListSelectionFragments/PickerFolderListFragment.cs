@@ -92,6 +92,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Filtering 
 
+        override public void OnClick(View v)
+        {
+            if (v == searchView)
+            {
+                searchEnabled = true;
+                refreshLayout.Enabled = false;
+                recyclerView.SwapAdapter(searchAdapter, true);
+            }
+        }
         override public bool OnQueryTextChange(string newText)
         {
             searchHandler.RemoveCallbacksAndMessages(null);
@@ -110,13 +119,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }, 500);
             return false;
-        }
-
-        override public bool OnClose()
-        {
-            var result = base.OnClose();
-            adapter.SetSelectionForFolders(SelectedFolders);
-            return result;
         }
 
         #endregion

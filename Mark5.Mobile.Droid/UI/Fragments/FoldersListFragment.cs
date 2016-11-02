@@ -38,14 +38,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected FolderListAdapter adapter;
         protected SearchFolderListAdapter searchAdapter;
-        SearchView searchView;
-        RecyclerView recyclerView;
-        SwipeRefreshLayout refreshLayout;
+        protected SearchView searchView;
+        protected RecyclerView recyclerView;
+        protected SwipeRefreshLayout refreshLayout;
         ActionMode actionMode;
         List<int> recoveredSelectedItemsPosition;
         List<Section> availableSections;
 
-        bool searchEnabled;
+        protected bool searchEnabled;
 
         protected readonly Handler searchHandler = new Handler();
 
@@ -581,7 +581,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Filtering 
 
-        public void OnClick(View v)
+        virtual public void OnClick(View v)
         {
             if (v == searchView)
             {
