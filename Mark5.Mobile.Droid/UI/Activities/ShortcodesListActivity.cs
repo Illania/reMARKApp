@@ -13,7 +13,9 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
 using Mark5.Mobile.Droid.Ui.Fragments;
+using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -21,10 +23,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity]
     public class ShortcodesListActivity : BaseAppCompatActivity
     {
-
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
 
         Toolbar toolbar;
+
+        TinyMessageSubscriptionToken entityMovedToken;
+
+        ShortcodesListFragment slf;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -43,11 +48,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                var dlf = new ShortcodesListFragment
+                slf = new ShortcodesListFragment
                 {
                     Folder = folder
                 };
-                ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, slf, slf.GenerateTag());
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ShortcodesListActivity)}");
@@ -56,6 +61,21 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 CommonConfig.Logger.Info($"Restored {nameof(ShortcodesListActivity)}");
             }
+
+            entityMovedToken = PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(m =>
+            {
+                if (slf != null && m.Sender != slf && slf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Shortcode)
+                {
+                    slf.RemoveMovedEntities(m);
+                }
+            });
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            if (entityMovedToken != null) PlatformConfig.MessengerHub.Unsubscribe<EntityMovedFromFolderMessage>(entityMovedToken);
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)

@@ -26,6 +26,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -50,6 +51,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool shouldNotifyAdapter;
         bool shouldNotifySearchAdapter;
+
+        ContactsListAdapter CurrentAdapter
+        {
+            get { return (ContactsListAdapter)recyclerView.GetAdapter(); }
+        }
 
         CancellationTokenSource cts;
 
@@ -267,6 +273,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public void RemoveMovedEntities(EntityMovedFromFolderMessage m)
+        {
+            foreach (var entityId in m.EntitiesId)
+            {
+                var position = adapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifyAdapter = true;
+                    adapter.RemoveItemsAtIndex(position);
+                    adapter.ClearSelections(false);
+                }
+
+                position = searchAdapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifySearchAdapter = true;
+                    searchAdapter.RemoveItemsAtIndex(position);
+                    adapter.ClearSelections(false);
+                }
+            }
+
+        }
+
         #endregion
 
         #region Adapter callbacks
@@ -315,37 +344,45 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             menu.Clear();
 
-            var currentAdapter = (ContactsListAdapter)recyclerView.GetAdapter();
-
-            menu.Add(Menu.None, 30, 30, Resource.String.copy_to_worktray);
-            menu.Add(Menu.None, 40, 40, Resource.String.copy_to_folder);
+            menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
+            menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
 
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static
                 || Folder.InternalType == FolderInternalType.Worktray)
             {
-                menu.Add(Menu.None, 41, 41, Resource.String.move_to_folder);
+                menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
             }
 
-            if (currentAdapter.SelectedItemCount == 1)
+            if (CurrentAdapter.SelectedItemCount == 1)
             {
-                menu.Add(Menu.None, 50, 50, Resource.String.categories);
+                menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
             }
 
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static
                 || Folder.InternalType == FolderInternalType.Worktray)
             {
-                menu.Add(Menu.None, 60, 60, Resource.String.delete_from_folder);
+                menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
             }
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
                 || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
             {
-                menu.Add(Menu.None, 61, 61, Resource.String.delete);
+                menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
             }
 
             return true;
+        }
+
+        static class MenuItemActions
+        {
+            public const int CopyToWorktray = 30;
+            public const int CopyToFolder = 40;
+            public const int MoveToFolder = 41;
+            public const int Categories = 50;
+            public const int DeleteFromFolder = 70;
+            public const int Delete = 71;
         }
 
         public bool OnCreateActionMode(ActionMode mode, IMenu menu)
@@ -355,7 +392,39 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public bool OnActionItemClicked(ActionMode mode, IMenuItem item)
         {
-            return true;
+            var selectedContacts = CurrentAdapter.SelectedItems;
+
+            if (item.ItemId == MenuItemActions.Categories)
+            {
+                var i = new Intent(Activity, typeof(CategoriesListActivity));
+                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(selectedContacts.First()));
+                StartActivity(i);
+
+                return true;
+            }
+            if (item.ItemId == MenuItemActions.CopyToFolder)
+            {
+                var i = new Intent(Activity, typeof(FolderListSelectionActivity));
+                i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.CopyToFolderMode);
+                i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
+                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(selectedContacts.Select(sp => sp as IBusinessEntity).ToList()));
+                StartActivity(i);
+
+                return true;
+            }
+            if (item.ItemId == MenuItemActions.MoveToFolder)
+            {
+                var i = new Intent(Activity, typeof(FolderListSelectionActivity));
+                i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.MoveToFolderMode);
+                i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
+                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(selectedContacts.Select(sp => sp as IBusinessEntity).ToList()));
+                i.PutExtra(FolderListSelectionActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
+                StartActivity(i);
+
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
         }
 
         public void OnDestroyActionMode(ActionMode mode)
@@ -581,14 +650,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 NotifyItemChanged(position);
             }
 
-            public void ClearSelections()
+            public void ClearSelections(bool notify = true)
             {
                 var contacts = selectedContactsInView.Values.ToArray();
                 selectedContactsInView.Clear();
-                foreach (var contact in contacts)
+                if (notify)
                 {
-                    NotifyItemChanged(GetPosition(contact));
+                    foreach (var contact in contacts)
+                    {
+                        NotifyItemChanged(GetPosition(contact));
+                    }
                 }
+
+            }
+
+            public void RemoveItemsAtIndex(int index)
+            {
+                contactPreviewsInView.RemoveAt(index);
             }
 
             public int GetPosition(int contactPreviewId)

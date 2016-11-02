@@ -220,13 +220,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var i = new Intent(Activity, typeof(CommentsListActivity));
                 i.PutExtra(CommentsListActivity.EntityIntentKey, SerializationUtils.Serialize(Document));
-                Activity.StartActivityForResult(i, RequestCodes.CommentsRequest); //Need to use activity, otherwise the request code is changed is changed by the enclosing activity
+                Activity.StartActivityForResult(i, RequestCodes.CommentsRequest);
             }
             if (item.ItemId == MenuItemActions.Actions)
             {
                 var i = new Intent(Activity, typeof(ObjectActionsActivity));
-                i.PutExtra(ObjectActionsActivity.BusinessEntityTypeIntentKey, SerializationUtils.Serialize(DocumentPreview.GetType()));
-                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(DocumentPreview));
+                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(DocumentPreview as IBusinessEntity));
                 StartActivity(i);
 
                 return true;
@@ -234,8 +233,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.Links)
             {
                 var i = new Intent(Activity, typeof(ObjectLinksActivity));
-                i.PutExtra(ObjectLinksActivity.BusinessEntityTypeIntentKey, SerializationUtils.Serialize(DocumentPreview.GetType()));
-                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(DocumentPreview));
+                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(DocumentPreview as IBusinessEntity));
                 StartActivity(i);
 
                 return true;

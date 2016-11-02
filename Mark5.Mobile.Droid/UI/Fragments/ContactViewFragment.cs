@@ -212,14 +212,70 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
+            menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
+            menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
+
+            if (Folder.InternalType == FolderInternalType.FilterView
+                || Folder.InternalType == FolderInternalType.Static
+                || Folder.InternalType == FolderInternalType.Worktray)
+            {
+                menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
+            }
             menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
-            menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments);
+            menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments); //TODO need to disable it
             menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.actions);
             menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
+
+            if (Folder.InternalType == FolderInternalType.FilterView
+                || Folder.InternalType == FolderInternalType.Static
+                || Folder.InternalType == FolderInternalType.Worktray)
+            {
+                menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
+            }
+
+            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
+                || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
+            {
+                menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
+            }
+        }
+
+        static class MenuItemActions
+        {
+            public const int CopyToWorktray = 30;
+            public const int CopyToFolder = 40;
+            public const int MoveToFolder = 41;
+            public const int Categories = 50;
+            public const int Comments = 60;
+            public const int Actions = 70;
+            public const int Links = 80;
+            public const int Delete = 90;
+            public const int DeleteFromFolder = 100;
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
+            if (item.ItemId == MenuItemActions.CopyToFolder)
+            {
+                var i = new Intent(Activity, typeof(FolderListSelectionActivity));
+                i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.CopyToFolderMode);
+                i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
+                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity> { ContactPreview }));
+                StartActivity(i);
+
+                return true;
+            }
+            if (item.ItemId == MenuItemActions.MoveToFolder)
+            {
+                var i = new Intent(Activity, typeof(FolderListSelectionActivity));
+                i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.MoveToFolderMode);
+                i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
+                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity> { ContactPreview }));
+                i.PutExtra(FolderListSelectionActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
+                StartActivity(i);
+
+                return true;
+            }
             if (item.ItemId == MenuItemActions.Categories)
             {
                 var i = new Intent(Activity, typeof(CategoriesListActivity));
@@ -239,17 +295,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.Actions)
             {
                 var i = new Intent(Activity, typeof(ObjectActionsActivity));
-                i.PutExtra(ObjectActionsActivity.BusinessEntityTypeIntentKey, SerializationUtils.Serialize(ContactPreview.GetType()));
-                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(ContactPreview));
-                StartActivity(i); //TODO ask Bartosz why needs to send the type
+                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(ContactPreview as IBusinessEntity));
+                StartActivity(i);
 
                 return true;
             }
             if (item.ItemId == MenuItemActions.Links)
             {
                 var i = new Intent(Activity, typeof(ObjectLinksActivity));
-                i.PutExtra(ObjectLinksActivity.BusinessEntityTypeIntentKey, SerializationUtils.Serialize(ContactPreview.GetType()));
-                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(ContactPreview));
+                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(ContactPreview as IBusinessEntity));
                 StartActivity(i);
 
                 return true;
@@ -262,14 +316,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var commentsMenuItem = menu.FindItem(MenuItemActions.Comments);
             commentsMenuItem.SetEnabled(Contact != null);
-        }
-
-        static class MenuItemActions
-        {
-            public const int Categories = 10;
-            public const int Comments = 20;
-            public const int Actions = 30;
-            public const int Links = 40;
         }
 
         #endregion

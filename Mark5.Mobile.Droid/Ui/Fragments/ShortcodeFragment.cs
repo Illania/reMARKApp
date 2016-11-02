@@ -124,6 +124,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        static class MenuItemActions
+        {
+            public const int CreateNewDocument = 20;
+            public const int CopyToWorktray = 30;
+            public const int CopyToFolder = 40;
+            public const int MoveToFolder = 41;
+            public const int Categories = 50;
+            public const int Actions = 70;
+            public const int Links = 80;
+            public const int Delete = 90;
+            public const int DeleteFromFolder = 100;
+        }
+
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             return base.OnOptionsItemSelected(item);

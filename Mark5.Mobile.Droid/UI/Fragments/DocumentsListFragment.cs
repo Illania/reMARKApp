@@ -51,11 +51,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ActionMode actionMode;
         SearchView searchView;
 
-        bool searchEnabled;
-
         DocumentsListAdapter CurrentAdapter
         {
-            get { return searchEnabled ? searchAdapter : adapter; }
+            get { return (DocumentsListAdapter)recyclerView.GetAdapter(); }
         }
 
         bool shouldNotifyAdapter;
@@ -428,19 +426,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var selectedDocumentPreviews = CurrentAdapter.SelectedItems;
 
+            if (item.ItemId == MenuItemActions.Categories)
+            {
+                var i = new Intent(Activity, typeof(CategoriesListActivity));
+                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(selectedDocumentPreviews.First()));
+                StartActivity(i);
+
+                return true;
+            }
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
-                //var i = new Intent(Activity, typeof(FolderListSelectionActivity));
-                //i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.CopyToFolderMode);
-                //i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
-                //i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(selectedDocumentPreviews.Select(sp => sp as IBusinessEntity).ToList()));
-                //StartActivity(i);
-
-                //return true;
-
                 var i = new Intent(Activity, typeof(FolderListSelectionActivity));
-                i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.PickerMode);
+                i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.CopyToFolderMode);
                 i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
+                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(selectedDocumentPreviews.Select(sp => sp as IBusinessEntity).ToList()));
                 StartActivity(i);
 
                 return true;
@@ -475,7 +474,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (v == searchView)
             {
-                searchEnabled = true;
                 refreshLayout.Enabled = false;
                 adapter.ClearSelections();
                 recyclerView.SwapAdapter(searchAdapter, true);
@@ -510,7 +508,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             searchAdapter.Clear();
             recyclerView.SwapAdapter(adapter, true);
             refreshLayout.Enabled = true;
-            searchEnabled = false;
             return false;
         }
 

@@ -26,6 +26,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -47,6 +48,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ShortcodesListAdapter searchAdapter;
         ActionMode actionMode;
         SearchView searchView;
+
+        bool shouldNotifyAdapter;
+        bool shouldNotifySearchAdapter;
+
+        ShortcodesListAdapter CurrentAdapter
+        {
+            get { return (ShortcodesListAdapter)recyclerView.GetAdapter(); }
+        }
 
         CancellationTokenSource cts;
 
@@ -108,6 +117,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (adapter.ItemCount < 1)
             {
                 RefreshData();
+            }
+
+            if (shouldNotifyAdapter)
+            {
+                shouldNotifyAdapter = false;
+                adapter.NotifyDataSetChanged();
+            }
+            if (shouldNotifySearchAdapter)
+            {
+                shouldNotifySearchAdapter = false;
+                searchAdapter.NotifyDataSetChanged();
             }
         }
 
@@ -274,30 +294,39 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             menu.Clear();
 
-            menu.Add(Menu.None, 30, 30, Resource.String.copy_to_worktray);
-            menu.Add(Menu.None, 40, 40, Resource.String.copy_to_folder);
+            menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
+            menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
 
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static
                 || Folder.InternalType == FolderInternalType.Worktray)
             {
-                menu.Add(Menu.None, 41, 41, Resource.String.move_to_folder);
+                menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
             }
 
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static
                 || Folder.InternalType == FolderInternalType.Worktray)
             {
-                menu.Add(Menu.None, 60, 60, Resource.String.delete_from_folder);
+                menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
             }
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
                 || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
             {
-                menu.Add(Menu.None, 61, 61, Resource.String.delete);
+                menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
             }
 
             return true;
+        }
+
+        static class MenuItemActions
+        {
+            public const int CopyToWorktray = 30;
+            public const int CopyToFolder = 40;
+            public const int MoveToFolder = 41;
+            public const int DeleteFromFolder = 70;
+            public const int Delete = 71;
         }
 
         public bool OnCreateActionMode(ActionMode mode, IMenu menu)
@@ -307,7 +336,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public bool OnActionItemClicked(ActionMode mode, IMenuItem item)
         {
-            return true;
+            var selectedShortocodes = CurrentAdapter.SelectedItems;
+
+            if (item.ItemId == MenuItemActions.CopyToFolder)
+            {
+                var i = new Intent(Activity, typeof(FolderListSelectionActivity));
+                i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.CopyToFolderMode);
+                i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
+                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(selectedShortocodes.Select(sp => sp as IBusinessEntity).ToList()));
+                StartActivity(i);
+
+                return true;
+            }
+            if (item.ItemId == MenuItemActions.MoveToFolder)
+            {
+                var i = new Intent(Activity, typeof(FolderListSelectionActivity));
+                i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.MoveToFolderMode);
+                i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
+                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(selectedShortocodes.Select(sp => sp as IBusinessEntity).ToList()));
+                i.PutExtra(FolderListSelectionActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
+                StartActivity(i);
+
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
         }
 
         public void OnDestroyActionMode(ActionMode mode)
@@ -315,6 +368,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var currentAdapter = (ShortcodesListAdapter)recyclerView.GetAdapter();
             currentAdapter.ClearSelections();
             actionMode = null;
+        }
+
+        #endregion
+
+        #region Messanger Handlers
+
+        public void RemoveMovedEntities(EntityMovedFromFolderMessage m)
+        {
+            foreach (var entityId in m.EntitiesId)
+            {
+                var position = adapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifyAdapter = true;
+                    adapter.RemoveItemsAtIndex(position);
+                    adapter.ClearSelections(false);
+                }
+
+                position = searchAdapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifySearchAdapter = true;
+                    searchAdapter.RemoveItemsAtIndex(position);
+                    adapter.ClearSelections(false);
+                }
+            }
         }
 
         #endregion
@@ -479,6 +558,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 AppendItems(items);
             }
 
+            public int GetPosition(int shortcodePreviewsId)
+            {
+                var position = -1;
+                for (var i = 0; i < shortcodePreviewsInView.Count; i++)
+                {
+                    if (shortcodePreviewsInView[i].Id == shortcodePreviewsId)
+                    {
+                        position = i;
+                        break;
+                    }
+                }
+                return position;
+            }
+
+            public void RemoveItemsAtIndex(int index)
+            {
+                shortcodePreviewsInView.RemoveAt(index);
+            }
+
             public void Clear()
             {
                 var size = shortcodePreviewsInView.Count;
@@ -516,13 +614,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 NotifyItemChanged(position);
             }
 
-            public void ClearSelections()
+            public void ClearSelections(bool notify = true)
             {
                 var shortcodes = selectedShortcodesInView.Values.ToArray();
                 selectedShortcodesInView.Clear();
-                foreach (var shortcode in shortcodes)
+                if (notify)
                 {
-                    NotifyItemChanged(GetPosition(shortcode));
+                    foreach (var shortcode in shortcodes)
+                    {
+                        NotifyItemChanged(GetPosition(shortcode));
+                    }
                 }
             }
 

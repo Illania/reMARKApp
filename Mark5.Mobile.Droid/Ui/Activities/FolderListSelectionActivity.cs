@@ -24,10 +24,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     {
         public enum ModeType
         {
-            SimpleMode = 1,
-            CopyToFolderMode = 2,
-            MoveToFolderMode = 3,
-            PickerMode = 4,
+            CopyToFolderMode = 1,
+            MoveToFolderMode = 2,
+            PickerMode = 3,
         }
 
         public const string ModuleIntentKey = "ModuleIntent_79a3dba4-bdad-4b11-be42-af6acdf31b4e";
