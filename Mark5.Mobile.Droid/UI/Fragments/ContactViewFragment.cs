@@ -222,7 +222,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
             }
             menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
-            menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments); //TODO need to disable it
+            menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments);
             menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.actions);
             menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
 
@@ -251,6 +251,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int Links = 80;
             public const int Delete = 90;
             public const int DeleteFromFolder = 100;
+        }
+
+        public override void OnPrepareOptionsMenu(IMenu menu)
+        {
+            var commentsMenuItem = menu.FindItem(MenuItemActions.Comments);
+            commentsMenuItem.SetEnabled(Contact != null);
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
