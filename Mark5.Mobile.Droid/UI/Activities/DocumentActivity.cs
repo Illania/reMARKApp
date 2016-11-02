@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 
+using System.Collections.Generic;
 using Android.App;
 using Android.OS;
 using Android.Support.V7.App;
@@ -27,7 +28,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string DocumentPreviewIntentKey = "DocumentPreview_0bd291a4-22a5-431c-ad6e-4c8b273eeb98";
         public const string ReadOnlyModeIntentKey = "ReadOnlyMode_c23890cf-06fc-45d7-86c8-76c4c8027daf";
 
+        const string dfFragmentTagKey = "fragmentTagKey";
+        string dfFragmentTag;
+
         Toolbar toolbar;
+        DocumentFragment df;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -49,7 +54,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var documentPreview = SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
                 var readOnlyMode = Intent.Extras.GetBoolean(ReadOnlyModeIntentKey);
                 var ft = SupportFragmentManager.BeginTransaction();
-                var df = new DocumentFragment
+                df = new DocumentFragment
                 {
                     Folder = folder,
                     SearchId = searchId,
@@ -57,15 +62,41 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     CloseRequest = OnBackPressed,
                     ReadOnlyMode = readOnlyMode
                 };
-                ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
+                dfFragmentTag = df.GenerateTag();
+                ft.Replace(Resource.Id.fragment_container, df, dfFragmentTag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(DocumentActivity)}");
             }
             else
             {
+                dfFragmentTag = savedInstanceState.GetString(dfFragmentTagKey);
+                df = SupportFragmentManager.FindFragmentByTag(dfFragmentTag) as DocumentFragment;
                 CommonConfig.Logger.Info($"Restored {nameof(DocumentActivity)}");
             }
+        }
+
+        protected override void OnActivityResult(int requestCode, Result resultCode, Android.Content.Intent data)
+        {
+            if (resultCode == Result.Ok && df != null)
+            {
+                if (requestCode == DocumentFragment.RequestCodes.CommentsRequest)
+                {
+                    var comments = SerializationUtils.Deserialize<List<Comment>>(data.GetStringExtra(CommentsListActivity.CommentsResultKey));
+                    df.UpdateComments(comments);
+                }
+                else if (requestCode == DocumentFragment.RequestCodes.CategoriesRequest)
+                {
+                    var categories = SerializationUtils.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
+                    df.UpdateCategories(categories);
+                }
+            }
+        }
+
+        protected override void OnSaveInstanceState(Bundle outState)
+        {
+            outState.PutString(dfFragmentTagKey, dfFragmentTag);
+            base.OnSaveInstanceState(outState);
         }
 
         public override bool OnOptionsItemSelected(Android.Views.IMenuItem item)

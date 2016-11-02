@@ -252,7 +252,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var foldersListFragment = new FoldersListFragment
             {
-                Folder = folder,
+                Folder = folder
             };
 
             var tag = foldersListFragment.GenerateTag();
@@ -448,7 +448,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             var module = selectedFolders.First().Module;
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(this.Activity, enabled ? Resource.String.subscribing_folders : Resource.String.unsubscribing_folders, Resource.String.please_wait);
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, enabled ? Resource.String.subscribing_folders : Resource.String.unsubscribing_folders, Resource.String.please_wait);
 
             Task.Run(async () =>
             {
@@ -637,7 +637,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return new FolderListFragmentState
             {
                 Folder = Folder,
-                SelectedItemPositions = new List<int>(adapter.SelectedItemPositions),
+                SelectedItemPositions = new List<int>(adapter.SelectedItemPositions)
             };
         }
 
@@ -649,7 +649,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Folder = flfs.Folder;
                 recoveredSelectedItemsPosition = flfs.SelectedItemPositions;
 
-                CommonConfig.Logger.Info($"Restored state state: [folderName={Folder.Name}, folderId={Folder.Id}, selectedItemsCount={recoveredSelectedItemsPosition.Count} ]");
+                CommonConfig.Logger.Info($"Restored state state: [folderName={Folder.Name}, folderId={Folder.Id}, selectedItemsCount={recoveredSelectedItemsPosition.Count}]");
             }
         }
 

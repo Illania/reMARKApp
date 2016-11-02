@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
 using Android.Support.V4.Widget;
@@ -21,6 +22,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -32,6 +34,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
     public class ContactFragment : RetainableStateFragment
     {
+        public static class RequestCodes
+        {
+            public static int CommentsRequest = 1;
+            public static int CategoriesRequest = 2;
+        }
 
         const float CardElevation = 2.0f;
         const float CardRadius = 2.0f;
@@ -78,6 +85,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(physicalAddressCardView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
             linearLayout.AddView(descriptionCardView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
+            HasOptionsMenu = true;
+
             return rootView;
         }
 
@@ -95,19 +104,73 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             await RefreshData();
         }
 
+        #region Options menu
+
+        static class MenuItemActions
+        {
+            public const int Categories = 10;
+            public const int Comments = 20;
+            public const int Actions = 30;
+            public const int Links = 40;
+        }
+
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             if (ReadOnlyMode) return;
 
-            // TODO add actions
+            menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
+            menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments);
+            menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.actions);
+            menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
+        }
+
+        public override void OnPrepareOptionsMenu(IMenu menu)
+        {
+            var commentsMenuItem = menu.FindItem(MenuItemActions.Comments);
+            commentsMenuItem?.SetEnabled(Contact != null);
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            // TODO add actions
+            if (item.ItemId == MenuItemActions.Categories)
+            {
+                var i = new Intent(Activity, typeof(CategoriesListActivity));
+                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(ContactPreview));
+                Activity.StartActivityForResult(i, RequestCodes.CategoriesRequest);
+
+                return true;
+            }
+            if (item.ItemId == MenuItemActions.Comments)
+            {
+                var i = new Intent(Activity, typeof(CommentsListActivity));
+                i.PutExtra(CommentsListActivity.EntityIntentKey, SerializationUtils.Serialize(Contact));
+                Activity.StartActivityForResult(i, RequestCodes.CommentsRequest);
+
+                return true;
+            }
+            if (item.ItemId == MenuItemActions.Actions)
+            {
+                var i = new Intent(Activity, typeof(ObjectActionsActivity));
+                i.PutExtra(ObjectActionsActivity.BusinessEntityTypeIntentKey, SerializationUtils.Serialize(ContactPreview.GetType()));
+                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(ContactPreview));
+                StartActivity(i);
+
+                return true;
+            }
+            if (item.ItemId == MenuItemActions.Links)
+            {
+                var i = new Intent(Activity, typeof(ObjectLinksActivity));
+                i.PutExtra(ObjectLinksActivity.BusinessEntityTypeIntentKey, SerializationUtils.Serialize(ContactPreview.GetType()));
+                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(ContactPreview));
+                StartActivity(i);
+
+                return true;
+            }
 
             return base.OnOptionsItemSelected(item);
         }
+
+        #endregion
 
         #region Card preparation
 
@@ -308,18 +371,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Subviews event handlers
 
-        void LinkedContactClicked(object sender, ContactPreview e)
+        void LinkedContactClicked(object sender, ContactPreview cp)
         {
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
             var ft = fragmentManager.BeginTransaction();
 
-            var cvf = new ContactFragment
+            var cf = new ContactFragment
             {
-                ContactPreview = e,
+                ContactPreview = cp,
                 Folder = Folder
             };
 
-            ft.Replace(Resource.Id.fragment_container, cvf, cvf.GenerateTag());
+            ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
             ft.AddToBackStack(null);
             ft.Commit();
         }
@@ -332,6 +395,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void AddressClicked(object sender, CommunicationAddress e)
         {
             //TODO 
+        }
+
+        #endregion
+
+        #region Update methods
+
+        public void UpdateCategories(List<Category> categories)
+        {
+            ContactPreview?.Categories.Clear();
+            ContactPreview?.Categories.AddRange(categories);
+        }
+
+        public void UpdateComments(List<Comment> comments)
+        {
+            if (ContactPreview != null)
+            {
+                ContactPreview.CommentsCount = comments.Count;
+                Contact.Comments.Clear();
+                Contact.Comments.AddRange(comments);
+            }
         }
 
         #endregion

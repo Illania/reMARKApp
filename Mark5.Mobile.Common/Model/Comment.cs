@@ -10,7 +10,7 @@ using System;
 namespace Mark5.Mobile.Common.Model
 {
 
-    public class Comment
+    public class Comment : ICopiable<Comment>
     {
 
         public int Id { get; set; } = -1;
@@ -28,6 +28,26 @@ namespace Mark5.Mobile.Common.Model
         public int ParentId { get; set; }
 
         public int ParentTypeId { get; set; }
+
+        public Comment ShallowCopy()
+        {
+            return new Comment
+            {
+                Id = Id,
+                Guid = Guid,
+                DateAddedTimestamp = DateAddedTimestamp,
+                UserId = UserId,
+                UserName = UserName,
+                Content = Content,
+                ParentId = ParentId,
+                ParentTypeId = ParentTypeId,
+            };
+        }
+
+        public Comment DeepCopy()
+        {
+            return ShallowCopy();
+        }
     }
 }
 

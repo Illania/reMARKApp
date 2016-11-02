@@ -48,6 +48,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ActionMode actionMode;
         SearchView searchView;
 
+        bool shouldNotifyAdapter;
+        bool shouldNotifySearchAdapter;
+
         CancellationTokenSource cts;
 
         readonly Handler searchHandler = new Handler();
@@ -110,6 +113,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Info($"No elements - will refresh...");
 
                 RefreshData();
+            }
+
+            if (shouldNotifyAdapter)
+            {
+                shouldNotifyAdapter = false;
+                adapter.NotifyDataSetChanged();
+            }
+            if (shouldNotifySearchAdapter)
+            {
+                shouldNotifySearchAdapter = false;
+                searchAdapter.NotifyDataSetChanged();
             }
         }
 
@@ -226,6 +240,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 Dialogs.ShowErrorDialog(Activity, ex);
             }, startRowId, cts.Token);
+        }
+
+        #endregion
+
+        #region Messanger Handlers
+
+        public void UpdateCategories(ContactPreviewCategoriesChangedMessage m)
+        {
+            var position = adapter.GetPosition(m.ContactPreviewId);
+            if (position >= 0)
+            {
+                shouldNotifyAdapter = true;
+                var cp = adapter.Items[position];
+                cp.Categories.Clear();
+                cp.Categories.AddRange(m.Categories);
+            }
+
+            position = searchAdapter.GetPosition(m.ContactPreviewId);
+            if (position >= 0)
+            {
+                shouldNotifySearchAdapter = true;
+                var cp = searchAdapter.Items[position];
+                cp.Categories.Clear();
+                cp.Categories.AddRange(m.Categories);
+            }
         }
 
         #endregion
@@ -552,7 +591,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            int GetPosition(ContactPreview contactPreview)
+            public int GetPosition(int contactPreviewId)
+            {
+                var position = -1;
+                for (var i = 0; i < contactPreviewsInView.Count; i++)
+                {
+                    if (contactPreviewsInView[i].Id == contactPreviewId)
+                    {
+                        position = i;
+                        break;
+                    }
+                }
+                return position;
+            }
+
+            public int GetPosition(ContactPreview contactPreview)
             {
                 var position = -1;
                 for (var i = 0; i < contactPreviewsInView.Count; i++)
