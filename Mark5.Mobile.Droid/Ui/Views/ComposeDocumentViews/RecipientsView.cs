@@ -21,20 +21,23 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             : base(context)
         {
             Orientation = Horizontal;
-            SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceNormal);
+            SetPadding(DistanceNormal, DistanceSmall, DistanceNormal, DistanceSmall);
 
             var titleTextView = new AppCompatTextView(context)
             {
-                LayoutParameters = new LayoutParams(ConversionUtils.ConvertDpToPixels(20), ViewGroup.LayoutParams.MatchParent),
+                LayoutParameters = new LayoutParams(ConversionUtils.ConvertDpToPixels(40), ViewGroup.LayoutParams.WrapContent),
             };
             titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimaryBold);
             titleTextView.Text = title;
 
             var contentEditTextView = new AppCompatEditText(context);
-            var contentLayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent);
+            var contentLayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
             contentLayoutParameters.Weight = 1;
             contentEditTextView.LayoutParameters = contentLayoutParameters;
             contentEditTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
+
+            AddView(titleTextView);
+            AddView(contentEditTextView);
         }
     }
 }

@@ -29,12 +29,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"{nameof(ComposeDocumentFragment)} [Document.Id={Document.Id}, CreationModeFlag={CreationModeFlag}]");
+            CommonConfig.Logger.Info($"{nameof(ComposeDocumentFragment)} [Document.Id={Document?.Id}, CreationModeFlag={CreationModeFlag}]");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
 
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
+            progress.Visibility = ViewStates.Gone;
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
+            scrollView.Visibility = ViewStates.Visible;
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
             linearLayout.AddView(new ToView(Context));
@@ -74,7 +76,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(ComposeDocumentFragment)} [Document.Id={Document.Id}, CreationModeFlag={CreationModeFlag}]";
+            return $"{nameof(ComposeDocumentFragment)} [Document.Id={Document?.Id}, CreationModeFlag={CreationModeFlag}]";
         }
 
         class ComposeDocumentFragmentState : IRetainableState

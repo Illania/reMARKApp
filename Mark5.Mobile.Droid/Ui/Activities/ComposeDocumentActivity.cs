@@ -7,13 +7,10 @@
 //
 
 using Android.App;
-using Android.Content;
 using Android.OS;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
@@ -28,9 +25,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             base.OnCreate(savedInstanceState);
 
-            CommonConfig.Logger.Info($"Creating {nameof(CategoriesListActivity)}...");
+            CommonConfig.Logger.Info($"Creating {nameof(ComposeDocumentActivity)}...");
 
-            SetTitle(Resource.String.categories);
             SetContentView(Resource.Layout.base_layout);
 
             toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
@@ -44,11 +40,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 ft.Replace(Resource.Id.fragment_container, cdf, cdf.GenerateTag());
                 ft.Commit();
 
-                CommonConfig.Logger.Info($"Created {nameof(CategoriesListActivity)}");
+                CommonConfig.Logger.Info($"Created {nameof(ComposeDocumentActivity)}");
             }
             else
             {
-                CommonConfig.Logger.Info($"Restored {nameof(CategoriesListActivity)}");
+                CommonConfig.Logger.Info($"Restored {nameof(ComposeDocumentActivity)}");
             }
         }
 
