@@ -45,6 +45,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new BccView(Context));
             linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new PriorityView(Context));
+            linearLayout.AddView(new Divider(Context));
 
             return rootView;
         }

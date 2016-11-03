@@ -29,14 +29,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             };
             titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimaryBold);
             titleTextView.Text = title;
+            AddView(titleTextView);
+
 
             var contentEditTextView = new AppCompatEditText(context);
             var contentLayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
             contentLayoutParameters.Weight = 1;
             contentEditTextView.LayoutParameters = contentLayoutParameters;
             contentEditTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
-
-            AddView(titleTextView);
             AddView(contentEditTextView);
         }
     }
