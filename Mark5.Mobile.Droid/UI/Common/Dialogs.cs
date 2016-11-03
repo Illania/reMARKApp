@@ -103,6 +103,17 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
+        public static Task<int> ShowListDialog(Context context, int titleId, int itemsId)
+        {
+            var tcs = new TaskCompletionSource<int>();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(titleId);
+            builder.Items(itemsId);
+            builder.ItemsCallback(new ListCallback(i => tcs.SetResult(i)));
+            builder.Show();
+            return tcs.Task;
+        }
+
         public static Task ShowErrorDialogAsync(Context context, Exception ex)
         {
             var tcs = new TaskCompletionSource<bool>();
@@ -244,6 +255,23 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 if (action != null)
                     action(p1.Select(i => i.IntValue()).ToArray());
                 return true;
+            }
+        }
+
+        class ListCallback : Java.Lang.Object, MaterialDialog.IListCallback
+        {
+            readonly Action<int> action;
+
+            public ListCallback(Action<int> action)
+            {
+                this.action = action;
+            }
+
+            public void OnSelection(MaterialDialog p0, View p1, int p2, Java.Lang.ICharSequence p3)
+            {
+
+                if (action != null)
+                    action(p2);
             }
         }
 

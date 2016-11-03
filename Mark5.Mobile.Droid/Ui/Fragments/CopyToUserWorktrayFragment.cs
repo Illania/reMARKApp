@@ -148,7 +148,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 refreshLayout.Post(() => refreshLayout.Refreshing = true); //Bug: fixed in support library v 24.2.0 (issue 77712)
 
                 var userDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
-                adapter.AppendItems(userDepartments.Users);
+                adapter.AppendItems(userDepartments.Users.Where(su => su.Username != ServerConfig.SystemSettings.UserInfo.User.Username).OrderBy(su => su.Username).ToList());
             }
             catch (Exception ex)
             {
@@ -339,7 +339,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 set
                 {
-                    username.Text = value;
+                    username.Text = value.ToUpper();
                 }
             }
 
