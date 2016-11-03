@@ -85,7 +85,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 else if (listMode == ModeType.PickerMode)
                 {
                     SupportActionBar.SetTitle(Resource.String.select_folders);
-                    var flf = new PickerFolderListFragment
+                    var flf = new FolderPickerListFragment
                     {
                         Folder = Folder.RootPerModule(moduleType),
                     };
