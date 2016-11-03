@@ -40,6 +40,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public Folder Folder { get; set; }
 
+        DocumentsListAdapter CurrentAdapter
+        {
+            get { return (DocumentsListAdapter)recyclerView.GetAdapter(); }
+        }
+
         bool refreshing;
 
         CoordinatorLayout coordinatorLayout;
@@ -440,7 +445,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 1)
             {
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, adapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
+
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
             }
         }
 

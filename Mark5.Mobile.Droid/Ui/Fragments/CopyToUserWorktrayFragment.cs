@@ -31,10 +31,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
 
         public List<IBusinessEntity> BusinessEntities { get; set; }
+        public Action CloseRequest { get; set; }
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         CopyToUserWorktrayAdapter adapter;
+        AppCompatButton copyButton;
 
         #region Fragment overrides
 
@@ -42,7 +44,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"Creating {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={BusinessEntities?.Count}]...");
 
-            var rootView = inflater.Inflate(Resource.Layout.list, container, false);
+            var rootView = inflater.Inflate(Resource.Layout.list_with_button, container, false);
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
             refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
@@ -55,6 +57,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             adapter = new CopyToUserWorktrayAdapter();
             adapter.ItemClicked += Adapter_ItemClicked;
             recyclerView.SetAdapter(adapter);
+
+            copyButton = rootView.FindViewById<AppCompatButton>(Resource.Id.button);
+            copyButton.Text = GetString(Resource.String.copy_to_worktray);
+            copyButton.Enabled = false;
+            copyButton.Click += async (sender, e) =>
+            {
+                CommonConfig.Logger.Info($"Attempting copy to folder [businessEntities.Count={BusinessEntities.Count}, adapter.selectedItemCount={adapter.SelectedItemCount}]...");
+
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
+
+                try
+                {
+                    await Managers.CommonActionsManager.CopyToUserWorktray(BusinessEntities, adapter.SelectedItems);
+
+                    if (CloseRequest != null) CloseRequest();
+                }
+                catch (Exception ex)
+                {
+                    dismissAction();
+
+                    CommonConfig.Logger.Error($"Copying to folder failed [businessEntities.Count={BusinessEntities.Count}, adapter.selectedItemCount={adapter.SelectedItemCount}]", ex);
+
+                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                }
+            };
 
             return rootView;
         }
@@ -127,6 +154,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 BusinessEntities = dlfs.BusinessEntities;
                 adapter.AppendItems(dlfs.SystemUsers);
                 adapter.SetSelected(dlfs.SelectedSystemUsers, true);
+
+                UpdateControls();
             }
         }
 
@@ -137,7 +166,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-        #region Refreshing
+        #region Local methods
 
         async Task RefreshData()
         {
@@ -164,13 +193,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        void UpdateControls()
+        {
+            if (adapter.SelectedItemCount < 1)
+            {
+
+                ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
+                copyButton.Enabled = false;
+            }
+            else
+            {
+                ((AppCompatActivity)Activity).SupportActionBar.Title = Resources.GetQuantityString(Resource.Plurals.users_selected, adapter.SelectedItemCount, adapter.SelectedItemCount);
+                copyButton.Enabled = true;
+            }
+        }
+
         #endregion
 
         #region Adapter callbacks
 
         void Adapter_ItemClicked(object sender, SystemUser systemUser)
         {
-            // TODOD
+            adapter.SetSelected(systemUser, !adapter.IsSelected(systemUser));
+            UpdateControls();
         }
 
         #endregion
@@ -339,7 +384,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 set
                 {
-                    username.Text = value.ToUpper();
+                    username.Text = value;
                 }
             }
 

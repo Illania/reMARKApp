@@ -6,7 +6,6 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
-using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -230,10 +229,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
             }
             catch (Exception ex)
             {
-                if (dismissAction != null)
-                {
-                    dismissAction();
-                }
+                dismissAction();
 
                 CommonConfig.Logger.Error("Log in failed", ex);
 

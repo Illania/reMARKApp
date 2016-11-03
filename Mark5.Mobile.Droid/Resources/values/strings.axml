@@ -171,4 +171,5 @@
 		<item>Own</item>
 		<item>Other users\'</item>
 	</string-array>
+	<string name="copying_to_worktray">Copying to worktray</string>
 </resources>

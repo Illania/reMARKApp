@@ -54,7 +54,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var ft = SupportFragmentManager.BeginTransaction();
                 var dlf = new CopyToUserWorktrayFragment
                 {
-                    BusinessEntities = be
+                    BusinessEntities = be,
+                    CloseRequest = OnBackPressed
                 };
                 ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
                 ft.Commit();

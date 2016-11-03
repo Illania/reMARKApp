@@ -447,6 +447,7 @@
     <AndroidResource Include="Resources\layout\linear_layout_with_progress.axml" />
     <AndroidResource Include="Resources\layout\pager.axml" />
     <AndroidResource Include="Resources\layout\list_item_system_user.axml" />
+    <AndroidResource Include="Resources\layout\list_with_button.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
