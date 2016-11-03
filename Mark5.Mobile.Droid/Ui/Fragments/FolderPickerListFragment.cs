@@ -20,7 +20,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class PickerFolderListFragment : FoldersListFragment
+    public class FolderPickerListFragment : FoldersListFragment
     {
         override public bool LocalSectionAvailable { get; set; } = false;
 
@@ -32,7 +32,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected override RetainableStateFragment GetFolderFragment(Folder folder)
         {
-            return new PickerFolderListFragment
+            return new FolderPickerListFragment
             {
                 SelectedFolders = SelectedFolders,
                 Folder = folder,
@@ -101,7 +101,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var selectedCount = SelectedFolders.Count;
             var title = selectedCount > 0 ? Resources.GetQuantityString(Resource.Plurals.folders_selected, SelectedFolders.Count, SelectedFolders.Count)
-                                                     : Resources.GetString(Resource.String.select_folders);
+                                                     : GetString(Resource.String.select_folders);
             ((AppCompatActivity)Activity).SupportActionBar.Title = title;
         }
 
@@ -142,7 +142,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return base.GenerateTag() + $" / {nameof(PickerFolderListFragment)} [selectedFolders.Count={SelectedFolders.Count}]";
+            return base.GenerateTag() + $" / {nameof(FolderPickerListFragment)} [selectedFolders.Count={SelectedFolders.Count}]";
         }
 
         public override IRetainableState OnRetainInstanceState()

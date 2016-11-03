@@ -56,7 +56,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task MoveBusinessEntityToFolder(Folder toFolder)
         {
-            var title = Resources.GetString(Resource.String.confirm_move_to_folder);
+            var title = GetString(Resource.String.confirm_move_to_folder);
             var content = Resources.GetQuantityString(Resource.Plurals.confirm_move_to_folder, BusinessEntities.Count, toFolder.Name);
             var confirmed = await Dialogs.ShowYesNoDialogAsync(Context, title, content);
             if (!confirmed)

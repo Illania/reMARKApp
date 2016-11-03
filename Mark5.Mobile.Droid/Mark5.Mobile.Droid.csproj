@@ -245,9 +245,9 @@
     <Compile Include="Ui\Common\BusMesseges\DocumentPreviewCategoriesChangedMessage.cs" />
     <Compile Include="Ui\Common\BusMesseges\ContactPreviewCategoriesChangedMessage.cs" />
     <Compile Include="Ui\Activities\FolderListSelectionActivity.cs" />
-    <Compile Include="Ui\Fragments\FoldersListSelectionFragments\CopyMoveToFolderListFragment.cs" />
-    <Compile Include="Ui\Fragments\FoldersListSelectionFragments\PickerFolderListFragment.cs" />
     <Compile Include="Ui\Common\BusMesseges\EntityMovedFromFolderMessage.cs" />
+    <Compile Include="Ui\Fragments\CopyMoveToFolderListFragment.cs" />
+    <Compile Include="Ui\Fragments\FolderPickerListFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -411,7 +411,6 @@
     <Folder Include="Ui\Views\ContactViews\HeaderViews\" />
     <Folder Include="Ui\Common\BusMesseges\" />
     <Folder Include="Ui\Views\ShortcodeViews\" />
-    <Folder Include="Ui\Fragments\FoldersListSelectionFragments\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">

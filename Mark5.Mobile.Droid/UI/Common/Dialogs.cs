@@ -34,11 +34,10 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
-        public static Task<bool> ShowYesNoDialogAsync(Context context, string title, string content) //TODO decide if to create one function with the previous one
+        public static Task<bool> ShowYesNoDialogAsync(Context context, string title, string content)
         {
             var tcs = new TaskCompletionSource<bool>();
             var builder = new MaterialDialog.Builder(context);
-            //builder.Typeface("Avenir-Heavy.ttf", "Avenir-Book.ttf");
             builder.Title(title);
             builder.Content(content);
             builder.PositiveText(Resource.String.yes);
