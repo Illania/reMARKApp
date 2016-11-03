@@ -12,7 +12,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
     public class AttachmentsView : ComposeDocumentView
     {
-        protected AttachmentsView(Context context)
+        public AttachmentsView(Context context)
             : base(context)
         {
 

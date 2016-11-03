@@ -12,7 +12,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
     public class PriorityView : ComposeDocumentView
     {
-        protected PriorityView(Context context)
+        public PriorityView(Context context)
             : base(context)
         {
 

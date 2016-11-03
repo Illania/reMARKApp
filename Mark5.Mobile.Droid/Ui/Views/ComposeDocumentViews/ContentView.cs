@@ -12,7 +12,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
     public class ContentView : ComposeDocumentView
     {
-        protected ContentView(Context context)
+        public ContentView(Context context)
             : base(context)
         {
 

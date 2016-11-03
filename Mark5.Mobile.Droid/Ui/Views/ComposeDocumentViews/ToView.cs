@@ -11,10 +11,10 @@ using Android.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
-    public class ToView : ComposeDocumentView
+    public class ToView : RecipientsView
     {
-        protected ToView(Context context)
-            : base(context)
+        public ToView(Context context)
+            : base(context, "To")
         {
 
         }

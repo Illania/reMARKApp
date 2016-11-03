@@ -11,10 +11,10 @@ using Android.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
-    public class BccView : ComposeDocumentView
+    public class BccView : RecipientsView
     {
-        protected BccView(Context context)
-            : base(context)
+        public BccView(Context context)
+            : base(context, "Bcc")
         {
 
         }

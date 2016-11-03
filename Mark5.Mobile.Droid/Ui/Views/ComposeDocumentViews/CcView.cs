@@ -10,10 +10,10 @@ using Android.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
-    public class CcView : ComposeDocumentView
+    public class CcView : RecipientsView
     {
-        protected CcView(Context context)
-            : base(context)
+        public CcView(Context context)
+            : base(context, "Cc")
         {
 
         }

@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: CategoriesListActivity.cs
+// File: ComposeDocumentActivity.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
 // Copyright (c) 2016 Nordic IT
@@ -14,19 +14,15 @@ using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Fragments;
 
-namespace Mark5.Mobile.Droid
+namespace Mark5.Mobile.Droid.Ui.Activities
 {
-
     [Activity]
     public class ComposeDocumentActivity : AppCompatActivity
     {
-
-        public const string BusinessEntityPreviewIntentKey = "BusinessEntityPreview_43dc8df1-dc88-4e39-81d6-59ea495c35ff";
-        public const string CategoriesResultKey = "CategoriesResult_0b8c55ac-2dbe-441e-af92-daa330d040fe";
-
         Toolbar toolbar;
-        CategoriesListFragment clf;
+        ComposeDocumentFragment cdf;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -43,13 +39,9 @@ namespace Mark5.Mobile.Droid
 
             if (savedInstanceState == null)
             {
-                var bep = SerializationUtils.Deserialize<BusinessEntityPreview>(Intent.Extras.GetString(BusinessEntityPreviewIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                clf = new CategoriesListFragment
-                {
-                    BusinessEntityPreview = bep
-                };
-                ft.Replace(Resource.Id.fragment_container, clf, clf.GenerateTag());
+                cdf = new ComposeDocumentFragment { };
+                ft.Replace(Resource.Id.fragment_container, cdf, cdf.GenerateTag());
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(CategoriesListActivity)}");

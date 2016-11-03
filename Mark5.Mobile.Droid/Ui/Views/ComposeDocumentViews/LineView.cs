@@ -12,7 +12,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
     public class LineView : ComposeDocumentView
     {
-        protected LineView(Context context)
+        public LineView(Context context)
             : base(context)
         {
 
