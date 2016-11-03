@@ -62,21 +62,23 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (listMode == ModeType.CopyToFolderMode)
                 {
                     SupportActionBar.SetTitle(Resource.String.select_folder);
-                    var flf = new CopyToFolderListFragment
+                    var flf = new CopyMoveToFolderListFragment
                     {
                         Folder = Folder.RootPerModule(moduleType),
                         BusinessEntities = be,
+                        Type = CopyMoveToFolderListFragment.ActionType.Copy
                     };
                     ft.Replace(Resource.Id.fragment_container, flf, flf.GenerateTag());
                 }
                 else if (listMode == ModeType.MoveToFolderMode)
                 {
                     SupportActionBar.SetTitle(Resource.String.select_folder);
-                    var flf = new MoveToFolderListFragment
+                    var flf = new CopyMoveToFolderListFragment
                     {
                         Folder = Folder.RootPerModule(moduleType),
                         BusinessEntities = be,
                         FromFolder = fromFolder,
+                        Type = CopyMoveToFolderListFragment.ActionType.Move
                     };
                     ft.Replace(Resource.Id.fragment_container, flf, flf.GenerateTag());
                 }

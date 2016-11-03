@@ -245,8 +245,7 @@
     <Compile Include="Ui\Common\BusMesseges\DocumentPreviewCategoriesChangedMessage.cs" />
     <Compile Include="Ui\Common\BusMesseges\ContactPreviewCategoriesChangedMessage.cs" />
     <Compile Include="Ui\Activities\FolderListSelectionActivity.cs" />
-    <Compile Include="Ui\Fragments\FoldersListSelectionFragments\CopyToFolderListFragment.cs" />
-    <Compile Include="Ui\Fragments\FoldersListSelectionFragments\MoveToFolderListFragment.cs" />
+    <Compile Include="Ui\Fragments\FoldersListSelectionFragments\CopyMoveToFolderListFragment.cs" />
     <Compile Include="Ui\Fragments\FoldersListSelectionFragments\PickerFolderListFragment.cs" />
     <Compile Include="Ui\Common\BusMesseges\EntityMovedFromFolderMessage.cs" />
   </ItemGroup>
