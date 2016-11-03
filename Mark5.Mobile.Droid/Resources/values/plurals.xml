@@ -4,4 +4,16 @@
 		<item quantity="one">%1$d new document received.</item>
 		<item quantity="other">%1$d new documents received.</item>
 	</plurals>
+	<plurals name="confirm_copy_to_folder">
+		<item quantity="one">Do you want to copy the document to %1$s folder?.</item>
+		<item quantity="other">Do you want to copy the documents to %1$s folder?.</item>
+	</plurals>
+	<plurals name="confirm_move_to_folder">
+		<item quantity="one">Do you want to move the document to %1$s folder?.</item>
+		<item quantity="other">Do you want to move the documents to %1$s folder?.</item>
+	</plurals>
+	<plurals name="folders_selected">
+		<item quantity="one">%1$d folder selected</item>
+		<item quantity="other">%1$d folders selected</item>
+	</plurals>
 </resources>

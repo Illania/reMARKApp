@@ -39,7 +39,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task CopyBusinessEntityToFolder(Folder folder)
         {
-            var confirmed = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.warning, Resource.String.confirm_copy_to_folder);
+            var title = Resources.GetString(Resource.String.confirm_copy_to_folder);
+            var content = Resources.GetQuantityString(Resource.Plurals.confirm_copy_to_folder, BusinessEntities.Count, folder.Name);
+            var confirmed = await Dialogs.ShowYesNoDialogAsync(Context, title, content);
+
             if (!confirmed)
             {
                 return;

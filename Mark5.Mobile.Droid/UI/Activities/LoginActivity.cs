@@ -84,7 +84,6 @@ namespace Mark5.Mobile.Droid.Ui.Activity
             CommonConfig.Logger.Info($"Started {nameof(LoginActivity)}");
         }
 
-
         protected override void OnSaveInstanceState(Bundle outState)
         {
             base.OnSaveInstanceState(outState);

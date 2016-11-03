@@ -30,8 +30,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         }
 
         public const string ModuleIntentKey = "ModuleIntent_79a3dba4-bdad-4b11-be42-af6acdf31b4e";
-        public const string ModeIntentKey = "Mode_418bec8d-f44d-41b4-bff0-e286dea3d705";
-        public const string BusinessEntitiesIntentKey = "BusinessEntity_d6047bae-dc5e-4c3e-a302-e33931531baa";
+        public const string ModeIntentKey = "ModeIntent_418bec8d-f44d-41b4-bff0-e286dea3d705";
+        public const string BusinessEntitiesIntentKey = "BusinessEntitiesIntent_d6047bae-dc5e-4c3e-a302-e33931531baa";
         public const string FromFolderIntentKey = "FromFolderIntent_3a68d401-f581-4094-b526-4478cc43d3f4";
 
         public const string FoldersResultKey = "FoldersResult_32e7327a-f02e-4628-850a-6d86e2109b3e";
@@ -44,7 +44,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Creating {nameof(DocumentsListActivity)}...");
 
-            //TODO need to set the correct title according to action?
             SetContentView(Resource.Layout.base_layout);
 
             toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
@@ -62,6 +61,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (listMode == ModeType.CopyToFolderMode)
                 {
+                    SupportActionBar.SetTitle(Resource.String.select_folder);
                     var flf = new CopyToFolderListFragment
                     {
                         Folder = Folder.RootPerModule(moduleType),
@@ -71,6 +71,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 }
                 else if (listMode == ModeType.MoveToFolderMode)
                 {
+                    SupportActionBar.SetTitle(Resource.String.select_folder);
                     var flf = new MoveToFolderListFragment
                     {
                         Folder = Folder.RootPerModule(moduleType),
@@ -81,6 +82,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 }
                 else if (listMode == ModeType.PickerMode)
                 {
+                    SupportActionBar.SetTitle(Resource.String.select_folders);
                     var flf = new PickerFolderListFragment
                     {
                         Folder = Folder.RootPerModule(moduleType),

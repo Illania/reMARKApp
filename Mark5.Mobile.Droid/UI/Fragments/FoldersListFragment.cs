@@ -37,22 +37,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public Folder Folder { get; set; }
         virtual public bool LocalSectionAvailable { get; set; } = true;
 
-        protected FolderListAdapter adapter;
-        protected SearchFolderListAdapter searchAdapter;
-        protected SearchView searchView;
-        protected RecyclerView recyclerView;
-        protected SwipeRefreshLayout refreshLayout;
+        protected FolderListAdapter Adapter;
+        protected SearchFolderListAdapter SearchAdapter;
+        protected SearchView SearchView;
+        protected RecyclerView RecyclerView;
+        protected SwipeRefreshLayout RefreshLayout;
         ActionMode actionMode;
         List<int> recoveredSelectedItemsPosition;
         List<Section> availableSections;
 
-        protected bool searchEnabled;
+        protected bool SearchEnabled;
 
-        protected readonly Handler searchHandler = new Handler();
+        protected readonly Handler SearchHandler = new Handler();
 
         protected FolderListAdapter CurrentAdapter
         {
-            get { return searchEnabled ? searchAdapter : adapter; }
+            get { return SearchEnabled ? SearchAdapter : Adapter; }
         }
 
         #region Overrides
@@ -63,26 +63,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
-            refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
-            refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
-            refreshLayout.Refresh += RefreshLayout_Refresh;
+            RefreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
+            RefreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
+            RefreshLayout.Refresh += RefreshLayout_Refresh;
 
-            recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
-            recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
-            recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
-            recyclerView.SetItemAnimator(new DefaultItemAnimator());
-            recyclerView.HasFixedSize = true;
+            RecyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
+            RecyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
+            RecyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
+            RecyclerView.SetItemAnimator(new DefaultItemAnimator());
+            RecyclerView.HasFixedSize = true;
 
-            adapter = new FolderListAdapter(Context, recyclerView);
-            adapter.ExpandIconClicked += Adapter_ExpandClicked;
-            adapter.ItemClicked += Adapter_ItemClicked;
-            adapter.ItemLongClicked += Adapter_ItemLongClicked;
+            Adapter = new FolderListAdapter(Context, RecyclerView);
+            Adapter.ExpandIconClicked += Adapter_ExpandClicked;
+            Adapter.ItemClicked += Adapter_ItemClicked;
+            Adapter.ItemLongClicked += Adapter_ItemLongClicked;
 
-            searchAdapter = new SearchFolderListAdapter(Context, recyclerView);
-            searchAdapter.ItemClicked += Adapter_ItemClicked;
-            searchAdapter.ItemLongClicked += Adapter_ItemLongClicked;
+            SearchAdapter = new SearchFolderListAdapter(Context, RecyclerView);
+            SearchAdapter.ItemClicked += Adapter_ItemClicked;
+            SearchAdapter.ItemLongClicked += Adapter_ItemLongClicked;
 
-            recyclerView.SetAdapter(adapter);
+            RecyclerView.SetAdapter(Adapter);
 
             HasOptionsMenu = true;
 
@@ -127,11 +127,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
             var searchItem = menu.FindItem(Resource.Id.action_search);
-            searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
-            searchView.QueryHint = GetString(Resource.String.filter);
-            searchView.SetOnSearchClickListener(this);
-            searchView.SetOnQueryTextListener(this);
-            searchView.SetOnCloseListener(this);
+            SearchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
+            SearchView.QueryHint = GetString(Resource.String.filter);
+            SearchView.SetOnSearchClickListener(this);
+            SearchView.SetOnQueryTextListener(this);
+            SearchView.SetOnCloseListener(this);
         }
 
         #endregion
@@ -147,7 +147,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
             }
 
-            refreshLayout.Post(() => refreshLayout.Refreshing = true); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
+            RefreshLayout.Post(() => RefreshLayout.Refreshing = true); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
 
             if (availableSections.Contains(Section.Remote))
             {
@@ -162,7 +162,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 RefreshLocal();
             }
 
-            refreshLayout.Post(() => refreshLayout.Refreshing = false); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
+            RefreshLayout.Post(() => RefreshLayout.Refreshing = false); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
         }
 
         async Task RefreshOffline(bool forceRefresh = false)
@@ -177,7 +177,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Folder.SubFolders.Clear();
                     Folder.SubFolders = folders;
 
-                    adapter.Refresh(folders, Section.Remote);
+                    Adapter.Refresh(folders, Section.Remote);
                 }
                 catch (Exception ex)
                 {
@@ -189,7 +189,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Folders already downloaded, refreshing views...");
 
-                adapter.Refresh(Folder.SubFolders, Section.Remote);
+                Adapter.Refresh(Folder.SubFolders, Section.Remote);
             }
         }
 
@@ -198,7 +198,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Refreshing favourite folders...");
 
             var folders = await Managers.FoldersManager.GetFavoriteFoldersAsync(Folder.Module);
-            adapter.Refresh(folders, Section.Favourites);
+            Adapter.Refresh(folders, Section.Favourites);
         }
 
         void RefreshLocal()
@@ -206,7 +206,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Refreshing local folders...");
 
             var localRootFolder = Folder.LocalRootPerModule(Folder.Module);
-            adapter.Refresh(localRootFolder.SubFolders, Section.Local);
+            Adapter.Refresh(localRootFolder.SubFolders, Section.Local);
         }
 
         protected virtual void RestoreSelection()
@@ -216,8 +216,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (recoveredSelectedItemsPosition != null && recoveredSelectedItemsPosition.Any())
             {
                 actionMode = Activity.StartActionMode(this);
-                adapter.SetSelection(recoveredSelectedItemsPosition);
-                actionMode.Title = adapter.SelectedItemsCount.ToString();
+                Adapter.SetSelection(recoveredSelectedItemsPosition);
+                actionMode.Title = Adapter.SelectedItemsCount.ToString();
                 actionMode.Invalidate();
             }
         }
@@ -239,7 +239,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 availableSections = new List<Section> { Section.Remote };
             }
 
-            adapter.SetSections(availableSections);
+            Adapter.SetSections(availableSections);
         }
 
         void NavigateInFolder(Folder folder)
@@ -477,8 +477,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 else
                 {
                     dismissAction();
-                    adapter.RefreshFolders(selectedFolders, enabled);
-                    searchAdapter.RefreshFolders(selectedFolders, enabled);
+                    Adapter.RefreshFolders(selectedFolders, enabled);
+                    SearchAdapter.RefreshFolders(selectedFolders, enabled);
                 }
 
                 actionMode.Finish();
@@ -518,8 +518,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 else
                 {
-                    adapter.RefreshFolders(selectedFolders);
-                    searchAdapter.RefreshFolders(selectedFolders);
+                    Adapter.RefreshFolders(selectedFolders);
+                    SearchAdapter.RefreshFolders(selectedFolders);
                 }
 
                 actionMode.Finish();
@@ -584,28 +584,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         virtual public void OnClick(View v)
         {
-            if (v == searchView)
+            if (v == SearchView)
             {
-                searchEnabled = true;
-                refreshLayout.Enabled = false;
-                adapter.ClearSelections();
-                recyclerView.SwapAdapter(searchAdapter, true);
+                SearchEnabled = true;
+                RefreshLayout.Enabled = false;
+                Adapter.ClearSelections();
+                RecyclerView.SwapAdapter(SearchAdapter, true);
             }
         }
 
         virtual public bool OnQueryTextChange(string newText)
         {
-            searchHandler.RemoveCallbacksAndMessages(null);
-            searchHandler.PostDelayed(() =>
+            SearchHandler.RemoveCallbacksAndMessages(null);
+            SearchHandler.PostDelayed(() =>
             {
                 if (string.IsNullOrWhiteSpace(newText))
                 {
-                    searchAdapter.Clear();
+                    SearchAdapter.Clear();
                 }
                 else
                 {
                     var matchingFolders = GetMatchingFolders(newText);
-                    searchAdapter.RefreshSearch(matchingFolders);
+                    SearchAdapter.RefreshSearch(matchingFolders);
                 }
             }, 500);
             return false;
@@ -618,10 +618,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         virtual public bool OnClose()
         {
-            searchAdapter.Clear();
-            recyclerView.SwapAdapter(adapter, true);
-            refreshLayout.Enabled = true;
-            searchEnabled = false;
+            SearchAdapter.Clear();
+            RecyclerView.SwapAdapter(Adapter, true);
+            RefreshLayout.Enabled = true;
+            SearchEnabled = false;
             return false;
         }
 
@@ -643,12 +643,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            CommonConfig.Logger.Info($"Retaining state: [folderName={Folder?.Name}, folderId={Folder?.Id}, selectedItemsCount={adapter.SelectedItemPositions.Count} ]");
+            CommonConfig.Logger.Info($"Retaining state: [folderName={Folder?.Name}, folderId={Folder?.Id}, selectedItemsCount={Adapter.SelectedItemPositions.Count} ]");
 
             return new FolderListFragmentState
             {
                 Folder = Folder,
-                SelectedItemPositions = new List<int>(adapter.SelectedItemPositions),
+                SelectedItemPositions = new List<int>(Adapter.SelectedItemPositions),
             };
         }
 

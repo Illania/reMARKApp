@@ -42,7 +42,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task MoveBusinessEntityToFolder(Folder toFolder)
         {
-            var confirmed = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.warning, Resource.String.confirm_move_to_folder);
+            var title = Resources.GetString(Resource.String.confirm_move_to_folder);
+            var content = Resources.GetQuantityString(Resource.Plurals.confirm_move_to_folder, BusinessEntities.Count, toFolder.Name);
+            var confirmed = await Dialogs.ShowYesNoDialogAsync(Context, title, content);
             if (!confirmed)
             {
                 return;
@@ -54,6 +56,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 await Managers.CommonActionsManager.MoveToFolder(BusinessEntities, FromFolder, toFolder);
+                PlatformConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, BusinessEntities.First().ObjectType, FromFolder.Id, BusinessEntities.Select(b => b.Id).ToList()));
             }
             catch (Exception ex)
             {
@@ -65,7 +68,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             finally
             {
                 dismissAction();
-                PlatformConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, BusinessEntities.First().ObjectType, FromFolder.Id, BusinessEntities.Select(b => b.Id).ToList()));
                 Activity.Finish();
             }
         }

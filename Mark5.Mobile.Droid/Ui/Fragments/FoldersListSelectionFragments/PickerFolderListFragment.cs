@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Android.App;
 using Android.Content;
+using Android.Support.V7.App;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
@@ -66,6 +67,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CurrentAdapter.SetSelectionForFolders(SelectedFolders);
             }
+
+            UpdateTitle();
         }
 
         protected override void Adapter_ItemClicked(object sender, int position)
@@ -90,34 +93,44 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 SelectedFolders.Remove(folder);
             }
+
+            UpdateTitle();
+        }
+
+        public void UpdateTitle()
+        {
+            var selectedCount = SelectedFolders.Count;
+            var title = selectedCount > 0 ? Resources.GetQuantityString(Resource.Plurals.folders_selected, SelectedFolders.Count, SelectedFolders.Count)
+                                                     : Resources.GetString(Resource.String.select_folders);
+            ((AppCompatActivity)Activity).SupportActionBar.Title = title;
         }
 
         #region Filtering 
 
         override public void OnClick(View v)
         {
-            if (v == searchView)
+            if (v == SearchView)
             {
-                searchEnabled = true;
-                refreshLayout.Enabled = false;
-                recyclerView.SwapAdapter(searchAdapter, true);
+                SearchEnabled = true;
+                RefreshLayout.Enabled = false;
+                RecyclerView.SwapAdapter(SearchAdapter, true);
             }
         }
         override public bool OnQueryTextChange(string newText)
         {
-            searchHandler.RemoveCallbacksAndMessages(null);
-            searchHandler.PostDelayed(() =>
+            SearchHandler.RemoveCallbacksAndMessages(null);
+            SearchHandler.PostDelayed(() =>
             {
                 if (string.IsNullOrWhiteSpace(newText))
                 {
-                    searchAdapter.Clear();
+                    SearchAdapter.Clear();
                 }
                 else
                 {
                     var matchingFolders = GetMatchingFolders(newText);
-                    searchAdapter.RefreshSearch(matchingFolders);
-                    searchAdapter.ClearSelections();
-                    searchAdapter.SetSelectionForFolders(SelectedFolders);
+                    SearchAdapter.RefreshSearch(matchingFolders);
+                    SearchAdapter.ClearSelections();
+                    SearchAdapter.SetSelectionForFolders(SelectedFolders);
                 }
             }, 500);
             return false;
