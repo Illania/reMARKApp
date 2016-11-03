@@ -46,11 +46,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var type = SerializationUtils.Deserialize<Type>(Intent.Extras.GetString(BusinessEntityTypeIntentKey));
                 var be = SerializationUtils.Deserialize(Intent.Extras.GetString(BusinessEntityIntentKey), type) as IBusinessEntity;
                 var ft = SupportFragmentManager.BeginTransaction();
-                var dlf = new ObjectActionsFragment
+                var oaf = new ObjectActionsFragment
                 {
                     BusinessEntity = be
                 };
-                ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, oaf, oaf.GenerateTag());
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ObjectActionsActivity)}");
