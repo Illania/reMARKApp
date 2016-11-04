@@ -19,10 +19,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ComposeDocumentFragment : RetainableStateFragment
     {
-        public Document Document { get; set; }
-        public DocumentPreview DocumentPreview { get; set; }
+        public Document PreviousDocument { get; set; }
+        public DocumentPreview PreviousDocumentPreview { get; set; }
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
-        public int? PrecedingDocumentId { get; set; }
         public int? PrecedingDocumentFolderId { get; set; }
 
         ProgressBar progress;

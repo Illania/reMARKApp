@@ -25,10 +25,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         ComposeDocumentFragment cdf;
 
         const string CreationModeFlagIntentKey = "CreationModeFlagIntent_290d1383-175d-4e2d-8f5e-ca899baff3f7";
-        const string DocumentPreviewIntentKey = "DocumentPreviewIntent_d3e7ce92-3b0d-4d6b-882b-88bf4ba7bf24";
-        const string DocumentIntentKey = "DocumentIntent_a2066147-a27b-454f-bc5c-03e6b8266697";
-        const string PrecedingDocumentIdIntentKey = "PrecedingDocumentIdIntent_1a6f3c5c-f54c-43c9-a9ce-8041fdcad7c5";
-        const string PrecedingDocumentFolderIdIntentKey = "PrecedingDocumentFolderIdIntent_ac0d9a31-2ddc-497b-8fbe-7fd5a51b2257";
+        const string PreviousDocumentPreviewIntentKey = "PreviousDocumentPreviewIntent_d3e7ce92-3b0d-4d6b-882b-88bf4ba7bf24";
+        const string PreviousDocumentIntentKey = "PreviousDocumentIntent_a2066147-a27b-454f-bc5c-03e6b8266697";
+        const string PreviousDocumentFolderIdIntentKey = "PreviousDocumentFolderIdIntent_ac0d9a31-2ddc-497b-8fbe-7fd5a51b2257";
 
         public static Intent CreateIntent(Context context, DocumentCreationModeFlag creationModeFlag, DocumentPreview documentPreview = null, Document document = null,
                                          int? precedingDocumentId = null, int? precedingDocumentFolderId = null)
@@ -37,19 +36,15 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             intent.PutExtra(CreationModeFlagIntentKey, (int)creationModeFlag);
             if (documentPreview != null)
             {
-                intent.PutExtra(DocumentPreviewIntentKey, SerializationUtils.Serialize(documentPreview));
+                intent.PutExtra(PreviousDocumentPreviewIntentKey, SerializationUtils.Serialize(documentPreview));
             }
             if (document != null)
             {
-                intent.PutExtra(DocumentIntentKey, SerializationUtils.Serialize(document));
+                intent.PutExtra(PreviousDocumentIntentKey, SerializationUtils.Serialize(document));
             }
             if (precedingDocumentId != null)
             {
-                intent.PutExtra(PrecedingDocumentIdIntentKey, precedingDocumentId.Value);
-            }
-            if (precedingDocumentId != null)
-            {
-                intent.PutExtra(PrecedingDocumentFolderIdIntentKey, precedingDocumentFolderId.Value);
+                intent.PutExtra(PreviousDocumentFolderIdIntentKey, precedingDocumentFolderId.Value);
             }
 
             return intent;
@@ -70,19 +65,17 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var creationModeFlag = (DocumentCreationModeFlag)Intent.Extras.GetInt(CreationModeFlagIntentKey);
-                var documentPreview = Intent.HasExtra(DocumentPreviewIntentKey) ? SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey)) : null;
-                var document = Intent.HasExtra(DocumentIntentKey) ? SerializationUtils.Deserialize<Document>(Intent.Extras.GetString(DocumentIntentKey)) : null;
-                var precedingDocumentId = Intent.HasExtra(PrecedingDocumentIdIntentKey) ? (int?)Intent.Extras.GetInt(PrecedingDocumentIdIntentKey) : null;
-                var precedingDocumentFolderId = Intent.HasExtra(PrecedingDocumentFolderIdIntentKey) ? (int?)Intent.Extras.GetInt(PrecedingDocumentFolderIdIntentKey) : null;
+                var previousDocumentPreview = Intent.HasExtra(PreviousDocumentPreviewIntentKey) ? SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(PreviousDocumentPreviewIntentKey)) : null;
+                var previousDocument = Intent.HasExtra(PreviousDocumentIntentKey) ? SerializationUtils.Deserialize<Document>(Intent.Extras.GetString(PreviousDocumentIntentKey)) : null;
+                var previousDocumentFolderId = Intent.HasExtra(PreviousDocumentFolderIdIntentKey) ? (int?)Intent.Extras.GetInt(PreviousDocumentFolderIdIntentKey) : null;
 
                 var ft = SupportFragmentManager.BeginTransaction();
                 cdf = new ComposeDocumentFragment
                 {
                     CreationModeFlag = creationModeFlag,
-                    DocumentPreview = documentPreview,
-                    Document = document,
-                    PrecedingDocumentId = precedingDocumentId,
-                    PrecedingDocumentFolderId = precedingDocumentFolderId,
+                    PreviousDocumentPreview = previousDocumentPreview,
+                    PreviousDocument = previousDocument,
+                    PreviousDocumentFolderId = previousDocumentFolderId,
                 };
                 ft.Replace(Resource.Id.fragment_container, cdf, cdf.GenerateTag());
                 ft.Commit();

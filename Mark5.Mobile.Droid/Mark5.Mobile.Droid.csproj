@@ -315,6 +315,8 @@
     <Compile Include="Ui\Views\ComposeDocumentViews\PriorityView.cs" />
     <Compile Include="Ui\Views\ComposeDocumentViews\ContentView.cs" />
     <Compile Include="Ui\Views\ComposeDocumentViews\AttachmentsView.cs" />
+    <Compile Include="Ui\Views\ComposeDocumentViews\SendOnView.cs" />
+    <Compile Include="Ui\Views\ComposeDocumentViews\SubjectView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
