@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.Collections.Generic;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
@@ -24,8 +25,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
         public int? PreviousDocumentFolderId { get; set; }
 
-        public Document Document { get; set; }
-        public DocumentPreview DocumentPreview { get; set; }
+        public Document Document { get; set; } = new Document();
+        public DocumentPreview DocumentPreview { get; set; } = new DocumentPreview();
+
+        ToView toView;
+        CcView ccView;
+        BccView bccView;
+        PriorityView priorityView;
+        LineView lineView;
+        SubjectView subjectView;
+        ContentView contentView;
+
+        List<ComposeDocumentView> subViews = new List<ComposeDocumentView>();
 
         ProgressBar progress;
         ScrollView scrollView;
@@ -43,22 +54,70 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             scrollView.Visibility = ViewStates.Visible;
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
-            linearLayout.AddView(new ToView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new CcView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new BccView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new PriorityView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new LineView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new SubjectView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new ContentView(Context));
-            linearLayout.AddView(new Divider(Context));
+            toView = new ToView(Context);
+            subViews.Add(toView);
+
+            ccView = new CcView(Context);
+            subViews.Add(ccView);
+
+            bccView = new BccView(Context);
+            subViews.Add(bccView);
+
+            priorityView = new PriorityView(Context);
+            subViews.Add(priorityView);
+
+            lineView = new LineView(Context);
+            subViews.Add(lineView);
+
+            subjectView = new SubjectView(Context);
+            subViews.Add(subjectView);
+
+            contentView = new ContentView(Context);
+            subViews.Add(contentView);
+
+            foreach (var subview in subViews)
+            {
+                linearLayout.AddView(subview);
+                linearLayout.AddView(new Divider(Context));
+            }
 
             return rootView;
+        }
+
+        public override void OnResume()
+        {
+            base.OnResume();
+
+            ShowDocument();
+        }
+
+        void ShowDocument()
+        {
+            if (CreationModeFlag == DocumentCreationModeFlag.New)
+            {
+                AskIfShouldUseTemplates();
+            }
+        }
+
+        void AskIfShouldUseTemplates()
+        {
+            var useTemplate = PlatformConfig.Preferences.UseTemplate;
+            if (useTemplate == Utilities.Preferences.TemplateUsageMode.DontUse)
+            {
+                return;
+            }
+            if (useTemplate == Utilities.Preferences.TemplateUsageMode.Local)
+            {
+
+            }
+            else if (useTemplate == Utilities.Preferences.TemplateUsageMode.Default)
+            {
+
+            }
+            else if (useTemplate == Utilities.Preferences.TemplateUsageMode.AlwaysAsk)
+            {
+
+            }
         }
 
         #region Retained State methods
@@ -82,7 +141,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var cfs = restoredState as ComposeDocumentFragmentState;
             if (cfs != null)
             {
-                //TODO to implement
+                Document = cfs.Document;
+                DocumentPreview = cfs.DocumentPreview;
+                PreviousDocument = cfs.PreviousDocument;
+                PreviousDocumentPreview = cfs.PreviousDocumentPreview;
+                CreationModeFlag = cfs.CreationModeFlag;
+                PreviousDocumentFolderId = cfs.PreviousDocumentFolderId;
             }
         }
 
@@ -97,6 +161,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public DocumentPreview DocumentPreview { get; set; }
             public Document PreviousDocument { get; set; }
             public DocumentPreview PreviousDocumentPreview { get; set; }
+            public int? PreviousDocumentFolderId { get; set; }
             public DocumentCreationModeFlag CreationModeFlag { get; set; }
 
         }
