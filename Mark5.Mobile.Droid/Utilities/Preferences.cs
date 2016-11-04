@@ -23,6 +23,8 @@ namespace Mark5.Mobile.Droid.Utilities
             sp = PreferenceManager.GetDefaultSharedPreferences(Application.Context);
         }
 
+        #region Documents
+
         public int DocumentsToDownload
         {
             get
@@ -63,71 +65,15 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
+        #endregion
+
+        #region Contacts
+
         public bool SynchroniseContacts
         {
             get
             {
                 return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_synchronised), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_synchronised_default));
-            }
-        }
-
-        public bool SynchroniseShortcodes
-        {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_shortcodes_synchronised), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_shortcodes_synchronised_default));
-            }
-        }
-
-        public bool RemoveLine
-        {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_compose_remove_line), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_compose_remove_line_summary_default));
-            }
-        }
-
-        public int CleanCacheIntervalDays
-        {
-            get
-            {
-                return int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_cache_auto_clean), Application.Context.Resources.GetString(Resource.String.pref_cache_auto_clean_default)));
-            }
-        }
-
-        public bool ClearCache
-        {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_cache_clear), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_cache_clear_default));
-            }
-            set
-            {
-                var e = sp.Edit();
-                e.PutBoolean(Application.Context.GetString(Resource.String.pref_key_cache_clear), value);
-                e.Commit();
-            }
-        }
-
-        public string PushNotificationToken
-        {
-            get
-            {
-                return sp.GetString(Application.Context.GetString(Resource.String.push_notification_token), string.Empty);
-            }
-            set
-            {
-                var e = sp.Edit();
-                e.PutString(Application.Context.GetString(Resource.String.push_notification_token), value);
-                e.Commit();
-            }
-        }
-
-        public bool EnableReporting
-        {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_advanced_enable_reporting), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_advanced_enable_reporting_default));
             }
         }
 
@@ -201,6 +147,97 @@ namespace Mark5.Mobile.Droid.Utilities
             {
                 return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_vat), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_vat_default));
             }
+        }
+
+        #endregion
+
+        #region Shortcodes
+
+
+        public bool SynchroniseShortcodes
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_shortcodes_synchronised), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_shortcodes_synchronised_default));
+            }
+        }
+
+        #endregion
+
+        #region Composing Documents
+
+        public bool RemoveLine
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_compose_remove_line), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_compose_remove_line_summary_default));
+            }
+        }
+
+        public TemplateUsageMode UseTemplate
+        {
+            get
+            {
+                return (TemplateUsageMode)int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_compose_template_mode), Application.Context.GetString(Resource.String.pref_compose_template_mode_default)));
+            }
+        }
+
+        #endregion
+
+        #region Cache
+
+        public int CleanCacheIntervalDays
+        {
+            get
+            {
+                return int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_cache_auto_clean), Application.Context.Resources.GetString(Resource.String.pref_cache_auto_clean_default)));
+            }
+        }
+
+        public bool ClearCache
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_cache_clear), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_cache_clear_default));
+            }
+            set
+            {
+                var e = sp.Edit();
+                e.PutBoolean(Application.Context.GetString(Resource.String.pref_key_cache_clear), value);
+                e.Commit();
+            }
+        }
+
+        #endregion
+
+        public string PushNotificationToken
+        {
+            get
+            {
+                return sp.GetString(Application.Context.GetString(Resource.String.push_notification_token), string.Empty);
+            }
+            set
+            {
+                var e = sp.Edit();
+                e.PutString(Application.Context.GetString(Resource.String.push_notification_token), value);
+                e.Commit();
+            }
+        }
+
+        public bool EnableReporting
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_advanced_enable_reporting), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_advanced_enable_reporting_default));
+            }
+        }
+
+        public enum TemplateUsageMode
+        {
+            DontUse = 0,
+            Default = 1,
+            Local = 2,
+            AlwaysAsk = 3,
         }
     }
 }
