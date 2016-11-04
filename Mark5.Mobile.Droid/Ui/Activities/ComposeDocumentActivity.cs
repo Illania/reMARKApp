@@ -7,10 +7,13 @@
 //
 
 using Android.App;
+using Android.Content;
 using Android.OS;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
@@ -20,6 +23,26 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     {
         Toolbar toolbar;
         ComposeDocumentFragment cdf;
+
+        const string CreationModeFlagIntentKey = "CreationModeFlagIntent_290d1383-175d-4e2d-8f5e-ca899baff3f7";
+        const string DocumentPreviewIntentKey = "DocumentPreviewIntent_d3e7ce92-3b0d-4d6b-882b-88bf4ba7bf24";
+        const string DocumentIntentKey = "DocumentIntent_a2066147-a27b-454f-bc5c-03e6b8266697";
+
+        public static Intent CreateIntent(Context context, DocumentCreationModeFlag creationModeFlag, DocumentPreview documentPreview = null, Document document = null)
+        {
+            var intent = new Intent(context, typeof(ComposeDocumentActivity));
+            intent.PutExtra(CreationModeFlagIntentKey, (int)creationModeFlag);
+            if (documentPreview != null)
+            {
+                intent.PutExtra(DocumentPreviewIntentKey, SerializationUtils.Serialize(documentPreview));
+            }
+            if (document != null)
+            {
+                intent.PutExtra(DocumentIntentKey, SerializationUtils.Serialize(document));
+            }
+
+            return intent;
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -35,8 +58,17 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
+                var creationModeFlag = (DocumentCreationModeFlag)Intent.Extras.GetInt(CreationModeFlagIntentKey);
+                var documentPreview = Intent.HasExtra(DocumentPreviewIntentKey) ? SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey)) : null;
+                var document = Intent.HasExtra(DocumentIntentKey) ? SerializationUtils.Deserialize<Document>(Intent.Extras.GetString(DocumentIntentKey)) : null;
+
                 var ft = SupportFragmentManager.BeginTransaction();
-                cdf = new ComposeDocumentFragment { };
+                cdf = new ComposeDocumentFragment
+                {
+                    CreationModeFlag = creationModeFlag,
+                    DocumentPreview = documentPreview,
+                    Document = document,
+                };
                 ft.Replace(Resource.Id.fragment_container, cdf, cdf.GenerateTag());
                 ft.Commit();
 
@@ -58,5 +90,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             return base.OnOptionsItemSelected(item);
         }
+
     }
 }
