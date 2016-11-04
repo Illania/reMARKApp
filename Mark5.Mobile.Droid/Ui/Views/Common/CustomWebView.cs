@@ -1,0 +1,50 @@
+﻿//
+// Project: Mark5.Mobile.Droid
+// File: CustomWebView.cs
+// Author: Ferdinando Papale fp@nordic-it.com
+//
+// Copyright (c) 2016 Nordic IT
+//
+using System;
+using Android.Content;
+using Android.Support.V4.View;
+using Android.Views;
+using Android.Webkit;
+
+namespace Mark5.Mobile.Droid.Ui.Views.Common
+{
+    class CustomWebView : WebView
+    {
+        public CustomWebView(Context context)
+            : base(context)
+        {
+        }
+
+        public override bool OnTouchEvent(MotionEvent e)
+        {
+            if (MotionEventCompat.FindPointerIndex(e, 0) != -1)
+            {
+                RequestDisallowInterceptTouchEvent(e.PointerCount > 1);
+            }
+
+            return base.OnTouchEvent(e);
+        }
+
+        protected override void OnOverScrolled(int scrollX, int scrollY, bool clampedX, bool clampedY)
+        {
+            base.OnOverScrolled(scrollX, scrollY, clampedX, clampedY);
+            RequestDisallowInterceptTouchEvent(true);
+        }
+    }
+
+    class CustomWebViewClient : WebViewClient
+    {
+
+        [Obsolete]
+        public override bool ShouldOverrideUrlLoading(WebView view, string url)
+        {
+            view.Context.StartActivity(new Intent(Intent.ActionView, Android.Net.Uri.Parse(url)));
+            return true;
+        }
+    }
+}

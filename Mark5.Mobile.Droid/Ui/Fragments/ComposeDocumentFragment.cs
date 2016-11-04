@@ -22,7 +22,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public Document PreviousDocument { get; set; }
         public DocumentPreview PreviousDocumentPreview { get; set; }
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
-        public int? PrecedingDocumentFolderId { get; set; }
+        public int? PreviousDocumentFolderId { get; set; }
+
+        public Document Document { get; set; }
+        public DocumentPreview DocumentPreview { get; set; }
 
         ProgressBar progress;
         ScrollView scrollView;
@@ -30,7 +33,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"{nameof(ComposeDocumentFragment)} [Document.Id={Document?.Id}, CreationModeFlag={CreationModeFlag}]");
+            CommonConfig.Logger.Info($"{nameof(ComposeDocumentFragment)} [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
 
@@ -47,6 +50,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new BccView(Context));
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new PriorityView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new LineView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new SubjectView(Context));
+            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContentView(Context));
             linearLayout.AddView(new Divider(Context));
 
             return rootView;
@@ -79,13 +88,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(ComposeDocumentFragment)} [Document.Id={Document?.Id}, CreationModeFlag={CreationModeFlag}]";
+            return $"{nameof(ComposeDocumentFragment)} [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]";
         }
 
         class ComposeDocumentFragmentState : IRetainableState
         {
             public Document Document { get; set; }
             public DocumentPreview DocumentPreview { get; set; }
+            public Document PreviousDocument { get; set; }
+            public DocumentPreview PreviousDocumentPreview { get; set; }
             public DocumentCreationModeFlag CreationModeFlag { get; set; }
 
         }

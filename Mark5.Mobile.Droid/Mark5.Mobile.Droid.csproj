@@ -317,6 +317,7 @@
     <Compile Include="Ui\Views\ComposeDocumentViews\AttachmentsView.cs" />
     <Compile Include="Ui\Views\ComposeDocumentViews\SendOnView.cs" />
     <Compile Include="Ui\Views\ComposeDocumentViews\SubjectView.cs" />
+    <Compile Include="Ui\Views\Common\CustomWebView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -483,6 +484,7 @@
     <Folder Include="Ui\Common\BusMesseges\" />
     <Folder Include="Ui\Views\ShortcodeViews\" />
     <Folder Include="Ui\Views\ComposeDocumentViews\" />
+    <Folder Include="Ui\Views\Common\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
