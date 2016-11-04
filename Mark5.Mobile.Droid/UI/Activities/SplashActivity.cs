@@ -18,6 +18,7 @@ using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Droid.Services;
 using Mark5.Mobile.Droid.Utilities.Hockey;
 
@@ -32,8 +33,6 @@ namespace Mark5.Mobile.Droid.Ui.Activity
               NoHistory = true)]
     public class SplashActivity : AppCompatActivity
     {
-
-        const string HockeyId = "137e2a4fb6384cb3a51de617dd2f5999";
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -57,8 +56,8 @@ namespace Mark5.Mobile.Droid.Ui.Activity
 
             CommonConfig.Logger.Info($"Starting {nameof(SplashActivity)}...");
 
-            CrashManager.Register(this, HockeyId, new CustomCrashManagerListener());
-            FeedbackManager.Register(this, HockeyId, new CustomFeedbackManagerLister());
+            CrashManager.Register(this, PlatformConfig.HockeyId, new CustomCrashManagerListener());
+            FeedbackManager.Register(this, PlatformConfig.HockeyId, new CustomFeedbackManagerLister());
             CrashManager.ResetAlwaysSend(new Java.Lang.Ref.WeakReference(this));
 
             Task.Run(async () =>
@@ -66,10 +65,20 @@ namespace Mark5.Mobile.Droid.Ui.Activity
                 var authenticator = AuthenticatorFactory.Create();
                 if (!await authenticator.IsAuthenticatedAsync())
                 {
+                    CommonConfig.Logger.Info($"Writing required file system storage version...");
+
+                    await FileSystemStorageUpdater.WriteRequiredStorageVersion();
+
                     CommonConfig.Logger.Info($"User was not authenticated - will present {nameof(LoginActivity)}");
 
                     return false;
                 }
+
+                CommonConfig.Logger.Info("Updating file system storage...");
+
+                var updated = await FileSystemStorageUpdater.UpdateStorage();
+
+                CommonConfig.Logger.Info(updated ? "File system storage updated" : "File system storage update not required");
 
                 CommonConfig.Logger.Info($"User is authenticated - initializing...");
 
