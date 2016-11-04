@@ -22,6 +22,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public Document Document { get; set; }
         public DocumentPreview DocumentPreview { get; set; }
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
+        public int? PrecedingDocumentId { get; set; }
+        public int? PrecedingDocumentFolderId { get; set; }
 
         ProgressBar progress;
         ScrollView scrollView;

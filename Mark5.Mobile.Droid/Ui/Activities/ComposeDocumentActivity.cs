@@ -27,8 +27,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         const string CreationModeFlagIntentKey = "CreationModeFlagIntent_290d1383-175d-4e2d-8f5e-ca899baff3f7";
         const string DocumentPreviewIntentKey = "DocumentPreviewIntent_d3e7ce92-3b0d-4d6b-882b-88bf4ba7bf24";
         const string DocumentIntentKey = "DocumentIntent_a2066147-a27b-454f-bc5c-03e6b8266697";
+        const string PrecedingDocumentIdIntentKey = "PrecedingDocumentIdIntent_1a6f3c5c-f54c-43c9-a9ce-8041fdcad7c5";
+        const string PrecedingDocumentFolderIdIntentKey = "PrecedingDocumentFolderIdIntent_ac0d9a31-2ddc-497b-8fbe-7fd5a51b2257";
 
-        public static Intent CreateIntent(Context context, DocumentCreationModeFlag creationModeFlag, DocumentPreview documentPreview = null, Document document = null)
+        public static Intent CreateIntent(Context context, DocumentCreationModeFlag creationModeFlag, DocumentPreview documentPreview = null, Document document = null,
+                                         int? precedingDocumentId = null, int? precedingDocumentFolderId = null)
         {
             var intent = new Intent(context, typeof(ComposeDocumentActivity));
             intent.PutExtra(CreationModeFlagIntentKey, (int)creationModeFlag);
@@ -39,6 +42,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (document != null)
             {
                 intent.PutExtra(DocumentIntentKey, SerializationUtils.Serialize(document));
+            }
+            if (precedingDocumentId != null)
+            {
+                intent.PutExtra(PrecedingDocumentIdIntentKey, precedingDocumentId.Value);
+            }
+            if (precedingDocumentId != null)
+            {
+                intent.PutExtra(PrecedingDocumentFolderIdIntentKey, precedingDocumentFolderId.Value);
             }
 
             return intent;
@@ -61,6 +72,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var creationModeFlag = (DocumentCreationModeFlag)Intent.Extras.GetInt(CreationModeFlagIntentKey);
                 var documentPreview = Intent.HasExtra(DocumentPreviewIntentKey) ? SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey)) : null;
                 var document = Intent.HasExtra(DocumentIntentKey) ? SerializationUtils.Deserialize<Document>(Intent.Extras.GetString(DocumentIntentKey)) : null;
+                var precedingDocumentId = Intent.HasExtra(PrecedingDocumentIdIntentKey) ? (int?)Intent.Extras.GetInt(PrecedingDocumentIdIntentKey) : null;
+                var precedingDocumentFolderId = Intent.HasExtra(PrecedingDocumentFolderIdIntentKey) ? (int?)Intent.Extras.GetInt(PrecedingDocumentFolderIdIntentKey) : null;
 
                 var ft = SupportFragmentManager.BeginTransaction();
                 cdf = new ComposeDocumentFragment
@@ -68,6 +81,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     CreationModeFlag = creationModeFlag,
                     DocumentPreview = documentPreview,
                     Document = document,
+                    PrecedingDocumentId = precedingDocumentId,
+                    PrecedingDocumentFolderId = precedingDocumentFolderId,
                 };
                 ft.Replace(Resource.Id.fragment_container, cdf, cdf.GenerateTag());
                 ft.Commit();
