@@ -57,7 +57,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         async Task MoveBusinessEntityToFolder(Folder toFolder)
         {
             var title = GetString(Resource.String.confirm_move_to_folder);
-            var content = Resources.GetQuantityString(Resource.Plurals.confirm_move_to_folder, BusinessEntities.Count, toFolder.Name);
+
+            int resourceId = 0;
+            switch (BusinessEntities.First().ObjectType)
+            {
+                case ObjectType.Document:
+                    resourceId = Resource.Plurals.confirm_move_to_folder_documents;
+                    break;
+                case ObjectType.Contact:
+                    resourceId = Resource.Plurals.confirm_move_to_folder_contacts;
+                    break;
+                case ObjectType.Shortcode:
+                    resourceId = Resource.Plurals.confirm_move_to_folder_shortcodes;
+                    break;
+                default:
+                    throw new ArgumentException("Object type not supported!");
+            }
+
+
+            var content = Resources.GetQuantityString(resourceId, BusinessEntities.Count, toFolder.Name);
             var confirmed = await Dialogs.ShowYesNoDialogAsync(Context, title, content);
             if (!confirmed)
             {
@@ -89,7 +107,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         async Task CopyBusinessEntityToFolder(Folder folder)
         {
             var title = Resources.GetString(Resource.String.confirm_copy_to_folder);
-            var content = Resources.GetQuantityString(Resource.Plurals.confirm_copy_to_folder, BusinessEntities.Count, folder.Name);
+
+            int resourceId = 0;
+            switch (BusinessEntities.First().ObjectType)
+            {
+                case ObjectType.Document:
+                    resourceId = Resource.Plurals.confirm_copy_to_folder_documents;
+                    break;
+                case ObjectType.Contact:
+                    resourceId = Resource.Plurals.confirm_copy_to_folder_contacts;
+                    break;
+                case ObjectType.Shortcode:
+                    resourceId = Resource.Plurals.confirm_copy_to_folder_shortcodes;
+                    break;
+                default:
+                    throw new ArgumentException("Object type not supported!");
+            }
+
+            var content = Resources.GetQuantityString(resourceId, BusinessEntities.Count, folder.Name);
             var confirmed = await Dialogs.ShowYesNoDialogAsync(Context, title, content);
 
             if (!confirmed)
