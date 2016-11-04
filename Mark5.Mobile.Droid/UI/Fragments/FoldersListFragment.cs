@@ -32,7 +32,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback, View.IOnClickListener, SearchView.IOnQueryTextListener, SearchView.IOnCloseListener
+    public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
 
         public Folder Folder { get; set; }
@@ -131,11 +131,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
             var searchItem = menu.FindItem(Resource.Id.action_search);
+            MenuItemCompat.SetOnActionExpandListener(searchItem, this);
             searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
             searchView.QueryHint = GetString(Resource.String.filter);
-            searchView.SetOnSearchClickListener(this);
             searchView.SetOnQueryTextListener(this);
-            searchView.SetOnCloseListener(this);
         }
 
         #endregion
@@ -571,15 +570,33 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Filtering 
 
-        void View.IOnClickListener.OnClick(View v)
+        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
-            if (v == searchView)
+            if (item.ItemId == Resource.Id.action_search)
             {
                 searchEnabled = true;
                 refreshLayout.Enabled = false;
                 adapter.ClearSelections();
                 recyclerView.SwapAdapter(searchAdapter, true);
+                return true;
             }
+
+            return false;
+        }
+
+        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
+        {
+            if (item.ItemId == Resource.Id.action_search)
+            {
+                searchHandler.RemoveCallbacksAndMessages(null);
+                searchAdapter.Clear();
+                recyclerView.SwapAdapter(adapter, true);
+                refreshLayout.Enabled = true;
+                searchEnabled = false;
+                return true;
+            }
+
+            return false;
         }
 
         bool SearchView.IOnQueryTextListener.OnQueryTextChange(string newText)
@@ -602,15 +619,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string query)
         {
-            return false;
-        }
-
-        bool SearchView.IOnCloseListener.OnClose()
-        {
-            searchAdapter.Clear();
-            recyclerView.SwapAdapter(adapter, true);
-            refreshLayout.Enabled = true;
-            searchEnabled = false;
             return false;
         }
 
