@@ -10,6 +10,7 @@ using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
@@ -27,10 +28,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
             };
+            subjectTextView.SetPadding(0, 0, 0, 0);
             subjectTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimaryBold);
             subjectTextView.SetHint(Resource.String.subject);
             subjectTextView.SetBackgroundColor(Android.Graphics.Color.Transparent);
-
             AddView(subjectTextView);
         }
     }

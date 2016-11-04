@@ -182,6 +182,14 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
+        public string LocalTemplate
+        {
+            get
+            {
+                return sp.GetString(Application.Context.GetString(Resource.String.pref_key_compose_template_local), Application.Context.GetString(Resource.String.pref_compose_template_local_default));
+            }
+        }
+
         #endregion
 
         #region Cache

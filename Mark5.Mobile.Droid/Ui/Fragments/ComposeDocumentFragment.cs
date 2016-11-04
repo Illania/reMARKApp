@@ -7,6 +7,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
@@ -84,31 +85,39 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return rootView;
         }
 
-        public override void OnResume()
+        public override async void OnResume()
         {
             base.OnResume();
 
-            ShowDocument();
+            await ShowDocument();
         }
 
-        void ShowDocument()
+        async Task ShowDocument()
         {
             if (CreationModeFlag == DocumentCreationModeFlag.New)
             {
-                AskIfShouldUseTemplates();
+                await AskIfShouldUseTemplates();
             }
         }
 
-        void AskIfShouldUseTemplates()
+        async Task AskIfShouldUseTemplates()
         {
+            if (CreationModeFlag == DocumentCreationModeFlag.Edit)
+            {
+                CommonConfig.Logger.Info("Document opened in edit mode, no need to add template");
+                return;
+            }
+
             var useTemplate = PlatformConfig.Preferences.UseTemplate;
             if (useTemplate == Utilities.Preferences.TemplateUsageMode.DontUse)
             {
                 return;
             }
+
             if (useTemplate == Utilities.Preferences.TemplateUsageMode.Local)
             {
-
+                var localTemplate = PlatformConfig.Preferences.LocalTemplate;
+                contentView.InsertTemplate(localTemplate, ContentType.PlainText);
             }
             else if (useTemplate == Utilities.Preferences.TemplateUsageMode.Default)
             {

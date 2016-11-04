@@ -5,9 +5,13 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using Android.Content;
+using Android.OS;
 using Android.Support.V7.Widget;
+using Android.Text;
 using Android.Views;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 
@@ -55,6 +59,37 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             oldContentWebView.HorizontalScrollBarEnabled = false;
             oldContentWebView.Visibility = ViewStates.Gone;
             AddView(oldContentWebView);
+        }
+
+        public void InsertTemplate(string templateContent, ContentType contentType)
+        {
+            if (contentType == ContentType.None)
+            {
+                throw new ArgumentException("Need to use a valide content type");
+            }
+            else if (contentType == ContentType.PlainText) //TODO eventually need to add spaces before t
+            {
+                newContentTextView.Text = templateContent;
+            }
+            else if (contentType == ContentType.Html)
+            {
+                ISpanned spanned;
+                if (Build.VERSION.SdkInt >= BuildVersionCodes.N)
+                {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                    spanned = Html.FromHtml(templateContent, FromHtmlOptions.ModeLegacy); //TODO need to check which flag is the more appropriate
+#pragma warning restore XA0001 // Find issues with Android API usage
+                }
+                else
+                {
+#pragma warning disable CS0618 // Type or member is obsolete
+                    spanned = Html.FromHtml(templateContent);
+#pragma warning restore CS0618 // Type or member is obsolete
+                }
+                newContentTextView.EditableText.Append(spanned);
+            }
+
+
         }
     }
 }

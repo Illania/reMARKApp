@@ -35,12 +35,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
 
             contentTextView = new AppCompatEditText(context);
+            contentTextView.SetPadding(0, 0, 0, 0);
             var contentLayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
             contentLayoutParameters.Weight = 1;
-            contentTextView.LayoutParameters = contentLayoutParameters;
             contentTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             contentTextView.SetBackgroundColor(Android.Graphics.Color.Transparent);
-            AddView(contentTextView);
+            AddView(contentTextView, contentLayoutParameters);
         }
     }
 }
