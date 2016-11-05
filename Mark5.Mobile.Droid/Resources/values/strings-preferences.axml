@@ -25,6 +25,10 @@
 	<string name="pref_documents_read_indicator_me_title">Unread idicator</string>
 	<string name="pref_documents_read_indicator_me_summary_on">Blue dot will be shown on the list if I didn\'t read the document</string>
 	<string name="pref_documents_read_indicator_me_summary_off">Blue dot will be shown on the list if noone read the document</string>
+	<string name="pref_key_documents_compact_list">pref_key_documents_compact_list</string>
+	<string name="pref_documents_compact_list_title">Compact list</string>
+	<string name="pref_documents_compact_list_summary_on">Preview of the document will not be shown on the list</string>
+	<string name="pref_documents_compact_list_summary_off">Preview of the document will be shown on the list</string>
 	<string name="pref_key_documents_large_attachment_warn">pref_key_documents_large_attachment_warn</string>
 	<string name="pref_documents_large_attachment_warn_title">Large attachment warning</string>
 	<string name="pref_documents_large_attachment_warn_summary_on">Show warning before downloading large attachment over metered connections</string>

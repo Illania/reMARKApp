@@ -661,6 +661,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public event EventHandler<DocumentPreview> ItemClicked = delegate { };
             public event EventHandler<DocumentPreview> ItemLongClicked = delegate { };
 
+            bool unreadIndicatorMe = PlatformConfig.Preferences.UnreadIndicatorMe;
+            bool compactList = PlatformConfig.Preferences.CompactDocumentsList;
+
             public DocumentsListAdapter(Context context)
             {
                 this.context = context;
@@ -709,10 +712,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dpvh.IncomingIndicator = dp.Direction == DocumentDirection.Incoming;
                     dpvh.OutgoingIndicator = dp.Direction == DocumentDirection.Outgoing;
                     dpvh.DraftIndicator = dp.Direction == DocumentDirection.Draft;
-                    dpvh.UnreadIndicator = PlatformConfig.Preferences.UnreadIndicatorMe ? !dp.IsReadByCurrent : !dp.IsReadByAnyone;
+                    dpvh.UnreadIndicator = unreadIndicatorMe ? !dp.IsReadByCurrent : !dp.IsReadByAnyone;
                     dpvh.AttachmentIndicator = dp.AttachmentsCount > 0;
                     dpvh.CommentIndicator = dp.CommentsCount > 0;
 
+                    dpvh.Compact = compactList;
                     dpvh.Selected = selectedDocumentsInView.ContainsKey(dp.Id);
 
                     if (loadMoreAction != null && position == ItemCount - 1)
@@ -949,6 +953,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 set
                 {
                     commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
+                }
+            }
+
+            public bool Compact
+            {
+                set
+                {
+                    attachmentImageView.Visibility = value ? ViewStates.Gone : ViewStates.Visible;
+                    commentImageView.Visibility = value ? ViewStates.Gone : ViewStates.Visible;
+                    previewTextView.Visibility = value ? ViewStates.Gone : ViewStates.Visible;
                 }
             }
 

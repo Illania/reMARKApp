@@ -47,6 +47,14 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
+        public bool CompactDocumentsList
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_compact_list), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_compact_list_default));
+            }
+        }
+
         public bool LargeAttachmentWarning
         {
             get
