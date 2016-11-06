@@ -7,6 +7,15 @@
 //
 using System.Text;
 using Android.OS;
+using System;
+using Android.Net;
+using Android.App;
+using Android.Content;
+using System.Linq;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Managers;
+using Android.Gms.Common;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -28,18 +37,20 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             var sb = new StringBuilder();
 
-            sb.AppendLine("===== Connection information =====");
+            sb.AppendLine("===== General =====");
+            var pi = Application.Context.PackageManager.GetPackageInfo(Application.Context.PackageName, 0);
+            sb.AppendLine("Version: " + pi.VersionName + " (" + pi.VersionCode + ")");
+            sb.AppendLine("Date: " + DateTime.UtcNow);
+            sb.AppendLine("Google Play Services status: " + GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(Application.Context));
+            sb.AppendLine("Google Play Services statuses:");
+            sb.AppendLine("  SUCCESS=" + ConnectionResult.Success);
+            sb.AppendLine("  SERVICE_MISSING=" + ConnectionResult.ServiceMissing);
+            sb.AppendLine("  SERVICE_UPDATING=" + ConnectionResult.ServiceUpdating);
+            sb.AppendLine("  SERVICE_VERSION_UPDATE_REQUIRED=" + ConnectionResult.ServiceVersionUpdateRequired);
+            sb.AppendLine("  SERVICE_DISABLED=" + ConnectionResult.ServiceDisabled);
+            sb.AppendLine("  SERVICE_INVALID=" + ConnectionResult.ServiceInvalid);
             sb.AppendLine();
 
-            sb.AppendLine("===== Server information =====");
-            sb.AppendLine();
-
-            sb.AppendLine("===== Preferences =====");
-            foreach (var kv in PlatformConfig.Preferences.All)
-            {
-                sb.AppendLine(kv.Key + ": " + kv.Value);
-            }
-            sb.AppendLine();
 
             sb.AppendLine("===== Device information =====");
             sb.AppendLine("Manufacturer: " + Build.Manufacturer);
@@ -58,10 +69,56 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("Version.SecurityPatch: " + Build.VERSION.SecurityPatch);
             sb.AppendLine();
 
+            sb.AppendLine("===== Connection information =====");
+            sb.AppendLine("Username: " + Managers.ActiveConnectionInfo.Username);
+            sb.AppendLine("Hostname: " + Managers.ActiveConnectionInfo.Hostname);
+            sb.AppendLine("Port: " + Managers.ActiveConnectionInfo.Port);
+            sb.AppendLine("SSL: " + Managers.ActiveConnectionInfo.SslMode);
+            sb.AppendLine("Friendly device name: " + Managers.ActiveConnectionInfo.FriendlyDeviceName);
+            sb.AppendLine("Installation ID: " + Managers.ActiveConnectionInfo.InstallationId);
+            sb.AppendLine();
+
+            sb.AppendLine("===== Server information =====");
+            sb.AppendLine(SerializationUtils.Serialize(ServerConfig.SystemSettings));
+
+            sb.AppendLine("===== Preferences =====");
+            foreach (var kv in PlatformConfig.Preferences.All)
+            {
+                sb.AppendLine(kv.Key + ": " + kv.Value);
+            }
+            sb.AppendLine();
+
             sb.AppendLine("===== Memory information =====");
             sb.AppendLine();
 
             sb.AppendLine("===== Network information =====");
+            var cm = Application.Context.GetSystemService(Context.ConnectivityService) as ConnectivityManager;
+            NetworkInfo[] networkInfos = null;
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop)
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                networkInfos = cm.GetAllNetworks().Select(n => cm.GetNetworkInfo(n)).ToArray();
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            else
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                networkInfos = cm.GetAllNetworkInfo();
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            for (int i = 0; i < networkInfos.Length; i++)
+            {
+                var networkInfo = networkInfos[i];
+                sb.AppendLine($"Network {i}:");
+                sb.AppendLine("  Type: " + networkInfo.Type);
+                sb.AppendLine("  Subtype: " + networkInfo.Subtype);
+                sb.AppendLine("  State: " + networkInfo.GetState());
+                sb.AppendLine("  Available:" + networkInfo.IsAvailable);
+                sb.AppendLine("  Connected:" + networkInfo.IsConnected);
+                sb.AppendLine("  Roaming:" + networkInfo.IsRoaming);
+                sb.AppendLine("  Failover:" + networkInfo.IsFailover);
+                sb.AppendLine("  Extra info:" + networkInfo.ExtraInfo);
+            }
             sb.AppendLine();
 
             sb.AppendLine("===== Properties =====");
