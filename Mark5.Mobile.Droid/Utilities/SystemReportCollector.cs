@@ -51,7 +51,6 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("  SERVICE_INVALID=" + ConnectionResult.ServiceInvalid);
             sb.AppendLine();
 
-
             sb.AppendLine("===== Device information =====");
             sb.AppendLine("Manufacturer: " + Build.Manufacturer);
             sb.AppendLine("Product: " + Build.Product);
@@ -67,6 +66,7 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("Version.Sdk: " + Build.VERSION.Sdk);
             sb.AppendLine("Version.SdkInt: " + Build.VERSION.SdkInt);
             sb.AppendLine("Version.SecurityPatch: " + Build.VERSION.SecurityPatch);
+            sb.AppendLine("Root: " + Integration.IsRootedMethod1() + "," + Integration.IsRootedMethod2() + "," + Integration.IsRootedMethod3());
             sb.AppendLine();
 
             sb.AppendLine("===== Connection information =====");
@@ -89,6 +89,12 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine();
 
             sb.AppendLine("===== Memory information =====");
+            var am = Application.Context.GetSystemService(Context.ActivityService) as ActivityManager;
+            var mi = new ActivityManager.MemoryInfo();
+            am.GetMemoryInfo(mi);
+            sb.AppendLine("Available memory KB: " + mi.AvailMem / 1024);
+            sb.AppendLine("Total memory KB: " + mi.TotalMem / 1024);
+            sb.AppendLine("Low memory: " + mi.LowMemory);
             sb.AppendLine();
 
             sb.AppendLine("===== Network information =====");
