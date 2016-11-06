@@ -25,8 +25,10 @@ namespace Mark5.Mobile.Common.Utilities
             {
                 TypeNameHandling = TypeNameHandling.All,
                 DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind,
+                Formatting = Formatting.Indented,
                 Converters =
                 {
+                    new StringEnumConverter(),
                     new VersionConverter()
                 }
             };

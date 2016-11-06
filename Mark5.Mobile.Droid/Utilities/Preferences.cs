@@ -9,6 +9,7 @@ using Android.App;
 using Android.Content;
 using Android.Support.V7.Preferences;
 using Mark5.Mobile.Common.Model;
+using System.Collections.Generic;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -21,6 +22,14 @@ namespace Mark5.Mobile.Droid.Utilities
         public Preferences()
         {
             sp = PreferenceManager.GetDefaultSharedPreferences(Application.Context);
+        }
+
+        public IDictionary<string, object> All
+        {
+            get
+            {
+                return sp.All;
+            }
         }
 
         public int DocumentsToDownload
