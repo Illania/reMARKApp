@@ -177,6 +177,7 @@
     <Compile Include="Utilities\StringExtensions.cs" />
     <Compile Include="Utilities\DateTimeUtils.cs" />
     <Compile Include="Managers\IDocumentsManager.cs" />
+    <Compile Include="Storage\FileSystemStorageUpdater.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

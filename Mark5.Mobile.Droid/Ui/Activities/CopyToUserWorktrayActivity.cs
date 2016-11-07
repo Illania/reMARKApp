@@ -1,12 +1,13 @@
-//
+﻿//
 // Project: Mark5.Mobile.Droid
-// File: ObjectActionsActivity.cs
+// File: CopyToUserWorktrayActivity.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
+using System.Collections.Generic;
 using Android.App;
+using Android.Content;
 using Android.OS;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -20,10 +21,17 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Activity]
-    public class ObjectActionsActivity : AppCompatActivity
+    public class CopyToUserWorktrayActivity : AppCompatActivity
     {
 
-        public const string BusinessEntityIntentKey = "BusinessEntity_ef8f3886-1478-4b4c-8bdb-7a6188035674";
+        const string BusinessEntitiesIntentKey = "BusinessEntities_79eb003f-6e04-4835-8820-fdd4e53a013b";
+
+        public static Intent CreateIntent(Context context, List<IBusinessEntity> businessEntities)
+        {
+            var i = new Intent(context, typeof(CopyToUserWorktrayActivity));
+            i.PutExtra(BusinessEntitiesIntentKey, SerializationUtils.Serialize(businessEntities));
+            return i;
+        }
 
         Toolbar toolbar;
 
@@ -31,9 +39,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             base.OnCreate(savedInstanceState);
 
-            CommonConfig.Logger.Info($"Creating {nameof(ObjectActionsActivity)}...");
+            CommonConfig.Logger.Info($"Creating {nameof(CopyToUserWorktrayActivity)}...");
 
-            SetTitle(Resource.String.actions);
+            SetTitle(Resource.String.select_users);
             SetContentView(Resource.Layout.base_layout);
 
             toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
@@ -42,20 +50,21 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var be = SerializationUtils.Deserialize<IBusinessEntity>(Intent.Extras.GetString(BusinessEntityIntentKey));
+                var be = SerializationUtils.Deserialize<List<IBusinessEntity>>(Intent.Extras.GetString(BusinessEntitiesIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                var oaf = new ObjectActionsFragment
+                var dlf = new CopyToUserWorktrayFragment
                 {
-                    BusinessEntity = be
+                    BusinessEntities = be,
+                    CloseRequest = OnBackPressed
                 };
-                ft.Replace(Resource.Id.fragment_container, oaf, oaf.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
                 ft.Commit();
 
-                CommonConfig.Logger.Info($"Created {nameof(ObjectActionsActivity)}");
+                CommonConfig.Logger.Info($"Created {nameof(CopyToUserWorktrayActivity)}");
             }
             else
             {
-                CommonConfig.Logger.Info($"Restored {nameof(ObjectActionsActivity)}");
+                CommonConfig.Logger.Info($"Restored {nameof(CopyToUserWorktrayActivity)}");
             }
         }
 
@@ -71,4 +80,3 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         }
     }
 }
-

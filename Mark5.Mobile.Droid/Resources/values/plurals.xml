@@ -1,7 +1,39 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <resources>
 	<plurals name="new_documents_received">
 		<item quantity="one">%1$d new document received.</item>
 		<item quantity="other">%1$d new documents received.</item>
+	</plurals>
+	<plurals name="confirm_copy_to_folder_documents">
+		<item quantity="one">Do you want to copy the document to %1$s folder?</item>
+		<item quantity="other">Do you want to copy the documents to %1$s folder?</item>
+	</plurals>
+	<plurals name="confirm_move_to_folder_documents">
+		<item quantity="one">Do you want to move the document to %1$s folder?</item>
+		<item quantity="other">Do you want to move the documents to %1$s folder?</item>
+	</plurals>
+	<plurals name="confirm_copy_to_folder_contacts">
+		<item quantity="one">Do you want to copy the contact to %1$s folder?</item>
+		<item quantity="other">Do you want to copy the contacts to %1$s folder?</item>
+	</plurals>
+	<plurals name="confirm_move_to_folder_contacts">
+		<item quantity="one">Do you want to move the contact to %1$s folder?</item>
+		<item quantity="other">Do you want to move the contacts to %1$s folder?</item>
+	</plurals>
+	<plurals name="confirm_copy_to_folder_shortcodes">
+		<item quantity="one">Do you want to copy the shortcodes to %1$s folder?</item>
+		<item quantity="other">Do you want to copy the shortcodes to %1$s folder?</item>
+	</plurals>
+	<plurals name="confirm_move_to_folder_shortcodes">
+		<item quantity="one">Do you want to move the shortcode to %1$s folder?</item>
+		<item quantity="other">Do you want to move the shortcodes to %1$s folder?</item>
+	</plurals>
+	<plurals name="folders_selected">
+		<item quantity="one">%1$d folder selected</item>
+		<item quantity="other">%1$d folders selected</item>
+	</plurals>
+	<plurals name="users_selected">
+		<item quantity="one">%1$d user selected</item>
+		<item quantity="other">%1$d users selected</item>
 	</plurals>
 </resources>

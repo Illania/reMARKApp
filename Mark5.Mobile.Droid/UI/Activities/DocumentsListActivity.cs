@@ -33,6 +33,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         TinyMessageSubscriptionToken readStatusToken;
         TinyMessageSubscriptionToken categoriesToken;
         TinyMessageSubscriptionToken commentCountToken;
+        TinyMessageSubscriptionToken entityMovedToken;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -88,6 +89,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     dlf.UpdateCommentsCount(m);
                 }
             });
+
+            entityMovedToken = PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(m =>
+           {
+               if (dlf != null && m.Sender != dlf && dlf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Document)
+               {
+                   dlf.RemoveMovedEntities(m);
+               }
+           });
         }
 
         protected override void OnDestroy()
@@ -97,7 +106,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (readStatusToken != null) PlatformConfig.MessengerHub.Unsubscribe<DocumentPreviewReadStatusChangedMessage>(readStatusToken);
             if (commentCountToken != null) PlatformConfig.MessengerHub.Unsubscribe<DocumentPreviewCommentCountChangedMessage>(commentCountToken);
             if (categoriesToken != null) PlatformConfig.MessengerHub.Unsubscribe<DocumentPreviewCategoriesChangedMessage>(categoriesToken);
-
+            if (entityMovedToken != null) PlatformConfig.MessengerHub.Unsubscribe<EntityMovedFromFolderMessage>(entityMovedToken);
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)

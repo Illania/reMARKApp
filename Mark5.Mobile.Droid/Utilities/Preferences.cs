@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: Preferences.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -9,6 +9,7 @@ using Android.App;
 using Android.Content;
 using Android.Support.V7.Preferences;
 using Mark5.Mobile.Common.Model;
+using System.Collections.Generic;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -21,6 +22,14 @@ namespace Mark5.Mobile.Droid.Utilities
         public Preferences()
         {
             sp = PreferenceManager.GetDefaultSharedPreferences(Application.Context);
+        }
+
+        public IDictionary<string, object> All
+        {
+            get
+            {
+                return sp.All;
+            }
         }
 
         #region Documents
@@ -46,6 +55,14 @@ namespace Mark5.Mobile.Droid.Utilities
             get
             {
                 return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_read_indicator_me), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_read_indicator_me_default));
+            }
+        }
+
+        public bool CompactDocumentsList
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_compact_list), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_compact_list_default));
             }
         }
 

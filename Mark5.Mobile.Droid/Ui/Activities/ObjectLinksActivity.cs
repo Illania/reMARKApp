@@ -24,7 +24,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     {
 
         public const string BusinessEntityIntentKey = "BusinessEntity_ef8f3886-1478-4b4c-8bdb-7a6188035674";
-        public const string BusinessEntityTypeIntentKey = "BusinessEntityType_5763e14a-b99d-4bdd-9cec-f54cfaf17ae0";
 
         Toolbar toolbar;
 
@@ -43,14 +42,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var type = SerializationUtils.Deserialize<Type>(Intent.Extras.GetString(BusinessEntityTypeIntentKey));
-                var be = SerializationUtils.Deserialize(Intent.Extras.GetString(BusinessEntityIntentKey), type) as IBusinessEntity;
+                var be = SerializationUtils.Deserialize<IBusinessEntity>(Intent.Extras.GetString(BusinessEntityIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                var dlf = new ObjectLinksFragment
+                var olf = new ObjectLinksFragment
                 {
                     BusinessEntity = be
                 };
-                ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, olf, olf.GenerateTag());
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ObjectLinksActivity)}");

@@ -39,6 +39,20 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
+        public static Task<bool> ShowYesNoDialogAsync(Context context, string title, string content)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(title);
+            builder.Content(content);
+            builder.PositiveText(Resource.String.yes);
+            builder.NegativeText(Resource.String.no);
+            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
+            builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(false)));
+            builder.Show();
+            return tcs.Task;
+        }
+
         public static Task ShowConfirmDialogAsync(Context context, int titleId, int contentId)
         {
             var tcs = new TaskCompletionSource<bool>();
@@ -100,6 +114,17 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 md.SetSelectedIndices(selectedIndexes.Select(i => new Java.Lang.Integer(i)).ToArray());
             }
             md.Show();
+            return tcs.Task;
+        }
+
+        public static Task<int> ShowListDialog(Context context, int titleId, int itemsId)
+        {
+            var tcs = new TaskCompletionSource<int>();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(titleId);
+            builder.Items(itemsId);
+            builder.ItemsCallback(new ListCallback(i => tcs.SetResult(i)));
+            builder.Show();
             return tcs.Task;
         }
 
@@ -244,6 +269,23 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 if (action != null)
                     action(p1.Select(i => i.IntValue()).ToArray());
                 return true;
+            }
+        }
+
+        class ListCallback : Java.Lang.Object, MaterialDialog.IListCallback
+        {
+            readonly Action<int> action;
+
+            public ListCallback(Action<int> action)
+            {
+                this.action = action;
+            }
+
+            public void OnSelection(MaterialDialog p0, View p1, int p2, Java.Lang.ICharSequence p3)
+            {
+
+                if (action != null)
+                    action(p2);
             }
         }
 
