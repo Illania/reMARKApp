@@ -191,8 +191,11 @@ namespace Mark5.Mobile.Common
                 cts = null;
             }
 
-            await downloadTask;
-            downloadTask = null;
+            if (downloadTask != null)
+            {
+                await downloadTask;
+                downloadTask = null;
+            }
         }
 
         #endregion

@@ -435,8 +435,9 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var queryString = $"select {nameof(FolderContactLink.FolderId)} from {nameof(FolderContactLink)} where  {nameof(FolderContactLink.ContactId)}  " +
-                        $" not in (select {nameof(Contact.Id)} from {nameof(Contact)})";
+                    var queryString = $"select {nameof(FolderContactLink.FolderId)} " +
+                        $"from {nameof(FolderContactLink)} " +
+                        $"where {nameof(FolderContactLink.ContactId)} not in (select {nameof(Contact.Id)} from {nameof(Contact)})";
 
                     var result = c.Query<int>(queryString);
 
