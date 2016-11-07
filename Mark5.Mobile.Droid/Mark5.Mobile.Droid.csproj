@@ -118,9 +118,6 @@
     <Reference Include="materialprogressbar">
       <HintPath>..\lib\materialprogressbar.dll</HintPath>
     </Reference>
-    <Reference Include="caligraphy_bindings">
-      <HintPath>..\lib\caligraphy_bindings.dll</HintPath>
-    </Reference>
     <Reference Include="Xamarin.Android.Support.v14.Preference">
       <HintPath>..\packages\Xamarin.Android.Support.v14.Preference.23.4.0.1\lib\MonoAndroid41\Xamarin.Android.Support.v14.Preference.dll</HintPath>
     </Reference>
@@ -168,7 +165,6 @@
     <Compile Include="Utilities\PortableConcurrentQueue.cs" />
     <Compile Include="Ui\Fragments\FoldersListFragment.cs" />
     <Compile Include="Ui\Activities\MainActivity.cs" />
-    <Compile Include="Ui\Common\BaseAppCompatActivity.cs" />
     <Compile Include="Ui\Fragments\PreferenceFragment.cs" />
     <Compile Include="Utilities\Preferences.cs" />
     <Compile Include="Utilities\Integration.cs" />
@@ -190,7 +186,6 @@
     <Compile Include="Ui\Fragments\ShortcodesListFragment.cs" />
     <Compile Include="Ui\Activities\ShortcodesListActivity.cs" />
     <Compile Include="Ui\Activities\ContactActivity.cs" />
-    <Compile Include="Ui\Fragments\ContactViewFragment.cs" />
     <Compile Include="Ui\Views\ContactViews\BaseSubviews\CommunicationCardSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\BaseSubviews\DescriptionCardSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\DescriptionSubview.cs" />
@@ -211,7 +206,6 @@
     <Compile Include="Ui\Views\ContactViews\ResponsibleSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\ShortIdSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\LinkedContactSubview.cs" />
-    <Compile Include="Utilities\ViewUtilities.cs" />
     <Compile Include="Ui\Views\ContactViews\BaseSubviews\ContactView.cs" />
     <Compile Include="Ui\Views\ContactViews\HeaderViews\ContactHeaderView.cs" />
     <Compile Include="Ui\Views\ContactViews\HeaderViews\ContactHeaderViewBehavior.cs" />
@@ -248,6 +242,72 @@
     <Compile Include="Ui\Common\BusMesseges\EntityMovedFromFolderMessage.cs" />
     <Compile Include="Ui\Fragments\CopyMoveToFolderListFragment.cs" />
     <Compile Include="Ui\Fragments\FolderPickerListFragment.cs" />
+    <Compile Include="Ui\Fragments\ContactFragment.cs" />
+    <Compile Include="Ui\Common\ViewUtilities.cs" />
+    <Compile Include="Ui\Common\CustomArrayAdapter.cs" />
+    <Compile Include="Ui\Fragments\ContactsSearchCriteriaFragment.cs" />
+    <Compile Include="Ui\Fragments\ContactsSearchResultsFragment.cs" />
+    <Compile Include="Ui\Fragments\DocumentsSearchCriteriaFragment.cs" />
+    <Compile Include="Ui\Fragments\DocumentsSearchResultsFragment.cs" />
+    <Compile Include="Ui\Fragments\SearchFragment.cs" />
+    <Compile Include="Ui\Fragments\ShortcodesSearchCriteriaFragment.cs" />
+    <Compile Include="Ui\Fragments\ShortcodesSearchResultsFragment.cs" />
+    <Compile Include="Ui\Activities\SearchResultsActivity.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractButtonSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractCategoriesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractCheckboxSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractDateRangeSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractEditTextSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractFoldersSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractMultiChoiceSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractMustHaveCategoriesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractSingleChoiceSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractSpinnerEditTextSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactCategoriesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactComAddressSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactCommentSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactDescriptionSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactFirstNameSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactFoldersSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactLastNameSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactLedgerSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactMustHaveCategoriesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactNameSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactPostAddressSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactResponsibleSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactShortIdSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactTypeSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactVatSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentAttachmentNamesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentCategoriesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentCommentsSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentDirectionsSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentExtraFieldsSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentFoldersSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentFromToSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentHandledSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentLinesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentMustHaveCategoriesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentPartialWordsSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentPrioritiesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentReceivedDateRangeSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentReferenceNumberSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentSearchInAttachmentsSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentSubjectMessageSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentUnreadOnlySearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentWithAttachmentsOnlySearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\MaxContactsSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\MaxDocumentsSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\MaxShortcodesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ShortcodeAddressSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ShortcodeDescriptionSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ShortcodeFoldersSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ShortcodeNameSearchView.cs" />
+    <Compile Include="Utilities\LambdaEqualityComparer.cs" />
+    <Compile Include="Ui\Activities\CopyToUserWorktrayActivity.cs" />
+    <Compile Include="Ui\Fragments\CopyToUserWorktrayFragment.cs" />
+    <Compile Include="Utilities\SystemReportCollector.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -260,7 +320,6 @@
     <AndroidResource Include="Resources\values\strings.axml" />
     <AndroidResource Include="Resources\values\style.axml" />
     <AndroidResource Include="Resources\layout\activity_login.axml" />
-    <AndroidResource Include="Resources\layout\activity_main.axml" />
     <AndroidResource Include="Resources\values\color.axml" />
     <AndroidResource Include="Resources\layout\drawer_header.axml" />
     <AndroidResource Include="Resources\values\dimens.axml" />
@@ -369,12 +428,10 @@
     <AndroidResource Include="Resources\drawable\line_divider.axml" />
     <AndroidResource Include="Resources\layout\list_item_shortcodes.axml" />
     <AndroidResource Include="Resources\values\plurals.xml" />
-    <AndroidResource Include="Resources\layout\linear_layout.axml" />
     <AndroidResource Include="Resources\drawable-hdpi\email.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\email.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\email.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\email.png" />
-    <AndroidResource Include="Resources\layout\base_layout_collapsing.axml" />
     <AndroidResource Include="Resources\drawable\rounded_background.xml" />
     <AndroidResource Include="Resources\xml\filepaths.xml" />
     <AndroidResource Include="Resources\layout\list_item_comments.axml" />
@@ -383,9 +440,16 @@
     <AndroidResource Include="Resources\drawable-xhdpi\send.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\send.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\send.png" />
-    <AndroidResource Include="Resources\layout\linear_layout_nested.axml" />
     <AndroidResource Include="Resources\layout\list_item_categories.axml" />
     <AndroidResource Include="Resources\layout\list_item_documents_external.axml" />
+    <AndroidResource Include="Resources\layout\base_layout_contact.axml" />
+    <AndroidResource Include="Resources\layout\base_layout_nav.axml" />
+    <AndroidResource Include="Resources\layout\linear_layout_contact.axml" />
+    <AndroidResource Include="Resources\layout\linear_layout_with_button.axml" />
+    <AndroidResource Include="Resources\layout\linear_layout_with_progress.axml" />
+    <AndroidResource Include="Resources\layout\pager.axml" />
+    <AndroidResource Include="Resources\layout\list_item_system_user.axml" />
+    <AndroidResource Include="Resources\layout\list_with_button.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

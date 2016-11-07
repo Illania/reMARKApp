@@ -23,7 +23,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid
 {
-    public class AvailableCategoriesListFragment : RetainableStateFragment, View.IOnClickListener, SearchView.IOnQueryTextListener, SearchView.IOnCloseListener
+    public class AvailableCategoriesListFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         public BusinessEntityPreview BusinessEntityPreview
         {
@@ -63,8 +63,6 @@ namespace Mark5.Mobile.Droid
 
             HasOptionsMenu = true;
 
-            ((BaseAppCompatActivity)Activity).SupportActionBar.SetDisplayHomeAsUpEnabled(false);
-
             return rootView;
         }
 
@@ -96,11 +94,10 @@ namespace Mark5.Mobile.Droid
             item.SetShowAsAction(ShowAsAction.Always);
 
             var searchItem = menu.FindItem(Resource.Id.action_search);
+            MenuItemCompat.SetOnActionExpandListener(searchItem, this);
             searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
             searchView.QueryHint = GetString(Resource.String.filter);
-            searchView.SetOnSearchClickListener(this);
             searchView.SetOnQueryTextListener(this);
-            searchView.SetOnCloseListener(this);
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -220,17 +217,33 @@ namespace Mark5.Mobile.Droid
 
         #endregion
 
-        #region Search
+        #region Filtering
 
-        public void OnClick(View v)
+        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
-            if (v == searchView)
+            if (item.ItemId == Resource.Id.action_search)
             {
                 recyclerView.SwapAdapter(searchAdapter, true);
+                return true;
             }
+
+            return false;
         }
 
-        public bool OnQueryTextChange(string newText)
+        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
+        {
+            if (item.ItemId == Resource.Id.action_search)
+            {
+                searchHandler.RemoveCallbacksAndMessages(null);
+                searchAdapter.Clear();
+                recyclerView.SwapAdapter(adapter, true);
+                return true;
+            }
+
+            return false;
+        }
+
+        bool SearchView.IOnQueryTextListener.OnQueryTextChange(string newText)
         {
             searchHandler.RemoveCallbacksAndMessages(null);
             searchHandler.PostDelayed(() =>
@@ -247,16 +260,8 @@ namespace Mark5.Mobile.Droid
             return false;
         }
 
-        public bool OnQueryTextSubmit(string newText)
+        bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string newText)
         {
-            return false;
-        }
-
-        public bool OnClose()
-        {
-            searchHandler.RemoveCallbacksAndMessages(null);
-            searchAdapter.Clear();
-            recyclerView.SwapAdapter(adapter, true);
             return false;
         }
 

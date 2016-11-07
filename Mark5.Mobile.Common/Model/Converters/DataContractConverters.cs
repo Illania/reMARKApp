@@ -10,6 +10,7 @@ using System.Linq;
 using Mark5.Mobile.Common.Extensions;
 using DataContract = Mark5.ServiceReference.DataContract;
 using System.Collections.Generic;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Common.Model.Converters
 {
@@ -34,7 +35,7 @@ namespace Mark5.Mobile.Common.Model.Converters
             {
                 Id = ad.Id,
                 Name = ad.Name,
-                SizeInBytes = ad.SizeInBytes,
+                SizeInBytes = ad.SizeInBytes
             };
         }
 
@@ -46,8 +47,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Guid = ca.Guid,
                 Subject = ca.Subject,
                 Location = ca.Location,
-                StartDate = DateTime.SpecifyKind(ca.StartDate, DateTimeKind.Utc),
-                EndDate = DateTime.SpecifyKind(ca.EndDate, DateTimeKind.Utc),
+                StartDateTimestamp = ca.StartDate.ConvertDateTimeToTimestampMilliseconds(),
+                EndDateTimestamp = ca.EndDate.ConvertDateTimeToTimestampMilliseconds(),
                 AllDay = ca.AllDay,
                 Private = ca.Private,
                 Category = ca.Category?.Convert(),
@@ -56,8 +57,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Creator = ca.Creator,
                 Priority = ca.Priority.ConvertEnum<Priority>(),
                 Type = ca.Type.ConvertEnum<CalendarOccurenceType>(),
-                ReminderDate = DateTime.SpecifyKind(ca.ReminderDate, DateTimeKind.Utc),
-                SnoozeDelay = ca.SnoozeDelay,
+                ReminderDateTimestamp = ca.ReminderDate.ConvertDateTimeToTimestampMilliseconds(),
+                SnoozeDelay = ca.SnoozeDelay
             };
 
             if (ca.Resources != null)
@@ -75,22 +76,22 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Id = ca.Id,
                 Guid = ca.Guid,
                 Subject = ca.Subject,
-                StartDate = DateTime.SpecifyKind(ca.StartDate, DateTimeKind.Utc),
-                EndDate = DateTime.SpecifyKind(ca.EndDate, DateTimeKind.Utc),
+                StartDateTimestamp = ca.StartDate.ConvertDateTimeToTimestampMilliseconds(),
+                EndDateTimestamp = ca.EndDate.ConvertDateTimeToTimestampMilliseconds(),
                 Private = ca.Private,
                 Status = ca.Status.ConvertEnum<TaskStatus>(),
                 CreatorId = ca.CreatorId,
                 Creator = ca.Creator,
                 Priority = ca.Priority.ConvertEnum<Priority>(),
                 Type = ca.Type.ConvertEnum<CalendarOccurenceType>(),
-                ReminderDate = DateTime.SpecifyKind(ca.ReminderDate, DateTimeKind.Utc),
+                ReminderDateTimestamp = ca.ReminderDate.ConvertDateTimeToTimestampMilliseconds(),
                 SnoozeDelay = ca.SnoozeDelay,
                 PercentComplete = ca.PercentComplete,
                 LinkedObjectId = ca.ObjectId,
                 LinkedObjectType = ca.ObjectType.ConvertEnum<ObjectType>(),
                 DelegatorId = ca.DelegatorId,
                 Delegator = ca.Delegator,
-                DelegationStatus = ca.DelegationStatus.ConvertEnum<DelegationStatus>(),
+                DelegationStatus = ca.DelegationStatus.ConvertEnum<DelegationStatus>()
             };
 
             if (ca.UserIds != null)
@@ -163,7 +164,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Id = c.Id,
                 Guid = c.Guid,
                 Content = c.Content,
-                DateAdded = DateTime.SpecifyKind(c.DateAdded, DateTimeKind.Utc),
+                DateAddedTimestamp = c.DateAdded.ConvertDateTimeToTimestampMilliseconds(),
                 ParentId = c.ParentId,
                 ParentTypeId = c.ParentTypeId,
                 UserId = c.UserId,
@@ -192,7 +193,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Patronymic = c.Patronymic,
                 LastName = c.LastName,
                 Account = c.Account,
-                BirthDate = DateTime.SpecifyKind(c.BirthDate, DateTimeKind.Utc),
+                BirthDateTimestamp = c.BirthDate.ConvertDateTimeToTimestampMilliseconds(),
                 Ledger = c.Ledger,
                 Vat = c.Vat,
                 WebPageAddress = c.WebPageAddress,
@@ -370,7 +371,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 IsReadByCurrent = dp.IsReadByCurrent,
                 CommentsCount = dp.CommentsCount,
                 AttachmentsCount = dp.AttachmentsCount,
-                DateReceived = DateTime.SpecifyKind(dp.DateReceived, DateTimeKind.Utc),
+                DateReceivedTimestamp = dp.DateReceived.ConvertDateTimeToTimestampMilliseconds(),
                 CreatorId = dp.CreatorId,
                 Creator = dp.Creator
             };
@@ -419,12 +420,12 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Guid = n.Guid,
                 Title = n.Title,
                 Message = n.Message,
-                DateTime = DateTime.SpecifyKind(n.DateTime, DateTimeKind.Utc),
+                DateTimeTimestamp = n.DateTime.ConvertDateTimeToTimestampMilliseconds(),
                 Type = n.Type.ConvertEnum<EventType>(),
                 FolderId = n.FolderId,
                 ObjectId = n.ObjectId,
                 ObjectType = n.ObjectType.ConvertEnum<ObjectType>(),
-                RemindOn = DateTime.SpecifyKind(n.RemindOn, DateTimeKind.Utc),
+                RemindOnTimestamp = n.RemindOn.ConvertDateTimeToTimestampMilliseconds(),
                 IsSilent = n.IsSilent
             };
         }
@@ -435,7 +436,7 @@ namespace Mark5.Mobile.Common.Model.Converters
             {
                 Id = oa.Id,
                 Description = oa.Description,
-                ActionTime = DateTime.SpecifyKind(oa.ActionTime, DateTimeKind.Utc),
+                ActionTimeTimestamp = oa.ActionTime.ConvertDateTimeToTimestampMilliseconds(),
                 ActionType = oa.ActionType,
                 ActionTypeId = oa.ActionTypeId,
                 ActionTypeGid = oa.ActionTypeGid,
@@ -499,7 +500,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Status = p.Status.ConvertEnum<ParticipantStatus>(),
                 CN = p.CN,
                 Customer = p.Customer,
-                Note = p.Note,
+                Note = p.Note
             };
         }
 
@@ -690,7 +691,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Attachments = doc.Attachments.Select(Convert).ToList(),
                 Comments = doc.Comments.Select(Convert).ToList(),
                 ExtraFields = doc.ExtraFields.ToDictionary(kv => kv.Key.Convert(), kv => kv.Value),
-                IsEncrypted = doc.IsEncrypted,
+                IsEncrypted = doc.IsEncrypted
             };
 
         }
@@ -726,7 +727,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Guid = c.Guid,
                 Name = c.Name,
                 Description = c.Description,
-                HexColor = c.HexColor,
+                HexColor = c.HexColor
             };
         }
 
@@ -743,7 +744,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 WebPageAddress = c.WebPageAddress,
                 Account = c.Account,
                 Vat = c.Vat,
-                BirthDate = c.BirthDate.ConvertToUTC(),
+                BirthDate = c.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
                 Ledger = c.Ledger,
                 PrimaryPerson = c.PrimaryPerson.Convert(),
                 Children = c.Children.Select(ch => ch.Convert()).ToList(),
@@ -752,7 +753,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 PreferrableType = c.PreferrableType.ConvertEnum<DataContract.CommunicationAddressType>(),
                 CommunicationAddresses = c.CommunicationAddresses.Select(ca => ca.Convert()).ToList(),
                 PhysicalAddresses = c.PhysicalAddresses.Select(pa => pa.Convert()).ToList(),
-                Comments = c.Comments.Select(co => co.Convert()).ToList(),
+                Comments = c.Comments.Select(co => co.Convert()).ToList()
             };
         }
 
@@ -770,7 +771,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Type = cp.Type.ConvertEnum<DataContract.ContactType>(),
                 Categories = cp.Categories.Select(ca => ca.Convert()).ToList(),
                 PrimaryAddress = cp.PrimaryAddress.Convert(),
-                CommentsCount = cp.CommentsCount,
+                CommentsCount = cp.CommentsCount
             };
         }
 
@@ -782,8 +783,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Guid = ca.Guid,
                 Subject = ca.Subject,
                 Location = ca.Location,
-                StartDate = ca.StartDate.ConvertToUTC(),
-                EndDate = ca.EndDate.ConvertToUTC(),
+                StartDate = ca.StartDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                EndDate = ca.EndDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
                 AllDay = ca.AllDay,
                 Private = ca.Private,
                 Category = ca.Category?.Convert(),
@@ -792,10 +793,10 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Creator = ca.Creator,
                 Priority = ca.Priority.ConvertEnum<DataContract.Priority>(),
                 Type = ca.Type.ConvertEnum<DataContract.CalendarOccurenceType>(),
-                ReminderDate = ca.ReminderDate.ConvertToUTC(),
+                ReminderDate = ca.ReminderDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
                 SnoozeDelay = ca.SnoozeDelay,
                 Resources = ca.Resources.Select(r => r.Convert()).ToList(),
-                Participants = ca.Participants.Select(p => p.Convert()).ToList(),
+                Participants = ca.Participants.Select(p => p.Convert()).ToList()
             };
         }
 
@@ -806,15 +807,15 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Id = ca.Id,
                 Guid = ca.Guid,
                 Subject = ca.Subject,
-                StartDate = ca.StartDate.ConvertToUTC(),
-                EndDate = ca.EndDate.ConvertToUTC(),
+                StartDate = ca.StartDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                EndDate = ca.EndDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
                 Private = ca.Private,
                 Status = ca.Status.ConvertEnum<DataContract.TaskStatus>(),
                 CreatorId = ca.CreatorId,
                 Creator = ca.Creator,
                 Priority = ca.Priority.ConvertEnum<DataContract.Priority>(),
                 Type = ca.Type.ConvertEnum<DataContract.CalendarOccurenceType>(),
-                ReminderDate = ca.ReminderDate.ConvertToUTC(),
+                ReminderDate = ca.ReminderDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
                 SnoozeDelay = ca.SnoozeDelay,
                 PercentComplete = ca.PercentComplete,
                 ObjectId = ca.LinkedObjectId,
@@ -825,7 +826,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 UserIds = ca.UserIds,
                 Users = ca.Users,
                 DepartmentIds = ca.DepartmentIds,
-                Departments = ca.Departments,
+                Departments = ca.Departments
             };
         }
 
@@ -851,7 +852,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Status = p.Status.ConvertEnum<DataContract.ParticipantStatus>(),
                 CN = p.CN,
                 Customer = p.Customer,
-                Note = p.Note,
+                Note = p.Note
             };
         }
 
@@ -862,7 +863,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Type = ca.Type.ConvertEnum<DataContract.CommunicationAddressType>(),
                 Description = ca.Description,
                 Address = ca.Address,
-                IsPrimary = ca.IsPrimary,
+                IsPrimary = ca.IsPrimary
             };
         }
 
@@ -875,7 +876,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Street = pa.Street,
                 ZipCode = pa.ZipCode,
                 Area = pa.Area,
-                City = pa.City,
+                City = pa.City
             };
         }
 
@@ -885,7 +886,7 @@ namespace Mark5.Mobile.Common.Model.Converters
             {
                 Id = pat.Id,
                 Name = pat.Name,
-                Description = pat.Description,
+                Description = pat.Description
             };
         }
 
@@ -898,7 +899,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 TelexPrefix = ci.TelexPrefix,
                 CCode = ci.CCode,
                 CCode3 = ci.CCode3,
-                Name = ci.Name,
+                Name = ci.Name
             };
         }
 
@@ -909,7 +910,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Id = c.Id,
                 Guid = c.Guid,
                 Content = c.Content,
-                DateAdded = c.DateAdded.ConvertToUTC(),
+                DateAdded = c.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime(),
                 ParentId = c.ParentId,
                 ParentTypeId = c.ParentTypeId,
                 UserId = c.UserId,
@@ -923,7 +924,7 @@ namespace Mark5.Mobile.Common.Model.Converters
             {
                 Guid = line.Guid,
                 Name = line.Name,
-                FromAddress = line.FromAddress,
+                FromAddress = line.FromAddress
             };
         }
 
@@ -959,7 +960,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Type = da.Type.ConvertEnum<DataContract.CommunicationAddressType>(),
                 AddressType = da.AddressType.ConvertEnum<DataContract.DocumentAddressType>(),
                 Address = da.Address,
-                FullAddress = da.FullAddress,
+                FullAddress = da.FullAddress
             };
         }
 
@@ -973,20 +974,6 @@ namespace Mark5.Mobile.Common.Model.Converters
         }
 
         #endregion
-
-        public static DateTime ConvertToUTC(this DateTime dt)
-        {
-            if (dt.Kind == DateTimeKind.Unspecified)
-            {
-                return DateTime.SpecifyKind(dt, DateTimeKind.Utc);
-            }
-            if (dt.Kind == DateTimeKind.Local)
-            {
-                return dt.ToUniversalTime();
-            }
-
-            return dt;
-        }
 
     }
 }

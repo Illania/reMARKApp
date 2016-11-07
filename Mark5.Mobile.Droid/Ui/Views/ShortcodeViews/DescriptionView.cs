@@ -10,7 +10,7 @@ using Android.Graphics;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
-using Mark5.Mobile.Droid.Utilities;
+using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
 {

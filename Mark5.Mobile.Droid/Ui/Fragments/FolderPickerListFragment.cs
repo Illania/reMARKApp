@@ -107,15 +107,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Filtering 
 
-        override public void OnClick(View v)
+        override public bool OnMenuItemActionExpand(IMenuItem item)
         {
-            if (v == SearchView)
+            if (item.ItemId == Resource.Id.action_search)
             {
                 SearchEnabled = true;
                 RefreshLayout.Enabled = false;
                 RecyclerView.SwapAdapter(SearchAdapter, true);
+                return true;
             }
+
+            return false;
         }
+
         override public bool OnQueryTextChange(string newText)
         {
             SearchHandler.RemoveCallbacksAndMessages(null);

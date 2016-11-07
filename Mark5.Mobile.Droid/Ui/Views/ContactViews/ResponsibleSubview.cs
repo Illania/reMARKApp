@@ -19,7 +19,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         public ResponsibleSubview(Context context) : base(context)
         {
             Title = "Responsible Users";
-            iconImageView.SetImageResource(Resource.Drawable.email);
+            IconImageView.SetImageResource(Resource.Drawable.email);
         }
 
         public override void RefreshView()
@@ -28,11 +28,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             {
                 Visibility = ViewStates.Visible;
 
-                contentLayout.RemoveAllViews();
+                ContentLayout.RemoveAllViews();
                 foreach (var id in Contact.ResponsibleUserIds)
                 {
                     var subsubview = new ResponsibleSubSubview(Context, this, id, Contact.ResponsibleUsers[id]);
-                    contentLayout.AddView(subsubview);
+                    ContentLayout.AddView(subsubview);
                 }
             }
             else

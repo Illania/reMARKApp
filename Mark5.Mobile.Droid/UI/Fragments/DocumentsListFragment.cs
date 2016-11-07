@@ -20,26 +20,30 @@ using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
-using Android.Text.Format;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
 
-    public class DocumentsListFragment : RetainableStateFragment, ActionMode.ICallback, View.IOnClickListener, SearchView.IOnQueryTextListener, SearchView.IOnCloseListener
+    public class DocumentsListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
 
         const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
 
         public Folder Folder { get; set; }
+
+        DocumentsListAdapter CurrentAdapter
+        {
+            get { return (DocumentsListAdapter)recyclerView.GetAdapter(); }
+        }
 
         bool refreshing;
 
@@ -50,11 +54,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         DocumentsListAdapter searchAdapter;
         ActionMode actionMode;
         SearchView searchView;
-
-        DocumentsListAdapter CurrentAdapter
-        {
-            get { return (DocumentsListAdapter)recyclerView.GetAdapter(); }
-        }
 
         bool shouldNotifyAdapter;
         bool shouldNotifySearchAdapter;
@@ -168,11 +167,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
             var searchItem = menu.FindItem(Resource.Id.action_search);
+            MenuItemCompat.SetOnActionExpandListener(searchItem, this);
             searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
             searchView.QueryHint = GetString(Resource.String.filter);
-            searchView.SetOnSearchClickListener(this);
             searchView.SetOnQueryTextListener(this);
-            searchView.SetOnCloseListener(this);
         }
 
         #endregion
@@ -345,7 +343,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Action mode
 
-        public bool OnPrepareActionMode(ActionMode mode, IMenu menu)
+        bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
             menu.Clear();
 
@@ -401,28 +399,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return true;
         }
 
-        static class MenuItemActions
-        {
-            public const int MarkAsRead = 10;
-            public const int MarkAsUnread = 11;
-            public const int Reply = 20;
-            public const int ReplyAll = 21;
-            public const int Forward = 22;
-            public const int CopyToWorktray = 30;
-            public const int CopyToFolder = 40;
-            public const int MoveToFolder = 41;
-            public const int SetPriority = 50;
-            public const int Categories = 60;
-            public const int DeleteFromFolder = 70;
-            public const int Delete = 71;
-        }
-
-        public bool OnCreateActionMode(ActionMode mode, IMenu menu)
+        bool ActionMode.ICallback.OnCreateActionMode(ActionMode mode, IMenu menu)
         {
             return true;
         }
 
-        public bool OnActionItemClicked(ActionMode mode, IMenuItem item)
+        bool ActionMode.ICallback.OnActionItemClicked(ActionMode mode, IMenuItem item)
         {
             var selectedDocumentPreviews = CurrentAdapter.SelectedItems;
 
@@ -455,32 +437,85 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
+            if (item.ItemId == MenuItemActions.CopyToWorktray)
+            {
+                CopyToWorktrayAction();
+            }
 
             return base.OnOptionsItemSelected(item);
         }
 
-        public void OnDestroyActionMode(ActionMode mode)
+        void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
         {
             var currentAdapter = (DocumentsListAdapter)recyclerView.GetAdapter();
             currentAdapter.ClearSelections();
             actionMode = null;
         }
 
+        static class MenuItemActions
+        {
+            public const int MarkAsRead = 10;
+            public const int MarkAsUnread = 11;
+            public const int Reply = 20;
+            public const int ReplyAll = 21;
+            public const int Forward = 22;
+            public const int CopyToWorktray = 30;
+            public const int CopyToFolder = 40;
+            public const int MoveToFolder = 41;
+            public const int SetPriority = 50;
+            public const int Categories = 60;
+            public const int DeleteFromFolder = 70;
+            public const int Delete = 71;
+        }
+
+        async void CopyToWorktrayAction()
+        {
+            var option = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_worktray, Resource.Array.copy_to_worktray_options);
+
+            if (option == 0)
+            {
+
+            }
+
+            if (option == 1)
+            {
+
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
+            }
+        }
+
         #endregion
 
         #region Filtering
 
-        void View.IOnClickListener.OnClick(View v)
+        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
-            if (v == searchView)
+            if (item.ItemId == Resource.Id.action_search)
             {
                 refreshLayout.Enabled = false;
                 adapter.ClearSelections();
                 recyclerView.SwapAdapter(searchAdapter, true);
+                return true;
             }
+
+            return false;
         }
 
-        public bool OnQueryTextChange(string newText)
+        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
+        {
+            if (item.ItemId == Resource.Id.action_search)
+            {
+                searchHandler.RemoveCallbacksAndMessages(null);
+                searchAdapter.Clear();
+                recyclerView.SwapAdapter(adapter, true);
+                refreshLayout.Enabled = true;
+                return true;
+            }
+
+            return false;
+        }
+
+        bool SearchView.IOnQueryTextListener.OnQueryTextChange(string newText)
         {
             searchHandler.RemoveCallbacksAndMessages(null);
             searchHandler.PostDelayed(() =>
@@ -497,17 +532,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return false;
         }
 
-        public bool OnQueryTextSubmit(string query)
+        bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string query)
         {
-            return false;
-        }
-
-        public bool OnClose()
-        {
-            searchHandler.RemoveCallbacksAndMessages(null);
-            searchAdapter.Clear();
-            recyclerView.SwapAdapter(adapter, true);
-            refreshLayout.Enabled = true;
             return false;
         }
 
@@ -645,6 +671,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class DocumentsListAdapter : RecyclerView.Adapter
         {
+
             public static class ViewType
             {
                 public const int DocumentView = 0;
@@ -691,6 +718,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public event EventHandler<DocumentPreview> ItemClicked = delegate { };
             public event EventHandler<DocumentPreview> ItemLongClicked = delegate { };
 
+            bool unreadIndicatorMe = PlatformConfig.Preferences.UnreadIndicatorMe;
+            bool compactList = PlatformConfig.Preferences.CompactDocumentsList;
+
             public DocumentsListAdapter(Context context)
             {
                 this.context = context;
@@ -728,31 +758,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         dpvh.Recipent = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
                     }
 
-                    var dateReceived = dp.DateReceived.ToServerTime();
-                    if (DateTime.Now.Date == dateReceived.Date)
-                    {
-                        dpvh.Date = DateFormat.Is24HourFormat(context) ? dateReceived.ToString("HH:mm") : dateReceived.ToString("hh:mm tt");
-                    }
-                    else if (DateTime.Now.AddDays(-1).Date == dateReceived.Date)
-                    {
-                        dpvh.Date = context.GetString(Resource.String.yesterday);
-                    }
-                    else
-                    {
-                        var dfo = DateFormat.GetDateFormatOrder(context);
-                        dpvh.Date = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
-                    }
-
                     dpvh.Subject = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
+                    dpvh.Date = dp.DateReceivedTimestamp
+                        .ConvertTimestampMillisecondsToDateTime()
+                        .ConvertUtcToServerTime()
+                        .ConvertDateTimeToTimestampMilliseconds()
+                        .FormatServerTimestampAsCompactShortDateTimeString(context);
                     dpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                     dpvh.Categories = dp.Categories;
                     dpvh.IncomingIndicator = dp.Direction == DocumentDirection.Incoming;
                     dpvh.OutgoingIndicator = dp.Direction == DocumentDirection.Outgoing;
                     dpvh.DraftIndicator = dp.Direction == DocumentDirection.Draft;
-                    dpvh.UnreadIndicator = PlatformConfig.Preferences.UnreadIndicatorMe ? !dp.IsReadByCurrent : !dp.IsReadByAnyone;
+                    dpvh.UnreadIndicator = unreadIndicatorMe ? !dp.IsReadByCurrent : !dp.IsReadByAnyone;
                     dpvh.AttachmentIndicator = dp.AttachmentsCount > 0;
                     dpvh.CommentIndicator = dp.CommentsCount > 0;
 
+                    dpvh.Compact = compactList;
                     dpvh.Selected = selectedDocumentsInView.ContainsKey(dp.Id);
 
                     if (loadMoreAction != null && position == ItemCount - 1)
@@ -768,21 +789,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     edpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
                     edpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
 
-                    var dateReceived = dp.DateReceived.ToServerTime();
-                    if (DateTime.Now.Date == dateReceived.Date)
-                    {
-                        edpvh.Date = DateFormat.Is24HourFormat(context) ? dateReceived.ToString("HH:mm") : dateReceived.ToString("hh:mm tt");
-                    }
-                    else if (DateTime.Now.AddDays(-1).Date == dateReceived.Date)
-                    {
-                        edpvh.Date = context.GetString(Resource.String.yesterday);
-                    }
-                    else
-                    {
-                        var dfo = DateFormat.GetDateFormatOrder(context);
-                        edpvh.Date = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
-                    }
-
+                    edpvh.Date = dp.DateReceivedTimestamp
+                    .ConvertTimestampMillisecondsToDateTime()
+                    .ConvertUtcToServerTime()
+                    .ConvertDateTimeToTimestampMilliseconds()
+                    .FormatServerTimestampAsCompactShortDateTimeString(context);
                     edpvh.Name = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
                     edpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                     edpvh.Categories = dp.Categories;
@@ -804,11 +815,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_documents, parent, false);
                     return new DocumentPreviewViewHolder(itemView);
                 }
-                else //ExternalDocumentView
+
+                if (viewType == ViewType.ExternalDocumentView)
                 {
                     var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_documents_external, parent, false);
                     return new ExternalDocumentPreviewViewHolder(itemView);
                 }
+
+                return null;
             }
 
             public void PrependItems(List<DocumentPreview> items)
@@ -1004,6 +1018,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 set
                 {
                     commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
+                }
+            }
+
+            public bool Compact
+            {
+                set
+                {
+                    attachmentImageView.Visibility = value ? ViewStates.Gone : ViewStates.Visible;
+                    commentImageView.Visibility = value ? ViewStates.Gone : ViewStates.Visible;
+                    previewTextView.Visibility = value ? ViewStates.Gone : ViewStates.Visible;
                 }
             }
 

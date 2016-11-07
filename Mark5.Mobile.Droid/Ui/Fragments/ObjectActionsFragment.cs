@@ -47,7 +47,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"Creating {nameof(ObjectActionsFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity.objectType={BusinessEntity?.ObjectType}]...");
 
-            var rootView = inflater.Inflate(Resource.Layout.linear_layout, container, false);
+            var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
             rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
 
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
@@ -103,7 +103,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout.RemoveViews(0, linearLayout.ChildCount);
 
-            var grouppedObjectActions = objectActions.OrderBy(oa => oa.ActionType).ThenBy(oa => oa.ActionTime).GroupBy(oa => oa.ActionType);
+            var grouppedObjectActions = objectActions.OrderBy(oa => oa.ActionType).ThenBy(oa => oa.ActionTimeTimestamp).GroupBy(oa => oa.ActionType);
 
             foreach (var grouppedObjectAction in grouppedObjectActions)
             {

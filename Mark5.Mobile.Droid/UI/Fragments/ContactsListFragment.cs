@@ -31,7 +31,7 @@ using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
 
-    public class ContactsListFragment : RetainableStateFragment, ActionMode.ICallback, View.IOnClickListener, SearchView.IOnQueryTextListener, SearchView.IOnCloseListener
+    public class ContactsListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
 
         public Folder Folder
@@ -151,11 +151,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
             var searchItem = menu.FindItem(Resource.Id.action_search);
+            MenuItemCompat.SetOnActionExpandListener(searchItem, this);
             searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
             searchView.QueryHint = GetString(Resource.String.filter);
-            searchView.SetOnSearchClickListener(this);
             searchView.SetOnQueryTextListener(this);
-            searchView.SetOnCloseListener(this);
         }
 
         #endregion
@@ -344,7 +343,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Action mode
 
-        public bool OnPrepareActionMode(ActionMode mode, IMenu menu)
+        bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
             menu.Clear();
 
@@ -394,7 +393,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return true;
         }
 
-        public bool OnActionItemClicked(ActionMode mode, IMenuItem item)
+        bool ActionMode.ICallback.OnActionItemClicked(ActionMode mode, IMenuItem item)
         {
             var selectedContacts = CurrentAdapter.SelectedItems;
 
@@ -431,7 +430,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return base.OnOptionsItemSelected(item);
         }
 
-        public void OnDestroyActionMode(ActionMode mode)
+        void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
         {
             var currentAdapter = (ContactsListAdapter)recyclerView.GetAdapter();
             currentAdapter.ClearSelections();
@@ -442,17 +441,34 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Filtering
 
-        void View.IOnClickListener.OnClick(View v)
+        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
-            if (v == searchView)
+            if (item.ItemId == Resource.Id.action_search)
             {
                 refreshLayout.Enabled = false;
                 adapter.ClearSelections();
                 recyclerView.SwapAdapter(searchAdapter, true);
+                return true;
             }
+
+            return false;
         }
 
-        public bool OnQueryTextChange(string newText)
+        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
+        {
+            if (item.ItemId == Resource.Id.action_search)
+            {
+                searchHandler.RemoveCallbacksAndMessages(null);
+                searchAdapter.Clear();
+                recyclerView.SwapAdapter(adapter, true);
+                refreshLayout.Enabled = true;
+                return true;
+            }
+
+            return false;
+        }
+
+        bool SearchView.IOnQueryTextListener.OnQueryTextChange(string newText)
         {
             searchHandler.RemoveCallbacksAndMessages(null);
             searchHandler.PostDelayed(() =>
@@ -469,17 +485,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return false;
         }
 
-        public bool OnQueryTextSubmit(string query)
+        bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string query)
         {
-            return false;
-        }
-
-        public bool OnClose()
-        {
-            searchHandler.RemoveCallbacksAndMessages(null);
-            searchAdapter.Clear();
-            recyclerView.SwapAdapter(adapter, true);
-            refreshLayout.Enabled = true;
             return false;
         }
 
@@ -712,7 +719,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 set
                 {
                     nameTextView.Text = value;
-                    letterTextView.Text = value.Length > 1 ? value.Substring(0, 1).ToUpper() : " ";
+                    letterTextView.Text = value.SafeSubstring(0, 1).ToUpper();
 
                     var sd = new ShapeDrawable(new OvalShape());
                     sd.Paint.Color = new Color(ContextCompat.GetColor(ItemView.Context, colors[Math.Abs(value.GetHashCode() % colors.Length)]));

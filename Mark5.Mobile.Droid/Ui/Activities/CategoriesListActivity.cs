@@ -9,17 +9,19 @@
 using Android.App;
 using Android.Content;
 using Android.OS;
+using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid
 {
+
     [Activity]
-    public class CategoriesListActivity : BaseAppCompatActivity
+    public class CategoriesListActivity : AppCompatActivity
     {
+
         public const string BusinessEntityPreviewIntentKey = "BusinessEntityPreview_43dc8df1-dc88-4e39-81d6-59ea495c35ff";
         public const string CategoriesResultKey = "CategoriesResult_0b8c55ac-2dbe-441e-af92-daa330d040fe";
 

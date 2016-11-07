@@ -173,9 +173,11 @@
     <Compile Include="Managers\IShortcodesManager.cs" />
     <Compile Include="Managers\ISystemManager.cs" />
     <Compile Include="Model\ReadByValue.cs" />
-    <Compile Include="IDocumentsManager.cs" />
     <Compile Include="Utilities\AsyncHelpers.cs" />
     <Compile Include="Utilities\StringExtensions.cs" />
+    <Compile Include="Utilities\DateTimeUtils.cs" />
+    <Compile Include="Managers\IDocumentsManager.cs" />
+    <Compile Include="Storage\FileSystemStorageUpdater.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

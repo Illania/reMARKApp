@@ -24,7 +24,7 @@
 		<item name="windowNoTitle">true</item>
 		<item name="windowActionBar">false</item>
 	</style>
-	<style name="mark5spinner" parent="Widget.AppCompat.Spinner.Underlined" />
+	<style name="mark5spinner" parent="Widget.AppCompat.Spinner" />
 	<style name="mark5appbaroverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 	<style name="mark5popupoverlay" parent="ThemeOverlay.AppCompat.Light" />
 	<style name="mark5navheaderoverlay" parent="ThemeOverlay.AppCompat.Dark" />

@@ -56,8 +56,8 @@ namespace Mark5.Mobile.Common.Model
         [Column("Vat")]
         public string Vat { get; set; }
 
-        [Column("BirthDate")]
-        public DateTime BirthDate { get; set; }
+        [Column("BirthDateTimestamp")]
+        public long BirthDateTimestamp { get; set; } = -1;
 
         [Column("Ledger")]
         public string Ledger { get; set; }

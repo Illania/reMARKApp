@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: ObjectActionsActivity.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -8,19 +8,19 @@
 using System;
 using Android.App;
 using Android.OS;
+using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Activity]
-    public class ObjectActionsActivity : BaseAppCompatActivity
+    public class ObjectActionsActivity : AppCompatActivity
     {
 
         public const string BusinessEntityIntentKey = "BusinessEntity_ef8f3886-1478-4b4c-8bdb-7a6188035674";
@@ -44,11 +44,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var be = SerializationUtils.Deserialize<IBusinessEntity>(Intent.Extras.GetString(BusinessEntityIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                var dlf = new ObjectActionsFragment
+                var oaf = new ObjectActionsFragment
                 {
                     BusinessEntity = be
                 };
-                ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, oaf, oaf.GenerateTag());
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ObjectActionsActivity)}");

@@ -15,6 +15,8 @@ namespace Mark5.Mobile.Common.Managers
     public interface ISearchManager
     {
 
+        DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; }
+
         Task<List<SavedSearch>> GetSavedSearches(SourceType sourceType = SourceType.Auto);
 
         Task<SearchDocumentsResult> SearchDocumentsAsync(SearchDocumentsCriteria criteria, SourceType sourceType = SourceType.Auto);
@@ -27,11 +29,11 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<SearchCalendarAppointmentsResult> SearchCalendarAppointmentsAsync(SearchCalendarEventsCriteria criteria, SourceType sourceType = SourceType.Auto);
 
-        Task<Document> GetDocumentAsync(int searchId, int documentId, DocumentBodyTypeRequest bodyType, SourceType sourceType = SourceType.Auto);
+        Task<Document> GetDocumentAsync(int searchId, DocumentPreview documentPreview, SourceType sourceType = SourceType.Auto);
 
-        Task<Contact> GetContactAsync(int searchId, int contactId, SourceType sourceType = SourceType.Auto);
+        Task<Contact> GetContactAsync(int searchId, ContactPreview contactPreview, SourceType sourceType = SourceType.Auto);
 
-        Task<Shortcode> GetShortcodeAsync(int searchId, int shortcodeId, SourceType sourceType = SourceType.Auto);
+        Task<Shortcode> GetShortcodeAsync(int searchId, ShortcodePreview shortcodePreview, SourceType sourceType = SourceType.Auto);
 
         Task<CalendarTask> GetCalendarTaskAsync(int searchId, int taskId, SourceType sourceType = SourceType.Auto);
 

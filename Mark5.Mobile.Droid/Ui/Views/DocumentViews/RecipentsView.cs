@@ -10,16 +10,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
 using Android.Graphics;
-using Android.OS;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Text.Format;
-using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
@@ -414,24 +413,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                     line3.Text = string.Empty;
                 }
 
-                var dateReceived = DocumentPreview.DateReceived.ToServerTime();
-
-                string dateText;
-                if (DateTime.Now.Date == dateReceived.Date)
-                {
-                    dateText = Context.GetString(Resource.String.today);
-                }
-                else if (DateTime.Now.AddDays(-1).Date == dateReceived.Date)
-                {
-                    dateText = Context.GetString(Resource.String.yesterday);
-                }
-                else
-                {
-                    var dfo = DateFormat.GetDateFormatOrder(Context);
-                    dateText = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
-                }
-
-                line4.Text = dateText + ", " + (DateFormat.Is24HourFormat(Context) ? dateReceived.ToString("HH:mm") : dateReceived.ToString("hh:mm tt"));
+                line4.Text = DocumentPreview.DateReceivedTimestamp
+                    .ConvertTimestampMillisecondsToDateTime()
+                    .ConvertUtcToServerTime()
+                    .ConvertDateTimeToTimestampMilliseconds()
+                    .FormatServerTimestampAsCompactLongDateTimeString(Context);
             }
             else
             {
@@ -503,13 +489,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 tableRowReadBy.Visibility = string.IsNullOrWhiteSpace(readByText) ? ViewStates.Gone : ViewStates.Visible;
                 readByValue.Text = readByText;
 
-                var dateReceived = DocumentPreview.DateReceived.ToServerTime();
-                var dfo = DateFormat.GetDateFormatOrder(Context);
-                var dateText = dateReceived.ToString($"{dfo[0]}{dfo[0]}/{dfo[1]}{dfo[1]}/{dfo[2]}{dfo[2]}{dfo[2]}{dfo[2]}");
-                var timeText = (DateFormat.Is24HourFormat(Context) ? dateReceived.ToString("HH:mm") : dateReceived.ToString("hh:mm tt"));
-                var dateReceivedText = timeText + " " + dateText;
-                tableRowDateReceived.Visibility = string.IsNullOrWhiteSpace(dateReceivedText) ? ViewStates.Gone : ViewStates.Visible;
-                dateReceivedValue.Text = dateReceivedText;
+                var processedDateReceivedTimestamp = DocumentPreview.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime().ConvertDateTimeToTimestampMilliseconds();
+                tableRowDateReceived.Visibility = DocumentPreview.DateReceivedTimestamp < 0 ? ViewStates.Gone : ViewStates.Visible;
+                dateReceivedValue.Text = processedDateReceivedTimestamp.FormatServerTimestampAsTimeAndDateString(Context);
 
                 var creatorText = DocumentPreview.Creator;
                 tableRowCreator.Visibility = string.IsNullOrWhiteSpace(creatorText) ? ViewStates.Gone : ViewStates.Visible;

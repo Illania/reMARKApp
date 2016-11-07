@@ -30,8 +30,8 @@ namespace Mark5.Mobile.Common.Model
         [Column("Type")]
         public EventType Type { get; set; }
 
-        [Column("DateTime")]
-        public DateTime DateTime { get; set; }
+        [Column("DateTimeTimestamp")]
+        public long DateTimeTimestamp { get; set; } = -1;
 
         [Column("ObjectType")]
         public ObjectType ObjectType { get; set; }
@@ -42,8 +42,8 @@ namespace Mark5.Mobile.Common.Model
         [Column("FolderId")]
         public int FolderId { get; set; } = -1;
 
-        [Column("RemindOn")]
-        public DateTime RemindOn { get; set; }
+        [Column("RemindOnTimestamp")]
+        public long RemindOnTimestamp { get; set; } = -1;
 
         [Column("IsSilent")]
         public bool IsSilent { get; set; }

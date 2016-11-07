@@ -6,12 +6,12 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
-using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.Design.Widget;
+using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
@@ -25,7 +25,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
 {
 
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
-    public class LoginActivity : BaseAppCompatActivity
+    public class LoginActivity : AppCompatActivity
     {
 
         TextInputEditText usernameEditText;
@@ -58,9 +58,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
             portEditText = FindViewById<TextInputEditText>(Resource.Id.port_edit_text);
             portEditText.TextChanged += (sender, e) => portEditText.Error = null;
             sslSpinner = FindViewById<AppCompatSpinner>(Resource.Id.ssl_spinner);
-            var sslSpinnerAdapter = Android.Widget.ArrayAdapter.CreateFromResource(this, Resource.Array.ssl_modes, Android.Resource.Layout.SimpleSpinnerItem);
-            sslSpinnerAdapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
-            sslSpinner.Adapter = sslSpinnerAdapter;
+            sslSpinner.Adapter = CustomArrayAdapter.CreateWithLeftPaddingMatchingEditText(this, Resource.Array.ssl_modes, Android.Resource.Layout.SimpleSpinnerItem, Resource.Layout.support_simple_spinner_dropdown_item);
             loginButton = FindViewById<AppCompatButton>(Resource.Id.login_button);
             loginButton.Click += LoginButton_Click;
 
@@ -136,7 +134,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
                 {
                     CommonConfig.Logger.Info($"Invalid password was entered: {password}");
 
-                    passwordEditText.Error = GetText(Resource.String.passowrd_invalid);
+                    passwordEditText.Error = GetText(Resource.String.password_invalid);
                     errors = true;
                 }
                 if (!Validator.IsHostNameValid(hostname))
@@ -197,6 +195,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
                 Managers.Initialize(ci);
                 Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
                 Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 var policies = Managers.DownloadManager.DownloadPolicies;
                 policies[ObjectType.Document] = new DownloadFoldersPolicy();
                 if (PlatformConfig.Preferences.SynchroniseContacts)
@@ -230,10 +229,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
             }
             catch (Exception ex)
             {
-                if (dismissAction != null)
-                {
-                    dismissAction();
-                }
+                dismissAction();
 
                 CommonConfig.Logger.Error("Log in failed", ex);
 

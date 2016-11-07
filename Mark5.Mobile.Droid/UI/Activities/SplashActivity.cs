@@ -10,6 +10,7 @@ using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
+using Android.Support.V7.App;
 using Android.Views;
 using HockeyApp.Android;
 using Mark5.Mobile.Common;
@@ -17,9 +18,9 @@ using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Droid.Services;
 using Mark5.Mobile.Droid.Utilities.Hockey;
-using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Activity
 {
@@ -30,10 +31,8 @@ namespace Mark5.Mobile.Droid.Ui.Activity
               Theme = "@style/mark5Splash",
               ScreenOrientation = ScreenOrientation.Portrait,
               NoHistory = true)]
-    public class SplashActivity : BaseAppCompatActivity
+    public class SplashActivity : AppCompatActivity
     {
-
-        const string HockeyId = "137e2a4fb6384cb3a51de617dd2f5999";
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -57,8 +56,8 @@ namespace Mark5.Mobile.Droid.Ui.Activity
 
             CommonConfig.Logger.Info($"Starting {nameof(SplashActivity)}...");
 
-            CrashManager.Register(this, HockeyId, new CustomCrashManagerListener());
-            FeedbackManager.Register(this, HockeyId, new CustomFeedbackManagerLister());
+            CrashManager.Register(this, PlatformConfig.HockeyId, new CustomCrashManagerListener());
+            FeedbackManager.Register(this, PlatformConfig.HockeyId, new CustomFeedbackManagerLister());
             CrashManager.ResetAlwaysSend(new Java.Lang.Ref.WeakReference(this));
 
             Task.Run(async () =>
@@ -66,10 +65,20 @@ namespace Mark5.Mobile.Droid.Ui.Activity
                 var authenticator = AuthenticatorFactory.Create();
                 if (!await authenticator.IsAuthenticatedAsync())
                 {
+                    CommonConfig.Logger.Info($"Writing required file system storage version...");
+
+                    await FileSystemStorageUpdater.WriteRequiredStorageVersion();
+
                     CommonConfig.Logger.Info($"User was not authenticated - will present {nameof(LoginActivity)}");
 
                     return false;
                 }
+
+                CommonConfig.Logger.Info("Updating file system storage...");
+
+                var updated = await FileSystemStorageUpdater.UpdateStorage();
+
+                CommonConfig.Logger.Info(updated ? "File system storage updated" : "File system storage update not required");
 
                 CommonConfig.Logger.Info($"User is authenticated - initializing...");
 
@@ -92,6 +101,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
                 Managers.Initialize(ci);
                 Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
                 Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 var policies = Managers.DownloadManager.DownloadPolicies;
                 policies[ObjectType.Document] = new DownloadFoldersPolicy();
                 if (PlatformConfig.Preferences.SynchroniseContacts)

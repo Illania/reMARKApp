@@ -32,7 +32,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback, View.IOnClickListener, SearchView.IOnQueryTextListener, SearchView.IOnCloseListener
+    public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         public Folder Folder { get; set; }
         virtual public bool LocalSectionAvailable { get; set; } = true;
@@ -127,11 +127,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
             var searchItem = menu.FindItem(Resource.Id.action_search);
+            MenuItemCompat.SetOnActionExpandListener(searchItem, this);
             SearchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
             SearchView.QueryHint = GetString(Resource.String.filter);
-            SearchView.SetOnSearchClickListener(this);
             SearchView.SetOnQueryTextListener(this);
-            SearchView.SetOnCloseListener(this);
         }
 
         #endregion
@@ -582,18 +581,36 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Filtering 
 
-        virtual public void OnClick(View v)
+        virtual public bool OnMenuItemActionExpand(IMenuItem item)
         {
-            if (v == SearchView)
+            if (item.ItemId == Resource.Id.action_search)
             {
                 SearchEnabled = true;
                 RefreshLayout.Enabled = false;
                 Adapter.ClearSelections();
                 RecyclerView.SwapAdapter(SearchAdapter, true);
+                return true;
             }
+
+            return false;
         }
 
-        virtual public bool OnQueryTextChange(string newText)
+        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
+        {
+            if (item.ItemId == Resource.Id.action_search)
+            {
+                SearchHandler.RemoveCallbacksAndMessages(null);
+                SearchAdapter.Clear();
+                RecyclerView.SwapAdapter(Adapter, true);
+                RefreshLayout.Enabled = true;
+                SearchEnabled = false;
+                return true;
+            }
+
+            return false;
+        }
+
+        public virtual bool OnQueryTextChange(string newText)
         {
             SearchHandler.RemoveCallbacksAndMessages(null);
             SearchHandler.PostDelayed(() =>
@@ -613,15 +630,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public bool OnQueryTextSubmit(string query)
         {
-            return false;
-        }
-
-        virtual public bool OnClose()
-        {
-            SearchAdapter.Clear();
-            RecyclerView.SwapAdapter(Adapter, true);
-            RefreshLayout.Enabled = true;
-            SearchEnabled = false;
             return false;
         }
 
@@ -660,7 +668,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Folder = flfs.Folder;
                 recoveredSelectedItemsPosition = flfs.SelectedItemPositions;
 
-                CommonConfig.Logger.Info($"Restored state state: [folderName={Folder.Name}, folderId={Folder.Id}, selectedItemsCount={recoveredSelectedItemsPosition.Count} ]");
+                CommonConfig.Logger.Info($"Restored state state: [folderName={Folder.Name}, folderId={Folder.Id}, selectedItemsCount={recoveredSelectedItemsPosition.Count}]");
             }
         }
 

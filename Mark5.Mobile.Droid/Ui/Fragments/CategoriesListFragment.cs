@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Android.Graphics;
 using Android.Graphics.Drawables;
-using Android.Graphics.Drawables.Shapes;
 using Android.OS;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
@@ -21,10 +20,11 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid
 {
-    public class CategoriesListFragment : RetainableStateFragment, View.IOnClickListener, SearchView.IOnQueryTextListener, SearchView.IOnCloseListener
+    public class CategoriesListFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         public BusinessEntityPreview BusinessEntityPreview { get; set; }
         public List<Category> Categories
@@ -61,8 +61,6 @@ namespace Mark5.Mobile.Droid
 
             searchAdapter = new CategoriesListAdapter();
 
-            ((BaseAppCompatActivity)Activity).SupportActionBar.SetDisplayHomeAsUpEnabled(true);
-
             HasOptionsMenu = true;
 
             return rootView;
@@ -96,11 +94,10 @@ namespace Mark5.Mobile.Droid
             item.SetShowAsAction(ShowAsAction.Always);
 
             var searchItem = menu.FindItem(Resource.Id.action_search);
+            MenuItemCompat.SetOnActionExpandListener(searchItem, this);
             searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
             searchView.QueryHint = GetString(Resource.String.filter);
-            searchView.SetOnSearchClickListener(this);
             searchView.SetOnQueryTextListener(this);
-            searchView.SetOnCloseListener(this);
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -139,17 +136,33 @@ namespace Mark5.Mobile.Droid
         }
 
 
-        #region Search
+        #region Filtering
 
-        public void OnClick(View v)
+        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
-            if (v == searchView)
+            if (item.ItemId == Resource.Id.action_search)
             {
                 recyclerView.SwapAdapter(searchAdapter, true);
+                return true;
             }
+
+            return false;
         }
 
-        public bool OnQueryTextChange(string newText)
+        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
+        {
+            if (item.ItemId == Resource.Id.action_search)
+            {
+                searchHandler.RemoveCallbacksAndMessages(null);
+                searchAdapter.Clear();
+                recyclerView.SwapAdapter(adapter, true);
+                return true;
+            }
+
+            return false;
+        }
+
+        bool SearchView.IOnQueryTextListener.OnQueryTextChange(string newText)
         {
             searchHandler.RemoveCallbacksAndMessages(null);
             searchHandler.PostDelayed(() =>
@@ -166,16 +179,8 @@ namespace Mark5.Mobile.Droid
             return false;
         }
 
-        public bool OnQueryTextSubmit(string newText)
+        bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string newText)
         {
-            return false;
-        }
-
-        public bool OnClose()
-        {
-            searchHandler.RemoveCallbacksAndMessages(null);
-            searchAdapter.Clear();
-            recyclerView.SwapAdapter(adapter, true);
             return false;
         }
 
@@ -201,7 +206,7 @@ namespace Mark5.Mobile.Droid
         {
             return new CategoriesListFragmentState
             {
-                BusinessEntityPreview = BusinessEntityPreview,
+                BusinessEntityPreview = BusinessEntityPreview
             };
         }
 
@@ -343,10 +348,12 @@ namespace Mark5.Mobile.Droid
             {
                 set
                 {
-                    var sd = new ShapeDrawable(new OvalShape());
-                    sd.Paint.Color = Color.ParseColor(value);
+                    var gd = new GradientDrawable();
+                    gd.SetShape(ShapeType.Oval);
+                    gd.SetStroke(ConversionUtils.ConvertDpToPixels(1), Color.Black);
+                    gd.SetColor(Color.ParseColor(value));
 
-                    colorImageView.Background = sd;
+                    colorImageView.Background = gd;
                 }
             }
 

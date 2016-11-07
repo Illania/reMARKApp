@@ -31,7 +31,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class ContactViewFragment : RetainableStateFragment
+
+    public class ContactFragment : RetainableStateFragment
     {
         public static class RequestCodes
         {
@@ -39,11 +40,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public static int CategoriesRequest = 2;
         }
 
+        const float CardElevation = 2.0f;
+        const float CardRadius = 2.0f;
+
+        public int? FolderId { get; set; }
+        public Folder Folder { get; set; }
+        public int SearchId { get; set; }
+        public int? ContactId { get; set; }
         public ContactPreview ContactPreview { get; set; }
         public Contact Contact { get; set; }
-        public Folder Folder { get; set; }
-        public int? FolderId { get; set; }
-        public int? ContactId { get; set; }
+        public Action CloseRequest { get; set; }
+        public bool ReadOnlyMode { get; set; }
 
         ProgressBar progress;
         NestedScrollView scrollView;
@@ -55,14 +62,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         AppCompatTextView descriptionCardTitle;
 
-        const float cardElevation = 2.0f;
-        const float cardRadius = 2.0f;
-
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(ContactViewFragment)} [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}, ...");
+            CommonConfig.Logger.Info($"Creating {nameof(ContactFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, contact.id={ContactId ?? ContactPreview?.Id}, readOnlyMode={ReadOnlyMode} ...");
 
-            var rootView = inflater.Inflate(Resource.Layout.linear_layout_nested, container, false);
+            var rootView = inflater.Inflate(Resource.Layout.linear_layout_contact, container, false);
             rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
 
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
@@ -90,14 +94,81 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            CommonConfig.Logger.Info($"Created {nameof(ContactViewFragment)} [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}, ...");
+            CommonConfig.Logger.Info($"Created {nameof(ContactFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, contact.id={ContactId ?? ContactPreview?.Id}, readOnlyMode={ReadOnlyMode}...");
         }
 
         public override async void OnResume()
         {
             base.OnResume();
+
             await RefreshData();
         }
+
+        #region Options menu
+
+        static class MenuItemActions
+        {
+            public const int Categories = 10;
+            public const int Comments = 20;
+            public const int Actions = 30;
+            public const int Links = 40;
+        }
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            if (ReadOnlyMode) return;
+
+            menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
+            menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments);
+            menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.actions);
+            menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
+        }
+
+        public override void OnPrepareOptionsMenu(IMenu menu)
+        {
+            var commentsMenuItem = menu.FindItem(MenuItemActions.Comments);
+            commentsMenuItem?.SetEnabled(Contact != null);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == MenuItemActions.Categories)
+            {
+                var i = new Intent(Activity, typeof(CategoriesListActivity));
+                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(ContactPreview));
+                Activity.StartActivityForResult(i, RequestCodes.CategoriesRequest);
+
+                return true;
+            }
+            if (item.ItemId == MenuItemActions.Comments)
+            {
+                var i = new Intent(Activity, typeof(CommentsListActivity));
+                i.PutExtra(CommentsListActivity.EntityIntentKey, SerializationUtils.Serialize(Contact));
+                Activity.StartActivityForResult(i, RequestCodes.CommentsRequest);
+
+                return true;
+            }
+            if (item.ItemId == MenuItemActions.Actions)
+            {
+                var i = new Intent(Activity, typeof(ObjectActionsActivity));
+                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(ContactPreview));
+                StartActivity(i);
+
+                return true;
+            }
+            if (item.ItemId == MenuItemActions.Links)
+            {
+                var i = new Intent(Activity, typeof(ObjectLinksActivity));
+                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(ContactPreview));
+                StartActivity(i);
+
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
+        }
+
+        #endregion
 
         #region Card preparation
 
@@ -125,8 +196,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             communicationCardView = new CardView(Context);
             communicationCardView.Visibility = ViewStates.Gone;
-            communicationCardView.Elevation = cardElevation;
-            communicationCardView.Radius = cardRadius;
+            communicationCardView.Elevation = CardElevation;
+            communicationCardView.Radius = CardRadius;
             communicationCardView.UseCompatPadding = true;
 
             var communicationCardInternalLayout = new LinearLayoutCompat(Context);
@@ -148,8 +219,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             physicalAddressCardView = new CardView(Context);
             physicalAddressCardView.Visibility = ViewStates.Gone;
-            physicalAddressCardView.Elevation = cardElevation;
-            physicalAddressCardView.Radius = cardRadius;
+            physicalAddressCardView.Elevation = CardElevation;
+            physicalAddressCardView.Radius = CardRadius;
             physicalAddressCardView.UseCompatPadding = true;
 
             var physicalAddressCardInternalLayout = new LinearLayoutCompat(Context);
@@ -186,8 +257,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             descriptionCardView = new CardView(Context);
             descriptionCardView.Visibility = ViewStates.Gone;
-            descriptionCardView.Elevation = cardElevation;
-            descriptionCardView.Radius = cardRadius;
+            descriptionCardView.Elevation = CardElevation;
+            descriptionCardView.Radius = CardRadius;
             descriptionCardView.UseCompatPadding = true;
 
             var descriptionCardViewInternalLayout = new LinearLayoutCompat(Context);
@@ -207,156 +278,45 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-        #region Options menu
-
-
-        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
-        {
-            menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
-            menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
-
-            if (Folder.InternalType == FolderInternalType.FilterView
-                || Folder.InternalType == FolderInternalType.Static
-                || Folder.InternalType == FolderInternalType.Worktray)
-            {
-                menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
-            }
-            menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
-            menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments);
-            menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.actions);
-            menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
-
-            if (Folder.InternalType == FolderInternalType.FilterView
-                || Folder.InternalType == FolderInternalType.Static
-                || Folder.InternalType == FolderInternalType.Worktray)
-            {
-                menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
-            }
-
-            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
-                || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
-            {
-                menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
-            }
-        }
-
-        static class MenuItemActions
-        {
-            public const int CopyToWorktray = 30;
-            public const int CopyToFolder = 40;
-            public const int MoveToFolder = 41;
-            public const int Categories = 50;
-            public const int Comments = 60;
-            public const int Actions = 70;
-            public const int Links = 80;
-            public const int Delete = 90;
-            public const int DeleteFromFolder = 100;
-        }
-
-        public override void OnPrepareOptionsMenu(IMenu menu)
-        {
-            var commentsMenuItem = menu.FindItem(MenuItemActions.Comments);
-            commentsMenuItem.SetEnabled(Contact != null);
-        }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == MenuItemActions.CopyToFolder)
-            {
-                var i = new Intent(Activity, typeof(FolderListSelectionActivity));
-                i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.CopyToFolderMode);
-                i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
-                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity> { ContactPreview }));
-                StartActivity(i);
-
-                return true;
-            }
-            if (item.ItemId == MenuItemActions.MoveToFolder)
-            {
-                var i = new Intent(Activity, typeof(FolderListSelectionActivity));
-                i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.MoveToFolderMode);
-                i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
-                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity> { ContactPreview }));
-                i.PutExtra(FolderListSelectionActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
-                StartActivity(i);
-
-                return true;
-            }
-            if (item.ItemId == MenuItemActions.Categories)
-            {
-                var i = new Intent(Activity, typeof(CategoriesListActivity));
-                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(ContactPreview));
-                Activity.StartActivityForResult(i, RequestCodes.CategoriesRequest);
-
-                return true;
-            }
-            if (item.ItemId == MenuItemActions.Comments)
-            {
-                var i = new Intent(Activity, typeof(CommentsListActivity));
-                i.PutExtra(CommentsListActivity.EntityIntentKey, SerializationUtils.Serialize(Contact));
-                Activity.StartActivityForResult(i, RequestCodes.CommentsRequest);
-
-                return true;
-            }
-            if (item.ItemId == MenuItemActions.Actions)
-            {
-                var i = new Intent(Activity, typeof(ObjectActionsActivity));
-                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(ContactPreview as IBusinessEntity));
-                StartActivity(i);
-
-                return true;
-            }
-            if (item.ItemId == MenuItemActions.Links)
-            {
-                var i = new Intent(Activity, typeof(ObjectLinksActivity));
-                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(ContactPreview as IBusinessEntity));
-                StartActivity(i);
-
-                return true;
-            }
-
-            return base.OnOptionsItemSelected(item);
-        }
-
-        #endregion
-
         #region Refresh methods
 
         async Task RefreshData()
         {
-            if (ContactId.HasValue && ContactPreview == null && Contact == null)
+            try
             {
-                try
+                if (Folder != null || FolderId.HasValue)
                 {
-                    var container = await Managers.ContactsManager.GetContactWithPreviewAsync(FolderId.Value, ContactId.Value);
-                    Contact = container.Contact;
-                    ContactPreview = container.ContactPreview;
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error($"Downloading contact and contact preview failed [folderId={FolderId.Value}, contactId={ContactId.Value}]", ex);
-                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                    Activity.OnBackPressed();
-                    return;
-                }
-            }
+                    if (ContactId.HasValue && ContactPreview == null && Contact == null)
+                    {
+                        var container = await Managers.ContactsManager.GetContactWithPreviewAsync(FolderId ?? Folder.Id, ContactId.Value);
+                        ContactPreview = container.ContactPreview;
+                        Contact = container.Contact;
+                    }
 
-            if (ContactPreview != null && Contact == null)
+                    if (ContactPreview != null && Contact == null)
+                    {
+                        Contact = await Managers.ContactsManager.GetContactAsync(FolderId ?? Folder.Id, ContactPreview.Id);
+                    }
+                }
+
+                if (SearchId <= -999)
+                {
+                    if (ContactPreview != null && Contact == null)
+                    {
+                        Contact = await Managers.SearchManager.GetContactAsync(SearchId, ContactPreview);
+                    }
+                }
+
+                RefreshView();
+            }
+            catch (Exception ex)
             {
-                try
-                {
-                    Contact = await Managers.ContactsManager.GetContactAsync(Folder, ContactPreview.Id);
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error($"Downloading contact failed [folder.name={Folder.Name}, contact.id={ContactPreview.Id}]", ex);
-                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                    Activity.OnBackPressed();
-                    return;
-                }
-            }
+                CommonConfig.Logger.Error($"Downloading contact failed [folder.name={Folder?.Name}, searchId={SearchId}, folder.id={FolderId ?? Folder?.Id}, contactId={ContactId ?? ContactPreview?.Id}, readOnlyMode={ReadOnlyMode}]", ex);
 
-            RefreshView();
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+
+                if (CloseRequest != null) CloseRequest();
+            }
         }
 
         void RefreshView()
@@ -409,18 +369,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Subviews event handlers
 
-        void LinkedContactClicked(object sender, ContactPreview e)
+        void LinkedContactClicked(object sender, ContactPreview cp)
         {
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
             var ft = fragmentManager.BeginTransaction();
 
-            var cvf = new ContactViewFragment
+            var cf = new ContactFragment
             {
-                ContactPreview = e,
-                Folder = Folder,
+                ContactPreview = cp,
+                Folder = Folder
             };
 
-            ft.Replace(Resource.Id.fragment_container, cvf, cvf.GenerateTag());
+            ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
             ft.AddToBackStack(null);
             ft.Commit();
         }
@@ -461,43 +421,58 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            return new ContactViewFragmentState
+            return new ContactFragmentState
             {
+                FolderId = FolderId,
+                Folder = Folder,
+                SearchId = SearchId,
+                ContactId = ContactId,
                 Contact = Contact,
                 ContactPreview = ContactPreview,
-                Folder = Folder,
-                ContactId = ContactId,
+                ReadOnlyMode = ReadOnlyMode
             };
         }
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var cvfs = restoredState as ContactViewFragmentState;
-
-            if (cvfs != null)
+            var cfs = restoredState as ContactFragmentState;
+            if (cfs != null)
             {
-                Contact = cvfs.Contact;
-                ContactPreview = cvfs.ContactPreview;
-                Folder = cvfs.Folder;
-                ContactId = cvfs.ContactId;
+                FolderId = cfs.FolderId;
+                Folder = cfs.Folder;
+                SearchId = cfs.SearchId;
+                Contact = cfs.Contact;
+                ContactPreview = cfs.ContactPreview;
+                ContactId = cfs.ContactId;
+                ReadOnlyMode = cfs.ReadOnlyMode;
             }
         }
 
         public override string GenerateTag()
         {
-            return $"{nameof(ContactViewFragment)} [contactId={ContactPreview?.Id ?? ContactId}, contactName={ContactPreview?.Name}, folderId={FolderId}]";
+            return $"{nameof(ContactFragment)} [contactId={ContactPreview?.Id ?? ContactId}]";
         }
 
         #endregion
 
         #region State
 
-        class ContactViewFragmentState : IRetainableState
+        class ContactFragmentState : IRetainableState
         {
-            public Contact Contact { get; set; }
-            public ContactPreview ContactPreview { get; set; }
+
+            public int? FolderId { get; set; }
+
             public Folder Folder { get; set; }
+
+            public int SearchId { get; set; }
+
             public int? ContactId { get; set; }
+
+            public Contact Contact { get; set; }
+
+            public ContactPreview ContactPreview { get; set; }
+
+            public bool ReadOnlyMode { get; set; }
         }
 
         #endregion

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <resources>
 	<plurals name="new_documents_received">
 		<item quantity="one">%1$d new document received.</item>
@@ -31,5 +31,9 @@
 	<plurals name="folders_selected">
 		<item quantity="one">%1$d folder selected</item>
 		<item quantity="other">%1$d folders selected</item>
+	</plurals>
+	<plurals name="users_selected">
+		<item quantity="one">%1$d user selected</item>
+		<item quantity="other">%1$d users selected</item>
 	</plurals>
 </resources>

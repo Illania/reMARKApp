@@ -31,9 +31,9 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<DocumentContainer> GetDocumentWithPreviewAsync(int folderId, int documentId, SourceType sourceType = SourceType.Auto);
 
-        Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, DateTime sendOn, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto);
+        Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto);
 
-        Task InsertDocumentInOutgoingAsync(Guid identifier, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, DateTime sendOn, bool confirmRead, bool confirmDelivery, SourceType sourceType = SourceType.Auto);
+        Task InsertDocumentInOutgoingAsync(Guid identifier, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery, SourceType sourceType = SourceType.Auto);
 
         Task LockOutgoingDocumentAsync(Guid identifier, SourceType sourceType = SourceType.Auto);
 
@@ -65,7 +65,9 @@ namespace Mark5.Mobile.Common.Managers
 
         Task DeleteComment(Document document, Comment comment, SourceType sourceType = SourceType.Auto);
 
-        Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, Document document, Folder folder, bool checkMD5 = false, SourceType sourceType = SourceType.Auto);
+        Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, Folder folder, Document document, bool checkMD5 = false, SourceType sourceType = SourceType.Auto);
+
+        Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, int folderId, Document document, bool checkMD5 = false, SourceType sourceType = SourceType.Auto);
 
         Task<Guid> UploadTemporaryAttachmentAsync(Attachment attachment, SourceType sourceType = SourceType.Auto);
     }

@@ -89,12 +89,20 @@ namespace Mark5.Mobile.Common.Managers
             private set;
         }
 
+        public static ConnectionInfo ActiveConnectionInfo
+        {
+            get;
+            private set;
+        }
+
         public static void Initialize(ConnectionInfo connectionInfo)
         {
             if (connectionInfo == null)
             {
                 throw new ArgumentNullException(nameof(connectionInfo));
             }
+
+            ActiveConnectionInfo = connectionInfo;
 
             var appServiceProxy = AppServiceProxyFactory.Create(connectionInfo.SslMode != SslMode.Off, connectionInfo.Hostname, connectionInfo.Port);
             var fileTransferServiceProxy = FileTransferServiceProxyFactory.Create(connectionInfo.SslMode != SslMode.Off, connectionInfo.Hostname, connectionInfo.Port, CommonConfig.HttpClientHandler);

@@ -37,10 +37,9 @@ namespace Mark5.Mobile.Droid.Ui.Common.BusMesseges
             private set;
         }
 
-        public DocumentPreviewReadStatusChangedMessage(object sender, int folderId, int documentPreviewId, bool isReadByCurrent, bool isReadByAnyone)
+        public DocumentPreviewReadStatusChangedMessage(object sender, int documentPreviewId, bool isReadByCurrent, bool isReadByAnyone)
             : base(sender)
         {
-            FolderId = folderId;
             DocumentPreviewId = documentPreviewId;
             IsReadByCurrent = isReadByCurrent;
             IsReadByAnyone = isReadByAnyone;
