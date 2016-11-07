@@ -36,6 +36,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         }
 
         public abstract void RefreshView();
+
+        public abstract void UpdateDocument();
+
     }
 }
 

@@ -91,15 +91,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 }
                 newContentTextView.EditableText.Append(spanned);
             }
-
-        }
-
-        public override void RefreshView()
-        {
-            if (PreviousDocument != null)
-            {
-                showOldContentButton.Visibility = ViewStates.Visible;
-            }
         }
 
         void ShowOldContentButton_Click(object sender, EventArgs e)
@@ -118,10 +109,25 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 {
                     oldContentWebView.LoadDataWithBaseURL(null, PreviousDocument.PlainTextBody, "text/plain", "UTF-8", null);
                 }
+
+                oldContentLoaded = true;
             }
 
             oldContentWebView.Visibility = ViewStates.Visible;
         }
 
+        public override void RefreshView()
+        {
+            if (PreviousDocument != null)
+            {
+                showOldContentButton.Visibility = ViewStates.Visible;
+            }
+        }
+
+
+        public override void UpdateDocument()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
