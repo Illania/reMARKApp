@@ -178,6 +178,7 @@
     <Compile Include="Utilities\DateTimeUtils.cs" />
     <Compile Include="Managers\IDocumentsManager.cs" />
     <Compile Include="Storage\FileSystemStorageUpdater.cs" />
+    <Compile Include="Model\Exceptions\InvalidSourceTypeException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />
@@ -196,6 +197,7 @@
     <Folder Include="Utilities\PortableCollections\" />
     <Folder Include="Model\Support\" />
     <Folder Include="Tester\" />
+    <Folder Include="Model\Exceptions\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PCLStorage">

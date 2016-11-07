@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: FoldersManager.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -33,7 +33,9 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<List<Folder>> GetFoldersAsync(Folder parentFolder, int depth = 2, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 var foldersResult = await AppServiceProxy.GetFoldersAsync(new DataContract.GetFoldersParameters
                 {
