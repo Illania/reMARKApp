@@ -169,4 +169,5 @@
 	<string name="priority">Priority</string>
 	<string name="subject">Subject</string>
 	<string name="line">Line</string>
+	<string name="loading_template">Loading template</string>
 </resources>

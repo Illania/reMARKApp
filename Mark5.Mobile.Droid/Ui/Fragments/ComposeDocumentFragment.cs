@@ -12,6 +12,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -121,11 +122,33 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             else if (useTemplate == Utilities.Preferences.TemplateUsageMode.Default)
             {
-
+                await GetDefaultTemplate();
             }
             else if (useTemplate == Utilities.Preferences.TemplateUsageMode.AlwaysAsk)
             {
 
+            }
+        }
+
+        async Task GetDefaultTemplate()
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait);
+
+            try
+            {
+                var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(CreationModeFlag);
+                contentView.InsertTemplate(template.Content, template.ContentType);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
+
+                dismissAction();
+                await Dialogs.ShowErrorDialogAsync(Context, ex);
+            }
+            finally
+            {
+                dismissAction();
             }
         }
 
@@ -172,7 +195,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public DocumentPreview PreviousDocumentPreview { get; set; }
             public int? PreviousDocumentFolderId { get; set; }
             public DocumentCreationModeFlag CreationModeFlag { get; set; }
-
         }
 
         #endregion

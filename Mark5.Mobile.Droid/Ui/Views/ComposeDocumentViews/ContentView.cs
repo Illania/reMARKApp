@@ -23,6 +23,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         readonly AppCompatButton showOldContentButton;
         readonly CustomWebView oldContentWebView;
 
+        bool oldContentLoaded;
+
         public ContentView(Context context)
             : base(context)
         {
@@ -44,6 +46,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             };
             showOldContentButton.Text = "Show old content"; //TODO need to use resources and find a good text
             showOldContentButton.Visibility = ViewStates.Gone;
+            showOldContentButton.Click += ShowOldContentButton_Click;
             AddView(showOldContentButton);
 
             oldContentWebView = new CustomWebView(context)
@@ -89,7 +92,36 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 newContentTextView.EditableText.Append(spanned);
             }
 
-
         }
+
+        public override void RefreshView()
+        {
+            if (PreviousDocument != null)
+            {
+                showOldContentButton.Visibility = ViewStates.Visible;
+            }
+        }
+
+        void ShowOldContentButton_Click(object sender, EventArgs e)
+        {
+            if (!oldContentLoaded)
+            {
+                if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
+                {
+                    oldContentWebView.LoadDataWithBaseURL(null, PreviousDocument.PlainTextBody, "text/plain", "UTF-8", null);
+                }
+                else if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
+                {
+                    oldContentWebView.LoadDataWithBaseURL(null, PreviousDocument.HtmlBody, "text/html", "UTF-8", null);
+                }
+                else
+                {
+                    oldContentWebView.LoadDataWithBaseURL(null, PreviousDocument.PlainTextBody, "text/plain", "UTF-8", null);
+                }
+            }
+
+            oldContentWebView.Visibility = ViewStates.Visible;
+        }
+
     }
 }

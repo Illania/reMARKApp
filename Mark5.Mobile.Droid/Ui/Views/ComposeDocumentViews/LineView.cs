@@ -62,5 +62,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 return line.Name;
             }
         }
+
+        public override void RefreshView()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

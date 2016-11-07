@@ -10,6 +10,7 @@ using System;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -17,20 +18,23 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
     public class RecipientsView : ComposeDocumentView
     {
-        AppCompatEditText contentTextView;
+        readonly AppCompatEditText contentTextView;
+        readonly DocumentAddressType type;
 
-        public RecipientsView(Context context, string title)
+        public RecipientsView(Context context, DocumentAddressType type)
             : base(context)
         {
+            this.type = type;
+
             Orientation = Horizontal;
-            SetPadding(DistanceNormal, DistanceSmall, DistanceNormal, DistanceSmall);
+            SetPadding(DistanceNormal, DistanceNormal, DistanceNormal, DistanceNormal);
 
             var titleTextView = new AppCompatTextView(context)
             {
                 LayoutParameters = new LayoutParams(ConversionUtils.ConvertDpToPixels(40), ViewGroup.LayoutParams.WrapContent),
             };
             titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimaryBold);
-            titleTextView.Text = title;
+            titleTextView.Text = type.ToString();
             AddView(titleTextView);
 
 
@@ -41,6 +45,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             contentTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             contentTextView.SetBackgroundColor(Android.Graphics.Color.Transparent);
             AddView(contentTextView, contentLayoutParameters);
+        }
+
+        public override void RefreshView()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -16,8 +16,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
     public abstract class ComposeDocumentView : LinearLayoutCompat
     {
         public DocumentPreview DocumentPreview { get; set; }
-
         public Document Document { get; set; }
+        public DocumentPreview PreviousDocumentPreview { get; set; }
+        public Document PreviousDocument { get; set; }
 
         protected int DistanceNone;
         protected int DistanceLarge;
@@ -33,6 +34,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             DistanceNormal = ConversionUtils.ConvertDpToPixels(8.0f);
             DistanceSmall = ConversionUtils.ConvertDpToPixels(4.0f);
         }
+
+        public abstract void RefreshView();
     }
 }
 

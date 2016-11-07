@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.Collections.Generic;
 using Android.Content;
 using Android.Support.V7.Widget;
@@ -43,6 +44,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             prioritySpinner.Adapter = adapter;
             prioritySpinner.SetSelection(priorities.IndexOf(Priority.Normal));
             AddView(prioritySpinner);
+        }
+
+        public override void RefreshView()
+        {
+            throw new NotImplementedException();
         }
     }
 }
