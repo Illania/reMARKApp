@@ -154,7 +154,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (availableSections.Contains(Section.Remote))
             {
-                await RefreshOffline(forceRefresh);
+                await RefreshRemote(forceRefresh);
             }
             if (availableSections.Contains(Section.Favourites))
             {
@@ -168,7 +168,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             refreshLayout.Post(() => refreshLayout.Refreshing = false); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
         }
 
-        async Task RefreshOffline(bool forceRefresh = false)
+        async Task RefreshRemote(bool forceRefresh = false)
         {
             CommonConfig.Logger.Info($"Refreshing remote folders...");
 
@@ -177,9 +177,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 try
                 {
                     var folders = await Managers.FoldersManager.GetFoldersAsync(Folder, 2);
-                    Folder.SubFolders.Clear();
-                    Folder.SubFolders = folders;
-
                     adapter.Refresh(folders, Section.Remote);
                 }
                 catch (Exception ex)
