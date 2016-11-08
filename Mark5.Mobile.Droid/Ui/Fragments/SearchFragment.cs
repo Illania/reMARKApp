@@ -34,8 +34,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             tabLayout = rootView.FindViewById<TabLayout>(Resource.Id.tab_layout);
 
             pager = rootView.FindViewById<ViewPager>(Resource.Id.pager);
+            pager.OffscreenPageLimit = 2;
             pager.AddOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-            pager.Adapter = new SearchPagerAdapter(Activity.SupportFragmentManager);
+            pager.Adapter = new SearchPagerAdapter(ChildFragmentManager);
 
             tabLayout.TabSelected += (sender, e) => pager.CurrentItem = e.Tab.Position;
 
