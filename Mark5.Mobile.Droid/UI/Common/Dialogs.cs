@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AFollestad.MaterialDialogs;
 using Android.Content;
+using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common.Utilities;
@@ -164,14 +165,32 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         #region Non-awaitable dialogs
 
-        public static void ShowYesNoDialog(Context context, int titleId, int contentId, Action positiveAction, Action negativeAction = null)
+        public static void ShowYesNoDialog(Context context, int titleId, int contentId, Action positiveAction, Action negativeAction = null,
+                                          int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no)
         {
             var builder = new MaterialDialog.Builder(context);
             builder.Title(titleId);
             builder.Content(contentId);
-            builder.PositiveText(Resource.String.yes);
-            builder.NegativeText(Resource.String.no);
+            builder.PositiveText(positiveTextId);
+            builder.NegativeText(negativeTextId);
             builder.OnPositive(new SingleButtonCallback(positiveAction));
+            if (negativeAction != null)
+                builder.OnNegative(new SingleButtonCallback(negativeAction));
+            builder.Show();
+        }
+
+        public static void ShowEditTextDialog(Context context, int titleId, string startText, Action<string> positiveAction, Action negativeAction = null,
+                                              int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no)
+        {
+            var editTextView = new AppCompatEditText(context);
+            editTextView.Text = startText;
+
+            var builder = new MaterialDialog.Builder(context);
+            builder.CustomView(editTextView, true);
+            builder.Title(titleId);
+            builder.PositiveText(positiveTextId);
+            builder.NegativeText(negativeTextId);
+            builder.OnPositive(new SingleButtonCallback(() => positiveAction(editTextView.Text)));
             if (negativeAction != null)
                 builder.OnNegative(new SingleButtonCallback(negativeAction));
             builder.Show();

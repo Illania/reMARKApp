@@ -139,31 +139,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.EditComment)
             {
-                var editDialogBuilder = new AlertDialog.Builder(Context);
-
-                var container = new FrameLayout(Context);
-                var editTextView = new AppCompatEditText(Context);
-                editTextView.Text = comment.Content;
-
-                var lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-                lp.LeftMargin = ConversionUtils.ConvertDpToPixels(10);
-                lp.RightMargin = ConversionUtils.ConvertDpToPixels(10);
-
-                container.AddView(editTextView, lp);
-
-                editDialogBuilder.SetView(container);
-
-                editDialogBuilder.SetTitle(Resource.String.edit_comment_message);
-
-                editDialogBuilder.SetPositiveButton(Resource.String.confirm, (sender, e) => EditComment(comment, editTextView.Text));
-                editDialogBuilder.SetNegativeButton(Resource.String.cancel, (sender, e) => { });
-                editDialogBuilder.Show();
+                Dialogs.ShowEditTextDialog(Context, Resource.String.edit_comment_message, comment.Content, (text) => EditComment(comment, text), null,
+                                          Resource.String.confirm, Resource.String.cancel);
             }
 
             if (item.ItemId == MenuItemActions.DeleteComment)
             {
                 Dialogs.ShowYesNoDialog(Context, Resource.String.confirm_comment_deletion_title, Resource.String.confirm_comment_deletion_content,
-                                             () => DeleteComment(comment));
+                                             () => DeleteComment(comment), null,
+                                        Resource.String.confirm, Resource.String.cancel);
             }
 
             return true;
