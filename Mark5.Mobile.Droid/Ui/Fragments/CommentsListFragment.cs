@@ -162,14 +162,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.DeleteComment)
             {
-                var deleteDialogBuilder = new AlertDialog.Builder(Context);
-
-                deleteDialogBuilder.SetTitle(Resource.String.confirm_comment_deletion_title);
-                deleteDialogBuilder.SetMessage(Resource.String.confirm_comment_deletion_content);
-
-                deleteDialogBuilder.SetPositiveButton(Resource.String.confirm, (sender, e) => DeleteComment(comment));
-                deleteDialogBuilder.SetNegativeButton(Resource.String.cancel, (sender, e) => { });
-                deleteDialogBuilder.Show();
+                Dialogs.ShowYesNoDialog(Context, Resource.String.confirm_comment_deletion_title, Resource.String.confirm_comment_deletion_content,
+                                             () => DeleteComment(comment));
             }
 
             return true;
