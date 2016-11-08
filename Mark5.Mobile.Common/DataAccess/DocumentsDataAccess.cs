@@ -77,7 +77,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     if (maxItems > 0)
                     {
-                        query += $"limit {maxItems - 1}";
+                        query += $"limit {maxItems - 1} ";
                     }
 
                     var result = c.Query<DocumentPreview>(query);

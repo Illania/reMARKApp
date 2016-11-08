@@ -56,22 +56,24 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
-                    var query = c.Table<FolderShortcodeLink>()
-                                 .Where(fdl => fdl.FolderId == folder.Id)
-                                 .Join(c.Table<ShortcodePreview>(), fdl => fdl.ShortcodeId, cp => cp.Id, (fdl, cp) => cp)
-                                 .OrderBy(cp => cp.Name);
+                    var query = $"select * " +
+                                $"from {nameof(ShortcodePreview)}, {nameof(FolderShortcodeLink)} " +
+                                $"where {nameof(FolderShortcodeLink.FolderId)} = {folder.Id} " +
+                                $"     and {nameof(ShortcodePreview)}.{nameof(ShortcodePreview.Id)} = {nameof(FolderShortcodeLink)}.{nameof(FolderShortcodeLink.ShortcodeId)} ";
 
-                    if (startRowId > 0)
-                    {
-                        query = query.Skip(startRowId);
-                    }
+                    query += $"order by {nameof(ShortcodePreview.Name)} ";
 
                     if (maxItems > 0)
                     {
-                        query = query.Take(maxItems);
+                        query += $"limit {maxItems - 1} ";
                     }
 
-                    var result = query.ToList();
+                    if (startRowId > 0)
+                    {
+                        query += $"offset {startRowId} ";
+                    }
+
+                    var result = c.Query<ShortcodePreview>(query);
 
                     if (result == null || result.Count < 1)
                     {

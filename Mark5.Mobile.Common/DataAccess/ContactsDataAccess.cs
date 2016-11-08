@@ -58,22 +58,24 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var query = c.Table<FolderContactLink>()
-                                 .Where(fdl => fdl.FolderId == folder.Id)
-                                 .Join(c.Table<ContactPreview>(), fdl => fdl.ContactId, cp => cp.Id, (fdl, cp) => cp)
-                                 .OrderBy(cp => cp.Name);
+                    var query = $"select * " +
+                                $"from {nameof(ContactPreview)}, {nameof(FolderContactLink)} " +
+                                $"where {nameof(FolderContactLink.FolderId)} = {folder.Id} " +
+                                $"     and {nameof(ContactPreview)}.{nameof(ContactPreview.Id)} = {nameof(FolderContactLink)}.{nameof(FolderContactLink.ContactId)} ";
 
-                    if (startRowId > 0)
-                    {
-                        query = query.Skip(startRowId);
-                    }
+                    query += $"order by {nameof(ContactPreview.Name)} ";
 
                     if (maxItems > 0)
                     {
-                        query = query.Take(maxItems);
+                        query += $"limit {maxItems - 1} ";
                     }
 
-                    var result = query.ToList();
+                    if (startRowId > 0)
+                    {
+                        query += $"offset {startRowId} ";
+                    }
+
+                    var result = c.Query<ContactPreview>(query);
 
                     if (result == null || result.Count < 1)
                     {
