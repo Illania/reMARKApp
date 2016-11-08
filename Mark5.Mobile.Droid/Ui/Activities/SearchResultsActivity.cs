@@ -51,7 +51,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var ft = SupportFragmentManager.BeginTransaction();
                     var dlf = new DocumentsSearchResultsFragment
                     {
-                        Criteria = criteria
+                        Criteria = criteria,
+                        CloseRequest = OnBackPressed
                     };
                     ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
                     ft.Commit();
@@ -64,7 +65,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var ft = SupportFragmentManager.BeginTransaction();
                     var dlf = new ContactsSearchResultsFragment
                     {
-                        Criteria = criteria
+                        Criteria = criteria,
+                        CloseRequest = OnBackPressed
                     };
                     ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
                     ft.Commit();
@@ -77,7 +79,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var ft = SupportFragmentManager.BeginTransaction();
                     var dlf = new ShortcodesSearchResultsFragment
                     {
-                        Criteria = criteria
+                        Criteria = criteria,
+                        CloseRequest = OnBackPressed
                     };
                     ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
                     ft.Commit();

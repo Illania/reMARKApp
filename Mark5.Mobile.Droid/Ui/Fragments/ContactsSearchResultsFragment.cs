@@ -33,6 +33,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
 
         public SearchContactsCriteria Criteria { get; set; }
+        public Action CloseRequest { get; set; }
 
         int searchId;
 
@@ -148,6 +149,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Error($"Downloading contacts failed [criteria={Criteria}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
+
+                if (CloseRequest != null) CloseRequest();
             }
             finally
             {

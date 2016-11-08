@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
@@ -34,6 +33,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
 
         public SearchDocumentsCriteria Criteria { get; set; }
+        public Action CloseRequest { get; set; }
 
         int searchId;
 
@@ -149,6 +149,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Error($"Downloading documents failed [criteria={Criteria}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
+
+                if (CloseRequest != null) CloseRequest();
             }
             finally
             {
