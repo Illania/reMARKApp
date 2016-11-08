@@ -141,8 +141,8 @@ namespace Mark5.Mobile.Droid
                         dismissAction();
                         if (t.IsFaulted)
                         {
-                            CommonConfig.Logger.Error($"Update of categories failed", t.Exception);
-                            await Dialogs.ShowErrorDialogAsync(Activity, t.Exception);
+                            CommonConfig.Logger.Error($"Update of categories failed", t.Exception.InnerException);
+                            await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
                         }
                         else
                         {

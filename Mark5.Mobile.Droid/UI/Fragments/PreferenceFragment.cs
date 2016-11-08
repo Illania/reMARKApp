@@ -79,11 +79,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     dismissAction();
 
-                    if (t.IsFaulted)
-                    {
-                        await Dialogs.ShowErrorDialogAsync(Activity, t.Exception);
-                    }
-                    else
+                    if (!t.IsFaulted)
                     {
                         StartActivity(SystemReportCollector.CreateShareReportIntent(Activity, t.Result));
                     }

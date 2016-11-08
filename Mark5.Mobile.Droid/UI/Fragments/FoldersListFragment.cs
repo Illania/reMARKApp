@@ -467,8 +467,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     dismissAction();
 
-                    CommonConfig.Logger.Error($"{(enabled ? "Subscription" : "Unsubscription")}  failed", t.Exception);
-                    Dialogs.ShowErrorDialog(Activity, t.Exception);
+                    CommonConfig.Logger.Error($"{(enabled ? "Subscription" : "Unsubscription")}  failed", t.Exception.InnerException);
+                    Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
                 }
                 else
                 {
@@ -508,8 +508,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (t.IsFaulted)
                 {
-                    CommonConfig.Logger.Error($"Error while changing offline status for folders", t.Exception);
-                    Dialogs.ShowErrorDialog(Activity, t.Exception);
+                    CommonConfig.Logger.Error($"Error while changing offline status for folders", t.Exception.InnerException);
+                    Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
                 }
                 else
                 {
@@ -548,8 +548,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (t.IsFaulted)
                 {
-                    CommonConfig.Logger.Error($"Error while changing favourite status for folders", t.Exception);
-                    Dialogs.ShowErrorDialog(Activity, t.Exception);
+                    CommonConfig.Logger.Error($"Error while changing favourite status for folders", t.Exception.InnerException);
+                    Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
                 }
                 else
                 {
