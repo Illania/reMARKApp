@@ -21,7 +21,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Services;
 using Mark5.Mobile.Droid.Ui.Common;
 
-namespace Mark5.Mobile.Droid.Ui.Activity
+namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
@@ -234,7 +234,7 @@ namespace Mark5.Mobile.Droid.Ui.Activity
 
                 CommonConfig.Logger.Error("Log in failed", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowConfirmDialogAsync(this, Resource.String.log_in_failed_title, Resource.String.log_in_failed_message);
             }
         }
     }

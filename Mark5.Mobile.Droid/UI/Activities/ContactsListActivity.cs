@@ -27,6 +27,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         Toolbar toolbar;
         ContactsListFragment clf;
 
+        TinyMessageSubscriptionToken categoriesToken;
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);

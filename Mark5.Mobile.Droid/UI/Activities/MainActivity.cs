@@ -25,7 +25,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using Mark5.Mobile.Droid.Utilities.PushNotifications;
 
-namespace Mark5.Mobile.Droid.Ui.Activity
+namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Android.App.Activity]

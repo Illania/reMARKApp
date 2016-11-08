@@ -22,7 +22,7 @@ using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Droid.Services;
 using Mark5.Mobile.Droid.Utilities.Hockey;
 
-namespace Mark5.Mobile.Droid.Ui.Activity
+namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Activity(Label = "MARK5",

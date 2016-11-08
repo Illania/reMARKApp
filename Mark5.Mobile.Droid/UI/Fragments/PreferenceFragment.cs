@@ -85,13 +85,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
                     else
                     {
-                        var sendIntent = new Intent();
-                        sendIntent.SetAction(Intent.ActionSend);
-                        sendIntent.PutExtra(Intent.ExtraEmail, new[] { "support@nordic-it.com" });
-                        sendIntent.PutExtra(Intent.ExtraSubject, "MARK5 for Android - System report");
-                        sendIntent.PutExtra(Intent.ExtraText, t.Result);
-                        sendIntent.SetType("text/plain");
-                        StartActivity(Intent.CreateChooser(sendIntent, GetText(Resource.String.share)));
+                        StartActivity(SystemReportCollector.CreateShareReportIntent(Activity, t.Result));
                     }
                 }, TaskScheduler.FromCurrentSynchronizationContext());
 
@@ -102,23 +96,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_update_config_title, Resource.String.please_wait);
                 Task.Run(async () =>
-                {
-                    try
-                    {
-                        var ss = await Managers.SystemManager.GetSystemSettingsAsync();
-                        ServerConfig.SystemSettings = ss;
+                            {
+                                try
+                                {
+                                    var ss = await Managers.SystemManager.GetSystemSettingsAsync();
+                                    ServerConfig.SystemSettings = ss;
 
-                        await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+                                    await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
 
-                        dismissAction();
-                    }
-                    catch (Exception ex)
-                    {
-                        dismissAction();
+                                    dismissAction();
+                                }
+                                catch (Exception ex)
+                                {
+                                    dismissAction();
 
-                        await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                    }
-                });
+                                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                                }
+                            });
 
                 return true;
             }

@@ -467,7 +467,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 actionMode.Finish();
-
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
@@ -508,7 +507,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 actionMode.Finish();
-
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
