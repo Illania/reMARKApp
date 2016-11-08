@@ -33,11 +33,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class ContactsListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
 
-        public Folder Folder
-        {
-            get;
-            set;
-        }
+        public Folder Folder { get; set; }
+        public Action CloseRequest { get; set; }
 
         bool refreshing;
 
@@ -223,8 +220,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             Managers.ContactsManager.GetAllContactPreviews(Folder, cps =>
             {
-                CommonConfig.Logger.Debug($"Retrieved {cps?.Count} contacts");
-
                 Managers.DownloadManager.Notify(ObjectType.Contact, Folder.Id);
                 Activity.RunOnUiThread(() => adapter.AppendItems(cps));
             }, () =>
@@ -238,6 +233,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Error($"Downloading contacts failed [folder.name={Folder?.Name}, folder.id={Folder?.Id}, startRowId={startRowId}, force={force}]", ex);
 
                 Dialogs.ShowErrorDialog(Activity, ex);
+
+                if (CloseRequest != null && adapter.ItemCount < 1) CloseRequest();
             }, startRowId, cts.Token);
         }
 

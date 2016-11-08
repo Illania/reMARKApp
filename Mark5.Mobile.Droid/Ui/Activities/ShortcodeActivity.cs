@@ -53,8 +53,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     Folder = folder,
                     SearchId = searchId,
                     ShortcodePreview = shortcodePreview,
-                    ReadOnlyMode = readOnlyMode,
-                    CloseRequest = OnBackPressed
+                    CloseRequest = OnBackPressed,
+                    ReadOnlyMode = readOnlyMode
                 };
                 ft.Replace(Resource.Id.fragment_container, sf, sf.GenerateTag());
                 ft.Commit();

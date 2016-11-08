@@ -27,8 +27,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         Toolbar toolbar;
         ContactsListFragment clf;
 
-        TinyMessageSubscriptionToken categoriesToken;
-
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -48,7 +46,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var ft = SupportFragmentManager.BeginTransaction();
                 clf = new ContactsListFragment
                 {
-                    Folder = folder
+                    Folder = folder,
+                    CloseRequest = OnBackPressed
                 };
                 ft.Replace(Resource.Id.fragment_container, clf, clf.GenerateTag());
                 ft.Commit();

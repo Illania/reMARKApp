@@ -39,6 +39,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
 
         public Folder Folder { get; set; }
+        public Action CloseRequest { get; set; }
 
         DocumentsListAdapter CurrentAdapter
         {
@@ -285,6 +286,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Error($"Downloading documents failed [folder.name={Folder?.Name}, folder.id={Folder?.Id}, startId={startId}, endId={endId}, force={force}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
+
+                if (CloseRequest != null) CloseRequest();
             }
             finally
             {

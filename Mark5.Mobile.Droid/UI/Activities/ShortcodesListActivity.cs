@@ -45,7 +45,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var ft = SupportFragmentManager.BeginTransaction();
                 var dlf = new ShortcodesListFragment
                 {
-                    Folder = folder
+                    Folder = folder,
+                    CloseRequest = OnBackPressed
                 };
                 ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
                 ft.Commit();
