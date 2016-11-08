@@ -16,7 +16,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
     class CustomWebView : WebView
     {
         public CustomWebView(Context context)
-            : base(context)
+    : base(context)
         {
         }
 
@@ -39,12 +39,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
 
     class CustomWebViewClient : WebViewClient
     {
+        public event EventHandler PageFinishedLoading = delegate { };
 
         [Obsolete]
         public override bool ShouldOverrideUrlLoading(WebView view, string url)
         {
             view.Context.StartActivity(new Intent(Intent.ActionView, Android.Net.Uri.Parse(url)));
             return true;
+        }
+
+        public override void OnPageFinished(WebView view, string url)
+        {
+            base.OnPageFinished(view, url);
+            PageFinishedLoading(this, EventArgs.Empty);
         }
     }
 }

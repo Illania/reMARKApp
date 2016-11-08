@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System.Threading.Tasks;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -37,7 +38,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public abstract void RefreshView();
 
-        public abstract void UpdateDocument();
+        public abstract Task UpdateDocument();
 
     }
 }

@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 
+using System;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -33,6 +34,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             subjectTextView.SetHint(Resource.String.subject);
             subjectTextView.SetBackgroundColor(Android.Graphics.Color.Transparent);
             AddView(subjectTextView);
+        }
+
+        public override void RefreshView()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void UpdateDocument()
+        {
+            throw new NotImplementedException();
         }
     }
 }

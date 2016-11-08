@@ -51,5 +51,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             throw new NotImplementedException();
         }
+
+        public override void UpdateDocument()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

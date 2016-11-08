@@ -95,10 +95,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task ShowDocument()
         {
-            if (CreationModeFlag == DocumentCreationModeFlag.New)
-            {
-                await AskIfShouldUseTemplates();
-            }
+            await AskIfShouldUseTemplates();
+
         }
 
         async Task AskIfShouldUseTemplates()
@@ -118,7 +116,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (useTemplate == Utilities.Preferences.TemplateUsageMode.Local)
             {
                 var localTemplate = PlatformConfig.Preferences.LocalTemplate;
-                contentView.InsertTemplate(localTemplate, ContentType.PlainText);
+                //contentView.InsertTemplate(localTemplate, ContentType.PlainText);
             }
             else if (useTemplate == Utilities.Preferences.TemplateUsageMode.Default)
             {
@@ -137,7 +135,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(CreationModeFlag);
-                contentView.InsertTemplate(template.Content, template.ContentType);
+                await contentView.InsertTemplate(template);
             }
             catch (Exception ex)
             {
