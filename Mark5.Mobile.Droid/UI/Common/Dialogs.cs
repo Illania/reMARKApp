@@ -173,7 +173,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.NegativeText(Resource.String.no);
             builder.OnPositive(new SingleButtonCallback(positiveAction));
             if (negativeAction != null)
-                builder.OnNegative(new SingleButtonCallback(positiveAction));
+                builder.OnNegative(new SingleButtonCallback(negativeAction));
             builder.Show();
         }
 
