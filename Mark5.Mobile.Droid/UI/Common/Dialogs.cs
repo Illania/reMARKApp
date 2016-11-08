@@ -44,6 +44,20 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
+        public static Task<bool> ShowYesNoDialogAsync(Context context, string title, string content)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(title);
+            builder.Content(content);
+            builder.PositiveText(Resource.String.yes);
+            builder.NegativeText(Resource.String.no);
+            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
+            builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(false)));
+            builder.Show();
+            return tcs.Task;
+        }
+
         public static Task ShowConfirmDialogAsync(Context context, int titleId, int contentId)
         {
             var tcs = new TaskCompletionSource<bool>();

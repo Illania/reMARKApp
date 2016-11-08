@@ -13,6 +13,7 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using TinyMessenger;
 
@@ -28,6 +29,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         ContactsListFragment clf;
 
         TinyMessageSubscriptionToken categoriesToken;
+        TinyMessageSubscriptionToken entityMovedToken;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -68,6 +70,22 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     clf.UpdateCategories(m);
                 }
             });
+
+            entityMovedToken = PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(m =>
+            {
+                if (clf != null && m.Sender != clf && clf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Contact)
+                {
+                    clf.RemoveMovedEntities(m);
+                }
+            });
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            categoriesToken?.Dispose();
+            entityMovedToken?.Dispose();
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)

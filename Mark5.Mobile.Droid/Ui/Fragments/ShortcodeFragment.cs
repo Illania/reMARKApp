@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: ShortcodeFragment.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -7,7 +7,9 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Android.Content;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
@@ -19,6 +21,8 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.ShortcodeViews;
 using Mark5.Mobile.Droid.Utilities;
@@ -95,36 +99,86 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (ReadOnlyMode) return;
 
-            menu.Add(Menu.None, 10, 10, Resource.String.create_new_document);
-            menu.Add(Menu.None, 20, 20, Resource.String.copy_to_worktray);
-            menu.Add(Menu.None, 30, 30, Resource.String.copy_to_folder);
+            menu.Add(Menu.None, MenuItemActions.CreateNewDocument, MenuItemActions.CreateNewDocument, Resource.String.create_new_document);
+            menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
+            menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
 
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static
                 || Folder.InternalType == FolderInternalType.Worktray)
             {
-                menu.Add(Menu.None, 31, 31, Resource.String.move_to_folder);
+                menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
             }
 
-            menu.Add(Menu.None, 40, 40, Resource.String.actions);
-            menu.Add(Menu.None, 50, 50, Resource.String.links);
+            menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.actions);
+            menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
 
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static
                 || Folder.InternalType == FolderInternalType.Worktray)
             {
-                menu.Add(Menu.None, 60, 60, Resource.String.delete_from_folder);
+                menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
             }
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
                 || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
             {
-                menu.Add(Menu.None, 61, 61, Resource.String.delete);
+                menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
             }
+        }
+
+        static class MenuItemActions
+        {
+            public const int CreateNewDocument = 20;
+            public const int CopyToWorktray = 30;
+            public const int CopyToFolder = 40;
+            public const int MoveToFolder = 41;
+            public const int Actions = 70;
+            public const int Links = 80;
+            public const int Delete = 90;
+            public const int DeleteFromFolder = 100;
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
+            if (item.ItemId == MenuItemActions.CopyToFolder)
+            {
+                var i = new Intent(Activity, typeof(FolderListSelectionActivity));
+                i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.CopyToFolderMode);
+                i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
+                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity> { ShortcodePreview }));
+                StartActivity(i);
+
+                return true;
+            }
+            if (item.ItemId == MenuItemActions.MoveToFolder)
+            {
+                var i = new Intent(Activity, typeof(FolderListSelectionActivity));
+                i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.MoveToFolderMode);
+                i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
+                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity> { ShortcodePreview }));
+                i.PutExtra(FolderListSelectionActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
+                StartActivity(i);
+
+                return true;
+            }
+            if (item.ItemId == MenuItemActions.Actions)
+            {
+                var i = new Intent(Activity, typeof(ObjectActionsActivity));
+                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(ShortcodePreview as IBusinessEntity));
+                StartActivity(i);
+
+                return true;
+            }
+            if (item.ItemId == MenuItemActions.Links)
+            {
+                var i = new Intent(Activity, typeof(ObjectLinksActivity));
+                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(ShortcodePreview as IBusinessEntity));
+                StartActivity(i);
+
+                return true;
+            }
+
             return base.OnOptionsItemSelected(item);
         }
 
