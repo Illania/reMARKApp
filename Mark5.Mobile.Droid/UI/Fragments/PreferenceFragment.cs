@@ -75,7 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Task.Run(() =>
                 {
                     return SystemReportCollector.CreateFullReport();
-                }).ContinueWith(async t =>
+                }).ContinueWith(t =>
                 {
                     dismissAction();
 
