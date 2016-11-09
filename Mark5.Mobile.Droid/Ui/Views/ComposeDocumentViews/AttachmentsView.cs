@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.Threading.Tasks;
 using Android.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
@@ -18,12 +19,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         }
 
-        public override void RefreshView()
+        public override Task RefreshView()
         {
             throw new NotImplementedException();
         }
 
-        public override void UpdateDocument()
+        public override Task UpdateDocument()
         {
             throw new NotImplementedException();
         }

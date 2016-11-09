@@ -129,6 +129,17 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
+        public static Task<int> ShowListDialog(Context context, int titleId, string[] items)
+        {
+            var tcs = new TaskCompletionSource<int>();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(titleId);
+            builder.Items(items);
+            builder.ItemsCallback(new ListCallback(i => tcs.SetResult(i)));
+            builder.Show();
+            return tcs.Task;
+        }
+
         public static Task ShowErrorDialogAsync(Context context, Exception ex)
         {
             var tcs = new TaskCompletionSource<bool>();

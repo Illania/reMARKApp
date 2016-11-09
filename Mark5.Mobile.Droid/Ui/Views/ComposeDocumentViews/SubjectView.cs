@@ -7,6 +7,7 @@
 //
 
 using System;
+using System.Threading.Tasks;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -36,12 +37,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             AddView(subjectTextView);
         }
 
-        public override void RefreshView()
+        public override Task RefreshView()
         {
             throw new NotImplementedException();
         }
 
-        public override void UpdateDocument()
+        public override Task UpdateDocument()
         {
             throw new NotImplementedException();
         }

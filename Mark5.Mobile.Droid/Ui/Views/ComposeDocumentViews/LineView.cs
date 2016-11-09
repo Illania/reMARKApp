@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -63,12 +64,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        public override void RefreshView()
+        public override Task RefreshView()
         {
             throw new NotImplementedException();
         }
 
-        public override void UpdateDocument()
+        public override Task UpdateDocument()
         {
             throw new NotImplementedException();
         }

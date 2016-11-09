@@ -179,6 +179,17 @@
 	<string name="subject">Subject</string>
 	<string name="line">Line</string>
 	<string name="loading_template">Loading template</string>
+	<string name="loading_templates">Loading templates</string>
+	<string name="template_question">Which template do you want to use?</string>
+	<string name="no_templates_title">No templates</string>
+	<string name="no_templates_content">There are no templates defined for this creation mode.</string>
+	<string name="template_null">You do not have a default template set.</string>
+	<string-array name="template_question_options">
+		<item>Default template</item>
+		<item>Local template</item>
+		<item>Another template</item>
+		<item>Cancel</item>
+	</string-array>
 	<string name="select_users">Select users</string>
 	<string-array name="copy_to_worktray_options">
 		<item>Own</item>

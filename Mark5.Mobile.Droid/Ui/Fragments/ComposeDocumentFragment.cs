@@ -7,6 +7,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -95,9 +96,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task ShowDocument()
         {
-            await AskIfShouldUseTemplates();
+            foreach (var subView in subViews)
+            {
+                subView.Document = Document;
+                subView.DocumentPreview = DocumentPreview;
+                subView.PreviousDocument = PreviousDocument;
+                subView.PreviousDocumentPreview = PreviousDocumentPreview;
+            }
 
+            await contentView.RefreshView();
+            await AskIfShouldUseTemplates();
         }
+
+        //TODO add process tamplate
+
+        #region Template methods
 
         async Task AskIfShouldUseTemplates()
         {
@@ -115,8 +128,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (useTemplate == Utilities.Preferences.TemplateUsageMode.Local)
             {
-                var localTemplate = PlatformConfig.Preferences.LocalTemplate;
-                //contentView.InsertTemplate(localTemplate, ContentType.PlainText);
+                await GetLocalTemplate();
             }
             else if (useTemplate == Utilities.Preferences.TemplateUsageMode.Default)
             {
@@ -124,18 +136,106 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             else if (useTemplate == Utilities.Preferences.TemplateUsageMode.AlwaysAsk)
             {
-
+                var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, Resource.Array.template_question_options);
+                switch (result)
+                {
+                    case 0:
+                        await GetDefaultTemplate(true);
+                        break;
+                    case 1:
+                        await GetLocalTemplate();
+                        break;
+                    case 2:
+                        await GetAllTemplates();
+                        break;
+                }
             }
         }
 
-        async Task GetDefaultTemplate()
+        async Task GetAllTemplates()
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_templates, Resource.String.please_wait);
+            List<TemplatePreview> templatesPreviews = null;
+
+            try
+            {
+                templatesPreviews = await Managers.DocumentsManager.GetTemplatePreviewsAsync();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
+
+                dismissAction();
+                await Dialogs.ShowErrorDialogAsync(Context, ex);
+            }
+            finally
+            {
+                dismissAction();
+            }
+
+            if (templatesPreviews != null)
+            {
+                var templatesForCreationMode = templatesPreviews.Where(t => t.CreationMode.HasFlag(CreationModeFlag));
+                if (templatesForCreationMode.Any())
+                {
+                    var templateNames = templatesForCreationMode.Select(t => $@"{(t.Private ? "[Private] " : "[Public] ")}{t.Name}").ToArray();
+                    var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, templateNames);
+                    var selectedPreview = templatesPreviews[result];
+                    await GetTemplate(selectedPreview);
+                }
+                else
+                {
+                    await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.no_templates_title, Resource.String.no_templates_content);
+                }
+            }
+        }
+
+        async Task GetTemplate(TemplatePreview templatePreview)
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait);
+
+            try
+            {
+                var template = await Managers.DocumentsManager.GetTemplateAsync(templatePreview.Id);
+                if (template != null)
+                {
+                    await contentView.InsertTemplate(template);
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while getting template [template.Id={templatePreview?.Id}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
+
+                dismissAction();
+                await Dialogs.ShowErrorDialogAsync(Context, ex);
+            }
+            finally
+            {
+                dismissAction();
+            }
+        }
+
+        async Task GetLocalTemplate()
+        {
+            var localTemplate = PlatformConfig.Preferences.LocalTemplate;
+            await contentView.InsertLocalTemplate(localTemplate);
+        }
+
+        async Task GetDefaultTemplate(bool errorMessageIfNull = false)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait);
 
             try
             {
                 var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(CreationModeFlag);
-                await contentView.InsertTemplate(template);
+                if (template != null)
+                {
+                    await contentView.InsertTemplate(template);
+                }
+                else if (errorMessageIfNull)
+                {
+                    throw new Exception(Resources.GetString(Resource.String.template_null));
+                }
             }
             catch (Exception ex)
             {
@@ -149,6 +249,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 dismissAction();
             }
         }
+
+        #endregion
 
         #region Retained State methods
 

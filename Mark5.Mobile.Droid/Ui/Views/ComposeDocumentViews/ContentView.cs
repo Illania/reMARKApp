@@ -6,24 +6,23 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Support.V7.Widget;
-using Android.Text;
 using Android.Views;
+using Android.Webkit;
+using AngleSharp.Dom;
+using AngleSharp.Html;
 using AngleSharp.Parser.Html;
 using Java.Interop;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Views.Common;
-using Mark5.Mobile.Common.Extensions;
-using AngleSharp.Dom;
-using System.Linq;
-using AngleSharp.Html;
-using System.IO;
-using Android.Webkit;
-using Mark5.Mobile.Common;
-using System.Text.RegularExpressions;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
@@ -66,7 +65,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             newContentWebView.SetBackgroundColor(Android.Graphics.Color.Transparent);
             newContentWebView.AddJavascriptInterface(new GetHtmlContentInterface(this), "GetHtmlContentInterface");
             var customWebViewClient = new CustomWebViewClient();
-            customWebViewClient.PageFinishedLoading += (sender, e) => { SetGetContentAsyncSemaphore.Release(); };
+            customWebViewClient.PageFinishedLoading += (sender, e) =>
+            {
+                SetGetContentAsyncSemaphore.Release();
+            };
             newContentWebView.SetWebViewClient(customWebViewClient);
             newContentWebView.Settings.JavaScriptEnabled = true;
             newContentWebView.Settings.DomStorageEnabled = true;
@@ -121,9 +123,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #region Public methods
 
-        public override void RefreshView()
+        public override async Task RefreshView()
         {
-            Task.Run(() => SetHtmlContentAsync(DefaultEditContent)); //TODO
+            await SetHtmlContentAsync(DefaultEditContent);
 
             if (PreviousDocument != null)
             {
@@ -140,6 +142,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public async Task InsertTemplate(Template template)
         {
             await SetWebContentPart(TemplateElementClass, template.ContentType, template.Content);
+        }
+
+        public async Task InsertLocalTemplate(string localTemplate)
+        {
+            await SetWebContentPart(TemplateElementClass, ContentType.PlainText, localTemplate);
         }
 
         #endregion

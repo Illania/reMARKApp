@@ -36,7 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             DistanceSmall = ConversionUtils.ConvertDpToPixels(4.0f);
         }
 
-        public abstract void RefreshView();
+        public abstract Task RefreshView();
 
         public abstract Task UpdateDocument();
 
