@@ -42,7 +42,7 @@ namespace Mark5.Mobile.Droid.Services
             IsReachable = CheckNetworkAvailability();
         }
 
-        public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.ServiceConnection, CancellationToken ct = default(CancellationToken), bool testOnly = false)
+        public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.ServiceConnection, bool testOnly = false)
         {
             if (!testOnly)
             {
@@ -57,15 +57,15 @@ namespace Mark5.Mobile.Droid.Services
             }
             if (result && mode.HasFlag(ReachabilityMode.Google))
             {
-                result &= await CheckWithGoogle(ct);
+                result &= await CheckWithGoogle();
             }
             if (result && mode.HasFlag(ReachabilityMode.ServiceConnection))
             {
-                result &= await CheckWithServiceConnection(ct);
+                result &= await CheckWithServiceConnection();
             }
             if (result && mode.HasFlag(ReachabilityMode.Service))
             {
-                result &= await CheckWithService(ct);
+                result &= await CheckWithService();
             }
 
             if (!testOnly)
@@ -91,7 +91,7 @@ namespace Mark5.Mobile.Droid.Services
             return result;
         }
 
-        public async Task<bool> CheckWithGoogle(CancellationToken ct = default(CancellationToken))
+        public async Task<bool> CheckWithGoogle()
         {
             try
             {
@@ -99,7 +99,7 @@ namespace Mark5.Mobile.Droid.Services
                 {
                     Timeout = new TimeSpan(0, 0, 2)
                 })
-                using (var response = await httpClient.GetAsync(GoogleRequestUrl, ct))
+                using (var response = await httpClient.GetAsync(GoogleRequestUrl))
                 {
                     var result = response.StatusCode == HttpStatusCode.NoContent && (await response.Content.ReadAsByteArrayAsync()).Length == 0;
 
@@ -116,7 +116,7 @@ namespace Mark5.Mobile.Droid.Services
             }
         }
 
-        public async Task<bool> CheckWithServiceConnection(CancellationToken ct = default(CancellationToken))
+        public async Task<bool> CheckWithServiceConnection()
         {
             try
             {
@@ -127,7 +127,7 @@ namespace Mark5.Mobile.Droid.Services
                 {
                     Timeout = new TimeSpan(0, 0, 2),
                 })
-                using (var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct))
+                using (var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
                 {
                     var result = response.StatusCode == HttpStatusCode.OK;
 
@@ -144,19 +144,19 @@ namespace Mark5.Mobile.Droid.Services
             }
         }
 
-        public async Task<bool> CheckWithService(CancellationToken ct = default(CancellationToken))
+        public async Task<bool> CheckWithService()
         {
             try
             {
                 var tester = TesterFactory.Create();
-                if (!await tester.CanTest(ct))
+                if (!await tester.CanTest())
                 {
                     CommonConfig.Logger.Info("Cannot test service availability");
 
                     return false;
                 }
 
-                var result = await tester.Test(ct);
+                var result = await tester.Test();
 
                 CommonConfig.Logger.Info($"Service availability: {result}");
 
