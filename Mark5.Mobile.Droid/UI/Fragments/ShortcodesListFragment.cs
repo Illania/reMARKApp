@@ -34,11 +34,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class ShortcodesListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
 
-        public Folder Folder
-        {
-            get;
-            set;
-        }
+        public Folder Folder { get; set; }
+        public Action CloseRequest { get; set; }
 
         bool refreshing;
 
@@ -246,6 +243,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Error($"Downloading shortcodes failed [folder.name={Folder?.Name}, folder.id={Folder?.Id}, startRowId={startRowId}, force={force}]", ex);
 
                 Dialogs.ShowErrorDialog(Activity, ex);
+
+                if (CloseRequest != null && adapter.ItemCount < 1) CloseRequest();
             }, startRowId, cts.Token);
         }
 

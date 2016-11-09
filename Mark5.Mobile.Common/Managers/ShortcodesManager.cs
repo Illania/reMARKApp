@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: ShortcodesManager.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -36,7 +36,9 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<List<ShortcodePreview>> GetShortcodePreviewsAsync(Folder folder, int startRowId = -1, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 var result = await AppServiceProxy.GetShortcodePreviewsAsync(new DataContract.GetShortcodePreviewsParameters
                 {
@@ -94,7 +96,9 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<Shortcode> GetShortcodeAsync(int folderId, int shortcodeId, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 var result = await AppServiceProxy.GetShortcodeAsync(new DataContract.GetShortcodeParameters
                 {
@@ -131,7 +135,9 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<ShortcodeContainer> GetShortcodeWithPreviewAsync(int folderId, int shortcodeId, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 var result = await AppServiceProxy.GetShortcodeAsync(new DataContract.GetShortcodeParameters
                 {

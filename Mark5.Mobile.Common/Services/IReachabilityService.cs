@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Common.Services
 
         event EventHandler<ReachabilityRefreshedEventArgs> ReachabilityRefreshed;
 
-        Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.Service, CancellationToken ct = default(CancellationToken));
+        Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.ServiceConnection, CancellationToken ct = default(CancellationToken), bool testOnly = false);
     }
 
     public class ReachabilityRefreshedEventArgs : EventArgs
@@ -51,7 +51,8 @@ namespace Mark5.Mobile.Common.Services
     {
         NetworkAvailability = 1,
         Google = 2,
-        Service = 4
+        ServiceConnection = 4,
+        Service = 8
     }
 }
 

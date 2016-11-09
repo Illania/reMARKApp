@@ -22,6 +22,18 @@ namespace Mark5.Mobile.Droid.Utilities
     public static class SystemReportCollector
     {
 
+        public static Intent CreateShareReportIntent(Context context, string report)
+        {
+            var sendIntent = new Intent();
+            sendIntent.SetAction(Intent.ActionSend);
+            sendIntent.PutExtra(Intent.ExtraEmail, new[] { "support@nordic-it.com" });
+            sendIntent.PutExtra(Intent.ExtraSubject, "MARK5 for Android - System report");
+            sendIntent.PutExtra(Intent.ExtraText, report);
+            sendIntent.SetType("text/plain");
+            return Intent.CreateChooser(sendIntent, context.GetText(Resource.String.share));
+        }
+
+
         public static string CreateFullReport()
         {
             var sb = new StringBuilder();

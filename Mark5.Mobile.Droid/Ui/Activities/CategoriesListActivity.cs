@@ -9,17 +9,17 @@
 using Android.App;
 using Android.Content;
 using Android.OS;
-using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid
 {
 
     [Activity]
-    public class CategoriesListActivity : AppCompatActivity
+    public class CategoriesListActivity : BaseAppCompatActivity
     {
 
         public const string BusinessEntityPreviewIntentKey = "BusinessEntityPreview_43dc8df1-dc88-4e39-81d6-59ea495c35ff";
@@ -58,17 +58,6 @@ namespace Mark5.Mobile.Droid
             {
                 CommonConfig.Logger.Info($"Restored {nameof(CategoriesListActivity)}");
             }
-        }
-
-        public override bool OnOptionsItemSelected(Android.Views.IMenuItem item)
-        {
-            if (item.ItemId == Android.Resource.Id.Home)
-            {
-                OnBackPressed();
-                return true;
-            }
-
-            return base.OnOptionsItemSelected(item);
         }
 
         public override void OnBackPressed()

@@ -15,6 +15,8 @@ namespace Mark5.Mobile.Common.Managers
     public interface INotificationsManager
     {
 
+        DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; }
+
         Task<List<Notification>> GetNotificationsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = default(SourceType));
 
         Task<Dictionary<ModuleType, List<Folder>>> GetFoldersNotificationsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = default(SourceType));

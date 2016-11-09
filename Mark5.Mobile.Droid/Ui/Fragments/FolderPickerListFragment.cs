@@ -22,7 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class FolderPickerListFragment : FoldersListFragment
     {
-        override public bool LocalSectionAvailable { get; set; } = false;
+        override public bool LocalSectionEnabled { get; set; } = false;
 
         public HashSet<Folder> SelectedFolders
         {

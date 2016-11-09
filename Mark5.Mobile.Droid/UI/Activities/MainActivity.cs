@@ -14,7 +14,6 @@ using Android.Support.Design.Widget;
 using Android.Support.V4.App;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
-using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
@@ -25,11 +24,11 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using Mark5.Mobile.Droid.Utilities.PushNotifications;
 
-namespace Mark5.Mobile.Droid.Ui.Activity
+namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Android.App.Activity]
-    public class MainActivity : AppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FragmentManager.IOnBackStackChangedListener
+    public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FragmentManager.IOnBackStackChangedListener
     {
 
         Toolbar toolbar;
@@ -207,12 +206,6 @@ namespace Mark5.Mobile.Droid.Ui.Activity
         {
             if (drawerToggle.OnOptionsItemSelected(item))
             {
-                return true;
-            }
-
-            if (item.ItemId == Android.Resource.Id.Home)
-            {
-                OnBackPressed();
                 return true;
             }
 

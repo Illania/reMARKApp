@@ -29,7 +29,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public List<IBusinessEntity> BusinessEntities { get; set; }
         public Folder FromFolder { get; set; }
         public ActionType Type { get; set; }
-        override public bool LocalSectionAvailable { get; set; } = false;
+        override public bool LocalSectionEnabled { get; set; } = false;
 
         protected override RetainableStateFragment GetFolderFragment(Folder folder)
         {
@@ -95,7 +95,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Error($"Error while moving business entity to folder [businessEntities.Count={BusinessEntities?.Count}, businessEntity.Type={BusinessEntities?.First().ObjectType}, toFolder.Id={toFolder?.Id}, fromFolder.Id={FromFolder?.Id}]", ex);
 
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(Context, ex);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
             finally
             {
@@ -144,7 +144,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Error($"Error while copying business entities to folder [businessEntities.Count={BusinessEntities?.Count}, businessEntities.Type={BusinessEntities?.First().ObjectType}, folder.Id={folder?.Id}]", ex);
 
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(Context, ex);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
             finally
             {

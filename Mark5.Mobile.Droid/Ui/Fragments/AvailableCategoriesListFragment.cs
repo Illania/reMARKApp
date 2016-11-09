@@ -136,13 +136,13 @@ namespace Mark5.Mobile.Droid
                     default:
                         throw new ArgumentException("The business entity provided does not have categories in the model");
                 }
-            }).ContinueWith(t =>
+            }).ContinueWith(async t =>
                     {
                         dismissAction();
                         if (t.IsFaulted)
                         {
-                            CommonConfig.Logger.Error($"Update of categories failed", t.Exception);
-                            Dialogs.ShowErrorDialog(Activity, t.Exception);
+                            CommonConfig.Logger.Error($"Update of categories failed", t.Exception.InnerException);
+                            await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
                         }
                         else
                         {

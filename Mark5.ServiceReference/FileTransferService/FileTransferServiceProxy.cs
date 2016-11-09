@@ -64,7 +64,6 @@ namespace Mark5.ServiceReference.FileTransferService
                         Version = version
                     };
                 }
-
             }
             catch (OperationCanceledException)
             {
@@ -117,7 +116,6 @@ namespace Mark5.ServiceReference.FileTransferService
                     }
                     return result;
                 }
-
             }
             catch (OperationCanceledException)
             {
@@ -157,7 +155,6 @@ namespace Mark5.ServiceReference.FileTransferService
                         Guid = guid
                     };
                 }
-
             }
             catch (OperationCanceledException)
             {
@@ -172,6 +169,7 @@ namespace Mark5.ServiceReference.FileTransferService
 
     public static class UriExtensions
     {
+
         public static Uri AppendPathSegments(this Uri uri, params object[] segments)
         {
             foreach (var segment in segments)

@@ -17,6 +17,11 @@ using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
+using Mark5.ServiceReference.Exceptions;
+using Mark5.Mobile.Common.DataAccess.Exceptions;
+using Mark5.Mobile.Common.Model.Exceptions;
+using Android.Support.V4.App;
+using Android.App;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
@@ -60,6 +65,18 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var builder = new MaterialDialog.Builder(context);
             builder.Title(titleId);
             builder.Content(contentId);
+            builder.PositiveText(Resource.String.ok);
+            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
+            builder.Show();
+            return tcs.Task;
+        }
+
+        public static Task ShowConfirmDialogAsync(Context context, string title, string content)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(title);
+            builder.Content(content);
             builder.PositiveText(Resource.String.ok);
             builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
             builder.Show();
@@ -148,18 +165,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
-        public static Task ShowErrorDialogAsync(Context context, Exception ex)
-        {
-            var tcs = new TaskCompletionSource<bool>();
-            var builder = new MaterialDialog.Builder(context);
-            builder.Title(Resource.String.error);
-            builder.Content(ex.Message);
-            builder.PositiveText(Resource.String.ok);
-            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
-            builder.Show();
-            return tcs.Task;
-        }
-
         public static Task<long> ShowDatePicker(Context context, long initialTimestamp = -1, long minTimestamp = -1, long maxTimestamp = -1)
         {
             var tcs = new TaskCompletionSource<long>();
@@ -226,17 +231,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Show();
         }
 
-        public static void ShowErrorDialog(Context context, Exception ex, Action action = null)
-        {
-            var builder = new MaterialDialog.Builder(context);
-            builder.Title(Resource.String.error);
-            builder.Content(ex.Message);
-            builder.PositiveText(Resource.String.ok);
-            if (action != null)
-                builder.OnPositive(new SingleButtonCallback(action));
-            builder.Show();
-        }
-
         public static Action ShowInfiniteProgressDialog(Context context, int titleId, int contentId, CancellationTokenSource cts = null)
         {
             var builder = new MaterialDialog.Builder(context);
@@ -251,6 +245,155 @@ namespace Mark5.Mobile.Droid.Ui.Common
             }
             var dialog = builder.Show();
             return dialog.Dismiss;
+        }
+
+        #endregion
+
+        #region Error dialogs
+
+        public static Task ShowErrorDialogAsync(Activity activity, Exception ex)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            var builder = new MaterialDialog.Builder(activity);
+            builder.Title(GetErrorTitle(activity, ex));
+            builder.Content(GetErrorMessage(activity, ex));
+            builder.PositiveText(Resource.String.ok);
+            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
+            if (ShouldShowCreateReport(ex))
+            {
+                builder.NeutralText(Resource.String.report);
+                builder.OnNeutral(new SingleButtonCallback(() =>
+                {
+                    var dismissAction = ShowInfiniteProgressDialog(activity, Resource.String.dialog_creating_report, Resource.String.please_wait);
+                    Task.Run(() =>
+                    {
+                        return SystemReportCollector.CreateFullReport();
+                    }).ContinueWith(t =>
+                    {
+                        dismissAction();
+
+                        if (!t.IsFaulted)
+                        {
+                            activity.StartActivity(SystemReportCollector.CreateShareReportIntent(activity, t.Result));
+                        }
+
+                        tcs.SetResult(true);
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                }));
+            }
+            builder.Show();
+            return tcs.Task;
+        }
+
+        public static void ShowErrorDialog(Activity activity, Exception ex, Action action = null)
+        {
+            var builder = new MaterialDialog.Builder(activity);
+            builder.Title(GetErrorTitle(activity, ex));
+            builder.Content(GetErrorMessage(activity, ex));
+            builder.PositiveText(Resource.String.ok);
+            if (action != null)
+                builder.OnPositive(new SingleButtonCallback(action));
+            if (ShouldShowCreateReport(ex))
+            {
+                builder.NeutralText(Resource.String.report);
+                builder.OnNeutral(new SingleButtonCallback(() =>
+                {
+                    var dismissAction = ShowInfiniteProgressDialog(activity, Resource.String.dialog_creating_report, Resource.String.please_wait);
+                    Task.Run(() =>
+                    {
+                        return SystemReportCollector.CreateFullReport();
+                    }).ContinueWith(t =>
+                    {
+                        dismissAction();
+
+                        if (!t.IsFaulted)
+                        {
+                            activity.StartActivity(SystemReportCollector.CreateShareReportIntent(activity, t.Result));
+                        }
+
+                        if (action != null) action();
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                }));
+            }
+            builder.Show();
+        }
+
+        static string GetErrorTitle(Context context, Exception ex)
+        {
+            if (ex is AppServiceException)
+            {
+                return context.GetString(Resource.String.appserviceexception_title);
+            }
+            if (ex is FileTransferServiceException)
+            {
+                return context.GetString(Resource.String.filetransferserviceexception_title);
+            }
+            if (ex is DataNotFoundException)
+            {
+                return context.GetString(Resource.String.datanotfoundexception_title);
+            }
+            if (ex is DataAccessException)
+            {
+                return context.GetString(Resource.String.dataaccessexception_title);
+            }
+            if (ex is InvalidSourceTypeException)
+            {
+                return context.GetString(Resource.String.invalidsourcetypeexception_title);
+            }
+
+            return context.GetString(Resource.String.generalexception_title);
+        }
+
+        static string GetErrorMessage(Context context, Exception ex)
+        {
+            if (ex is AppServiceException)
+            {
+                return ex.Message;
+            }
+            if (ex is FileTransferServiceException)
+            {
+                return ex.Message;
+            }
+            if (ex is DataNotFoundException)
+            {
+                return context.GetString(Resource.String.datanotfoundexception_message);
+            }
+            if (ex is DataAccessException)
+            {
+                return ex.Message;
+            }
+            if (ex is InvalidSourceTypeException)
+            {
+                return context.GetString(Resource.String.invalidsourcetypeexception_message);
+            }
+
+            return ex.Message;
+        }
+
+        static bool ShouldShowCreateReport(Exception ex)
+        {
+            if (ex is AppServiceException)
+            {
+                return true;
+            }
+            if (ex is FileTransferServiceException)
+            {
+                return true;
+            }
+            if (ex is DataNotFoundException)
+            {
+                return false;
+            }
+            if (ex is DataAccessException)
+            {
+                return true;
+            }
+            if (ex is InvalidSourceTypeException)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         #endregion

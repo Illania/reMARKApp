@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="app_name">MARK5</string>
-	<string name="error">Error</string>
 	<string name="warning">Warning</string>
 	<string name="yes">Yes</string>
 	<string name="no">No</string>
@@ -31,6 +30,8 @@
 		<item>SSL Disabled</item>
 	</string-array>
 	<string name="log_in">Log in</string>
+	<string name="log_in_failed_title">Log in failed</string>
+	<string name="log_in_failed_message">Please check your credentials and try again</string>
 	<string name="ssl_accept_selfsigned_warning">You chose to accept certificates. This may decrease security of the connection. Do you want to continue?</string>
 	<string name="ssl_off_warning">You chose to turn off SSL. Connection will be unsecure. Do you want to continue?</string>
 	<string name="logging_in">Logging in</string>
@@ -195,4 +196,11 @@
 		<item>Other users\'</item>
 	</string-array>
 	<string name="copying_to_worktray">Copying to worktray</string>
+	<string name="testing_connection">Testing connection</string>
+	<string name="connection_status">Connection status</string>
+	<string name="network_interface">Network interface:</string>
+	<string name="internet_access">Internet access:</string>
+	<string name="mark5_server_reachability">MARK5 Server:</string>
+	<string name="mark5_service_reachability">MARK5 App Service:</string>
+	<string name="unavailable">Unavailable</string>
 </resources>

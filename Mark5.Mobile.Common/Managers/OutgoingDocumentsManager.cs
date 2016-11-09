@@ -144,8 +144,11 @@ namespace Mark5.Mobile.Common.Managers
                     cts = null;
                 }
 
-                await sendTask;
-                sendTask = null;
+                if (sendTask != null)
+                {
+                    await sendTask;
+                    sendTask = null;
+                }
 
             }
             finally
