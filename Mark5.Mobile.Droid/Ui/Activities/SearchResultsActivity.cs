@@ -7,19 +7,18 @@
 //
 using Android.App;
 using Android.OS;
-using Android.Support.V7.App;
 using Android.Support.V7.Widget;
-using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Activity]
-    public class SearchResultsActivity : AppCompatActivity
+    public class SearchResultsActivity : BaseAppCompatActivity
     {
 
         public const string ModuleIntentKey = "Module_fb7022b2-d795-4a22-8f94-052397d50b17";
@@ -51,7 +50,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var ft = SupportFragmentManager.BeginTransaction();
                     var dlf = new DocumentsSearchResultsFragment
                     {
-                        Criteria = criteria
+                        Criteria = criteria,
+                        CloseRequest = OnBackPressed
                     };
                     ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
                     ft.Commit();
@@ -64,7 +64,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var ft = SupportFragmentManager.BeginTransaction();
                     var dlf = new ContactsSearchResultsFragment
                     {
-                        Criteria = criteria
+                        Criteria = criteria,
+                        CloseRequest = OnBackPressed
                     };
                     ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
                     ft.Commit();
@@ -77,7 +78,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var ft = SupportFragmentManager.BeginTransaction();
                     var dlf = new ShortcodesSearchResultsFragment
                     {
-                        Criteria = criteria
+                        Criteria = criteria,
+                        CloseRequest = OnBackPressed
                     };
                     ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
                     ft.Commit();
@@ -89,17 +91,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 CommonConfig.Logger.Info($"Restored {nameof(SearchResultsActivity)}");
             }
-        }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == Android.Resource.Id.Home)
-            {
-                OnBackPressed();
-                return true;
-            }
-
-            return base.OnOptionsItemSelected(item);
         }
     }
 }

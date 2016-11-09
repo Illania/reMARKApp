@@ -13,6 +13,9 @@ using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Net;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Services;
 using Mark5.Mobile.Common.Tester;
 
@@ -26,24 +29,20 @@ namespace Mark5.Mobile.Droid.Services
 
         public bool IsReachable
         {
-            get
-            {
-                return lastResult;
-            }
+            get;
+            private set;
         }
 
         public event EventHandler RefreshingReachability = delegate { };
 
         public event EventHandler<ReachabilityRefreshedEventArgs> ReachabilityRefreshed = delegate { };
 
-        bool lastResult;
-
         public ReachabilityService()
         {
-            lastResult = CheckNetworkAvailability();
+            IsReachable = CheckNetworkAvailability();
         }
 
-        public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.Service, CancellationToken ct = default(CancellationToken))
+        public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.ServiceConnection, CancellationToken ct = default(CancellationToken))
         {
             RefreshingReachability(this, EventArgs.Empty);
 
@@ -57,14 +56,21 @@ namespace Mark5.Mobile.Droid.Services
             {
                 result &= await CheckWithGoogle(ct);
             }
+            if (result && mode.HasFlag(ReachabilityMode.ServiceConnection))
+            {
+                result &= await CheckWithServiceConnection(ct);
+            }
             if (result && mode.HasFlag(ReachabilityMode.Service))
             {
                 result &= await CheckWithService(ct);
             }
 
-            ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(lastResult != result, result));
+            var lastResult = IsReachable;
+            IsReachable = result;
 
-            lastResult = result;
+            CommonConfig.Logger.Info($"Reachability checked: {result}");
+
+            ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(lastResult != result, result));
 
             return result;
         }
@@ -72,7 +78,11 @@ namespace Mark5.Mobile.Droid.Services
         public bool CheckNetworkAvailability()
         {
             var cm = (ConnectivityManager)Application.Context.GetSystemService(Context.ConnectivityService);
-            return cm.ActiveNetworkInfo?.IsConnected ?? false;
+            var result = cm.ActiveNetworkInfo?.IsConnected ?? false;
+
+            CommonConfig.Logger.Info($"Network availability: {result}");
+
+            return result;
         }
 
         public async Task<bool> CheckWithGoogle(CancellationToken ct = default(CancellationToken))
@@ -85,11 +95,45 @@ namespace Mark5.Mobile.Droid.Services
                 })
                 using (var response = await httpClient.GetAsync(GoogleRequestUrl, ct))
                 {
-                    return response.StatusCode != HttpStatusCode.NoContent && (await response.Content.ReadAsByteArrayAsync()).Length == 0;
+                    var result = response.StatusCode != HttpStatusCode.NoContent && (await response.Content.ReadAsByteArrayAsync()).Length == 0;
+
+                    CommonConfig.Logger.Info($"Google availability: {result}");
+
+                    return result;
                 }
             }
             catch
             {
+                CommonConfig.Logger.Info("Cannot check Google availability");
+
+                return false;
+            }
+        }
+
+        public async Task<bool> CheckWithServiceConnection(CancellationToken ct = default(CancellationToken))
+        {
+            try
+            {
+                var ci = Managers.ActiveConnectionInfo;
+                var url = $"{(ci.SslMode == SslMode.Off ? "http" : "https")}://{ci.Hostname}:{ci.Port}/app3";
+
+                using (var httpClient = new HttpClient
+                {
+                    Timeout = new TimeSpan(0, 0, 2),
+                })
+                using (var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct))
+                {
+                    var result = response.StatusCode == HttpStatusCode.OK;
+
+                    CommonConfig.Logger.Info($"Service connection availability: {result}");
+
+                    return result;
+                }
+            }
+            catch
+            {
+                CommonConfig.Logger.Info("Cannot check service connection availability");
+
                 return false;
             }
         }
@@ -101,13 +145,21 @@ namespace Mark5.Mobile.Droid.Services
                 var tester = TesterFactory.Create();
                 if (!await tester.CanTest(ct))
                 {
+                    CommonConfig.Logger.Info("Cannot test service availability");
+
                     return false;
                 }
 
-                return await tester.Test(ct);
+                var result = await tester.Test(ct);
+
+                CommonConfig.Logger.Info($"Service availability: {result}");
+
+                return result;
             }
             catch
             {
+                CommonConfig.Logger.Info("Cannot check service availability");
+
                 return false;
             }
         }

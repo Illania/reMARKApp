@@ -5,22 +5,20 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
 using Android.App;
 using Android.OS;
-using Android.Support.V7.App;
 using Android.Support.V7.Widget;
-using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Activity]
-    public class ObjectLinksActivity : AppCompatActivity
+    public class ObjectLinksActivity : BaseAppCompatActivity
     {
 
         public const string BusinessEntityIntentKey = "BusinessEntity_ef8f3886-1478-4b4c-8bdb-7a6188035674";
@@ -58,17 +56,5 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.Logger.Info($"Restored {nameof(ObjectLinksActivity)}");
             }
         }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == Android.Resource.Id.Home)
-            {
-                OnBackPressed();
-                return true;
-            }
-
-            return base.OnOptionsItemSelected(item);
-        }
     }
 }
-

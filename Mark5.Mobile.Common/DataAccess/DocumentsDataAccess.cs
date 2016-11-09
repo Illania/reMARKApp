@@ -58,27 +58,29 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var query = c.Table<FolderDocumentLink>()
-                                 .Where(fdl => fdl.FolderId == folder.Id)
-                                 .Join(c.Table<DocumentPreview>(), fdl => fdl.DocumentId, dp => dp.Id, (fdl, dp) => dp)
-                                 .OrderByDescending(dp => dp.Id);
+                    var query = $"select * " +
+                                $"from {nameof(DocumentPreview)}, {nameof(FolderDocumentLink)} " +
+                                $"where {nameof(FolderDocumentLink.FolderId)} = {folder.Id} " +
+                                $"     and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} = {nameof(FolderDocumentLink)}.{nameof(FolderDocumentLink.DocumentId)} ";
 
                     if (startId > 0)
                     {
-                        query = query.Where(dp => dp.Id < startId);
+                        query += $"    and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} < \"{startId}\" ";
                     }
 
                     if (endId > 0)
                     {
-                        query = query.Where(dp => dp.Id > endId);
+                        query += $"    and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} > \"{endId}\" ";
                     }
+
+                    query += $"order by {nameof(DocumentPreview.Id)} desc ";
 
                     if (maxItems > 0)
                     {
-                        query = query.Take(maxItems);
+                        query += $"limit {maxItems - 1} ";
                     }
 
-                    var result = query.ToList();
+                    var result = c.Query<DocumentPreview>(query);
 
                     if (result == null || result.Count < 1)
                     {

@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: NotificationsManager.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -17,12 +17,15 @@ using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Model.Containers;
+using Mark5.Mobile.Common.Model.Exceptions;
 
 namespace Mark5.Mobile.Common.Managers
 {
 
     class NotificationsManager : AbstractManager, INotificationsManager
     {
+
+        public DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; } = DocumentBodyTypeRequest.HtmlOnly;
 
         readonly IFoldersDataAccess foldersDataAccess;
         readonly INotificationsDataAccess notificationsDataAccess;
@@ -36,7 +39,9 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<List<Notification>> GetNotificationsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 var result = await AppServiceProxy.GetNotificationsAsync(new DataContract.GetNotificationsParameters
                 {
@@ -62,7 +67,9 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<Dictionary<ModuleType, List<Folder>>> GetFoldersNotificationsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 var result = await AppServiceProxy.GetFoldersNotificationsAsync(new DataContract.GetFoldersNotificationsParameters
                 {
@@ -79,12 +86,19 @@ namespace Mark5.Mobile.Common.Managers
                 };
             }
 
+            if (sourceType == SourceType.Local)
+            {
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
+            }
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task SetFoldersNotificationsAsync(DeviceType deviceType, string pushToken, ModuleType moduleType, List<Folder> folders, bool enabled, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 var folderIds = folders.Select(f => f.Id).ToArray();
 
@@ -116,12 +130,19 @@ namespace Mark5.Mobile.Common.Managers
                 return;
             }
 
+            if (sourceType == SourceType.Local)
+            {
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
+            }
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<bool> GetCalendarNotificationsEnabledAsync(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 var result = await AppServiceProxy.GetCalendarNotificationsEnabledAsync(new DataContract.GetCalendarNotificationsEnabledParameters
                 {
@@ -150,7 +171,9 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task SetCalendarNotificationsEnabledAsync(DeviceType deviceType, string pushToken, bool enabled, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 await AppServiceProxy.SetCalendarNotificationsEnabledAsync(new DataContract.SetCalendarNotificationsEnabledParameters
                 {
@@ -167,12 +190,19 @@ namespace Mark5.Mobile.Common.Managers
                 return;
             }
 
+            if (sourceType == SourceType.Local)
+            {
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
+            }
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<string> GetNotificationsSoundAsync(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 var result = await AppServiceProxy.GetNotificationsSoundAsync(new DataContract.GetNotificationsSoundParameters
                 {
@@ -201,7 +231,9 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task SetNotificationsSoundAsync(DeviceType deviceType, string pushToken, string soundName, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 await AppServiceProxy.SetNotificationsSoundAsync(new DataContract.SetNotificationsSoundParameters
                 {
@@ -218,12 +250,19 @@ namespace Mark5.Mobile.Common.Managers
                 return;
             }
 
+            if (sourceType == SourceType.Local)
+            {
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
+            }
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task ClearAllNotificationSettingsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 await AppServiceProxy.ClearAllNotificationsAsync(new DataContract.ClearAllNotificationsParameters
                 {
@@ -240,7 +279,6 @@ namespace Mark5.Mobile.Common.Managers
                     favoriteFolder.Subscribed = false;
                 }
                 await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
-
                 await FileSystemStorage.SaveNotificationSettingsAsync(new NotificationSettings());
 
                 return;
@@ -251,7 +289,9 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<object> GetRemoteObjectAsync(Notification notification, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 var objectId = notification.ObjectId;
                 var folderId = notification.FolderId;
@@ -263,13 +303,13 @@ namespace Mark5.Mobile.Common.Managers
                         Token = Token,
                         FolderId = folderId,
                         DocumentId = objectId,
-                        BodyRequest = DataContract.DocumentBodyTypeRequest.None, //TODO Probably we'll need to take this from settings
+                        BodyRequest = DocumentBodyTypeRequest.ConvertEnum<DataContract.DocumentBodyTypeRequest>(),
                         IncludePreview = true
                     });
 
                     return new DocumentContainer(result.DocumentPreview.Convert(), result.Document.Convert());
                 }
-                else if (notification.ObjectType == ObjectType.Contact)
+                if (notification.ObjectType == ObjectType.Contact)
                 {
                     var result = await AppServiceProxy.GetContactAsync(new DataContract.GetContactParameters
                     {
@@ -281,7 +321,7 @@ namespace Mark5.Mobile.Common.Managers
 
                     return new ContactContainer(result.ContactPreview.Convert(), result.Contact.Convert());
                 }
-                else if (notification.ObjectType == ObjectType.Shortcode)
+                if (notification.ObjectType == ObjectType.Shortcode)
                 {
                     var result = await AppServiceProxy.GetShortcodeAsync(new DataContract.GetShortcodeParameters
                     {
@@ -293,7 +333,7 @@ namespace Mark5.Mobile.Common.Managers
 
                     return new ShortcodeContainer(result.ShortcodePreview.Convert(), result.Shortcode.Convert());
                 }
-                else if (notification.ObjectType == ObjectType.CalendarTask)
+                if (notification.ObjectType == ObjectType.CalendarTask)
                 {
                     var result = await AppServiceProxy.GetCalendarTaskAsync(new DataContract.GetCalendarTaskParameters
                     {
@@ -304,18 +344,22 @@ namespace Mark5.Mobile.Common.Managers
 
                     return result.CalendarTask.Convert();
                 }
-                else if (notification.ObjectType == ObjectType.CalendarAppointment)
+                if (notification.ObjectType == ObjectType.CalendarAppointment)
                 {
                     var result = await AppServiceProxy.GetCalendarAppointmentAsync(new DataContract.GetCalendarAppointmentParameters
                     {
                         Token = Token,
                         FolderId = folderId,
-                        CalendarAppointmentId = objectId,
+                        CalendarAppointmentId = objectId
                     });
 
                     return result.CalendarAppointment.Convert();
                 }
+            }
 
+            if (sourceType == SourceType.Local)
+            {
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
             }
 
             throw new ArgumentException("Invalid sourceType provided.");

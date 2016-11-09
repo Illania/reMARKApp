@@ -297,7 +297,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Error($"Failed to view attachment [document.Id={Document.Id}, attachment.Id={attachmentDescription?.Id}, attachment.Name={attachmentDescription?.Name}", ex);
 
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(Context, ex);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
             finally
             {
@@ -358,7 +358,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Error($"Failed to share attachment [document.Id={Document.Id}, attachment.Id={attachmentDescription?.Id}, attachment.Name={attachmentDescription?.Name}", ex);
 
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(Context, ex);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
             finally
             {

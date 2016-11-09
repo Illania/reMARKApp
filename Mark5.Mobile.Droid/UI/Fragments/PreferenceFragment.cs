@@ -75,23 +75,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Task.Run(() =>
                 {
                     return SystemReportCollector.CreateFullReport();
-                }).ContinueWith(async t =>
+                }).ContinueWith(t =>
                 {
                     dismissAction();
 
-                    if (t.IsFaulted)
+                    if (!t.IsFaulted)
                     {
-                        await Dialogs.ShowErrorDialogAsync(Activity, t.Exception);
-                    }
-                    else
-                    {
-                        var sendIntent = new Intent();
-                        sendIntent.SetAction(Intent.ActionSend);
-                        sendIntent.PutExtra(Intent.ExtraEmail, new[] { "support@nordic-it.com" });
-                        sendIntent.PutExtra(Intent.ExtraSubject, "MARK5 for Android - System report");
-                        sendIntent.PutExtra(Intent.ExtraText, t.Result);
-                        sendIntent.SetType("text/plain");
-                        StartActivity(Intent.CreateChooser(sendIntent, GetText(Resource.String.share)));
+                        StartActivity(SystemReportCollector.CreateShareReportIntent(Activity, t.Result));
                     }
                 }, TaskScheduler.FromCurrentSynchronizationContext());
 
@@ -102,23 +92,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_update_config_title, Resource.String.please_wait);
                 Task.Run(async () =>
-                {
-                    try
-                    {
-                        var ss = await Managers.SystemManager.GetSystemSettingsAsync();
-                        ServerConfig.SystemSettings = ss;
+                            {
+                                try
+                                {
+                                    var ss = await Managers.SystemManager.GetSystemSettingsAsync();
+                                    ServerConfig.SystemSettings = ss;
 
-                        await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+                                    await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
 
-                        dismissAction();
-                    }
-                    catch (Exception ex)
-                    {
-                        dismissAction();
+                                    dismissAction();
+                                }
+                                catch (Exception ex)
+                                {
+                                    dismissAction();
 
-                        await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                    }
-                });
+                                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                                }
+                            });
 
                 return true;
             }
@@ -141,6 +131,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (key == GetString(Resource.String.pref_key_documents_download_as_plaintext))
             {
                 Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
             }
             if (key == GetString(Resource.String.pref_key_contacts_synchronised))

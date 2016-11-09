@@ -308,6 +308,7 @@
     <Compile Include="Ui\Activities\CopyToUserWorktrayActivity.cs" />
     <Compile Include="Ui\Fragments\CopyToUserWorktrayFragment.cs" />
     <Compile Include="Utilities\SystemReportCollector.cs" />
+    <Compile Include="Ui\Common\BaseAppCompatActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -450,6 +451,7 @@
     <AndroidResource Include="Resources\layout\pager.axml" />
     <AndroidResource Include="Resources\layout\list_item_system_user.axml" />
     <AndroidResource Include="Resources\layout\list_with_button.axml" />
+    <AndroidResource Include="Resources\values\strings-errordialogs.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
@@ -484,6 +486,10 @@
     <ProjectReference Include="..\TinyMessenger\TinyMessenger.csproj">
       <Project>{D552EA9E-E8C6-44A4-9D05-D2A8655BE8EA}</Project>
       <Name>TinyMessenger</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
+      <Project>{022EE3DF-AD72-4537-9531-262A320E9334}</Project>
+      <Name>Mark5.ServiceReference.Exceptions</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

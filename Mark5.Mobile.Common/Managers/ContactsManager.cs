@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: ContactsManager.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -15,6 +15,7 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Converters;
+using Mark5.Mobile.Common.Model.Exceptions;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 
@@ -36,7 +37,9 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<List<ContactPreview>> GetContactPreviewsAsync(Folder folder, int startRowId = -1, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 var result = await AppServiceProxy.GetContactPreviewsAsync(new DataContract.GetContactPreviewsParameters
                 {
@@ -94,7 +97,9 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<Contact> GetContactAsync(int folderId, int contactId, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 var result = await AppServiceProxy.GetContactAsync(new DataContract.GetContactParameters
                 {
@@ -126,7 +131,9 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<ContactContainer> GetContactWithPreviewAsync(int folderId, int contactId, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 var result = await AppServiceProxy.GetContactAsync(new DataContract.GetContactParameters
                 {
@@ -161,7 +168,9 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<bool> CreteOrUpdateContactAsync(Contact contact, ContactPreview contactPreview, int parentObjectId, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 var result = await AppServiceProxy.CreateOrUpdateContactAsync(new DataContract.CreateOrUpdateContactParameters
                 {
@@ -180,12 +189,19 @@ namespace Mark5.Mobile.Common.Managers
                 return result.Updated;
             }
 
+            if (sourceType == SourceType.Local)
+            {
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
+            }
+
             throw new ArgumentException("Invalid sourceType provided");
         }
 
         public async Task<List<Category>> GetAllCategoriesAsync(SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 var result = await AppServiceProxy.GetAllCategoriesAsync(new DataContract.GetAllCategoriesParameters
                 {
@@ -210,7 +226,9 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task SetCategoriesAsync(ContactPreview contactPreview, List<Category> categories, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 await AppServiceProxy.SetCategoriesAsync(new DataContract.SetCategoriesParameters
                 {
@@ -228,12 +246,19 @@ namespace Mark5.Mobile.Common.Managers
                 return;
             }
 
+            if (sourceType == SourceType.Local)
+            {
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
+            }
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<Comment> AddComment(Contact contact, string content, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 var result = await AppServiceProxy.AddCommentAsync(new DataContract.AddCommentParameters
                 {
@@ -251,12 +276,19 @@ namespace Mark5.Mobile.Common.Managers
                 return comment;
             }
 
+            if (sourceType == SourceType.Local)
+            {
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
+            }
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<bool> EditComment(Contact contact, Comment comment, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 var result = await AppServiceProxy.EditCommentAsync(new DataContract.EditCommentParameters
                 {
@@ -282,12 +314,19 @@ namespace Mark5.Mobile.Common.Managers
                 return editSuccess;
             }
 
+            if (sourceType == SourceType.Local)
+            {
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
+            }
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task DeleteComment(Contact contact, Comment comment, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 await AppServiceProxy.DeleteCommentAsync(new DataContract.DeleteCommentParameters
                 {
@@ -302,6 +341,11 @@ namespace Mark5.Mobile.Common.Managers
                 await contactsDataAccess.DeleteCommentAsync(contact, comment);
 
                 return;
+            }
+
+            if (sourceType == SourceType.Local)
+            {
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
             }
 
             throw new ArgumentException("Invalid sourceType provided.");

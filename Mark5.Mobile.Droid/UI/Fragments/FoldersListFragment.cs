@@ -35,7 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         public Folder Folder { get; set; }
-        virtual public bool LocalSectionAvailable { get; set; } = true;
+        virtual public bool LocalSectionEnabled { get; set; } = true;
 
         protected FolderListAdapter Adapter;
         protected SearchFolderListAdapter SearchAdapter;
@@ -150,7 +150,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (availableSections.Contains(Section.Remote))
             {
-                await RefreshOffline(forceRefresh);
+                await RefreshRemote(forceRefresh);
             }
             if (availableSections.Contains(Section.Favourites))
             {
@@ -164,7 +164,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             RefreshLayout.Post(() => RefreshLayout.Refreshing = false); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
         }
 
-        async Task RefreshOffline(bool forceRefresh = false)
+        async Task RefreshRemote(bool forceRefresh = false)
         {
             CommonConfig.Logger.Info($"Refreshing remote folders...");
 
@@ -173,9 +173,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 try
                 {
                     var folders = await Managers.FoldersManager.GetFoldersAsync(Folder, 2);
-                    Folder.SubFolders.Clear();
-                    Folder.SubFolders = folders;
-
                     Adapter.Refresh(folders, Section.Remote);
                 }
                 catch (Exception ex)
@@ -228,7 +225,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Folder.Root)
             {
                 availableSections = new List<Section> { Section.Favourites, Section.Remote };
-                if (Folder.Module == ModuleType.Documents && LocalSectionAvailable)
+                if (Folder.Module == ModuleType.Documents && LocalSectionEnabled)
                 {
                     availableSections.Add(Section.Local);
                 }
@@ -470,8 +467,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     dismissAction();
 
-                    CommonConfig.Logger.Error($"{(enabled ? "Subscription" : "Unsubscription")}  failed", t.Exception);
-                    Dialogs.ShowErrorDialog(Activity, t.Exception);
+                    CommonConfig.Logger.Error($"{(enabled ? "Subscription" : "Unsubscription")}  failed", t.Exception.InnerException);
+                    Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
                 }
                 else
                 {
@@ -481,7 +478,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 actionMode.Finish();
-
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
@@ -512,8 +508,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (t.IsFaulted)
                 {
-                    CommonConfig.Logger.Error($"Error while changing offline status for folders", t.Exception);
-                    Dialogs.ShowErrorDialog(Activity, t.Exception);
+                    CommonConfig.Logger.Error($"Error while changing offline status for folders", t.Exception.InnerException);
+                    Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
                 }
                 else
                 {
@@ -522,7 +518,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 actionMode.Finish();
-
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
@@ -553,8 +548,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (t.IsFaulted)
                 {
-                    CommonConfig.Logger.Error($"Error while changing favourite status for folders", t.Exception);
-                    Dialogs.ShowErrorDialog(Activity, t.Exception);
+                    CommonConfig.Logger.Error($"Error while changing favourite status for folders", t.Exception.InnerException);
+                    Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
                 }
                 else
                 {

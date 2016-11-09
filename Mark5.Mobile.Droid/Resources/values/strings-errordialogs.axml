@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+	<string name="report">Report</string>
+	<string name="generalexception_title">Unexpected exception</string>
+	<string name="appserviceexception_title">Error</string>
+	<string name="filetransferserviceexception_title">Error</string>
+	<string name="datanotfoundexception_title">Unavailble offline</string>
+	<string name="datanotfoundexception_message">This item is not available offline</string>
+	<string name="dataaccessexception_title">Cache error occured</string>
+	<string name="invalidsourcetypeexception_title">Unavailable offline</string>
+	<string name="invalidsourcetypeexception_message">This action cannot be performed offline</string>
+</resources>

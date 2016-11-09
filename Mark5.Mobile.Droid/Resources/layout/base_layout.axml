@@ -8,9 +8,26 @@
     android:fitsSystemWindows="true">
     <include
         layout="@layout/appbar" />
-    <FrameLayout
-        android:id="@+id/fragment_container"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        android:animateLayoutChanges="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/connection_bar"
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:layout_alignParentBottom="true"
+            android:text="No connection"
+            android:textAppearance="@style/fontSmall"
+            android:textColor="@color/white"
+            android:background="@color/brown"
+            android:gravity="center"
+            android:visibility="gone" />
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/connection_bar" />
+    </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>

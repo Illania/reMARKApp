@@ -8,6 +8,7 @@
 using System;
 using System.Runtime.Serialization;
 using System.ServiceModel;
+using System.Text;
 
 namespace Mark5.ServiceReference.Exceptions
 {
@@ -23,7 +24,8 @@ namespace Mark5.ServiceReference.Exceptions
             private set;
         }
 
-        public AppServiceException(Exception ex) : base(GetMessage(ex), ex)
+        public AppServiceException(Exception ex)
+            : base(GetMessage(ex), ex)
         {
             Detail = (ex as FaultException<AppServiceFaultDetail>)?.Detail;
         }
@@ -55,6 +57,20 @@ namespace Mark5.ServiceReference.Exceptions
             }
 
             return "Unexpected exception.";
+        }
+
+        public override string ToString()
+        {
+            if (Detail != null)
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine(base.ToString());
+                sb.AppendLine("Detail.Code: " + Detail.Code);
+                sb.AppendLine("Detail.DiagnosticInformation: " + Detail.DiagnosticInformation);
+                return sb.ToString();
+            }
+
+            return base.ToString();
         }
     }
 

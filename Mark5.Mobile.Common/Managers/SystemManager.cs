@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: SystemManager.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -28,7 +28,9 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<SystemSettings> GetSystemSettingsAsync(SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 var systemSettingsResult = await AppServiceProxy.GetSystemSettingsAsync(new DataContract.GetSystemSettingsParameters
                 {
@@ -60,7 +62,9 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<SystemUsersDepartments> GetSystemUsersDepartmentsAsync(SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto || sourceType == SourceType.Remote)
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
             {
                 var systemSettingsResult = await AppServiceProxy.GetSystemUsersAsync(new DataContract.GetSystemUsersParameters
                 {
