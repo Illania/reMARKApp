@@ -14,14 +14,12 @@ using Android.Support.Design.Widget;
 using Android.Support.V4.App;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
-using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Services;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using Mark5.Mobile.Droid.Utilities.PushNotifications;
@@ -30,7 +28,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Android.App.Activity]
-    public class MainActivity : AppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FragmentManager.IOnBackStackChangedListener
+    public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FragmentManager.IOnBackStackChangedListener
     {
 
         Toolbar toolbar;
@@ -126,29 +124,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             drawerToggle.SyncState();
         }
 
-        protected override void OnResume()
-        {
-            base.OnResume();
-
-            var cb = FindViewById(Resource.Id.connection_bar);
-            cb.Visibility = CommonConfig.ReachabilityService.IsReachable ? ViewStates.Gone : ViewStates.Visible;
-
-            CommonConfig.ReachabilityService.ReachabilityRefreshed += ReachabilityService_ReachabilityRefreshed;
-        }
-
-        protected override void OnPause()
-        {
-            base.OnPause();
-
-            CommonConfig.ReachabilityService.ReachabilityRefreshed -= ReachabilityService_ReachabilityRefreshed;
-        }
-
-        void ReachabilityService_ReachabilityRefreshed(object sender, ReachabilityRefreshedEventArgs e)
-        {
-            var cb = FindViewById(Resource.Id.connection_bar);
-            cb.Visibility = e.IsReachable ? ViewStates.Gone : ViewStates.Visible;
-        }
-
         public override void OnBackPressed()
         {
             if (drawer.IsDrawerOpen(GravityCompat.Start))
@@ -231,12 +206,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             if (drawerToggle.OnOptionsItemSelected(item))
             {
-                return true;
-            }
-
-            if (item.ItemId == Android.Resource.Id.Home)
-            {
-                OnBackPressed();
                 return true;
             }
 

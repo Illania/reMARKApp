@@ -308,6 +308,7 @@
     <Compile Include="Ui\Activities\CopyToUserWorktrayActivity.cs" />
     <Compile Include="Ui\Fragments\CopyToUserWorktrayFragment.cs" />
     <Compile Include="Utilities\SystemReportCollector.cs" />
+    <Compile Include="Ui\Common\BaseAppCompatActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

@@ -7,12 +7,11 @@
 //
 using Android.App;
 using Android.OS;
-using Android.Support.V7.App;
 using Android.Support.V7.Widget;
-using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using TinyMessenger;
@@ -21,7 +20,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Activity]
-    public class DocumentsListActivity : AppCompatActivity
+    public class DocumentsListActivity : BaseAppCompatActivity
     {
 
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
@@ -108,17 +107,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             commentCountToken?.Dispose();
             categoriesToken?.Dispose();
             entityMovedToken?.Dispose();
-        }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == Android.Resource.Id.Home)
-            {
-                OnBackPressed();
-                return true;
-            }
-
-            return base.OnOptionsItemSelected(item);
         }
     }
 }
