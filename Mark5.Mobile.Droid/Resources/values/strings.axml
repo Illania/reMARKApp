@@ -188,7 +188,6 @@
 		<item>Default template</item>
 		<item>Local template</item>
 		<item>Another template</item>
-		<item>Cancel</item>
 	</string-array>
 	<string name="select_users">Select users</string>
 	<string-array name="copy_to_worktray_options">

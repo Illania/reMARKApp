@@ -136,7 +136,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             else if (useTemplate == Utilities.Preferences.TemplateUsageMode.AlwaysAsk)
             {
-                var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, Resource.Array.template_question_options);
+                var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, Resource.Array.template_question_options, true);
                 switch (result)
                 {
                     case 0:
@@ -150,7 +150,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         break;
                 }
             }
-        }
+        }  //TODO templates can modify also the line and the subject
 
         async Task GetAllTemplates()
         {
@@ -179,7 +179,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (templatesForCreationMode.Any())
                 {
                     var templateNames = templatesForCreationMode.Select(t => $@"{(t.Private ? "[Private] " : "[Public] ")}{t.Name}").ToArray();
-                    var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, templateNames);
+                    var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, templateNames, true);
                     var selectedPreview = templatesPreviews[result];
                     await GetTemplate(selectedPreview);
                 }
@@ -187,31 +187,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.no_templates_title, Resource.String.no_templates_content);
                 }
-            }
-        }
-
-        async Task GetTemplate(TemplatePreview templatePreview)
-        {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait);
-
-            try
-            {
-                var template = await Managers.DocumentsManager.GetTemplateAsync(templatePreview.Id);
-                if (template != null)
-                {
-                    await contentView.InsertTemplate(template);
-                }
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error($"Error while getting template [template.Id={templatePreview?.Id}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
-
-                dismissAction();
-                await Dialogs.ShowErrorDialogAsync(Context, ex);
-            }
-            finally
-            {
-                dismissAction();
             }
         }
 
@@ -240,6 +215,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
+
+                dismissAction();
+                await Dialogs.ShowErrorDialogAsync(Context, ex);
+            }
+            finally
+            {
+                dismissAction();
+            }
+        }
+
+        async Task GetTemplate(TemplatePreview templatePreview)
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait);
+
+            try
+            {
+                var template = await Managers.DocumentsManager.GetTemplateAsync(templatePreview.Id);
+                if (template != null)
+                {
+                    await contentView.InsertTemplate(template);
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while getting template [template.Id={templatePreview?.Id}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(Context, ex);

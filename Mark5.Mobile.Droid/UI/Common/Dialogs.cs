@@ -118,24 +118,32 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
-        public static Task<int> ShowListDialog(Context context, int titleId, int itemsId)
+        public static Task<int> ShowListDialog(Context context, int titleId, int itemsId, bool includeCancel = false)
         {
             var tcs = new TaskCompletionSource<int>();
             var builder = new MaterialDialog.Builder(context);
             builder.Title(titleId);
             builder.Items(itemsId);
             builder.ItemsCallback(new ListCallback(i => tcs.SetResult(i)));
+            if (includeCancel)
+            {
+                builder.NegativeText(Resource.String.cancel);
+            }
             builder.Show();
             return tcs.Task;
         }
 
-        public static Task<int> ShowListDialog(Context context, int titleId, string[] items)
+        public static Task<int> ShowListDialog(Context context, int titleId, string[] items, bool includeCancel = false)
         {
             var tcs = new TaskCompletionSource<int>();
             var builder = new MaterialDialog.Builder(context);
             builder.Title(titleId);
             builder.Items(items);
             builder.ItemsCallback(new ListCallback(i => tcs.SetResult(i)));
+            if (includeCancel)
+            {
+                builder.NegativeText(Resource.String.cancel);
+            }
             builder.Show();
             return tcs.Task;
         }
