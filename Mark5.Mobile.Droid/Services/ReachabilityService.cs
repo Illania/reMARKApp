@@ -101,16 +101,16 @@ namespace Mark5.Mobile.Droid.Services
                 })
                 using (var response = await httpClient.GetAsync(GoogleRequestUrl, ct))
                 {
-                    var result = response.StatusCode != HttpStatusCode.NoContent && (await response.Content.ReadAsByteArrayAsync()).Length == 0;
+                    var result = response.StatusCode == HttpStatusCode.NoContent && (await response.Content.ReadAsByteArrayAsync()).Length == 0;
 
                     CommonConfig.Logger.Info($"Google availability: {result}");
 
                     return result;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                CommonConfig.Logger.Info("Cannot check Google availability");
+                CommonConfig.Logger.Info("Cannot check Google availability", ex);
 
                 return false;
             }
@@ -136,9 +136,9 @@ namespace Mark5.Mobile.Droid.Services
                     return result;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                CommonConfig.Logger.Info("Cannot check service connection availability");
+                CommonConfig.Logger.Info("Cannot check service connection availability", ex);
 
                 return false;
             }
@@ -162,9 +162,9 @@ namespace Mark5.Mobile.Droid.Services
 
                 return result;
             }
-            catch
+            catch (Exception ex)
             {
-                CommonConfig.Logger.Info("Cannot check service availability");
+                CommonConfig.Logger.Info("Cannot check service availability", ex);
 
                 return false;
             }

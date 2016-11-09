@@ -56,7 +56,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             connectionBar.Visibility = e.IsReachable ? ViewStates.Gone : ViewStates.Visible;
         }
 
-        async void ConnectionBar_LongClick(object sender, System.EventArgs e)
+        async void ConnectionBar_LongClick(object sender, EventArgs e)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.testing_connection, Resource.String.please_wait);
 
