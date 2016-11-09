@@ -182,4 +182,11 @@
 		<item>Other users\'</item>
 	</string-array>
 	<string name="copying_to_worktray">Copying to worktray</string>
+	<string name="testing_connection">Testing connection</string>
+	<string name="connection_status">Connection status</string>
+	<string name="network_interface">Network interface:</string>
+	<string name="internet_access">Internet access:</string>
+	<string name="mark5_server_reachability">MARK5 Server:</string>
+	<string name="mark5_service_reachability">MARK5 App Service:</string>
+	<string name="unavailable">Unavailable</string>
 </resources>

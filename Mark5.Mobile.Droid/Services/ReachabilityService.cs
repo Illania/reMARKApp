@@ -42,9 +42,12 @@ namespace Mark5.Mobile.Droid.Services
             IsReachable = CheckNetworkAvailability();
         }
 
-        public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.ServiceConnection, CancellationToken ct = default(CancellationToken))
+        public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.ServiceConnection, CancellationToken ct = default(CancellationToken), bool testOnly = false)
         {
-            RefreshingReachability(this, EventArgs.Empty);
+            if (!testOnly)
+            {
+                RefreshingReachability(this, EventArgs.Empty);
+            }
 
             var result = true;
 
@@ -65,12 +68,15 @@ namespace Mark5.Mobile.Droid.Services
                 result &= await CheckWithService(ct);
             }
 
-            var lastResult = IsReachable;
-            IsReachable = result;
+            if (!testOnly)
+            {
+                var lastResult = IsReachable;
+                IsReachable = result;
 
-            CommonConfig.Logger.Info($"Reachability checked: {result}");
+                CommonConfig.Logger.Info($"Reachability checked: {result}");
 
-            ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(lastResult != result, result));
+                ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(lastResult != result, result));
+            }
 
             return result;
         }
