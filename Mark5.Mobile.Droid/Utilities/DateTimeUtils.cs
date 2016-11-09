@@ -68,8 +68,8 @@ namespace Mark5.Mobile.Droid.Utilities
         /// </summary>
         public static string FormatServerTimestampAsCompactShortDateTimeString(this long timestamp, Context context)
         {
-            var serverTimezone = timestamp.ConvertTimestampMillisecondsToDateTime().ConvertServerTimeToUtc();
-            var nowUtc = DateTime.UtcNow;
+            var serverTimezone = timestamp.ConvertTimestampMillisecondsToDateTime();
+            var nowUtc = DateTime.UtcNow.ConvertUtcToServerTime();
 
             if (serverTimezone.Date == nowUtc.Date)
             {
@@ -89,8 +89,8 @@ namespace Mark5.Mobile.Droid.Utilities
         /// </summary>
         public static string FormatServerTimestampAsCompactLongDateTimeString(this long timestamp, Context context)
         {
-            var serverTimezone = timestamp.ConvertTimestampMillisecondsToDateTime().ConvertServerTimeToUtc();
-            var nowUtc = DateTime.UtcNow;
+            var serverTimezone = timestamp.ConvertTimestampMillisecondsToDateTime();
+            var nowUtc = DateTime.UtcNow.ConvertUtcToServerTime();
 
             if (serverTimezone.Date == nowUtc.Date)
             {
