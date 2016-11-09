@@ -8,19 +8,19 @@
 using Android.App;
 using Android.Content;
 using Android.OS;
-using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Activity]
-    public class CommentsListActivity : AppCompatActivity
+    public class CommentsListActivity : BaseAppCompatActivity
     {
 
         public const string EntityIntentKey = "EntityIntent_20c8514c-b644-47db-842f-f2df4204d93a";
@@ -72,22 +72,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.OnSaveInstanceState(outState);
         }
 
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == Android.Resource.Id.Home)
-            {
-                OnBackPressed();
-                return true;
-            }
-
-            return base.OnOptionsItemSelected(item);
-        }
-
         public override void OnBackPressed()
         {
             var intent = new Intent();
             intent.PutExtra(CommentsResultKey, SerializationUtils.Serialize(cf.Comments));
             SetResult(Result.Ok, intent);
+
             base.OnBackPressed();
         }
     }

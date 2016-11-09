@@ -9,19 +9,20 @@
 using System.Collections.Generic;
 using Android.App;
 using Android.OS;
-using Android.Support.V7.App;
 using Android.Support.V7.Widget;
-using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
+
     [Activity]
-    public class FolderListSelectionActivity : AppCompatActivity
+    public class FolderListSelectionActivity : BaseAppCompatActivity
     {
+
         public enum ModeType
         {
             CopyToFolderMode = 1,
@@ -33,7 +34,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string ModeIntentKey = "ModeIntent_418bec8d-f44d-41b4-bff0-e286dea3d705";
         public const string BusinessEntitiesIntentKey = "BusinessEntitiesIntent_d6047bae-dc5e-4c3e-a302-e33931531baa";
         public const string FromFolderIntentKey = "FromFolderIntent_3a68d401-f581-4094-b526-4478cc43d3f4";
-
         public const string FoldersResultKey = "FoldersResult_32e7327a-f02e-4628-850a-6d86e2109b3e";
 
         Toolbar toolbar;
@@ -59,37 +59,37 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 var ft = SupportFragmentManager.BeginTransaction();
 
-                if (listMode == ModeType.CopyToFolderMode)
+                switch (listMode)
                 {
-                    SupportActionBar.SetTitle(Resource.String.select_folder);
-                    var flf = new CopyMoveToFolderListFragment
-                    {
-                        Folder = Folder.RootPerModule(moduleType),
-                        BusinessEntities = be,
-                        Type = CopyMoveToFolderListFragment.ActionType.Copy
-                    };
-                    ft.Replace(Resource.Id.fragment_container, flf, flf.GenerateTag());
-                }
-                else if (listMode == ModeType.MoveToFolderMode)
-                {
-                    SupportActionBar.SetTitle(Resource.String.select_folder);
-                    var flf = new CopyMoveToFolderListFragment
-                    {
-                        Folder = Folder.RootPerModule(moduleType),
-                        BusinessEntities = be,
-                        FromFolder = fromFolder,
-                        Type = CopyMoveToFolderListFragment.ActionType.Move
-                    };
-                    ft.Replace(Resource.Id.fragment_container, flf, flf.GenerateTag());
-                }
-                else if (listMode == ModeType.PickerMode)
-                {
-                    SupportActionBar.SetTitle(Resource.String.select_folders);
-                    var flf = new FolderPickerListFragment
-                    {
-                        Folder = Folder.RootPerModule(moduleType),
-                    };
-                    ft.Replace(Resource.Id.fragment_container, flf, flf.GenerateTag());
+                    case ModeType.CopyToFolderMode:
+                        SupportActionBar.SetTitle(Resource.String.select_folder);
+                        var cmflf = new CopyMoveToFolderListFragment
+                        {
+                            Folder = Folder.RootPerModule(moduleType),
+                            BusinessEntities = be,
+                            Type = CopyMoveToFolderListFragment.ActionType.Copy
+                        };
+                        ft.Replace(Resource.Id.fragment_container, cmflf, cmflf.GenerateTag());
+                        break;
+                    case ModeType.MoveToFolderMode:
+                        SupportActionBar.SetTitle(Resource.String.select_folder);
+                        var cmflf2 = new CopyMoveToFolderListFragment
+                        {
+                            Folder = Folder.RootPerModule(moduleType),
+                            BusinessEntities = be,
+                            FromFolder = fromFolder,
+                            Type = CopyMoveToFolderListFragment.ActionType.Move
+                        };
+                        ft.Replace(Resource.Id.fragment_container, cmflf2, cmflf2.GenerateTag());
+                        break;
+                    case ModeType.PickerMode:
+                        SupportActionBar.SetTitle(Resource.String.select_folders);
+                        var fplf = new FolderPickerListFragment
+                        {
+                            Folder = Folder.RootPerModule(moduleType)
+                        };
+                        ft.Replace(Resource.Id.fragment_container, fplf, fplf.GenerateTag());
+                        break;
                 }
 
                 ft.Commit();
@@ -100,19 +100,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 CommonConfig.Logger.Info($"Restored {nameof(FolderListSelectionActivity)}");
             }
-
-        }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == Android.Resource.Id.Home)
-            {
-                OnBackPressed();
-                return true;
-            }
-
-            return base.OnOptionsItemSelected(item);
         }
     }
-
 }
