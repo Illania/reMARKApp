@@ -71,7 +71,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
-            coordinatorLayout = (CoordinatorLayout)container.Parent;
+            coordinatorLayout = (CoordinatorLayout)container.Parent.Parent;
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
             refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);

@@ -21,6 +21,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Services;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using Mark5.Mobile.Droid.Utilities.PushNotifications;
@@ -123,6 +124,29 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             drawerToggle.DrawerIndicatorEnabled = SupportFragmentManager.BackStackEntryCount <= 1;
             drawerToggle.SyncState();
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+
+            var cb = FindViewById(Resource.Id.connection_bar);
+            cb.Visibility = CommonConfig.ReachabilityService.IsReachable ? ViewStates.Gone : ViewStates.Visible;
+
+            CommonConfig.ReachabilityService.ReachabilityRefreshed += ReachabilityService_ReachabilityRefreshed;
+        }
+
+        protected override void OnPause()
+        {
+            base.OnPause();
+
+            CommonConfig.ReachabilityService.ReachabilityRefreshed -= ReachabilityService_ReachabilityRefreshed;
+        }
+
+        void ReachabilityService_ReachabilityRefreshed(object sender, ReachabilityRefreshedEventArgs e)
+        {
+            var cb = FindViewById(Resource.Id.connection_bar);
+            cb.Visibility = e.IsReachable ? ViewStates.Gone : ViewStates.Visible;
         }
 
         public override void OnBackPressed()
