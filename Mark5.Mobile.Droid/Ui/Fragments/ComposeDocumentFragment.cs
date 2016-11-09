@@ -205,7 +205,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(CreationModeFlag);
                 if (template != null)
                 {
-                    await contentView.InsertTemplate(template);
+                    await ApplyTemplate(template);
                 }
                 else if (errorMessageIfNull)
                 {
@@ -234,7 +234,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var template = await Managers.DocumentsManager.GetTemplateAsync(templatePreview.Id);
                 if (template != null)
                 {
-                    await contentView.InsertTemplate(template);
+                    await ApplyTemplate(template);
                 }
             }
             catch (Exception ex)
@@ -247,6 +247,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             finally
             {
                 dismissAction();
+            }
+        }
+
+        async Task ApplyTemplate(Template template)
+        {
+            await contentView.InsertTemplate(template);
+            if (!string.IsNullOrEmpty(template.Subject))
+            {
+                subjectView.SetSubject(template.Subject);
+            }
+            if (template.LineGuid != null)
+            {
+                lineView.SetLineFromGuid(template.LineGuid);
             }
         }
 

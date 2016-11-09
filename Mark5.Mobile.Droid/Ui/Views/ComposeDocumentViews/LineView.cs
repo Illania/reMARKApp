@@ -51,7 +51,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         class LineInView
         {
-            readonly Line line;
+            public readonly Line line;
 
             public LineInView(Line line)
             {
@@ -72,6 +72,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public override Task UpdateDocument()
         {
             throw new NotImplementedException();
+        }
+
+        public void SetLineFromGuid(Guid lineGuid)
+        {
+            var index = availableOutgoingLines.FindIndex(l => l.line.Guid == lineGuid);
+            if (index > 0)
+            {
+                lineSpinner.SetSelection(index);
+            }
         }
     }
 }
