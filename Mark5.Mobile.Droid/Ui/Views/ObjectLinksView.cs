@@ -13,6 +13,7 @@ using Android.Support.V7.Widget;
 using Android.Util;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views
@@ -62,18 +63,7 @@ namespace Mark5.Mobile.Droid.Ui.Views
                 },
                 Text = title
             };
-            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                titleView.SetTextAppearance(Context, Resource.Style.fontLarge);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            else
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                titleView.SetTextAppearance(Resource.Style.fontLarge);
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
+            titleView.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
             titleView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
             titleView.SetPadding(distanceLarge, 0, distanceNormal, 0);
             innerLayout.AddView(titleView);
@@ -109,37 +99,15 @@ namespace Mark5.Mobile.Droid.Ui.Views
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                     Text = objectLink.IsReverse ? objectLink.TypeInfo.DescriptionComplexReverse : objectLink.TypeInfo.DescriptionComplex
                 };
-                if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-                {
-#pragma warning disable CS0618 // Type or member is obsolete
-                    titleView.SetTextAppearance(Context, Resource.Style.fontPrimary);
-#pragma warning restore CS0618 // Type or member is obsolete
-                }
-                else
-                {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                    titleView.SetTextAppearance(Resource.Style.fontPrimary);
-#pragma warning restore XA0001 // Find issues with Android API usage
-                }
+                titleView.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
                 AddView(titleView);
 
                 var subtitleView = new AppCompatTextView(Context)
                 {
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                    Text = objectLink.IsReverse ? $"{objectLink.TypeInfo.FromType} (ID: {objectLink.FromObjectId})" : $"{objectLink.TypeInfo.ToType} (ID: {objectLink.ToObjectId})"
+                    Text = objectLink.IsReverse ? $"ID: {objectLink.FromObjectId}" : $"ID: {objectLink.ToObjectId}"
                 };
-                if (Build.VERSION.SdkInt < BuildVersionCodes.M)
-                {
-#pragma warning disable CS0618 // Type or member is obsolete
-                    subtitleView.SetTextAppearance(Context, Resource.Style.fontSmallLight);
-#pragma warning restore CS0618 // Type or member is obsolete
-                }
-                else
-                {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                    subtitleView.SetTextAppearance(Resource.Style.fontSmallLight);
-#pragma warning restore XA0001 // Find issues with Android API usage
-                }
+                subtitleView.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
                 AddView(subtitleView);
             }
         }
