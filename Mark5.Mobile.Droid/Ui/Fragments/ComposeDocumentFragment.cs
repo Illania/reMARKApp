@@ -166,7 +166,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
 
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(Context, ex);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
             finally
             {
@@ -217,7 +217,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
 
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(Context, ex);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
             finally
             {
@@ -242,7 +242,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Error($"Error while getting template [template.Id={templatePreview?.Id}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
 
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(Context, ex);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
             finally
             {
@@ -257,10 +257,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 subjectView.SetSubject(template.Subject);
             }
-            if (template.LineGuid != null)
-            {
-                lineView.SetLineFromGuid(template.LineGuid);
-            }
+
+            lineView.SetLineFromGuid(template.LineGuid);
         }
 
         #endregion
