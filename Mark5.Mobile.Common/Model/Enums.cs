@@ -157,7 +157,6 @@ namespace Mark5.Mobile.Common.Model
 
     #region Calendar
 
-
     public enum CalendarCategoryType
     {
 
@@ -305,6 +304,18 @@ namespace Mark5.Mobile.Common.Model
         FromOrTo = 0,
         FromOnly = 1,
         ToOnly = 2,
+    }
+
+    #endregion
+
+    #region Suggestions
+
+    public enum SuggestionType
+    {
+        Unknown,
+        RecentAddress,
+        Phonebook,
+        Contact,
     }
 
     #endregion

@@ -467,6 +467,7 @@
     <AndroidResource Include="Resources\layout\list_item_system_user.axml" />
     <AndroidResource Include="Resources\layout\list_with_button.axml" />
     <AndroidResource Include="Resources\values\strings-errordialogs.axml" />
+    <AndroidResource Include="Resources\layout\suggestion_dropdown.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

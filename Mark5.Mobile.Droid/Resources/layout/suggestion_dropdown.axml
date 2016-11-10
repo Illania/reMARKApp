@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:paddingTop="2dp"
+    android:paddingBottom="0dp"
+    android:paddingLeft="4dp"
+    android:paddingRight="4dp"
+    android:orientation="vertical">
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/suggestionName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/darkerblue" />
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/suggestionAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/darkerblue" />
+    <View
+        android:id="@+id/suggestionSeparator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:background="@color/lightgray" />
+    <ProgressBar
+        android:id="@+id/suggestionProgressBar"
+        android:layout_width="match_parent"
+        android:layout_height="25dp" />
+</android.support.v7.widget.LinearLayoutCompat>

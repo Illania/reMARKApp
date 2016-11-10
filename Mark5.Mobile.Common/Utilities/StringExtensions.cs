@@ -6,6 +6,8 @@
 // Copyright (c) 2016 Nordic IT
 //
 
+using System;
+
 namespace Mark5.Mobile.Common.Utilities
 {
 
@@ -30,6 +32,16 @@ namespace Mark5.Mobile.Common.Utilities
             }
 
             return str.Substring(startIndex, length);
+        }
+
+        public static bool ContainsCaseInsensitive(this string source, string toCheck)
+        {
+            if (toCheck == null)
+            {
+                throw new ArgumentException("The toCheck string cannot be null");
+            }
+
+            return source.IndexOf(toCheck, StringComparison.CurrentCultureIgnoreCase) >= 0;
         }
     }
 }
