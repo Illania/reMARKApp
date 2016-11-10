@@ -12,8 +12,10 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
 using Android.Graphics;
+using Android.OS;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Text;
@@ -30,7 +32,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
     public class RecipientsView : ComposeDocumentView
     {
-        readonly AppCompatMultiAutoCompleteTextView Control;
+        readonly AppCompatMultiAutoCompleteTextView autoCompleteTextView;
         readonly DocumentAddressType type;
 
         const string EmailSeparator = ", ";
@@ -54,24 +56,25 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             titleTextView.Text = type.ToString();
             AddView(titleTextView);
 
-            Control = new AppCompatMultiAutoCompleteTextView(context);
-            Control.SetPadding(0, 0, 0, 0);
+            autoCompleteTextView = new AppCompatMultiAutoCompleteTextView(context);
+            autoCompleteTextView.SetPadding(0, 0, 0, 0);
             var contentLayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
             contentLayoutParameters.Weight = 1;
-            Control.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
-            Control.SetBackgroundColor(Android.Graphics.Color.Transparent);
-            AddView(Control, contentLayoutParameters);
-
-            Control.Threshold = 1;
-            Control.TextSize = 15;
-            Control.InputType = InputTypes.ClassText | InputTypes.TextVariationEmailAddress | InputTypes.TextFlagMultiLine;
-            Control.Ellipsize = TextUtils.TruncateAt.End;
-            Control.BeforeTextChanged += Control_BeforeTextChanged;
-            Control.AfterTextChanged += Control_AfterTextChanged;
-            Control.FocusChange += Control_FocusChange;
+            autoCompleteTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
+            autoCompleteTextView.SetBackgroundColor(Android.Graphics.Color.Transparent);
 
             var adapter = new SuggestionsAdapter();
-            Control.Adapter = adapter;
+            autoCompleteTextView.Adapter = adapter;
+            autoCompleteTextView.SetTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+            autoCompleteTextView.Threshold = 0;
+            autoCompleteTextView.TextSize = 15;
+            autoCompleteTextView.InputType = InputTypes.ClassText | InputTypes.TextVariationEmailAddress | InputTypes.TextFlagMultiLine;
+            autoCompleteTextView.Ellipsize = TextUtils.TruncateAt.End;
+            autoCompleteTextView.BeforeTextChanged += TextView_BeforeTextChanged;
+            autoCompleteTextView.AfterTextChanged += TextView_AfterTextChanged;
+            autoCompleteTextView.FocusChange += TextView_FocusChange;
+
+            AddView(autoCompleteTextView, contentLayoutParameters);
         }
 
         public override Task RefreshView()
@@ -86,7 +89,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #region Control event handlers
 
-        void Control_FocusChange(object sender, FocusChangeEventArgs e)
+        void TextView_FocusChange(object sender, FocusChangeEventArgs e)
         {
             if (e.HasFocus)
             {
@@ -98,15 +101,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 CompressView();
             }
 
-            Control.Invalidate();
+            autoCompleteTextView.Invalidate();
         }
 
-        void Control_BeforeTextChanged(object sender, TextChangedEventArgs e)
+        void TextView_BeforeTextChanged(object sender, TextChangedEventArgs e)
         {
             textBeforeChange = e.Text.ToString();
         }
 
-        void Control_AfterTextChanged(object sender, AfterTextChangedEventArgs e)
+        void TextView_AfterTextChanged(object sender, AfterTextChangedEventArgs e)
         {
             if (textHasChangedFlag)
             {
@@ -126,7 +129,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 char lastChar;
 
                 while ((lastChar = spannable.LastOrDefault()) != default(char)
-                       && (lastChar == ' ' || lastChar == ',' || lastChar == '\t' || lastChar.ToString() == Environment.NewLine))
+                       && (lastChar == ' ' || lastChar == ',' || lastChar == '\t' || lastChar.ToString() == System.Environment.NewLine))
                 {
                     textHasChangedFlag = true;
 
@@ -155,7 +158,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
 
             CorrectMarkup();
-            Control.Invalidate();
+            autoCompleteTextView.Invalidate();
         }
 
         #endregion
@@ -164,22 +167,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void CompressView()
         {
-            Control.SetSingleLine(true);
+            autoCompleteTextView.SetSingleLine(true);
         }
 
         void ExpandView()
         {
-            Control.SetSingleLine(false);
+            autoCompleteTextView.SetSingleLine(false);
         }
 
         void CorrectMarkup()
         {
-            if (string.IsNullOrEmpty(Control.Text))
+            if (string.IsNullOrEmpty(autoCompleteTextView.Text))
             {
                 return;
             }
 
-            var matches = Validator.ExtractValidEmails(Control.Text);
+            var matches = Validator.ExtractValidEmails(autoCompleteTextView.Text);
 
             ResetStyle();
 
@@ -191,7 +194,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void ResetStyle()
         {
-            SetColor(0, Control.TextFormatted.Length() - 1, Resource.Color.black);
+            SetColor(0, autoCompleteTextView.TextFormatted.Length() - 1, Resource.Color.black);
         }
 
         void SetEmailStyle(int start, int end)
@@ -201,18 +204,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void SetColor(int start, int end, int colorId)
         {
-            var cursorPosition = Control.SelectionStart;
+            var cursorPosition = autoCompleteTextView.SelectionStart;
 
-            var editableText = Control.EditableText;
-            var color = new Android.Graphics.Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)); //TODO should we cache it?
+            var editableText = autoCompleteTextView.EditableText;
+            var color = new Color(ContextCompat.GetColor(Context, colorId)); //TODO should we cache it?
 
             editableText.SetSpan(new ForegroundColorSpan(color), start, end, SpanTypes.ExclusiveExclusive);
-            Control.SetSelection(cursorPosition);
+            autoCompleteTextView.SetSelection(cursorPosition);
         }
 
         void SetCursorAtEnd()
         {
-            Control.SetSelection(Control.Text.Count());
+            autoCompleteTextView.SetSelection(autoCompleteTextView.Text.Count());
         }
 
         #endregion
@@ -220,19 +223,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public class SuggestionsAdapter : BaseAdapter<PrintableSuggestion>, IFilterable
         {
-            SuggestionsObservableCollection suggestions = new SuggestionsObservableCollection();
-
-            public SuggestionsObservableCollection Suggestions
-            {
-                get
-                {
-                    return suggestions;
-                }
-                set
-                {
-                    suggestions = value;
-                }
-            }
+            readonly SuggestionsObservableCollection suggestions = new SuggestionsObservableCollection();
 
             Filter filter;
 
@@ -248,7 +239,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 get
                 {
-                    return Suggestions.Count;
+                    return suggestions.Count;
                 }
             }
 
@@ -259,7 +250,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 filter = new SuggestionsFilter(this);
             }
 
-            public override Android.Views.View GetView(int position, Android.Views.View convertView, ViewGroup parent)
+            public override View GetView(int position, View convertView, ViewGroup parent)
             {
                 var view = convertView ?? LayoutInflater.From(parent.Context).Inflate(
                                         Resource.Layout.suggestion_dropdown, parent, false);
@@ -274,10 +265,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 separator.Visibility = (position == Count - 1 && !isLoading) ? ViewStates.Invisible : ViewStates.Visible;
                 progressBar.Visibility = (position == Count - 1 && isLoading) ? ViewStates.Visible : ViewStates.Gone;
 
-                var name = Suggestions[position].Name;
-                var address = Suggestions[position].Address;
+                var name = suggestions[position].Name;
+                var address = suggestions[position].Address;
 
-                var colorSelection = new Color(ContextCompat.GetColor(parent.Context, Resource.Color.brown))
+                var colorSelection = new Color(ContextCompat.GetColor(parent.Context, Resource.Color.brown));
 
                 var start = address.IndexOf(ActualConstraint, StringComparison.CurrentCultureIgnoreCase);
                 var end = start + ActualConstraint.Length;
@@ -325,16 +316,34 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             public override long GetItemId(int position)
             {
-                return Suggestions[position].GetHashCode();
+                return suggestions[position].GetHashCode();
             }
 
-            public override PrintableSuggestion this[int index]
+            public override PrintableSuggestion this[int position]
             {
                 get
                 {
-                    return Suggestions[index];
+                    return suggestions[position];
                 }
 
+            }
+
+            public void AddSuggestions(List<PrintableSuggestion> newSuggestions)
+            {
+                new Handler(Looper.MainLooper).Post(() =>
+                {
+                    suggestions.AddOrReplaceAllSorted(newSuggestions);
+                    NotifyDataSetChanged();
+                });
+            }
+
+            public void Clean()
+            {
+                new Handler(Looper.MainLooper).Post(() =>
+                  {
+                      suggestions.Clear();
+                      NotifyDataSetInvalidated();
+                  });
             }
 
             #region Support classes
@@ -361,7 +370,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 {
                     this.suggestionsAdapter = suggestionsAdapter;
                     suggestionService = new SuggestionsRetrievalService();
-                    suggestionService.GetSuggestionsCompleted += SuggestionService_GetSuggestionsCompleted;
                 }
 
                 #region Overrides
@@ -374,11 +382,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                         searchCancellationTokenSource = null;
                     }
 
-                    CrossCurrentActivity.Current.Activity.RunOnUiThread(() =>
-                        {
-                            suggestionsAdapter.Suggestions.Clear();
-                            suggestionsAdapter.NotifyDataSetInvalidated();
-                        });
+                    suggestionsAdapter.Clean();
 
                     if (constraint != null)
                     {
@@ -387,7 +391,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                         suggestionsAdapter.ActualConstraint = constraint.ToString();
                         searchCancellationTokenSource = new CancellationTokenSource();
                         searchCancellationTokenSources.Add(searchCancellationTokenSource);
-                        suggestionService.GetSuggestions(suggestionsAdapter.ActualConstraint, searchCancellationTokenSource.Token);
+                        suggestionService.GetSuggestions(suggestionsAdapter.ActualConstraint, searchCancellationTokenSource.Token, HandleSugguestions);
                     }
                     else
                     {
@@ -400,31 +404,26 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 protected override void PublishResults(Java.Lang.ICharSequence constraint, FilterResults results)
                 {
-                    //Nothing to do here
+                    //Nothing to do here //TODO this is in the UI thread, need to check ir
                 }
 
                 #endregion
 
                 #region SuggestionService handlers
 
-                void SuggestionService_GetSuggestionsCompleted(object sender, SuggestionsRetrievalService.GetSuggestionsEventArgs e)
+                void HandleSugguestions(List<PrintableSuggestion> newSuggestions, CancellationToken token)
                 {
-                    if (e.CancellationToken.IsCancellationRequested)
+                    if (token.IsCancellationRequested)
                     {
                         return;
                     }
 
-                    CrossCurrentActivity.Current.Activity.RunOnUiThread(() =>
-                        {
-                            answersReceived += 1;
-                            suggestionsAdapter.Suggestions.AddOrReplaceAllSorted(e.Suggestions);
-                            suggestionsAdapter.NotifyDataSetChanged();
-                        });
+                    answersReceived += 1;
+                    suggestionsAdapter.AddSuggestions(newSuggestions);
                 }
 
                 #endregion
             }
-
             #endregion
         }
 
