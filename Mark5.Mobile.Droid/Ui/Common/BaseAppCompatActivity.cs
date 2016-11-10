@@ -23,6 +23,8 @@ namespace Mark5.Mobile.Droid.Ui.Common
             base.OnResume();
 
             var connectionBar = FindViewById(Resource.Id.connection_bar);
+            connectionBar.Clickable = true;
+            connectionBar.Click += ConnectionBar_Click;
             connectionBar.LongClickable = true;
             connectionBar.LongClick += ConnectionBar_LongClick;
             connectionBar.Visibility = CommonConfig.ReachabilityService.IsReachable ? ViewStates.Gone : ViewStates.Visible;
@@ -35,6 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             base.OnPause();
 
             var connectionBar = FindViewById(Resource.Id.connection_bar);
+            connectionBar.Click -= ConnectionBar_Click;
             connectionBar.LongClick -= ConnectionBar_LongClick;
             CommonConfig.ReachabilityService.ReachabilityRefreshed -= ReachabilityService_ReachabilityRefreshed;
         }
@@ -56,16 +59,25 @@ namespace Mark5.Mobile.Droid.Ui.Common
             connectionBar.Visibility = e.IsReachable ? ViewStates.Gone : ViewStates.Visible;
         }
 
-        async void ConnectionBar_LongClick(object sender, System.EventArgs e)
+        async void ConnectionBar_Click(object sender, EventArgs e)
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.testing_connection, Resource.String.please_wait);
+
+            await CommonConfig.ReachabilityService.Refresh();
+
+            dismissAction();
+        }
+
+        async void ConnectionBar_LongClick(object sender, EventArgs e)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.testing_connection, Resource.String.please_wait);
 
             try
             {
-                var network = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.NetworkAvailability, testOnly: true);
-                var google = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.Google, testOnly: true);
-                var serviceConnection = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.ServiceConnection, testOnly: true);
-                var service = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.Service, testOnly: true);
+                var network = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.NetworkAvailability, true);
+                var google = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.Google, true);
+                var serviceConnection = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.ServiceConnection, true);
+                var service = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.Service, true);
 
                 var title = GetString(Resource.String.connection_status);
 

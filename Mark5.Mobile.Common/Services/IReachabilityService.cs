@@ -6,7 +6,6 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Mark5.Mobile.Common.Services
@@ -21,7 +20,7 @@ namespace Mark5.Mobile.Common.Services
 
         event EventHandler<ReachabilityRefreshedEventArgs> ReachabilityRefreshed;
 
-        Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.ServiceConnection, CancellationToken ct = default(CancellationToken), bool testOnly = false);
+        Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.ServiceConnection, bool testOnly = false);
     }
 
     public class ReachabilityRefreshedEventArgs : EventArgs

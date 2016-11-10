@@ -82,6 +82,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (objectLinks == null)
                 {
                     objectLinks = await Managers.CommonActionsManager.GetObjectLinksAsync(BusinessEntity);
+                    ProcessObjectLinks(objectLinks);
                 }
 
                 RefreshView();
@@ -103,7 +104,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout.RemoveViews(0, linearLayout.ChildCount);
 
-            var grouppedObjectLinks = objectLinks.OrderBy(oa => oa.TypeInfo.DescriptionComplex).GroupBy(oa => oa.TypeInfo.DescriptionComplex);
+            var grouppedObjectLinks = objectLinks.OrderBy(ol => ol.TypeInfo.DescriptionSimple).GroupBy(ol => ol.TypeInfo.DescriptionComplex);
 
             foreach (var grouppedObjectLink in grouppedObjectLinks)
             {
@@ -112,6 +113,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout.Invalidate();
             linearLayout.RequestLayout();
+        }
+
+        void ProcessObjectLinks(List<ObjectLink> ols)
+        {
+            foreach (var ol in ols)
+            {
+                ol.TypeInfo.DescriptionAction = ProcessString(ol.TypeInfo.DescriptionAction, ol.TypeInfo.FromType, ol.TypeInfo.ToType);
+                ol.TypeInfo.DescriptionActionReverse = ProcessString(ol.TypeInfo.DescriptionActionReverse, ol.TypeInfo.FromType, ol.TypeInfo.ToType);
+                ol.TypeInfo.DescriptionComplex = ProcessString(ol.TypeInfo.DescriptionComplex, ol.TypeInfo.FromType, ol.TypeInfo.ToType);
+                ol.TypeInfo.DescriptionComplexReverse = ProcessString(ol.TypeInfo.DescriptionComplexReverse, ol.TypeInfo.FromType, ol.TypeInfo.ToType);
+                ol.TypeInfo.DescriptionSimple = ProcessString(ol.TypeInfo.DescriptionSimple, ol.TypeInfo.FromType, ol.TypeInfo.ToType);
+            }
+        }
+
+        string ProcessString(string str, ObjectType from, ObjectType to)
+        {
+            if (str.Contains("%"))
+            {
+                str = str.Replace("%ObjFromName%", from.ToString());
+                str = str.Replace("%ObjToName%", to.ToString());
+            }
+
+            return str;
         }
 
         public override IRetainableState OnRetainInstanceState()
