@@ -27,6 +27,7 @@ namespace Mark5.Mobile.Common.Database
                 c.CreateTable<TemplatePreview>();
                 c.CreateTable<Template>();
                 c.CreateTable<DefaultTemplateInfo>();
+                c.CreateTable<RecentAddress>();
             });
             await DatabaseConnectionProvider.ContactsDatabase.RunInConnectionAsync(c =>
             {

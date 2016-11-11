@@ -50,7 +50,7 @@ namespace Mark5.Mobile.Droid
                 CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
                 CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
                 CommonConfig.HttpClientHandler = () => { return new AndroidClientHandler(); };
-
+                CommonConfig.PhonebookUtilities = new PhonebookUtilities();
 #if !DEBUG
                 CommonConfig.Logger.Level = LogLevel.TRACE;
 #else
@@ -63,6 +63,7 @@ namespace Mark5.Mobile.Droid
                 PlatformConfig.ReachabilityBroadcastReceiver = new ReachabilityBroadcastReceiver();
                 PlatformConfig.Preferences = new Preferences();
                 PlatformConfig.MessengerHub = new TinyMessengerHub();
+
             }).Wait();
 
             CommonConfig.Logger.Info($"Initialized {nameof(Mark5Application)}");

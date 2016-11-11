@@ -11,7 +11,6 @@ namespace Mark5.Mobile.Common.Model
 
     public class CommunicationAddress
     {
-
         public CommunicationAddressType Type { get; set; }
 
         public string Description { get; set; }
@@ -19,6 +18,14 @@ namespace Mark5.Mobile.Common.Model
         public string Address { get; set; }
 
         public bool IsPrimary { get; set; }
+
+        public CommunicationAddress(string address, CommunicationAddressType type)
+        {
+            Address = address;
+            Type = type;
+        }
+
+        public CommunicationAddress() { }
     }
 }
 

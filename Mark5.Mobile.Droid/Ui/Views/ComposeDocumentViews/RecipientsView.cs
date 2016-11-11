@@ -61,15 +61,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             var contentLayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
             contentLayoutParameters.Weight = 1;
             autoCompleteTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
-            autoCompleteTextView.SetBackgroundColor(Android.Graphics.Color.Transparent);
+            autoCompleteTextView.SetBackgroundColor(Color.Transparent);
 
             var adapter = new SuggestionsAdapter();
             autoCompleteTextView.Adapter = adapter;
             autoCompleteTextView.SetTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
-            autoCompleteTextView.Threshold = 0;
+            autoCompleteTextView.Threshold = 2;
             autoCompleteTextView.TextSize = 15;
             autoCompleteTextView.InputType = InputTypes.ClassText | InputTypes.TextVariationEmailAddress | InputTypes.TextFlagMultiLine;
             autoCompleteTextView.Ellipsize = TextUtils.TruncateAt.End;
+            autoCompleteTextView.DropDownVerticalOffset = ConversionUtils.ConvertDpToPixels(4);
+
             autoCompleteTextView.BeforeTextChanged += TextView_BeforeTextChanged;
             autoCompleteTextView.AfterTextChanged += TextView_AfterTextChanged;
             autoCompleteTextView.FocusChange += TextView_FocusChange;

@@ -51,7 +51,8 @@ namespace Mark5.Mobile.Common.Model
             {
                 foreach (var address in contact.CommunicationAddresses)
                 {
-                    var fullName = $"{contact.FirstName}{(string.IsNullOrEmpty(contact.Patronymic) ? string.Empty : " " + contact.Patronymic)} {contact.LastName}";
+                    var fullName = $"{contact.FirstName}{(string.IsNullOrEmpty(contact.Patronymic) ? string.Empty : " " + contact.Patronymic)}" +
+                        $"{(string.IsNullOrEmpty(contact.LastName) ? "" : " " + contact.LastName)}";
                     suggestions.Add(new PrintableSuggestion(fullName, address.Address, type));
                 }
             }

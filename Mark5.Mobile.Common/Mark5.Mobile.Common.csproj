@@ -182,6 +182,7 @@
     <Compile Include="Model\PrintableSuggestion.cs" />
     <Compile Include="Utilities\SuggestionsRetrievalService.cs" />
     <Compile Include="Utilities\PortableCollections\SortedObservableCollection.cs" />
+    <Compile Include="Utilities\PhonebookContactsUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

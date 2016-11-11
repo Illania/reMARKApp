@@ -19,6 +19,11 @@ namespace Mark5.Mobile.Common.Utilities
     {
         public void GetSuggestions(string phrase, CancellationToken token, Action<List<PrintableSuggestion>, CancellationToken> handler)
         {
+            if (token.IsCancellationRequested)
+            {
+                return;
+            }
+
             GetSuggestionFromRecentAddresses(phrase, token, handler);
             GetSuggestionFromContacts(phrase, token, handler);
             GetSuggestionFromPhonebook(phrase, token, handler);
@@ -26,13 +31,18 @@ namespace Mark5.Mobile.Common.Utilities
 
         public void GetSuggestionFromRecentAddresses(string phrase, CancellationToken token, Action<List<PrintableSuggestion>, CancellationToken> handler)
         {
+            if (token.IsCancellationRequested)
+            {
+                return;
+            }
+
             Task.Run(async () =>
             {
                 var filtered = new List<PrintableSuggestion>();
                 try
                 {
-                    var recentAddresses = await Managers.Managers.DocumentsManager.GetRecentAddressesAsync(); //TODO eventually this should happen only the first time
-                    filtered = recentAddresses.Where(r => r.Address.ContainsCaseInsensitive(phrase) || r.Name.ContainsCaseInsensitive(phrase)) //TODO need to select the right type
+                    var recentAddresses = await Managers.Managers.DocumentsManager.GetRecentAddressesAsync(); //TODO Discuss with Bartosz about when to call this
+                    filtered = recentAddresses.Where(r => r.Address.ContainsCaseInsensitive(phrase) || r.Name.ContainsCaseInsensitive(phrase))
                                                  .Select(ra => new PrintableSuggestion(ra)).ToList();
                 }
                 catch (Exception ex)
@@ -46,22 +56,35 @@ namespace Mark5.Mobile.Common.Utilities
 
         public void GetSuggestionFromPhonebook(string phrase, CancellationToken token, Action<List<PrintableSuggestion>, CancellationToken> handler)
         {
-            var a1 = new PrintableSuggestion("Ferdinando", "fp@nordic-it.com", SuggestionType.Phonebook);
-            var a2 = new PrintableSuggestion("Luigi", "ls@nordic-it.com", SuggestionType.Phonebook);
-            var a3 = new PrintableSuggestion("Magda", "ma@nordic-it.com", SuggestionType.Phonebook);
+            if (token.IsCancellationRequested)
+            {
+                return;
+            }
+
             Task.Run(() =>
            {
-               handler(new List<PrintableSuggestion> { a1, a2, a3 }, token);
+               var phonebookContacts = CommonConfig.PhonebookUtilities.GetFilteredPhonebookContacts(phrase) ?? new List<Contact>();
+               var filtered = PrintableSuggestion.GetPrintableSuggestionsFromContacts(phonebookContacts, SuggestionType.Phonebook);
+               handler(filtered, token);
            });
         }
 
         public void GetSuggestionFromContacts(string phrase, CancellationToken token, Action<List<PrintableSuggestion>, CancellationToken> handler)
         {
+            if (token.IsCancellationRequested)
+            {
+                return;
+            }
+
             var a4 = new PrintableSuggestion("Bartosz", "bgc@nordic-it.com", SuggestionType.Contact);
-            var a5 = new PrintableSuggestion("", "fp@nordic-it.com", SuggestionType.Contact);
+            var a5 = new PrintableSuggestion("Ander", "andersp@gmail.com", SuggestionType.Contact);
+
+            var sugg = new List<PrintableSuggestion> { a4, a5 };
+            var filtered = sugg.Where(ps => ps.Name.ContainsCaseInsensitive(phrase) | ps.Address.ContainsCaseInsensitive(phrase)).ToList();
+
             Task.Run(() =>
            {
-               handler(new List<PrintableSuggestion> { a4, a5 }, token);
+               handler(filtered, token);
            });
         }
     }
