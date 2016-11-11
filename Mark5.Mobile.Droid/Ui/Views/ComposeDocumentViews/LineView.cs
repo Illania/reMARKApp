@@ -54,19 +54,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #region Public methods
 
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public override async Task RefreshView()
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        public override Task RefreshView()
         {
             if (CreationModeFlag == DocumentCreationModeFlag.None || CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
-                return;
+                return Task.CompletedTask;
             }
 
             if (availableOutgoingLinesInView.Count == 1)
             {
                 SetLine(availableOutgoingLinesInView.First().Line);
-                return;
+                return Task.CompletedTask;
             }
 
             var previousDocumentLines = PreviousDocument.Lines;
@@ -86,11 +84,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     //TODO need to notify the user somehow (not easy to put empty text)
                 }
             }
+
+            return Task.CompletedTask;
+
         }
 
         public override Task UpdateDocument()
         {
-            throw new NotImplementedException();
+            Document.Lines.Add(availableOutgoingLinesInView[lineSpinner.SelectedItemPosition].Line);
+            return Task.CompletedTask;
         }
 
         public void SetLineFromGuid(Guid lineGuid)

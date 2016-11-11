@@ -13,7 +13,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.OS;
@@ -24,6 +23,7 @@ using Android.Text.Style;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.PortableCollections;
@@ -85,14 +85,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #region Public Methods
 
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public override async Task RefreshView()
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        public override Task RefreshView()
         {
             if (CreationModeFlag == DocumentCreationModeFlag.New || CreationModeFlag == DocumentCreationModeFlag.None
                 || CreationModeFlag == DocumentCreationModeFlag.Forward)
             {
-                return;
+                return Task.CompletedTask;
             }
 
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
@@ -104,7 +102,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 if (AddressType != DocumentAddressType.To)
                 {
-                    return;
+                    return Task.CompletedTask;
                 }
 
                 if (PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
@@ -156,22 +154,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             //TODO What is redirect?
             //TODO What is resend? (like edit?)
+            return Task.CompletedTask;
         }
 
         public override Task UpdateDocument()
         {
-            throw new NotImplementedException();
+            GetEmails().ForEach(s => DocumentPreview.Addresses.Add(new DocumentAddress { Address = s, AddressType = this.AddressType, Type = CommunicationAddressType.Email }));
+            return Task.CompletedTask;
         }
 
         #endregion
 
         #region Utilities
-
-        void StartEditing()
-        {
-            RequestFocus();
-            emailEditor.RequestFocus(); //TODO check if necessary 
-        }
 
         void SetEmails(IEnumerable<string> emails)
         {
@@ -196,69 +190,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        void AddEmails(IEnumerable<string> emails)
-        {
-            AddEmails(string.Join(EmailSeparator, emails));
-        }
-
-        void AddEmails(string emails)
-        {
-            MatchCollection matches;
-            if (Validator.ContainsValidEmails(emails, out matches))
-            {
-                var text = emailEditor.Text;
-                var newEmails = new StringBuilder();
-                newEmails.Append(text);
-                if (!text.EndsWith(EmailSeparator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(text))
-                {
-                    newEmails.Append(EmailSeparator);
-                }
-                newEmails.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
-                newEmails.Append(EmailSeparator);
-
-                emailEditor.Text = newEmails.ToString();
-
-                //Edited(this, EventArgs.Empty); //TODO decide if useful
-            }
-            else
-            {
-                CommonConfig.Logger.Info($"No valid emails found in {emails}");
-            }
-        }
-
         IEnumerable<string> GetEmails()
         {
             MatchCollection matches;
             return Validator.ContainsValidEmails(emailEditor.Text, out matches) ? matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() : new List<string>();
-        }
-
-        IEnumerable<string> GetRecipents()
-        {
-            return emailEditor.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries).Where(Validator.ContainsValidEmails).Select(s => s.Trim());
-        }
-
-        void AddRecipent(string name, string address)
-        {
-            var text = emailEditor.Text;
-            var newEmails = new StringBuilder();
-            newEmails.Append(text);
-            if (!text.EndsWith(EmailSeparator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(text))
-            {
-                newEmails.Append(EmailSeparator);
-            }
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                newEmails.Append(address);
-            }
-            else
-            {
-                newEmails.Append(string.Format(RecipentFormat, name, address));
-            }
-            newEmails.Append(EmailSeparator);
-
-            emailEditor.Text = newEmails.ToString();
-
-            //Edited(this, EventArgs.Empty); //TODO
         }
 
         #endregion

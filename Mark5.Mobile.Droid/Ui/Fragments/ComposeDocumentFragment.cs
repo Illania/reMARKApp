@@ -102,6 +102,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
             }
 
+            documentShown = true;
+
             foreach (var subView in subViews)
             {
                 subView.Document = Document;
@@ -113,10 +115,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             await AskIfShouldUseTemplates();
-            documentShown = true; //TODO find a better name?
         }
-
-        //TODO add process tamplate
 
         #region Template methods
 
@@ -158,7 +157,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         break;
                 }
             }
-        }  //TODO templates can modify also the line and the subject
+        }
 
         async Task GetAllTemplates()
         {

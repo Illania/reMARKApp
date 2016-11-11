@@ -37,13 +37,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             AddView(subjectTextView);
         }
 
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public override async Task RefreshView()
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        public override Task RefreshView()
         {
             if (CreationModeFlag == DocumentCreationModeFlag.None || CreationModeFlag == DocumentCreationModeFlag.New)
             {
-                return;
+                return Task.CompletedTask;
             }
 
             switch (CreationModeFlag)
@@ -61,11 +59,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
 
             //TODO what about redirect and resend?
+
+            return Task.CompletedTask;
         }
 
         public override Task UpdateDocument()
         {
-            throw new NotImplementedException();
+            DocumentPreview.Subject = subjectTextView.Text;
+            return Task.CompletedTask;
         }
 
         public void SetSubject(string subject)
