@@ -49,7 +49,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #region Public methods
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public override async Task RefreshView()
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
             {

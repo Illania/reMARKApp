@@ -22,8 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
     {
         readonly AppCompatSpinner lineSpinner;
         readonly List<LineInView> availableOutgoingLinesInView;
-        readonly Line defaultLine; //TODO remember to set;
-        Line defaultOutgoingLine;
+        readonly Line defaultOutgoingLine;
 
         public LineView(Context context)
             : base(context)
@@ -55,7 +54,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #region Public methods
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public override async Task RefreshView()
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             if (CreationModeFlag == DocumentCreationModeFlag.None || CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
@@ -69,9 +70,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
 
             var previousDocumentLines = PreviousDocument.Lines;
-            if (previousDocumentLines.Contains(defaultLine))
+            if (previousDocumentLines.Contains(defaultOutgoingLine))
             {
-                SetLine(defaultLine);
+                SetLine(defaultOutgoingLine);
             }
             else
             {

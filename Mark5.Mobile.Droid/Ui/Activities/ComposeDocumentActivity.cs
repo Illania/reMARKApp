@@ -32,7 +32,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         const string PreviousDocumentFolderIdIntentKey = "PreviousDocumentFolderIdIntent_ac0d9a31-2ddc-497b-8fbe-7fd5a51b2257";
 
         public static Intent CreateIntent(Context context, DocumentCreationModeFlag creationModeFlag, DocumentPreview documentPreview = null, Document document = null,
-                                         int? precedingDocumentId = null, int? precedingDocumentFolderId = null)
+                                          int? precedingDocumentFolderId = null)
         {
             var intent = new Intent(context, typeof(ComposeDocumentActivity));
             intent.PutExtra(CreationModeFlagIntentKey, (int)creationModeFlag);
@@ -44,7 +44,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 intent.PutExtra(PreviousDocumentIntentKey, SerializationUtils.Serialize(document));
             }
-            if (precedingDocumentId != null)
+            if (precedingDocumentFolderId != null)
             {
                 intent.PutExtra(PreviousDocumentFolderIdIntentKey, precedingDocumentFolderId.Value);
             }

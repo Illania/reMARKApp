@@ -203,4 +203,6 @@
 	<string name="mark5_server_reachability">MARK5 Server:</string>
 	<string name="mark5_service_reachability">MARK5 App Service:</string>
 	<string name="unavailable">Unavailable</string>
+	<string name="show_previous_message">Show previous message</string>
+	<string name="hide_previous_message">Hide previous message</string>
 </resources>

@@ -108,10 +108,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 subView.DocumentPreview = DocumentPreview;
                 subView.PreviousDocument = PreviousDocument;
                 subView.PreviousDocumentPreview = PreviousDocumentPreview;
+                subView.CreationModeFlag = CreationModeFlag;
                 await subView.RefreshView();
             }
 
-            await contentView.RefreshView();
             await AskIfShouldUseTemplates();
             documentShown = true; //TODO find a better name?
         }

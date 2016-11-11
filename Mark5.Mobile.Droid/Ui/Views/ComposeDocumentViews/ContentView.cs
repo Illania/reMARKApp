@@ -55,7 +55,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public ContentView(Context context)
             : base(context)
         {
-            Orientation = Horizontal;
+            Orientation = Vertical;
+            var layoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, 0);
+            layoutParams.Weight = 1;
+            LayoutParameters = layoutParams;
             SetPadding(DistanceNormal, DistanceNormal, DistanceNormal, DistanceNormal);
 
             newContentWebView = new CustomWebView(context)
@@ -78,7 +81,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
             };
-            showOldContentButton.Text = "Show old content"; //TODO need to use resources and find a good text
+            showOldContentButton.SetText(Resource.String.show_previous_message);
             showOldContentButton.Visibility = ViewStates.Gone;
             showOldContentButton.Click += ShowOldContentButton_Click;
             AddView(showOldContentButton);
@@ -100,25 +103,35 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void ShowOldContentButton_Click(object sender, EventArgs e)
         {
-            if (!oldContentLoaded)
+            if (oldContentWebView.Visibility == ViewStates.Gone)
             {
-                if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
+                if (!oldContentLoaded)
                 {
-                    oldContentWebView.LoadDataWithBaseURL(null, PreviousDocument.PlainTextBody, "text/plain", "UTF-8", null);
-                }
-                else if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
-                {
-                    oldContentWebView.LoadDataWithBaseURL(null, PreviousDocument.HtmlBody, "text/html", "UTF-8", null);
-                }
-                else
-                {
-                    oldContentWebView.LoadDataWithBaseURL(null, PreviousDocument.PlainTextBody, "text/plain", "UTF-8", null);
+                    if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
+                    {
+                        oldContentWebView.LoadDataWithBaseURL(null, PreviousDocument.PlainTextBody, "text/plain", "UTF-8", null);
+                    }
+                    else if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
+                    {
+                        oldContentWebView.LoadDataWithBaseURL(null, PreviousDocument.HtmlBody, "text/html", "UTF-8", null);
+                    }
+                    else
+                    {
+                        oldContentWebView.LoadDataWithBaseURL(null, PreviousDocument.PlainTextBody, "text/plain", "UTF-8", null);
+                    }
+
+                    oldContentLoaded = true;
                 }
 
-                oldContentLoaded = true;
+                showOldContentButton.SetText(Resource.String.hide_previous_message);
+                oldContentWebView.Visibility = ViewStates.Visible;
+            }
+            else
+            {
+                oldContentWebView.Visibility = ViewStates.Gone;
+                showOldContentButton.SetText(Resource.String.show_previous_message);
             }
 
-            oldContentWebView.Visibility = ViewStates.Visible;
         }
 
         #region Public methods

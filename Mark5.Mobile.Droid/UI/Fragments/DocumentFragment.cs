@@ -186,6 +186,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
+            if (item.ItemId == MenuItemActions.Reply)
+            {
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Reply, DocumentPreview, Document, Folder.Id));
+                return true;
+            }
+            if (item.ItemId == MenuItemActions.ReplyAll)
+            {
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.ReplyAll, DocumentPreview, Document, Folder.Id));
+                return true;
+            }
+            if (item.ItemId == MenuItemActions.Forward)
+            {
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Forward, DocumentPreview, Document, Folder.Id));
+                return true;
+            }
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
                 var i = new Intent(Activity, typeof(FolderListSelectionActivity));
@@ -220,6 +235,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var i = new Intent(Activity, typeof(CommentsListActivity));
                 i.PutExtra(CommentsListActivity.EntityIntentKey, SerializationUtils.Serialize(Document));
                 Activity.StartActivityForResult(i, RequestCodes.CommentsRequest);
+                return true;
             }
             if (item.ItemId == MenuItemActions.Actions)
             {
