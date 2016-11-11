@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
@@ -36,9 +37,28 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             AddView(subjectTextView);
         }
 
-        public override Task RefreshView()
+        public override async Task RefreshView()
         {
-            throw new NotImplementedException();
+            if (CreationModeFlag == DocumentCreationModeFlag.None || CreationModeFlag == DocumentCreationModeFlag.New)
+            {
+                return;
+            }
+
+            switch (CreationModeFlag)
+            {
+                case DocumentCreationModeFlag.Edit:
+                    subjectTextView.Text = PreviousDocumentPreview.Subject;
+                    break;
+                case DocumentCreationModeFlag.Reply:
+                case DocumentCreationModeFlag.ReplyAll:
+                    subjectTextView.Text = $"Re: {PreviousDocumentPreview.Subject}";
+                    break;
+                case DocumentCreationModeFlag.Forward:
+                    subjectTextView.Text = $"Fw: {PreviousDocumentPreview.Subject}";
+                    break;
+            }
+
+            //TODO what about redirect and resend?
         }
 
         public override Task UpdateDocument()

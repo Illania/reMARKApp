@@ -21,8 +21,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
     public class LineView : ComposeDocumentView
     {
         readonly AppCompatSpinner lineSpinner;
-        readonly List<LineInView> availableOutgoingLines;
+        readonly List<LineInView> availableOutgoingLinesInView;
         readonly Line defaultLine; //TODO remember to set;
+        Line defaultOutgoingLine;
 
         public LineView(Context context)
             : base(context)
@@ -38,16 +39,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             titleTextView.SetText(Resource.String.line);
             AddView(titleTextView);
 
-            availableOutgoingLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Select(l => new LineInView(l)).ToList();
+            defaultOutgoingLine = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultOutgoingLine;
+            availableOutgoingLinesInView = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Select(l => new LineInView(l)).ToList();
 
             lineSpinner = new AppCompatSpinner(context);
             var spinnerLayoutParams = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
             spinnerLayoutParams.Weight = 1;
             lineSpinner.LayoutParameters = spinnerLayoutParams;
-            var adapter = new ArrayAdapter(context, Android.Resource.Layout.SimpleSpinnerItem, availableOutgoingLines);
+            var adapter = new ArrayAdapter(context, Android.Resource.Layout.SimpleSpinnerItem, availableOutgoingLinesInView);
             adapter.SetDropDownViewResource(Resource.Layout.support_simple_spinner_dropdown_item);
             lineSpinner.Adapter = adapter;
             AddView(lineSpinner);
+
         }
 
         #region Public methods
@@ -59,9 +62,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 return;
             }
 
-            if (availableOutgoingLines.Count == 1)
+            if (availableOutgoingLinesInView.Count == 1)
             {
-                SetLine(availableOutgoingLines.First().Line);
+                SetLine(availableOutgoingLinesInView.First().Line);
                 return;
             }
 
@@ -72,7 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
             else
             {
-                var intersection = previousDocumentLines.Intersect(availableOutgoingLines.Select(l => l.Line)).ToList();
+                var intersection = previousDocumentLines.Intersect(availableOutgoingLinesInView.Select(l => l.Line)).ToList();
                 if (intersection.Count() == 1)
                 {
                     SetLine(intersection.First());
@@ -91,7 +94,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public void SetLineFromGuid(Guid lineGuid)
         {
-            var index = availableOutgoingLines.FindIndex(l => l.Line.Guid == lineGuid);
+            var index = availableOutgoingLinesInView.FindIndex(l => l.Line.Guid == lineGuid);
             if (index > 0)
             {
                 lineSpinner.SetSelection(index);

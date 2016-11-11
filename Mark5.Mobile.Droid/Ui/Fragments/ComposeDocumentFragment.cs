@@ -44,6 +44,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ProgressBar progress;
         ScrollView scrollView;
         LinearLayoutCompat linearLayout;
+        bool documentShown;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
@@ -96,16 +97,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task ShowDocument()
         {
+            if (documentShown)
+            {
+                return;
+            }
+
             foreach (var subView in subViews)
             {
                 subView.Document = Document;
                 subView.DocumentPreview = DocumentPreview;
                 subView.PreviousDocument = PreviousDocument;
                 subView.PreviousDocumentPreview = PreviousDocumentPreview;
+                await subView.RefreshView();
             }
 
             await contentView.RefreshView();
             await AskIfShouldUseTemplates();
+            documentShown = true; //TODO find a better name?
         }
 
         //TODO add process tamplate
@@ -252,13 +260,61 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task ApplyTemplate(Template template)
         {
+            ProcessTemplate(template);
+
             await contentView.InsertTemplate(template);
+
             if (!string.IsNullOrEmpty(template.Subject))
             {
                 subjectView.SetSubject(template.Subject);
             }
 
             lineView.SetLineFromGuid(template.LineGuid);
+        }
+
+        void ProcessTemplate(Template template)
+        {
+            var templateContent = template.Content;
+
+            var currentTime = DateTime.Now;
+            var dateString = currentTime.ToString("dd-MM-yyyy");
+            var timeString = currentTime.ToString("HH:mm");
+
+            string fromNameString = string.Empty;
+            if (PreviousDocumentPreview != null && PreviousDocumentPreview.Addresses != null)
+            {
+                fromNameString = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Name).FirstOrDefault() ?? string.Empty;
+            }
+
+            if (template.ContentType == ContentType.Html)
+            {
+                templateContent = templateContent.Replace("&lt;FROMNAME&gt;", fromNameString);
+                templateContent = templateContent.Replace("&lt;DATE&gt;", dateString);
+                templateContent = templateContent.Replace("&lt;TIME&gt;", timeString);
+            }
+            else
+            {
+                templateContent = templateContent.Replace("<FROMNAME>", fromNameString);
+                templateContent = templateContent.Replace("<DATE>", dateString);
+                templateContent = templateContent.Replace("<TIME>", timeString);
+            }
+
+            if (template.ContentType == ContentType.Html)
+            {
+                templateContent = templateContent.Replace("&lt;CUR&gt;", string.Empty);
+                templateContent = templateContent.Replace("&lt;SOURCETEXT&gt;", string.Empty);
+                templateContent = templateContent.Replace("&lt;COMPANYNAME&gt;", string.Empty);
+                templateContent = templateContent.Replace("&lt;FROMNAMEWITHCOMPANY&gt;", string.Empty);
+            }
+            else
+            {
+                templateContent = templateContent.Replace("<CUR>", string.Empty);
+                templateContent = templateContent.Replace("<SOURCETEXT>", string.Empty);
+                templateContent = templateContent.Replace("<COMPANYNAME>", string.Empty);
+                templateContent = templateContent.Replace("<FROMNAMEWITHCOMPANY>", string.Empty);
+            }
+
+            template.Content = templateContent;
         }
 
         #endregion
