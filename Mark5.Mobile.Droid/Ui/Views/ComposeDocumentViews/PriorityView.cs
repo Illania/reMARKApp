@@ -43,18 +43,35 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             var adapter = new ArrayAdapter(context, Android.Resource.Layout.SimpleSpinnerItem, priorities);
             adapter.SetDropDownViewResource(Resource.Layout.support_simple_spinner_dropdown_item);
             prioritySpinner.Adapter = adapter;
-            prioritySpinner.SetSelection(priorities.IndexOf(Priority.Normal));
+            SetPriority(Priority.Normal);
             AddView(prioritySpinner);
         }
 
-        public override Task RefreshView()
+        #region Public methods
+
+        public override async Task RefreshView()
         {
-            throw new NotImplementedException();
+            if (CreationModeFlag == DocumentCreationModeFlag.Edit)
+            {
+                SetPriority(PreviousDocumentPreview.Priority);
+            }
         }
 
         public override Task UpdateDocument()
         {
             throw new NotImplementedException();
         }
+
+        #endregion
+
+        #region Utilities
+
+        void SetPriority(Priority priority)
+        {
+            prioritySpinner.SetSelection(priorities.IndexOf(priority));
+        }
+
+        #endregion
+
     }
 }

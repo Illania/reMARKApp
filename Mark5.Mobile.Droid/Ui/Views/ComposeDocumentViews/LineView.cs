@@ -22,6 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
     {
         readonly AppCompatSpinner lineSpinner;
         readonly List<LineInView> availableOutgoingLines;
+        readonly Line defaultLine; //TODO remember to set;
 
         public LineView(Context context)
             : base(context)
@@ -49,24 +50,38 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             AddView(lineSpinner);
         }
 
-        class LineInView
-        {
-            public readonly Line line;
+        #region Public methods
 
-            public LineInView(Line line)
+        public override async Task RefreshView()
+        {
+            if (CreationModeFlag == DocumentCreationModeFlag.None || CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
-                this.line = line;
+                return;
             }
 
-            public override string ToString()
+            if (availableOutgoingLines.Count == 1)
             {
-                return line.Name;
+                SetLine(availableOutgoingLines.First().Line);
+                return;
             }
-        }
 
-        public override Task RefreshView()
-        {
-            throw new NotImplementedException();
+            var previousDocumentLines = PreviousDocument.Lines;
+            if (previousDocumentLines.Contains(defaultLine))
+            {
+                SetLine(defaultLine);
+            }
+            else
+            {
+                var intersection = previousDocumentLines.Intersect(availableOutgoingLines.Select(l => l.Line)).ToList();
+                if (intersection.Count() == 1)
+                {
+                    SetLine(intersection.First());
+                }
+                else
+                {
+                    //TODO need to notify the user somehow (not easy to put empty text)
+                }
+            }
         }
 
         public override Task UpdateDocument()
@@ -76,11 +91,44 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public void SetLineFromGuid(Guid lineGuid)
         {
-            var index = availableOutgoingLines.FindIndex(l => l.line.Guid == lineGuid);
+            var index = availableOutgoingLines.FindIndex(l => l.Line.Guid == lineGuid);
             if (index > 0)
             {
                 lineSpinner.SetSelection(index);
             }
         }
+
+        #endregion
+
+        #region Utilities
+
+        void SetLine(Line line)
+        {
+            SetLineFromGuid(line.Guid);
+        }
+
+        class LineInView
+        {
+            readonly Line line;
+
+            public Line Line
+            {
+                get
+                {
+                    return line;
+                }
+            }
+            public LineInView(Line line)
+            {
+                this.line = line;
+            }
+
+            public override string ToString()
+            {
+                return Line.Name;
+            }
+        }
+
+        #endregion
     }
 }

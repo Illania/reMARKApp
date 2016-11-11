@@ -43,5 +43,18 @@ namespace Mark5.Mobile.Common.Utilities
 
             return source.IndexOf(toCheck, StringComparison.CurrentCultureIgnoreCase) >= 0;
         }
+
+        public static string SafeSubstringBeforeLast(this string str, char value)
+        {
+            var index = str.LastIndexOf(value);
+            return index > 0 ? str.SafeSubstring(0, index) : str;
+        }
+
+        public static string SafeSubstringAfterLast(this string str, char value)
+        {
+            var index = str.LastIndexOf(value);
+            return index > 0 ? str.SafeSubstring(index + 1) : str;
+        }
+
     }
 }

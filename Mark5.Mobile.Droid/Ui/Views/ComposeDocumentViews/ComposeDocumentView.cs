@@ -20,6 +20,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public Document Document { get; set; }
         public DocumentPreview PreviousDocumentPreview { get; set; }
         public Document PreviousDocument { get; set; }
+        public DocumentCreationModeFlag CreationModeFlag { get; set; }
 
         protected int DistanceNone;
         protected int DistanceLarge;

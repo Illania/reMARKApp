@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,6 +23,7 @@ using Android.Text;
 using Android.Text.Style;
 using Android.Views;
 using Android.Widget;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.PortableCollections;
@@ -32,10 +34,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
     public class RecipientsView : ComposeDocumentView
     {
-        readonly AppCompatMultiAutoCompleteTextView autoCompleteTextView;
-        readonly DocumentAddressType type;
+        readonly AppCompatMultiAutoCompleteTextView emailEditor;
+        readonly DocumentAddressType AddressType;
 
         const string EmailSeparator = ", ";
+        const string RecipentRegex = @".*<.*@.*>";
+        const string RecipentFormat = "{0} <{1}>";
 
         bool textHasChangedFlag;
         string textBeforeChange;
@@ -43,7 +47,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public RecipientsView(Context context, DocumentAddressType type)
             : base(context)
         {
-            this.type = type;
+            this.AddressType = type;
 
             Orientation = Horizontal;
             SetPadding(DistanceNormal, DistanceNormal, DistanceNormal, DistanceNormal);
@@ -56,38 +60,206 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             titleTextView.Text = type.ToString();
             AddView(titleTextView);
 
-            autoCompleteTextView = new AppCompatMultiAutoCompleteTextView(context);
-            autoCompleteTextView.SetPadding(0, 0, 0, 0);
+            emailEditor = new AppCompatMultiAutoCompleteTextView(context);
+            emailEditor.SetPadding(0, 0, 0, 0);
             var contentLayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
             contentLayoutParameters.Weight = 1;
-            autoCompleteTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
-            autoCompleteTextView.SetBackgroundColor(Color.Transparent);
+            emailEditor.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
+            emailEditor.SetBackgroundColor(Color.Transparent);
 
             var adapter = new SuggestionsAdapter();
-            autoCompleteTextView.Adapter = adapter;
-            autoCompleteTextView.SetTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
-            autoCompleteTextView.Threshold = 2;
-            autoCompleteTextView.TextSize = 15;
-            autoCompleteTextView.InputType = InputTypes.ClassText | InputTypes.TextVariationEmailAddress | InputTypes.TextFlagMultiLine;
-            autoCompleteTextView.Ellipsize = TextUtils.TruncateAt.End;
-            autoCompleteTextView.DropDownVerticalOffset = ConversionUtils.ConvertDpToPixels(4);
+            emailEditor.Adapter = adapter;
+            emailEditor.SetTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+            emailEditor.Threshold = 2;
+            emailEditor.TextSize = 15;
+            emailEditor.InputType = InputTypes.ClassText | InputTypes.TextVariationEmailAddress | InputTypes.TextFlagMultiLine;
+            emailEditor.Ellipsize = TextUtils.TruncateAt.End;
+            emailEditor.DropDownVerticalOffset = ConversionUtils.ConvertDpToPixels(4);
 
-            autoCompleteTextView.BeforeTextChanged += TextView_BeforeTextChanged;
-            autoCompleteTextView.AfterTextChanged += TextView_AfterTextChanged;
-            autoCompleteTextView.FocusChange += TextView_FocusChange;
+            emailEditor.BeforeTextChanged += TextView_BeforeTextChanged;
+            emailEditor.AfterTextChanged += TextView_AfterTextChanged;
+            emailEditor.FocusChange += TextView_FocusChange;
 
-            AddView(autoCompleteTextView, contentLayoutParameters);
+            AddView(emailEditor, contentLayoutParameters);
         }
 
-        public override Task RefreshView()
+        #region Public Methods
+
+        public override async Task RefreshView()
         {
-            throw new NotImplementedException();
+            if (CreationModeFlag == DocumentCreationModeFlag.New || CreationModeFlag == DocumentCreationModeFlag.None
+                || CreationModeFlag == DocumentCreationModeFlag.Forward)
+            {
+                return;
+            }
+
+            if (CreationModeFlag == DocumentCreationModeFlag.Edit)
+            {
+                SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
+            }
+
+            if (CreationModeFlag == DocumentCreationModeFlag.Reply)
+            {
+                if (AddressType != DocumentAddressType.To)
+                {
+                    return;
+                }
+
+                if (PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
+                {
+                    var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo).Select(da => da.Address);
+                    if (replyToAddresses == null || !replyToAddresses.Any())
+                    {
+                        SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Address));
+                    }
+                    else
+                    {
+                        SetEmails(replyToAddresses);
+                    }
+                }
+                else if (PreviousDocumentPreview.Direction == DocumentDirection.Outgoing)
+                {
+                    SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To).Select(da => da.Address));
+                }
+            }
+
+            if (CreationModeFlag == DocumentCreationModeFlag.ReplyAll)
+            {
+                if (PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
+                {
+                    var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo).Select(da => da.Address);
+
+                    if (AddressType == DocumentAddressType.To)
+                    {
+                        if (replyToAddresses == null || !replyToAddresses.Any())
+                        {
+                            SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From || da.AddressType == DocumentAddressType.To).Select(da => da.Address));
+                        }
+                        else
+                        {
+                            SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To).Select(da => da.Address).Union(replyToAddresses));
+                        }
+                    }
+                    else if (AddressType == DocumentAddressType.Cc)
+                    {
+                        var ccAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.Cc).Select(da => da.Address);
+                        SetEmails(ccAddresses);
+                    }
+                }
+                if (PreviousDocumentPreview.Direction == DocumentDirection.Outgoing)
+                {
+                    SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == AddressType).Select(da => da.Address));
+                }
+            }
+
+            //TODO What is redirect?
+            //TODO What is resend? (like edit?)
         }
 
         public override Task UpdateDocument()
         {
             throw new NotImplementedException();
         }
+
+        #endregion
+
+        #region Utilities
+
+        void StartEditing()
+        {
+            RequestFocus();
+            emailEditor.RequestFocus(); //TODO check if necessary 
+        }
+
+        void SetEmails(IEnumerable<string> emails)
+        {
+            SetEmails(string.Join(EmailSeparator, emails));
+        }
+
+        void SetEmails(string emails)
+        {
+            MatchCollection matches;
+            if (Validator.ContainsValidEmails(emails, out matches))
+            {
+                var sb = new StringBuilder();
+                sb.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
+
+                sb.Append(EmailSeparator);
+
+                emailEditor.Text = sb.ToString();
+            }
+            else
+            {
+                CommonConfig.Logger.Info($"No valid emails found in {emails}");
+            }
+        }
+
+        void AddEmails(IEnumerable<string> emails)
+        {
+            AddEmails(string.Join(EmailSeparator, emails));
+        }
+
+        void AddEmails(string emails)
+        {
+            MatchCollection matches;
+            if (Validator.ContainsValidEmails(emails, out matches))
+            {
+                var text = emailEditor.Text;
+                var newEmails = new StringBuilder();
+                newEmails.Append(text);
+                if (!text.EndsWith(EmailSeparator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(text))
+                {
+                    newEmails.Append(EmailSeparator);
+                }
+                newEmails.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
+                newEmails.Append(EmailSeparator);
+
+                emailEditor.Text = newEmails.ToString();
+
+                //Edited(this, EventArgs.Empty); //TODO decide if useful
+            }
+            else
+            {
+                CommonConfig.Logger.Info($"No valid emails found in {emails}");
+            }
+        }
+
+        IEnumerable<string> GetEmails()
+        {
+            MatchCollection matches;
+            return Validator.ContainsValidEmails(emailEditor.Text, out matches) ? matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() : new List<string>();
+        }
+
+        IEnumerable<string> GetRecipents()
+        {
+            return emailEditor.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries).Where(Validator.ContainsValidEmails).Select(s => s.Trim());
+        }
+
+        void AddRecipent(string name, string address)
+        {
+            var text = emailEditor.Text;
+            var newEmails = new StringBuilder();
+            newEmails.Append(text);
+            if (!text.EndsWith(EmailSeparator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(text))
+            {
+                newEmails.Append(EmailSeparator);
+            }
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                newEmails.Append(address);
+            }
+            else
+            {
+                newEmails.Append(string.Format(RecipentFormat, name, address));
+            }
+            newEmails.Append(EmailSeparator);
+
+            emailEditor.Text = newEmails.ToString();
+
+            //Edited(this, EventArgs.Empty); //TODO
+        }
+
+        #endregion
 
         #region Control event handlers
 
@@ -103,7 +275,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 CompressView();
             }
 
-            autoCompleteTextView.Invalidate();
+            emailEditor.Invalidate();
         }
 
         void TextView_BeforeTextChanged(object sender, TextChangedEventArgs e)
@@ -160,7 +332,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
 
             CorrectMarkup();
-            autoCompleteTextView.Invalidate();
+            emailEditor.Invalidate();
         }
 
         #endregion
@@ -169,22 +341,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void CompressView()
         {
-            autoCompleteTextView.SetSingleLine(true);
+            emailEditor.SetSingleLine(true);
         }
 
         void ExpandView()
         {
-            autoCompleteTextView.SetSingleLine(false);
+            emailEditor.SetSingleLine(false);
         }
 
         void CorrectMarkup()
         {
-            if (string.IsNullOrEmpty(autoCompleteTextView.Text))
+            if (string.IsNullOrEmpty(emailEditor.Text))
             {
                 return;
             }
 
-            var matches = Validator.ExtractValidEmails(autoCompleteTextView.Text);
+            var matches = Validator.ExtractValidEmails(emailEditor.Text);
 
             ResetStyle();
 
@@ -196,7 +368,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void ResetStyle()
         {
-            SetColor(0, autoCompleteTextView.TextFormatted.Length() - 1, Resource.Color.black);
+            SetColor(0, emailEditor.TextFormatted.Length() - 1, Resource.Color.black);
         }
 
         void SetEmailStyle(int start, int end)
@@ -206,18 +378,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void SetColor(int start, int end, int colorId)
         {
-            var cursorPosition = autoCompleteTextView.SelectionStart;
+            var cursorPosition = emailEditor.SelectionStart;
 
-            var editableText = autoCompleteTextView.EditableText;
+            var editableText = emailEditor.EditableText;
             var color = new Color(ContextCompat.GetColor(Context, colorId)); //TODO should we cache it?
 
             editableText.SetSpan(new ForegroundColorSpan(color), start, end, SpanTypes.ExclusiveExclusive);
-            autoCompleteTextView.SetSelection(cursorPosition);
+            emailEditor.SetSelection(cursorPosition);
         }
 
         void SetCursorAtEnd()
         {
-            autoCompleteTextView.SetSelection(autoCompleteTextView.Text.Count());
+            emailEditor.SetSelection(emailEditor.Text.Count());
         }
 
         #endregion
