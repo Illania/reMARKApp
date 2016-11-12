@@ -47,7 +47,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public RecipientsView(Context context, DocumentAddressType type)
             : base(context)
         {
-            this.AddressType = type;
+            AddressType = type;
 
             Orientation = Horizontal;
             SetPadding(DistanceNormal, DistanceNormal, DistanceNormal, DistanceNormal);

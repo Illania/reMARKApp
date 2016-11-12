@@ -205,4 +205,5 @@
 	<string name="unavailable">Unavailable</string>
 	<string name="show_previous_message">Show previous message</string>
 	<string name="hide_previous_message">Hide previous message</string>
+	<string name="sending_document">Sending document</string>
 </resources>

@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.Support.V4.View;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
@@ -85,6 +86,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 linearLayout.AddView(new Divider(Context));
             }
 
+            HasOptionsMenu = true;
+
             return rootView;
         }
 
@@ -116,6 +119,67 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             await AskIfShouldUseTemplates();
         }
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            var newItem = menu.Add(Menu.None, 10, 10, "Send"); //TODO an icon should be here
+            newItem.SetShowAsAction(ShowAsAction.Always);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == 10)
+            {
+                SendDocument();
+            }
+
+            return base.OnOptionsItemSelected(item);
+        }
+
+        void SendDocument()
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.sending_document, Resource.String.please_wait);
+
+            Task.Run(async () =>
+            {
+                foreach (var subView in subViews)
+                {
+                    await subView.UpdateDocument();
+                }
+
+                //TODO eventually here we need to get info about sendNow and so on
+
+                await Managers.DocumentsManager.SendDocumentAsync(Document, DocumentPreview, CreationModeFlag, PreviousDocument?.Id ?? 0 //TODO need to check parameters
+                                                                  , PreviousDocumentFolderId.HasValue ? PreviousDocumentFolderId.Value : 0, 0, false, false, null);
+            }).ContinueWith(async t =>
+           {
+               dismissAction();
+
+               if (t.IsFaulted)
+               {
+                   CommonConfig.Logger.Error($"Failed to send document [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", t.Exception.InnerException);
+                   await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
+               }
+               else
+               {
+                   Activity.Finish();
+               }
+           }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        /*
+         * TODO
+         * - Decide what to do about inlining
+         * - Check what happens with plain text body (if it gets loaded correctly)
+         * - Check if EDIT works fine
+         * - Implement attachments view
+         * - Check all the parameters of send
+         * - Check the TIMESTAMP on header of old document in content
+         * - Check what happens with no connection and autocomplete
+         * - Decide what to do with getting info from contacts in autocomplete
+         * - UI autocomplete
+         * - Add sendOn and confirms
+         */
 
         #region Template methods
 

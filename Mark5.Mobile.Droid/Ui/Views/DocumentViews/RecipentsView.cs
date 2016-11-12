@@ -13,7 +13,6 @@ using Android.Graphics;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Text;
-using Android.Text.Format;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common.Model;
