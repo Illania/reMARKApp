@@ -110,23 +110,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             if (oldContentWebView.Visibility == ViewStates.Gone)
             {
-                if (!oldContentLoaded)
-                {
-                    if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
-                    {
-                        oldContentWebView.LoadDataWithBaseURL(null, await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText), "text/html", "UTF-8", null);
-                    }
-                    else if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
-                    {
-                        oldContentWebView.LoadDataWithBaseURL(null, await GetBodyWithHeader(PreviousDocument.HtmlBody, ContentType.Html), "text/html", "UTF-8", null);
-                    }
-                    else
-                    {
-                        oldContentWebView.LoadDataWithBaseURL(null, await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText), "text/html", "UTF-8", null); //TODO need to test
-                    }
-
-                    oldContentLoaded = true;
-                }
+                await LoadOldContent();
 
                 showOldContentButton.SetText(Resource.String.hide_previous_message);
                 oldContentWebView.Visibility = ViewStates.Visible;
@@ -136,7 +120,30 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 oldContentWebView.Visibility = ViewStates.Gone;
                 showOldContentButton.SetText(Resource.String.show_previous_message);
             }
+        }
 
+        async Task LoadOldContent()
+        {
+            if (!oldContentLoaded && PreviousDocument != null)
+            {
+                if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
+                {
+                    oldContent = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
+                    oldContentWebView.LoadDataWithBaseURL(null, oldContent, "text/html", "UTF-8", null);
+                }
+                else if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
+                {
+                    oldContent = await GetBodyWithHeader(PreviousDocument.HtmlBody, ContentType.Html);
+                    oldContentWebView.LoadDataWithBaseURL(null, await GetBodyWithHeader(PreviousDocument.HtmlBody, ContentType.Html), "text/html", "UTF-8", null);
+                }
+                else
+                {
+                    oldContent = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
+                    oldContentWebView.LoadDataWithBaseURL(null, oldContent, "text/html", "UTF-8", null); //TODO need to test
+                }
+
+                oldContentLoaded = true;
+            }
         }
 
         async Task<string> GetBodyWithHeader(string content, ContentType contentType)
@@ -154,8 +161,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 var textWriter = new StringWriter();
                 htmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
 
-                oldContent = textWriter.ToString();
-                return oldContent;
+                return textWriter.ToString();
             }
 
             if (contentType == ContentType.PlainText)
@@ -173,8 +179,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 var textWriter = new StringWriter();
                 parsedHeader.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
 
-                oldContent = textWriter.ToString();
-                return oldContent;
+                return textWriter.ToString();
             }
 
             return "";
@@ -250,16 +255,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         async Task<string> RetrieveCombinedText() //TODO test autocomplete when offline
         {
             var firstPart = await GetHtmlContentAsync(true);
-            var secondPart = oldContent;
 
-            var htmlParser = new HtmlParser();
-            var htmlDocument = await htmlParser.ParseAsync(firstPart);
-            htmlDocument.Body.Append(await htmlParser.ParseAsync(secondPart));
+            if (!string.IsNullOrEmpty(oldContent))
+            {
+                var htmlParser = new HtmlParser();
+                var htmlDocument = await htmlParser.ParseAsync(firstPart);
+                htmlDocument.Body.Append((await htmlParser.ParseAsync(oldContent)).Body);
+                var textWriter = new StringWriter();
+                htmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
+                return textWriter.ToString();
+            }
 
-            var textWriter = new StringWriter();
-            htmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
-
-            return textWriter.ToString();
+            return firstPart;
         }
 
         async Task SetHtmlContentAsync(string htmlString)

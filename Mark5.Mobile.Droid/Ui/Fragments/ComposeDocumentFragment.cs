@@ -147,10 +147,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     await subView.UpdateDocument();
                 }
 
+                DocumentPreview.Direction = DocumentDirection.Outgoing;
+
                 //TODO eventually here we need to get info about sendNow and so on
 
-                await Managers.DocumentsManager.SendDocumentAsync(Document, DocumentPreview, CreationModeFlag, PreviousDocument?.Id ?? 0 //TODO need to check parameters
-                                                                  , PreviousDocumentFolderId.HasValue ? PreviousDocumentFolderId.Value : 0, 0, false, false, null);
+                await Managers.DocumentsManager.SendDocumentAsync(Document, DocumentPreview, CreationModeFlag, PreviousDocument?.Id ?? 0, //TODO need to check parameters
+                                                                  PreviousDocumentFolderId.HasValue ? PreviousDocumentFolderId.Value : 0, 0, false, false, null);
             }).ContinueWith(async t =>
            {
                dismissAction();
