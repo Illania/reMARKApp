@@ -187,7 +187,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         string GetHtmlHeader()
         {
-            var processedDateReceivedTimestamp = DocumentPreview.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime().ConvertDateTimeToTimestampMilliseconds();
+            var processedDateReceivedTimestamp = PreviousDocumentPreview.DateReceivedTimestamp
+                                                                        .ConvertTimestampMillisecondsToDateTime()
+                                                                        .ConvertUtcToServerTime()
+                                                                        .ConvertDateTimeToTimestampMilliseconds();
             var date = processedDateReceivedTimestamp.FormatServerTimestampAsTimeAndDateString(Context);
 
             var header = new StringBuilder();
