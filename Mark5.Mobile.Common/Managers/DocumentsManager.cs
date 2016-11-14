@@ -162,7 +162,7 @@ namespace Mark5.Mobile.Common.Managers
                     SendOn = sendOnTimestamp.ConvertTimestampMillisecondsToDateTime(),
                     ConfirmRead = confirmRead,
                     ConfirmDelivery = confirmDelivery,
-                    TemporaryAttachmentGuids = temporaryAttachmentGuids
+                    TemporaryAttachmentGuids = temporaryAttachmentGuids ?? new List<Guid>(),
                 });
 
                 document.Id = result.Id;
