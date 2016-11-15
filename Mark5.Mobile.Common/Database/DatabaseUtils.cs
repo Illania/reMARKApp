@@ -53,6 +53,10 @@ namespace Mark5.Mobile.Common.Database
                 c.CreateTable<CalendarAppointment>();
                 c.CreateTable<Category>();
             });
+            await DatabaseConnectionProvider.SystemDatabase.RunInConnectionAsync(c =>
+            {
+                c.CreateTable<Notification>();
+            });
         }
 
         public static async Task ClearDatabases()
@@ -92,6 +96,10 @@ namespace Mark5.Mobile.Common.Database
                 c.DeleteAll<CalendarTask>();
                 c.DeleteAll<CalendarAppointment>();
                 c.DeleteAll<Category>();
+            });
+            await DatabaseConnectionProvider.SystemDatabase.RunInConnectionAsync(c =>
+            {
+                c.DeleteAll<Notification>();
             });
         }
 

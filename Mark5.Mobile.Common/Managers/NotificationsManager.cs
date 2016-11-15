@@ -50,7 +50,7 @@ namespace Mark5.Mobile.Common.Managers
                     PushToken = pushToken
                 });
 
-                var notifications = result.Notifications.WhereNotNull().Select(n => n.Convert()).ToList();
+                var notifications = result.Notifications.WhereNotNull().Select(n => n.Convert()).OrderByDescending(n => n.DateTimeTimestamp).ToList();
 
                 await notificationsDataAccess.SaveNotifications(notifications);
 

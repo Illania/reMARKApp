@@ -19,18 +19,18 @@ namespace Mark5.Mobile.Common.DataAccess
     class NotificationsDataAccess : INotificationsDataAccess
     {
 
-        readonly DatabaseConnectionProvider commonDatabase;
+        readonly DatabaseConnectionProvider systemDatabase;
 
-        public NotificationsDataAccess(DatabaseConnectionProvider commonDatabase)
+        public NotificationsDataAccess(DatabaseConnectionProvider systemDatabase)
         {
-            this.commonDatabase = commonDatabase;
+            this.systemDatabase = systemDatabase;
         }
 
         public async Task SaveNotifications(List<Notification> notifications)
         {
             try
             {
-                await commonDatabase.RunInConnectionAsync(c =>
+                await systemDatabase.RunInConnectionAsync(c =>
                 {
                     c.DeleteAll<Notification>();
                     c.InsertAll(notifications);
@@ -48,9 +48,9 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 List<Notification> notifications = null;
 
-                await commonDatabase.RunInConnectionAsync(c =>
+                await systemDatabase.RunInConnectionAsync(c =>
                 {
-                    notifications = c.Table<Notification>().ToList();
+                    notifications = c.Table<Notification>().OrderByDescending(n => n.DateTimeTimestamp).ToList();
                 });
 
                 return notifications;
