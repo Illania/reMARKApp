@@ -404,12 +404,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 var hasName = !string.IsNullOrWhiteSpace(addresses[i].Name);
                 if (hasName)
                 {
-                    sb.Append(addresses[i].Name).Append(" <");
+                    sb.Append(addresses[i].Name).Append(" &lt;");
                 }
                 sb.Append(addresses[i].Address);
                 if (hasName)
                 {
-                    sb.Append(">");
+                    sb.Append("&gt;");
                 }
                 if (i < addresses.Count - 1)
                 {
