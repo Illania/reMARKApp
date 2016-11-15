@@ -128,19 +128,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
                 {
                     oldContent = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
-                    oldContentWebView.LoadDataWithBaseURL(null, oldContent, "text/html", "UTF-8", null);
                 }
                 else if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
                 {
                     oldContent = await GetBodyWithHeader(PreviousDocument.HtmlBody, ContentType.Html);
-                    oldContentWebView.LoadDataWithBaseURL(null, oldContent, "text/html", "UTF-8", null);
                 }
                 else
                 {
                     oldContent = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
-                    oldContentWebView.LoadDataWithBaseURL(null, oldContent, "text/html", "UTF-8", null); //TODO need to test
                 }
 
+                Post(() => oldContentWebView.LoadDataWithBaseURL(null, oldContent, "text/html", "UTF-8", null));
                 oldContentLoaded = true;
             }
         }
