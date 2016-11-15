@@ -251,7 +251,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var templatesForCreationMode = templatesPreviews.Where(t => t.CreationMode.HasFlag(CreationModeFlag));
                 if (templatesForCreationMode.Any())
                 {
-                    var templateNames = templatesForCreationMode.Select(t => $@"{(t.Private ? "[Private] " : "[Public] ")}{t.Name}").ToArray();
+                    var templateNames = templatesForCreationMode.Select(t => (t.Private ? "[Private] " : "[Public] ") + t.Name).ToArray();
                     var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, templateNames, true);
                     var selectedPreview = templatesPreviews[result];
                     await GetTemplate(selectedPreview);

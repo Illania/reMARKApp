@@ -134,7 +134,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 else if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
                 {
                     oldContent = await GetBodyWithHeader(PreviousDocument.HtmlBody, ContentType.Html);
-                    oldContentWebView.LoadDataWithBaseURL(null, await GetBodyWithHeader(PreviousDocument.HtmlBody, ContentType.Html), "text/html", "UTF-8", null);
+                    oldContentWebView.LoadDataWithBaseURL(null, oldContent, "text/html", "UTF-8", null);
                 }
                 else
                 {
