@@ -180,8 +180,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnPrepareOptionsMenu(IMenu menu)
         {
-            var commentsMenuItem = menu.FindItem(MenuItemActions.Comments);
-            commentsMenuItem?.SetEnabled(Document != null);
+            var isDocumentReady = Document != null;
+
+            var menuItemIds = new List<int> { MenuItemActions.Comments, MenuItemActions.Reply, MenuItemActions.ReplyAll, MenuItemActions.Forward };
+            foreach (var itemId in menuItemIds)
+            {
+                var menuItem = menu.FindItem(itemId);
+                menuItem?.SetEnabled(isDocumentReady);
+            }
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
