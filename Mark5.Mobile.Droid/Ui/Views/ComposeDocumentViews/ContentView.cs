@@ -54,7 +54,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                                             </body>
                                         </html>";
 
-
         bool oldContentLoaded;
 
         public ContentView(Context context)
@@ -196,7 +195,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             var header = new StringBuilder();
             header.Append("<br/><hr/>");
             header.Append(string.Format("<b>From</b>: {0}", GetAddressTextFromPreviousDocument(DocumentAddressType.From))).Append("</br>");
-            header.Append(string.Format("<b>Date</b>: {0}", date)).Append("</br>"); //TODO need to put it back
+            header.Append(string.Format("<b>Date</b>: {0}", date)).Append("</br>");
             header.Append(string.Format("<b>To</b>: {0}", GetAddressTextFromPreviousDocument(DocumentAddressType.To))).Append("</br>");
             var ccText = GetAddressTextFromPreviousDocument(DocumentAddressType.Cc);
             if (!string.IsNullOrWhiteSpace(ccText))
@@ -259,7 +258,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             var newContentString = await GetHtmlContentAsync(true);
 
-            //TODO need to load the old content if not done already
+            await LoadOldContent();
 
             if (!string.IsNullOrEmpty(oldContent))
             {
