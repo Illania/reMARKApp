@@ -343,7 +343,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             if (contentToInsertType == ContentType.PlainText)
             {
-                var htmlDocument = await htmlParser.ParseAsync("<div>" + contentToInsert + "</div>");
+                var htmlDocument = await htmlParser.ParseAsync("<div><pre>" + contentToInsert + "</pre></div>");
                 return htmlDocument.Body.Children;
             }
 
