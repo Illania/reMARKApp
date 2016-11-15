@@ -255,21 +255,26 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #region Utility methods
 
-        async Task<string> RetrieveCombinedText() //TODO test autocomplete when offline
+        async Task<string> RetrieveCombinedText()
         {
-            var firstPart = await GetHtmlContentAsync(true);
+            var newContentString = await GetHtmlContentAsync(true);
+
+            //TODO need to load the old content if not done already
 
             if (!string.IsNullOrEmpty(oldContent))
             {
                 var htmlParser = new HtmlParser();
-                var htmlDocument = await htmlParser.ParseAsync(firstPart);
-                htmlDocument.Body.Append((await htmlParser.ParseAsync(oldContent)).Body);
+                var newContentParsed = await htmlParser.ParseAsync(newContentString);
+                var oldContentParsed = await htmlParser.ParseAsync(oldContent);
+                var oldContentInDiv = newContentParsed.CreateElement("div");
+                oldContentInDiv.InnerHtml = oldContentParsed.Body.InnerHtml;
+                newContentParsed.Body.Append(oldContentInDiv);
                 var textWriter = new StringWriter();
-                htmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
+                newContentParsed.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
                 return textWriter.ToString();
             }
 
-            return firstPart;
+            return newContentString;
         }
 
         async Task SetHtmlContentAsync(string htmlString)
