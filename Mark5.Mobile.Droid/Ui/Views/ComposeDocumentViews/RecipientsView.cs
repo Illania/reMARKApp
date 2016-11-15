@@ -152,8 +152,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 }
             }
 
-            //TODO What is redirect?
-            //TODO What is resend? (like edit?)
             return Task.CompletedTask;
         }
 

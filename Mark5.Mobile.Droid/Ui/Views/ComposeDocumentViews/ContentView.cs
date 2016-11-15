@@ -162,13 +162,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
 
             if (contentType == ContentType.PlainText)
-            { //TODO need to test this
+            {
                 var htmlHeader = GetHtmlHeader();
 
                 var htmlParser = new HtmlParser();
                 var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
 
-                var contentHtml = parsedHeader.CreateElement("p");
+                var contentHtml = parsedHeader.CreateElement("pre");
                 contentHtml.TextContent = content;
 
                 parsedHeader.Body.Append(contentHtml);

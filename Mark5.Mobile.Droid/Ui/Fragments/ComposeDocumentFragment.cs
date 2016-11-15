@@ -122,7 +122,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
-            var newItem = menu.Add(Menu.None, 10, 10, "Send"); //TODO an icon should be here
+            var newItem = menu.Add(Menu.None, 10, 10, "Send");
             newItem.SetShowAsAction(ShowAsAction.Always);
         }
 
@@ -149,9 +149,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 DocumentPreview.Direction = DocumentDirection.Outgoing;
 
-                //TODO eventually here we need to get info about sendNow and so on
-
-                await Managers.DocumentsManager.SendDocumentAsync(Document, DocumentPreview, CreationModeFlag, PreviousDocument?.Id ?? 0, //TODO need to check parameters
+                await Managers.DocumentsManager.SendDocumentAsync(Document, DocumentPreview, CreationModeFlag, PreviousDocument?.Id ?? 0,
                                                                   PreviousDocumentFolderId.HasValue ? PreviousDocumentFolderId.Value : 0, 0, false, false, null);
             }).ContinueWith(async t =>
            {
@@ -172,15 +170,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         /*
          * TODO
          * - Decide what to do about inlining
-         * - Check what happens with plain text body (if it gets loaded correctly)
          * - Check if EDIT works fine
          * - Implement attachments view
-         * - Check all the parameters of send
-         * - Check the TIMESTAMP on header of old document in content
          * - Check what happens with no connection and autocomplete
          * - Decide what to do with getting info from contacts in autocomplete
          * - UI autocomplete
-         * - Add sendOn and confirms
          */
 
         #region Template methods
