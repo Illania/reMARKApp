@@ -56,6 +56,7 @@ namespace Mark5.Mobile.Common.Database
             await DatabaseConnectionProvider.SystemDatabase.RunInConnectionAsync(c =>
             {
                 c.CreateTable<Notification>();
+                c.CreateTable<ReadNotificationInfo>();
             });
         }
 
@@ -100,6 +101,7 @@ namespace Mark5.Mobile.Common.Database
             await DatabaseConnectionProvider.SystemDatabase.RunInConnectionAsync(c =>
             {
                 c.DeleteAll<Notification>();
+                c.DeleteAll<ReadNotificationInfo>();
             });
         }
 

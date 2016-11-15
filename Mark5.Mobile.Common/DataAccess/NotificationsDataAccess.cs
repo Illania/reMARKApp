@@ -60,6 +60,61 @@ namespace Mark5.Mobile.Common.DataAccess
                 throw new DataAccessException("Error getting notifications.", ex);
             }
         }
+
+        public async Task<HashSet<Guid>> GetReadNotificationGuids()
+        {
+            try
+            {
+                HashSet<Guid> guids = null;
+
+                await systemDatabase.RunInConnectionAsync(c =>
+                {
+                    guids = new HashSet<Guid>(c.Table<ReadNotificationInfo>().Select(rni => rni.NotificationGuid));
+                });
+
+                return guids;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting notifications.", ex);
+            }
+        }
+
+        public async Task MarkAsRead(Notification notification)
+        {
+            try
+            {
+                await systemDatabase.RunInConnectionAsync(c =>
+                {
+                    c.InsertOrReplace(new ReadNotificationInfo { NotificationGuid = notification.Guid });
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting notifications.", ex);
+            }
+        }
+
+        public async Task MarkAllAsRead()
+        {
+            try
+            {
+                await systemDatabase.RunInConnectionAsync(c =>
+                {
+                    var cmd = c.CreateCommand($"delete from \"{nameof(ReadNotificationInfo)}\"");
+                    cmd.ExecuteNonQuery();
+
+                    cmd = c.CreateCommand($"insert into \"{nameof(ReadNotificationInfo)}\" (\"{nameof(ReadNotificationInfo.NotificationGuid)}\") " +
+                                          $"select \"{nameof(Notification.Guid)}\" " +
+                                          $"from \"{nameof(Notification)}\"");
+                    cmd.ExecuteNonQuery();
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting notifications.", ex);
+            }
+        }
     }
 }
 

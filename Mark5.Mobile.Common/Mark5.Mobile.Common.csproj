@@ -179,6 +179,7 @@
     <Compile Include="Managers\IDocumentsManager.cs" />
     <Compile Include="Storage\FileSystemStorageUpdater.cs" />
     <Compile Include="Model\Exceptions\InvalidSourceTypeException.cs" />
+    <Compile Include="Model\ReadNotificationInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

@@ -5,8 +5,9 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System.Threading.Tasks;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.DataAccess
@@ -18,6 +19,12 @@ namespace Mark5.Mobile.Common.DataAccess
         Task SaveNotifications(List<Notification> notifications);
 
         Task<List<Notification>> GetNotifications();
+
+        Task<HashSet<Guid>> GetReadNotificationGuids();
+
+        Task MarkAsRead(Notification notification);
+
+        Task MarkAllAsRead();
     }
 }
 
