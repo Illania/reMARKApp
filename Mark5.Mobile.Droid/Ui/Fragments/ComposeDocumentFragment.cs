@@ -24,10 +24,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ComposeDocumentFragment : RetainableStateFragment
     {
-        public Document PreviousDocument { get; set; }
-        public DocumentPreview PreviousDocumentPreview { get; set; }
+        Document PreviousDocument { get; set; }
+        DocumentPreview PreviousDocumentPreview { get; set; }
+
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
         public int? PreviousDocumentFolderId { get; set; }
+        public int? PreviousDocumentId { get; set; }
 
         public Document Document { get; set; } = new Document();
         public DocumentPreview DocumentPreview { get; set; } = new DocumentPreview();
@@ -95,7 +97,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnResume();
 
+            await LoadDocument();
             await ShowDocument();
+        }
+
+        async Task LoadDocument()
+        {
+            if (PreviousDocument != null || CreationModeFlag == DocumentCreationModeFlag.New)
+            {
+                return;
+            }
+
+            try
+            {
+                var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, SourceType.Local);
+                PreviousDocument = container.Document;
+                PreviousDocumentPreview = container.DocumentPreview;
+            }
+            catch (Exception ex)
+            {
+                //TODO what to do here? Need also to consider the case in which the document is not in local, for example if we open a draft
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
         }
 
         async Task ShowDocument()
@@ -169,7 +193,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         /*
          * TODO
-         * - Decide what to do about inlining
          * - Implement attachments view
          * - Check what happens with no connection and autocomplete
          * - Decide what to do with getting info from contacts in autocomplete
