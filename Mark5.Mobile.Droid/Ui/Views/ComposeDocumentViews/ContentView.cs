@@ -6,8 +6,6 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
-using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -26,6 +24,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
+using System.Linq;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
@@ -155,10 +154,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
                 body.InsertBefore(parsedHeader.Body, body.FirstChild);
 
-                var textWriter = new StringWriter();
-                htmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
-
-                return textWriter.ToString();
+                return htmlDocument.ToHtml(HtmlMarkupFormatter.Instance);
             }
 
             if (contentType == ContentType.PlainText)
@@ -173,10 +169,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 parsedHeader.Body.Append(contentHtml);
 
-                var textWriter = new StringWriter();
-                parsedHeader.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
-
-                return textWriter.ToString();
+                return parsedHeader.ToHtml(HtmlMarkupFormatter.Instance);
             }
 
             return "";
@@ -266,9 +259,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 var oldContentInDiv = newContentParsed.CreateElement("div");
                 oldContentInDiv.InnerHtml = oldContentParsed.Body.InnerHtml;
                 newContentParsed.Body.Append(oldContentInDiv);
-                var textWriter = new StringWriter();
-                newContentParsed.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
-                return textWriter.ToString();
+                return newContentParsed.ToHtml(HtmlMarkupFormatter.Instance);
             }
 
             return newContentString;
@@ -324,10 +315,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             parentElement.Append(nodes.ToArray());
 
-            var textWriter = new StringWriter();
-            currentHtmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
-
-            await SetHtmlContentAsync(textWriter.ToString());
+            await SetHtmlContentAsync(currentHtmlDocument.ToHtml(HtmlMarkupFormatter.Instance));
         }
 
         static async Task<IHtmlCollection<IElement>> ProcessInsertedContent(HtmlParser htmlParser, ContentType contentToInsertType, string contentToInsert)

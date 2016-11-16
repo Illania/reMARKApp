@@ -170,11 +170,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         /*
          * TODO
          * - Decide what to do about inlining
-         * - Check if EDIT works fine
          * - Implement attachments view
          * - Check what happens with no connection and autocomplete
          * - Decide what to do with getting info from contacts in autocomplete
-         * - UI autocomplete
          */
 
         #region Template methods
