@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Support.V7.Widget;

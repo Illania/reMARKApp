@@ -471,6 +471,10 @@
     <AndroidResource Include="Resources\layout\list_with_button.axml" />
     <AndroidResource Include="Resources\values\strings-errordialogs.axml" />
     <AndroidResource Include="Resources\layout\suggestion_dropdown.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\error.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\error.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\error.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\error.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

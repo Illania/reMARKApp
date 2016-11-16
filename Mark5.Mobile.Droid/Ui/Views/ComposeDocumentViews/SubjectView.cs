@@ -18,10 +18,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
     public class SubjectView : ComposeDocumentView
     {
+        public event EventHandler Edited = delegate { };
+
         readonly AppCompatEditText subjectTextView;
 
+        public bool Empty
+        {
+            get { return string.IsNullOrEmpty(subjectTextView?.Text); }
+        }
+
+        public string Subject
+        {
+            get { return subjectTextView?.Text; }
+        }
+
         public SubjectView(Context context)
-            : base(context)
+                : base(context)
         {
             Orientation = Horizontal;
             SetPadding(DistanceNormal, DistanceNormal, DistanceNormal, DistanceNormal);
@@ -34,6 +46,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             subjectTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimaryBold);
             subjectTextView.SetHint(Resource.String.subject);
             subjectTextView.SetBackgroundColor(Android.Graphics.Color.Transparent);
+            subjectTextView.AfterTextChanged += (sender, e) => Edited(this, EventArgs.Empty);
             AddView(subjectTextView);
         }
 
@@ -57,8 +70,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     subjectTextView.Text = $"Fw: {PreviousDocumentPreview.Subject}";
                     break;
             }
-
-            //TODO what about redirect and resend?
 
             return Task.CompletedTask;
         }

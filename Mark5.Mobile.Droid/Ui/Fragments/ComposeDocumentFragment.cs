@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.Support.V4.View;
+using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
@@ -24,6 +25,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ComposeDocumentFragment : RetainableStateFragment
     {
+        const string DefaultTitle = "New document";
+
         Document PreviousDocument { get; set; }
         DocumentPreview PreviousDocumentPreview { get; set; }
 
@@ -42,6 +45,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         SubjectView subjectView;
         ContentView contentView;
 
+        IMenu optionsMenu;
         List<ComposeDocumentView> subViews = new List<ComposeDocumentView>();
 
         ProgressBar progress;
@@ -62,21 +66,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
             toView = new ToView(Context);
+            toView.Edited += Subview_Edited;
             subViews.Add(toView);
 
             ccView = new CcView(Context);
+            ccView.Edited += Subview_Edited;
             subViews.Add(ccView);
 
             bccView = new BccView(Context);
+            bccView.Edited += Subview_Edited;
             subViews.Add(bccView);
 
             priorityView = new PriorityView(Context);
             subViews.Add(priorityView);
 
             lineView = new LineView(Context);
+            lineView.Edited += Subview_Edited;
             subViews.Add(lineView);
 
             subjectView = new SubjectView(Context);
+            subjectView.Edited += Subview_Edited;
+
             subViews.Add(subjectView);
 
             contentView = new ContentView(Context);
@@ -141,23 +151,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 await subView.RefreshView();
             }
 
+            UpdateSendButtonState();
+
             await AskIfShouldUseTemplates();
         }
 
-        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
-        {
-            var newItem = menu.Add(Menu.None, 10, 10, "Send");
-            newItem.SetShowAsAction(ShowAsAction.Always);
-        }
 
-        public override bool OnOptionsItemSelected(IMenuItem item)
+        void Subview_Edited(object sender, EventArgs e)
         {
-            if (item.ItemId == 10)
-            {
-                SendDocument();
-            }
-
-            return base.OnOptionsItemSelected(item);
+            ((AppCompatActivity)Activity).SupportActionBar.Title = !subjectView.Empty ? subjectView.Subject : DefaultTitle;
+            UpdateSendButtonState();
         }
 
         void SendDocument()
@@ -197,6 +200,55 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
          * - Check what happens with no connection and autocomplete
          * - Decide what to do with getting info from contacts in autocomplete
          */
+
+        #region Options menu related
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            optionsMenu = menu;
+            var sendItem = menu.Add(Menu.None, 10, 10, "Send");
+            sendItem.SetShowAsAction(ShowAsAction.Always);
+            sendItem.SetEnabled(false);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == 10)
+            {
+                SendDocument();
+            }
+
+            return true;
+        }
+
+        void UpdateSendButtonState()
+        {
+            var sendItem = optionsMenu?.FindItem(10);
+            sendItem?.SetEnabled(IsFormValid());
+        }
+
+        bool IsFormValid()
+        {
+            if (subjectView.Empty)
+            {
+                return false;
+            }
+
+            var recipientAdded = false;
+            foreach (var recipientView in new List<RecipientsView> { toView, ccView, bccView })
+            {
+                recipientAdded |= !recipientView.Empty;
+            }
+
+            if (!recipientAdded)
+            {
+                return false;
+            }
+
+            return !lineView.LineSelectedIsAmbiguous;
+        }
+
+        #endregion
 
         #region Template methods
 

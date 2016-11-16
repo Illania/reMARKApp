@@ -34,6 +34,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
     public class RecipientsView : ComposeDocumentView
     {
+        public event EventHandler Edited = delegate { };
+
         readonly AppCompatMultiAutoCompleteTextView emailEditor;
         readonly DocumentAddressType AddressType;
 
@@ -43,6 +45,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         bool textHasChangedFlag;
         string textBeforeChange;
+
+        public bool Empty
+        {
+            get
+            {
+                return !Validator.ContainsValidEmail(emailEditor.Text);
+            }
+        }
 
         public RecipientsView(Context context, DocumentAddressType type)
             : base(context)
@@ -268,6 +278,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             CorrectMarkup();
             emailEditor.Invalidate();
+            Edited(this, EventArgs.Empty);
         }
 
         #endregion

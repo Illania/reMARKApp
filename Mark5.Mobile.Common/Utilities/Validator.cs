@@ -75,16 +75,15 @@ namespace Mark5.Mobile.Common.Utilities
             return Regex.Matches(text ?? string.Empty, EmailAddressRegex, RegexOptions.IgnoreCase);
         }
 
-        public static bool ContainsValidEmails(string text)
-        {
-            MatchCollection mc;
-            return ContainsValidEmails(text, out mc);
-        }
-
         public static bool ContainsValidEmails(string text, out MatchCollection matches)
         {
             matches = ExtractValidEmails(text);
             return matches.Count > 0;
+        }
+
+        public static bool ContainsValidEmail(string text)
+        {
+            return !string.IsNullOrEmpty(text) && Regex.IsMatch(text, EmailAddressRegex, RegexOptions.IgnoreCase);
         }
 
         public static bool ContainsValidTelephoneNumber(string text, out string phoneNumber)

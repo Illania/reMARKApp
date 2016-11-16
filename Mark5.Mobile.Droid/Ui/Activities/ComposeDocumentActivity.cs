@@ -15,7 +15,6 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
