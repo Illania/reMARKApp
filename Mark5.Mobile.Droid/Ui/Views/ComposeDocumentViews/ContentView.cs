@@ -366,16 +366,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             var tcs = new TaskCompletionSource<string>();
 
-            //var inlineResult = PreMailer.Net.PreMailer.MoveCssInline(content, true, null, null, true, true);
-            //if (inlineResult.Warnings != null && inlineResult.Warnings.Count > 0)
-            //{
-            //    if (Log.IsWarningEnabled())
-            //    {
-            //        Log.Warning("There were warnings when inlining CSS:\n" + string.Join("\n", inlineResult.Warnings));
-            //    }
-            //}
+            var inlineResult = PreMailer.Net.PreMailer.MoveCssInline(content, true, null, null, true, true);
+            if (inlineResult.Warnings != null && inlineResult.Warnings.Count > 0)
+            {
+                CommonConfig.Logger.Warning("There were warnings when inlining CSS:\n" + string.Join("\n", inlineResult.Warnings));
+            }
 
-            tcs.SetResult(content); //TODO 
+            tcs.SetResult(inlineResult.Html);
             return tcs.Task;
         }
 
