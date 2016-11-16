@@ -6,6 +6,8 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -24,7 +26,6 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
-using System.Linq;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
@@ -120,85 +121,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        async Task LoadOldContent()
-        {
-            if (!oldContentLoaded && PreviousDocument != null)
-            {
-                if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
-                {
-                    oldContent = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
-                }
-                else if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
-                {
-                    oldContent = await GetBodyWithHeader(PreviousDocument.HtmlBody, ContentType.Html);
-                }
-                else
-                {
-                    oldContent = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
-                }
-
-                Post(() => oldContentWebView.LoadDataWithBaseURL(null, oldContent, "text/html", "UTF-8", null));
-                oldContentLoaded = true;
-            }
-        }
-
-        async Task<string> GetBodyWithHeader(string content, ContentType contentType)
-        {
-            if (contentType == ContentType.Html)
-            {
-                var htmlHeader = GetHtmlHeader();
-
-                var htmlParser = new HtmlParser();
-                var htmlDocument = await htmlParser.ParseAsync(content);
-                var body = htmlDocument.Body;
-                var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
-                body.InsertBefore(parsedHeader.Body, body.FirstChild);
-
-                return htmlDocument.ToHtml(HtmlMarkupFormatter.Instance);
-            }
-
-            if (contentType == ContentType.PlainText)
-            {
-                var htmlHeader = GetHtmlHeader();
-
-                var htmlParser = new HtmlParser();
-                var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
-
-                var contentHtml = parsedHeader.CreateElement("pre");
-                contentHtml.TextContent = content;
-
-                parsedHeader.Body.Append(contentHtml);
-
-                return parsedHeader.ToHtml(HtmlMarkupFormatter.Instance);
-            }
-
-            return "";
-        }
-
-        string GetHtmlHeader()
-        {
-            var processedDateReceivedTimestamp = PreviousDocumentPreview.DateReceivedTimestamp
-                                                                        .ConvertTimestampMillisecondsToDateTime()
-                                                                        .ConvertUtcToServerTime()
-                                                                        .ConvertDateTimeToTimestampMilliseconds();
-            var date = processedDateReceivedTimestamp.FormatServerTimestampAsTimeAndDateString(Context);
-
-            var header = new StringBuilder();
-            header.Append("<br/><hr/>");
-            header.Append(string.Format("<b>From</b>: {0}", GetAddressTextFromPreviousDocument(DocumentAddressType.From))).Append("</br>");
-            header.Append(string.Format("<b>Date</b>: {0}", date)).Append("</br>");
-            header.Append(string.Format("<b>To</b>: {0}", GetAddressTextFromPreviousDocument(DocumentAddressType.To))).Append("</br>");
-            var ccText = GetAddressTextFromPreviousDocument(DocumentAddressType.Cc);
-            if (!string.IsNullOrWhiteSpace(ccText))
-            {
-                header.Append(string.Format("<b>Cc</b>: {0}", ccText)).Append("</br>");
-            }
-            header.Append(string.Format("<b>Subject</b>: {0}", PreviousDocumentPreview.Subject)).Append("</br>");
-            header.Append("<br/><br/>");
-
-            return header.ToString();
-        }
-
         #region Public methods
 
         public override async Task RefreshView()
@@ -245,6 +167,92 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #region Utility methods
 
+        async Task LoadOldContent()
+        {
+            if (!oldContentLoaded && PreviousDocument != null)
+            {
+                if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
+                {
+                    oldContent = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
+                }
+                else if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
+                {
+                    oldContent = await GetBodyWithHeader(PreviousDocument.HtmlBody, ContentType.Html);
+                }
+                else
+                {
+                    oldContent = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
+                }
+
+                Post(() => oldContentWebView.LoadDataWithBaseURL(null, oldContent, "text/html", "UTF-8", null));
+                oldContentLoaded = true;
+            }
+        }
+
+        async Task<string> GetBodyWithHeader(string content, ContentType contentType)
+        {
+            if (contentType == ContentType.Html)
+            {
+                var htmlHeader = GetHtmlHeader();
+
+                var htmlParser = new HtmlParser();
+                var htmlDocument = await htmlParser.ParseAsync(content);
+                var body = htmlDocument.Body;
+                var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
+                body.InsertBefore(parsedHeader.Body, body.FirstChild);
+
+                var textWriter = new StringWriter();
+                htmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
+
+                return textWriter.ToString();
+            }
+
+            if (contentType == ContentType.PlainText)
+            {
+                var htmlHeader = GetHtmlHeader();
+
+                var htmlParser = new HtmlParser();
+                var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
+
+                var contentHtml = parsedHeader.CreateElement("pre");
+                contentHtml.TextContent = content;
+
+                parsedHeader.Body.Append(contentHtml);
+
+                var textWriter = new StringWriter();
+                parsedHeader.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
+
+                return textWriter.ToString();
+            }
+
+            return "";
+        }
+
+        string GetHtmlHeader()
+        {
+            var processedDateReceivedTimestamp = PreviousDocumentPreview.DateReceivedTimestamp
+                                                                        .ConvertTimestampMillisecondsToDateTime()
+                                                                        .ConvertUtcToServerTime()
+                                                                        .ConvertDateTimeToTimestampMilliseconds();
+            var date = processedDateReceivedTimestamp.FormatServerTimestampAsTimeAndDateString(Context);
+
+            var header = new StringBuilder();
+            header.Append("<br/><hr/>");
+            header.Append(string.Format("<b>From</b>: {0}", GetAddressTextFromPreviousDocument(DocumentAddressType.From))).Append("</br>");
+            header.Append(string.Format("<b>Date</b>: {0}", date)).Append("</br>");
+            header.Append(string.Format("<b>To</b>: {0}", GetAddressTextFromPreviousDocument(DocumentAddressType.To))).Append("</br>");
+            var ccText = GetAddressTextFromPreviousDocument(DocumentAddressType.Cc);
+            if (!string.IsNullOrWhiteSpace(ccText))
+            {
+                header.Append(string.Format("<b>Cc</b>: {0}", ccText)).Append("</br>");
+            }
+            header.Append(string.Format("<b>Subject</b>: {0}", PreviousDocumentPreview.Subject)).Append("</br>");
+            header.Append("<br/><br/>");
+
+            return header.ToString();
+        }
+
+
         async Task<string> RetrieveCombinedText()
         {
             var newContentString = await GetHtmlContentAsync(true);
@@ -259,7 +267,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 var oldContentInDiv = newContentParsed.CreateElement("div");
                 oldContentInDiv.InnerHtml = oldContentParsed.Body.InnerHtml;
                 newContentParsed.Body.Append(oldContentInDiv);
-                return newContentParsed.ToHtml(HtmlMarkupFormatter.Instance);
+                var textWriter = new StringWriter();
+                newContentParsed.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
+                return textWriter.ToString();
             }
 
             return newContentString;
@@ -315,7 +325,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             parentElement.Append(nodes.ToArray());
 
-            await SetHtmlContentAsync(currentHtmlDocument.ToHtml(HtmlMarkupFormatter.Instance));
+            var textWriter = new StringWriter();
+            currentHtmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
+
+            await SetHtmlContentAsync(textWriter.ToString());
         }
 
         static async Task<IHtmlCollection<IElement>> ProcessInsertedContent(HtmlParser htmlParser, ContentType contentToInsertType, string contentToInsert)

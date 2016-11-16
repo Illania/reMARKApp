@@ -146,11 +146,11 @@
       <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.0\lib\MonoAndroid\SQLitePCLRaw.batteries_v2.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Android.Export" />
-    <Reference Include="PreMailer.Net">
-      <HintPath>..\packages\PreMailer.Net.1.5.0\lib\net45\PreMailer.Net.dll</HintPath>
-    </Reference>
     <Reference Include="AngleSharp">
       <HintPath>..\packages\AngleSharp.0.9.9\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="PreMailer.Net">
+      <HintPath>..\packages\PreMailer.Net.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
