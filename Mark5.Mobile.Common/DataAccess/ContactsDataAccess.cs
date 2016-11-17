@@ -553,6 +553,10 @@ namespace Mark5.Mobile.Common.DataAccess
                     var outerDeleteQueryContact = $"delete from {nameof(Contact)} where {nameof(Contact.Id)} not in ({innerSelectQueryText}) ";
                     var cmd2 = c.CreateCommand(outerDeleteQueryContact);
                     cmd2.ExecuteNonQuery();
+
+                    var outerDeleteQueryContactCommunicationAddresses = $"delete from {nameof(ContactCommunicationAddress)} where {nameof(ContactCommunicationAddress.ContactId)} not in ({innerSelectQueryText}) ";
+                    var cmd3 = c.CreateCommand(outerDeleteQueryContactCommunicationAddresses);
+                    cmd3.ExecuteNonQuery();
                 });
 
             }
