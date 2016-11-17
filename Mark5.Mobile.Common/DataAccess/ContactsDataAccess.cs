@@ -106,6 +106,13 @@ namespace Mark5.Mobile.Common.DataAccess
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
                     c.InsertOrReplace(contact);
+
+                    c.Table<ContactCommunicationAddress>().Delete(ca => ca.ContactId == contact.Id);
+
+                    var contactCommunicationAddresses = contact.CommunicationAddresses
+                                                               .Select(ca => new ContactCommunicationAddress(contact.Id, ca.Address, ca.Type, ca.Description, ca.IsPrimary));
+                    c.InsertAll(contactCommunicationAddresses);
+
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
@@ -130,6 +137,18 @@ namespace Mark5.Mobile.Common.DataAccess
                     }
 
                     contact = result;
+
+                    var cmd = c.CreateCommand($"select \"{nameof(ContactCommunicationAddress.Address)}\", " +
+                                              $"\"{nameof(ContactCommunicationAddress.Description)}\"," +
+                                              $" \"{nameof(ContactCommunicationAddress.IsPrimary)}\", " +
+                                              $"\"{nameof(ContactCommunicationAddress.Type)}\" " +
+                                              $"from \"{nameof(ContactCommunicationAddress)}\" " +
+                                              $"where \"{nameof(ContactCommunicationAddress.ContactId)}\" = @contactId");
+                    cmd.Bind("@contactId", contactId);
+                    var addresses = cmd.ExecuteQuery<CommunicationAddress>();
+
+                    contact.CommunicationAddresses.AddRange(addresses);
+
                 });
 
                 return contact;
@@ -147,6 +166,13 @@ namespace Mark5.Mobile.Common.DataAccess
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
                     c.InsertOrReplace(container.Contact);
+                    c.Table<ContactCommunicationAddress>().Delete(ca => ca.ContactId == container.Contact.Id);
+
+                    var contactCommunicationAddresses = container.Contact.CommunicationAddresses
+                                                               .Select(ca => new ContactCommunicationAddress(container.Contact.Id, ca.Address, ca.Type, ca.Description, ca.IsPrimary));
+                    c.InsertAll(contactCommunicationAddresses);
+
+
                     c.InsertOrReplace(container.ContactPreview);
                 });
             }
@@ -169,6 +195,17 @@ namespace Mark5.Mobile.Common.DataAccess
                     {
                         throw new DataNotFoundException("Contact could not be found.");
                     }
+
+                    var cmd = c.CreateCommand($"select \"{nameof(ContactCommunicationAddress.Address)}\", " +
+                          $"\"{nameof(ContactCommunicationAddress.Description)}\"," +
+                          $" \"{nameof(ContactCommunicationAddress.IsPrimary)}\", " +
+                          $"\"{nameof(ContactCommunicationAddress.Type)}\" " +
+                          $"from \"{nameof(ContactCommunicationAddress)}\" " +
+                          $"where \"{nameof(ContactCommunicationAddress.ContactId)}\" = @contactId");
+                    cmd.Bind("@contactId", contactId);
+                    var addresses = cmd.ExecuteQuery<CommunicationAddress>();
+
+                    contact.CommunicationAddresses.AddRange(addresses);
 
                     var contactPreview = c.Find<ContactPreview>(contactId);
                     if (contactPreview == null)
@@ -193,7 +230,7 @@ namespace Mark5.Mobile.Common.DataAccess
             await RemoveFromFolderAsync(ids, folder.Id);
         }
 
-        public async Task RemoveFromFolderAsync(List<Contact> contacts, Folder folder)
+        public async Task RemoveFromFolderAsync(List<Contact> contacts, Folder folder) //TODO remember to delete also addresses
         {
             var ids = contacts.Select(c => c.Id).Distinct().ToList();
             await RemoveFromFolderAsync(ids, folder.Id);
@@ -212,6 +249,7 @@ namespace Mark5.Mobile.Common.DataAccess
                         {
                             c.Table<ContactPreview>().Delete(cp => cp.Id == id);
                             c.Table<Contact>().Delete(ct => ct.Id == id);
+                            c.Table<ContactCommunicationAddress>().Delete(ca => ca.ContactId == id);
                         }
 
                         c.Table<FolderContactLink>().Delete(fcl => fcl.ContactId == id && fcl.FolderId == folderId);
@@ -245,6 +283,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     c.Table<FolderContactLink>().Delete(fcl => ids.Contains(fcl.ContactId));
                     c.Table<ContactPreview>().Delete(cp => ids.Contains(cp.Id));
                     c.Table<Contact>().Delete(ct => ids.Contains(ct.Id));
+                    c.Table<ContactCommunicationAddress>().Delete(ca => ids.Contains(ca.ContactId));
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))

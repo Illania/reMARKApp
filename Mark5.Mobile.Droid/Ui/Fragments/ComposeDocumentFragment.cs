@@ -194,13 +194,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        /*
-         * TODO
-         * - Implement attachments view
-         * - Check what happens with no connection and autocomplete
-         * - Decide what to do with getting info from contacts in autocomplete
-         */
-
         #region Options menu related
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)

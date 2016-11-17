@@ -242,19 +242,6 @@ namespace Mark5.Mobile.Common.Model
             }
         }
 
-        [Column("CommunicationAddressesBytes")]
-        public byte[] CommunicationAddressesBytes
-        {
-            get
-            {
-                return SerializationUtils.SerializeToByteArray(CommunicationAddresses);
-            }
-            set
-            {
-                CommunicationAddresses = SerializationUtils.DeserializeFromByteArray<List<CommunicationAddress>>(value);
-            }
-        }
-
         [Column("PhysicalAddressesBytes")]
         public byte[] PhysicalAddressesBytes
         {

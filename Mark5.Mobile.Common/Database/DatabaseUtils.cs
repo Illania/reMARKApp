@@ -36,6 +36,7 @@ namespace Mark5.Mobile.Common.Database
                 c.CreateTable<ContactPreview>();
                 c.CreateTable<Contact>();
                 c.CreateTable<Category>();
+                c.CreateTable<ContactCommunicationAddress>();
             });
             await DatabaseConnectionProvider.ShortcodesDatabase.RunInConnectionAsync(c =>
             {
@@ -76,6 +77,7 @@ namespace Mark5.Mobile.Common.Database
                 c.DeleteAll<ContactPreview>();
                 c.DeleteAll<Contact>();
                 c.DeleteAll<Category>();
+                c.DeleteAll<ContactCommunicationAddress>();
             });
             await DatabaseConnectionProvider.ShortcodesDatabase.RunInConnectionAsync(c =>
             {
