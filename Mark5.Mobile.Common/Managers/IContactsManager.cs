@@ -42,6 +42,8 @@ namespace Mark5.Mobile.Common.Managers
         Task<bool> EditComment(Contact contact, Comment comment, SourceType sourceType = SourceType.Auto);
 
         Task DeleteComment(Contact contact, Comment comment, SourceType sourceType = SourceType.Auto);
+
+        Task<List<PrintableSuggestion>> GetSuggestions(string phrase, SourceType sourceType = SourceType.Auto);
     }
 }
 

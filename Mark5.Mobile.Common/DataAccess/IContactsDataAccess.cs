@@ -56,6 +56,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task RemoveOrphans();
 
+        Task<List<PrintableSuggestion>> GetSuggestions(string phrase);
     }
 }
 

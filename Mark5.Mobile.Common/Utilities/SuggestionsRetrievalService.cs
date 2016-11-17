@@ -76,14 +76,17 @@ namespace Mark5.Mobile.Common.Utilities
                 return;
             }
 
-            var a4 = new PrintableSuggestion("Bartosz", "bgc@nordic-it.com", SuggestionType.Contact);
-            var a5 = new PrintableSuggestion("Ander", "andersp@gmail.com", SuggestionType.Contact);
-
-            var sugg = new List<PrintableSuggestion> { a4, a5 };
-            var filtered = sugg.Where(ps => ps.Name.ContainsCaseInsensitive(phrase) | ps.Address.ContainsCaseInsensitive(phrase)).ToList();
-
-            Task.Run(() =>
+            Task.Run(async () =>
            {
+               var filtered = new List<PrintableSuggestion>();
+               try
+               {
+                   filtered = await Managers.Managers.ContactsManager.GetSuggestions(phrase);
+               }
+               catch (Exception ex)
+               {
+                   CommonConfig.Logger.Error("Error while retrieving suggestions from database", ex);
+               }
                handler(filtered, token);
            });
         }

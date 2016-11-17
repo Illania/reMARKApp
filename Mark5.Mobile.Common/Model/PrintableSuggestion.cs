@@ -19,7 +19,25 @@ namespace Mark5.Mobile.Common.Model
             set;
         }
 
+        public string ContactDescription
+        {
+            get;
+            set;
+        }
+
         public string Address
+        {
+            get;
+            set;
+        }
+
+        public string AddressDescription
+        {
+            get;
+            set;
+        }
+
+        public string ShortId
         {
             get;
             set;
@@ -34,7 +52,10 @@ namespace Mark5.Mobile.Common.Model
         public PrintableSuggestion(RecentAddress ra)
             : this(ra.Name, ra.Address, SuggestionType.RecentAddress)
         {
+        }
 
+        public PrintableSuggestion()
+        {
         }
 
         public PrintableSuggestion(string name, string address, SuggestionType type)

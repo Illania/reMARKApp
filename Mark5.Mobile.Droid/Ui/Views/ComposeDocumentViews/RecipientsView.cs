@@ -524,7 +524,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 protected override void PublishResults(Java.Lang.ICharSequence constraint, FilterResults results)
                 {
-                    //Nothing to do here //TODO this is in the UI thread, need to check ir
+                    //Nothing to do here 
                 }
 
                 #endregion

@@ -565,6 +565,41 @@ namespace Mark5.Mobile.Common.DataAccess
                 throw new DataAccessException("Error removing orphan contacts and contact previews.", ex);
             }
         }
+
+        public async Task<List<PrintableSuggestion>> GetSuggestions(string phrase)
+        {
+            try
+            {
+                List<PrintableSuggestion> suggestions = null;
+
+                await contactsDatabase.RunInConnectionAsync(c =>
+               {
+                   var commandString = $"select CP.{nameof(ContactPreview.Name)} as {nameof(PrintableSuggestion.Name)}," +
+                      $" CP.{nameof(ContactPreview.ShortId)} as {nameof(PrintableSuggestion.ShortId)}, " +
+                        $" CP.{nameof(ContactPreview.Description)} as {nameof(PrintableSuggestion.ContactDescription)}, " +
+                        $" CA.{nameof(ContactCommunicationAddress.Address)} as {nameof(PrintableSuggestion.Address)}, " +
+                        $" CA.{nameof(ContactCommunicationAddress.Description)} as {nameof(PrintableSuggestion.AddressDescription)} " +
+                        $" from {nameof(ContactPreview)} CP inner join {nameof(ContactCommunicationAddress)} CA" +
+                        $" on CP.{nameof(ContactPreview.Id)} = CA.{nameof(ContactCommunicationAddress.ContactId)}" +
+                        $" where (CA.{nameof(ContactCommunicationAddress.Type)} = @addressType) AND " +
+                        $" ((CP.{nameof(ContactPreview.Name)} like @phrase) OR (CP.{nameof(ContactPreview.ShortId)} like @phrase)" +
+                        $" OR (CA.{nameof(ContactCommunicationAddress.Address)} like @phrase))  " +
+                        "COLLATE Nocase";
+                   var cmd = c.CreateCommand(commandString);
+                   cmd.Bind("@phrase", $"%{phrase}%");
+                   cmd.Bind("@addressType", (int)CommunicationAddressType.Email);
+                   var result = cmd.ExecuteQuery<PrintableSuggestion>();
+                   suggestions = result;
+               });
+
+                return suggestions;
+            }
+            catch
+            {
+                return new List<PrintableSuggestion>();
+            }
+        }
     }
 }
+
 
