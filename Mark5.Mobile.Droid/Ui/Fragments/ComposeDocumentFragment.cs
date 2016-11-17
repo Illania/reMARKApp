@@ -196,19 +196,33 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Options menu related
 
+        static class MenuItemActions
+        {
+            public const int AddAttachment = 10;
+            public const int SendDocument = 20;
+        }
+
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             optionsMenu = menu;
-            var sendItem = menu.Add(Menu.None, 10, 10, "Send");
+            var sendItem = menu.Add(Menu.None, MenuItemActions.SendDocument, MenuItemActions.SendDocument, Resource.String.send);
+            sendItem.SetIcon(Resource.Drawable.send);
             sendItem.SetShowAsAction(ShowAsAction.Always);
             sendItem.SetEnabled(false);
+
+            var attachmentItem = menu.Add(Menu.None, MenuItemActions.AddAttachment, MenuItemActions.AddAttachment, Resource.String.add_attachment);
+            attachmentItem.SetShowAsAction(ShowAsAction.Always); //TODO add icon
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            if (item.ItemId == 10)
+            if (item.ItemId == MenuItemActions.SendDocument)
             {
                 SendDocument();
+            }
+            if (item.ItemId == MenuItemActions.AddAttachment)
+            {
+
             }
 
             return true;
@@ -216,7 +230,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void UpdateSendButtonState()
         {
-            var sendItem = optionsMenu?.FindItem(10);
+            var sendItem = optionsMenu?.FindItem(MenuItemActions.SendDocument);
             sendItem?.SetEnabled(IsFormValid());
         }
 

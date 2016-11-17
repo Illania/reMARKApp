@@ -206,4 +206,6 @@
 	<string name="show_previous_message">Show previous message</string>
 	<string name="hide_previous_message">Hide previous message</string>
 	<string name="sending_document">Sending document</string>
+	<string name="send">Send</string>
+	<string name="add_attachment">Add attachment</string>
 </resources>
