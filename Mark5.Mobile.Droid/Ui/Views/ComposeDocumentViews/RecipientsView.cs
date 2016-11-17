@@ -381,12 +381,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 var separator = view.FindViewById<View>(Resource.Id.suggestionSeparator);
 
                 bool isLoading = (filter as SuggestionsFilter).Loading;
+                var suggestion = suggestions[position];
 
                 separator.Visibility = (position == Count - 1 && !isLoading) ? ViewStates.Invisible : ViewStates.Visible;
                 progressBar.Visibility = (position == Count - 1 && isLoading) ? ViewStates.Visible : ViewStates.Gone;
 
-                var name = suggestions[position].Name;
-                var address = suggestions[position].Address;
+                var name = suggestion.Name;
+                if (!string.IsNullOrEmpty(suggestion.ShortId))
+                {
+                    name += $" ({suggestion.ShortId})";
+                }
+                var address = suggestion.Address;
 
                 var colorSelection = new Color(ContextCompat.GetColor(parent.Context, Resource.Color.brown));
 
