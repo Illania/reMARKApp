@@ -169,7 +169,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         async Task LoadOldContent()
         {
-            if (!oldContentLoaded && PreviousDocument != null)
+            if (!oldContentLoaded && CreationModeFlag != DocumentCreationModeFlag.Edit && PreviousDocument != null)
             {
                 if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
                 {

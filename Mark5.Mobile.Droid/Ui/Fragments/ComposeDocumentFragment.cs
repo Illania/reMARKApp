@@ -15,6 +15,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -52,6 +53,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ScrollView scrollView;
         LinearLayoutCompat linearLayout;
         bool documentShown;
+        bool loadingDocument; //On resume could be called again after contact access permission
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
@@ -113,10 +115,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task LoadDocument()
         {
-            if (PreviousDocument != null || CreationModeFlag == DocumentCreationModeFlag.New)
+            if (loadingDocument || PreviousDocument != null || CreationModeFlag == DocumentCreationModeFlag.New)
             {
                 return;
             }
+
+            loadingDocument = true;
+            bool notFoundInCache = false;
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.loading_document, Resource.String.please_wait);
 
             try
             {
@@ -124,12 +131,35 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 PreviousDocument = container.Document;
                 PreviousDocumentPreview = container.DocumentPreview;
             }
+            catch (DataNotFoundException)
+            {
+                notFoundInCache = true; //For example if we open the compose fragment from a draft
+            }
             catch (Exception ex)
             {
-                //TODO what to do here? Need also to consider the case in which the document is not in local, for example if we open a draft
-
+                dismissAction();
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
+
+            if (notFoundInCache)
+            {
+                try
+                {
+                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, SourceType.Remote);
+                    PreviousDocument = container.Document;
+                    PreviousDocumentPreview = container.DocumentPreview;
+                }
+                catch (Exception ex)
+                {
+                    dismissAction();
+                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                    Activity.Finish(); //TODO Ask Bartosz what he thinks of the flow
+                }
+            }
+
+            dismissAction();
+
+            loadingDocument = false;
         }
 
         async Task ShowDocument()

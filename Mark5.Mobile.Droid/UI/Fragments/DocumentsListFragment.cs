@@ -324,10 +324,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (actionMode == null)
             {
-                var i = new Intent(Activity, typeof(DocumentActivity));
-                i.PutExtra(DocumentActivity.FolderIntentKey, SerializationUtils.Serialize(Folder));
-                i.PutExtra(DocumentActivity.DocumentPreviewIntentKey, SerializationUtils.Serialize(documentPreview));
-                StartActivity(i);
+                if (documentPreview.Direction == DocumentDirection.Draft)
+                {
+                    StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Edit, documentPreview.Id, Folder.Id));
+                }
+                else
+                {
+                    var i = new Intent(Activity, typeof(DocumentActivity));
+                    i.PutExtra(DocumentActivity.FolderIntentKey, SerializationUtils.Serialize(Folder));
+                    i.PutExtra(DocumentActivity.DocumentPreviewIntentKey, SerializationUtils.Serialize(documentPreview));
+                    StartActivity(i);
+                }
             }
             else
             {
