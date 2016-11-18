@@ -29,6 +29,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         const string PreviousDocumentIdIntentKey = "PreviousDocumentIdIntent_a2066147-a27b-454f-bc5c-03e6b8266697";
         const string PreviousDocumentFolderIdIntentKey = "PreviousDocumentFolderIdIntent_ac0d9a31-2ddc-497b-8fbe-7fd5a51b2257";
 
+        const string cdfFragmentTagKey = "fragmentTagKey";
+        string cdfFragmentTag;
+
         public static Intent CreateIntent(Context context, DocumentCreationModeFlag creationModeFlag, int? precedingDocumentId = null,
                                           int? precedingDocumentFolderId = null)
         {
@@ -71,7 +74,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     PreviousDocumentId = previousDocumentId,
                     PreviousDocumentFolderId = previousDocumentFolderId,
                 };
-                ft.Replace(Resource.Id.fragment_container, cdf, cdf.GenerateTag());
+                cdfFragmentTag = cdf.GenerateTag();
+                ft.Replace(Resource.Id.fragment_container, cdf, cdfFragmentTag);
                 ft.Commit();
 
                 ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.ReadContacts }, 383);
@@ -80,8 +84,16 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
             else
             {
+                cdfFragmentTag = savedInstanceState.GetString(cdfFragmentTagKey);
+                cdf = SupportFragmentManager.FindFragmentByTag(cdfFragmentTag) as ComposeDocumentFragment;
                 CommonConfig.Logger.Info($"Restored {nameof(ComposeDocumentActivity)}");
             }
+        }
+
+        protected override void OnSaveInstanceState(Bundle outState)
+        {
+            outState.PutString(cdfFragmentTagKey, cdfFragmentTag);
+            base.OnSaveInstanceState(outState);
         }
 
         public override bool OnOptionsItemSelected(Android.Views.IMenuItem item)
@@ -93,6 +105,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
 
             return base.OnOptionsItemSelected(item);
+        }
+
+        public override void OnBackPressed()
+        {
+            cdf.AskIfShouldSaveAsDraft();
         }
 
     }

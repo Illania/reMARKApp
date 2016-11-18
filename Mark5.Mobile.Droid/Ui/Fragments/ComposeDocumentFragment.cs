@@ -163,9 +163,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             UpdateSendButtonState();
         }
 
-        void SendDocument()
+        void SendDocument(bool draft = false)
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.sending_document, Resource.String.please_wait);
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, draft ? Resource.String.saving_draft : Resource.String.sending_document, Resource.String.please_wait);
 
             Task.Run(async () =>
             {
@@ -174,17 +174,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     await subView.UpdateDocument();
                 }
 
-                DocumentPreview.Direction = DocumentDirection.Outgoing;
+                DocumentPreview.Direction = draft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
 
-                await Managers.DocumentsManager.SendDocumentAsync(Document, DocumentPreview, CreationModeFlag, PreviousDocument?.Id ?? 0,
-                                                                  PreviousDocumentFolderId.HasValue ? PreviousDocumentFolderId.Value : 0, 0, false, false, null);
+                await Managers.DocumentsManager.SendDocumentAsync(Document, DocumentPreview, CreationModeFlag, PreviousDocument?.Id ?? -1,
+                                                                  PreviousDocumentFolderId.HasValue ? PreviousDocumentFolderId.Value : -1, 0, false, false, null);
             }).ContinueWith(async t =>
            {
                dismissAction();
 
                if (t.IsFaulted)
                {
-                   CommonConfig.Logger.Error($"Failed to send document [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", t.Exception.InnerException);
+                   CommonConfig.Logger.Error($"Failed to send document [isDraft={draft}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", t.Exception.InnerException);
                    await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
                }
                else
@@ -192,6 +192,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                    Activity.Finish();
                }
            }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        public void AskIfShouldSaveAsDraft()
+        {
+            Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft, () => SendDocument(true), Activity.Finish);
         }
 
         #region Options menu related
