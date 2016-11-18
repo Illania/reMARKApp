@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.Content;
 using Android.Support.V4.View;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -27,6 +28,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class ComposeDocumentFragment : RetainableStateFragment
     {
         const string DefaultTitle = "New document";
+        public const int AttachmentRequestCode = 111;
 
         Document PreviousDocument { get; set; }
         DocumentPreview PreviousDocumentPreview { get; set; }
@@ -44,6 +46,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         PriorityView priorityView;
         LineView lineView;
         SubjectView subjectView;
+        AttachmentsView attachmentsView;
         ContentView contentView;
 
         IMenu optionsMenu;
@@ -88,8 +91,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             subjectView = new SubjectView(Context);
             subjectView.Edited += Subview_Edited;
-
             subViews.Add(subjectView);
+
+            attachmentsView = new AttachmentsView(Context);
+            subViews.Add(attachmentsView);
 
             contentView = new ContentView(Context);
             subViews.Add(contentView);
@@ -262,10 +267,41 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             if (item.ItemId == MenuItemActions.AddAttachment)
             {
-
+                AddAttachment();
             }
 
             return true;
+        }
+
+        void AddAttachment()
+        {
+            var intent = new Intent(Intent.ActionGetContent);
+            intent.SetType("*/*");
+            intent.AddCategory(Intent.CategoryOpenable);
+            Intent i = Intent.CreateChooser(intent, "File");
+            Activity.StartActivityForResult(i, AttachmentRequestCode);
+        }
+
+        public void LoadAttachment(Attachment attachment) //TODO find a better name and a better place
+        {
+            attachmentsView.AddAttachment(attachment);
+
+            Task.Run(async () =>
+            {
+                var guid = await Managers.DocumentsManager.UploadTemporaryAttachmentAsync(attachment);
+
+            }).ContinueWith(t =>
+           {
+               if (t.IsFaulted)
+               {
+                    //TODO what to do here?
+                }
+               else
+               {
+                    //TODO what to do here?
+                }
+           }, TaskScheduler.FromCurrentSynchronizationContext());
+
         }
 
         void UpdateSendButtonState()
