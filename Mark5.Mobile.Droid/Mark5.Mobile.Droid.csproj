@@ -475,6 +475,10 @@
     <AndroidResource Include="Resources\drawable-xhdpi\error.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\error.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\error.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\send_white.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\send_white.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\send_white.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\send_white.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

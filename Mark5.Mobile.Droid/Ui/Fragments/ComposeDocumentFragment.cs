@@ -53,7 +53,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ScrollView scrollView;
         LinearLayoutCompat linearLayout;
         bool documentShown;
-        bool loadingDocument; //On resume could be called again after contact access permission
+        bool resuming; //On resume could be called again after contact access permission
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
@@ -107,20 +107,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override async void OnResume()
         {
-            base.OnResume();
-
-            await LoadDocument();
-            await ShowDocument();
-        }
-
-        async Task LoadDocument()
-        {
-            if (loadingDocument || PreviousDocument != null || CreationModeFlag == DocumentCreationModeFlag.New)
+            if (resuming)
             {
                 return;
             }
 
-            loadingDocument = true;
+            resuming = true;
+            base.OnResume();
+
+            await LoadDocument();
+            await ShowDocument();
+
+            resuming = false;
+        }
+
+        async Task LoadDocument()
+        {
+            if (PreviousDocument != null || CreationModeFlag == DocumentCreationModeFlag.New)
+            {
+                return;
+            }
+
             bool notFoundInCache = false;
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.loading_document, Resource.String.please_wait);
@@ -158,8 +165,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             dismissAction();
-
-            loadingDocument = false;
         }
 
         async Task ShowDocument()
@@ -241,7 +246,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             optionsMenu = menu;
             var sendItem = menu.Add(Menu.None, MenuItemActions.SendDocument, MenuItemActions.SendDocument, Resource.String.send);
-            sendItem.SetIcon(Resource.Drawable.send);
+            sendItem.SetIcon(Resource.Drawable.send_white);
             sendItem.SetShowAsAction(ShowAsAction.Always);
             sendItem.SetEnabled(false);
 
@@ -266,7 +271,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void UpdateSendButtonState()
         {
             var sendItem = optionsMenu?.FindItem(MenuItemActions.SendDocument);
-            sendItem?.SetEnabled(IsFormValid());
+            if (sendItem != null)
+            {
+                var isFormValid = IsFormValid();
+                sendItem.SetEnabled(isFormValid);
+                sendItem.Icon.Mutate().Alpha = isFormValid ? 255 : 130;
+            }
         }
 
         bool IsFormValid()

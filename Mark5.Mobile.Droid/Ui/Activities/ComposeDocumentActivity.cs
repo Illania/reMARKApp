@@ -11,6 +11,7 @@ using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Support.V4.App;
+using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
@@ -78,7 +79,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 ft.Replace(Resource.Id.fragment_container, cdf, cdfFragmentTag);
                 ft.Commit();
 
-                ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.ReadContacts }, 383);
+                if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadContacts) != Android.Content.PM.Permission.Granted)
+                {
+                    ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.ReadContacts }, 383);
+                }
 
                 CommonConfig.Logger.Info($"Created {nameof(ComposeDocumentActivity)}");
             }
