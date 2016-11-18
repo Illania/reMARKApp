@@ -118,5 +118,41 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             cdf.AskIfShouldSaveAsDraft();
         }
 
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        {
+            if (requestCode == ComposeDocumentFragment.AttachmentRequestCode)
+            {
+                if (resultCode != Result.Ok)
+                {
+                    //TODO error to the user?
+                }
+
+                var uri = data.Data;
+
+                var cursor = ContentResolver.Query(uri, null, null, null, null);
+                var nameIndex = cursor.GetColumnIndex(OpenableColumns.DisplayName);
+                var sizeIndex = cursor.GetColumnIndex(OpenableColumns.Size);
+                cursor.MoveToFirst();
+
+                var name = cursor.GetString(nameIndex);
+                var size = cursor.GetLong(sizeIndex);
+                var mimeType = ContentResolver.GetType(uri);
+                var extension = MimeTypeMap.Singleton.GetExtensionFromMimeType(mimeType);
+
+                var stream = ContentResolver.OpenInputStream(uri);
+                var a = stream.Position;
+
+                var attachment = new Attachment
+                {
+                    Filename = name,
+                    Extension = extension,
+                    Size = (int)size,
+                    Stream = stream,
+                };
+
+                cdf.LoadAttachment(attachment);
+            }
+        }
+
     }
 }
