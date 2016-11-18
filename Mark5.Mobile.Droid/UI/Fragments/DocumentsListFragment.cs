@@ -1042,9 +1042,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 set
                 {
-                    attachmentImageView.Visibility = value ? ViewStates.Gone : ViewStates.Visible;
-                    commentImageView.Visibility = value ? ViewStates.Gone : ViewStates.Visible;
-                    previewTextView.Visibility = value ? ViewStates.Gone : ViewStates.Visible;
+                    attachmentImageView.Visibility = value ? ViewStates.Gone : attachmentImageView.Visibility;
+                    commentImageView.Visibility = value ? ViewStates.Gone : commentImageView.Visibility;
+                    previewTextView.Visibility = value ? ViewStates.Gone : previewTextView.Visibility;
                 }
             }
 
