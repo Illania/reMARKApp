@@ -63,62 +63,53 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<List<Folder>> GetFavoriteFoldersAsync(ModuleType module)
         {
-            var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
+            var rootFavoriteFolder = Folder.RootPerModule(module, true);
 
-            List<Folder> moduleFavoriteFolders;
-            if (!favoriteFolders.TryGetValue(module, out moduleFavoriteFolders))
+            if (!rootFavoriteFolder.SubFolders.Any())
             {
-                return new List<Folder>();
+                var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
+
+                List<Folder> moduleFavoriteFolders;
+                if (!favoriteFolders.TryGetValue(module, out moduleFavoriteFolders))
+                {
+                    return new List<Folder>();
+                }
+
+                rootFavoriteFolder.SubFolders.AddRange(moduleFavoriteFolders); //TODO there was a shallow copy here, necessary?
             }
 
-            return moduleFavoriteFolders.Select(f => f.ShallowCopy()).ToList();
+            return rootFavoriteFolder.SubFolders;
         }
 
         public async Task AddFavoriteFolderAsync(ModuleType module, Folder folder)
         {
-            var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
-
-            List<Folder> moduleFavoriteFolders;
-            if (!favoriteFolders.TryGetValue(module, out moduleFavoriteFolders))
-            {
-                moduleFavoriteFolders = new List<Folder>();
-                favoriteFolders[module] = moduleFavoriteFolders;
-            }
+            var moduleFavoriteFolders = await GetFavoriteFoldersAsync(module);
 
             if (moduleFavoriteFolders.FirstOrDefault(f => f.Id == folder.Id) == null)
             {
                 moduleFavoriteFolders.Add(folder.ShallowCopy());
             }
 
+            var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
+            favoriteFolders[module] = moduleFavoriteFolders;
+
             await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
         }
 
         public async Task RemoveFavoriteFolderAsync(ModuleType module, Folder folder)
         {
-            var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
-
-            List<Folder> moduleFavoriteFolders;
-            if (!favoriteFolders.TryGetValue(module, out moduleFavoriteFolders))
-            {
-                moduleFavoriteFolders = new List<Folder>();
-                favoriteFolders[module] = moduleFavoriteFolders;
-            }
-
+            var moduleFavoriteFolders = await GetFavoriteFoldersAsync(module);
             moduleFavoriteFolders.RemoveAll(f => f.Id == folder.Id);
+
+            var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
+            favoriteFolders[module] = moduleFavoriteFolders;
 
             await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
         }
 
         public async Task<bool> IsFolderFavouriteAsync(ModuleType module, Folder folder)
         {
-            var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
-
-            List<Folder> moduleFavoriteFolders;
-            if (!favoriteFolders.TryGetValue(module, out moduleFavoriteFolders))
-            {
-                return false;
-            }
-
+            var moduleFavoriteFolders = await GetFavoriteFoldersAsync(module);
             return moduleFavoriteFolders.FirstOrDefault(f => f.Id == folder.Id) != null;
         }
 

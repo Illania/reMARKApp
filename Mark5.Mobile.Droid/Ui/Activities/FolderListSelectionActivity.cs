@@ -65,7 +65,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         SupportActionBar.SetTitle(Resource.String.select_folder);
                         var cmflf = new CopyMoveToFolderListFragment
                         {
-                            Folder = Folder.RootPerModule(moduleType),
+                            RemoteFolder = Folder.RootPerModule(moduleType),
                             BusinessEntities = be,
                             Type = CopyMoveToFolderListFragment.ActionType.Copy
                         };
@@ -75,7 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         SupportActionBar.SetTitle(Resource.String.select_folder);
                         var cmflf2 = new CopyMoveToFolderListFragment
                         {
-                            Folder = Folder.RootPerModule(moduleType),
+                            RemoteFolder = Folder.RootPerModule(moduleType),
                             BusinessEntities = be,
                             FromFolder = fromFolder,
                             Type = CopyMoveToFolderListFragment.ActionType.Move
@@ -86,7 +86,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         SupportActionBar.SetTitle(Resource.String.select_folders);
                         var fplf = new FolderPickerListFragment
                         {
-                            Folder = Folder.RootPerModule(moduleType)
+                            RemoteFolder = Folder.RootPerModule(moduleType)
                         };
                         ft.Replace(Resource.Id.fragment_container, fplf, fplf.GenerateTag());
                         break;
