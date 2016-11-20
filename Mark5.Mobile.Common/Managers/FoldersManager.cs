@@ -75,7 +75,7 @@ namespace Mark5.Mobile.Common.Managers
                     return new List<Folder>();
                 }
 
-                rootFavoriteFolder.SubFolders.AddRange(moduleFavoriteFolders); //TODO there was a shallow copy here, necessary?
+                rootFavoriteFolder.SubFolders.AddRange(moduleFavoriteFolders);
             }
 
             return rootFavoriteFolder.SubFolders;

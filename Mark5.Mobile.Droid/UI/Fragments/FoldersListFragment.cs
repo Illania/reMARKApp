@@ -175,7 +175,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     var remoteFolders = await Managers.FoldersManager.GetFoldersAsync(RemoteFolder, 2);
                     RemoteFolder.SubFolders.Clear();
-                    RemoteFolder.SubFolders.AddRange(remoteFolders); //TODO should this be done in the manager..?
+                    RemoteFolder.SubFolders.AddRange(remoteFolders);
                     Adapter.Refresh(remoteFolders, Section.Remote);
                 }
                 catch (Exception ex)
@@ -192,7 +192,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        async Task RefreshFavorites(bool forceRefresh = false)
+        async Task RefreshFavorites()
         {
             CommonConfig.Logger.Info($"Refreshing favourite folders...");
 
