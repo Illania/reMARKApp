@@ -34,7 +34,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-        public Folder Folder { get; set; }
+        public Folder RemoteFolder { get; set; }
+
         virtual public bool LocalSectionEnabled { get; set; } = true;
 
         protected FolderListAdapter Adapter;
@@ -59,7 +60,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(FoldersListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
@@ -93,17 +94,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = Folder.Module.ToString();
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder.Root ? string.Empty : Folder.Name;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = RemoteFolder.Module.ToString();
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = RemoteFolder.Root ? string.Empty : RemoteFolder.Name;
 
-            CommonConfig.Logger.Info($"Created {nameof(FoldersListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]");
+            CommonConfig.Logger.Info($"Created {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]");
         }
 
         public async override void OnResume()
         {
             base.OnResume();
 
-            CommonConfig.Logger.Info($"Resuming {nameof(FoldersListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
+            CommonConfig.Logger.Info($"Resuming {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
             SetSections();
             await RefreshData();
@@ -114,7 +115,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnPause();
 
-            CommonConfig.Logger.Info($"Pausing {nameof(FoldersListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
+            CommonConfig.Logger.Info($"Pausing {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
             if (actionMode != null)
             {
@@ -141,7 +142,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"Refreshing...");
 
-            if (!Folder.HasSubFolders)
+            if (!RemoteFolder.HasSubFolders)
             {
                 return;
             }
@@ -168,16 +169,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"Refreshing remote folders...");
 
-            if (forceRefresh || !Folder.SubFolders.Any())
+            if (forceRefresh || !RemoteFolder.SubFolders.Any())
             {
                 try
                 {
-                    var folders = await Managers.FoldersManager.GetFoldersAsync(Folder, 2);
-                    Adapter.Refresh(folders, Section.Remote);
+                    var remoteFolders = await Managers.FoldersManager.GetFoldersAsync(RemoteFolder, 2);
+                    RemoteFolder.SubFolders.Clear();
+                    RemoteFolder.SubFolders.AddRange(remoteFolders);
+                    Adapter.Refresh(remoteFolders, Section.Remote);
                 }
                 catch (Exception ex)
                 {
-                    CommonConfig.Logger.Error($"Downloading folders failed [folder.name={Folder.Name}, folder.id={Folder.Id}]", ex);
+                    CommonConfig.Logger.Error($"Downloading folders failed [folder.name={RemoteFolder.Name}, folder.id={RemoteFolder.Id}]", ex);
                     await Dialogs.ShowErrorDialogAsync(Activity, ex);
                 }
             }
@@ -185,7 +188,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Folders already downloaded, refreshing views...");
 
-                Adapter.Refresh(Folder.SubFolders, Section.Remote);
+                Adapter.Refresh(RemoteFolder.SubFolders, Section.Remote);
             }
         }
 
@@ -193,15 +196,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"Refreshing favourite folders...");
 
-            var folders = await Managers.FoldersManager.GetFavoriteFoldersAsync(Folder.Module);
-            Adapter.Refresh(folders, Section.Favourites);
+            var favouriteFolders = await Managers.FoldersManager.GetFavoriteFoldersAsync(RemoteFolder.Module);
+            Adapter.Refresh(favouriteFolders, Section.Favourites);
         }
 
         void RefreshLocal()
         {
             CommonConfig.Logger.Info($"Refreshing local folders...");
 
-            var localRootFolder = Folder.LocalRootPerModule(Folder.Module);
+            var localRootFolder = Folder.LocalRootPerModule(RemoteFolder.Module);
             Adapter.Refresh(localRootFolder.SubFolders, Section.Local);
         }
 
@@ -222,10 +225,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info("Setting sections according to the folder");
 
-            if (Folder.Root)
+            if (RemoteFolder.Root)
             {
                 availableSections = new List<Section> { Section.Favourites, Section.Remote };
-                if (Folder.Module == ModuleType.Documents && LocalSectionEnabled)
+                if (RemoteFolder.Module == ModuleType.Documents && LocalSectionEnabled)
                 {
                     availableSections.Add(Section.Local);
                 }
@@ -256,7 +259,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             return new FoldersListFragment
             {
-                Folder = folder,
+                RemoteFolder = folder,
             };
         }
 
@@ -424,7 +427,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 menu.Add(Menu.None, MenuItemActions.EnableOffline, MenuItemActions.EnableOffline, Resource.String.add_offline).SetShowAsAction(ShowAsAction.Never);
                 menu.Add(Menu.None, MenuItemActions.DisableOffline, MenuItemActions.DisableOffline, Resource.String.remove_offline).SetShowAsAction(ShowAsAction.Never);
 
-                if (Folder.Module == ModuleType.Documents)
+                if (RemoteFolder.Module == ModuleType.Documents)
                 {
                     menu.Add(Menu.None, MenuItemActions.Subscribe, MenuItemActions.Subscribe, Resource.String.subscribe_folder).SetShowAsAction(ShowAsAction.Never);
                     menu.Add(Menu.None, MenuItemActions.Unsubscribe, MenuItemActions.Unsubscribe, Resource.String.unsubscribe_folder).SetShowAsAction(ShowAsAction.Never);
@@ -630,7 +633,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected List<Folder> GetMatchingFolders(string query)
         {
-            var folder = Folder.RootPerModule(Folder.Module);
+            var folder = Folder.RootPerModule(RemoteFolder.Module);
             var flattenedFolders = folder.SubFolders.Flatten(f => f.SubFolders);
             return flattenedFolders.Where(f => f.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0).ToList();
         }
@@ -641,16 +644,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(FoldersListFragment)} [FolderId={Folder?.Id}, ModuleType={Folder?.Module}]";
+            return $"{nameof(FoldersListFragment)} [FolderId={RemoteFolder?.Id}, ModuleType={RemoteFolder?.Module}]";
         }
 
         public override IRetainableState OnRetainInstanceState()
         {
-            CommonConfig.Logger.Info($"Retaining state: [folderName={Folder?.Name}, folderId={Folder?.Id}, selectedItemsCount={Adapter.SelectedItemPositions.Count} ]");
+            CommonConfig.Logger.Info($"Retaining state: [folderName={RemoteFolder?.Name}, folderId={RemoteFolder?.Id}, selectedItemsCount={Adapter.SelectedItemPositions.Count} ]");
 
             return new FolderListFragmentState
             {
-                Folder = Folder,
+                Folder = RemoteFolder,
                 SelectedItemPositions = new List<int>(Adapter.SelectedItemPositions),
             };
         }
@@ -660,10 +663,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var flfs = restoredState as FolderListFragmentState;
             if (flfs != null)
             {
-                Folder = flfs.Folder;
+                RemoteFolder = flfs.Folder;
                 recoveredSelectedItemsPosition = flfs.SelectedItemPositions;
 
-                CommonConfig.Logger.Info($"Restored state state: [folderName={Folder.Name}, folderId={Folder.Id}, selectedItemsCount={recoveredSelectedItemsPosition.Count}]");
+                CommonConfig.Logger.Info($"Restored state state: [folderName={RemoteFolder.Name}, folderId={RemoteFolder.Id}, selectedItemsCount={recoveredSelectedItemsPosition.Count}]");
             }
         }
 
