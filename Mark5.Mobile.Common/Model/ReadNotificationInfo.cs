@@ -15,10 +15,7 @@ namespace Mark5.Mobile.Common.Model
     public class ReadNotificationInfo
     {
 
-        [Column("Id"), PrimaryKey]
-        public int Id { get; set; } = -1;
-
-        [Column("NotificationGuid")]
+        [Column("NotificationGuid"), NotNull, Unique]
         public Guid NotificationGuid { get; set; }
     }
 }

@@ -48,12 +48,12 @@ namespace Mark5.Mobile.Common.DataAccess
             try
             {
                 List<Notification> notifications = null;
-                HashSet<Guid> readNotificationsGuids = null;
+                List<Guid> readNotificationsGuids = null;
 
                 await systemDatabase.RunInConnectionAsync(c =>
                 {
                     notifications = c.Table<Notification>().OrderByDescending(n => n.DateTimeTimestamp).ToList();
-                    readNotificationsGuids = new HashSet<Guid>(c.Table<ReadNotificationInfo>().Select(rni => rni.NotificationGuid));
+                    readNotificationsGuids = c.Table<ReadNotificationInfo>().Select(rni => rni.NotificationGuid).ToList();
                 });
 
                 if (notifications != null && readNotificationsGuids != null && readNotificationsGuids.Count > 0)
@@ -69,18 +69,18 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<HashSet<Guid>> GetReadNotificationGuids()
+        public async Task<List<Guid>> GetReadNotificationGuids()
         {
             try
             {
-                HashSet<Guid> guids = null;
+                List<ReadNotificationInfo> rnis = null;
 
                 await systemDatabase.RunInConnectionAsync(c =>
                 {
-                    guids = new HashSet<Guid>(c.Table<ReadNotificationInfo>().Select(rni => rni.NotificationGuid));
+                    rnis = c.Table<ReadNotificationInfo>().ToList();
                 });
 
-                return guids;
+                return rnis.Select(rni => rni.NotificationGuid).ToList();
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {

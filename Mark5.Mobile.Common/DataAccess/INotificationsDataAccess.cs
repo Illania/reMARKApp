@@ -20,7 +20,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task<List<Notification>> GetNotifications();
 
-        Task<HashSet<Guid>> GetReadNotificationGuids();
+        Task<List<Guid>> GetReadNotificationGuids();
 
         Task MarkAsRead(Notification notification);
 

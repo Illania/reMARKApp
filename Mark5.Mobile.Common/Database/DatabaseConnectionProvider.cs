@@ -148,6 +148,23 @@ namespace Mark5.Mobile.Common.Database
                 }
             });
         }
+
+        public async Task RunInConnectionWithoutTransactionAsync(Action<SQLiteConnection> action)
+        {
+            await Task.Run(() =>
+            {
+                try
+                {
+                    connectionSemaphore.Wait();
+
+                    action(connection);
+                }
+                finally
+                {
+                    connectionSemaphore.Release();
+                }
+            });
+        }
     }
 }
 

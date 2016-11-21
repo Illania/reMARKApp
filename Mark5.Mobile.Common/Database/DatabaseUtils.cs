@@ -107,23 +107,23 @@ namespace Mark5.Mobile.Common.Database
 
         public static async Task CompactDatabases()
         {
-            await DatabaseConnectionProvider.DocumentsDatabase.RunInConnectionAsync(c =>
+            await DatabaseConnectionProvider.DocumentsDatabase.RunInConnectionWithoutTransactionAsync(c =>
             {
                 c.CreateCommand("VACUUM;").ExecuteNonQuery();
             });
-            await DatabaseConnectionProvider.ContactsDatabase.RunInConnectionAsync(c =>
+            await DatabaseConnectionProvider.ContactsDatabase.RunInConnectionWithoutTransactionAsync(c =>
             {
                 c.CreateCommand("VACUUM;").ExecuteNonQuery();
             });
-            await DatabaseConnectionProvider.ShortcodesDatabase.RunInConnectionAsync(c =>
+            await DatabaseConnectionProvider.ShortcodesDatabase.RunInConnectionWithoutTransactionAsync(c =>
             {
                 c.CreateCommand("VACUUM;").ExecuteNonQuery();
             });
-            await DatabaseConnectionProvider.CalendarDatabase.RunInConnectionAsync(c =>
+            await DatabaseConnectionProvider.CalendarDatabase.RunInConnectionWithoutTransactionAsync(c =>
             {
                 c.CreateCommand("VACUUM;").ExecuteNonQuery();
             });
-            await DatabaseConnectionProvider.SystemDatabase.RunInConnectionAsync(c =>
+            await DatabaseConnectionProvider.SystemDatabase.RunInConnectionWithoutTransactionAsync(c =>
             {
                 c.CreateCommand("VACUUM;").ExecuteNonQuery();
             });

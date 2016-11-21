@@ -153,9 +153,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Adapter callbacks
 
-        void Adapter_ItemClicked(object sender, Notification notification)
+        async void Adapter_ItemClicked(object sender, Notification notification)
         {
             // TODO
+
+            await Managers.NotificationsManager.MarkAsRead(notification);
+
+            var position = adapter.GetPosition(notification);
+            if (position >= 0)
+            {
+                adapter.NotifyItemChanged(position);
+            }
         }
 
         #endregion
@@ -217,6 +225,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     .ConvertUtcToServerTime()
                     .ConvertDateTimeToTimestampMilliseconds()
                     .FormatServerTimestampAsCompactShortDateTimeString(context);
+                cpvh.UnreadIndicator = !n.IsRead;
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -230,6 +239,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var count = notificationsInView.Count;
                 notificationsInView.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
+            }
+
+            public int GetPosition(Notification notification)
+            {
+                return GetPosition(notification.Id);
+            }
+
+            public int GetPosition(int notificationId)
+            {
+                var position = -1;
+                for (var i = 0; i < notificationsInView.Count; i++)
+                {
+                    if (notificationsInView[i].Id == notificationId)
+                    {
+                        position = i;
+                        break;
+                    }
+                }
+                return position;
             }
 
             public void Clear()
@@ -267,6 +295,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
+            public bool UnreadIndicator
+            {
+                set
+                {
+                    unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Invisible;
+                }
+            }
+
+            readonly AppCompatImageView unreadImageView;
             readonly AppCompatTextView titleTextView;
             readonly AppCompatTextView messageTextView;
             readonly AppCompatTextView dateTimeTextView;
@@ -274,6 +311,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public NotificationViewHolder(View itemView)
                     : base(itemView)
             {
+                unreadImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_notification_unread);
                 titleTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_notification_title);
                 messageTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_notification_message);
                 dateTimeTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_notification_date);
