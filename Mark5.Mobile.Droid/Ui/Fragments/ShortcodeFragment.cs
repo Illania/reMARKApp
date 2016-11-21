@@ -279,7 +279,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(ShortcodeFragment)} [ShortcodeId={ShortcodePreview?.Id ?? Shortcode.Id}]";
+            return $"{nameof(ShortcodeFragment)} [ShortcodeId={ShortcodePreview?.Id ?? Shortcode?.Id ?? ShortcodeId}]";
         }
 
         class ShortcodeFragmentState : IRetainableState

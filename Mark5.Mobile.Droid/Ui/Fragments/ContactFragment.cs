@@ -450,7 +450,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(ContactFragment)} [contactId={ContactPreview?.Id ?? ContactId}]";
+            return $"{nameof(ContactFragment)} [contactId={ContactPreview?.Id ?? Contact?.Id ?? ContactId}]";
         }
 
         #endregion

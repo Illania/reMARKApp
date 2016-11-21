@@ -24,7 +24,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     {
 
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
+        public const string FolderIdIntentKey = "FolderId_4bd29db4-c529-48a2-bf8f-8f1a96ed60b5";
         public const string SearchIdIntentKey = "SearchId_fe483a14-0042-4fe2-a887-c232b332a715";
+        public const string DocumentIdIntentKey = "DocumentId_690fc3d6-ae73-4f5e-844a-06bdc44b6747";
         public const string DocumentPreviewIntentKey = "DocumentPreview_0bd291a4-22a5-431c-ad6e-4c8b273eeb98";
         public const string ReadOnlyModeIntentKey = "ReadOnlyMode_c23890cf-06fc-45d7-86c8-76c4c8027daf";
 
@@ -49,19 +51,29 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
-                var searchId = Intent.Extras.GetInt(SearchIdIntentKey);
-                var documentPreview = SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
-                var readOnlyMode = Intent.Extras.GetBoolean(ReadOnlyModeIntentKey);
+                df = new DocumentFragment();
+
+                if (Intent.HasExtra(FolderIdIntentKey))
+                    df.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
+
+                if (Intent.HasExtra(FolderIntentKey))
+                    df.Folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+
+                if (Intent.HasExtra(SearchIdIntentKey))
+                    df.SearchId = Intent.Extras.GetInt(SearchIdIntentKey);
+
+                if (Intent.HasExtra(DocumentIdIntentKey))
+                    df.DocumentId = Intent.Extras.GetInt(DocumentIdIntentKey);
+
+                if (Intent.HasExtra(DocumentPreviewIntentKey))
+                    df.DocumentPreview = SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
+
+                if (Intent.HasExtra(ReadOnlyModeIntentKey))
+                    df.ReadOnlyMode = Intent.Extras.GetBoolean(ReadOnlyModeIntentKey);
+
+                df.CloseRequest = OnBackPressed;
+
                 var ft = SupportFragmentManager.BeginTransaction();
-                df = new DocumentFragment
-                {
-                    Folder = folder,
-                    SearchId = searchId,
-                    DocumentPreview = documentPreview,
-                    CloseRequest = OnBackPressed,
-                    ReadOnlyMode = readOnlyMode
-                };
                 dfFragmentTag = df.GenerateTag();
                 ft.Replace(Resource.Id.fragment_container, df, dfFragmentTag);
                 ft.Commit();
