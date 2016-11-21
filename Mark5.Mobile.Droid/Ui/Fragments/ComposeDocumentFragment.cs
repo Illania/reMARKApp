@@ -247,16 +247,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 DocumentPreview.Direction = draft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
-
-                await Managers.DocumentsManager.SendDocumentAsync(Document, DocumentPreview, CreationModeFlag, PreviousDocument?.Id ?? -1,
-                                                                  PreviousDocumentFolderId.HasValue ? PreviousDocumentFolderId.Value : -1, 0, false, false, null);
+                await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, CreationModeFlag,
+                                                                        PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1,
+                                                                       0, false, false);
             }).ContinueWith(async t =>
            {
                dismissAction();
 
                if (t.IsFaulted)
                {
-                   CommonConfig.Logger.Error($"Failed to send document [isDraft={draft}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", t.Exception.InnerException);
+                   CommonConfig.Logger.Error($"Failed to insert document in outgoing [isDraft={draft}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", t.Exception.InnerException);
                    await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
                }
                else
