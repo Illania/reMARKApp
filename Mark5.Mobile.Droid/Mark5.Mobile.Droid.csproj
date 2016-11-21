@@ -479,6 +479,10 @@
     <AndroidResource Include="Resources\drawable-xhdpi\send_white.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\send_white.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\send_white.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\add_attachment.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\add_attachment.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\add_attachment.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\add_attachment.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

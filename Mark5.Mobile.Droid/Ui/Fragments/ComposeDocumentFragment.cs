@@ -250,13 +250,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             optionsMenu = menu;
+
+            var attachmentItem = menu.Add(Menu.None, MenuItemActions.AddAttachment, MenuItemActions.AddAttachment, Resource.String.add_attachment);
+            attachmentItem.SetIcon(Resource.Drawable.add_attachment);
+            attachmentItem.SetShowAsAction(ShowAsAction.Always);
+
             var sendItem = menu.Add(Menu.None, MenuItemActions.SendDocument, MenuItemActions.SendDocument, Resource.String.send);
             sendItem.SetIcon(Resource.Drawable.send_white);
             sendItem.SetShowAsAction(ShowAsAction.Always);
             sendItem.SetEnabled(false);
-
-            var attachmentItem = menu.Add(Menu.None, MenuItemActions.AddAttachment, MenuItemActions.AddAttachment, Resource.String.add_attachment);
-            attachmentItem.SetShowAsAction(ShowAsAction.Always); //TODO add icon
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
