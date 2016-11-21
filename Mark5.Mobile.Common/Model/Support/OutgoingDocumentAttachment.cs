@@ -1,0 +1,21 @@
+﻿//
+// Project: Mark5.Mobile.Common
+// File: OutgoingDocumentAttachment.cs
+// Author: Ferdinando Papale fp@nordic-it.com
+//
+// Copyright (c) 2016 Nordic IT
+//
+using System;
+using System.IO;
+
+namespace Mark5.Mobile.Common.Model.Support
+{
+    public class OutgoingDocumentAttachment
+    {
+        public Stream Stream { get; set; }
+
+        public string Filename { get; set; }
+
+        public long SizeInBytes { get; set; }
+    }
+}

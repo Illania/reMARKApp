@@ -268,6 +268,24 @@ namespace Mark5.Mobile.Common.Storage
             return attachments;
         }
 
+        public static async Task SaveOutgoingDocumentAttachmentAsync(Guid id, string filename, Stream attachmentStream, CancellationToken ct = default(CancellationToken))
+        {
+            var attachmentsFolder = await GetOutgoingAttachmentsFolderAsync(id);
+            var fileExists = await attachmentsFolder.CheckExistsAsync(filename);
+            if (fileExists == ExistenceCheckResult.FileExists)
+            {
+                return;
+            }
+
+            var file = await attachmentsFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting, ct);
+            using (var fileStream = await file.OpenAsync(FileAccess.ReadAndWrite))
+            {
+                await attachmentStream.CopyToAsync(fileStream);
+            }
+
+            return;
+        }
+
         public static async Task SetOutgoingDocumentToFailedAsync(Guid id, Exception ex)
         {
             var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);

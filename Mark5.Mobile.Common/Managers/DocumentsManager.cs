@@ -20,6 +20,7 @@ using Mark5.ServiceReference.FileTransferService;
 using DataContract = Mark5.ServiceReference.DataContract;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Model.Exceptions;
+using System.IO;
 
 namespace Mark5.Mobile.Common.Managers
 {
@@ -198,6 +199,11 @@ namespace Mark5.Mobile.Common.Managers
 
             await FileSystemStorage.SaveOutgoingDocumentAsync(outgoingDocumentInfo, document, documentPreview);
             Managers.OutgoingDocumentsManager.Notify(id);
+        }
+
+        public async Task SaveOutgoingAttachmentAsync(Guid id, string filename, Stream attachmentStream)
+        {
+            await FileSystemStorage.SaveOutgoingDocumentAttachmentAsync(id, filename, attachmentStream);
         }
 
         public async Task LockOutgoingDocumentAsync(Guid id)
