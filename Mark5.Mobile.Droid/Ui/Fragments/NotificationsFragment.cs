@@ -52,6 +52,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             adapter.ItemClicked += Adapter_ItemClicked;
             recyclerView.SetAdapter(adapter);
 
+            HasOptionsMenu = true;
+
             return rootView;
         }
 
@@ -83,6 +85,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnPause();
 
             CommonConfig.Logger.Info($"Pausing {nameof(NotificationsFragment)}...");
+        }
+
+        #endregion
+
+        #region Options menu
+
+        static class MenuItemActions
+        {
+            public const int MarkAllAsRead = 10;
+        }
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            menu.Add(Menu.None, MenuItemActions.MarkAllAsRead, MenuItemActions.MarkAllAsRead, Resource.String.mark_all_as_read);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == MenuItemActions.MarkAllAsRead)
+            {
+                MarkAllAsRead();
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
         }
 
         #endregion
@@ -155,8 +182,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void Adapter_ItemClicked(object sender, Notification notification)
         {
-            // TODO
-
             await Managers.NotificationsManager.MarkAsRead(notification);
 
             var position = adapter.GetPosition(notification);
@@ -164,6 +189,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 adapter.NotifyItemChanged(position);
             }
+
+            // TODO
+        }
+
+        #endregion
+
+        #region Private methods
+
+        async void MarkAllAsRead()
+        {
+            await Managers.NotificationsManager.MarkAsRead(adapter.Items);
+            adapter.NotifyItemRangeChanged(0, adapter.ItemCount);
         }
 
         #endregion

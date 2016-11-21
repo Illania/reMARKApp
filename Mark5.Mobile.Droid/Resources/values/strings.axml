@@ -54,6 +54,7 @@
 	<string name="no_content">No content</string>
 	<string name="create_new_document">Create new document</string>
 	<string name="mark_as_read">Mark as read</string>
+	<string name="mark_all_as_read">Mark all as read</string>
 	<string name="marks_as_unread">Mark as unread</string>
 	<string name="reply">Reply</string>
 	<string name="reply_all">Reply all</string>
