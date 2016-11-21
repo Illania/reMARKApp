@@ -87,6 +87,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.ReadContacts }, 383);
                 }
 
+                if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != Android.Content.PM.Permission.Granted)
+                {
+                    ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.ReadExternalStorage }, 769);
+                }
+
                 CommonConfig.Logger.Info($"Created {nameof(ComposeDocumentActivity)}");
             }
             else
@@ -121,35 +126,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
-            if (requestCode == ComposeDocumentFragment.AttachmentRequestCode)
+            if (requestCode == ComposeDocumentFragment.AttachmentRequestCode && resultCode == Result.Ok)
             {
-                if (resultCode != Result.Ok)
-                {
-                    //TODO error to the user?
-                }
-
-                var uri = data.Data;
-
-                var cursor = ContentResolver.Query(uri, null, null, null, null);
-                var nameIndex = cursor.GetColumnIndex(OpenableColumns.DisplayName);
-                var sizeIndex = cursor.GetColumnIndex(OpenableColumns.Size);
-                cursor.MoveToFirst();
-
-                var name = cursor.GetString(nameIndex);
-                var size = cursor.GetLong(sizeIndex);
-
-                var stream = ContentResolver.OpenInputStream(uri);
-
-                var attachment = new OutgoingDocumentAttachment
-                {
-                    Filename = name,
-                    SizeInBytes = size,
-                    Stream = stream,
-                };
-
-                cdf.LoadAttachment(attachment);
-
-
+                cdf.HandleLocalAttachment(data);
             }
         }
 

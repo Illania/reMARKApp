@@ -9,12 +9,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
+using Android.Database;
+using Android.Provider;
+using Android.Runtime;
 using Android.Support.V4.View;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using Java.IO;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Managers;
@@ -250,23 +255,59 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft, () => SendDocument(true), Activity.Finish);
         }
 
-        public void HandleLocalAttachment(OutgoingDocumentAttachment attachment) //TODO find a better name and a better place
+        public void HandleLocalAttachment(Intent data)
         {
+            OutgoingDocumentAttachment attachment = null;
+
             Task.Run(async () =>
             {
+                var uri = data.Data;
+                var stream = Activity.ContentResolver.OpenInputStream(uri);
+                var size = (stream as InputStreamInvoker).BaseInputStream.Available();
+
+                string name;
+
+                if (uri.Scheme == "file")
+                {
+                    name = uri.LastPathSegment;
+                }
+                else
+                {
+                    ICursor cursor = null;
+                    try
+                    {
+                        cursor = Activity.ContentResolver.Query(uri, null, null, null, null);
+                        var nameIndex = cursor.GetColumnIndex(OpenableColumns.DisplayName);
+                        cursor.MoveToFirst();
+
+                        name = cursor.GetString(nameIndex);
+                    }
+                    finally
+                    {
+                        cursor.Close();
+                    }
+                }
+
+                attachment = new OutgoingDocumentAttachment
+                {
+                    Filename = name,
+                    SizeInBytes = size,
+                    Stream = stream,
+                };
+
                 await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Filename, attachment.Stream);
             }).ContinueWith(async t =>
-           {
-               if (t.IsFaulted)
-               {
-                   CommonConfig.Logger.Error($"Failed to save attachment to memory [AttachmentName={attachment.Filename}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", t.Exception.InnerException);
-                   await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(Resource.String.error_saving_local_attachment)));
-               }
-               else
-               {
-                   attachmentsView.AddAttachment(attachment);
-               }
-           }, TaskScheduler.FromCurrentSynchronizationContext());
+            {
+                if (t.IsFaulted)
+                {
+                    CommonConfig.Logger.Error($"Failed to save attachment to memory [AttachmentName={attachment?.Filename}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", t.Exception.InnerException);
+                    await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(Resource.String.error_saving_local_attachment)));
+                }
+                else
+                {
+                    attachmentsView.AddAttachment(attachment);
+                }
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         #endregion
