@@ -212,4 +212,5 @@
 	<string name="save_draft">Save draft</string>
 	<string name="confirm_save_as_draft">Do you want to save the document as draft?</string>
 	<string name="loading_document">Loading document</string>
+	<string name="error_saving_local_attachment">Error while saving local attachment</string>
 </resources>

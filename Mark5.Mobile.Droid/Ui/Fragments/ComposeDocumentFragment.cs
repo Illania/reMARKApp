@@ -19,6 +19,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews;
@@ -39,6 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public Document Document { get; set; } = new Document();
         public DocumentPreview DocumentPreview { get; set; } = new DocumentPreview();
+        public Guid OutgoingDocumentGuid { get; set; } //TODO eventually this should be set for preexisting documents
 
         ToView toView;
         CcView ccView;
@@ -102,10 +104,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             foreach (var subview in subViews)
             {
                 linearLayout.AddView(subview);
-                linearLayout.AddView(new Divider(Context));
+                if (subview != contentView)
+                {
+                    linearLayout.AddView(new Divider(Context));
+                }
             }
 
             HasOptionsMenu = true;
+
+            if (OutgoingDocumentGuid == Guid.Empty)
+            {
+                OutgoingDocumentGuid = Guid.NewGuid();
+            }
 
             return rootView;
         }
@@ -196,12 +206,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             await AskIfShouldUseTemplates();
         }
 
-
         void Subview_Edited(object sender, EventArgs e)
         {
             ((AppCompatActivity)Activity).SupportActionBar.Title = !subjectView.Empty ? subjectView.Subject : DefaultTitle;
             UpdateSendButtonState();
         }
+
+        #region Actions
 
         void SendDocument(bool draft = false)
         {
@@ -238,6 +249,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft, () => SendDocument(true), Activity.Finish);
         }
+
+        public void HandleLocalAttachment(OutgoingDocumentAttachment attachment) //TODO find a better name and a better place
+        {
+            Task.Run(async () =>
+            {
+                await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Filename, attachment.Stream);
+            }).ContinueWith(async t =>
+           {
+               if (t.IsFaulted)
+               {
+                   CommonConfig.Logger.Error($"Failed to save attachment to memory [AttachmentName={attachment.Filename}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", t.Exception.InnerException);
+                   await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(Resource.String.error_saving_local_attachment)));
+               }
+               else
+               {
+                   attachmentsView.AddAttachment(attachment);
+               }
+           }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        #endregion
+
 
         #region Options menu related
 
@@ -282,28 +315,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             intent.AddCategory(Intent.CategoryOpenable);
             Intent i = Intent.CreateChooser(intent, "File");
             Activity.StartActivityForResult(i, AttachmentRequestCode);
-        }
-
-        public void LoadAttachment(Attachment attachment) //TODO find a better name and a better place
-        {
-            attachmentsView.AddAttachment(attachment);
-
-            Task.Run(async () =>
-            {
-                var guid = await Managers.DocumentsManager.UploadTemporaryAttachmentAsync(attachment);
-
-            }).ContinueWith(t =>
-           {
-               if (t.IsFaulted)
-               {
-                    //TODO what to do here?
-                }
-               else
-               {
-                    //TODO what to do here?
-                }
-           }, TaskScheduler.FromCurrentSynchronizationContext());
-
         }
 
         void UpdateSendButtonState()

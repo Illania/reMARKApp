@@ -18,6 +18,7 @@ using Android.Support.V7.Widget;
 using Android.Webkit;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
@@ -136,21 +137,19 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 var name = cursor.GetString(nameIndex);
                 var size = cursor.GetLong(sizeIndex);
-                var mimeType = ContentResolver.GetType(uri);
-                var extension = MimeTypeMap.Singleton.GetExtensionFromMimeType(mimeType);
 
                 var stream = ContentResolver.OpenInputStream(uri);
-                var a = stream.Position;
 
-                var attachment = new Attachment
+                var attachment = new OutgoingDocumentAttachment
                 {
                     Filename = name,
-                    Extension = extension,
-                    Size = (int)size,
+                    SizeInBytes = size,
                     Stream = stream,
                 };
 
                 cdf.LoadAttachment(attachment);
+
+
             }
         }
 

@@ -7,6 +7,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.Content;
@@ -15,6 +16,7 @@ using Android.Text;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -23,7 +25,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
     public class AttachmentsView : ComposeDocumentView
     {
         LinearLayoutCompat container;
-        List<Attachment> attachments = new List<Attachment>();
+        List<OutgoingDocumentAttachment> attachments = new List<OutgoingDocumentAttachment>();
 
         public AttachmentsView(Context context)
             : base(context)
@@ -56,7 +58,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             throw new NotImplementedException();
         }
 
-        public void AddAttachment(Attachment attachment)
+        public void AddAttachment(OutgoingDocumentAttachment attachment)
         {
             attachments.Add(attachment);
 
@@ -70,7 +72,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         void Attachment_Click(object sender, EventArgs e)
         {
             var attachmentView = sender as AttachmentView;
-            attachments.Remove(attachmentView.attachment);
+            attachments.Remove(attachmentView.outgoingDocumentAttachment);
             container.RemoveView(attachmentView);
 
             if (!attachments.Any())
@@ -81,12 +83,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         class AttachmentView : LinearLayoutCompat
         {
-            public readonly Attachment attachment;
+            public readonly OutgoingDocumentAttachment outgoingDocumentAttachment;
 
-            public AttachmentView(Context context, Attachment attachment)
+            public AttachmentView(Context context, OutgoingDocumentAttachment attachment)
                 : base(context)
             {
-                this.attachment = attachment;
+                this.outgoingDocumentAttachment = attachment;
 
                 var minimumWidth = ConversionUtils.ConvertDpToPixels(100.0f);
                 var maximumWidth = ConversionUtils.ConvertDpToPixels(175.0f);
@@ -132,7 +134,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 };
                 AddView(innerLayout);
 
-                var extensionFromPath = attachment.Extension;
+                var extensionFromPath = Path.GetExtension(attachment.Filename);
                 var extension = new AppCompatTextView(Context)
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
@@ -140,7 +142,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                         RightMargin = innerMargin,
                         Weight = 1
                     },
-                    Text = string.IsNullOrWhiteSpace(extensionFromPath) ? string.Empty : extensionFromPath.ToUpper(),
+                    Text = string.IsNullOrWhiteSpace(extensionFromPath) ? string.Empty : extensionFromPath.Substring(1).ToUpper(),
                     Gravity = GravityFlags.Start
                 };
                 extension.SetSingleLine(true);
@@ -154,7 +156,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     {
                         Weight = 1
                     },
-                    Text = Formatters.FormatFileSize(attachment.Size),
+                    Text = Formatters.FormatFileSize(attachment.SizeInBytes),
                     Gravity = GravityFlags.End
                 };
                 size.SetSingleLine(true);

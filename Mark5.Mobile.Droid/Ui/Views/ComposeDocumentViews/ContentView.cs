@@ -79,7 +79,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             newContentWebView.SetWebViewClient(customWebViewClient);
             newContentWebView.Settings.JavaScriptEnabled = true;
             newContentWebView.Settings.DomStorageEnabled = true;
-            AddView(newContentWebView); //TODO check what kind of settings we need to enable
+            AddView(newContentWebView);
 
             showOldContentButton = new AppCompatButton(context)
             {
