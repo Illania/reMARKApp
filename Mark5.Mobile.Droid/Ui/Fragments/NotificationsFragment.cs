@@ -101,6 +101,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             menu.Add(Menu.None, MenuItemActions.MarkAllAsRead, MenuItemActions.MarkAllAsRead, Resource.String.mark_all_as_read);
         }
 
+        public override void OnPrepareOptionsMenu(IMenu menu)
+        {
+            menu.FindItem(MenuItemActions.MarkAllAsRead)?.SetEnabled(adapter.Items.Any(n => !n.IsRead));
+        }
+
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if (item.ItemId == MenuItemActions.MarkAllAsRead)
