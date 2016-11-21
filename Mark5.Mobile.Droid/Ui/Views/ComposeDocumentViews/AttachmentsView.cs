@@ -15,7 +15,6 @@ using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
 using Android.Widget;
-using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
@@ -26,6 +25,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
     {
         LinearLayoutCompat container;
         List<OutgoingDocumentAttachment> attachments = new List<OutgoingDocumentAttachment>();
+
+        public event EventHandler<OutgoingDocumentAttachment> AttachmentClicked = delegate { };
 
         public AttachmentsView(Context context)
             : base(context)
@@ -69,16 +70,21 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             Visibility = ViewStates.Visible;
         }
 
-        void Attachment_Click(object sender, EventArgs e)
+        public void RemoveAttachment(object senderView, OutgoingDocumentAttachment attachment)
         {
-            var attachmentView = sender as AttachmentView;
-            attachments.Remove(attachmentView.outgoingDocumentAttachment);
-            container.RemoveView(attachmentView);
+            attachments.Remove(attachment);
+            container.RemoveView(senderView as AttachmentView);
 
             if (!attachments.Any())
             {
                 Visibility = ViewStates.Gone;
             }
+        }
+
+        void Attachment_Click(object sender, EventArgs e)
+        {
+            var attachmentView = sender as AttachmentView;
+            AttachmentClicked(sender, attachmentView.outgoingDocumentAttachment);
         }
 
         class AttachmentView : LinearLayoutCompat

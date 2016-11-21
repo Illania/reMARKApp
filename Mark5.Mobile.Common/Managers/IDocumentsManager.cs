@@ -38,6 +38,8 @@ namespace Mark5.Mobile.Common.Managers
 
         Task SaveOutgoingAttachmentAsync(Guid id, string filename, Stream attachmentStream);
 
+        Task RemoveOutgoingAttachmentAsync(Guid id, string filename);
+
         Task LockOutgoingDocumentAsync(Guid identifier);
 
         Task UnlockOutgoingDocumentAsync(Guid identifier);

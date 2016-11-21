@@ -271,7 +271,7 @@ namespace Mark5.Mobile.Common.Storage
         public static async Task SaveOutgoingDocumentAttachmentAsync(Guid id, string filename, Stream attachmentStream, CancellationToken ct = default(CancellationToken))
         {
             var attachmentsFolder = await GetOutgoingAttachmentsFolderAsync(id);
-            var fileExists = await attachmentsFolder.CheckExistsAsync(filename);
+            var fileExists = await attachmentsFolder.CheckExistsAsync(filename, ct);
             if (fileExists == ExistenceCheckResult.FileExists)
             {
                 return;
@@ -282,6 +282,22 @@ namespace Mark5.Mobile.Common.Storage
             {
                 await attachmentStream.CopyToAsync(fileStream);
             }
+
+            return;
+        }
+
+        public static async Task RemoveOutgoingDocumentAttachmentAsync(Guid id, string filename, CancellationToken ct = default(CancellationToken))
+        {
+            var attachmentsFolder = await GetOutgoingAttachmentsFolderAsync(id);
+
+            var fileExists = await attachmentsFolder.CheckExistsAsync(filename, ct);
+            if (fileExists != ExistenceCheckResult.FileExists)
+            {
+                return;
+            }
+
+            var file = await attachmentsFolder.GetFileAsync(filename, ct);
+            await file.DeleteAsync(ct);
 
             return;
         }

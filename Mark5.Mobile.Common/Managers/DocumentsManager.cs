@@ -206,6 +206,11 @@ namespace Mark5.Mobile.Common.Managers
             await FileSystemStorage.SaveOutgoingDocumentAttachmentAsync(id, filename, attachmentStream);
         }
 
+        public async Task RemoveOutgoingAttachmentAsync(Guid id, string filename)
+        {
+            await FileSystemStorage.RemoveOutgoingDocumentAttachmentAsync(id, filename);
+        }
+
         public async Task LockOutgoingDocumentAsync(Guid id)
         {
             await FileSystemStorage.LockOutgoingDocumentAsync(id);

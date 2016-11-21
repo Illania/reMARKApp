@@ -9,17 +9,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Android.App;
 using Android.Content;
 using Android.Database;
 using Android.Provider;
 using Android.Runtime;
-using Android.Support.V4.View;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
-using Java.IO;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Managers;
@@ -101,6 +98,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             subViews.Add(subjectView);
 
             attachmentsView = new AttachmentsView(Context);
+            attachmentsView.AttachmentClicked += AttachmentsView_AttachmentClicked;
             subViews.Add(attachmentsView);
 
             contentView = new ContentView(Context);
@@ -211,11 +209,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             await AskIfShouldUseTemplates();
         }
 
+        #region Subviews event handlers
+
         void Subview_Edited(object sender, EventArgs e)
         {
             ((AppCompatActivity)Activity).SupportActionBar.Title = !subjectView.Empty ? subjectView.Subject : DefaultTitle;
             UpdateSendButtonState();
         }
+
+        async void AttachmentsView_AttachmentClicked(object sender, OutgoingDocumentAttachment attachment)
+        {
+            try
+            {
+                await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Filename);
+                attachmentsView.RemoveAttachment(sender, attachment);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while removing attachment [AttachmentName={attachment?.Filename}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
+                await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(Resource.String.error_removing_local_attachment)));
+            }
+        }
+
+        #endregion
 
         #region Actions
 
