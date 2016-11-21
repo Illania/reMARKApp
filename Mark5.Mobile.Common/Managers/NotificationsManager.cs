@@ -12,12 +12,12 @@ using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Converters;
+using Mark5.Mobile.Common.Model.Exceptions;
+using Mark5.Mobile.Common.Storage;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
-using Mark5.Mobile.Common.Storage;
-using Mark5.Mobile.Common.Model.Containers;
-using Mark5.Mobile.Common.Model.Exceptions;
 
 namespace Mark5.Mobile.Common.Managers
 {
@@ -53,6 +53,12 @@ namespace Mark5.Mobile.Common.Managers
                 var notifications = result.Notifications.WhereNotNull().Select(n => n.Convert()).OrderByDescending(n => n.DateTimeTimestamp).ToList();
 
                 await notificationsDataAccess.SaveNotifications(notifications);
+
+                var readGuids = await notificationsDataAccess.GetReadNotificationGuids();
+                if (readGuids.Count > 0)
+                {
+                    notifications.ForEach(n => n.IsRead = readGuids.Contains(n.Guid));
+                }
 
                 return notifications;
             }
@@ -284,6 +290,11 @@ namespace Mark5.Mobile.Common.Managers
                 return;
             }
 
+            if (sourceType == SourceType.Local)
+            {
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
+            }
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -363,6 +374,20 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task MarkAsRead(Notification notification)
+        {
+            await notificationsDataAccess.MarkAsRead(notification);
+
+            notification.IsRead = true;
+        }
+
+        public async Task MarkAsRead(List<Notification> notifications)
+        {
+            await notificationsDataAccess.MarkAllAsRead(notifications, true);
+
+            notifications.ForEach(n => n.IsRead = true);
         }
     }
 }

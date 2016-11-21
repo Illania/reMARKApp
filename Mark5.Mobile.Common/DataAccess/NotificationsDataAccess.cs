@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Database;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.DataAccess
@@ -47,11 +48,18 @@ namespace Mark5.Mobile.Common.DataAccess
             try
             {
                 List<Notification> notifications = null;
+                HashSet<Guid> readNotificationsGuids = null;
 
                 await systemDatabase.RunInConnectionAsync(c =>
                 {
                     notifications = c.Table<Notification>().OrderByDescending(n => n.DateTimeTimestamp).ToList();
+                    readNotificationsGuids = new HashSet<Guid>(c.Table<ReadNotificationInfo>().Select(rni => rni.NotificationGuid));
                 });
+
+                if (notifications != null && readNotificationsGuids != null && readNotificationsGuids.Count > 0)
+                {
+                    notifications.ForEach(n => n.IsRead = readNotificationsGuids.Contains(n.Guid));
+                }
 
                 return notifications;
             }
@@ -95,19 +103,18 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task MarkAllAsRead()
+        public async Task MarkAllAsRead(List<Notification> notifications, bool clear)
         {
             try
             {
                 await systemDatabase.RunInConnectionAsync(c =>
                 {
-                    var cmd = c.CreateCommand($"delete from \"{nameof(ReadNotificationInfo)}\"");
-                    cmd.ExecuteNonQuery();
+                    if (clear)
+                    {
+                        c.DeleteAll<ReadNotificationInfo>();
+                    }
 
-                    cmd = c.CreateCommand($"insert into \"{nameof(ReadNotificationInfo)}\" (\"{nameof(ReadNotificationInfo.NotificationGuid)}\") " +
-                                          $"select \"{nameof(Notification.Guid)}\" " +
-                                          $"from \"{nameof(Notification)}\"");
-                    cmd.ExecuteNonQuery();
+                    c.InsertOrReplaceAll(notifications.Select(n => new ReadNotificationInfo { NotificationGuid = n.Guid }));
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))

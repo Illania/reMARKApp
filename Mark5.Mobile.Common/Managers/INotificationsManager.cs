@@ -34,6 +34,10 @@ namespace Mark5.Mobile.Common.Managers
         Task ClearAllNotificationSettingsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = default(SourceType));
 
         Task<object> GetRemoteObjectAsync(Notification notification, SourceType sourceType = default(SourceType));
+
+        Task MarkAsRead(Notification notification);
+
+        Task MarkAsRead(List<Notification> notifications);
     }
 }
 
