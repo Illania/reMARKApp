@@ -294,7 +294,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
                     var foldersListFragment = new FoldersListFragment
                     {
-                        Folder = Folder.RootPerModule(ModuleType)
+                        RemoteFolder = Folder.RootPerModule(ModuleType)
                     };
 
                     var tag = foldersListFragment.GenerateTag();

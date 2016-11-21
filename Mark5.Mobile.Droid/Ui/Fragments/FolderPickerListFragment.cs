@@ -35,7 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return new FolderPickerListFragment
             {
                 SelectedFolders = SelectedFolders,
-                Folder = folder,
+                RemoteFolder = folder,
             };
         }
 

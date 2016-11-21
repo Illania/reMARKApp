@@ -37,7 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 BusinessEntities = BusinessEntities,
                 FromFolder = FromFolder,
-                Folder = folder,
+                RemoteFolder = folder,
             };
         }
 
