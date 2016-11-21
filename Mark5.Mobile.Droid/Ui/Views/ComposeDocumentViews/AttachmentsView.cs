@@ -56,7 +56,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override Task UpdateDocument()
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public void AddAttachment(OutgoingDocumentAttachment attachment)
