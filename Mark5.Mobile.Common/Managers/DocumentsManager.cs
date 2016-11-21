@@ -211,6 +211,11 @@ namespace Mark5.Mobile.Common.Managers
             await FileSystemStorage.RemoveOutgoingDocumentAttachmentAsync(id, filename);
         }
 
+        public async Task DeleteOutgoingDocumentFolder(Guid id)
+        {
+            await FileSystemStorage.DeleteOutgoingDocumentFolderAsync(id);
+        }
+
         public async Task LockOutgoingDocumentAsync(Guid id)
         {
             await FileSystemStorage.LockOutgoingDocumentAsync(id);

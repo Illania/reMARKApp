@@ -40,6 +40,8 @@ namespace Mark5.Mobile.Common.Managers
 
         Task RemoveOutgoingAttachmentAsync(Guid id, string filename);
 
+        Task DeleteOutgoingDocumentFolder(Guid id);
+
         Task LockOutgoingDocumentAsync(Guid identifier);
 
         Task UnlockOutgoingDocumentAsync(Guid identifier);

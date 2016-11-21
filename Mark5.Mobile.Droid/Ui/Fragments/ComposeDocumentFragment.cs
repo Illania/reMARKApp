@@ -268,7 +268,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void AskIfShouldSaveAsDraft()
         {
-            Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft, () => SendDocument(true), Activity.Finish);
+            Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft, () => SendDocument(true), CloseComposeActivity);
+        }
+
+        void CloseComposeActivity()
+        {
+            Task.Run(async () =>
+           {
+               await Managers.DocumentsManager.DeleteOutgoingDocumentFolder(OutgoingDocumentGuid);
+           }).ContinueWith(t =>
+          {
+              Activity.Finish();
+          }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         public void HandleLocalAttachment(Intent data)

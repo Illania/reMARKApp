@@ -247,8 +247,12 @@ namespace Mark5.Mobile.Common.Storage
 
         public static async Task DeleteOutgoingDocumentFolderAsync(Guid id)
         {
-            var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
-            await outgoingDocumentFolder.DeleteAsync();
+            var folderExists = await CommonConfig.OutgoingFolder.CheckExistsAsync(id.ToString()) == ExistenceCheckResult.FolderExists;
+            if (folderExists)
+            {
+                var outgoingDocumentFolder = await CommonConfig.OutgoingFolder.GetFolderAsync(id.ToString());
+                await outgoingDocumentFolder.DeleteAsync();
+            }
         }
 
         public static async Task<IEnumerable<Attachment>> GetOutgoingDocumentAttachmentsAsync(Guid id)
