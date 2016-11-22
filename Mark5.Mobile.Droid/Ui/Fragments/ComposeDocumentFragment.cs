@@ -129,13 +129,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override async void OnResume()
         {
+            base.OnResume();
+
             if (resuming)
             {
                 return;
             }
 
             resuming = true;
-            base.OnResume();
 
             await LoadDocument();
             await ShowDocument();
