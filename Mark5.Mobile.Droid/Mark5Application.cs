@@ -52,9 +52,9 @@ namespace Mark5.Mobile.Droid
                 CommonConfig.HttpClientHandler = () => { return new AndroidClientHandler(); };
 
 #if !DEBUG
-                CommonConfig.Logger.Level = LogLevel.TRACE;
-#else
                 CommonConfig.Logger.Level = LogLevel.INFO;
+#else
+                CommonConfig.Logger.Level = LogLevel.DEBUG;
 #endif
 
                 await DatabaseUtils.InitializeDatabases();
