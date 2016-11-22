@@ -203,6 +203,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 i.PutExtra(DocumentActivity.DocumentIdIntentKey, notification.ObjectId);
                 StartActivity(i);
             }
+            if (notification.ObjectType == ObjectType.Contact)
+            {
+                var i = new Intent(Activity, typeof(ContactActivity));
+                i.PutExtra(ContactActivity.FolderIdIntentKey, notification.FolderId);
+                i.PutExtra(ContactActivity.ContactIdIntentKey, notification.ObjectId);
+                StartActivity(i);
+            }
+            if (notification.ObjectType == ObjectType.Shortcode)
+            {
+                var i = new Intent(Activity, typeof(ShortcodeActivity));
+                i.PutExtra(ShortcodeActivity.FolderIdIntentKey, notification.FolderId);
+                i.PutExtra(ShortcodeActivity.ShortcodeIdIntentKey, notification.ObjectId);
+                StartActivity(i);
+            }
         }
 
         #endregion
@@ -211,8 +225,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void MarkAllAsRead()
         {
-            await Managers.NotificationsManager.MarkAsRead(adapter.Items);
-            adapter.NotifyItemRangeChanged(0, adapter.ItemCount);
+            try
+            {
+                await Managers.NotificationsManager.MarkAsRead(adapter.Items);
+                adapter.NotifyItemRangeChanged(0, adapter.ItemCount);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Marking notifications as read failed", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
         }
 
         #endregion

@@ -23,8 +23,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     public class DocumentActivity : BaseAppCompatActivity
     {
 
-        public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
         public const string FolderIdIntentKey = "FolderId_4bd29db4-c529-48a2-bf8f-8f1a96ed60b5";
+        public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
         public const string SearchIdIntentKey = "SearchId_fe483a14-0042-4fe2-a887-c232b332a715";
         public const string DocumentIdIntentKey = "DocumentId_690fc3d6-ae73-4f5e-844a-06bdc44b6747";
         public const string DocumentPreviewIntentKey = "DocumentPreview_0bd291a4-22a5-431c-ad6e-4c8b273eeb98";

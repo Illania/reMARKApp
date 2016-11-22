@@ -108,20 +108,53 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         static class MenuItemActions
         {
-            public const int Categories = 10;
-            public const int Comments = 20;
-            public const int Actions = 30;
-            public const int Links = 40;
+            public const int CopyToWorktray = 10;
+            public const int CopyToFolder = 20;
+            public const int MoveToFolder = 21;
+            public const int Categories = 30;
+            public const int Comments = 40;
+            public const int Actions = 50;
+            public const int Links = 60;
+            public const int DeleteFromFolder = 70;
+            public const int Delete = 71;
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             if (ReadOnlyMode) return;
+            if (ContactPreview == null) return;
 
+            menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
+            menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
+
+            if (Folder?.InternalType == FolderInternalType.FilterView
+                || Folder?.InternalType == FolderInternalType.Static
+                || Folder?.InternalType == FolderInternalType.Worktray)
+            {
+                menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
+            }
             menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
-            menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments);
+
+            if (Contact != null)
+            {
+                menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments);
+            }
+
             menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.actions);
             menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
+
+            if (Folder?.InternalType == FolderInternalType.FilterView
+                || Folder?.InternalType == FolderInternalType.Static
+                || Folder?.InternalType == FolderInternalType.Worktray)
+            {
+                menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
+            }
+
+            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
+                || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
+            {
+                menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
+            }
         }
 
         public override void OnPrepareOptionsMenu(IMenu menu)
@@ -331,6 +364,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout.Invalidate();
             linearLayout.RequestLayout();
+
+            Activity.InvalidateOptionsMenu();
         }
 
         void RefreshCardView(CardView cardView)

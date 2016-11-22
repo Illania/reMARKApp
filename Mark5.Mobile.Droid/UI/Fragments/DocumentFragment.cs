@@ -161,7 +161,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             menu.Add(Menu.None, MenuItemActions.SetPriority, MenuItemActions.SetPriority, Resource.String.set_priority);
             menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
-            menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments);
+
+            if (Document != null)
+            {
+                menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments);
+            }
+
             menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.actions);
             menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
 
