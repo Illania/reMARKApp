@@ -26,6 +26,7 @@ using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -33,6 +34,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         const string DefaultTitle = "New document";
         public const int AttachmentRequestCode = 111;
+        const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
         Document PreviousDocument { get; set; }
         DocumentPreview PreviousDocumentPreview { get; set; }
@@ -218,7 +220,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             UpdateSendButtonState();
         }
 
-        async void AttachmentsView_AttachmentClicked(object sender, OutgoingDocumentAttachment attachment)
+        async void AttachmentsView_AttachmentClicked(object sender, IAttachmentDescription attachment)
         {
             var option = await Dialogs.ShowListDialog(Context, Resource.String.attachment_clicked, Resource.Array.attachment_clicked_options);
 
@@ -226,9 +228,42 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
 
+                string path = null;
+
+                var outgoingAttachment = attachment as OutgoingDocumentAttachmentDescription;
+                if (outgoingAttachment != null)
+                {
+                    path = outgoingAttachment.Path;
+                }
+                else
+                {
+                    var remoteAttachment = attachment as AttachmentDescription;
+
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(remoteAttachment, PreviousDocumentFolderId.Value, Document, false, SourceType.Local);
+
+                    if (string.IsNullOrWhiteSpace(path))
+                    {
+                        if (remoteAttachment.SizeInBytes > LargeAttachmentSizeInBytes
+                            && PlatformConfig.Preferences.LargeAttachmentWarning
+                            && Integration.IsConnectedToMeteredConnection()
+                            && !await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.warning, Resource.String.large_attachment))
+                        {
+                            dismissAction();
+                            return;
+                        }
+
+                        path = await Managers.DocumentsManager.GetAttachmentAsync(remoteAttachment, PreviousDocumentFolderId.Value, PreviousDocument, false, SourceType.Remote);
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    throw new Exception("Unable to get attachment path.");
+                }
+
                 try
                 {
-                    var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(attachment.Path));
+                    var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
                     var mimeType = Context.ContentResolver.GetType(uri);
 
                     var openFileIntent = new Intent(Intent.ActionView);
@@ -240,7 +275,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 catch (Exception ex)
                 {
-                    CommonConfig.Logger.Error($"Failed to view attachment [AttachmentName={attachment?.Filename}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
+                    CommonConfig.Logger.Error($"Failed to view attachment [AttachmentName={outgoingAttachment?.Name}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
                     dismissAction();
                     await Dialogs.ShowErrorDialogAsync(Activity, ex);
                 }
@@ -248,18 +283,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     dismissAction();
                 }
+
             }
             else if (option == 1)
             {
-                try
+                var outgoingAttachment = attachment as OutgoingDocumentAttachmentDescription;
+                if (outgoingAttachment != null)
                 {
-                    await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Filename);
-                    attachmentsView.RemoveAttachment(sender, attachment);
+                    try
+                    {
+                        await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, outgoingAttachment.Name);
+                        attachmentsView.RemoveAttachment(sender, outgoingAttachment);
+                    }
+                    catch (Exception ex)
+                    {
+                        CommonConfig.Logger.Error($"Error while removing attachment [AttachmentName={outgoingAttachment?.Name}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
+                        await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(Resource.String.error_removing_local_attachment)));
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    CommonConfig.Logger.Error($"Error while removing attachment [AttachmentName={attachment?.Filename}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
-                    await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(Resource.String.error_removing_local_attachment)));
+                    var remoteAttachment = attachment as AttachmentDescription;
+                    attachmentsView.RemoveAttachment(sender, remoteAttachment);
                 }
             }
         }
@@ -317,7 +362,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void HandleLocalAttachment(Intent data)
         {
-            OutgoingDocumentAttachment attachment = null;
+            OutgoingDocumentAttachmentDescription attachment = null;
 
             Task.Run(async () =>
             {
@@ -350,9 +395,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
 
-                attachment = new OutgoingDocumentAttachment
+                attachment = new OutgoingDocumentAttachmentDescription
                 {
-                    Filename = filename,
+                    Name = filename,
                     SizeInBytes = size,
                     Stream = stream,
                     Path = path,
@@ -362,7 +407,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (t.IsFaulted)
                 {
-                    CommonConfig.Logger.Error($"Failed to save attachment to memory [AttachmentName={attachment?.Filename}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", t.Exception.InnerException);
+                    CommonConfig.Logger.Error($"Failed to save attachment to memory [AttachmentName={attachment?.Name}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", t.Exception.InnerException);
                     await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(Resource.String.error_saving_local_attachment)));
                 }
                 else

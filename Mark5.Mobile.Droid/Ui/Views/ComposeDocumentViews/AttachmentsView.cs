@@ -15,6 +15,7 @@ using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
 using Android.Widget;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
@@ -24,9 +25,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
     public class AttachmentsView : ComposeDocumentView
     {
         LinearLayoutCompat container;
-        List<OutgoingDocumentAttachment> attachments = new List<OutgoingDocumentAttachment>();
+        List<IAttachmentDescription> attachments = new List<IAttachmentDescription>();
 
-        public event EventHandler<OutgoingDocumentAttachment> AttachmentClicked = delegate { };
+        public event EventHandler<IAttachmentDescription> AttachmentClicked = delegate { };
 
         public AttachmentsView(Context context)
             : base(context)
@@ -51,15 +52,28 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override Task RefreshView()
         {
+            if (CreationModeFlag == DocumentCreationModeFlag.Forward)
+            {
+                foreach (var attachmentDescription in PreviousDocument.Attachments)
+                {
+                    AddAttachment(attachmentDescription);
+                }
+            }
+
             return Task.CompletedTask;
         }
 
         public override Task UpdateDocument()
         {
+            var remoteAttachments = attachments.OfType<AttachmentDescription>().ToList();
+            Document.Attachments.AddRange(remoteAttachments);
+
+            //Nothing to do for local attachments, they're saved on disk
+
             return Task.CompletedTask;
         }
 
-        public void AddAttachment(OutgoingDocumentAttachment attachment)
+        public void AddAttachment(IAttachmentDescription attachment)
         {
             attachments.Add(attachment);
 
@@ -70,7 +84,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             Visibility = ViewStates.Visible;
         }
 
-        public void RemoveAttachment(object senderView, OutgoingDocumentAttachment attachment)
+        public void RemoveAttachment(object senderView, IAttachmentDescription attachment)
         {
             attachments.Remove(attachment);
             container.RemoveView(senderView as AttachmentView);
@@ -84,17 +98,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         void Attachment_Click(object sender, EventArgs e)
         {
             var attachmentView = sender as AttachmentView;
-            AttachmentClicked(sender, attachmentView.outgoingDocumentAttachment);
+            AttachmentClicked(sender, attachmentView.documentAttachment);
         }
 
         class AttachmentView : LinearLayoutCompat
         {
-            public readonly OutgoingDocumentAttachment outgoingDocumentAttachment;
+            public readonly IAttachmentDescription documentAttachment;
 
-            public AttachmentView(Context context, OutgoingDocumentAttachment attachment)
+            public AttachmentView(Context context, IAttachmentDescription attachment)
                 : base(context)
             {
-                this.outgoingDocumentAttachment = attachment;
+                documentAttachment = attachment;
 
                 var minimumWidth = ConversionUtils.ConvertDpToPixels(100.0f);
                 var maximumWidth = ConversionUtils.ConvertDpToPixels(175.0f);
@@ -122,7 +136,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     {
                         BottomMargin = innerMargin
                     },
-                    Text = attachment.Filename,
+                    Text = attachment.Name,
                     Ellipsize = TextUtils.TruncateAt.End,
                     Gravity = GravityFlags.Top,
                 };
@@ -140,7 +154,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 };
                 AddView(innerLayout);
 
-                var extensionFromPath = Path.GetExtension(attachment.Filename);
+                var extensionFromPath = Path.GetExtension(attachment.Name);
                 var extension = new AppCompatTextView(Context)
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)

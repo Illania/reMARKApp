@@ -184,7 +184,7 @@
     <Compile Include="Utilities\PortableCollections\SortedObservableCollection.cs" />
     <Compile Include="Utilities\PhonebookContactsUtilities.cs" />
     <Compile Include="Model\ContactCommunicationAddress.cs" />
-    <Compile Include="Model\Support\OutgoingDocumentAttachment.cs" />
+    <Compile Include="Model\Support\OutgoingDocumentAttachmentDescription.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

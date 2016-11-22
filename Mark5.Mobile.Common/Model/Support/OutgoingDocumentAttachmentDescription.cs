@@ -10,11 +10,11 @@ using System.IO;
 
 namespace Mark5.Mobile.Common.Model.Support
 {
-    public class OutgoingDocumentAttachment
+    public class OutgoingDocumentAttachmentDescription : IAttachmentDescription
     {
         public Stream Stream { get; set; }
 
-        public string Filename { get; set; }
+        public string Name { get; set; }
 
         public long SizeInBytes { get; set; }
 

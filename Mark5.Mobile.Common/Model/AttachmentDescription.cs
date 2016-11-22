@@ -9,7 +9,7 @@
 namespace Mark5.Mobile.Common.Model
 {
 
-    public class AttachmentDescription
+    public class AttachmentDescription : IAttachmentDescription
     {
 
         public int Id { get; set; } = -1;
@@ -18,5 +18,13 @@ namespace Mark5.Mobile.Common.Model
 
         public long SizeInBytes { get; set; }
     }
+
+    public interface IAttachmentDescription
+    {
+        string Name { get; set; }
+
+        long SizeInBytes { get; set; }
+    }
+
 }
 
