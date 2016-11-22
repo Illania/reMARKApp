@@ -17,5 +17,7 @@ namespace Mark5.Mobile.Common.Model.Support
         public string Filename { get; set; }
 
         public long SizeInBytes { get; set; }
+
+        public string Path { get; set; }
     }
 }

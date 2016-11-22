@@ -214,4 +214,10 @@
 	<string name="loading_document">Loading document</string>
 	<string name="error_saving_local_attachment">Error while saving local attachment</string>
 	<string name="error_removing_local_attachment">Error while removing local attachment</string>
+	<string-array name="attachment_clicked_options">
+		<item>Open attachment</item>
+		<item>Remove attachment</item>
+	</string-array>
+	<string name="attachment_clicked">Select action</string>
+	<string name="choose_application">Choose an application</string>
 </resources>

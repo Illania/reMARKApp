@@ -13,6 +13,7 @@ using Android.Content;
 using Android.Database;
 using Android.Provider;
 using Android.Runtime;
+using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -42,7 +43,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public Document Document { get; set; } = new Document();
         public DocumentPreview DocumentPreview { get; set; } = new DocumentPreview();
-        public Guid OutgoingDocumentGuid { get; set; } //TODO eventually this should be set for preexisting documents
+        public Guid OutgoingDocumentGuid { get; set; } //TODO eventually this should be set for preexisting documents (take care when doing the local documents)
 
         ToView toView;
         CcView ccView;
@@ -60,7 +61,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ScrollView scrollView;
         LinearLayoutCompat linearLayout;
         bool documentShown;
-        bool resuming; //On resume could be called again after contact access permission
+        bool resuming; //On resume called again after access permission requests
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
@@ -219,15 +220,47 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void AttachmentsView_AttachmentClicked(object sender, OutgoingDocumentAttachment attachment)
         {
-            try
+            var option = await Dialogs.ShowListDialog(Context, Resource.String.attachment_clicked, Resource.Array.attachment_clicked_options);
+
+            if (option == 0)
             {
-                await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Filename);
-                attachmentsView.RemoveAttachment(sender, attachment);
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
+
+                try
+                {
+                    var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(attachment.Path));
+                    var mimeType = Context.ContentResolver.GetType(uri);
+
+                    var openFileIntent = new Intent(Intent.ActionView);
+                    openFileIntent.SetDataAndType(uri, mimeType);
+                    openFileIntent.AddFlags(ActivityFlags.NewTask);
+                    openFileIntent.AddFlags(ActivityFlags.GrantReadUriPermission);
+                    Intent chooser = Intent.CreateChooser(openFileIntent, Resources.GetString(Resource.String.choose_application));
+                    Context.StartActivity(chooser);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error($"Failed to view attachment [AttachmentName={attachment?.Filename}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
+                    dismissAction();
+                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                }
+                finally
+                {
+                    dismissAction();
+                }
             }
-            catch (Exception ex)
+            else if (option == 1)
             {
-                CommonConfig.Logger.Error($"Error while removing attachment [AttachmentName={attachment?.Filename}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
-                await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(Resource.String.error_removing_local_attachment)));
+                try
+                {
+                    await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Filename);
+                    attachmentsView.RemoveAttachment(sender, attachment);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error($"Error while removing attachment [AttachmentName={attachment?.Filename}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
+                    await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(Resource.String.error_removing_local_attachment)));
+                }
             }
         }
 
@@ -292,11 +325,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var stream = Activity.ContentResolver.OpenInputStream(uri);
                 var size = (stream as InputStreamInvoker).BaseInputStream.Available();
 
-                string name;
+                string filename;
 
                 if (uri.Scheme == "file")
                 {
-                    name = uri.LastPathSegment;
+                    filename = uri.LastPathSegment;
                 }
                 else
                 {
@@ -307,7 +340,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         var nameIndex = cursor.GetColumnIndex(OpenableColumns.DisplayName);
                         cursor.MoveToFirst();
 
-                        name = cursor.GetString(nameIndex);
+                        filename = cursor.GetString(nameIndex);
                     }
                     finally
                     {
@@ -315,14 +348,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
                 }
 
+                var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
+
                 attachment = new OutgoingDocumentAttachment
                 {
-                    Filename = name,
+                    Filename = filename,
                     SizeInBytes = size,
                     Stream = stream,
+                    Path = path,
                 };
 
-                await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Filename, attachment.Stream);
             }).ContinueWith(async t =>
             {
                 if (t.IsFaulted)

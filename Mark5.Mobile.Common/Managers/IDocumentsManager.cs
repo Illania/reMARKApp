@@ -36,7 +36,7 @@ namespace Mark5.Mobile.Common.Managers
 
         Task InsertDocumentInOutgoingAsync(Guid identifier, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery);
 
-        Task SaveOutgoingAttachmentAsync(Guid id, string filename, Stream attachmentStream);
+        Task<string> SaveOutgoingAttachmentAsync(Guid id, string filename, Stream attachmentStream);
 
         Task RemoveOutgoingAttachmentAsync(Guid id, string filename);
 

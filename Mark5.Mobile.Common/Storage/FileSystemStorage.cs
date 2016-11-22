@@ -272,13 +272,13 @@ namespace Mark5.Mobile.Common.Storage
             return attachments;
         }
 
-        public static async Task SaveOutgoingDocumentAttachmentAsync(Guid id, string filename, Stream attachmentStream, CancellationToken ct = default(CancellationToken))
+        public static async Task<string> SaveOutgoingDocumentAttachmentAsync(Guid id, string filename, Stream attachmentStream, CancellationToken ct = default(CancellationToken))
         {
             var attachmentsFolder = await GetOutgoingAttachmentsFolderAsync(id);
             var fileExists = await attachmentsFolder.CheckExistsAsync(filename, ct);
             if (fileExists == ExistenceCheckResult.FileExists)
             {
-                return;
+                return Path.Combine(attachmentsFolder.Path, filename);
             }
 
             var file = await attachmentsFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting, ct);
@@ -287,7 +287,7 @@ namespace Mark5.Mobile.Common.Storage
                 await attachmentStream.CopyToAsync(fileStream);
             }
 
-            return;
+            return file.Path;
         }
 
         public static async Task RemoveOutgoingDocumentAttachmentAsync(Guid id, string filename, CancellationToken ct = default(CancellationToken))
