@@ -47,6 +47,9 @@ namespace Mark5.Mobile.Common.Model
 
         [Column("IsSilent")]
         public bool IsSilent { get; set; }
+
+        [Ignore]
+        public bool IsRead { get; set; }
     }
 }
 

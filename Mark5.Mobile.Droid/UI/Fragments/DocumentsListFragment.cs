@@ -346,6 +346,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Action mode
 
+        static class MenuItemActions
+        {
+            public const int MarkAsRead = 10;
+            public const int MarkAsUnread = 11;
+            public const int Reply = 20;
+            public const int ReplyAll = 21;
+            public const int Forward = 22;
+            public const int CopyToWorktray = 30;
+            public const int CopyToFolder = 40;
+            public const int MoveToFolder = 41;
+            public const int SetPriority = 50;
+            public const int Categories = 60;
+            public const int DeleteFromFolder = 70;
+            public const int Delete = 71;
+        }
+
         bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
             menu.Clear();
@@ -453,22 +469,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var currentAdapter = (DocumentsListAdapter)recyclerView.GetAdapter();
             currentAdapter.ClearSelections();
             actionMode = null;
-        }
-
-        static class MenuItemActions
-        {
-            public const int MarkAsRead = 10;
-            public const int MarkAsUnread = 11;
-            public const int Reply = 20;
-            public const int ReplyAll = 21;
-            public const int Forward = 22;
-            public const int CopyToWorktray = 30;
-            public const int CopyToFolder = 40;
-            public const int MoveToFolder = 41;
-            public const int SetPriority = 50;
-            public const int Categories = 60;
-            public const int DeleteFromFolder = 70;
-            public const int Delete = 71;
         }
 
         async void CopyToWorktrayAction()

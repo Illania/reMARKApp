@@ -48,8 +48,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public int? DocumentId { get; set; }
         public DocumentPreview DocumentPreview { get; set; }
         public Document Document { get; set; }
+        public bool ReadOnlyMode { get; set; } = false;
         public Action CloseRequest { get; set; }
-        public bool ReadOnlyMode { get; set; }
 
         ProgressBar progress;
         ScrollView scrollView;
@@ -112,53 +112,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             setReadStatusCancellationTokenSource?.Cancel();
         }
 
-        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
-        {
-            if (ReadOnlyMode) return;
-
-            if (!DocumentPreview.IsReadByCurrent)
-            {
-                menu.Add(Menu.None, MenuItemActions.MarkAsRead, MenuItemActions.MarkAsRead, Resource.String.mark_as_read);
-            }
-
-            if (DocumentPreview.IsReadByCurrent)
-            {
-                menu.Add(Menu.None, MenuItemActions.MarkAsUnread, MenuItemActions.MarkAsUnread, Resource.String.marks_as_unread);
-            }
-
-            menu.Add(Menu.None, MenuItemActions.Reply, MenuItemActions.Reply, Resource.String.reply);
-            menu.Add(Menu.None, MenuItemActions.ReplyAll, MenuItemActions.ReplyAll, Resource.String.reply_all);
-            menu.Add(Menu.None, MenuItemActions.Forward, MenuItemActions.Forward, Resource.String.forward);
-            menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
-            menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
-
-            if (Folder.InternalType == FolderInternalType.FilterView
-                || Folder.InternalType == FolderInternalType.Static
-                || Folder.InternalType == FolderInternalType.Worktray)
-            {
-                menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
-            }
-
-            menu.Add(Menu.None, MenuItemActions.SetPriority, MenuItemActions.SetPriority, Resource.String.set_priority);
-            menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
-            menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments);
-            menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.actions);
-            menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
-
-            if (Folder.InternalType == FolderInternalType.FilterView
-                || Folder.InternalType == FolderInternalType.Static
-                || Folder.InternalType == FolderInternalType.Worktray)
-            {
-                menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
-            }
-
-            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
-                || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed)
-            {
-                menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
-            }
-        }
-
         static class MenuItemActions
         {
             public const int MarkAsRead = 10;
@@ -178,10 +131,57 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int Delete = 101;
         }
 
-        public override void OnPrepareOptionsMenu(IMenu menu)
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
-            var commentsMenuItem = menu.FindItem(MenuItemActions.Comments);
-            commentsMenuItem?.SetEnabled(Document != null);
+            if (ReadOnlyMode) return;
+            if (DocumentPreview == null) return;
+
+            if (!DocumentPreview.IsReadByCurrent)
+            {
+                menu.Add(Menu.None, MenuItemActions.MarkAsRead, MenuItemActions.MarkAsRead, Resource.String.mark_as_read);
+            }
+
+            if (DocumentPreview.IsReadByCurrent)
+            {
+                menu.Add(Menu.None, MenuItemActions.MarkAsUnread, MenuItemActions.MarkAsUnread, Resource.String.marks_as_unread);
+            }
+
+            menu.Add(Menu.None, MenuItemActions.Reply, MenuItemActions.Reply, Resource.String.reply);
+            menu.Add(Menu.None, MenuItemActions.ReplyAll, MenuItemActions.ReplyAll, Resource.String.reply_all);
+            menu.Add(Menu.None, MenuItemActions.Forward, MenuItemActions.Forward, Resource.String.forward);
+            menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
+            menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
+
+            if (Folder?.InternalType == FolderInternalType.FilterView
+                || Folder?.InternalType == FolderInternalType.Static
+                || Folder?.InternalType == FolderInternalType.Worktray)
+            {
+                menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
+            }
+
+            menu.Add(Menu.None, MenuItemActions.SetPriority, MenuItemActions.SetPriority, Resource.String.set_priority);
+            menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
+
+            if (Document != null)
+            {
+                menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments);
+            }
+
+            menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.actions);
+            menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
+
+            if (Folder?.InternalType == FolderInternalType.FilterView
+                || Folder?.InternalType == FolderInternalType.Static
+                || Folder?.InternalType == FolderInternalType.Worktray)
+            {
+                menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
+            }
+
+            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
+                || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed)
+            {
+                menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
+            }
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -430,6 +430,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout.Invalidate();
             linearLayout.RequestLayout();
+
+            Activity.InvalidateOptionsMenu();
         }
 
         void RefreshView<T>() where T : DocumentView
@@ -457,6 +459,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout.Invalidate();
             linearLayout.RequestLayout();
+
+            Activity.InvalidateOptionsMenu();
         }
 
         void MarkAsReadIfNecessary()
@@ -553,7 +557,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(DocumentFragment)} [DocumentId={DocumentPreview?.Id ?? Document.Id}]";
+            return $"{nameof(DocumentFragment)} [DocumentId={DocumentPreview?.Id ?? Document?.Id ?? DocumentId}]";
         }
 
         class DocumentFragmentState : IRetainableState

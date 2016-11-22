@@ -5,17 +5,16 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System.Text;
-using Android.OS;
 using System;
-using Android.Net;
+using System.Linq;
+using System.Text;
 using Android.App;
 using Android.Content;
-using System.Linq;
-using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
 using Android.Gms.Common;
+using Android.Net;
+using Android.OS;
+using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -107,6 +106,8 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("Available memory KB: " + mi.AvailMem / 1024);
             sb.AppendLine("Total memory KB: " + mi.TotalMem / 1024);
             sb.AppendLine("Low memory: " + mi.LowMemory);
+            sb.AppendLine("[MONO] Total memory: " + GC.GetTotalMemory(false) / 1024);
+            sb.AppendLine("[MONO] Total memory after GC: " + GC.GetTotalMemory(true) / 1024);
             sb.AppendLine();
 
             sb.AppendLine("===== Network information =====");
