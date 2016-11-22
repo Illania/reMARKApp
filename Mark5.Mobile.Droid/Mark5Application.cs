@@ -41,10 +41,10 @@ namespace Mark5.Mobile.Droid
             {
                 var mainFolder = FileSystem.Current.LocalStorage;
 
-                CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "data"), CreationCollisionOption.OpenIfExists); ;
-                CommonConfig.OutgoingFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "out"), CreationCollisionOption.OpenIfExists); ;
-                CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "db"), CreationCollisionOption.OpenIfExists); ;
-                CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("..", "cache", "att"), CreationCollisionOption.OpenIfExists); ;
+                CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "data"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.OutgoingFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "out"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "db"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("..", "cache", "att"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.Logger = new SimpleLogger();
                 CommonConfig.ReachabilityService = new ReachabilityService();
                 CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
