@@ -25,6 +25,8 @@ namespace Mark5.Mobile.Common.Managers
     class NotificationsManager : AbstractManager, INotificationsManager
     {
 
+        public ObjectType[] EnabledObjectTypes { get { return new[] { ObjectType.Document }; } }
+
         public DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; } = DocumentBodyTypeRequest.HtmlOnly;
 
         readonly IFoldersDataAccess foldersDataAccess;
@@ -50,7 +52,7 @@ namespace Mark5.Mobile.Common.Managers
                     PushToken = pushToken
                 });
 
-                var notifications = result.Notifications.WhereNotNull().Select(n => n.Convert()).OrderByDescending(n => n.DateTimeTimestamp).ToList();
+                var notifications = result.Notifications.WhereNotNull().Select(n => n.Convert()).Where(n => EnabledObjectTypes.Contains(n.ObjectType)).OrderByDescending(n => n.DateTimeTimestamp).ToList();
 
                 await notificationsDataAccess.SaveNotifications(notifications);
 
