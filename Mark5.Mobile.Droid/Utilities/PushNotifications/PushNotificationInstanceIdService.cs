@@ -1,29 +1,27 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: InstanceIdListenerService.cs
+// File: PushNotificationInstanceIdService.cs
 // Author: Ferdinando Papale <fp@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
-/*using Android.App;
+using Android.App;
 using Android.Content;
-using Android.Gms.Gcm.Iid;
+using Firebase.Iid;
 using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.Droid.Utilities.PushNotifications
 {
 
-    [Service(Exported = false), IntentFilter(new[] { "com.google.android.gms.iid.InstanceID" })]
-    public class InstanceIdListenerService : InstanceIDListenerService
+    [Service(Exported = false), IntentFilter(new[] { "com.google.firebase.INSTANCE_ID_EVENT" })]
+    public class PushNotificationInstanceIdService : FirebaseInstanceIdService
     {
 
         public override void OnTokenRefresh()
         {
             CommonConfig.Logger.Info("Will refresh token...");
 
-            var intent = new Intent(this, typeof(RegistrationIntentService));
-            StartService(intent);
+            PlatformConfig.Preferences.PushNotificationToken = FirebaseInstanceId.Instance.Token;
         }
     }
 }
-*/
