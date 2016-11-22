@@ -13,15 +13,18 @@ using Mark5.Mobile.Common;
 namespace Mark5.Mobile.Droid.Utilities.PushNotifications
 {
 
-    [Service(Exported = false), IntentFilter(new[] { "com.google.firebase.INSTANCE_ID_EVENT" })]
+    [Service, IntentFilter(new[] { "com.google.firebase.INSTANCE_ID_EVENT" })]
     public class PushNotificationInstanceIdService : FirebaseInstanceIdService
     {
 
         public override void OnTokenRefresh()
         {
-            CommonConfig.Logger.Info("Will refresh token...");
+            var token = FirebaseInstanceId.Instance.Token;
 
-            PlatformConfig.Preferences.PushNotificationToken = FirebaseInstanceId.Instance.Token;
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug($"Received Firebase token: {token}");
+
+            PlatformConfig.Preferences.PushNotificationToken = token;
         }
     }
 }

@@ -91,9 +91,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 initialMenuItem.SetChecked(true);
                 OnNavigationItemSelected(initialMenuItem);
 
-                //var registrationIntent = new Intent(this, typeof(RegistrationIntentService));
-                //StartService(registrationIntent);
-
                 Task.Run(async () =>
                 {
                     var ci = await AuthenticatorFactory.Create().GetConnectionInfoAsync();

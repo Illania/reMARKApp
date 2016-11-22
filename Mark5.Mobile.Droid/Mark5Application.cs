@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Runtime;
+using Firebase;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Utilities;
@@ -36,6 +37,12 @@ namespace Mark5.Mobile.Droid
         public override void OnCreate()
         {
             base.OnCreate();
+
+            FirebaseApp.InitializeApp(this, new FirebaseOptions.Builder()
+                                                               .SetApiKey("AIzaSyAdGSIOm8bNSw7j7vJ7AmBo-jSlugkOND4")
+                                                               .SetApplicationId("1:310064787348:android:4929c9701f864e3f")
+                                                               .SetGcmSenderId("310064787348")
+                                                               .Build());
 
             Task.Run(async () =>
             {
