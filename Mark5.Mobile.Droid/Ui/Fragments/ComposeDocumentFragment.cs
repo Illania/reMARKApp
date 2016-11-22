@@ -7,6 +7,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.Content;
@@ -363,12 +364,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public void HandleLocalAttachment(Intent data)
         {
             OutgoingDocumentAttachmentDescription attachment = null;
+            bool attachmentTooBig = false;
+            Stream stream = null;
 
             Task.Run(async () =>
             {
                 var uri = data.Data;
-                var stream = Activity.ContentResolver.OpenInputStream(uri);
-                var size = (stream as InputStreamInvoker).BaseInputStream.Available();
+                stream = Activity.ContentResolver.OpenInputStream(uri);
 
                 string filename;
 
@@ -394,6 +396,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
+                var size = (new Java.IO.File(path)).Length();
+
+                if (size > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
+                {
+                    attachmentTooBig = true;
+                    await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename);
+                    throw new Exception();
+                }
 
                 attachment = new OutgoingDocumentAttachmentDescription
                 {
@@ -405,15 +415,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             }).ContinueWith(async t =>
             {
+                stream?.Dispose();
+
                 if (t.IsFaulted)
                 {
                     CommonConfig.Logger.Error($"Failed to save attachment to memory [AttachmentName={attachment?.Name}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", t.Exception.InnerException);
-                    await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(Resource.String.error_saving_local_attachment)));
+                    var resourceStringId = attachmentTooBig ? Resource.String.attachment_too_big : Resource.String.error_saving_local_attachment;
+                    await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(resourceStringId)));
                 }
                 else
                 {
                     attachmentsView.AddAttachment(attachment);
                 }
+
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 

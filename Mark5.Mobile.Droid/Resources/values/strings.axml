@@ -220,4 +220,5 @@
 	</string-array>
 	<string name="attachment_clicked">Select action</string>
 	<string name="choose_application">Choose an application</string>
+	<string name="attachment_too_big">The attachment is bigger than the maximum allowed size on the server</string>
 </resources>
