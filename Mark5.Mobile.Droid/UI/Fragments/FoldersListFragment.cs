@@ -147,7 +147,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
             }
 
-            RefreshLayout.Post(() => RefreshLayout.Refreshing = true); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
+            RefreshLayout.Refreshing = true;
 
             if (availableSections.Contains(Section.Remote))
             {
@@ -162,7 +162,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 RefreshLocal();
             }
 
-            RefreshLayout.Post(() => RefreshLayout.Refreshing = false); //Not a good way, but it's a bug, fixed in support library v 24.2.0 (issue 77712)
+            RefreshLayout.Refreshing = false;
         }
 
         async Task RefreshRemote(bool forceRefresh = false)

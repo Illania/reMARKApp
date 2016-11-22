@@ -5,7 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using Android.App;
+/*using Android.App;
 using Android.Content;
 using Android.Gms.Gcm.Iid;
 using Mark5.Mobile.Common;
@@ -26,3 +26,4 @@ namespace Mark5.Mobile.Droid.Utilities.PushNotifications
         }
     }
 }
+*/

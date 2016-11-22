@@ -22,7 +22,6 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
-using Mark5.Mobile.Droid.Utilities.PushNotifications;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -92,8 +91,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 initialMenuItem.SetChecked(true);
                 OnNavigationItemSelected(initialMenuItem);
 
-                var registrationIntent = new Intent(this, typeof(RegistrationIntentService));
-                StartService(registrationIntent);
+                //var registrationIntent = new Intent(this, typeof(RegistrationIntentService));
+                //StartService(registrationIntent);
 
                 Task.Run(async () =>
                 {

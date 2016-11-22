@@ -10,7 +10,6 @@ using System.Linq;
 using System.Text;
 using Android.App;
 using Android.Content;
-using Android.Gms.Common;
 using Android.Net;
 using Android.OS;
 using Mark5.Mobile.Common.Managers;
@@ -32,7 +31,6 @@ namespace Mark5.Mobile.Droid.Utilities
             return Intent.CreateChooser(sendIntent, context.GetText(Resource.String.share));
         }
 
-
         public static string CreateFullReport()
         {
             var sb = new StringBuilder();
@@ -52,14 +50,6 @@ namespace Mark5.Mobile.Droid.Utilities
             var pi = Application.Context.PackageManager.GetPackageInfo(Application.Context.PackageName, 0);
             sb.AppendLine("Version: " + pi.VersionName + " (" + pi.VersionCode + ")");
             sb.AppendLine("Date: " + DateTime.UtcNow);
-            sb.AppendLine("Google Play Services status: " + GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(Application.Context));
-            sb.AppendLine("Google Play Services statuses:");
-            sb.AppendLine("  SUCCESS=" + ConnectionResult.Success);
-            sb.AppendLine("  SERVICE_MISSING=" + ConnectionResult.ServiceMissing);
-            sb.AppendLine("  SERVICE_UPDATING=" + ConnectionResult.ServiceUpdating);
-            sb.AppendLine("  SERVICE_VERSION_UPDATE_REQUIRED=" + ConnectionResult.ServiceVersionUpdateRequired);
-            sb.AppendLine("  SERVICE_DISABLED=" + ConnectionResult.ServiceDisabled);
-            sb.AppendLine("  SERVICE_INVALID=" + ConnectionResult.ServiceInvalid);
             sb.AppendLine();
 
             sb.AppendLine("===== Device information =====");

@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: CopyToUserWorktrayFragment.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -174,7 +174,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Refresh running...");
 
-                refreshLayout.Post(() => refreshLayout.Refreshing = true); //Bug: fixed in support library v 24.2.0 (issue 77712)
+                refreshLayout.Refreshing = true;
 
                 var userDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
                 adapter.AppendItems(userDepartments.Users.Where(su => su.Username != ServerConfig.SystemSettings.UserInfo.User.Username).OrderBy(su => su.Username).ToList());
@@ -187,7 +187,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             finally
             {
-                refreshLayout.Post(() => refreshLayout.Refreshing = false); //Bug: fixed in support library v 24.2.0 (issue 77712)
+                refreshLayout.Refreshing = false;
 
                 CommonConfig.Logger.Info($"Refresh finished");
             }
