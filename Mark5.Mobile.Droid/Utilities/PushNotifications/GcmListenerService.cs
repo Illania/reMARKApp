@@ -5,15 +5,23 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using Android.App;
+using Android.Content;
+using Android.OS;
+using GCM = Android.Gms.Gcm;
+using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.Droid.Utilities.PushNotifications
 {
-    [Android.App.Service(Exported = false), Android.App.IntentFilter(new[] { "com.google.android.c2dm.intent.RECEIVE" })]
-    public class GcmListenerService : Android.Gms.Gcm.GcmListenerService
+
+    [Service(Exported = false), IntentFilter(new[] { "com.google.android.c2dm.intent.RECEIVE" })]
+    public class GcmListenerService : GCM.GcmListenerService
     {
-        public override void OnMessageReceived(string from, Android.OS.Bundle data)
+
+        public override void OnMessageReceived(string from, Bundle data)
         {
-            //TODO need to complete
+            CommonConfig.Logger.Error("NOTIFICATION RECEIVED");
+
         }
     }
 }

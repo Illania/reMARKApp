@@ -5,19 +5,25 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-
 using System;
+using Android.App;
+using Android.Content;
+using Android.Gms.Gcm;
+using Android.Gms.Gcm.Iid;
 using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.Droid.Utilities.PushNotifications
 {
-    [Android.App.Service(Exported = false)]
-    class RegistrationIntentService : Android.App.IntentService
+
+    [Service(Exported = false)]
+    class RegistrationIntentService : IntentService
     {
-        static readonly object handleIntentLock = new object();
+
         const string SenderId = "887732996602";
 
-        protected override void OnHandleIntent(Android.Content.Intent intent)
+        static readonly object handleIntentLock = new object();
+
+        protected override void OnHandleIntent(Intent intent)
         {
             try
             {
@@ -25,21 +31,17 @@ namespace Mark5.Mobile.Droid.Utilities.PushNotifications
 
                 lock (handleIntentLock)
                 {
-                    var instanceId = Android.Gms.Gcm.Iid.InstanceID.GetInstance(Android.App.Application.Context);
-                    var token = instanceId.GetToken(SenderId, Android.Gms.Gcm.GoogleCloudMessaging.InstanceIdScope, null);
+                    var instanceId = InstanceID.GetInstance(Application);
+                    var token = instanceId.GetToken(SenderId, GoogleCloudMessaging.InstanceIdScope, null);
 
-                    CommonConfig.Logger.Info(string.Format("Token received. [token={0}]", token));
+                    CommonConfig.Logger.Info($"Token received [token={token}]");
 
                     PlatformConfig.Preferences.PushNotificationToken = token;
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Request token failed.", e);
-
-                //TODO what to do here?
-
-                return;
+                CommonConfig.Logger.Error("Request token failed", ex);
             }
         }
     }
