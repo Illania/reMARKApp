@@ -12,6 +12,8 @@ using Android.App;
 using Android.Content;
 using Android.Net;
 using Android.OS;
+using Firebase;
+using Firebase.Iid;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Utilities;
 
@@ -68,6 +70,7 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("Version.SdkInt: " + Build.VERSION.SdkInt);
             sb.AppendLine("Version.SecurityPatch: " + Build.VERSION.SecurityPatch);
             sb.AppendLine("Root: " + Integration.IsRootedMethod1() + "," + Integration.IsRootedMethod2() + "," + Integration.IsRootedMethod3());
+            sb.AppendLine("Firebase initialized: " + (FirebaseApp.Instance == null ? "false" : "true"));
             sb.AppendLine();
 
             sb.AppendLine("===== Connection information =====");
@@ -77,6 +80,7 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("SSL: " + Managers.ActiveConnectionInfo.SslMode);
             sb.AppendLine("Friendly device name: " + Managers.ActiveConnectionInfo.FriendlyDeviceName);
             sb.AppendLine("Installation ID: " + Managers.ActiveConnectionInfo.InstallationId);
+            sb.AppendLine("Firebase Instance ID: " + FirebaseInstanceId.Instance?.Token);
             sb.AppendLine();
 
             sb.AppendLine("===== Server information =====");

@@ -10,7 +10,7 @@ using Android.Content;
 using Firebase.Messaging;
 using Mark5.Mobile.Common;
 
-namespace Mark5.Mobile.Droid.Utilities.PushNotifications
+namespace Mark5.Mobile.Droid.Utilities.Services
 {
 
     [Service, IntentFilter(new[] { "com.google.firebase.MESSAGING_EVENT" })]

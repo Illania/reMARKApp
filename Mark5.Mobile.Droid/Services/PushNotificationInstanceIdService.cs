@@ -10,7 +10,7 @@ using Android.Content;
 using Firebase.Iid;
 using Mark5.Mobile.Common;
 
-namespace Mark5.Mobile.Droid.Utilities.PushNotifications
+namespace Mark5.Mobile.Droid.Services
 {
 
     [Service, IntentFilter(new[] { "com.google.firebase.INSTANCE_ID_EVENT" })]
