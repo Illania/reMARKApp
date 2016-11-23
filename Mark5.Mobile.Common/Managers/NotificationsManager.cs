@@ -39,6 +39,56 @@ namespace Mark5.Mobile.Common.Managers
             this.notificationsDataAccess = notificationsDataAccess;
         }
 
+        public async Task Subscribe(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                await AppServiceProxy.SetFoldersNotificationsAsync(new DataContract.SetFoldersNotificationsParameters
+                {
+                    Token = Token,
+                    DeviceType = deviceType.ConvertEnum<DataContract.DeviceType>(),
+                    PushToken = pushToken,
+                    Enabled = true
+                });
+
+                return;
+            }
+
+            if (sourceType == SourceType.Local)
+            {
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task UnSubscribe(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                await AppServiceProxy.SetFoldersNotificationsAsync(new DataContract.SetFoldersNotificationsParameters
+                {
+                    Token = Token,
+                    DeviceType = deviceType.ConvertEnum<DataContract.DeviceType>(),
+                    PushToken = pushToken,
+                    Enabled = false
+                });
+
+                return;
+            }
+
+            if (sourceType == SourceType.Local)
+            {
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
         public async Task<List<Notification>> GetNotificationsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;

@@ -225,6 +225,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 CommonConfig.Logger.Info($"Logged in - will present {nameof(MainActivity)}");
 
+                if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
+                {
+                    CommonConfig.Logger.Info($"Sending Firebase token to service...");
+
+                    await Managers.NotificationsManager.Subscribe(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
+                }
+
                 StartActivity(new Intent(this, typeof(MainActivity)));
                 Finish();
             }

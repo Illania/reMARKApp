@@ -115,7 +115,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (preference.Key == GetString(Resource.String.pref_key_advanced_logout))
             {
-                Dialogs.ShowYesNoDialog(Activity, Resource.String.dialog_logout_title, Resource.String.dialog_logout_content, Integration.ClearDataAndStop);
+                Dialogs.ShowYesNoDialog(Activity, Resource.String.dialog_logout_title, Resource.String.dialog_logout_content, async () =>
+                {
+                    Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_logging_out_title, Resource.String.please_wait);
+
+                    try
+                    {
+                        if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
+                        {
+                            await Managers.NotificationsManager.UnSubscribe(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
+                        }
+                    }
+                    catch
+                    {
+                    }
+
+                    Integration.ClearDataAndStop();
+                });
                 return true;
             }
 

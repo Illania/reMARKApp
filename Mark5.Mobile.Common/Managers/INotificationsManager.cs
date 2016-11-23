@@ -19,6 +19,10 @@ namespace Mark5.Mobile.Common.Managers
 
         DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; }
 
+        Task Subscribe(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto);
+
+        Task UnSubscribe(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto);
+
         Task<List<Notification>> GetNotificationsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = default(SourceType));
 
         Task<Dictionary<ModuleType, List<Folder>>> GetFoldersNotificationsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = default(SourceType));
