@@ -44,12 +44,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public abstract Task UpdateDocument();
 
         public abstract IComposeDocumentViewState ReturnState();
-
     }
 
     public interface IComposeDocumentViewState
     {
-
     }
 }
 

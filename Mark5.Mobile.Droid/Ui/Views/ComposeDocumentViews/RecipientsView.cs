@@ -334,8 +334,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             var cursorPosition = emailEditor.SelectionStart;
 
             var editableText = emailEditor.EditableText;
-            var color = new Color(ContextCompat.GetColor(Context, colorId)); //TODO should we cache it?
-
+            var color = new Color(ContextCompat.GetColor(Context, colorId));
             editableText.SetSpan(new ForegroundColorSpan(color), start, end, SpanTypes.ExclusiveExclusive);
             emailEditor.SetSelection(cursorPosition);
         }

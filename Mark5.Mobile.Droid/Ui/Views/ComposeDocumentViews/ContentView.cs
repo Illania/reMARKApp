@@ -159,7 +159,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override async Task UpdateDocument()
         {
-            Document.HtmlBody = await RetrieveCombinedText(); //TODO need to test this
+            Document.HtmlBody = await RetrieveCombinedText();
             DocumentPreview.Preview = GetPlainText(Document.HtmlBody);
         }
 

@@ -200,7 +200,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             public override void SetSelection(int position)
             {
-                //The base spinner does not fire the onItemSelected event when selecting the same
+                //The base spinner does not fire the onItemSelected event when selecting the same item
                 if (position == SelectedItemPosition)
                 {
                     OnItemSelectedListener.OnItemSelected(this, SelectedView, position, SelectedItemId);

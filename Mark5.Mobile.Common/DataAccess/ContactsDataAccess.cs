@@ -230,7 +230,7 @@ namespace Mark5.Mobile.Common.DataAccess
             await RemoveFromFolderAsync(ids, folder.Id);
         }
 
-        public async Task RemoveFromFolderAsync(List<Contact> contacts, Folder folder) //TODO remember to delete also addresses
+        public async Task RemoveFromFolderAsync(List<Contact> contacts, Folder folder)
         {
             var ids = contacts.Select(c => c.Id).Distinct().ToList();
             await RemoveFromFolderAsync(ids, folder.Id);
