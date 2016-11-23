@@ -32,15 +32,17 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         const string CreationModeFlagIntentKey = "CreationModeFlagIntent_290d1383-175d-4e2d-8f5e-ca899baff3f7";
         const string PreviousDocumentIdIntentKey = "PreviousDocumentIdIntent_a2066147-a27b-454f-bc5c-03e6b8266697";
         const string PreviousDocumentFolderIdIntentKey = "PreviousDocumentFolderIdIntent_ac0d9a31-2ddc-497b-8fbe-7fd5a51b2257";
+        const string PreviousDocumentDirectionIntentKey = "PreviousDocumentDirectionIntent_edefdcd2-764f-439d-891b-178b8de29333";
 
         const string cdfFragmentTagKey = "fragmentTagKey";
         string cdfFragmentTag;
 
-        public static Intent CreateIntent(Context context, DocumentCreationModeFlag creationModeFlag, int? precedingDocumentId = null,
+        public static Intent CreateIntent(Context context, DocumentCreationModeFlag creationModeFlag, DocumentDirection previousDocumentDirection, int? precedingDocumentId = null,
                                           int? precedingDocumentFolderId = null)
         {
             var intent = new Intent(context, typeof(ComposeDocumentActivity));
             intent.PutExtra(CreationModeFlagIntentKey, (int)creationModeFlag);
+            intent.PutExtra(PreviousDocumentDirectionIntentKey, (int)previousDocumentDirection);
             if (precedingDocumentId != null)
             {
                 intent.PutExtra(PreviousDocumentIdIntentKey, precedingDocumentId.Value);
@@ -68,6 +70,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var creationModeFlag = (DocumentCreationModeFlag)Intent.Extras.GetInt(CreationModeFlagIntentKey);
+                var previousDocumentDirection = (DocumentDirection)Intent.Extras.GetInt(PreviousDocumentDirectionIntentKey);
                 var previousDocumentId = Intent.HasExtra(PreviousDocumentIdIntentKey) ? (int?)Intent.Extras.GetInt(PreviousDocumentIdIntentKey) : null;
                 var previousDocumentFolderId = Intent.HasExtra(PreviousDocumentFolderIdIntentKey) ? (int?)Intent.Extras.GetInt(PreviousDocumentFolderIdIntentKey) : null;
 
@@ -77,6 +80,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     CreationModeFlag = creationModeFlag,
                     PreviousDocumentId = previousDocumentId,
                     PreviousDocumentFolderId = previousDocumentFolderId,
+                    PreviousDocumentDirection = previousDocumentDirection,
                 };
                 cdfFragmentTag = cdf.GenerateTag();
                 ft.Replace(Resource.Id.fragment_container, cdf, cdfFragmentTag);

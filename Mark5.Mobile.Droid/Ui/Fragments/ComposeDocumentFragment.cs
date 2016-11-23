@@ -40,6 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         Document PreviousDocument { get; set; }
         DocumentPreview PreviousDocumentPreview { get; set; }
 
+        public DocumentDirection PreviousDocumentDirection { get; set; }
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
@@ -64,7 +65,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ScrollView scrollView;
         LinearLayoutCompat linearLayout;
         bool documentShown;
-        bool resuming; //On resume called again after access permission requests
+        bool resuming;
+        bool templateLoaded;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
@@ -131,7 +133,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnResume();
 
-            if (resuming)
+            if (resuming) //On resume called again after access permission requests
             {
                 return;
             }
@@ -151,40 +153,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
             }
 
-            bool notFoundInCache = false;
-
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.loading_document, Resource.String.please_wait);
 
             try
             {
-                var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, SourceType.Local);
+                var sourceType = PreviousDocumentDirection == DocumentDirection.Draft ? SourceType.Auto : SourceType.Local;
+                var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, sourceType);
                 PreviousDocument = container.Document;
                 PreviousDocumentPreview = container.DocumentPreview;
-            }
-            catch (DataNotFoundException)
-            {
-                notFoundInCache = true; //For example if we open the compose fragment from a draft
             }
             catch (Exception ex)
             {
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
-            }
-
-            if (notFoundInCache)
-            {
-                try
-                {
-                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, SourceType.Remote);
-                    PreviousDocument = container.Document;
-                    PreviousDocumentPreview = container.DocumentPreview;
-                }
-                catch (Exception ex)
-                {
-                    dismissAction();
-                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                    Activity.Finish(); //TODO Ask Bartosz what he thinks of the flow
-                }
+                Activity.Finish();
             }
 
             dismissAction();
@@ -487,7 +469,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var isFormValid = IsFormValid();
                 sendItem.SetEnabled(isFormValid);
-                sendItem.Icon.Mutate().Alpha = isFormValid ? 255 : 130;
+                sendItem.Icon.Mutate().Alpha = isFormValid ? 255 : 130; //Change of alpha is not done for icons automatically
             }
         }
 
@@ -518,6 +500,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task AskIfShouldUseTemplates()
         {
+            if (templateLoaded)
+            {
+                return;
+            }
+
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
                 CommonConfig.Logger.Info("Document opened in edit mode, no need to add template");
@@ -554,6 +541,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         break;
                 }
             }
+
+            templateLoaded = true;
         }
 
         async Task GetAllTemplates()
@@ -729,6 +718,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 PreviousDocumentId = PreviousDocumentId,
                 OutgoingDocumentGuid = OutgoingDocumentGuid,
                 CreationModeFlag = CreationModeFlag,
+                TemplateLoaded = templateLoaded,
                 ToState = toView.ReturnState(),
                 CcState = ccView.ReturnState(),
                 BccState = bccView.ReturnState(),
@@ -753,6 +743,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 PreviousDocumentId = cfs.PreviousDocumentId;
                 OutgoingDocumentGuid = cfs.OutgoingDocumentGuid;
                 CreationModeFlag = cfs.CreationModeFlag;
+                templateLoaded = cfs.TemplateLoaded;
                 toView.State = cfs.ToState;
                 ccView.State = cfs.CcState;
                 bccView.State = cfs.BccState;
@@ -778,6 +769,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int? PreviousDocumentFolderId { get; set; }
             public int? PreviousDocumentId { get; set; }
             public Guid OutgoingDocumentGuid { get; set; }
+            public bool TemplateLoaded { get; set; }
             public DocumentCreationModeFlag CreationModeFlag { get; set; }
             public IComposeDocumentViewState ToState { get; set; }
             public IComposeDocumentViewState CcState { get; set; }

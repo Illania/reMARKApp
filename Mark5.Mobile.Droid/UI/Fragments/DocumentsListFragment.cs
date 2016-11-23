@@ -181,7 +181,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == 10)
             {
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None));
                 return true;
             }
 
@@ -326,7 +326,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (documentPreview.Direction == DocumentDirection.Draft)
                 {
-                    StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Edit, documentPreview.Id, Folder.Id));
+                    StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Edit, documentPreview.Direction, documentPreview.Id, Folder.Id));
                 }
                 else
                 {

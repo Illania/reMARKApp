@@ -194,17 +194,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == MenuItemActions.Reply)
             {
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Reply, Document.Id, Folder.Id));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Reply, DocumentPreview.Direction, Document.Id, Folder.Id));
                 return true;
             }
             if (item.ItemId == MenuItemActions.ReplyAll)
             {
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.ReplyAll, Document.Id, Folder.Id));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.ReplyAll, DocumentPreview.Direction, Document.Id, Folder.Id));
                 return true;
             }
             if (item.ItemId == MenuItemActions.Forward)
             {
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Forward, Document.Id, Folder.Id));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Forward, DocumentPreview.Direction, Document.Id, Folder.Id));
                 return true;
             }
             if (item.ItemId == MenuItemActions.CopyToFolder)
