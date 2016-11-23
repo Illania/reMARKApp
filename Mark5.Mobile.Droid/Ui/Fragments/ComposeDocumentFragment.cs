@@ -719,16 +719,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            //CommonConfig.Logger.Info($"Retaining state [entity.Id={Entity?.Id}, addCommentText={addCommentEditText?.Text}");
-
-            //return new CommentsFragmentState
-            //{
-            //    Entity = Entity,
-            //    AddCommentText = addCommentEditText.Text
-            //};
-
-            //TODO to implement
-            return new ComposeDocumentFragmentState();
+            return new ComposeDocumentFragmentState()
+            {
+                Document = Document,
+                DocumentPreview = DocumentPreview,
+                PreviousDocument = PreviousDocument,
+                PreviousDocumentPreview = PreviousDocumentPreview,
+                PreviousDocumentFolderId = PreviousDocumentFolderId,
+                PreviousDocumentId = PreviousDocumentId,
+                OutgoingDocumentGuid = OutgoingDocumentGuid,
+                CreationModeFlag = CreationModeFlag,
+                ToState = toView.ReturnState(),
+                CcState = ccView.ReturnState(),
+                BccState = bccView.ReturnState(),
+                PriorityState = priorityView.ReturnState(),
+                LineState = lineView.ReturnState(),
+                SubjectState = subjectView.ReturnState(),
+                AttachmentsState = attachmentsView.ReturnState(),
+                ContentState = contentView.ReturnState(),
+            };
         }
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
@@ -740,8 +749,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 DocumentPreview = cfs.DocumentPreview;
                 PreviousDocument = cfs.PreviousDocument;
                 PreviousDocumentPreview = cfs.PreviousDocumentPreview;
-                CreationModeFlag = cfs.CreationModeFlag;
                 PreviousDocumentFolderId = cfs.PreviousDocumentFolderId;
+                PreviousDocumentId = cfs.PreviousDocumentId;
+                OutgoingDocumentGuid = cfs.OutgoingDocumentGuid;
+                CreationModeFlag = cfs.CreationModeFlag;
+                toView.State = cfs.ToState;
+                ccView.State = cfs.CcState;
+                bccView.State = cfs.BccState;
+                priorityView.State = cfs.PriorityState;
+                lineView.State = cfs.LineState;
+                subjectView.State = cfs.SubjectState;
+                attachmentsView.State = cfs.AttachmentsState;
+                contentView.State = cfs.ContentState;
             }
         }
 
@@ -757,7 +776,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public Document PreviousDocument { get; set; }
             public DocumentPreview PreviousDocumentPreview { get; set; }
             public int? PreviousDocumentFolderId { get; set; }
+            public int? PreviousDocumentId { get; set; }
+            public Guid OutgoingDocumentGuid { get; set; }
             public DocumentCreationModeFlag CreationModeFlag { get; set; }
+            public IComposeDocumentViewState ToState { get; set; }
+            public IComposeDocumentViewState CcState { get; set; }
+            public IComposeDocumentViewState BccState { get; set; }
+            public IComposeDocumentViewState PriorityState { get; set; }
+            public IComposeDocumentViewState LineState { get; set; }
+            public IComposeDocumentViewState SubjectState { get; set; }
+            public IComposeDocumentViewState AttachmentsState { get; set; }
+            public IComposeDocumentViewState ContentState { get; set; }
         }
 
         #endregion

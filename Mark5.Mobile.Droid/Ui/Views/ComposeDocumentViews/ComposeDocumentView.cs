@@ -22,6 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public DocumentPreview PreviousDocumentPreview { get; set; }
         public Document PreviousDocument { get; set; }
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
+        public IComposeDocumentViewState State { get; set; }
 
         protected int DistanceNone;
         protected int DistanceLarge;
@@ -41,6 +42,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public abstract Task RefreshView();
 
         public abstract Task UpdateDocument();
+
+        public abstract IComposeDocumentViewState ReturnState();
+
+    }
+
+    public interface IComposeDocumentViewState
+    {
 
     }
 }

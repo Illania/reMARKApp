@@ -30,7 +30,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         bool selectionChangedProgrammatically;
 
-        public bool LineSelectedIsAmbiguous //TODO Jesus I need a better name for this
+        public bool LineSelectedIsAmbiguous
         {
             get { return lineAmbiguityIndicator.Visibility == ViewStates.Visible; }
         }
@@ -90,6 +90,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override Task RefreshView()
         {
+            if (State != null)
+            {
+                RestoreState();
+                State = null;
+                return Task.CompletedTask;
+            }
+
             if (CreationModeFlag == DocumentCreationModeFlag.None)
             {
                 return Task.CompletedTask;
@@ -131,7 +138,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override Task UpdateDocument()
         {
-            Document.Lines.Add(availableOutgoingLinesInView[lineSpinner.SelectedItemPosition].Line);
+            Document.Lines.Add(GetLine());
             return Task.CompletedTask;
         }
 
@@ -152,6 +159,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         void SetLine(Line line)
         {
             SetLineFromGuid(line.Guid);
+        }
+
+        Line GetLine()
+        {
+            return availableOutgoingLinesInView[lineSpinner.SelectedItemPosition].Line;
         }
 
         class LineInView
@@ -197,6 +209,32 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 base.SetSelection(position);
             }
+        }
+
+        #endregion
+
+        #region State related
+
+        void RestoreState()
+        {
+            var lineViewState = State as LineViewState;
+            SetLine(lineViewState.SelectedLine);
+            lineAmbiguityIndicator.Visibility = lineViewState.LineAmbiguityIndicatorVisibility;
+        }
+
+        public override IComposeDocumentViewState ReturnState()
+        {
+            return new LineViewState
+            {
+                SelectedLine = GetLine(),
+                LineAmbiguityIndicatorVisibility = lineAmbiguityIndicator.Visibility,
+            };
+        }
+
+        class LineViewState : IComposeDocumentViewState
+        {
+            public Line SelectedLine { get; set; }
+            public ViewStates LineAmbiguityIndicatorVisibility { get; set; }
         }
 
         #endregion

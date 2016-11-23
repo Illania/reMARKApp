@@ -52,6 +52,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override Task RefreshView()
         {
+            if (State != null)
+            {
+                RestoreState();
+                State = null;
+                return Task.CompletedTask;
+            }
+
             if (CreationModeFlag == DocumentCreationModeFlag.None || CreationModeFlag == DocumentCreationModeFlag.New)
             {
                 return Task.CompletedTask;
@@ -84,5 +91,28 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             subjectTextView.Text = subject;
         }
+
+        #region State related
+
+        void RestoreState()
+        {
+            var subjectViewState = State as SubjectViewState;
+            subjectTextView.Text = subjectViewState.Content;
+        }
+
+        public override IComposeDocumentViewState ReturnState()
+        {
+            return new SubjectViewState
+            {
+                Content = subjectTextView.Text,
+            };
+        }
+
+        class SubjectViewState : IComposeDocumentViewState
+        {
+            public string Content { get; set; }
+        }
+
+        #endregion
     }
 }

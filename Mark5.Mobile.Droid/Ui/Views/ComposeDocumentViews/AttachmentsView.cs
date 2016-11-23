@@ -16,7 +16,6 @@ using Android.Text;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -25,7 +24,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
     public class AttachmentsView : ComposeDocumentView
     {
         LinearLayoutCompat container;
-        List<IAttachmentDescription> attachments = new List<IAttachmentDescription>();
+        List<IAttachmentDescription> attachmentsDescription = new List<IAttachmentDescription>();
 
         public event EventHandler<IAttachmentDescription> AttachmentClicked = delegate { };
 
@@ -52,6 +51,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override Task RefreshView()
         {
+            if (State != null)
+            {
+                RestoreState();
+                State = null;
+                return Task.CompletedTask;
+            }
+
             if (CreationModeFlag == DocumentCreationModeFlag.Forward)
             {
                 foreach (var attachmentDescription in PreviousDocument.Attachments)
@@ -65,7 +71,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override Task UpdateDocument()
         {
-            var remoteAttachments = attachments.OfType<AttachmentDescription>().ToList();
+            var remoteAttachments = attachmentsDescription.OfType<AttachmentDescription>().ToList();
             Document.Attachments.AddRange(remoteAttachments);
 
             //Nothing to do for local attachments, they're saved on disk
@@ -75,7 +81,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public void AddAttachment(IAttachmentDescription attachment)
         {
-            attachments.Add(attachment);
+            attachmentsDescription.Add(attachment);
 
             var av = new AttachmentView(Context, attachment);
             av.Click += Attachment_Click;
@@ -86,10 +92,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public void RemoveAttachment(object senderView, IAttachmentDescription attachment)
         {
-            attachments.Remove(attachment);
+            attachmentsDescription.Remove(attachment);
             container.RemoveView(senderView as AttachmentView);
 
-            if (!attachments.Any())
+            if (!attachmentsDescription.Any())
             {
                 Visibility = ViewStates.Gone;
             }
@@ -100,6 +106,31 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             var attachmentView = sender as AttachmentView;
             AttachmentClicked(sender, attachmentView.documentAttachment);
         }
+
+        #region State related
+
+        void RestoreState()
+        {
+            var attachmentsViewState = State as AttachmentsViewState;
+            attachmentsViewState.AttachmentDescriptions.ForEach(AddAttachment);
+        }
+
+        public override IComposeDocumentViewState ReturnState()
+        {
+            return new AttachmentsViewState
+            {
+                AttachmentDescriptions = attachmentsDescription,
+            };
+        }
+
+        class AttachmentsViewState : IComposeDocumentViewState
+        {
+            public List<IAttachmentDescription> AttachmentDescriptions { get; set; }
+        }
+
+        #endregion
+
+        #region Subview
 
         class AttachmentView : LinearLayoutCompat
         {
@@ -185,5 +216,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 innerLayout.AddView(size);
             }
         }
+
+        #endregion
+
     }
 }

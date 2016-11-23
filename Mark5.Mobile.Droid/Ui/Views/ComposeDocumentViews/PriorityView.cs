@@ -51,6 +51,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override Task RefreshView()
         {
+            if (State != null)
+            {
+                RestoreState();
+                State = null;
+                return Task.CompletedTask;
+            }
+
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
                 SetPriority(PreviousDocumentPreview.Priority);
@@ -61,7 +68,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override Task UpdateDocument()
         {
-            DocumentPreview.Priority = priorities[prioritySpinner.SelectedItemPosition];
+            DocumentPreview.Priority = GetPriority();
             return Task.CompletedTask;
         }
 
@@ -74,7 +81,34 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             prioritySpinner.SetSelection(priorities.IndexOf(priority));
         }
 
+        Priority GetPriority()
+        {
+            return priorities[prioritySpinner.SelectedItemPosition];
+        }
+
         #endregion
 
+        #region State related
+
+        void RestoreState()
+        {
+            var priorityViewState = State as PriorityViewState;
+            SetPriority(priorityViewState.SelectedPriority);
+        }
+
+        public override IComposeDocumentViewState ReturnState()
+        {
+            return new PriorityViewState
+            {
+                SelectedPriority = GetPriority()
+            };
+        }
+
+        class PriorityViewState : IComposeDocumentViewState
+        {
+            public Priority SelectedPriority { get; set; }
+        }
+
+        #endregion
     }
 }

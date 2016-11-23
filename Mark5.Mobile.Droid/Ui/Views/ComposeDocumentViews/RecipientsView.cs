@@ -97,6 +97,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override Task RefreshView()
         {
+            if (State != null)
+            {
+                RestoreState();
+                State = null;
+                return Task.CompletedTask;
+            }
+
             if (CreationModeFlag == DocumentCreationModeFlag.New || CreationModeFlag == DocumentCreationModeFlag.None
                 || CreationModeFlag == DocumentCreationModeFlag.Forward)
             {
@@ -340,6 +347,30 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #endregion
 
+        #region State related
+
+        void RestoreState()
+        {
+            var recipientsViewState = State as RecipientsViewState;
+            emailEditor.Text = recipientsViewState.Content;
+        }
+
+        public override IComposeDocumentViewState ReturnState()
+        {
+            return new RecipientsViewState
+            {
+                Content = emailEditor.Text,
+            };
+        }
+
+        class RecipientsViewState : IComposeDocumentViewState
+        {
+            public string Content { get; set; }
+        }
+
+        #endregion
+
+        #region Support class
 
         public class SuggestionsAdapter : BaseAdapter<PrintableSuggestion>, IFilterable
         {
@@ -470,8 +501,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                       NotifyDataSetInvalidated();
                   });
             }
-
-            #region Support classes
 
             public class SuggestionsFilter : Filter
             {
