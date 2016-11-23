@@ -13,14 +13,12 @@ using System.Threading.Tasks;
 using Android.Content;
 using Android.Database;
 using Android.Provider;
-using Android.Runtime;
 using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Support;
@@ -34,19 +32,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class ComposeDocumentFragment : RetainableStateFragment
     {
         const string DefaultTitle = "New document";
-        public const int AttachmentRequestCode = 111;
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
-
-        Document PreviousDocument { get; set; }
-        DocumentPreview PreviousDocumentPreview { get; set; }
+        public const int AttachmentRequestCode = 111;
 
         public DocumentDirection PreviousDocumentDirection { get; set; }
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
 
-        public Document Document { get; set; } = new Document();
-        public DocumentPreview DocumentPreview { get; set; } = new DocumentPreview();
+        Document PreviousDocument { get; set; }
+        DocumentPreview PreviousDocumentPreview { get; set; }
+
+        Document Document { get; set; } = new Document();
+        DocumentPreview DocumentPreview { get; set; } = new DocumentPreview();
         public Guid OutgoingDocumentGuid { get; set; } //TODO eventually this should be set for preexisting documents (take care when doing the local documents)
 
         ToView toView;
@@ -121,11 +119,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             HasOptionsMenu = true;
 
-            if (OutgoingDocumentGuid == Guid.Empty)
-            {
-                OutgoingDocumentGuid = Guid.NewGuid();
-            }
-
             return rootView;
         }
 
@@ -139,6 +132,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             resuming = true;
+
+            if (OutgoingDocumentGuid == Guid.Empty)
+            {
+                OutgoingDocumentGuid = Guid.NewGuid();
+            }
 
             await LoadDocument();
             await ShowDocument();
@@ -208,7 +206,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var option = await Dialogs.ShowListDialog(Context, Resource.String.attachment_clicked, Resource.Array.attachment_clicked_options);
 
-            if (option == 0)
+            if (option == 0) //Open attachment
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
 
@@ -269,7 +267,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
             }
-            else if (option == 1)
+            else if (option == 1) //Remove attachment
             {
                 var outgoingAttachment = attachment as OutgoingDocumentAttachmentDescription;
                 if (outgoingAttachment != null)
