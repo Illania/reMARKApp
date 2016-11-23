@@ -35,10 +35,10 @@
 	<string name="ssl_accept_selfsigned_warning">You chose to accept certificates. This may decrease security of the connection. Do you want to continue?</string>
 	<string name="ssl_off_warning">You chose to turn off SSL. Connection will be unsecure. Do you want to continue?</string>
 	<string name="logging_in">Logging in</string>
-	<string name="subscribing_folders">Subscribing to folders.</string>
-	<string name="unsubscribing_folders">Unsubscribing from folders.</string>
-	<string name="subscription_token_missing_title">Missing subscription token.</string>
-	<string name="subscription_token_missing_content">The subscription token was not set. Please try again later.</string>
+	<string name="enabling_notifications">Enabling notifications on folders.</string>
+	<string name="disabling_notifications_folders">Disabling notification on folders.</string>
+	<string name="notification_token_missing_title">Missing notification token.</string>
+	<string name="notification_token_missing_content">The notification token was not set. Please try again later.</string>
 	<string name="open_drawer">Open navigation drawer</string>
 	<string name="close_drawer">Close navigation drawer</string>
 	<string name="search">Search</string>
@@ -69,8 +69,8 @@
 	<string name="links">Links</string>
 	<string name="delete_from_folder">Delete from folder</string>
 	<string name="delete">Delete</string>
-	<string name="subscribe_folder">Subscribe</string>
-	<string name="unsubscribe_folder">Unsubscribe</string>
+	<string name="enable_notifications_folder">Enable notifications</string>
+	<string name="disable_notifications_folder">Disable notifications</string>
 	<string name="add_favorites">Add to favourites</string>
 	<string name="remove_favorites">Remove from favourites</string>
 	<string name="add_offline">Enable offline mode</string>
