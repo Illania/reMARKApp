@@ -411,7 +411,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Name = filename,
                     SizeInBytes = size,
                     Stream = stream,
-                    Path = path,
+                    Path = path
                 };
 
             }).ContinueWith(async t =>
@@ -525,20 +525,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             var useTemplate = PlatformConfig.Preferences.UseTemplate;
-            if (useTemplate == Utilities.Preferences.TemplateUsageMode.DontUse)
+            if (useTemplate == Preferences.TemplateUsageMode.DontUse)
             {
                 return;
             }
 
-            if (useTemplate == Utilities.Preferences.TemplateUsageMode.Local)
+            if (useTemplate == Preferences.TemplateUsageMode.Local)
             {
                 await GetLocalTemplate();
             }
-            else if (useTemplate == Utilities.Preferences.TemplateUsageMode.Default)
+            else if (useTemplate == Preferences.TemplateUsageMode.Default)
             {
                 await GetDefaultTemplate();
             }
-            else if (useTemplate == Utilities.Preferences.TemplateUsageMode.AlwaysAsk)
+            else if (useTemplate == Preferences.TemplateUsageMode.AlwaysAsk)
             {
                 var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, Resource.Array.template_question_options, true);
                 switch (result)
