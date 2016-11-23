@@ -38,12 +38,6 @@ namespace Mark5.Mobile.Droid
         {
             base.OnCreate();
 
-            FirebaseApp.InitializeApp(this, new FirebaseOptions.Builder()
-                                                               .SetApiKey("AIzaSyAdGSIOm8bNSw7j7vJ7AmBo-jSlugkOND4")
-                                                               .SetApplicationId("1:310064787348:android:4929c9701f864e3f")
-                                                               .SetGcmSenderId("310064787348")
-                                                               .Build());
-
             Task.Run(async () =>
             {
                 var mainFolder = FileSystem.Current.LocalStorage;

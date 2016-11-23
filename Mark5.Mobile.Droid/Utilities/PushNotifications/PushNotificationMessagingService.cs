@@ -13,7 +13,7 @@ using Mark5.Mobile.Common;
 namespace Mark5.Mobile.Droid.Utilities.PushNotifications
 {
 
-    [Service(Name = "com.nordic_it.mark5.android.PushNotificationMessagingService"), IntentFilter(new[] { "com.google.firebase.MESSAGING_EVENT" })]
+    [Service, IntentFilter(new[] { "com.google.firebase.MESSAGING_EVENT" })]
     public class PushNotificationMessagingService : FirebaseMessagingService
     {
 
