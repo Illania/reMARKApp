@@ -12,6 +12,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -23,8 +24,8 @@ using Java.Interop;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
@@ -34,6 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         readonly CustomWebView newContentWebView;
         readonly AppCompatButton showOldContentButton;
         readonly CustomWebView oldContentWebView;
+        readonly Context context;
 
         public SemaphoreSlim SetGetContentAsyncSemaphore = new SemaphoreSlim(1, 1);
         SemaphoreSlim getHtmlContentInterfaceSemaphore = new SemaphoreSlim(0, 1);
@@ -59,6 +61,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public ContentView(Context context)
             : base(context)
         {
+            this.context = context;
             Orientation = Vertical;
             var layoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, 0);
             layoutParams.Weight = 1;
@@ -184,7 +187,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     oldContent = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
                 }
 
-                Post(() => oldContentWebView.LoadDataWithBaseURL(null, oldContent, "text/html", "UTF-8", null));
+                ((Activity)context).RunOnUiThread(() => oldContentWebView.LoadDataWithBaseURL(null, oldContent, "text/html", "UTF-8", null));
                 oldContentLoaded = true;
             }
         }
@@ -278,7 +281,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         async Task SetHtmlContentAsync(string htmlString)
         {
             await SetGetContentAsyncSemaphore.WaitAsync();
-            Post(() => newContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
+            ((Activity)context).RunOnUiThread(() => newContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
         }
 
         async Task<string> GetHtmlContentAsync(bool processing)
@@ -286,7 +289,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             try
             {
                 await SetGetContentAsyncSemaphore.WaitAsync();
-                Post(() => newContentWebView.LoadUrl(GetHtmlContentInterface.JavaScript));
+                ((Activity)context).RunOnUiThread(() => newContentWebView.LoadUrl(GetHtmlContentInterface.JavaScript));
 
                 await getHtmlContentInterfaceSemaphore.WaitAsync();
             }
