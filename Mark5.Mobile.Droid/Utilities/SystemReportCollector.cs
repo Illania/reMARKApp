@@ -74,17 +74,18 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine();
 
             sb.AppendLine("===== Connection information =====");
-            sb.AppendLine("Username: " + Managers.ActiveConnectionInfo.Username);
-            sb.AppendLine("Hostname: " + Managers.ActiveConnectionInfo.Hostname);
-            sb.AppendLine("Port: " + Managers.ActiveConnectionInfo.Port);
-            sb.AppendLine("SSL: " + Managers.ActiveConnectionInfo.SslMode);
-            sb.AppendLine("Friendly device name: " + Managers.ActiveConnectionInfo.FriendlyDeviceName);
-            sb.AppendLine("Installation ID: " + Managers.ActiveConnectionInfo.InstallationId);
+            sb.AppendLine("Username: " + Managers.ActiveConnectionInfo?.Username);
+            sb.AppendLine("Hostname: " + Managers.ActiveConnectionInfo?.Hostname);
+            sb.AppendLine("Port: " + Managers.ActiveConnectionInfo?.Port);
+            sb.AppendLine("SSL: " + Managers.ActiveConnectionInfo?.SslMode);
+            sb.AppendLine("Friendly device name: " + Managers.ActiveConnectionInfo?.FriendlyDeviceName);
+            sb.AppendLine("Installation ID: " + Managers.ActiveConnectionInfo?.InstallationId);
             sb.AppendLine("Firebase Instance ID: " + FirebaseInstanceId.Instance?.Token);
             sb.AppendLine();
 
             sb.AppendLine("===== Server information =====");
             sb.AppendLine(SerializationUtils.Serialize(ServerConfig.SystemSettings));
+            sb.AppendLine();
 
             sb.AppendLine("===== Preferences =====");
             foreach (var kv in PlatformConfig.Preferences.All)
