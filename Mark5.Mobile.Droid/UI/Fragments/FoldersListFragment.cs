@@ -174,8 +174,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 try
                 {
                     var remoteFolders = await Managers.FoldersManager.GetFoldersAsync(RemoteFolder, 2);
-                    RemoteFolder.SubFolders.Clear();
-                    RemoteFolder.SubFolders.AddRange(remoteFolders);
                     Adapter.Refresh(remoteFolders, Section.Remote);
                 }
                 catch (Exception ex)

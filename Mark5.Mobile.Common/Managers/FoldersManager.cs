@@ -47,6 +47,7 @@ namespace Mark5.Mobile.Common.Managers
 
                 var folders = foldersResult.Folders.WhereNotNull().Select(f => f.Convert()).ToList();
                 ProcessFolders(folders, parentFolder);
+                parentFolder.SubFolders = folders;
 
                 await foldersDataAccess.InsertOrReplaceRecursively(parentFolder.Module, folders, parentFolder);
 
