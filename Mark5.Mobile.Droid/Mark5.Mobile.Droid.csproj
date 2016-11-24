@@ -331,6 +331,8 @@
     <Compile Include="Ui\Fragments\NotificationsFragment.cs" />
     <Compile Include="Services\PushNotificationInstanceIdService.cs" />
     <Compile Include="Services\PushNotificationMessagingService.cs" />
+    <Compile Include="Utilities\PushNotificationsConverter.cs" />
+    <Compile Include="Model\PushNotification.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -503,6 +505,7 @@
     <Folder Include="Ui\Views\ContactViews\HeaderViews\" />
     <Folder Include="Ui\Common\BusMesseges\" />
     <Folder Include="Ui\Views\ShortcodeViews\" />
+    <Folder Include="Model\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
