@@ -328,7 +328,6 @@
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
     <None Include="packages.config" />
-    <None Include="google-services.json" />
     <None Include="Ui\Activities\ContactActivity.cs.orig" />
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
@@ -488,6 +487,7 @@
     <AndroidResource Include="Resources\values-v21\style.axml" />
     <AndroidResource Include="Resources\xml\filepaths.xml" />
     <AndroidResource Include="Resources\xml\preferences.axml" />
+    <AndroidResource Include="Resources\values\values-googleservices.axml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Xamarin.GooglePlayServices.Basement.32.961.0-beta1\build\Xamarin.GooglePlayServices.Basement.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Basement.32.961.0-beta1\build\Xamarin.GooglePlayServices.Basement.targets')" />

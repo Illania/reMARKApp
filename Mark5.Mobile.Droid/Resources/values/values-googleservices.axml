@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--https://developers.google.com/android/guides/google-services-plugin-->
+<resources>
+	<string name="google_app_id" translatable="false">1:310064787348:android:4929c9701f864e3f</string>
+	<string name="gcm_defaultSenderId" translatable="false">310064787348</string>
+	<string name="default_web_client_id" translatable="false">310064787348-sm28oknn4vfaktlu07bg8hesrh3envq2.apps.googleusercontent.com</string>
+	<string name="firebase_database_url" translatable="false">https://mark5-android.firebaseio.com</string>
+	<string name="google_api_key" translatable="false">AIzaSyC2dKjBZVFWy3ZhVy4_og_UTmVkyMsR7BA</string>
+	<string name="google_crash_reporting_api_key" translatable="false">AIzaSyC2dKjBZVFWy3ZhVy4_og_UTmVkyMsR7BA</string>
+</resources>
