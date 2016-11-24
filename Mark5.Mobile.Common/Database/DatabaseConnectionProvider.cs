@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: DatabaseConnectionProvider.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -12,6 +12,7 @@ using Mark5.Mobile.Common.Model;
 using PCLStorage;
 using SQLite;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Database
 {
 

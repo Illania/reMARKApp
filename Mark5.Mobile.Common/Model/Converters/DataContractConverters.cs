@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: DataContractConverters.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -12,6 +12,7 @@ using DataContract = Mark5.ServiceReference.DataContract;
 using System.Collections.Generic;
 using Mark5.Mobile.Common.Utilities;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model.Converters
 {
 

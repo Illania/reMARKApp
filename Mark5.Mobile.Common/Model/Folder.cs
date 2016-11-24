@@ -11,6 +11,7 @@ using System.Linq;
 using Mark5.Mobile.Common.Utilities;
 using SQLite;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
 

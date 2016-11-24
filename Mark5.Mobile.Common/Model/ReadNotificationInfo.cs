@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: ReadNotificationInfo.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -8,6 +8,7 @@
 using System;
 using SQLite;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
 

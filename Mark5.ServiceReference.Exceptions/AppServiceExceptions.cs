@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.ServiceReference.DataContract
 // File: AppServiceExceptions.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -10,6 +10,7 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
 
+#pragma warning disable CS1701
 namespace Mark5.ServiceReference.Exceptions
 {
 

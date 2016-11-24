@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.ServiceReference
 // File: IFileTransferServiceProxy.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mark5.ServiceReference.DataContract;
 
+#pragma warning disable CS1701
 namespace Mark5.ServiceReference.FileTransferService
 {
 

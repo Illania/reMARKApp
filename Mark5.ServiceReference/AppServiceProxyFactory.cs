@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.ServiceReference
 // File: AppServiceProxyFactory.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -9,6 +9,7 @@ using Mark5.ServiceReference.AppService;
 using System.Collections.Generic;
 using System.Linq;
 
+#pragma warning disable CS1701
 namespace Mark5.ServiceReference
 {
 

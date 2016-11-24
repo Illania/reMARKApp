@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: IAuthenticationManager.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Authenticator
 {
 

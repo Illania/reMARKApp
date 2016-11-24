@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: INotificationsDataAccess.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.DataAccess
 {
 

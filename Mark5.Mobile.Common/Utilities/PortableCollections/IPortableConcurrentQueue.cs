@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: IPortableConcurrentQueue.cs
 // Author: Ferdinando Papale <fp@nordic-it.com>
@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.PortableCollections
 {
 

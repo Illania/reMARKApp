@@ -11,6 +11,7 @@ using Mark5.Mobile.Common.Services;
 using Mark5.Mobile.Common.Utilities;
 using PCLStorage;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common
 {
 

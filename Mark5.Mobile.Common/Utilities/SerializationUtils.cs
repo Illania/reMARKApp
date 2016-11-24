@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: SerializationUtils.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Utilities
 {
 

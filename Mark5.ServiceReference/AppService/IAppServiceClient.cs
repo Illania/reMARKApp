@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.ServiceReference
 // File: IAppServiceClient.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -10,6 +10,7 @@ using System.ServiceModel;
 using Mark5.ServiceReference.DataContract;
 using Mark5.ServiceReference.Exceptions;
 
+#pragma warning disable CS1701
 namespace Mark5.ServiceReference.AppService
 {
 

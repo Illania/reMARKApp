@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.ServiceReference
 // File: AppServiceProxy.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Mark5.ServiceReference.DataContract;
 using Mark5.ServiceReference.Exceptions;
 
+#pragma warning disable CS1701
 namespace Mark5.ServiceReference.AppService
 {
 
