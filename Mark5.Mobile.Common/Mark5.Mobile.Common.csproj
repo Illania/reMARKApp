@@ -185,6 +185,7 @@
     <Compile Include="Utilities\PhonebookContactsUtilities.cs" />
     <Compile Include="Model\ContactCommunicationAddress.cs" />
     <Compile Include="Model\Support\OutgoingDocumentAttachmentDescription.cs" />
+    <Compile Include="Model\Support\OutgoingDocumentPreview.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

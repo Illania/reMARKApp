@@ -22,6 +22,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Support;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews;
@@ -307,6 +308,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 DocumentPreview.Direction = draft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
+                DocumentPreview.DateReceivedTimestamp = DateTime.Now.ToUniversalTime().ConvertDateTimeToTimestampMilliseconds();
                 await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, CreationModeFlag,
                                                                         PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1,
                                                                        0, false, false);

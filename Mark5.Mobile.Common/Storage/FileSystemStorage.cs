@@ -12,6 +12,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Common.Utilities;
 using PCLStorage;
 
@@ -233,6 +234,28 @@ namespace Mark5.Mobile.Common.Storage
                 identifiers.Add(new Guid(folder.Name));
             }
             return identifiers;
+        }
+
+        public static async Task<List<OutgoingDocumentPreview>> GetOutgoingDocumentPreviewsAsync()
+        {
+            var outgoingDocumentPreviews = new List<OutgoingDocumentPreview>();
+            foreach (var outgoingDocumentFolder in await CommonConfig.OutgoingFolder.GetFoldersAsync())
+            {
+                var isReady = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingInfo)) == ExistenceCheckResult.FileExists;
+                if (!isReady)
+                {
+                    continue;
+                }
+
+                var documentPreviewFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingDocumentPreview);
+                var outgoingDocumentPreview = new OutgoingDocumentPreview(await SerializationUtils.DeserializeAsync<DocumentPreview>(await documentPreviewFile.ReadAllTextAsync()));
+                var isFailed = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed)) == ExistenceCheckResult.FileExists;
+
+                outgoingDocumentPreview.State = isFailed ? OutgoingDocumentState.Failed : OutgoingDocumentState.Waiting;
+                outgoingDocumentPreviews.Add(outgoingDocumentPreview);
+            }
+
+            return outgoingDocumentPreviews;
         }
 
         static async Task<IFolder> GetOutgoingAttachmentsFolderAsync(Guid id)

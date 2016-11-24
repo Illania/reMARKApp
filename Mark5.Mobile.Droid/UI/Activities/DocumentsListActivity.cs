@@ -51,11 +51,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                dlf = new DocumentsListFragment
-                {
-                    Folder = folder,
-                    CloseRequest = OnBackPressed
-                };
+                dlf = folder.Local ? new OutgoingDocumentListFragment() : new DocumentsListFragment();
+                dlf.Folder = folder;
+                dlf.CloseRequest = OnBackPressed;
                 ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
                 ft.Commit();
 

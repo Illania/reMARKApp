@@ -73,6 +73,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             var remoteAttachments = attachmentsDescription.OfType<AttachmentDescription>().ToList();
             Document.Attachments.AddRange(remoteAttachments);
+            DocumentPreview.AttachmentsCount = attachmentsDescription.Count;
 
             //Nothing to do for local attachments, they're saved on disk
 

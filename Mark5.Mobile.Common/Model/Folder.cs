@@ -52,7 +52,7 @@ namespace Mark5.Mobile.Common.Model
         {
             get
             {
-                return documentsLocalRootFolder.SubFolders.Contains(this);
+                return documentsLocalRootFolder.SubFolders.Any(f => f.Id == Id);
             }
         }
 

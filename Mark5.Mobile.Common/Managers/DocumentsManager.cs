@@ -7,6 +7,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
@@ -14,13 +15,13 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Converters;
+using Mark5.Mobile.Common.Model.Exceptions;
+using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Common.Storage;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.ServiceReference.AppService;
 using Mark5.ServiceReference.FileTransferService;
 using DataContract = Mark5.ServiceReference.DataContract;
-using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Common.Model.Exceptions;
-using System.IO;
 
 namespace Mark5.Mobile.Common.Managers
 {
@@ -70,6 +71,11 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task<List<OutgoingDocumentPreview>> GetOutgoingDocumentPreviewsAsync()
+        {
+            return await FileSystemStorage.GetOutgoingDocumentPreviewsAsync();
         }
 
         public async Task<Document> GetDocumentAsync(Folder folder, int documentId, SourceType sourceType = SourceType.Auto)

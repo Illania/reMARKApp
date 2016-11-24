@@ -11,6 +11,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
+using Mark5.Mobile.Common.Model.Support;
 
 namespace Mark5.Mobile.Common.Managers
 {
@@ -23,6 +24,8 @@ namespace Mark5.Mobile.Common.Managers
         DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; }
 
         Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId = -1, int endId = -1, SourceType sourceType = SourceType.Auto);
+
+        Task<List<OutgoingDocumentPreview>> GetOutgoingDocumentPreviewsAsync();
 
         Task<Document> GetDocumentAsync(Folder folder, int documentId, SourceType sourceType = SourceType.Auto);
 

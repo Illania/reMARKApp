@@ -24,6 +24,7 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -46,15 +47,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             get { return (DocumentsListAdapter)recyclerView.GetAdapter(); }
         }
 
-        bool refreshing;
+        protected bool refreshing;
 
-        CoordinatorLayout coordinatorLayout;
-        SwipeRefreshLayout refreshLayout;
-        RecyclerView recyclerView;
-        DocumentsListAdapter adapter;
-        DocumentsListAdapter searchAdapter;
-        ActionMode actionMode;
-        SearchView searchView;
+        protected CoordinatorLayout coordinatorLayout;
+        protected SwipeRefreshLayout refreshLayout;
+        protected RecyclerView recyclerView;
+        protected DocumentsListAdapter adapter;
+        protected DocumentsListAdapter searchAdapter;
+        protected ActionMode actionMode;
+        protected SearchView searchView;
 
         bool shouldNotifyAdapter;
         bool shouldNotifySearchAdapter;
@@ -120,7 +121,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (adapter.ItemCount < 1)
             {
                 CommonConfig.Logger.Info($"No elements - will refresh...");
-
+                adapter.OutgoingDocumentAdapterMode = Folder != null && Folder.Local;
                 await RefreshData();
             }
 
@@ -276,7 +277,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        async Task RefreshData(int startId = -1, int endId = -1, bool force = false)
+        protected virtual async Task RefreshData(int startId = -1, int endId = -1, bool force = false)
         {
             try
             {
@@ -693,13 +694,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region RecyclerView Adapter/ViewHolder
 
-        class DocumentsListAdapter : RecyclerView.Adapter
+        protected class DocumentsListAdapter : RecyclerView.Adapter
         {
 
             public static class ViewType
             {
                 public const int DocumentView = 0;
                 public const int ExternalDocumentView = 1;
+                public const int OutgoingDocumentView = 2;
             }
 
             public List<DocumentPreview> Items
@@ -734,6 +736,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
+            public bool OutgoingDocumentAdapterMode //TODO find a better name
+            {
+                get;
+                set;
+            }
+
             readonly List<DocumentPreview> documentPreviewsInView = new List<DocumentPreview>(1000);
             readonly Dictionary<int, DocumentPreview> selectedDocumentsInView = new Dictionary<int, DocumentPreview>();
             readonly Action<int> loadMoreAction;
@@ -758,6 +766,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public override int GetItemViewType(int position)
             {
+                if (OutgoingDocumentAdapterMode)
+                {
+                    return ViewType.OutgoingDocumentView;
+                }
+
                 return documentPreviewsInView[position].Direction == DocumentDirection.External ? ViewType.ExternalDocumentView : ViewType.DocumentView;
             }
 
@@ -830,6 +843,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         loadMoreAction(dp.Id);
                     }
                 }
+                else if (holder is OutgoingDocumentPreviewViewHolder)
+                {
+                    var odpvh = holder as OutgoingDocumentPreviewViewHolder;
+                    var dp = documentPreviewsInView[position] as OutgoingDocumentPreview;
+
+                    odpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
+                    odpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
+
+                    var address = dp.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType).FirstOrDefault();
+                    odpvh.Recipient = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
+
+                    odpvh.Subject = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
+                    odpvh.Date = dp.DateReceivedTimestamp
+                    .ConvertTimestampMillisecondsToDateTime()
+                    .ConvertUtcToServerTime()
+                    .ConvertDateTimeToTimestampMilliseconds()
+                    .FormatServerTimestampAsCompactShortDateTimeString(context);
+                    odpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
+                    odpvh.AttachmentIndicator = dp.AttachmentsCount > 0;
+                    odpvh.WaitingIndicator = dp.State == OutgoingDocumentState.Waiting;
+                    odpvh.SendingIndicator = dp.State == OutgoingDocumentState.Sending;
+                    odpvh.FailedIndicator = dp.State == OutgoingDocumentState.Failed;
+
+                    odpvh.Selected = selectedDocumentsInView.ContainsKey(dp.Id);
+                }
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -844,6 +882,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_documents_external, parent, false);
                     return new ExternalDocumentPreviewViewHolder(itemView);
+                }
+
+                if (viewType == ViewType.OutgoingDocumentView)
+                {
+                    var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_documents_outgoing, parent, false);
+                    return new OutgoingDocumentPreviewViewHolder(itemView);
                 }
 
                 return null;
@@ -1170,6 +1214,111 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 previewTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_external_preview);
                 categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_external_categories);
                 commentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_external_comment);
+                selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
+            }
+        }
+
+        class OutgoingDocumentPreviewViewHolder : RecyclerView.ViewHolder
+        {
+
+            public string Recipient
+            {
+                set
+                {
+                    recipentTextView.Text = value;
+                }
+            }
+
+            public string Subject
+            {
+                set
+                {
+                    subjectTextView.Text = value;
+                }
+            }
+
+            public string Date
+            {
+                set
+                {
+                    dateTextView.Text = value;
+                }
+            }
+
+            public string Preview
+            {
+                set
+                {
+                    previewTextView.Text = value;
+                }
+            }
+
+
+            public bool AttachmentIndicator
+            {
+                set
+                {
+                    attachmentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
+                }
+            }
+
+
+            public bool WaitingIndicator
+            {
+                set
+                {
+                    waitingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
+                }
+            }
+
+
+            public bool FailedIndicator
+            {
+                set
+                {
+                    failedImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
+                }
+            }
+
+
+            public bool SendingIndicator
+            {
+                set
+                {
+                    sendingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
+                }
+            }
+
+
+            public bool Selected
+            {
+                set
+                {
+                    selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
+                }
+            }
+
+            readonly AppCompatTextView recipentTextView;
+            readonly AppCompatTextView dateTextView;
+            readonly AppCompatTextView subjectTextView;
+            readonly AppCompatTextView previewTextView;
+            readonly AppCompatImageView waitingImageView;
+            readonly AppCompatImageView failedImageView;
+            readonly AppCompatImageView sendingImageView;
+            readonly AppCompatImageView attachmentImageView;
+            readonly View selectedOverlay;
+
+            public OutgoingDocumentPreviewViewHolder(View itemView)
+                    : base(itemView)
+            {
+                recipentTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_outgoing_recipent); //TODO need to correct the icons for the states
+                subjectTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_outgoing_subject);
+                dateTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_outgoing_date);
+                previewTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_outgoing_preview);
+                waitingImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_outgoing_waiting);
+                failedImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_outgoing_error);
+                sendingImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_outgoing_sending);
+                attachmentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_outgoing_attachment);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
             }
         }
