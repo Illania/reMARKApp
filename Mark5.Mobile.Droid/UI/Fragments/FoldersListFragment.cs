@@ -417,18 +417,44 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             menu.Clear();
 
-            menu.Add(Menu.None, MenuItemActions.AddToFavourites, MenuItemActions.AddToFavourites, Resource.String.add_favorites).SetShowAsAction(ShowAsAction.Never);
-            menu.Add(Menu.None, MenuItemActions.RemoveFromFavourites, MenuItemActions.RemoveFromFavourites, Resource.String.remove_favorites).SetShowAsAction(ShowAsAction.Never);
+            var foldersFavoriteState = selectedFolders.Select(f => AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderFavouriteAsync(f.Module, f)));
+
+            if (foldersFavoriteState.Any(v => v))
+            {
+                menu.Add(Menu.None, MenuItemActions.RemoveFromFavourites, MenuItemActions.RemoveFromFavourites, Resource.String.remove_favorites).SetShowAsAction(ShowAsAction.Never);
+            }
+            if (foldersFavoriteState.Any(v => !v))
+            {
+                menu.Add(Menu.None, MenuItemActions.AddToFavourites, MenuItemActions.AddToFavourites, Resource.String.add_favorites).SetShowAsAction(ShowAsAction.Never);
+            }
 
             if (section != Section.Favourites)
             {
-                menu.Add(Menu.None, MenuItemActions.EnableOffline, MenuItemActions.EnableOffline, Resource.String.add_offline).SetShowAsAction(ShowAsAction.Never);
-                menu.Add(Menu.None, MenuItemActions.DisableOffline, MenuItemActions.DisableOffline, Resource.String.remove_offline).SetShowAsAction(ShowAsAction.Never);
 
-                if (RemoteFolder.Module == ModuleType.Documents)
+                var foldersAvailableOfflineState = selectedFolders.Select(f => AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderOfflineAsync(f.Module, f)));
+
+                if (foldersAvailableOfflineState.Any(v => v))
                 {
-                    menu.Add(Menu.None, MenuItemActions.Subscribe, MenuItemActions.Subscribe, Resource.String.subscribe_folder).SetShowAsAction(ShowAsAction.Never);
-                    menu.Add(Menu.None, MenuItemActions.Unsubscribe, MenuItemActions.Unsubscribe, Resource.String.unsubscribe_folder).SetShowAsAction(ShowAsAction.Never);
+                    menu.Add(Menu.None, MenuItemActions.DisableOffline, MenuItemActions.DisableOffline, Resource.String.remove_offline).SetShowAsAction(ShowAsAction.Never);
+                }
+                if (foldersAvailableOfflineState.Any(v => !v))
+                {
+                    menu.Add(Menu.None, MenuItemActions.EnableOffline, MenuItemActions.EnableOffline, Resource.String.add_offline).SetShowAsAction(ShowAsAction.Never);
+                }
+
+                if (RemoteFolder.Module == ModuleType.Documents && !string.IsNullOrEmpty(PlatformConfig.Preferences.PushNotificationToken))
+                {
+                    var foldersSubscribedState = selectedFolders.Select(f => f.Subscribed);
+
+                    if (foldersSubscribedState.Any(v => v))
+                    {
+                        menu.Add(Menu.None, MenuItemActions.Unsubscribe, MenuItemActions.Unsubscribe, Resource.String.disable_notifications_folder).SetShowAsAction(ShowAsAction.Never);
+                    }
+                    if (foldersSubscribedState.Any(v => !v))
+                    {
+                        menu.Add(Menu.None, MenuItemActions.Subscribe, MenuItemActions.Subscribe, Resource.String.enable_notifications_folder).SetShowAsAction(ShowAsAction.Never);
+                    }
+
                 }
             }
             return true;
@@ -451,12 +477,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var token = PlatformConfig.Preferences.PushNotificationToken;
             if (string.IsNullOrEmpty(token))
             {
-                Dialogs.ShowConfirmDialog(Activity, Resource.String.subscription_token_missing_title, Resource.String.subscription_token_missing_content);
+                Dialogs.ShowConfirmDialog(Activity, Resource.String.notification_token_missing_title, Resource.String.notification_token_missing_content);
                 return;
             }
 
             var module = selectedFolders.First().Module;
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, enabled ? Resource.String.subscribing_folders : Resource.String.unsubscribing_folders, Resource.String.please_wait);
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, enabled ? Resource.String.enabling_notifications : Resource.String.disabling_notifications_folders, Resource.String.please_wait);
 
             Task.Run(async () =>
             {
