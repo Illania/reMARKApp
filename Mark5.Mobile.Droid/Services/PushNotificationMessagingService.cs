@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using Android.App;
 using Android.Content;
 using Firebase.Messaging;
@@ -21,7 +22,15 @@ namespace Mark5.Mobile.Droid.Utilities.Services
         {
             CommonConfig.Logger.Info("Notification received");
 
-            var pn = message.ConvertToPushNotification();
+            try
+            {
+                var pn = message.ConvertToPushNotification();
+
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Could not process notification", ex);
+            }
         }
     }
 }
