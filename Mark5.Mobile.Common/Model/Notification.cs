@@ -51,6 +51,11 @@ namespace Mark5.Mobile.Common.Model
 
         [Ignore]
         public bool IsRead { get; set; }
+
+        public override string ToString()
+        {
+            return $"[Notification: Id={Id}, Guid={Guid}, Title={Title}, Message={Message}, Type={Type}, DateTimeTimestamp={DateTimeTimestamp}, ObjectType={ObjectType}, ObjectId={ObjectId}, FolderId={FolderId}, RemindOnTimestamp={RemindOnTimestamp}, IsSilent={IsSilent}, IsRead={IsRead}]";
+        }
     }
 }
 

@@ -76,6 +76,11 @@ namespace Mark5.Mobile.Droid.Model
         {
             get
             {
+                if (string.IsNullOrWhiteSpace(RemindOn))
+                {
+                    return 0;
+                }
+
                 return DateTime.ParseExact(RemindOn, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture).ConvertDateTimeToTimestampMilliseconds();
             }
         }
