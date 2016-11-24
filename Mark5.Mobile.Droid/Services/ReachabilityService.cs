@@ -94,7 +94,7 @@ namespace Mark5.Mobile.Droid.Services
         {
             try
             {
-                using (var httpClient = new HttpClient
+                using (var httpClient = new HttpClient(CommonConfig.HttpClientHandler())
                 {
                     Timeout = new TimeSpan(0, 0, 2)
                 })
@@ -122,7 +122,7 @@ namespace Mark5.Mobile.Droid.Services
                 var ci = Managers.ActiveConnectionInfo;
                 var url = $"{(ci.SslMode == SslMode.Off ? "http" : "https")}://{ci.Hostname}:{ci.Port}/app3";
 
-                using (var httpClient = new HttpClient
+                using (var httpClient = new HttpClient(CommonConfig.HttpClientHandler())
                 {
                     Timeout = new TimeSpan(0, 0, 2),
                 })

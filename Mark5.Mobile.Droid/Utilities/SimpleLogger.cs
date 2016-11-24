@@ -45,7 +45,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
             if (exception != null)
             {
-                logMessageBuilder.Append($"{exception.GetType()}: ").Append(exception.Message).Append(" ").Append(exception.StackTrace);
+                logMessageBuilder.AppendLine($"{exception.GetType()}: ").AppendLine(exception.Message).Append(" ").Append(exception.StackTrace);
             }
 
             LogPriority priority = LogPriority.Info;

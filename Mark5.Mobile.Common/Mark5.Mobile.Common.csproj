@@ -3,14 +3,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{32ACF699-5511-485F-B54B-5BFDB3D337AE}</ProjectGuid>
+    <ProjectGuid>{8161E607-C6EA-4BB8-B801-EE9D128240CB}</ProjectGuid>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <UseMSBuildEngine>true</UseMSBuildEngine>
     <OutputType>Library</OutputType>
     <RootNamespace>Mark5.Mobile.Common</RootNamespace>
     <AssemblyName>Mark5.Mobile.Common</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Profile78</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,151 +18,50 @@
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <NoStdLib>false</NoStdLib>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <NoStdLib>false</NoStdLib>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Storage\FileSystemStorage.cs" />
-    <Compile Include="Model\ConnectionInfo.cs" />
-    <Compile Include="Utilities\SerializationUtils.cs" />
-    <Compile Include="Model\DateRange.cs" />
-    <Compile Include="Model\Enums.cs" />
-    <Compile Include="Model\BusinessEntity.cs" />
-    <Compile Include="Model\BusinessEntityPreview.cs" />
-    <Compile Include="Model\Folder.cs" />
-    <Compile Include="Model\OptionalParameters.cs" />
-    <Compile Include="Model\SendDocumentInfo.cs" />
-    <Compile Include="Model\Document.cs" />
-    <Compile Include="Model\DocumentPreview.cs" />
-    <Compile Include="Model\DocumentAddress.cs" />
-    <Compile Include="Model\AttachmentDescription.cs" />
-    <Compile Include="Model\Comment.cs" />
-    <Compile Include="Model\Line.cs" />
-    <Compile Include="Model\TemplatePreview.cs" />
-    <Compile Include="Model\Template.cs" />
-    <Compile Include="Model\Contact.cs" />
-    <Compile Include="Model\ContactPreview.cs" />
-    <Compile Include="Model\PhysicalAddress.cs" />
-    <Compile Include="Model\CountryInfo.cs" />
-    <Compile Include="Model\PhysicalAddressType.cs" />
-    <Compile Include="Model\CommunicationAddress.cs" />
-    <Compile Include="Model\ShortcodePreview.cs" />
-    <Compile Include="Model\Shortcode.cs" />
-    <Compile Include="Model\CalendarAppointment.cs" />
-    <Compile Include="Model\CalendarTask.cs" />
-    <Compile Include="Model\CalendarCategory.cs" />
-    <Compile Include="Model\CalendarResource.cs" />
-    <Compile Include="Model\Participant.cs" />
-    <Compile Include="Model\SearchDocumentsCriteria.cs" />
-    <Compile Include="Model\SearchContactsCriteria.cs" />
-    <Compile Include="Model\SearchShortcodesCriteria.cs" />
-    <Compile Include="Model\SearchCalendarEventsCriteria.cs" />
-    <Compile Include="Model\SavedSearch.cs" />
-    <Compile Include="Model\Notification.cs" />
-    <Compile Include="Model\SystemSettings.cs" />
-    <Compile Include="Model\RecentAddress.cs" />
-    <Compile Include="Model\SystemInfo.cs" />
-    <Compile Include="Model\DocumentsModuleInfo.cs" />
-    <Compile Include="Model\ContactsModuleInfo.cs" />
-    <Compile Include="Model\ShortcodesModuleInfo.cs" />
-    <Compile Include="Model\CalendarModuleInfo.cs" />
-    <Compile Include="Model\UserInfo.cs" />
-    <Compile Include="Model\Permissions.cs" />
-    <Compile Include="Model\DocumentExtraFieldInfo.cs" />
-    <Compile Include="Model\SystemDepartment.cs" />
-    <Compile Include="Model\SystemUser.cs" />
-    <Compile Include="Model\Category.cs" />
-    <Compile Include="Model\ObjectAction.cs" />
-    <Compile Include="Model\ObjectLink.cs" />
-    <Compile Include="Model\ObjectLinkTypeInfo.cs" />
-    <Compile Include="Managers\SystemManager.cs" />
-    <Compile Include="Managers\Managers.cs" />
-    <Compile Include="Authenticator\Authenticator.cs" />
-    <Compile Include="Authenticator\IAuthenticator.cs" />
-    <Compile Include="Authenticator\AuthenticatorFactory.cs" />
     <Compile Include="CommonConfig.cs" />
-    <Compile Include="Managers\AbstractManager.cs" />
-    <Compile Include="Database\DatabaseConnectionProvider.cs" />
-    <Compile Include="Model\Converters\DataContractConverters.cs" />
-    <Compile Include="Managers\FoldersManager.cs" />
-    <Compile Include="Database\DatabaseUtils.cs" />
-    <Compile Include="Model\Containers\ContactContainer.cs" />
-    <Compile Include="Model\Containers\DocumentContainer.cs" />
-    <Compile Include="Model\Containers\ShortcodeContainer.cs" />
-    <Compile Include="Model\Containers\TemplateContainer.cs" />
+    <Compile Include="Authenticator\Authenticator.cs" />
+    <Compile Include="Authenticator\AuthenticatorFactory.cs" />
+    <Compile Include="Authenticator\IAuthenticator.cs" />
+    <Compile Include="DataAccess\CalendarDataAccess.cs" />
+    <Compile Include="DataAccess\ContactsDataAccess.cs" />
+    <Compile Include="DataAccess\DocumentsDataAccess.cs" />
     <Compile Include="DataAccess\FoldersDataAccess.cs" />
+    <Compile Include="DataAccess\ICalendarDataAccess.cs" />
+    <Compile Include="DataAccess\IContactsDataAccess.cs" />
+    <Compile Include="DataAccess\IDocumentsDataAccess.cs" />
     <Compile Include="DataAccess\IFoldersDataAccess.cs" />
-    <Compile Include="Model\ICopiable.cs" />
-    <Compile Include="Services\IReachabilityService.cs" />
+    <Compile Include="DataAccess\INotificationsDataAccess.cs" />
+    <Compile Include="DataAccess\IShortcodesDataAccess.cs" />
+    <Compile Include="DataAccess\NotificationsDataAccess.cs" />
+    <Compile Include="DataAccess\ShortcodesDataAccess.cs" />
     <Compile Include="DataAccess\Exceptions\DataAccessException.cs" />
     <Compile Include="DataAccess\Exceptions\DataNotFoundException.cs" />
+    <Compile Include="Database\DatabaseConnectionProvider.cs" />
+    <Compile Include="Database\DatabaseUtils.cs" />
     <Compile Include="Extensions\LinqExtensions.cs" />
-    <Compile Include="Model\IBusinessEntity.cs" />
-    <Compile Include="DataAccess\IDocumentsDataAccess.cs" />
-    <Compile Include="DataAccess\DocumentsDataAccess.cs" />
-    <Compile Include="Model\Links\FolderDocumentLink.cs" />
-    <Compile Include="Model\Links\FolderContactLink.cs" />
-    <Compile Include="Model\Links\FolderShortcodeLink.cs" />
-    <Compile Include="Model\Links\FolderCalendarAppointmentLink.cs" />
-    <Compile Include="Model\Links\FolderCalendarTaskLink.cs" />
-    <Compile Include="Managers\DocumentsManager.cs" />
-    <Compile Include="DataAccess\IContactsDataAccess.cs" />
-    <Compile Include="DataAccess\ContactsDataAccess.cs" />
-    <Compile Include="DataAccess\IShortcodesDataAccess.cs" />
-    <Compile Include="DataAccess\ShortcodesDataAccess.cs" />
-    <Compile Include="DataAccess\ICalendarDataAccess.cs" />
-    <Compile Include="DataAccess\CalendarDataAccess.cs" />
-    <Compile Include="Managers\ContactsManager.cs" />
-    <Compile Include="Managers\ShortcodesManager.cs" />
-    <Compile Include="Managers\CalendarManager.cs" />
-    <Compile Include="Managers\NotificationsManager.cs" />
-    <Compile Include="Model\SystemUsersDepartments.cs" />
-    <Compile Include="Model\DefaultTemplateInfo.cs" />
-    <Compile Include="Model\IdValue.cs" />
-    <Compile Include="Managers\SearchManager.cs" />
-    <Compile Include="Model\SearchDocumentsResult.cs" />
-    <Compile Include="Model\SearchContactsResult.cs" />
-    <Compile Include="Model\SearchShortcodesResult.cs" />
-    <Compile Include="DataAccess\INotificationsDataAccess.cs" />
-    <Compile Include="DataAccess\NotificationsDataAccess.cs" />
-    <Compile Include="Model\NotificationSettings.cs" />
-    <Compile Include="Model\CommentsValue.cs" />
-    <Compile Include="Managers\CommonActionsManager.cs" />
-    <Compile Include="Model\CategoriesValue.cs" />
-    <Compile Include="Model\SearchCalendarTasksResult.cs" />
-    <Compile Include="Model\SearchCalendarAppointmentsResult.cs" />
-    <Compile Include="Model\Attachment.cs" />
     <Compile Include="Extensions\SQLiteConnectionExtensions.cs" />
-    <Compile Include="Managers\OutgoingDocumentsManager.cs" />
-    <Compile Include="Utilities\PortableCollections\IPortableConcurrentQueue.cs" />
-    <Compile Include="Model\Support\OutgoingDocumentInfo.cs" />
-    <Compile Include="Utilities\PortableCollections\CrossPlatformCollectionsExtensions.cs" />
-    <Compile Include="Model\Support\OutgoingDocumentContainer.cs" />
-    <Compile Include="Managers\DownloadManager.cs" />
-    <Compile Include="Model\Support\DownloadItemInfo.cs" />
-    <Compile Include="Model\Support\DownloadPolicy.cs" />
+    <Compile Include="Managers\AbstractManager.cs" />
+    <Compile Include="Managers\CalendarManager.cs" />
     <Compile Include="Managers\CleanUpManager.cs" />
-    <Compile Include="Tester\ITester.cs" />
-    <Compile Include="Tester\Tester.cs" />
-    <Compile Include="Tester\TesterFactory.cs" />
-    <Compile Include="Utilities\TaskExtensions.cs" />
-    <Compile Include="Utilities\AbstractLogger.cs" />
-    <Compile Include="Utilities\ILogger.cs" />
-    <Compile Include="Utilities\Validator.cs" />
-    <Compile Include="Utilities\IDeviceInfoProvider.cs" />
+    <Compile Include="Managers\CommonActionsManager.cs" />
+    <Compile Include="Managers\ContactsManager.cs" />
+    <Compile Include="Managers\DocumentsManager.cs" />
+    <Compile Include="Managers\DownloadManager.cs" />
+    <Compile Include="Managers\FoldersManager.cs" />
     <Compile Include="Managers\ICalendarManager.cs" />
     <Compile Include="Managers\ICleanUpManager.cs" />
     <Compile Include="Managers\ICommonActionsManager.cs" />
     <Compile Include="Managers\IContactsManager.cs" />
+    <Compile Include="Managers\IDocumentsManager.cs" />
     <Compile Include="Managers\IDownloadManager.cs" />
     <Compile Include="Managers\IFoldersManager.cs" />
     <Compile Include="Managers\INotificationsManager.cs" />
@@ -172,91 +69,124 @@
     <Compile Include="Managers\ISearchManager.cs" />
     <Compile Include="Managers\IShortcodesManager.cs" />
     <Compile Include="Managers\ISystemManager.cs" />
+    <Compile Include="Managers\Managers.cs" />
+    <Compile Include="Managers\NotificationsManager.cs" />
+    <Compile Include="Managers\OutgoingDocumentsManager.cs" />
+    <Compile Include="Managers\SearchManager.cs" />
+    <Compile Include="Managers\ShortcodesManager.cs" />
+    <Compile Include="Managers\SystemManager.cs" />
+    <Compile Include="Model\Attachment.cs" />
+    <Compile Include="Model\AttachmentDescription.cs" />
+    <Compile Include="Model\BusinessEntity.cs" />
+    <Compile Include="Model\BusinessEntityPreview.cs" />
+    <Compile Include="Model\CalendarAppointment.cs" />
+    <Compile Include="Model\CalendarCategory.cs" />
+    <Compile Include="Model\CalendarModuleInfo.cs" />
+    <Compile Include="Model\CalendarResource.cs" />
+    <Compile Include="Model\CalendarTask.cs" />
+    <Compile Include="Model\CategoriesValue.cs" />
+    <Compile Include="Model\Category.cs" />
+    <Compile Include="Model\Comment.cs" />
+    <Compile Include="Model\CommentsValue.cs" />
+    <Compile Include="Model\CommunicationAddress.cs" />
+    <Compile Include="Model\ConnectionInfo.cs" />
+    <Compile Include="Model\Contact.cs" />
+    <Compile Include="Model\ContactPreview.cs" />
+    <Compile Include="Model\ContactsModuleInfo.cs" />
+    <Compile Include="Model\CountryInfo.cs" />
+    <Compile Include="Model\DateRange.cs" />
+    <Compile Include="Model\DefaultTemplateInfo.cs" />
+    <Compile Include="Model\Document.cs" />
+    <Compile Include="Model\DocumentAddress.cs" />
+    <Compile Include="Model\DocumentExtraFieldInfo.cs" />
+    <Compile Include="Model\DocumentPreview.cs" />
+    <Compile Include="Model\DocumentsModuleInfo.cs" />
+    <Compile Include="Model\Enums.cs" />
+    <Compile Include="Model\Folder.cs" />
+    <Compile Include="Model\IBusinessEntity.cs" />
+    <Compile Include="Model\ICopiable.cs" />
+    <Compile Include="Model\IdValue.cs" />
+    <Compile Include="Model\Line.cs" />
+    <Compile Include="Model\Notification.cs" />
+    <Compile Include="Model\NotificationSettings.cs" />
+    <Compile Include="Model\ObjectAction.cs" />
+    <Compile Include="Model\ObjectLink.cs" />
+    <Compile Include="Model\ObjectLinkTypeInfo.cs" />
+    <Compile Include="Model\OptionalParameters.cs" />
+    <Compile Include="Model\Participant.cs" />
+    <Compile Include="Model\Permissions.cs" />
+    <Compile Include="Model\PhysicalAddress.cs" />
+    <Compile Include="Model\PhysicalAddressType.cs" />
     <Compile Include="Model\ReadByValue.cs" />
-    <Compile Include="Utilities\AsyncHelpers.cs" />
-    <Compile Include="Utilities\StringExtensions.cs" />
-    <Compile Include="Utilities\DateTimeUtils.cs" />
-    <Compile Include="Managers\IDocumentsManager.cs" />
-    <Compile Include="Storage\FileSystemStorageUpdater.cs" />
-    <Compile Include="Model\Exceptions\InvalidSourceTypeException.cs" />
     <Compile Include="Model\ReadNotificationInfo.cs" />
+    <Compile Include="Model\RecentAddress.cs" />
+    <Compile Include="Model\SavedSearch.cs" />
+    <Compile Include="Model\SearchCalendarAppointmentsResult.cs" />
+    <Compile Include="Model\SearchCalendarEventsCriteria.cs" />
+    <Compile Include="Model\SearchCalendarTasksResult.cs" />
+    <Compile Include="Model\SearchContactsCriteria.cs" />
+    <Compile Include="Model\SearchContactsResult.cs" />
+    <Compile Include="Model\SearchDocumentsCriteria.cs" />
+    <Compile Include="Model\SearchDocumentsResult.cs" />
+    <Compile Include="Model\SearchShortcodesCriteria.cs" />
+    <Compile Include="Model\SearchShortcodesResult.cs" />
+    <Compile Include="Model\SendDocumentInfo.cs" />
+    <Compile Include="Model\Shortcode.cs" />
+    <Compile Include="Model\ShortcodePreview.cs" />
+    <Compile Include="Model\ShortcodesModuleInfo.cs" />
+    <Compile Include="Model\SystemDepartment.cs" />
+    <Compile Include="Model\SystemInfo.cs" />
+    <Compile Include="Model\SystemSettings.cs" />
+    <Compile Include="Model\SystemUser.cs" />
+    <Compile Include="Model\SystemUsersDepartments.cs" />
+    <Compile Include="Model\Template.cs" />
+    <Compile Include="Model\TemplatePreview.cs" />
+    <Compile Include="Model\UserInfo.cs" />
+    <Compile Include="Model\Containers\ContactContainer.cs" />
+    <Compile Include="Model\Containers\DocumentContainer.cs" />
+    <Compile Include="Model\Containers\ShortcodeContainer.cs" />
+    <Compile Include="Model\Containers\TemplateContainer.cs" />
+    <Compile Include="Model\Converters\DataContractConverters.cs" />
+    <Compile Include="Model\Exceptions\InvalidSourceTypeException.cs" />
+    <Compile Include="Model\Links\FolderCalendarAppointmentLink.cs" />
+    <Compile Include="Model\Links\FolderCalendarTaskLink.cs" />
+    <Compile Include="Model\Links\FolderContactLink.cs" />
+    <Compile Include="Model\Links\FolderDocumentLink.cs" />
+    <Compile Include="Model\Links\FolderShortcodeLink.cs" />
+    <Compile Include="Model\Support\DownloadItemInfo.cs" />
+    <Compile Include="Model\Support\DownloadPolicy.cs" />
+    <Compile Include="Model\Support\OutgoingDocumentContainer.cs" />
+    <Compile Include="Model\Support\OutgoingDocumentInfo.cs" />
+    <Compile Include="Services\IReachabilityService.cs" />
+    <Compile Include="Storage\FileSystemStorage.cs" />
+    <Compile Include="Storage\FileSystemStorageUpdater.cs" />
+    <Compile Include="Tester\ITester.cs" />
+    <Compile Include="Tester\Tester.cs" />
+    <Compile Include="Tester\TesterFactory.cs" />
+    <Compile Include="Utilities\AbstractLogger.cs" />
+    <Compile Include="Utilities\AsyncHelpers.cs" />
+    <Compile Include="Utilities\DateTimeUtils.cs" />
+    <Compile Include="Utilities\IDeviceInfoProvider.cs" />
+    <Compile Include="Utilities\ILogger.cs" />
+    <Compile Include="Utilities\SerializationUtils.cs" />
+    <Compile Include="Utilities\StringExtensions.cs" />
+    <Compile Include="Utilities\TaskExtensions.cs" />
+    <Compile Include="Utilities\Validator.cs" />
+    <Compile Include="Utilities\PortableCollections\CrossPlatformCollectionsExtensions.cs" />
+    <Compile Include="Utilities\PortableCollections\IPortableConcurrentQueue.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Storage\" />
-    <Folder Include="Model\" />
-    <Folder Include="Utilities\" />
-    <Folder Include="Managers\" />
-    <Folder Include="Model\Converters\" />
-    <Folder Include="Authenticator\" />
-    <Folder Include="Database\" />
-    <Folder Include="Model\Containers\" />
-    <Folder Include="DataAccess\" />
-    <Folder Include="Services\" />
-    <Folder Include="DataAccess\Exceptions\" />
-    <Folder Include="Extensions\" />
-    <Folder Include="Model\Links\" />
-    <Folder Include="Utilities\PortableCollections\" />
-    <Folder Include="Model\Support\" />
-    <Folder Include="Tester\" />
-    <Folder Include="Model\Exceptions\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="PCLStorage">
-      <HintPath>..\packages\PCLStorage.1.0.2\lib\portable-net45+wp8+wpa81+win8+monoandroid+monotouch+Xamarin.iOS+Xamarin.Mac\PCLStorage.dll</HintPath>
-    </Reference>
-    <Reference Include="PCLStorage.Abstractions">
-      <HintPath>..\packages\PCLStorage.1.0.2\lib\portable-net45+wp8+wpa81+win8+monoandroid+monotouch+Xamarin.iOS+Xamarin.Mac\PCLStorage.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\portable-net45+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Threading.Tasks">
-      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\portable-net45+win8+wp8+wpa81\Microsoft.Threading.Tasks.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Threading.Tasks.Extensions">
-      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\portable-net45+win8+wp8+wpa81\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http">
-      <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\portable-net40+sl4+win8+wp71+wpa81\System.Net.Http.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http.Primitives">
-      <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\portable-net40+sl4+win8+wp71+wpa81\System.Net.Http.Primitives.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCL.raw">
-      <HintPath>..\packages\SQLitePCL.raw.0.9.3\lib\portable-net45+netcore45+wp8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\SQLitePCL.raw.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCL.batteries">
-      <HintPath>..\packages\SQLitePCL.bundle_green.0.9.3\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\SQLitePCL.batteries.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLite-net">
-      <HintPath>..\packages\sqlite-net-pcl.1.2.0\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\SQLite-net.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.core">
-      <HintPath>..\packages\SQLitePCLRaw.core.1.1.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.batteries_green">
-      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.batteries_v2">
-      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Collections.Immutable">
-      <HintPath>..\packages\System.Collections.Immutable.1.3.0\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference\Mark5.ServiceReference.csproj">
-      <Project>{9E3D3694-5B7B-4605-A912-EAA3602C6BB5}</Project>
+      <Project>{C98C420B-DDE1-4FEB-BA40-6EE199E46D21}</Project>
       <Name>Mark5.ServiceReference</Name>
     </ProjectReference>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
-      <Project>{022EE3DF-AD72-4537-9531-262A320E9334}</Project>
+      <Project>{6C099FEF-30C6-4D04-917A-FB0C3E561D93}</Project>
       <Name>Mark5.ServiceReference.Exceptions</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
-  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
 </Project>
