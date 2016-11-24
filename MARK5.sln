@@ -52,12 +52,11 @@ Global
 		$0.TextStylePolicy = $2
 		$2.FileWidth = 160
 		$2.EolMarker = Unix
-		$2.inheritsSet = null
+		$2.inheritsSet = VisualStudio
 		$2.inheritsScope = text/plain
-		$2.scope = application/android+xml
+		$2.scope = text/x-csharp
 		$0.CSharpFormattingPolicy = $3
 		$3.IndentSwitchSection = True
-		$3.IndentSwitchCaseSection = False
 		$3.NewLinesForBracesInProperties = True
 		$3.NewLinesForBracesInAccessors = True
 		$3.NewLinesForBracesInAnonymousMethods = True
@@ -81,5 +80,18 @@ Global
 		$4.inheritsSet = null
 		$4.inheritsScope = application/xml
 		$4.scope = application/android+xml
+		$0.NameConventionPolicy = $5
+		$5.Rules = $6
+		$6.NamingRule = $7
+		$7.Name = Type Parameters
+		$7.AffectedEntity = TypeParameter
+		$7.VisibilityMask = VisibilityMask
+		$7.NamingStyle = PascalCase
+		$7.IncludeInstanceMembers = True
+		$7.IncludeStaticEntities = True
+		$7.RequiredPrefixes = $8
+		$8.String = T
+		$7.RequiredSuffixes = $9
+		$9.String = Exception
 	EndGlobalSection
 EndGlobal

@@ -169,7 +169,7 @@ namespace Mark5.Mobile.Common.Managers
             foreach (var folder in folders)
             {
                 folder.ParentFolderId = parentFolder?.Id ?? 0;
-                folder.Path = parentPath + Folder.PathSeparator + folder.Name;
+                folder.Path = parentPath + CommonConfig.PathSeparator + folder.Name;
                 if (folder.HasSubFolders && folder.SubFolders.Count > 0)
                 {
                     ProcessFolders(folder.SubFolders, folder);

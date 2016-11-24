@@ -6,11 +6,11 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Runtime;
-using Firebase;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Utilities;
@@ -42,6 +42,7 @@ namespace Mark5.Mobile.Droid
             {
                 var mainFolder = FileSystem.Current.LocalStorage;
 
+                CommonConfig.PathSeparator = Path.PathSeparator;
                 CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "data"), CreationCollisionOption.OpenIfExists); ;
                 CommonConfig.OutgoingFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "out"), CreationCollisionOption.OpenIfExists); ;
                 CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "db"), CreationCollisionOption.OpenIfExists); ;

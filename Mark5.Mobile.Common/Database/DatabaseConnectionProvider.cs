@@ -111,7 +111,7 @@ namespace Mark5.Mobile.Common.Database
 
         DatabaseConnectionProvider(string dbFileName)
         {
-            connection = new SQLiteConnection(PortablePath.Combine(CommonConfig.DatabaseFolder.Path, dbFileName), true);
+            connection = new SQLiteConnection(CommonConfig.DatabaseFolder.Path + CommonConfig.PathSeparator + dbFileName, true);
 #if DEBUG
             connection.Trace = true;
 #endif

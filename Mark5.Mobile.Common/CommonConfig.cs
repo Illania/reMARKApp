@@ -17,7 +17,7 @@ namespace Mark5.Mobile.Common
     public static class CommonConfig
     {
 
-        public static string PathSeparator { get; set; }
+        public static char PathSeparator { get; set; }
 
         public static IFolder DataFolder { get; set; }
 

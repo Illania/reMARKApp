@@ -78,7 +78,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
             public override bool OnTouchEvent(MotionEvent e)
             {
-                if (MotionEventCompat.FindPointerIndex(e, 0) != -1)
+                if (e.FindPointerIndex(0) != -1)
                 {
                     RequestDisallowInterceptTouchEvent(e.PointerCount > 1);
                 }
