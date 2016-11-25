@@ -28,6 +28,8 @@ namespace Mark5.Mobile.Common.Managers
 
         SemaphoreSlim semaphore;
 
+        public event EventHandler<Guid> DocumentAddedToQueue = delegate { };
+        public event EventHandler<OutgoingDocumentContainer> DocumentBeingSent = delegate { };
         public event EventHandler<OutgoingDocumentContainer> DocumentSendingSuccessful = delegate { };
         public event EventHandler<OutgoingDocumentContainer> DocumentSendingFailed = delegate { };
 
@@ -56,6 +58,7 @@ namespace Mark5.Mobile.Common.Managers
 
         public void Notify(Guid identifier)
         {
+            DocumentAddedToQueue(this, identifier);
             AddToQueue(identifier);
         }
 
@@ -187,6 +190,9 @@ namespace Mark5.Mobile.Common.Managers
                     bool sendSuccessful = false;
                     try
                     {
+
+                        DocumentBeingSent(this, container);
+
                         var attachmentGuids = new List<Guid>();
 
                         foreach (var attachment in await FileSystemStorage.GetOutgoingDocumentAttachmentsAsync(identifier))
