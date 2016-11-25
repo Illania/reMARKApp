@@ -68,7 +68,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             readStatusToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(m =>
             {
-                if (dlf != null && m.Sender != dlf && dlf.Folder.Id == m.FolderId)
+                if (dlf != null && m.Sender != dlf)
                 {
                     dlf.UpdateReadStatus(m);
                 }

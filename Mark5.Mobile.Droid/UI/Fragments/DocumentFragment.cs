@@ -500,6 +500,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     {
                         if (token.IsCancellationRequested) return;
                         if (!IsAdded || IsDetached || IsRemoving) return;
+                        if (dp == null) return;
 
                         RefreshView<RecipentsView>();
                         PlatformConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, dp.Id, dp.IsReadByCurrent, dp.IsReadByAnyone));
