@@ -28,11 +28,18 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         Toolbar toolbar;
 
         DocumentsListFragment dlf;
+        OutgoingDocumentsListFragment odlf;
 
         TinyMessageSubscriptionToken readStatusToken;
         TinyMessageSubscriptionToken categoriesToken;
         TinyMessageSubscriptionToken commentCountToken;
         TinyMessageSubscriptionToken entityMovedToken;
+
+        const string dlfFragmentTagKey = "DocumentsListFragmentTagKey";
+        string dlfFragmentTag = string.Empty;
+
+        const string odlfFragmentTagKey = "OutgoingDocumentsListFragmentTagKey";
+        string odlfFragmentTag = string.Empty;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -51,16 +58,42 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                dlf = folder.Local ? new OutgoingDocumentListFragment() : new DocumentsListFragment();
-                dlf.Folder = folder;
-                dlf.CloseRequest = OnBackPressed;
-                ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
-                ft.Commit();
+                if (folder.Local)
+                {
+                    odlf = new OutgoingDocumentsListFragment();
+                    odlf.CloseRequest = OnBackPressed;
+                    odlfFragmentTag = odlf.GenerateTag();
+                    ft.Replace(Resource.Id.fragment_container, odlf, odlfFragmentTag);
+                    ft.Commit();
+                }
+                else
+                {
+                    dlf = new DocumentsListFragment();
+                    dlf.Folder = folder;
+                    dlf.CloseRequest = OnBackPressed;
+                    dlfFragmentTag = dlf.GenerateTag();
+                    ft.Replace(Resource.Id.fragment_container, dlf, dlfFragmentTag);
+                    ft.Commit();
+                }
 
                 CommonConfig.Logger.Info($"Created {nameof(DocumentsListActivity)}");
             }
             else
             {
+                dlfFragmentTag = savedInstanceState.GetString(dlfFragmentTagKey);
+                if (!string.IsNullOrEmpty(dlfFragmentTag))
+                {
+                    dlf = SupportFragmentManager.FindFragmentByTag(dlfFragmentTag) as DocumentsListFragment;
+                    CommonConfig.Logger.Info($"Reassigned {nameof(DocumentsListFragment)}");
+                }
+
+                odlfFragmentTag = savedInstanceState.GetString(odlfFragmentTagKey);
+                if (!string.IsNullOrEmpty(odlfFragmentTag))
+                {
+                    odlf = SupportFragmentManager.FindFragmentByTag(odlfFragmentTag) as OutgoingDocumentsListFragment;
+                    CommonConfig.Logger.Info($"Reassigned {nameof(OutgoingDocumentsListFragment)}");
+                }
+
                 CommonConfig.Logger.Info($"Restored {nameof(DocumentsListActivity)}");
             }
 
@@ -95,6 +128,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                    dlf.RemoveMovedEntities(m);
                }
            });
+        }
+
+        protected override void OnSaveInstanceState(Bundle outState)
+        {
+
+            outState.PutString(dlfFragmentTagKey, dlfFragmentTag);
+            outState.PutString(odlfFragmentTagKey, odlfFragmentTag);
+            base.OnSaveInstanceState(outState);
         }
 
         protected override void OnDestroy()
