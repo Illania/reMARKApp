@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using Android.App;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -27,6 +28,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string ShortcodeIdIntentKey = "ShortcodeId_3b7133eb-aa8c-44e9-be83-e984c5c43967";
         public const string ShortcodePreviewIntentKey = "ShortcodePreview_0bd291a4-22a5-431c-ad6e-4c8b273eeb98";
         public const string ReadOnlyModeIntentKey = "ReadOnlyMode_5676137e-22ab-4bf9-bff5-de812892c121";
+        public const string NotificationGuidIntentKey = "NotificationGuid_f1cdbdf5-3f62-4545-ae60-8acfd6a5c750";
 
         const string sfFragmentTagKey = "fragmentTagKey";
         string sfFragmentTag;
@@ -69,6 +71,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (Intent.HasExtra(ReadOnlyModeIntentKey))
                     sf.ReadOnlyMode = Intent.Extras.GetBoolean(ReadOnlyModeIntentKey);
+
+                if (Intent.HasExtra(NotificationGuidIntentKey))
+                    sf.NotificationGuid = SerializationUtils.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
 
                 sf.CloseRequest = OnBackPressed;
 

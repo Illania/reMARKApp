@@ -429,6 +429,16 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        public async Task SaveNotification(Notification notification)
+        {
+            await notificationsDataAccess.SaveNotifications(new List<Notification> { notification });
+        }
+
+        public async Task MarkAsRead(Guid notificationGuid)
+        {
+            await notificationsDataAccess.MarkAsRead(notificationGuid);
+        }
+
         public async Task MarkAsRead(Notification notification)
         {
             await notificationsDataAccess.MarkAsRead(notification);

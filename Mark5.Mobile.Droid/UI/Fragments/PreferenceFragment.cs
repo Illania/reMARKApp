@@ -8,22 +8,30 @@
 using System;
 using System.Threading.Tasks;
 using Android.Content;
+using Android.Media;
 using Android.OS;
+using Android.Provider;
 using Android.Support.V4.App;
 using Android.Support.V7.App;
 using Android.Support.V7.Preferences;
+using Firebase.Iid;
 using HockeyApp.Android;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
 
     public class PreferenceFragment : PreferenceFragmentCompat, PreferenceFragmentCompat.IOnPreferenceStartScreenCallback, ISharedPreferencesOnSharedPreferenceChangeListener
     {
+
+        static class RequestCodes
+        {
+            public static int NotificationRingtone = 1;
+        }
 
         public override Fragment CallbackFragment
         {
@@ -49,6 +57,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             PreferenceManager.SharedPreferences.UnregisterOnSharedPreferenceChangeListener(this);
         }
 
+        public override void OnActivityResult(int requestCode, int resultCode, Intent data)
+        {
+            if (resultCode == (int)Android.App.Result.Ok && requestCode == RequestCodes.NotificationRingtone)
+            {
+                var uri = data.GetParcelableExtra(RingtoneManager.ExtraRingtonePickedUri);
+                PlatformConfig.Preferences.NotificationsRingtone = uri?.ToString() ?? string.Empty;
+            }
+        }
+
         public override void OnCreatePreferences(Bundle savedInstanceState, string rootKey)
         {
             SetPreferencesFromResource(Resource.Xml.preferences, rootKey);
@@ -62,6 +79,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override bool OnPreferenceTreeClick(Preference preference)
         {
+            if (preference.Key == GetString(Resource.String.pref_key_notification_ringtone))
+            {
+                var i = new Intent(RingtoneManager.ActionRingtonePicker);
+                i.PutExtra(RingtoneManager.ExtraRingtoneType, (int)RingtoneType.Notification);
+                i.PutExtra(RingtoneManager.ExtraRingtoneTitle, GetString(Resource.String.pref_notification_ringtone_title));
+                i.PutExtra(RingtoneManager.ExtraRingtoneDefaultUri, Settings.System.DefaultNotificationUri);
+                if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.NotificationsRingtone))
+                {
+                    i.PutExtra(RingtoneManager.ExtraRingtoneExistingUri, Android.Net.Uri.Parse(PlatformConfig.Preferences.NotificationsRingtone));
+                }
+                StartActivityForResult(i, RequestCodes.NotificationRingtone);
+                return true;
+            }
+
             if (preference.Key == GetString(Resource.String.pref_key_advanced_send_feedback))
             {
                 FeedbackManager.ShowFeedbackActivity(Activity);
@@ -95,10 +126,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                             {
                                 try
                                 {
-                                    var ss = await Managers.SystemManager.GetSystemSettingsAsync();
+                                    FirebaseInstanceId.Instance?.DeleteInstanceId();
+                                    var _nullToken = FirebaseInstanceId.Instance?.Token; // Token will be null, but it will cause refresh
+
+                                    var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Remote);
                                     ServerConfig.SystemSettings = ss;
 
-                                    await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+                                    await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Remote);
 
                                     dismissAction();
                                 }

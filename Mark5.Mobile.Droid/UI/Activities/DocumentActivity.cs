@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 
+using System;
 using System.Collections.Generic;
 using Android.App;
 using Android.OS;
@@ -29,6 +30,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string DocumentIdIntentKey = "DocumentId_690fc3d6-ae73-4f5e-844a-06bdc44b6747";
         public const string DocumentPreviewIntentKey = "DocumentPreview_0bd291a4-22a5-431c-ad6e-4c8b273eeb98";
         public const string ReadOnlyModeIntentKey = "ReadOnlyMode_c23890cf-06fc-45d7-86c8-76c4c8027daf";
+        public const string NotificationGuidIntentKey = "NotificationGuid_0473a08d-5f96-4acd-924a-6d160a23cdf2";
 
         const string dfFragmentTagKey = "fragmentTagKey";
         string dfFragmentTag;
@@ -70,6 +72,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (Intent.HasExtra(ReadOnlyModeIntentKey))
                     df.ReadOnlyMode = Intent.Extras.GetBoolean(ReadOnlyModeIntentKey);
+
+                if (Intent.HasExtra(NotificationGuidIntentKey))
+                    df.NotificationGuid = SerializationUtils.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
 
                 df.CloseRequest = OnBackPressed;
 

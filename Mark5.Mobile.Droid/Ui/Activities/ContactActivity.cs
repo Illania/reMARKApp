@@ -32,6 +32,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string ContactIdIntentKey = "ContactId_248178bc-e0e4-4ca2-aad5-ffaed65514e5";
         public const string ContactPreviewIntentKey = "ContactPreview_0da27d12-4d29-4f44-8dbf-2e28d7f93aae";
         public const string ReadOnlyModeIntentKey = "ReadOnlyMode_660e0fd1-17df-46f2-a4c2-44dacb9f0a76";
+        public const string NotificationGuidIntentKey = "NotificationGuid_d0224832-22e3-481b-9c0d-78b361a57691";
 
         const string cfFragmentTagKey = "fragmentTagKey";
         string cfFragmentTag;
@@ -83,6 +84,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (Intent.HasExtra(ReadOnlyModeIntentKey))
                     cf.ReadOnlyMode = Intent.Extras.GetBoolean(ReadOnlyModeIntentKey);
+
+                if (Intent.HasExtra(NotificationGuidIntentKey))
+                    cf.NotificationGuid = SerializationUtils.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
 
                 cf.CloseRequest = OnBackPressed;
 

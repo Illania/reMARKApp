@@ -9,6 +9,8 @@
 	<string name="pref_key_cat_compose">pref_key_cat_compose</string>
 	<string name="pref_cat_compose">Composing documents</string>
 	<string name="pref_key_cat_cache">pref_key_cat_cache</string>
+	<string name="pref_key_cat_notifications">pref_key_cat_notifications</string>
+	<string name="pref_cat_notifications">Notifications</string>
 	<string name="pref_cat_cache">Cache</string>
 	<string name="pref_key_cat_advanced">pref_key_cat_advanced</string>
 	<string name="pref_cat_advanced">Advanced</string>
@@ -58,6 +60,14 @@
 	<string name="pref_key_compose_template_local">pref_key_compose_template_local</string>
 	<string name="pref_compose_template_local_title">Local template</string>
 	<string name="pref_compose_template_local_summary">Custom template available only on this device.</string>
+	<string name="pref_key_notification_silence">pref_key_notification_silence</string>
+	<string name="pref_notification_silence_title">Do not show notifications</string>
+	<string name="pref_notification_silence_summary_on">Notifications will be visible only in MARK5 app</string>
+	<string name="pref_notification_silence_summary_off">Notifications will be shown in MARK5 app and system drawer</string>
+	<string name="pref_key_notification_ringtone">pref_key_notification_ringtone</string>
+	<string name="pref_notification_ringtone_title">Notification sound</string>
+	<string name="pref_key_notification_vibrate">pref_key_notification_vibrate</string>
+	<string name="pref_notification_vibrate_title">Vibration</string>
 	<string name="pref_key_cache_auto_clean">pref_key_cache_auto_clean</string>
 	<string name="pref_cache_auto_clean_title">Cache clean up</string>
 	<string name="pref_cache_auto_clean_summary">Cache will be cleaned up every %s</string>

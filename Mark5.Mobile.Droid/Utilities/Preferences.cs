@@ -104,6 +104,48 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
+        public bool SilenceNotifications
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_notification_silence), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_notification_silence_default));
+            }
+            set
+            {
+                var e = sp.Edit();
+                e.PutBoolean(Application.Context.GetString(Resource.String.pref_key_notification_silence), value);
+                e.Commit();
+            }
+        }
+
+        public string NotificationsRingtone
+        {
+            get
+            {
+                return sp.GetString(Application.Context.GetString(Resource.String.pref_key_notification_ringtone), Application.Context.Resources.GetString(Resource.String.pref_notification_ringtone_default));
+            }
+            set
+            {
+                var e = sp.Edit();
+                e.PutString(Application.Context.GetString(Resource.String.pref_key_notification_ringtone), value);
+                e.Commit();
+            }
+        }
+
+        public bool NotificationsVibrate
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_notification_vibrate), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_notification_vibrate_default));
+            }
+            set
+            {
+                var e = sp.Edit();
+                e.PutBoolean(Application.Context.GetString(Resource.String.pref_key_notification_vibrate), value);
+                e.Commit();
+            }
+        }
+
         public int CleanCacheIntervalDays
         {
             get
@@ -126,6 +168,14 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
+        public bool EnableReporting
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_advanced_enable_reporting), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_advanced_enable_reporting_default));
+            }
+        }
+
         public string PushNotificationToken
         {
             get
@@ -137,14 +187,6 @@ namespace Mark5.Mobile.Droid.Utilities
                 var e = sp.Edit();
                 e.PutString(Application.Context.GetString(Resource.String.push_notification_token), value);
                 e.Commit();
-            }
-        }
-
-        public bool EnableReporting
-        {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_advanced_enable_reporting), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_advanced_enable_reporting_default));
             }
         }
 
