@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 
+using System;
 using Android;
 using Android.App;
 using Android.Content;
@@ -15,10 +16,8 @@ using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
-using Android.Webkit;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
@@ -33,16 +32,18 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         const string PreviousDocumentIdIntentKey = "PreviousDocumentIdIntent_a2066147-a27b-454f-bc5c-03e6b8266697";
         const string PreviousDocumentFolderIdIntentKey = "PreviousDocumentFolderIdIntent_ac0d9a31-2ddc-497b-8fbe-7fd5a51b2257";
         const string PreviousDocumentDirectionIntentKey = "PreviousDocumentDirectionIntent_edefdcd2-764f-439d-891b-178b8de29333";
+        const string OutgoingDocumentGuidIntentKey = "OutgoingDocumentGuidIntent_7901fa2b-f096-4e9e-82b9-5aeae9f39d05";
 
         const string cdfFragmentTagKey = "fragmentTagKey";
         string cdfFragmentTag;
 
         public static Intent CreateIntent(Context context, DocumentCreationModeFlag creationModeFlag, DocumentDirection previousDocumentDirection, int? precedingDocumentId = null,
-                                          int? precedingDocumentFolderId = null)
+                                          int? precedingDocumentFolderId = null, Guid outgoingDocumentGuid = default(Guid))
         {
             var intent = new Intent(context, typeof(ComposeDocumentActivity));
             intent.PutExtra(CreationModeFlagIntentKey, (int)creationModeFlag);
             intent.PutExtra(PreviousDocumentDirectionIntentKey, (int)previousDocumentDirection);
+            intent.PutExtra(OutgoingDocumentGuidIntentKey, outgoingDocumentGuid.ToString());
             if (precedingDocumentId != null)
             {
                 intent.PutExtra(PreviousDocumentIdIntentKey, precedingDocumentId.Value);
@@ -73,6 +74,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var previousDocumentDirection = (DocumentDirection)Intent.Extras.GetInt(PreviousDocumentDirectionIntentKey);
                 var previousDocumentId = Intent.HasExtra(PreviousDocumentIdIntentKey) ? (int?)Intent.Extras.GetInt(PreviousDocumentIdIntentKey) : null;
                 var previousDocumentFolderId = Intent.HasExtra(PreviousDocumentFolderIdIntentKey) ? (int?)Intent.Extras.GetInt(PreviousDocumentFolderIdIntentKey) : null;
+                var outgoingDocumentGuid = new Guid(Intent.Extras.GetString(OutgoingDocumentGuidIntentKey));
 
                 var ft = SupportFragmentManager.BeginTransaction();
                 cdf = new ComposeDocumentFragment
@@ -81,6 +83,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     PreviousDocumentId = previousDocumentId,
                     PreviousDocumentFolderId = previousDocumentFolderId,
                     PreviousDocumentDirection = previousDocumentDirection,
+                    OutgoingDocumentGuid = outgoingDocumentGuid,
+                    LocalDocument = outgoingDocumentGuid != Guid.Empty,
                 };
                 cdfFragmentTag = cdf.GenerateTag();
                 ft.Replace(Resource.Id.fragment_container, cdf, cdfFragmentTag);

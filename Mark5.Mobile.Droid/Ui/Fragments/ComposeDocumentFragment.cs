@@ -38,6 +38,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public DocumentDirection PreviousDocumentDirection { get; set; }
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
+        public Guid OutgoingDocumentGuid { get; set; }
+        public bool LocalDocument { get; set; }
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
 
@@ -46,7 +48,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         Document Document { get; set; } = new Document();
         DocumentPreview DocumentPreview { get; set; } = new DocumentPreview();
-        public Guid OutgoingDocumentGuid { get; set; } //TODO eventually this should be set for preexisting documents (take care when doing the local documents)
 
         ToView toView;
         CcView ccView;
@@ -727,6 +728,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 SubjectState = subjectView.ReturnState(),
                 AttachmentsState = attachmentsView.ReturnState(),
                 ContentState = contentView.ReturnState(),
+                LocalDocument = LocalDocument,
             };
         }
 
@@ -752,6 +754,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 subjectView.State = cfs.SubjectState;
                 attachmentsView.State = cfs.AttachmentsState;
                 contentView.State = cfs.ContentState;
+                LocalDocument = cfs.LocalDocument;
             }
         }
 
@@ -770,6 +773,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int? PreviousDocumentId { get; set; }
             public Guid OutgoingDocumentGuid { get; set; }
             public bool TemplateLoaded { get; set; }
+            public bool LocalDocument { get; set; }
             public DocumentCreationModeFlag CreationModeFlag { get; set; }
             public IComposeDocumentViewState ToState { get; set; }
             public IComposeDocumentViewState CcState { get; set; }
