@@ -776,7 +776,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dpvh.AttachmentIndicator = dp.AttachmentsCount > 0;
                     dpvh.CommentIndicator = dp.CommentsCount > 0;
 
-                    dpvh.Compact = compactList;
+                    if (compactList)
+                    {
+                        dpvh.Preview = null;
+                        dpvh.AttachmentIndicator = false;
+                        dpvh.CommentIndicator = false;
+                    }
+
                     dpvh.Selected = selectedDocumentsInView.ContainsKey(dp.Id);
 
                     if (loadMoreAction != null && position == ItemCount - 1)
@@ -954,7 +960,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 set
                 {
-                    previewTextView.Text = value;
+                    if (value == null)
+                    {
+                        previewTextView.Text = string.Empty;
+                        previewTextView.Visibility = ViewStates.Gone;
+                    }
+                    else
+                    {
+                        previewTextView.Text = value;
+                        previewTextView.Visibility = ViewStates.Visible;
+                    }
                 }
             }
 
@@ -1021,16 +1036,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 set
                 {
                     commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
-
-            public bool Compact
-            {
-                set
-                {
-                    attachmentImageView.Visibility = value ? ViewStates.Gone : ViewStates.Visible;
-                    commentImageView.Visibility = value ? ViewStates.Gone : ViewStates.Visible;
-                    previewTextView.Visibility = value ? ViewStates.Gone : ViewStates.Visible;
                 }
             }
 

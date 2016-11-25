@@ -243,6 +243,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     policies[ObjectType.Shortcode] = new DownloadAllPolicy();
                 }
 
+                CommonConfig.Logger.Info("Retrieving system settings...");
+
+                ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
+
                 CommonConfig.Logger.Info($"Starting {nameof(IDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
 
                 await Managers.DownloadManager.Start();
@@ -253,10 +257,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
                 PlatformConfig.ReachabilityBroadcastReceiver.Register();
-
-                CommonConfig.Logger.Info("Retrieving system settings...");
-
-                ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
 
                 CommonConfig.Logger.Info($"Logged in - will present {nameof(MainActivity)}");
 

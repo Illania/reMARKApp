@@ -169,6 +169,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
+            if (preference.Key == GetString(Resource.String.pref_key_about_version))
+            {
+                var i = new Intent(Settings.ActionApplicationDetailsSettings, Android.Net.Uri.Parse("package:" + Activity.PackageName));
+                StartActivity(i);
+            }
+
             return base.OnPreferenceTreeClick(preference);
         }
 
