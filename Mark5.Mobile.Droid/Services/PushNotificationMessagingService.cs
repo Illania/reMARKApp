@@ -8,6 +8,7 @@
 using System;
 using Android.App;
 using Android.Content;
+using Android.Provider;
 using Android.Support.V7.App;
 using Firebase.Messaging;
 using Mark5.Mobile.Common;
@@ -39,6 +40,11 @@ namespace Mark5.Mobile.Droid.Utilities.Services
                     return;
                 }
 
+                if (PlatformConfig.Preferences.SilenceNotifications)
+                {
+                    return;
+                }
+
                 if (n.ObjectType == ObjectType.Document)
                 {
                     await Managers.NotificationsManager.SaveNotification(n);
@@ -49,18 +55,26 @@ namespace Mark5.Mobile.Droid.Utilities.Services
                     i.PutExtra(DocumentActivity.NotificationGuidIntentKey, SerializationUtils.Serialize(n.Guid));
                     var pi = PendingIntent.GetActivity(this, 0, i, PendingIntentFlags.UpdateCurrent);
 
-                    var ln = new NotificationCompat.Builder(this)
+                    var nb = new NotificationCompat.Builder(this)
                                                .SetSmallIcon(Resource.Mipmap.ic_icon)
                                                .SetContentTitle(n.Title)
+                                               .SetContentText(n.Message)
                                                .SetContentIntent(pi)
                                                .SetAutoCancel(true)
                                                .SetGroup(n.Type.ToString())
                                                .SetPriority((int)NotificationPriority.High)
                                                .SetStyle(new Android.Support.V4.App.NotificationCompat.BigTextStyle()
-                                                         .BigText(n.Message))
-                                               .Build();
+                                                         .BigText(n.Message));
+                    if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.NotificationsRingtone))
+                    {
+                        nb.SetSound(Android.Net.Uri.Parse(PlatformConfig.Preferences.NotificationsRingtone));
+                    }
+                    if (PlatformConfig.Preferences.NotificationsVibrate)
+                    {
+                        nb.SetVibrate(new[] { 500L, 250L, 500L });
+                    }
                     var nm = (NotificationManager)GetSystemService(NotificationService);
-                    nm.Notify(NotificationIdCounter++, ln);
+                    nm.Notify(NotificationIdCounter++, nb.Build());
                 }
             }
             catch (Exception ex)
