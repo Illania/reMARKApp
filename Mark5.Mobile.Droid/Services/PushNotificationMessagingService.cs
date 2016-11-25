@@ -42,6 +42,7 @@ namespace Mark5.Mobile.Droid.Utilities.Services
 
                 if (PlatformConfig.Preferences.SilenceNotifications)
                 {
+                    CommonConfig.Logger.Info($"Notification are silenced - ignoring...");
                     return;
                 }
 
