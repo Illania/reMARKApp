@@ -402,7 +402,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         // Implementation based on http://stackoverflow.com/questions/5870438/get-plain-text-from-html-in-net
         static string GetPlainText(string htmlText)
         {
-            return Regex.Replace(htmlText, @"<(.|\n)*?>", "");
+            return Regex.Replace(htmlText, @"<(.|\n)*?>", "").SafeSubstring(0, 300).TrimStart();
         }
 
         string GetAddressTextFromPreviousDocument(DocumentAddressType addressType)
