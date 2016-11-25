@@ -16,6 +16,8 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
+using Android.OS;
+using Android.Support.V4.Content;
 
 namespace Mark5.Mobile.Droid.Utilities.Services
 {
@@ -57,7 +59,8 @@ namespace Mark5.Mobile.Droid.Utilities.Services
                     var pi = PendingIntent.GetActivity(this, 0, i, PendingIntentFlags.UpdateCurrent);
 
                     var nb = new NotificationCompat.Builder(this)
-                                               .SetSmallIcon(Resource.Mipmap.ic_icon)
+                                               .SetSmallIcon(Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop ? Resource.Mipmap.ic_icon_lollipop : Resource.Mipmap.ic_icon)
+                                               .SetColor(ContextCompat.GetColor(this, Resource.Color.darkerblue))
                                                .SetContentTitle(n.Title)
                                                .SetContentText(n.Message)
                                                .SetContentIntent(pi)
