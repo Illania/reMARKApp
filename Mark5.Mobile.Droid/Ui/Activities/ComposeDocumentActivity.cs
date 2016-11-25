@@ -90,13 +90,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 ft.Replace(Resource.Id.fragment_container, cdf, cdfFragmentTag);
                 ft.Commit();
 
-                if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadContacts) != Android.Content.PM.Permission.Granted
-                    || ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != Android.Content.PM.Permission.Granted)
-                {
-                    ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.ReadExternalStorage, Manifest.Permission.ReadContacts }, 769);
-                }
-
-
                 CommonConfig.Logger.Info($"Created {nameof(ComposeDocumentActivity)}");
             }
             else

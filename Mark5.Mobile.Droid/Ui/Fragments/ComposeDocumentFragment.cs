@@ -10,9 +10,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Android;
 using Android.Content;
 using Android.Database;
 using Android.Provider;
+using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -67,6 +69,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool documentShown;
         bool resuming;
         bool templateLoaded;
+        bool permissionsAsked;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
@@ -133,7 +136,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
             }
 
-            resuming = true;
 
             if (OutgoingDocumentGuid == Guid.Empty)
             {
@@ -143,7 +145,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             await LoadDocument();
             await ShowDocument();
 
-            resuming = false;
+            AskForPermissions();
+
+            resuming = true;
+        }
+
+        void AskForPermissions()
+        {
+            if (permissionsAsked)
+            {
+                return;
+            }
+
+            if (ContextCompat.CheckSelfPermission(Activity, Manifest.Permission.ReadContacts) != Android.Content.PM.Permission.Granted
+                    || ContextCompat.CheckSelfPermission(Activity, Manifest.Permission.ReadExternalStorage) != Android.Content.PM.Permission.Granted)
+            {
+                RequestPermissions(new string[] { Manifest.Permission.ReadExternalStorage, Manifest.Permission.ReadContacts }, 769);
+            }
+
+            permissionsAsked = true;
         }
 
         async Task LoadDocument()
@@ -729,6 +749,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 AttachmentsState = attachmentsView.ReturnState(),
                 ContentState = contentView.ReturnState(),
                 LocalDocument = LocalDocument,
+                PermissionsAsked = permissionsAsked,
             };
         }
 
@@ -755,6 +776,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 attachmentsView.State = cfs.AttachmentsState;
                 contentView.State = cfs.ContentState;
                 LocalDocument = cfs.LocalDocument;
+                permissionsAsked = cfs.PermissionsAsked;
             }
         }
 
@@ -774,6 +796,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public Guid OutgoingDocumentGuid { get; set; }
             public bool TemplateLoaded { get; set; }
             public bool LocalDocument { get; set; }
+            public bool PermissionsAsked { get; set; }
             public DocumentCreationModeFlag CreationModeFlag { get; set; }
             public IComposeDocumentViewState ToState { get; set; }
             public IComposeDocumentViewState CcState { get; set; }
