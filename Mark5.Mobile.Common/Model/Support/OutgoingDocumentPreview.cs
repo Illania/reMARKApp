@@ -5,9 +5,10 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using SQLite;
 
-namespace Mark5.Mobile.Common.Model.Support
+namespace Mark5.Mobile.Common.Model
 {
     public class OutgoingDocumentPreview : DocumentPreview
     {
@@ -18,11 +19,18 @@ namespace Mark5.Mobile.Common.Model.Support
             set;
         }
 
+        [Ignore]
+        public Guid Identifier
+        {
+            get;
+            set;
+        }
+
         public OutgoingDocumentPreview(DocumentPreview documentPreview)
         {
             this.Addresses = documentPreview.Addresses;
             this.AttachmentsCount = documentPreview.AttachmentsCount;
-            this.DateReceivedTimestamp = documentPreview.DateReceivedTimestamp;
+            this.DateReceivedTimestamp = documentPreview.DateReceivedTimestamp; //When the document was put in the queue
             this.Direction = documentPreview.Direction;
             this.Preview = documentPreview.Preview;
             this.Priority = documentPreview.Priority;

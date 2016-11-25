@@ -252,6 +252,7 @@ namespace Mark5.Mobile.Common.Storage
                 var isFailed = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed)) == ExistenceCheckResult.FileExists;
 
                 outgoingDocumentPreview.State = isFailed ? OutgoingDocumentState.Failed : OutgoingDocumentState.Waiting;
+                outgoingDocumentPreview.Identifier = new Guid(outgoingDocumentFolder.Name);
                 outgoingDocumentPreviews.Add(outgoingDocumentPreview);
             }
 
