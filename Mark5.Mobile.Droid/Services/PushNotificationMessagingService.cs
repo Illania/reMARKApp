@@ -11,7 +11,9 @@ using Android.Content;
 using Android.Support.V7.App;
 using Firebase.Messaging;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Utilities.Services
@@ -21,7 +23,9 @@ namespace Mark5.Mobile.Droid.Utilities.Services
     public class PushNotificationMessagingService : FirebaseMessagingService
     {
 
-        public override void OnMessageReceived(RemoteMessage message)
+        static int NotificationIdCounter;
+
+        public override async void OnMessageReceived(RemoteMessage message)
         {
             try
             {
@@ -31,26 +35,32 @@ namespace Mark5.Mobile.Droid.Utilities.Services
 
                 if (n.IsSilent)
                 {
-                    // Nothing to do
+                    // Nothing to do (for now )
                     return;
                 }
 
                 if (n.ObjectType == ObjectType.Document)
                 {
+                    await Managers.NotificationsManager.SaveNotification(n);
+
                     var i = new Intent(this, typeof(DocumentActivity));
                     i.PutExtra(DocumentActivity.FolderIdIntentKey, n.FolderId);
                     i.PutExtra(DocumentActivity.DocumentIdIntentKey, n.ObjectId);
+                    i.PutExtra(DocumentActivity.NotificationGuidIntentKey, SerializationUtils.Serialize(n.Guid));
                     var pi = PendingIntent.GetActivity(this, 0, i, PendingIntentFlags.UpdateCurrent);
 
                     var ln = new NotificationCompat.Builder(this)
                                                .SetSmallIcon(Resource.Mipmap.ic_icon)
                                                .SetContentTitle(n.Title)
-                                               .SetContentText(n.Message)
                                                .SetContentIntent(pi)
                                                .SetAutoCancel(true)
+                                               .SetGroup(n.Type.ToString())
+                                               .SetPriority((int)NotificationPriority.High)
+                                               .SetStyle(new Android.Support.V4.App.NotificationCompat.BigTextStyle()
+                                                         .BigText(n.Message))
                                                .Build();
                     var nm = (NotificationManager)GetSystemService(NotificationService);
-                    nm.Notify(0, ln);
+                    nm.Notify(NotificationIdCounter++, ln);
                 }
             }
             catch (Exception ex)

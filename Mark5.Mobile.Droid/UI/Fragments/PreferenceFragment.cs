@@ -18,6 +18,7 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Firebase.Iid;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -95,6 +96,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                             {
                                 try
                                 {
+#if DEBUG
+                                    FirebaseInstanceId.Instance.DeleteInstanceId();
+                                    var _nullToken = FirebaseInstanceId.Instance.Token; // Token will be null, but it will cause refresh
+#endif
+
                                     var ss = await Managers.SystemManager.GetSystemSettingsAsync();
                                     ServerConfig.SystemSettings = ss;
 

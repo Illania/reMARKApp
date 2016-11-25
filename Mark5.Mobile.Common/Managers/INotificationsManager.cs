@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
@@ -41,6 +42,10 @@ namespace Mark5.Mobile.Common.Managers
         Task ClearAllNotificationSettingsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = default(SourceType));
 
         Task<object> GetRemoteObjectAsync(Notification notification, SourceType sourceType = default(SourceType));
+
+        Task SaveNotification(Notification notification);
+
+        Task MarkAsRead(Guid notificationGuid);
 
         Task MarkAsRead(Notification notification);
 

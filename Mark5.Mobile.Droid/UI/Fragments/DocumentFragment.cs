@@ -50,6 +50,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public Document Document { get; set; }
         public bool ReadOnlyMode { get; set; } = false;
         public Action CloseRequest { get; set; }
+        public Guid NotificationGuid { get; set; }
 
         ProgressBar progress;
         ScrollView scrollView;
@@ -370,6 +371,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             try
             {
+                if (NotificationGuid != default(Guid))
+                {
+                    await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
+                }
+
                 if (Folder != null || FolderId.HasValue)
                 {
                     if (DocumentId.HasValue && DocumentPreview == null && Document == null)
