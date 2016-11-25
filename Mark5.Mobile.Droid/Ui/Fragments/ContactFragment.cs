@@ -51,6 +51,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public Contact Contact { get; set; }
         public Action CloseRequest { get; set; }
         public bool ReadOnlyMode { get; set; }
+        public Guid NotificationGuid { get; set; }
 
         ProgressBar progress;
         NestedScrollView scrollView;
@@ -317,6 +318,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             try
             {
+                if (NotificationGuid != default(Guid))
+                {
+                    await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
+                }
+
                 if (Folder != null || FolderId.HasValue)
                 {
                     if (ContactId.HasValue && ContactPreview == null && Contact == null)

@@ -15,7 +15,6 @@ using Android.OS;
 using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
-using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
@@ -41,6 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public Shortcode Shortcode { get; set; }
         public Action CloseRequest { get; set; }
         public bool ReadOnlyMode { get; set; }
+        public Guid NotificationGuid { get; set; }
 
         ProgressBar progress;
         ScrollView scrollView;
@@ -192,6 +192,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             try
             {
+                if (NotificationGuid != default(Guid))
+                {
+                    await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
+                }
+
                 if (Folder != null || FolderId.HasValue)
                 {
                     if (ShortcodeId.HasValue && ShortcodePreview == null && Shortcode == null)
