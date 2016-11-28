@@ -116,18 +116,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Pausing {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={BusinessEntities?.Count}]...");
         }
 
-        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
-        {
-            //TODO
-        }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            //TODO
-
-            return true;
-        }
-
         #endregion
 
         #region RetainableStateFragment overrides

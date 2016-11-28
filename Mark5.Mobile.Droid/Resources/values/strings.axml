@@ -192,4 +192,6 @@
 	<string name="mark5_service_reachability">MARK5 App Service:</string>
 	<string name="unavailable">Unavailable</string>
 	<string name="create_system_report">Create system report</string>
+	<string name="save">Save</string>
+	<string name="select_categories">Select categories</string>
 </resources>

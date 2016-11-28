@@ -24,9 +24,13 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid
 {
+
     public class CategoriesListFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
+
         public BusinessEntityPreview BusinessEntityPreview { get; set; }
+        public Action CloseRequest { get; set; }
+
         public List<Category> Categories
         {
             get
@@ -107,7 +111,8 @@ namespace Mark5.Mobile.Droid
                 var ft = Activity.SupportFragmentManager.BeginTransaction();
                 var clf = new AvailableCategoriesListFragment
                 {
-                    BusinessEntityPreview = BusinessEntityPreview
+                    BusinessEntityPreview = BusinessEntityPreview,
+                    CloseRequest = CloseRequest
                 };
                 ft.Replace(Resource.Id.fragment_container, clf, clf.GenerateTag());
                 ft.AddToBackStack(null);
@@ -233,31 +238,17 @@ namespace Mark5.Mobile.Droid
 
         #region RecyclerView Adapter/ViewHolder
 
-        public class CategoriesListAdapter : RecyclerView.Adapter
+        class CategoriesListAdapter : RecyclerView.Adapter
         {
             readonly List<Category> categoriesInView = new List<Category>();
-            readonly bool selectionEnabled;
 
             public override int ItemCount { get { return categoriesInView.Count; } }
             public List<Category> Items { get { return categoriesInView; } }
-            public Dictionary<int, Category> SelectedCategoriesInView { get; set; }
-            public bool CategoriesModified { get; set; }
-
-            public CategoriesListAdapter(bool selectionEnabled = false)
-            {
-                this.selectionEnabled = selectionEnabled;
-            }
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
                 var category = categoriesInView[position];
                 var viewHolder = holder as CategoryViewHolder;
-
-                if (selectionEnabled)
-                {
-                    viewHolder.ItemView.SetOnClickListener(new ActionOnClickListener(() => ToggleSelected(category)));
-                    viewHolder.Selected = SelectedCategoriesInView.ContainsKey(category.Id);
-                }
 
                 viewHolder.Name = category.Name;
                 viewHolder.HexColor = category.HexColor;
@@ -289,36 +280,9 @@ namespace Mark5.Mobile.Droid
                 Clear();
                 SetItems(items);
             }
-
-            public bool IsSelected(Category category)
-            {
-                return SelectedCategoriesInView.ContainsKey(category.Id);
-            }
-
-            public void ToggleSelected(Category category)
-            {
-                var isSelected = IsSelected(category);
-
-                if (isSelected)
-                {
-                    SelectedCategoriesInView.Remove(category.Id);
-                }
-                else
-                {
-                    SelectedCategoriesInView.Add(category.Id, category);
-                }
-
-                CategoriesModified = true;
-                NotifyItemChanged(GetPosition(category));
-            }
-
-            public int GetPosition(Category category)
-            {
-                return categoriesInView.FindIndex(c => c.Id == category.Id);
-            }
         }
 
-        public class CategoryViewHolder : RecyclerView.ViewHolder
+        class CategoryViewHolder : RecyclerView.ViewHolder
         {
             public string Name
             {

@@ -36,4 +36,8 @@
 		<item quantity="one">%1$d user selected</item>
 		<item quantity="other">%1$d users selected</item>
 	</plurals>
+	<plurals name="categories_selected">
+		<item quantity="one">%1$d category selected</item>
+		<item quantity="other">%1$d categories selected</item>
+	</plurals>
 </resources>
