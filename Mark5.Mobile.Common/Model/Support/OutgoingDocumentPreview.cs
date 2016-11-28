@@ -13,7 +13,7 @@ namespace Mark5.Mobile.Common.Model
     public class OutgoingDocumentPreview : DocumentPreview
     {
         [Ignore]
-        public OutgoingDocumentState State
+        public OutgoingDocumentState State //We have the same in the container, what to do....?
         {
             get;
             set;
@@ -43,5 +43,6 @@ namespace Mark5.Mobile.Common.Model
         Waiting,
         Failed,
         Sending,
+        Locked
     }
 }

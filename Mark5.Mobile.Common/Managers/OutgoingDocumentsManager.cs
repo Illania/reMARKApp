@@ -178,7 +178,7 @@ namespace Mark5.Mobile.Common.Managers
 
                     var container = await FileSystemStorage.GetOutgoingDocumentContainerAsync(identifier);
 
-                    if (container == null)
+                    if (container == null || container.Info.State != OutgoingDocumentState.Waiting)
                     {
                         continue;
                     }
@@ -204,7 +204,6 @@ namespace Mark5.Mobile.Common.Managers
                         await Managers.DocumentsManager.SendDocumentAsync(document, documentPreview, info.Flag, info.PrecedingDocumentId,
                                                                                    info.PrecedingDocumentFolderId, info.SendOnTimestamp,
                                                                                    info.ConfirmRead, info.ConfirmDelivery, attachmentGuids);
-
                         sendSuccessful = true;
                     }
                     catch (Exception ex)

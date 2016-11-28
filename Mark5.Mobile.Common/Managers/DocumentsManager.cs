@@ -207,6 +207,11 @@ namespace Mark5.Mobile.Common.Managers
             Managers.OutgoingDocumentsManager.Notify(id);
         }
 
+        public async Task<OutgoingDocumentContainer> GetOutgoingDocumentContainerAsync(Guid id)
+        {
+            return await FileSystemStorage.GetOutgoingDocumentContainerAsync(id);
+        }
+
         public async Task<string> SaveOutgoingAttachmentAsync(Guid id, string filename, Stream attachmentStream)
         {
             return await FileSystemStorage.SaveOutgoingDocumentAttachmentAsync(id, filename, attachmentStream);

@@ -211,6 +211,8 @@
 	<string name="add_attachment">Add attachment</string>
 	<string name="save_draft">Save draft</string>
 	<string name="confirm_save_as_draft">Do you want to save the document as draft?</string>
+	<string name="save_modifications">Save modifications</string>
+	<string name="confirm_save_modified_document">Do you want to save the modified document?</string>
 	<string name="loading_document">Loading document</string>
 	<string name="error_saving_local_attachment">Error while saving local attachment</string>
 	<string name="error_removing_local_attachment">Error while removing local attachment</string>

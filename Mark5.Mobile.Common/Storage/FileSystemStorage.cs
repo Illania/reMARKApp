@@ -192,7 +192,7 @@ namespace Mark5.Mobile.Common.Storage
 
         public static async Task<OutgoingDocumentContainer> GetOutgoingDocumentContainerAsync(Guid id)
         {
-            if (!await OutgoingFolderExistsAsync(id) || !await OutgoingDocumentAvailableAsync(id))
+            if (!await OutgoingFolderExistsAsync(id))
             {
                 return null;
             }
@@ -207,6 +207,20 @@ namespace Mark5.Mobile.Common.Storage
 
             var infoFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingInfo);
             var info = await SerializationUtils.DeserializeAsync<OutgoingDocumentInfo>(await infoFile.ReadAllTextAsync());
+            var isLocked = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OugoingLock)) == ExistenceCheckResult.FileExists;
+            var isFailed = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed)) == ExistenceCheckResult.FileExists;
+            if (isLocked)
+            {
+                info.State = OutgoingDocumentState.Locked;
+            }
+            else if (isFailed)
+            {
+                info.State = OutgoingDocumentState.Failed;
+            }
+            else
+            {
+                info.State = OutgoingDocumentState.Waiting;
+            }
 
             return new OutgoingDocumentContainer
             {
@@ -214,16 +228,6 @@ namespace Mark5.Mobile.Common.Storage
                 DocumentPreview = documentPreview,
                 Info = info,
             };
-        }
-
-        static async Task<bool> OutgoingDocumentAvailableAsync(Guid id)
-        {
-            var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
-            var isLocked = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OugoingLock)) == ExistenceCheckResult.FileExists;
-            var isFailed = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed)) == ExistenceCheckResult.FileExists;
-            var isReady = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingInfo)) == ExistenceCheckResult.FileExists;
-
-            return isReady && !isLocked && !isFailed;
         }
 
         public static async Task<IEnumerable<Guid>> GetOutgoingDocumentIdentifiersAsync()
@@ -333,8 +337,7 @@ namespace Mark5.Mobile.Common.Storage
         public static async Task SetOutgoingDocumentToFailedAsync(Guid id, Exception ex)
         {
             var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
-            var failedFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingFailed, CreationCollisionOption.ReplaceExisting);
-            await failedFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(ex));
+            await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingFailed, CreationCollisionOption.ReplaceExisting);
         }
 
         public static async Task LockOutgoingDocumentAsync(Guid id)
