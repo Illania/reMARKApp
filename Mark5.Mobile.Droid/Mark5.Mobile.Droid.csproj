@@ -491,6 +491,10 @@
     <AndroidResource Include="Resources\mipmap-xhdpi\ic_icon_lollipop.png" />
     <AndroidResource Include="Resources\mipmap-xxhdpi\ic_icon_lollipop.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_icon_lollipop.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\search.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\search.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\search.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\search.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Xamarin.Build.Download.0.3.0\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.3.0\build\Xamarin.Build.Download.targets')" />
