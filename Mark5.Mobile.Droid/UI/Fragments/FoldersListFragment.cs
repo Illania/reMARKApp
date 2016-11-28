@@ -127,11 +127,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
+            var newItem = menu.Add(Menu.None, 10, 10, "New"); //TODO an icon should be here
+            newItem.SetShowAsAction(ShowAsAction.Always);
+
             var searchItem = menu.FindItem(Resource.Id.action_search);
             MenuItemCompat.SetOnActionExpandListener(searchItem, this);
             SearchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
             SearchView.QueryHint = GetString(Resource.String.filter);
             SearchView.SetOnQueryTextListener(this);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == 10)
+            {
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None));
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
         }
 
         #endregion

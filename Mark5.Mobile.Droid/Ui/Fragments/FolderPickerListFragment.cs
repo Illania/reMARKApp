@@ -10,7 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Android.App;
 using Android.Content;
+using Android.Support.V4.View;
 using Android.Support.V7.App;
+using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
@@ -41,7 +43,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
-            base.OnCreateOptionsMenu(menu, inflater);
+            inflater.Inflate(Resource.Menu.menu_main, menu);
+
+            var searchItem = menu.FindItem(Resource.Id.action_search);
+            MenuItemCompat.SetOnActionExpandListener(searchItem, this);
+            SearchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
+            SearchView.QueryHint = GetString(Resource.String.filter);
+            SearchView.SetOnQueryTextListener(this);
 
             var item = menu.Add(Menu.None, 10, 10, Resource.String.done);
             item.SetShowAsAction(ShowAsAction.Always);

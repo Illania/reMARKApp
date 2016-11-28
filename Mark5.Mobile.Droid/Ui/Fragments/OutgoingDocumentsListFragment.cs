@@ -138,6 +138,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Managers.OutgoingDocumentsManager.DocumentSendingSuccessful -= OutgoingDocumentsManager_DocumentSendingSuccessful;
         }
 
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            var newItem = menu.Add(Menu.None, 10, 10, "New"); //TODO an icon should be here
+            newItem.SetShowAsAction(ShowAsAction.Always);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == 10)
+            {
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None));
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
+        }
+
         void Adapter_ItemClicked(object sender, OutgoingDocumentPreview e)
         {
             StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Edit, e.Direction, outgoingDocumentGuid: e.Identifier));
