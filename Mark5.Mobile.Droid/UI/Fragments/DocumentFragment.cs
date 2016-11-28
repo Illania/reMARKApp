@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Support.V4.App;
@@ -111,6 +112,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnDestroyedByUser();
 
             setReadStatusCancellationTokenSource?.Cancel();
+        }
+
+        public override void OnActivityResult(int requestCode, int resultCode, Intent data)
+        {
+            if (resultCode == (int)Result.Ok)
+            {
+                if (requestCode == RequestCodes.CommentsRequest)
+                {
+                    var comments = SerializationUtils.Deserialize<List<Comment>>(data.GetStringExtra(CommentsListActivity.CommentsResultKey));
+                    UpdateComments(comments);
+                }
+                else if (requestCode == RequestCodes.CategoriesRequest)
+                {
+                    var categories = SerializationUtils.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
+                    UpdateCategories(categories);
+                }
+            }
         }
 
         static class MenuItemActions
@@ -513,13 +531,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             });
         }
 
-        public void UpdateCategories(List<Category> categories)
+        void UpdateCategories(List<Category> categories)
         {
             DocumentPreview?.Categories.Clear();
             DocumentPreview?.Categories.AddRange(categories);
         }
 
-        public void UpdateComments(List<Comment> comments)
+        void UpdateComments(List<Comment> comments)
         {
             if (Document != null)
             {

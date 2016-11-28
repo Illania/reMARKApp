@@ -7,7 +7,6 @@
 //
 
 using System;
-using System.Collections.Generic;
 using Android.App;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -32,11 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string ReadOnlyModeIntentKey = "ReadOnlyMode_c23890cf-06fc-45d7-86c8-76c4c8027daf";
         public const string NotificationGuidIntentKey = "NotificationGuid_0473a08d-5f96-4acd-924a-6d160a23cdf2";
 
-        const string dfFragmentTagKey = "fragmentTagKey";
-        string dfFragmentTag;
-
         Toolbar toolbar;
-        DocumentFragment df;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -53,7 +48,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                df = new DocumentFragment();
+                var df = new DocumentFragment();
 
                 if (Intent.HasExtra(FolderIdIntentKey))
                     df.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
@@ -79,41 +74,15 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 df.CloseRequest = OnBackPressed;
 
                 var ft = SupportFragmentManager.BeginTransaction();
-                dfFragmentTag = df.GenerateTag();
-                ft.Replace(Resource.Id.fragment_container, df, dfFragmentTag);
+                ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(DocumentActivity)}");
             }
             else
             {
-                dfFragmentTag = savedInstanceState.GetString(dfFragmentTagKey);
-                df = SupportFragmentManager.FindFragmentByTag(dfFragmentTag) as DocumentFragment;
                 CommonConfig.Logger.Info($"Restored {nameof(DocumentActivity)}");
             }
-        }
-
-        protected override void OnActivityResult(int requestCode, Result resultCode, Android.Content.Intent data)
-        {
-            if (resultCode == Result.Ok && df != null)
-            {
-                if (requestCode == DocumentFragment.RequestCodes.CommentsRequest)
-                {
-                    var comments = SerializationUtils.Deserialize<List<Comment>>(data.GetStringExtra(CommentsListActivity.CommentsResultKey));
-                    df.UpdateComments(comments);
-                }
-                else if (requestCode == DocumentFragment.RequestCodes.CategoriesRequest)
-                {
-                    var categories = SerializationUtils.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
-                    df.UpdateCategories(categories);
-                }
-            }
-        }
-
-        protected override void OnSaveInstanceState(Bundle outState)
-        {
-            outState.PutString(dfFragmentTagKey, dfFragmentTag);
-            base.OnSaveInstanceState(outState);
         }
     }
 }

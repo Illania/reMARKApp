@@ -34,13 +34,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string ReadOnlyModeIntentKey = "ReadOnlyMode_660e0fd1-17df-46f2-a4c2-44dacb9f0a76";
         public const string NotificationGuidIntentKey = "NotificationGuid_d0224832-22e3-481b-9c0d-78b361a57691";
 
-        const string cfFragmentTagKey = "fragmentTagKey";
-        string cfFragmentTag;
-
         ContactHeaderView toolbarHeaderView;
         ContactHeaderView floatHeaderView;
-
-        ContactFragment cf;
 
         Toolbar toolbar;
 
@@ -65,7 +60,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                cf = new ContactFragment();
+                var cf = new ContactFragment();
 
                 if (Intent.HasExtra(FolderIdIntentKey))
                     cf.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
@@ -91,41 +86,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 cf.CloseRequest = OnBackPressed;
 
                 var ft = SupportFragmentManager.BeginTransaction();
-                cfFragmentTag = cf.GenerateTag();
-                ft.Replace(Resource.Id.fragment_container, cf, cfFragmentTag);
+                ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ContactActivity)}");
             }
             else
             {
-                cfFragmentTag = savedInstanceState.GetString(cfFragmentTagKey);
-                cf = SupportFragmentManager.FindFragmentByTag(cfFragmentTag) as ContactFragment;
-
                 CommonConfig.Logger.Info($"Restored {nameof(ContactActivity)}");
-            }
-        }
-
-        protected override void OnSaveInstanceState(Bundle outState)
-        {
-            outState.PutString(cfFragmentTagKey, cfFragmentTag);
-            base.OnSaveInstanceState(outState);
-        }
-
-        protected override void OnActivityResult(int requestCode, Result resultCode, Android.Content.Intent data)
-        {
-            if (resultCode == Result.Ok && cf != null)
-            {
-                if (requestCode == ContactFragment.RequestCodes.CommentsRequest)
-                {
-                    var comments = SerializationUtils.Deserialize<List<Comment>>(data.GetStringExtra(CommentsListActivity.CommentsResultKey));
-                    cf.UpdateComments(comments);
-                }
-                else if (requestCode == ContactFragment.RequestCodes.CategoriesRequest)
-                {
-                    var categories = SerializationUtils.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
-                    cf.UpdateCategories(categories);
-                }
             }
         }
 

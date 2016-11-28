@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
@@ -103,6 +104,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnResume();
 
             await RefreshData();
+        }
+
+        public override void OnActivityResult(int requestCode, int resultCode, Intent data)
+        {
+            if (resultCode == (int)Result.Ok)
+            {
+                if (requestCode == RequestCodes.CommentsRequest)
+                {
+                    var comments = SerializationUtils.Deserialize<List<Comment>>(data.GetStringExtra(CommentsListActivity.CommentsResultKey));
+                    UpdateComments(comments);
+                }
+                else if (requestCode == RequestCodes.CategoriesRequest)
+                {
+                    var categories = SerializationUtils.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
+                    UpdateCategories(categories);
+                }
+            }
         }
 
         #region Options menu
@@ -440,13 +458,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Update methods
 
-        public void UpdateCategories(List<Category> categories)
+        void UpdateCategories(List<Category> categories)
         {
             ContactPreview?.Categories.Clear();
             ContactPreview?.Categories.AddRange(categories);
         }
 
-        public void UpdateComments(List<Comment> comments)
+        void UpdateComments(List<Comment> comments)
         {
             if (ContactPreview != null)
             {
