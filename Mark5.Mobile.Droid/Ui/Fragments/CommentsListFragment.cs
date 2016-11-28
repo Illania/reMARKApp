@@ -203,12 +203,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         throw new ArgumentException("The input business entity does not have comments defined in the model");
                 }
 
-                Activity.RunOnUiThread(() =>
-                {
-                    adapter.AppendItem(newComment);
-                    recyclerView.SmoothScrollToPosition(adapter.ItemCount);
-                    addCommentEditText.Text = string.Empty;
-                });
+                adapter.AppendItem(newComment);
+                recyclerView.SmoothScrollToPosition(adapter.ItemCount);
+                addCommentEditText.Text = string.Empty;
             }
             catch (Exception ex)
             {
@@ -296,9 +293,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                  {
                      adapter.EditItem(newComment);
                  }
-
              }, TaskScheduler.FromCurrentSynchronizationContext());
-
         }
 
         void AddCommentEditText_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
