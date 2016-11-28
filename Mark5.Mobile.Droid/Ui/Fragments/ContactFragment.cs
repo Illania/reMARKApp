@@ -96,6 +96,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
+            ((AppCompatActivity)Activity).SupportActionBar.Title = string.Empty;
+
             CommonConfig.Logger.Info($"Created {nameof(ContactFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, contact.id={ContactId ?? ContactPreview?.Id}, readOnlyMode={ReadOnlyMode}...");
         }
 
@@ -420,7 +422,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void RefreshTitle()
         {
-            ((ContactActivity)Activity).SetTitles(ContactPreview?.Name, ContactPreview?.CompanyName);
+            ((AppCompatActivity)Activity).SupportActionBar.Title = ContactPreview?.Name;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = ContactPreview?.CompanyName;
             descriptionCardTitle.Text = $"About {ContactPreview?.Name}";
         }
 
