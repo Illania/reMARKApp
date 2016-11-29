@@ -508,7 +508,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
-
             return base.OnOptionsItemSelected(item);
         }
 

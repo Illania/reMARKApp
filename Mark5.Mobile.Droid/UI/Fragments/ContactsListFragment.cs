@@ -250,54 +250,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-        #region Messanger Handlers
-
-        public void UpdateCategories(ContactPreviewCategoriesChangedMessage m)
-        {
-            var position = adapter.GetPosition(m.ContactPreviewId);
-            if (position >= 0)
-            {
-                shouldNotifyAdapter = true;
-                var cp = adapter.Items[position];
-                cp.Categories.Clear();
-                cp.Categories.AddRange(m.Categories);
-            }
-
-            position = searchAdapter.GetPosition(m.ContactPreviewId);
-            if (position >= 0)
-            {
-                shouldNotifySearchAdapter = true;
-                var cp = searchAdapter.Items[position];
-                cp.Categories.Clear();
-                cp.Categories.AddRange(m.Categories);
-            }
-        }
-
-        public void RemoveMovedEntities(EntityMovedFromFolderMessage m)
-        {
-            foreach (var entityId in m.EntitiesId)
-            {
-                var position = adapter.GetPosition(entityId);
-                if (position >= 0)
-                {
-                    shouldNotifyAdapter = true;
-                    adapter.RemoveItemsAtIndex(position);
-                    adapter.ClearSelections(false);
-                }
-
-                position = searchAdapter.GetPosition(entityId);
-                if (position >= 0)
-                {
-                    shouldNotifySearchAdapter = true;
-                    searchAdapter.RemoveItemsAtIndex(position);
-                    adapter.ClearSelections(false);
-                }
-            }
-
-        }
-
-        #endregion
-
         #region Adapter callbacks
 
         void Adapter_ItemClicked(object sender, ContactPreview contactPreview)
@@ -340,6 +292,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Action mode
 
+        static class MenuItemActions
+        {
+            public const int CopyToWorktray = 30;
+            public const int CopyToFolder = 40;
+            public const int MoveToFolder = 41;
+            public const int Categories = 50;
+            public const int DeleteFromFolder = 70;
+            public const int Delete = 71;
+        }
+
         bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
             menu.Clear();
@@ -375,16 +337,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return true;
         }
 
-        static class MenuItemActions
-        {
-            public const int CopyToWorktray = 30;
-            public const int CopyToFolder = 40;
-            public const int MoveToFolder = 41;
-            public const int Categories = 50;
-            public const int DeleteFromFolder = 70;
-            public const int Delete = 71;
-        }
-
         public bool OnCreateActionMode(ActionMode mode, IMenu menu)
         {
             return true;
@@ -392,35 +344,56 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool ActionMode.ICallback.OnActionItemClicked(ActionMode mode, IMenuItem item)
         {
-            var selectedContacts = CurrentAdapter.SelectedItems;
-
-            if (item.ItemId == MenuItemActions.Categories)
+            if (item.ItemId == MenuItemActions.CopyToWorktray)
             {
-                var i = new Intent(Activity, typeof(CategoriesListActivity));
-                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(selectedContacts.First()));
-                StartActivity(i);
-
+                CopyToWorktrayAction();
                 return true;
             }
+
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
                 var i = new Intent(Activity, typeof(FolderListSelectionActivity));
                 i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.CopyToFolderMode);
                 i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
-                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(selectedContacts.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
+                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
                 StartActivity(i);
 
+                actionMode?.Finish();
                 return true;
             }
+
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
                 var i = new Intent(Activity, typeof(FolderListSelectionActivity));
                 i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.MoveToFolderMode);
                 i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
-                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(selectedContacts.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
+                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
                 i.PutExtra(FolderListSelectionActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
                 StartActivity(i);
 
+                actionMode?.Finish();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.Categories)
+            {
+                var i = new Intent(Activity, typeof(CategoriesListActivity));
+                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(CurrentAdapter.SelectedItems.First()));
+                StartActivity(i);
+
+                actionMode?.Finish();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.DeleteFromFolder)
+            {
+                DeleteFromFolder();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.Delete)
+            {
+                Delete();
                 return true;
             }
 
@@ -432,6 +405,100 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var currentAdapter = (ContactsListAdapter)recyclerView.GetAdapter();
             currentAdapter.ClearSelections();
             actionMode = null;
+        }
+
+        async void CopyToWorktrayAction()
+        {
+            var option = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_worktray, Resource.Array.copy_to_worktray_options);
+
+            if (option == 0)
+            {
+                CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
+
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
+
+                try
+                {
+                    await Managers.CommonActionsManager.CopyToWorktray(adapter.SelectedItems.OfType<IBusinessEntity>().ToList());
+
+                    dismissAction();
+                }
+                catch (Exception ex)
+                {
+                    dismissAction();
+
+                    CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+
+                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                }
+            }
+
+            if (option == 1)
+            {
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
+            }
+        }
+
+        async void DeleteFromFolder()
+        {
+            var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
+            if (!yesNo)
+            {
+                return;
+            }
+
+            CommonConfig.Logger.Info($"Attempting to delete from folder [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting_from_folder, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.CommonActionsManager.RemoveFromFolder(CurrentAdapter.SelectedItems.OfType<IBusinessEntity>().ToList(), Folder);
+                adapter.RemoveItems(CurrentAdapter.SelectedItems);
+                searchAdapter.RemoveItems(CurrentAdapter.SelectedItems);
+
+                dismissAction();
+                actionMode?.Finish();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Deleting from folder failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
+        async void Delete()
+        {
+            var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
+            if (!yesNo)
+            {
+                return;
+            }
+
+            CommonConfig.Logger.Info($"Attempting to delete [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.CommonActionsManager.Delete(CurrentAdapter.SelectedItems.OfType<IBusinessEntity>().ToList());
+                adapter.RemoveItems(CurrentAdapter.SelectedItems);
+                searchAdapter.RemoveItems(CurrentAdapter.SelectedItems);
+
+                dismissAction();
+                actionMode?.Finish();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Deleting failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
         }
 
         #endregion
@@ -535,6 +602,52 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
+        #region Messenger hub related
+
+        public void UpdateCategories(ContactPreviewCategoriesChangedMessage m)
+        {
+            var position = adapter.GetPosition(m.ContactPreviewId);
+            if (position >= 0)
+            {
+                shouldNotifyAdapter = true;
+                var cp = adapter.Items[position];
+                cp.Categories.Clear();
+                cp.Categories.AddRange(m.Categories);
+            }
+
+            position = searchAdapter.GetPosition(m.ContactPreviewId);
+            if (position >= 0)
+            {
+                shouldNotifySearchAdapter = true;
+                var cp = searchAdapter.Items[position];
+                cp.Categories.Clear();
+                cp.Categories.AddRange(m.Categories);
+            }
+        }
+
+        public void RemoveMovedEntities(EntityMovedFromFolderMessage m)
+        {
+            foreach (var entityId in m.EntitiesId)
+            {
+                var position = adapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifyAdapter = true;
+                    adapter.Items.RemoveAt(position);
+                }
+
+                position = searchAdapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifySearchAdapter = true;
+                    searchAdapter.Items.RemoveAt(position);
+                }
+            }
+
+        }
+
+        #endregion
+
         #region RecyclerView Adapter/ViewHolder
 
         class ContactsListAdapter : RecyclerView.Adapter
@@ -621,12 +734,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 AppendItems(items);
             }
 
-            public void Clear()
+            public void RemoveItems(List<ContactPreview> items)
             {
-                var size = contactPreviewsInView.Count;
-                contactPreviewsInView.Clear();
-                selectedContactsInView.Clear();
-                NotifyItemRangeRemoved(0, size);
+                foreach (var item in items)
+                {
+                    var position = GetPosition(item);
+                    if (position >= 0)
+                    {
+                        contactPreviewsInView.RemoveAt(position);
+                        NotifyItemChanged(position);
+                    }
+                }
             }
 
             public bool IsSelected(ContactPreview contactPreview)
@@ -662,19 +780,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var contacts = selectedContactsInView.Values.ToArray();
                 selectedContactsInView.Clear();
-                if (notify)
+
+                foreach (var contact in contacts)
                 {
-                    foreach (var contact in contacts)
+                    var position = GetPosition(contact);
+                    if (position >= 0)
                     {
-                        NotifyItemChanged(GetPosition(contact));
+                        NotifyItemChanged(position);
                     }
                 }
-
             }
 
-            public void RemoveItemsAtIndex(int index)
+            public void Clear()
             {
-                contactPreviewsInView.RemoveAt(index);
+                var size = contactPreviewsInView.Count;
+                contactPreviewsInView.Clear();
+                selectedContactsInView.Clear();
+                NotifyItemRangeRemoved(0, size);
             }
 
             public int GetPosition(int contactPreviewId)
