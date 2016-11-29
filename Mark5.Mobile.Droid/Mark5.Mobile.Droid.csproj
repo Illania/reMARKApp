@@ -160,6 +160,9 @@
     <Reference Include="Xamarin.Firebase.Messaging">
       <HintPath>..\packages\Xamarin.Firebase.Messaging.32.961.0\lib\MonoAndroid70\Xamarin.Firebase.Messaging.dll</HintPath>
     </Reference>
+    <Reference Include="AngleSharp">
+      <HintPath>..\packages\AngleSharp.0.9.9\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Resources\Resource.designer.cs" />
