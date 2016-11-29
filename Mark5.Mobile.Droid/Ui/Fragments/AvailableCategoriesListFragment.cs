@@ -38,6 +38,7 @@ namespace Mark5.Mobile.Droid
             get { return (CategoriesListAdapter)recyclerView.GetAdapter(); }
         }
 
+        SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         SearchView searchView;
         CategoriesListAdapter adapter;
@@ -54,7 +55,8 @@ namespace Mark5.Mobile.Droid
 
             var rootView = inflater.Inflate(Resource.Layout.list_with_button, container, false);
 
-            var refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
+            refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
+            refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
             refreshLayout.Enabled = false;
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
@@ -157,6 +159,10 @@ namespace Mark5.Mobile.Droid
         {
             try
             {
+                CommonConfig.Logger.Info($"Refresh running...");
+
+                refreshLayout.Refreshing = true;
+
                 List<Category> availableCategories;
                 switch (BusinessEntityPreview.ObjectType)
                 {
@@ -175,7 +181,14 @@ namespace Mark5.Mobile.Droid
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while retrieving available categories [businessEntity.id={BusinessEntityPreview.Id}, businessEntity.objectType={BusinessEntityPreview.ObjectType}]", ex);
+
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+            finally
+            {
+                refreshLayout.Refreshing = false;
+
+                CommonConfig.Logger.Info($"Refresh finished");
             }
         }
 
@@ -226,6 +239,8 @@ namespace Mark5.Mobile.Droid
 
         void UpdateControls()
         {
+            if (Activity == null) return;
+
             if (selectedCategories.Count < 1)
             {
                 ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_categories);

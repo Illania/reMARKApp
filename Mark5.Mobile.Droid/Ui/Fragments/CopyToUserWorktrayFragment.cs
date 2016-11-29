@@ -183,9 +183,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void UpdateControls()
         {
+            if (Activity == null) return;
+
             if (adapter.SelectedItemCount < 1)
             {
-
                 ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
                 copyButton.Enabled = false;
             }
