@@ -11,16 +11,15 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AFollestad.MaterialDialogs;
+using Android.App;
 using Android.Content;
 using Android.Views;
 using Android.Widget;
+using Mark5.Mobile.Common.DataAccess.Exceptions;
+using Mark5.Mobile.Common.Model.Exceptions;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.ServiceReference.Exceptions;
-using Mark5.Mobile.Common.DataAccess.Exceptions;
-using Mark5.Mobile.Common.Model.Exceptions;
-using Android.Support.V4.App;
-using Android.App;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
@@ -90,7 +89,8 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Items(values.Select(t => { return displayText == null ? t.ToString() : displayText(t); }).ToArray());
             builder.ItemsCallbackSingleChoice(-1, new SingleChoiceCallback(si =>
             {
-                tcs.SetResult(values[si]);
+                if (si >= 0)
+                    tcs.SetResult(values[si]);
             }));
             builder.PositiveText(Resource.String.ok);
             builder.NegativeText(Resource.String.cancel);

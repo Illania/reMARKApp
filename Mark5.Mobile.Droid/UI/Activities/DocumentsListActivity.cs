@@ -91,12 +91,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             });
 
             entityMovedToken = PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(m =>
-           {
-               if (dlf != null && m.Sender != dlf && dlf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Document)
-               {
-                   dlf.RemoveMovedEntities(m);
-               }
-           });
+            {
+                if (dlf != null && m.Sender != dlf && dlf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Document)
+                {
+                    dlf.UpdateMovedEntities(m);
+                }
+            });
         }
 
         protected override void OnDestroy()

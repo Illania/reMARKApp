@@ -63,7 +63,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             copyButton.Enabled = false;
             copyButton.Click += async (sender, e) =>
             {
-                CommonConfig.Logger.Info($"Attempting copy to folder [businessEntities.Count={BusinessEntities.Count}, adapter.selectedItemCount={adapter.SelectedItemCount}]...");
+                CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={BusinessEntities.Count}, adapter.selectedItemCount={adapter.SelectedItemCount}]...");
 
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
 
@@ -77,7 +77,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     dismissAction();
 
-                    CommonConfig.Logger.Error($"Copying to folder failed [businessEntities.Count={BusinessEntities.Count}, adapter.selectedItemCount={adapter.SelectedItemCount}]", ex);
+                    CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={BusinessEntities.Count}, adapter.selectedItemCount={adapter.SelectedItemCount}]", ex);
 
                     await Dialogs.ShowErrorDialogAsync(Activity, ex);
                 }

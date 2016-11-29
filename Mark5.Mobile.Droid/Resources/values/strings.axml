@@ -194,4 +194,11 @@
 	<string name="create_system_report">Create system report</string>
 	<string name="save">Save</string>
 	<string name="select_categories">Select categories</string>
+	<string name="marking_as_read">Marking as read...</string>
+	<string name="marking_as_unread">Marking as unread...</string>
+	<string name="setting_priority">Setting priority...</string>
+	<string name="delete_from_folder_are_you_sure">Are you sure you want to delete selected documents from folder?</string>
+	<string name="delete_are_you_sure">Are you sure you want to delete selected documents?</string>
+	<string name="deleting_from_folder">Deleting from folder...</string>
+	<string name="deleting">Deleting...</string>
 </resources>
