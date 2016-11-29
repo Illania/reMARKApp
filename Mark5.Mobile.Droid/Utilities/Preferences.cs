@@ -32,6 +32,8 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
+        #region Documents
+
         public int DocumentsToDownload
         {
             get
@@ -80,6 +82,83 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
+        #endregion
+
+        #region Contacts
+
+        public bool ContactCommunicationFaxNumbersEnabled
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_fax), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_fax_default));
+            }
+        }
+
+        public bool ContactCommunicationTelexNumbersEnabled
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_telex), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_telex_default));
+            }
+        }
+
+        public bool ContactCommunicationImEnabled
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_im), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_im_default));
+            }
+        }
+
+        public bool ContactCommunicationInternalEnabled
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_internal), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_internal_default));
+            }
+        }
+
+        public bool ContactCommunicationOtherEnabled
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_other), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_other_default));
+            }
+        }
+
+        public bool ContactAddressesEnabled
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_address), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_address_default));
+            }
+        }
+
+        public bool ContactBirthdateEnabled
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_birthdate), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_birthdate_default));
+            }
+        }
+
+        public bool ContactAccountEnabled
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_account), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_account_default));
+            }
+        }
+
+        public bool ContactVatEnabled
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_vat), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_vat_default));
+            }
+        }
+
+
         public bool SynchroniseContacts
         {
             get
@@ -87,6 +166,10 @@ namespace Mark5.Mobile.Droid.Utilities
                 return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_synchronised), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_synchronised_default));
             }
         }
+
+        #endregion
+
+        #region Shortcodes
 
         public bool SynchroniseShortcodes
         {
@@ -96,6 +179,10 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
+        #endregion
+
+        #region Composing Documents
+
         public bool RemoveLine
         {
             get
@@ -103,6 +190,24 @@ namespace Mark5.Mobile.Droid.Utilities
                 return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_compose_remove_line), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_compose_remove_line_summary_default));
             }
         }
+
+        public TemplateUsageMode UseTemplate
+        {
+            get
+            {
+                return (TemplateUsageMode)int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_compose_template_mode), Application.Context.GetString(Resource.String.pref_compose_template_mode_default)));
+            }
+        }
+
+        public string LocalTemplate
+        {
+            get
+            {
+                return sp.GetString(Application.Context.GetString(Resource.String.pref_key_compose_template_local), Application.Context.GetString(Resource.String.pref_compose_template_local_default));
+            }
+        }
+
+        #endregion
 
         public bool SilenceNotifications
         {
@@ -190,76 +295,12 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
-        public bool ContactCommunicationFaxNumbersEnabled
+        public enum TemplateUsageMode
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_fax), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_fax_default));
-            }
-        }
-
-        public bool ContactCommunicationTelexNumbersEnabled
-        {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_telex), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_telex_default));
-            }
-        }
-
-        public bool ContactCommunicationImEnabled
-        {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_im), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_im_default));
-            }
-        }
-
-        public bool ContactCommunicationInternalEnabled
-        {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_internal), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_internal_default));
-            }
-        }
-
-        public bool ContactCommunicationOtherEnabled
-        {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_other), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_other_default));
-            }
-        }
-
-        public bool ContactAddressesEnabled
-        {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_address), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_address_default));
-            }
-        }
-
-        public bool ContactBirthdateEnabled
-        {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_birthdate), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_birthdate_default));
-            }
-        }
-
-        public bool ContactAccountEnabled
-        {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_account), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_account_default));
-            }
-        }
-
-        public bool ContactVatEnabled
-        {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_vat), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_vat_default));
-            }
+            DontUse = 0,
+            Default = 1,
+            Local = 2,
+            AlwaysAsk = 3,
         }
     }
 }
