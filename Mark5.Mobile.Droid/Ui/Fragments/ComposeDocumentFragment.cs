@@ -14,7 +14,6 @@ using Android;
 using Android.Content;
 using Android.Database;
 using Android.Provider;
-using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -40,6 +39,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public DocumentDirection PreviousDocumentDirection { get; set; }
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
+        public DocumentCreationModeFlag OutgoingDocumentOriginalCreationModeFlag { get; set; }
         public Guid OutgoingDocumentGuid { get; set; }
         public bool LocalDocument { get; set; }
         public int? PreviousDocumentFolderId { get; set; }
@@ -67,9 +67,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ScrollView scrollView;
         LinearLayoutCompat linearLayout;
         bool documentShown;
-        bool resuming;
+        bool resumed;
         bool templateLoaded;
         bool permissionsAsked;
+        bool sendButtonAvailable = true;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
@@ -131,7 +132,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnResume();
 
-            if (resuming) //On resume called again after access permission requests
+            if (resumed) //On resume called again after access permission requests
             {
                 return;
             }
@@ -146,8 +147,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             await ShowDocument();
 
             AskForPermissions();
-
-            resuming = true;
+            Activity.InvalidateOptionsMenu();
+            resumed = true;
         }
 
         void AskForPermissions()
@@ -177,10 +178,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                var sourceType = PreviousDocumentDirection == DocumentDirection.Draft ? SourceType.Auto : SourceType.Local;
-                var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, sourceType);
-                PreviousDocument = container.Document;
-                PreviousDocumentPreview = container.DocumentPreview;
+                if (LocalDocument)
+                {
+                    var outgoingContainer = await Managers.DocumentsManager.GetOutgoingDocumentContainerAsync(OutgoingDocumentGuid);
+                    PreviousDocument = outgoingContainer.Document;
+                    PreviousDocumentPreview = outgoingContainer.DocumentPreview;
+                    OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag;
+                    PreviousDocumentId = outgoingContainer.Info.PrecedingDocumentId;
+                    PreviousDocumentFolderId = outgoingContainer.Info.PrecedingDocumentFolderId;
+                    if (outgoingContainer.Info.State == OutgoingDocumentState.Failed)
+                    {
+                        await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(Resource.String.error_while_sending_document)));
+                    }
+                    else
+                    {
+                        sendButtonAvailable = false; //TODO probably locked should be another thing, not a state
+                    }
+                }
+                else
+                {
+                    var sourceType = PreviousDocumentDirection == DocumentDirection.Draft ? SourceType.Auto : SourceType.Local;
+                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, sourceType);
+                    PreviousDocument = container.Document;
+                    PreviousDocumentPreview = container.DocumentPreview;
+                }
             }
             catch (Exception ex)
             {
@@ -211,6 +232,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 await subView.RefreshView();
             }
 
+            AddSendButtonIfNecessary();
             UpdateSendButtonState();
 
             await AskIfShouldUseTemplates();
@@ -330,7 +352,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 DocumentPreview.Direction = draft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
                 DocumentPreview.DateReceivedTimestamp = DateTime.Now.ToUniversalTime().ConvertDateTimeToTimestampMilliseconds();
-                await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, CreationModeFlag,
+                await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,
                                                                         PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1,
                                                                        0, false, false);
             }).ContinueWith(async t =>
@@ -349,16 +371,52 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        public void AskIfShouldSaveAsDraft()
+        void SaveModifiedOutgoingDocument()
         {
-            Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft, () => SendDocument(true), CloseComposeActivity);
+            Task.Run(async () =>
+            {
+                foreach (var subView in subViews)
+                {
+                    await subView.UpdateDocument();
+                }
+
+                await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,
+                                                                        PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1,
+                                                                       0, false, false);
+            }).ContinueWith(async t =>
+           {
+               if (t.IsFaulted)
+               {
+                   CommonConfig.Logger.Error($"Failed to save modified outgoing document [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", t.Exception.InnerException);
+                   await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
+               }
+               else
+               {
+                   Activity.Finish();
+               }
+           }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        void CloseComposeActivity()
+        public void AskIfShouldSaveAsDraft()
+        {
+            if (LocalDocument)
+            {
+                Dialogs.ShowYesNoDialog(Context, Resource.String.save_modifications, Resource.String.confirm_save_modified_document, SaveModifiedOutgoingDocument, SaveAndCloseComposeActivity);
+            }
+            else
+            {
+                Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft, () => SendDocument(true), SaveAndCloseComposeActivity);
+            }
+        }
+
+        void SaveAndCloseComposeActivity()
         {
             Task.Run(async () =>
            {
-               await Managers.DocumentsManager.DeleteOutgoingDocumentFolder(OutgoingDocumentGuid);
+               if (!LocalDocument)
+               {
+                   await Managers.DocumentsManager.DeleteOutgoingDocumentFolder(OutgoingDocumentGuid);
+               }
            }).ContinueWith(t =>
           {
               Activity.Finish();
@@ -449,15 +507,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             optionsMenu = menu;
+            optionsMenu.Clear();
 
             var attachmentItem = menu.Add(Menu.None, MenuItemActions.AddAttachment, MenuItemActions.AddAttachment, Resource.String.add_attachment);
             attachmentItem.SetIcon(Resource.Drawable.add_attachment);
             attachmentItem.SetShowAsAction(ShowAsAction.Always);
 
-            var sendItem = menu.Add(Menu.None, MenuItemActions.SendDocument, MenuItemActions.SendDocument, Resource.String.send);
-            sendItem.SetIcon(Resource.Drawable.send_white);
-            sendItem.SetShowAsAction(ShowAsAction.Always);
-            sendItem.SetEnabled(false);
+            if (sendButtonAvailable)
+            {
+                var sendItem = optionsMenu.Add(Menu.None, MenuItemActions.SendDocument, MenuItemActions.SendDocument, Resource.String.send);
+                sendItem.SetIcon(Resource.Drawable.send_white);
+                sendItem.SetShowAsAction(ShowAsAction.Always);
+                sendItem.SetEnabled(false);
+            }
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -483,14 +545,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Activity.StartActivityForResult(i, AttachmentRequestCode);
         }
 
+        void AddSendButtonIfNecessary()
+        {
+        }
+
         void UpdateSendButtonState()
         {
-            var sendItem = optionsMenu?.FindItem(MenuItemActions.SendDocument);
+            if (optionsMenu == null || !sendButtonAvailable)
+            {
+                return;
+            }
+
+            var sendItem = optionsMenu.FindItem(MenuItemActions.SendDocument);
             if (sendItem != null)
             {
                 var isFormValid = IsFormValid();
                 sendItem.SetEnabled(isFormValid);
-                sendItem.Icon.Mutate().Alpha = isFormValid ? 255 : 130; //Change of alpha is not done for icons automatically
+                sendItem.Icon.Mutate().Alpha = isFormValid ? 255 : 130; //Change of alpha is not done for icons automatically 
             }
         }
 
@@ -750,6 +821,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 ContentState = contentView.ReturnState(),
                 LocalDocument = LocalDocument,
                 PermissionsAsked = permissionsAsked,
+                OutgoingDocumentOriginalCreationModeFlag = OutgoingDocumentOriginalCreationModeFlag,
+                SendButtonAvailable = sendButtonAvailable,
             };
         }
 
@@ -777,6 +850,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 contentView.State = cfs.ContentState;
                 LocalDocument = cfs.LocalDocument;
                 permissionsAsked = cfs.PermissionsAsked;
+                OutgoingDocumentOriginalCreationModeFlag = cfs.OutgoingDocumentOriginalCreationModeFlag;
+                sendButtonAvailable = cfs.SendButtonAvailable;
             }
         }
 
@@ -797,7 +872,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public bool TemplateLoaded { get; set; }
             public bool LocalDocument { get; set; }
             public bool PermissionsAsked { get; set; }
+            public bool SendButtonAvailable { get; set; }
             public DocumentCreationModeFlag CreationModeFlag { get; set; }
+            public DocumentCreationModeFlag OutgoingDocumentOriginalCreationModeFlag { get; set; }
             public IComposeDocumentViewState ToState { get; set; }
             public IComposeDocumentViewState CcState { get; set; }
             public IComposeDocumentViewState BccState { get; set; }

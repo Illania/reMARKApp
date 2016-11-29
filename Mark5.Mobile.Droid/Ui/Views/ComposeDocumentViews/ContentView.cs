@@ -9,7 +9,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
@@ -51,7 +50,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                                             <head>
                                             </head>
                                             <body style=""min-height: 200px;"">
-                                                <div class=""" + EditableContentClass + @""" contenteditable=""true"" style=""width: 100%;""><br><br></div>
+                                                <div class=""" + EditableContentClass + @""" contenteditable=""true"" style=""width: 100%;""><br></div>
                                                 <div class=""" + TemplateElementClass + @""" contenteditable=""true""></div>
                                             </body>
                                         </html>";
@@ -160,7 +159,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public override async Task UpdateDocument()
         {
             Document.HtmlBody = await RetrieveCombinedText();
-            DocumentPreview.Preview = GetPlainText(Document.HtmlBody);
+            DocumentPreview.Preview = await GetPreview(Document.HtmlBody);
         }
 
         public async Task InsertTemplate(Template template)
@@ -399,10 +398,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             return tcs.Task;
         }
 
-        // Implementation based on http://stackoverflow.com/questions/5870438/get-plain-text-from-html-in-net
-        static string GetPlainText(string htmlText)
+        static async Task<string> GetPreview(string htmlText)
         {
-            return Regex.Replace(htmlText, @"<(.|\n)*?>", "").SafeSubstring(0, 300).TrimStart();
+            var htmlParser = new HtmlParser();
+            var newContentParsed = await htmlParser.ParseAsync(htmlText);
+            var textContent = newContentParsed.Body.TextContent;
+            return textContent.SafeSubstring(0, 300).TrimStart();
         }
 
         string GetAddressTextFromPreviousDocument(DocumentAddressType addressType)

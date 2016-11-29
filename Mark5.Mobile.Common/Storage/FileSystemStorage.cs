@@ -180,6 +180,13 @@ namespace Mark5.Mobile.Common.Storage
         {
             var outgoingDocumentFolder = await GetOutgoingFolderAsync(outgoingDocumentInfo.Identifier);
 
+            var wasFailed = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed)) == ExistenceCheckResult.FileExists;
+            if (wasFailed)
+            {
+                var isFailedFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingFailed);
+                await isFailedFile.DeleteAsync();
+            }
+
             var documentFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingDocument, CreationCollisionOption.ReplaceExisting);
             await documentFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(document));
 
