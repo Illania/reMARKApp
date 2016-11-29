@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.ServiceReference.DataContract
 // File: AppServiceDataContract.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
+#pragma warning disable CS1701
 namespace Mark5.ServiceReference.DataContract
 {
 

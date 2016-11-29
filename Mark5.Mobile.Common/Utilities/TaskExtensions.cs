@@ -1,12 +1,14 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: TaskExtensions.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.Threading.Tasks;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Utilities
 {
 
@@ -19,8 +21,17 @@ namespace Mark5.Mobile.Common.Utilities
             {
                 await task.ConfigureAwait(false);
             }
-            catch
+            catch (AggregateException ex)
             {
+                ex.Handle(e =>
+                {
+                    CommonConfig.Logger?.Error(e);
+                    return true;
+                });
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger?.Error(ex);
             }
         }
     }

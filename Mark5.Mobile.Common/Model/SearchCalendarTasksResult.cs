@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: SearchCalendarTasksResult.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using Mark5.Mobile.Common.Model;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common
 {
 

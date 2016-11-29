@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: FileSystemStorage.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -7,7 +7,6 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,6 +15,7 @@ using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Common.Utilities;
 using PCLStorage;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Storage
 {
 
@@ -36,7 +36,7 @@ namespace Mark5.Mobile.Common.Storage
             public const string OutgoingDocument = "document.json";
             public const string OutgoingDocumentPreview = "documentPreview.json";
             public const string OutgoingInfo = "info.json";
-            public const string OugoingLock = ".lock";
+            public const string OutgoingLock = ".lock";
             public const string OutgoingFailed = ".failed";
             public const string OutgoingAttachmentFolder = "attachment";
         }
@@ -51,7 +51,7 @@ namespace Mark5.Mobile.Common.Storage
             [Filenames.OfflineFolders] = new SemaphoreSlim(1),
             [Filenames.NotificationSettings] = new SemaphoreSlim(1),
             [Filenames.LastCacheCleanUp] = new SemaphoreSlim(1)
-        }.ToImmutableDictionary();
+        };
 
         static readonly IDictionary<string, object> objectCache = new Dictionary<string, object>();
 
@@ -315,8 +315,8 @@ namespace Mark5.Mobile.Common.Storage
             foreach (var item in await attachmentsFolder.GetFilesAsync())
             {
                 var attachment = new Attachment();
-                attachment.Stream = await item.OpenAsync(FileAccess.Read);
-                attachment.Size = (int)attachment.Stream.Length;
+                attachment.Stream = await item.OpenAsync(PCLStorage.FileAccess.Read);
+                attachment.Size = (int)attachment.Stream.Length; //TODO check this
                 attachment.Extension = Path.GetExtension(item.Name);
                 attachment.Filename = Path.GetFileNameWithoutExtension(item.Name);
                 attachments.Add(attachment);
@@ -335,7 +335,7 @@ namespace Mark5.Mobile.Common.Storage
             }
 
             var file = await attachmentsFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting, ct);
-            using (var fileStream = await file.OpenAsync(FileAccess.ReadAndWrite))
+            using (var fileStream = await file.OpenAsync(PCLStorage.FileAccess.ReadAndWrite))
             {
                 await attachmentStream.CopyToAsync(fileStream);
             }
@@ -396,7 +396,7 @@ namespace Mark5.Mobile.Common.Storage
             }
 
             var file = await CommonConfig.AttachmentsFolder.CreateFileAsync(GetAttachmentFilename(attachmentDescription), CreationCollisionOption.ReplaceExisting, ct);
-            using (var fileStream = await file.OpenAsync(FileAccess.ReadAndWrite))
+            using (var fileStream = await file.OpenAsync(PCLStorage.FileAccess.ReadAndWrite))
             {
                 await attachmentStream.CopyToAsync(fileStream);
             }
@@ -411,7 +411,7 @@ namespace Mark5.Mobile.Common.Storage
             var fileExists = await CommonConfig.AttachmentsFolder.CheckExistsAsync(filename);
             if (fileExists == ExistenceCheckResult.FileExists)
             {
-                return PortablePath.Combine(CommonConfig.AttachmentsFolder.Path, filename);
+                return CommonConfig.AttachmentsFolder.Path + CommonConfig.PathSeparator + filename;
             }
 
             return string.Empty;

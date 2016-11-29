@@ -5,15 +5,19 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using Android.Content;
+using Android.Support.V4.View;
 using Android.Views;
+using Android.Webkit;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Ui.Views.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
+
     public class ContentView : DocumentView
     {
+
         CustomWebView webView;
 
         public ContentView(Context context)
@@ -61,6 +65,42 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 Visibility = ViewStates.Gone;
 
                 webView.LoadData(string.Empty, "text/plain", "UTF-8");
+            }
+        }
+
+        class CustomWebView : WebView
+        {
+
+            public CustomWebView(Context context)
+                : base(context)
+            {
+            }
+
+            public override bool OnTouchEvent(MotionEvent e)
+            {
+                if (e.FindPointerIndex(0) != -1)
+                {
+                    RequestDisallowInterceptTouchEvent(e.PointerCount > 1);
+                }
+
+                return base.OnTouchEvent(e);
+            }
+
+            protected override void OnOverScrolled(int scrollX, int scrollY, bool clampedX, bool clampedY)
+            {
+                base.OnOverScrolled(scrollX, scrollY, clampedX, clampedY);
+                RequestDisallowInterceptTouchEvent(true);
+            }
+        }
+
+        class CustomWebViewClient : WebViewClient
+        {
+
+            [Obsolete]
+            public override bool ShouldOverrideUrlLoading(WebView view, string url)
+            {
+                view.Context.StartActivity(new Intent(Intent.ActionView, Android.Net.Uri.Parse(url)));
+                return true;
             }
         }
     }

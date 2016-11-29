@@ -11,6 +11,7 @@ using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Model;
 using Mark5.ServiceReference;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
 {
 

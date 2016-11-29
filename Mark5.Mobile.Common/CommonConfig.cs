@@ -11,11 +11,14 @@ using Mark5.Mobile.Common.Services;
 using Mark5.Mobile.Common.Utilities;
 using PCLStorage;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common
 {
 
     public static class CommonConfig
     {
+
+        public static char PathSeparator { get; set; }
 
         public static IFolder DataFolder { get; set; }
 

@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: DocumentSearchResultsFragment.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -138,7 +138,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Refresh running...");
 
-                refreshLayout.Post(() => refreshLayout.Refreshing = true); //Bug: fixed in support library v 24.2.0 (issue 77712)
+                refreshLayout.Refreshing = true;
 
                 var searchResults = await Managers.SearchManager.SearchDocumentsAsync(Criteria);
                 searchId = searchResults.SearchId;
@@ -154,7 +154,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             finally
             {
-                refreshLayout.Post(() => refreshLayout.Refreshing = false); //Bug: fixed in support library v 24.2.0 (issue 77712)
+                refreshLayout.Refreshing = false;
 
                 CommonConfig.Logger.Info($"Refresh finished");
             }

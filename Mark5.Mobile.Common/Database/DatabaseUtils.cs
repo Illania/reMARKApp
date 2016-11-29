@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: DatabaseUtils.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Links;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Database
 {
 
@@ -55,6 +56,11 @@ namespace Mark5.Mobile.Common.Database
                 c.CreateTable<CalendarAppointment>();
                 c.CreateTable<Category>();
             });
+            await DatabaseConnectionProvider.SystemDatabase.RunInConnectionAsync(c =>
+            {
+                c.CreateTable<Notification>();
+                c.CreateTable<ReadNotificationInfo>();
+            });
         }
 
         public static async Task ClearDatabases()
@@ -96,27 +102,32 @@ namespace Mark5.Mobile.Common.Database
                 c.DeleteAll<CalendarAppointment>();
                 c.DeleteAll<Category>();
             });
+            await DatabaseConnectionProvider.SystemDatabase.RunInConnectionAsync(c =>
+            {
+                c.DeleteAll<Notification>();
+                c.DeleteAll<ReadNotificationInfo>();
+            });
         }
 
         public static async Task CompactDatabases()
         {
-            await DatabaseConnectionProvider.DocumentsDatabase.RunInConnectionAsync(c =>
+            await DatabaseConnectionProvider.DocumentsDatabase.RunInConnectionWithoutTransactionAsync(c =>
             {
                 c.CreateCommand("VACUUM;").ExecuteNonQuery();
             });
-            await DatabaseConnectionProvider.ContactsDatabase.RunInConnectionAsync(c =>
+            await DatabaseConnectionProvider.ContactsDatabase.RunInConnectionWithoutTransactionAsync(c =>
             {
                 c.CreateCommand("VACUUM;").ExecuteNonQuery();
             });
-            await DatabaseConnectionProvider.ShortcodesDatabase.RunInConnectionAsync(c =>
+            await DatabaseConnectionProvider.ShortcodesDatabase.RunInConnectionWithoutTransactionAsync(c =>
             {
                 c.CreateCommand("VACUUM;").ExecuteNonQuery();
             });
-            await DatabaseConnectionProvider.CalendarDatabase.RunInConnectionAsync(c =>
+            await DatabaseConnectionProvider.CalendarDatabase.RunInConnectionWithoutTransactionAsync(c =>
             {
                 c.CreateCommand("VACUUM;").ExecuteNonQuery();
             });
-            await DatabaseConnectionProvider.SystemDatabase.RunInConnectionAsync(c =>
+            await DatabaseConnectionProvider.SystemDatabase.RunInConnectionWithoutTransactionAsync(c =>
             {
                 c.CreateCommand("VACUUM;").ExecuteNonQuery();
             });

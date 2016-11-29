@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -13,6 +14,7 @@ using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
+using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
@@ -20,6 +22,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Services;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -103,9 +106,41 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             portEditText.SetSelection(savedInstanceState.GetInt("ssl"));
         }
 
-        public override void OnRestoreInstanceState(Bundle savedInstanceState, PersistableBundle persistentState)
+        static class MenuItemActions
         {
-            base.OnRestoreInstanceState(savedInstanceState, persistentState);
+            public const int SystemReport = 10;
+        }
+
+        public override bool OnCreateOptionsMenu(IMenu menu)
+        {
+            menu.Add(Menu.None, MenuItemActions.SystemReport, MenuItemActions.SystemReport, Resource.String.create_system_report);
+
+            return true;
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == MenuItemActions.SystemReport)
+            {
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.dialog_creating_report, Resource.String.please_wait);
+
+                Task.Run(() =>
+                {
+                    return SystemReportCollector.CreateFullReport();
+                }).ContinueWith(t =>
+                {
+                    dismissAction();
+
+                    if (!t.IsFaulted)
+                    {
+                        StartActivity(SystemReportCollector.CreateShareReportIntent(this, t.Result));
+                    }
+                }, TaskScheduler.FromCurrentSynchronizationContext());
+
+                return true;
+            }
+
+            return false;
         }
 
         async void LoginButton_Click(object sender, EventArgs e)
@@ -208,6 +243,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     policies[ObjectType.Shortcode] = new DownloadAllPolicy();
                 }
 
+                CommonConfig.Logger.Info("Retrieving system settings...");
+
+                ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
+
                 CommonConfig.Logger.Info($"Starting {nameof(IDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
 
                 await Managers.DownloadManager.Start();
@@ -219,11 +258,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
                 PlatformConfig.ReachabilityBroadcastReceiver.Register();
 
-                CommonConfig.Logger.Info("Retrieving system settings...");
-
-                ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
-
                 CommonConfig.Logger.Info($"Logged in - will present {nameof(MainActivity)}");
+
+                if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
+                {
+                    CommonConfig.Logger.Info($"Sending Firebase token to service...");
+
+                    await Managers.NotificationsManager.Subscribe(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
+                }
 
                 StartActivity(new Intent(this, typeof(MainActivity)));
                 Finish();

@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: FileSystemStorageUpdater.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -9,6 +9,7 @@
 using System.Threading.Tasks;
 using PCLStorage;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Storage
 {
 

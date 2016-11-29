@@ -8,6 +8,7 @@
 using System;
 using SQLite;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
 
@@ -47,6 +48,14 @@ namespace Mark5.Mobile.Common.Model
 
         [Column("IsSilent")]
         public bool IsSilent { get; set; }
+
+        [Ignore]
+        public bool IsRead { get; set; }
+
+        public override string ToString()
+        {
+            return $"[Notification: Id={Id}, Guid={Guid}, Title={Title}, Message={Message}, Type={Type}, DateTimeTimestamp={DateTimeTimestamp}, ObjectType={ObjectType}, ObjectId={ObjectId}, FolderId={FolderId}, RemindOnTimestamp={RemindOnTimestamp}, IsSilent={IsSilent}, IsRead={IsRead}]";
+        }
     }
 }
 

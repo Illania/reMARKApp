@@ -22,7 +22,6 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
-using Mark5.Mobile.Droid.Utilities.PushNotifications;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -83,6 +82,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         [Resource.Id.nav_documents] = new ModulesMenuItemContent(ModuleType.Documents),
                         [Resource.Id.nav_contacts] = new ModulesMenuItemContent(ModuleType.Contacts),
                         [Resource.Id.nav_shortcodes] = new ModulesMenuItemContent(ModuleType.Shortcodes),
+                        [Resource.Id.nav_notifications] = new NotificationsMenuItemContent(),
                         [Resource.Id.nav_settings] = new PreferencesMenuItemContent()
                     }
                 };
@@ -90,9 +90,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var initialMenuItem = navigationView.Menu.FindItem(Resource.Id.nav_documents);
                 initialMenuItem.SetChecked(true);
                 OnNavigationItemSelected(initialMenuItem);
-
-                var registrationIntent = new Intent(this, typeof(RegistrationIntentService));
-                StartService(registrationIntent);
 
                 Task.Run(async () =>
                 {
@@ -318,6 +315,61 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         foldersListFragment.SetInitialSavedState(state);
                         ft.SetTransition(FragmentTransaction.TransitFragmentFade);
                         ft.Replace(Resource.Id.fragment_container, foldersListFragment, tag);
+                        ft.AddToBackStack(tag);
+                        ft.Commit();
+                    }
+
+                    BackstackStates.Clear();
+                    SavedTags.Clear();
+                }
+            }
+        }
+
+        class NotificationsMenuItemContent : MenuItemContent
+        {
+
+            public override void Save(FragmentManager fm)
+            {
+                BackstackStates.Clear();
+                SavedTags.Clear();
+
+                for (int i = 0; i < fm.BackStackEntryCount; i++)
+                {
+                    var tag = fm.GetBackStackEntryAt(i).Name;
+                    var fragment = fm.FindFragmentByTag(tag);
+                    var state = fm.SaveFragmentInstanceState(fragment);
+                    SavedTags.Add(tag);
+                    BackstackStates.Add(state);
+                }
+            }
+
+            public override void RestoreOrCreate(FragmentManager fm)
+            {
+                if (BackstackStates == null || !BackstackStates.Any())
+                {
+                    var notificationsFragment = new NotificationsFragment();
+
+                    var tag = notificationsFragment.GenerateTag();
+                    var ft = fm.BeginTransaction();
+                    ft.SetTransition(FragmentTransaction.TransitFragmentFade);
+                    ft.Replace(Resource.Id.fragment_container, notificationsFragment, tag);
+                    ft.AddToBackStack(tag);
+                    ft.Commit();
+                }
+                else
+                {
+                    var backStackStatesAndTags = BackstackStates.Zip(SavedTags, (state, tag) => new { State = state, Tag = tag });
+
+                    foreach (var item in backStackStatesAndTags)
+                    {
+                        var state = item.State;
+                        var tag = item.Tag;
+
+                        var ft = fm.BeginTransaction();
+                        var notificationsFragment = new NotificationsFragment();
+                        notificationsFragment.SetInitialSavedState(state);
+                        ft.SetTransition(FragmentTransaction.TransitFragmentFade);
+                        ft.Replace(Resource.Id.fragment_container, notificationsFragment, tag);
                         ft.AddToBackStack(tag);
                         ft.Commit();
                     }

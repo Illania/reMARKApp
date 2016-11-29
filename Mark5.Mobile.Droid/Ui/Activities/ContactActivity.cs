@@ -26,10 +26,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     public class ContactActivity : BaseAppCompatActivity
     {
 
+        public const string FolderIdIntentKey = "FolderId_35678826-1e66-4e81-9f6a-68b758712338";
         public const string FolderIntentKey = "Folder_88a33f0b-ebbf-4eed-b33d-49fba4f43f15";
         public const string SearchIdIntentKey = "SearchId_7634b0db-2217-4f5b-90a8-903ed1782e77";
+        public const string ContactIdIntentKey = "ContactId_248178bc-e0e4-4ca2-aad5-ffaed65514e5";
         public const string ContactPreviewIntentKey = "ContactPreview_0da27d12-4d29-4f44-8dbf-2e28d7f93aae";
         public const string ReadOnlyModeIntentKey = "ReadOnlyMode_660e0fd1-17df-46f2-a4c2-44dacb9f0a76";
+        public const string NotificationGuidIntentKey = "NotificationGuid_d0224832-22e3-481b-9c0d-78b361a57691";
 
         const string cfFragmentTagKey = "fragmentTagKey";
         string cfFragmentTag;
@@ -62,19 +65,32 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
-                var searchId = Intent.Extras.GetInt(SearchIdIntentKey);
-                var contactPreview = SerializationUtils.Deserialize<ContactPreview>(Intent.Extras.GetString(ContactPreviewIntentKey));
-                var readOnlyMode = Intent.Extras.GetBoolean(ReadOnlyModeIntentKey);
+                cf = new ContactFragment();
+
+                if (Intent.HasExtra(FolderIdIntentKey))
+                    cf.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
+
+                if (Intent.HasExtra(FolderIntentKey))
+                    cf.Folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+
+                if (Intent.HasExtra(SearchIdIntentKey))
+                    cf.SearchId = Intent.Extras.GetInt(SearchIdIntentKey);
+
+                if (Intent.HasExtra(ContactIdIntentKey))
+                    cf.ContactId = Intent.Extras.GetInt(ContactIdIntentKey);
+
+                if (Intent.HasExtra(ContactPreviewIntentKey))
+                    cf.ContactPreview = SerializationUtils.Deserialize<ContactPreview>(Intent.Extras.GetString(ContactPreviewIntentKey));
+
+                if (Intent.HasExtra(ReadOnlyModeIntentKey))
+                    cf.ReadOnlyMode = Intent.Extras.GetBoolean(ReadOnlyModeIntentKey);
+
+                if (Intent.HasExtra(NotificationGuidIntentKey))
+                    cf.NotificationGuid = SerializationUtils.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
+
+                cf.CloseRequest = OnBackPressed;
+
                 var ft = SupportFragmentManager.BeginTransaction();
-                cf = new ContactFragment
-                {
-                    Folder = folder,
-                    SearchId = searchId,
-                    ContactPreview = contactPreview,
-                    CloseRequest = OnBackPressed,
-                    ReadOnlyMode = readOnlyMode
-                };
                 cfFragmentTag = cf.GenerateTag();
                 ft.Replace(Resource.Id.fragment_container, cf, cfFragmentTag);
                 ft.Commit();

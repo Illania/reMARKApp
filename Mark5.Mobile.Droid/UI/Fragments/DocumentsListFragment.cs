@@ -284,7 +284,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (refreshing) return;
 
                 refreshing = true;
-                refreshLayout.Post(() => refreshLayout.Refreshing = true); //Bug: fixed in support library v 24.2.0 (issue 77712)
+                refreshLayout.Refreshing = true;
 
                 CommonConfig.Logger.Info($"Refresh running...");
 
@@ -308,7 +308,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             finally
             {
-                refreshLayout.Post(() => refreshLayout.Refreshing = false); //Bug: fixed in support library v 24.2.0 (issue 77712)
+                refreshLayout.Refreshing = false;
                 refreshing = false;
 
                 CommonConfig.Logger.Info($"Refresh finished");
@@ -365,6 +365,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         #endregion
 
         #region Action mode
+
+        static class MenuItemActions
+        {
+            public const int MarkAsRead = 10;
+            public const int MarkAsUnread = 11;
+            public const int Reply = 20;
+            public const int ReplyAll = 21;
+            public const int Forward = 22;
+            public const int CopyToWorktray = 30;
+            public const int CopyToFolder = 40;
+            public const int MoveToFolder = 41;
+            public const int SetPriority = 50;
+            public const int Categories = 60;
+            public const int DeleteFromFolder = 70;
+            public const int Delete = 71;
+        }
 
         bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
@@ -473,22 +489,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var currentAdapter = (DocumentsListAdapter)recyclerView.GetAdapter();
             currentAdapter.ClearSelections();
             actionMode = null;
-        }
-
-        static class MenuItemActions
-        {
-            public const int MarkAsRead = 10;
-            public const int MarkAsUnread = 11;
-            public const int Reply = 20;
-            public const int ReplyAll = 21;
-            public const int Forward = 22;
-            public const int CopyToWorktray = 30;
-            public const int CopyToFolder = 40;
-            public const int MoveToFolder = 41;
-            public const int SetPriority = 50;
-            public const int Categories = 60;
-            public const int DeleteFromFolder = 70;
-            public const int Delete = 71;
         }
 
         async void CopyToWorktrayAction()
@@ -796,7 +796,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dpvh.AttachmentIndicator = dp.AttachmentsCount > 0;
                     dpvh.CommentIndicator = dp.CommentsCount > 0;
 
-                    dpvh.Compact = compactList;
+                    if (compactList)
+                    {
+                        dpvh.Preview = null;
+                        dpvh.AttachmentIndicator = false;
+                        dpvh.CommentIndicator = false;
+                    }
+
                     dpvh.Selected = selectedDocumentsInView.ContainsKey(dp.Id);
 
                     if (loadMoreAction != null && position == ItemCount - 1)
@@ -974,7 +980,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 set
                 {
-                    previewTextView.Text = value;
+                    if (value == null)
+                    {
+                        previewTextView.Text = string.Empty;
+                        previewTextView.Visibility = ViewStates.Gone;
+                    }
+                    else
+                    {
+                        previewTextView.Text = value;
+                        previewTextView.Visibility = ViewStates.Visible;
+                    }
                 }
             }
 

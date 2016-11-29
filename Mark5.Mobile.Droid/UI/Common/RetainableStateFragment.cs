@@ -8,6 +8,7 @@
 using Android.OS;
 using Android.Support.V4.App;
 using Android.Views;
+using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
@@ -21,6 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
+            CommonConfig.Logger.Debug($"Creating retainable fragment {Tag}");
 
             retainedFragment = RetainedFragment<IRetainableState>.FindOrCreate(Activity.SupportFragmentManager, Tag);
             OnRetainedInstanceStateRestored(retainedFragment.State);
@@ -74,6 +76,9 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         public virtual void OnDestroyedByUser()
         {
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug($"Destroing retainable fragment {Tag}");
+
             retainedFragment.Remove(Activity.SupportFragmentManager);
             retainedFragment.State = null;
             retainedFragment = null;

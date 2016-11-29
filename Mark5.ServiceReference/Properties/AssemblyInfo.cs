@@ -1,5 +1,5 @@
 ﻿//
-// Project: Mark5.Mobile.Common
+// Project: Mark5.ServiceReference.Exceptions
 // File: AssemblyInfo.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
@@ -31,4 +31,3 @@ using System.Runtime.CompilerServices;
 
 //[assembly: AssemblyDelaySign(false)]
 //[assembly: AssemblyKeyFile("")]
-

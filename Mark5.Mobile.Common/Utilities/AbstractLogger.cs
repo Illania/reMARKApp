@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: AbstractLogger.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -7,6 +7,7 @@
 //
 using System;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Utilities
 {
 

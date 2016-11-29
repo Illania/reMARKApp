@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
@@ -41,20 +42,21 @@ namespace Mark5.Mobile.Droid
             {
                 var mainFolder = FileSystem.Current.LocalStorage;
 
-                CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "data"), CreationCollisionOption.OpenIfExists);
-                CommonConfig.OutgoingFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "out"), CreationCollisionOption.OpenIfExists);
-                CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "db"), CreationCollisionOption.OpenIfExists);
-                CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("..", "cache", "att"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.PathSeparator = Path.PathSeparator;
+                CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "data"), CreationCollisionOption.OpenIfExists); ;
+                CommonConfig.OutgoingFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "out"), CreationCollisionOption.OpenIfExists); ;
+                CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "db"), CreationCollisionOption.OpenIfExists); ;
+                CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("..", "cache", "att"), CreationCollisionOption.OpenIfExists); ;
                 CommonConfig.Logger = new SimpleLogger();
                 CommonConfig.ReachabilityService = new ReachabilityService();
                 CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
                 CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
                 CommonConfig.HttpClientHandler = () => { return new AndroidClientHandler(); };
-                CommonConfig.PhonebookUtilities = new PhonebookUtilities();
+
 #if !DEBUG
-                CommonConfig.Logger.Level = LogLevel.TRACE;
-#else
                 CommonConfig.Logger.Level = LogLevel.INFO;
+#else
+                CommonConfig.Logger.Level = LogLevel.DEBUG;
 #endif
 
                 await DatabaseUtils.InitializeDatabases();
@@ -63,7 +65,6 @@ namespace Mark5.Mobile.Droid
                 PlatformConfig.ReachabilityBroadcastReceiver = new ReachabilityBroadcastReceiver();
                 PlatformConfig.Preferences = new Preferences();
                 PlatformConfig.MessengerHub = new TinyMessengerHub();
-
             }).Wait();
 
             CommonConfig.Logger.Info($"Initialized {nameof(Mark5Application)}");

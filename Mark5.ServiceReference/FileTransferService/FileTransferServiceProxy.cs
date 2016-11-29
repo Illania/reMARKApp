@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.ServiceReference
 // File: FileTransferServiceProxy.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -16,6 +16,7 @@ using Mark5.ServiceReference.DataContract;
 using Mark5.ServiceReference.Exceptions;
 using Newtonsoft.Json;
 
+#pragma warning disable CS1701
 namespace Mark5.ServiceReference.FileTransferService
 {
 

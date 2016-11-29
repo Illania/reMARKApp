@@ -11,8 +11,10 @@ using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Common.BusMesseges
 {
+
     public class EntityMovedFromFolderMessage : TinyMessageBase
     {
+
         public ObjectType ObjectType
         {
             get;

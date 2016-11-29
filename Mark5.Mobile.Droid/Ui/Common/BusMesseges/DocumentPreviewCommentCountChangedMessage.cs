@@ -5,13 +5,14 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
 using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Common.BusMesseges
 {
+
     public class DocumentPreviewCommentCountChangedMessage : TinyMessageBase
     {
+
         public int DocumentPreviewId
         {
             get;

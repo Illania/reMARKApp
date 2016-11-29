@@ -17,6 +17,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
 {
 

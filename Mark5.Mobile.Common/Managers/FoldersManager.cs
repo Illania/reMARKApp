@@ -17,6 +17,7 @@ using Mark5.Mobile.Common.Storage;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
 {
 
@@ -170,7 +171,7 @@ namespace Mark5.Mobile.Common.Managers
             foreach (var folder in folders)
             {
                 folder.ParentFolderId = parentFolder?.Id ?? 0;
-                folder.Path = parentPath + Folder.PathSeparator + folder.Name;
+                folder.Path = parentPath + CommonConfig.PathSeparator + folder.Name;
                 if (folder.HasSubFolders && folder.SubFolders.Count > 0)
                 {
                     ProcessFolders(folder.SubFolders, folder);

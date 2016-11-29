@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using SQLite;
 using Mark5.Mobile.Common.Utilities;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
 

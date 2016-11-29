@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: SearchDocumentsResult.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -7,6 +7,7 @@
 //
 using System.Collections.Generic;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
     public class SearchDocumentsResult

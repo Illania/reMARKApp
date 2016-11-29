@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.ServiceReference.DataContract
 // File: FtsServiceDataContract.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -8,6 +8,7 @@
 using System;
 using System.IO;
 
+#pragma warning disable CS1701
 namespace Mark5.ServiceReference.DataContract
 {
 

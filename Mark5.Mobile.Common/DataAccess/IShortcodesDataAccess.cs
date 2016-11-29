@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.DataAccess
 {
 

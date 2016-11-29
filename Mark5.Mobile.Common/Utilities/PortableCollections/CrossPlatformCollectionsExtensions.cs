@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: CrossPlatformCollectionsExtensions.cs
 // Author: Ferdinando Papale <fp@nordic-it.com>
@@ -7,6 +7,7 @@
 //
 using Mark5.Mobile.Common.PortableCollections;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common
 {
 

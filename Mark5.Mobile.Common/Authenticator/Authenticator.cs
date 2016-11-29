@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: AuthenticationManager.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -13,6 +13,7 @@ using Mark5.Mobile.Common.Storage;
 using Mark5.ServiceReference;
 using DataContract = Mark5.ServiceReference.DataContract;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Authenticator
 {
 

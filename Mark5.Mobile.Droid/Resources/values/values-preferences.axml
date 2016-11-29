@@ -61,6 +61,9 @@
 	</string-array>
 	<string name="pref_compose_template_mode_default">1</string>
 	<string name="pref_compose_template_local_default">Sent from MARK5 for Android</string>
+	<bool name="pref_notification_silence_default">false</bool>
+	<string name="pref_notification_ringtone_default">content://settings/system/notification_sound</string>
+	<bool name="pref_notification_vibrate_default">true</bool>
 	<string-array name="pref_cache_auto_clean_entries">
 		<item>3 days</item>
 		<item>7 days</item>

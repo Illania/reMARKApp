@@ -5,17 +5,17 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System.Text;
-using Android.OS;
 using System;
-using Android.Net;
+using System.Linq;
+using System.Text;
 using Android.App;
 using Android.Content;
-using System.Linq;
-using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Common;
+using Android.Net;
+using Android.OS;
+using Firebase;
+using Firebase.Iid;
 using Mark5.Mobile.Common.Managers;
-using Android.Gms.Common;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -32,7 +32,6 @@ namespace Mark5.Mobile.Droid.Utilities
             sendIntent.SetType("text/plain");
             return Intent.CreateChooser(sendIntent, context.GetText(Resource.String.share));
         }
-
 
         public static string CreateFullReport()
         {
@@ -53,14 +52,6 @@ namespace Mark5.Mobile.Droid.Utilities
             var pi = Application.Context.PackageManager.GetPackageInfo(Application.Context.PackageName, 0);
             sb.AppendLine("Version: " + pi.VersionName + " (" + pi.VersionCode + ")");
             sb.AppendLine("Date: " + DateTime.UtcNow);
-            sb.AppendLine("Google Play Services status: " + GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(Application.Context));
-            sb.AppendLine("Google Play Services statuses:");
-            sb.AppendLine("  SUCCESS=" + ConnectionResult.Success);
-            sb.AppendLine("  SERVICE_MISSING=" + ConnectionResult.ServiceMissing);
-            sb.AppendLine("  SERVICE_UPDATING=" + ConnectionResult.ServiceUpdating);
-            sb.AppendLine("  SERVICE_VERSION_UPDATE_REQUIRED=" + ConnectionResult.ServiceVersionUpdateRequired);
-            sb.AppendLine("  SERVICE_DISABLED=" + ConnectionResult.ServiceDisabled);
-            sb.AppendLine("  SERVICE_INVALID=" + ConnectionResult.ServiceInvalid);
             sb.AppendLine();
 
             sb.AppendLine("===== Device information =====");
@@ -79,19 +70,22 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("Version.SdkInt: " + Build.VERSION.SdkInt);
             sb.AppendLine("Version.SecurityPatch: " + Build.VERSION.SecurityPatch);
             sb.AppendLine("Root: " + Integration.IsRootedMethod1() + "," + Integration.IsRootedMethod2() + "," + Integration.IsRootedMethod3());
+            sb.AppendLine("Firebase initialized: " + (FirebaseApp.Instance == null ? "false" : "true"));
             sb.AppendLine();
 
             sb.AppendLine("===== Connection information =====");
-            sb.AppendLine("Username: " + Managers.ActiveConnectionInfo.Username);
-            sb.AppendLine("Hostname: " + Managers.ActiveConnectionInfo.Hostname);
-            sb.AppendLine("Port: " + Managers.ActiveConnectionInfo.Port);
-            sb.AppendLine("SSL: " + Managers.ActiveConnectionInfo.SslMode);
-            sb.AppendLine("Friendly device name: " + Managers.ActiveConnectionInfo.FriendlyDeviceName);
-            sb.AppendLine("Installation ID: " + Managers.ActiveConnectionInfo.InstallationId);
+            sb.AppendLine("Username: " + Managers.ActiveConnectionInfo?.Username);
+            sb.AppendLine("Hostname: " + Managers.ActiveConnectionInfo?.Hostname);
+            sb.AppendLine("Port: " + Managers.ActiveConnectionInfo?.Port);
+            sb.AppendLine("SSL: " + Managers.ActiveConnectionInfo?.SslMode);
+            sb.AppendLine("Friendly device name: " + Managers.ActiveConnectionInfo?.FriendlyDeviceName);
+            sb.AppendLine("Installation ID: " + Managers.ActiveConnectionInfo?.InstallationId);
+            sb.AppendLine("Firebase Instance ID: " + FirebaseInstanceId.Instance?.Token);
             sb.AppendLine();
 
             sb.AppendLine("===== Server information =====");
             sb.AppendLine(SerializationUtils.Serialize(ServerConfig.SystemSettings));
+            sb.AppendLine();
 
             sb.AppendLine("===== Preferences =====");
             foreach (var kv in PlatformConfig.Preferences.All)
@@ -107,6 +101,8 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("Available memory KB: " + mi.AvailMem / 1024);
             sb.AppendLine("Total memory KB: " + mi.TotalMem / 1024);
             sb.AppendLine("Low memory: " + mi.LowMemory);
+            sb.AppendLine("[MONO] Total memory: " + GC.GetTotalMemory(false) / 1024);
+            sb.AppendLine("[MONO] Total memory after GC: " + GC.GetTotalMemory(true) / 1024);
             sb.AppendLine();
 
             sb.AppendLine("===== Network information =====");

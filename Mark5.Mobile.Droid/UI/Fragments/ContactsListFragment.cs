@@ -216,7 +216,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (refreshing) return;
 
             refreshing = true;
-            refreshLayout.Post(() => refreshLayout.Refreshing = true); //Bug: fixed in support library v 24.2.0 (issue 77712)
+            refreshLayout.Refreshing = true;
 
             CommonConfig.Logger.Info($"Refresh running...");
 
@@ -234,7 +234,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Activity.RunOnUiThread(() => adapter.AppendItems(cps));
             }, () =>
             {
-                refreshLayout.Post(() => refreshLayout.Refreshing = false); //Bug: fixed in support library v 24.2.0 (issue 77712)
+                refreshLayout.Refreshing = false;
                 refreshing = false;
 
                 CommonConfig.Logger.Info($"Refresh finished");

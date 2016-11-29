@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: DatabaseConnectionProvider.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -12,6 +12,7 @@ using Mark5.Mobile.Common.Model;
 using PCLStorage;
 using SQLite;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Database
 {
 
@@ -111,7 +112,7 @@ namespace Mark5.Mobile.Common.Database
 
         DatabaseConnectionProvider(string dbFileName)
         {
-            connection = new SQLiteConnection(PortablePath.Combine(CommonConfig.DatabaseFolder.Path, dbFileName), true);
+            connection = new SQLiteConnection(CommonConfig.DatabaseFolder.Path + CommonConfig.PathSeparator + dbFileName, true);
 #if DEBUG
             connection.Trace = true;
 #endif
@@ -141,6 +142,23 @@ namespace Mark5.Mobile.Common.Database
                     {
                         action(connection);
                     });
+                }
+                finally
+                {
+                    connectionSemaphore.Release();
+                }
+            });
+        }
+
+        public async Task RunInConnectionWithoutTransactionAsync(Action<SQLiteConnection> action)
+        {
+            await Task.Run(() =>
+            {
+                try
+                {
+                    connectionSemaphore.Wait();
+
+                    action(connection);
                 }
                 finally
                 {

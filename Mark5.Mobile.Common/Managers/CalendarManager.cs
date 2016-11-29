@@ -18,6 +18,7 @@ using DataContract = Mark5.ServiceReference.DataContract;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Model.Exceptions;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
 {
     class CalendarManager : AbstractManager, ICalendarManager

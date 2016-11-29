@@ -1,21 +1,29 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: INotificationsManager.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
 {
 
     public interface INotificationsManager
     {
 
+        ObjectType[] EnabledObjectTypes { get; }
+
         DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; }
+
+        Task Subscribe(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto);
+
+        Task UnSubscribe(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto);
 
         Task<List<Notification>> GetNotificationsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = default(SourceType));
 
@@ -34,6 +42,14 @@ namespace Mark5.Mobile.Common.Managers
         Task ClearAllNotificationSettingsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = default(SourceType));
 
         Task<object> GetRemoteObjectAsync(Notification notification, SourceType sourceType = default(SourceType));
+
+        Task SaveNotification(Notification notification);
+
+        Task MarkAsRead(Guid notificationGuid);
+
+        Task MarkAsRead(Notification notification);
+
+        Task MarkAsRead(List<Notification> notifications);
     }
 }
 

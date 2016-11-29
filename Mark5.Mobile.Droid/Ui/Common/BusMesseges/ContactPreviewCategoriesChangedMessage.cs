@@ -5,15 +5,16 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
 using System.Collections.Generic;
 using Mark5.Mobile.Common.Model;
 using TinyMessenger;
 
 namespace Mark5.Mobile.Droid
 {
+
     public class ContactPreviewCategoriesChangedMessage : TinyMessageBase
     {
+
         public int ContactPreviewId
         {
             get;

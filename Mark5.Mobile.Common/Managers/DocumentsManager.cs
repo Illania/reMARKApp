@@ -23,6 +23,7 @@ using Mark5.ServiceReference.AppService;
 using Mark5.ServiceReference.FileTransferService;
 using DataContract = Mark5.ServiceReference.DataContract;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
 {
 

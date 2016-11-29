@@ -9,16 +9,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mark5.Mobile.Common.Utilities;
-using PCLStorage;
 using SQLite;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
 
     [Table("Folder")]
     public class Folder : ICopiable<Folder>
     {
-        public static char PathSeparator = PortablePath.DirectorySeparatorChar;
 
         [Column("Id"), PrimaryKey]
         public int Id { get; set; } = -1;

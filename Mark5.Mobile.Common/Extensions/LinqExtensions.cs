@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Extensions
 {
 

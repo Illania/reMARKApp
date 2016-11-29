@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using SQLite;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common
 {
     public static class SQLiteConnectionExtensions

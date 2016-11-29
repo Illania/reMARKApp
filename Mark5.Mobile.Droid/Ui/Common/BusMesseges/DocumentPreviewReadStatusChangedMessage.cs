@@ -13,12 +13,6 @@ namespace Mark5.Mobile.Droid.Ui.Common.BusMesseges
     public class DocumentPreviewReadStatusChangedMessage : TinyMessageBase
     {
 
-        public int FolderId
-        {
-            get;
-            private set;
-        }
-
         public int DocumentPreviewId
         {
             get;

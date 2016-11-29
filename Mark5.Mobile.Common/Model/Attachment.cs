@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: Attachment.cs
 // Author: Ferdinando Papale <fp@nordic-it.com>
@@ -7,6 +7,7 @@
 //
 using System.IO;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common
 {
     public class Attachment
