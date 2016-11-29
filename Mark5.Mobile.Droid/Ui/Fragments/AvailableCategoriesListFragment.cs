@@ -239,7 +239,7 @@ namespace Mark5.Mobile.Droid
 
         void UpdateControls()
         {
-            if (Activity == null) return;
+            if (!IsAdded || IsDetached || IsRemoving) return;
 
             if (selectedCategories.Count < 1)
             {

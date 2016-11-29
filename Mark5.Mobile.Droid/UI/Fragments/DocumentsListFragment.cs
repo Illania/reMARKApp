@@ -317,16 +317,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             else
             {
-                var currentAdapter = (DocumentsListAdapter)recyclerView.GetAdapter();
-                currentAdapter.SetSelected(documentPreview, !currentAdapter.IsSelected(documentPreview));
+                CurrentAdapter.SetSelected(documentPreview, !CurrentAdapter.IsSelected(documentPreview));
 
-                if (currentAdapter.SelectedItemCount < 1)
+                if (CurrentAdapter.SelectedItemCount < 1)
                 {
                     actionMode.Finish();
                 }
                 else
                 {
-                    actionMode.Title = currentAdapter.SelectedItemCount.ToString();
+                    actionMode.Title = CurrentAdapter.SelectedItemCount.ToString();
                     actionMode.Invalidate();
                 }
             }
@@ -366,19 +365,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             menu.Clear();
 
-            var currentAdapter = (DocumentsListAdapter)recyclerView.GetAdapter();
-
-            if (currentAdapter.SelectedItems.Any(dp => !dp.IsReadByCurrent))
+            if (CurrentAdapter.SelectedItems.Any(dp => !dp.IsReadByCurrent))
             {
                 menu.Add(Menu.None, MenuItemActions.MarkAsRead, MenuItemActions.MarkAsRead, Resource.String.mark_as_read);
             }
 
-            if (currentAdapter.SelectedItems.Any(dp => dp.IsReadByCurrent))
+            if (CurrentAdapter.SelectedItems.Any(dp => dp.IsReadByCurrent))
             {
                 menu.Add(Menu.None, MenuItemActions.MarkAsUnread, MenuItemActions.MarkAsUnread, Resource.String.marks_as_unread);
             }
 
-            if (currentAdapter.SelectedItemCount == 1)
+            if (CurrentAdapter.SelectedItemCount == 1)
             {
                 menu.Add(Menu.None, MenuItemActions.Reply, MenuItemActions.Reply, Resource.String.reply);
                 menu.Add(Menu.None, MenuItemActions.ReplyAll, MenuItemActions.ReplyAll, Resource.String.reply_all);
@@ -397,7 +394,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             menu.Add(Menu.None, MenuItemActions.SetPriority, MenuItemActions.SetPriority, Resource.String.set_priority);
 
-            if (currentAdapter.SelectedItemCount == 1)
+            if (CurrentAdapter.SelectedItemCount == 1)
             {
                 menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
             }

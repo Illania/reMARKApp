@@ -263,16 +263,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             else
             {
-                var currentAdapter = (ShortcodesListAdapter)recyclerView.GetAdapter();
-                currentAdapter.SetSelected(shortcodePreview, !currentAdapter.IsSelected(shortcodePreview));
+                CurrentAdapter.SetSelected(shortcodePreview, !CurrentAdapter.IsSelected(shortcodePreview));
 
-                if (currentAdapter.SelectedItemCount < 1)
+                if (CurrentAdapter.SelectedItemCount < 1)
                 {
                     actionMode.Finish();
                 }
                 else
                 {
-                    actionMode.Title = currentAdapter.SelectedItemCount.ToString();
+                    actionMode.Title = CurrentAdapter.SelectedItemCount.ToString();
                     actionMode.Invalidate();
                 }
             }
@@ -291,6 +290,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         #endregion
 
         #region Action mode
+
+        static class MenuItemActions
+        {
+            public const int CopyToWorktray = 10;
+            public const int CopyToFolder = 20;
+            public const int MoveToFolder = 21;
+            public const int DeleteFromFolder = 30;
+            public const int Delete = 31;
+        }
 
         bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
@@ -320,15 +328,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             return true;
-        }
-
-        static class MenuItemActions
-        {
-            public const int CopyToWorktray = 30;
-            public const int CopyToFolder = 40;
-            public const int MoveToFolder = 41;
-            public const int DeleteFromFolder = 70;
-            public const int Delete = 71;
         }
 
         public bool OnCreateActionMode(ActionMode mode, IMenu menu)
@@ -367,35 +366,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void OnDestroyActionMode(ActionMode mode)
         {
-            var currentAdapter = (ShortcodesListAdapter)recyclerView.GetAdapter();
-            currentAdapter.ClearSelections();
+            CurrentAdapter.ClearSelections();
             actionMode = null;
-        }
-
-        #endregion
-
-        #region Messanger Handlers
-
-        public void RemoveMovedEntities(EntityMovedFromFolderMessage m)
-        {
-            foreach (var entityId in m.EntitiesId)
-            {
-                var position = adapter.GetPosition(entityId);
-                if (position >= 0)
-                {
-                    shouldNotifyAdapter = true;
-                    adapter.RemoveItemsAtIndex(position);
-                    adapter.ClearSelections(false);
-                }
-
-                position = searchAdapter.GetPosition(entityId);
-                if (position >= 0)
-                {
-                    shouldNotifySearchAdapter = true;
-                    searchAdapter.RemoveItemsAtIndex(position);
-                    searchAdapter.ClearSelections(false);
-                }
-            }
         }
 
         #endregion
@@ -479,6 +451,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public List<ShortcodePreview> SelectedShortcodePreviews { get; set; }
 
             public bool RefreshInProgress { get; set; }
+        }
+
+        #endregion
+
+        #region Messenger hub related
+
+        public void UpdateMovedEntities(EntityMovedFromFolderMessage m)
+        {
+            foreach (var entityId in m.EntitiesId)
+            {
+                var position = adapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifyAdapter = true;
+                    adapter.RemoveItemsAtIndex(position);
+                    adapter.ClearSelections(false);
+                }
+
+                position = searchAdapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifySearchAdapter = true;
+                    searchAdapter.RemoveItemsAtIndex(position);
+                    searchAdapter.ClearSelections(false);
+                }
+            }
         }
 
         #endregion

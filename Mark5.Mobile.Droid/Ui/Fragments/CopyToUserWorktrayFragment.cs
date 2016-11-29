@@ -183,7 +183,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void UpdateControls()
         {
-            if (Activity == null) return;
+            if (!IsAdded || IsDetached || IsRemoving) return;
 
             if (adapter.SelectedItemCount < 1)
             {

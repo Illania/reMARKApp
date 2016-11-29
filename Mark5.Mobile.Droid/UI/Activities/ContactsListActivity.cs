@@ -75,7 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 if (clf != null && m.Sender != clf && clf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Contact)
                 {
-                    clf.RemoveMovedEntities(m);
+                    clf.UpdateMovedEntities(m);
                 }
             });
         }

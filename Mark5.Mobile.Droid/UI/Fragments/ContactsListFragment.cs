@@ -263,16 +263,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             else
             {
-                var currentAdapter = (ContactsListAdapter)recyclerView.GetAdapter();
-                currentAdapter.SetSelected(contactPreview, !currentAdapter.IsSelected(contactPreview));
+                CurrentAdapter.SetSelected(contactPreview, !CurrentAdapter.IsSelected(contactPreview));
 
-                if (currentAdapter.SelectedItemCount < 1)
+                if (CurrentAdapter.SelectedItemCount < 1)
                 {
                     actionMode.Finish();
                 }
                 else
                 {
-                    actionMode.Title = currentAdapter.SelectedItemCount.ToString();
+                    actionMode.Title = CurrentAdapter.SelectedItemCount.ToString();
                     actionMode.Invalidate();
                 }
             }
@@ -402,8 +401,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
         {
-            var currentAdapter = (ContactsListAdapter)recyclerView.GetAdapter();
-            currentAdapter.ClearSelections();
+            CurrentAdapter.ClearSelections();
             actionMode = null;
         }
 
@@ -524,6 +522,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 searchHandler.RemoveCallbacksAndMessages(null);
                 searchAdapter.Clear();
+                searchAdapter.ClearSelections();
                 recyclerView.SwapAdapter(adapter, true);
                 refreshLayout.Enabled = true;
                 return true;
@@ -625,7 +624,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public void RemoveMovedEntities(EntityMovedFromFolderMessage m)
+        public void UpdateMovedEntities(EntityMovedFromFolderMessage m)
         {
             foreach (var entityId in m.EntitiesId)
             {
