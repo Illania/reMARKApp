@@ -36,7 +36,7 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_margin="4dp"
-                android:src="@mipmap/incoming"
+                android:src="@drawable/incoming"
                 android:tint="#123D57"
                 android:visibility="gone" />
             <android.support.v7.widget.AppCompatImageView
@@ -44,7 +44,7 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_margin="4dp"
-                android:src="@mipmap/outgoing"
+                android:src="@drawable/outgoing"
                 android:tint="#123D57"
                 android:visibility="gone" />
             <android.support.v7.widget.AppCompatImageView
@@ -52,7 +52,7 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_margin="4dp"
-                android:src="@mipmap/draft"
+                android:src="@drawable/draft"
                 android:tint="#123D57"
                 android:visibility="gone" />
             <android.support.v7.widget.AppCompatImageView
@@ -60,7 +60,7 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_margin="4dp"
-                android:src="@mipmap/unread"
+                android:src="@drawable/unread"
                 android:tint="#123D57"
                 android:visibility="gone" />
             <android.support.v7.widget.AppCompatImageView
@@ -68,7 +68,7 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_margin="4dp"
-                android:src="@mipmap/attachment"
+                android:src="@drawable/attachment"
                 android:tint="#123D57"
                 android:visibility="gone" />
             <android.support.v7.widget.AppCompatImageView
@@ -76,7 +76,7 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_margin="4dp"
-                android:src="@mipmap/comment"
+                android:src="@drawable/comment"
                 android:tint="#123D57"
                 android:visibility="gone" />
         </android.support.v7.widget.LinearLayoutCompat>
