@@ -41,7 +41,7 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<string> SaveOutgoingAttachmentAsync(Guid id, string filename, Stream attachmentStream);
 
-        Task<OutgoingDocumentContainer> GetOutgoingDocumentContainerAsync(Guid id);
+        Task<OutgoingDocumentContainer> GetOutgoingDocumentContainerAsync(Guid id, bool lockDocument = false);
 
         Task RemoveOutgoingAttachmentAsync(Guid id, string filename);
 

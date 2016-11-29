@@ -145,11 +145,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return base.OnOptionsItemSelected(item);
         }
 
-        void Adapter_ItemClicked(object sender, OutgoingDocumentPreview e)
+        void Adapter_ItemClicked(object sender, OutgoingDocumentPreview outgoingDocumentPreview)
         {
+            if (outgoingDocumentPreview.State == OutgoingDocumentState.Sending)
+            {
+                return;
+            }
+
             if (actionMode != null)
             {
-                adapter.SetSelected(e, !adapter.IsSelected(e));
+                adapter.SetSelected(outgoingDocumentPreview, !adapter.IsSelected(outgoingDocumentPreview));
 
                 if (adapter.SelectedItemCount < 1)
                 {
@@ -163,18 +168,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             else
             {
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Edit, e.Direction, outgoingDocumentGuid: e.Identifier));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Edit, outgoingDocumentPreview.Direction, outgoingDocumentGuid: outgoingDocumentPreview.Identifier));
             }
         }
 
-        void Adapter_ItemLongClicked(object sender, OutgoingDocumentPreview e)
+        void Adapter_ItemLongClicked(object sender, OutgoingDocumentPreview outgoingDocumentPreview)
         {
+            if (outgoingDocumentPreview.State == OutgoingDocumentState.Sending)
+            {
+                return;
+            }
+
             if (actionMode == null)
             {
                 actionMode = Activity.StartActionMode(this);
             }
 
-            Adapter_ItemClicked(sender, e);
+            Adapter_ItemClicked(sender, outgoingDocumentPreview);
         }
 
         #region Action mode
@@ -418,7 +428,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public void ReplaceItems(List<OutgoingDocumentPreview> items)
             {
                 Clear();
-                AppendItems(items.OrderBy(i => i.DateReceivedTimestamp).ToList());
+                AppendItems(items.OrderByDescending(i => i.DateReceivedTimestamp).ToList());
             }
 
             public void Clear()
@@ -437,18 +447,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            public void SetSelected(OutgoingDocumentPreview documentPreview, bool selected)
+            public void SetSelected(OutgoingDocumentPreview outgoingDocumentPreview, bool selected)
             {
-                var position = GetPosition(documentPreview);
+                var position = GetPosition(outgoingDocumentPreview);
                 if (position < 0) return;
 
                 if (selected)
                 {
-                    selectedOutgoingDocumentsInView[documentPreview.Identifier] = documentPreview;
+                    selectedOutgoingDocumentsInView[outgoingDocumentPreview.Identifier] = outgoingDocumentPreview;
                 }
                 else
                 {
-                    selectedOutgoingDocumentsInView.Remove(documentPreview.Identifier);
+                    selectedOutgoingDocumentsInView.Remove(outgoingDocumentPreview.Identifier);
                 }
                 NotifyItemChanged(position);
             }

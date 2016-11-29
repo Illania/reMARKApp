@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public List<Contact> GetFilteredPhonebookContacts(string phrase)
         {
-            var selection = string.Format("{0} like \"%{2}%\" OR {1} like \"%{2}%\" COLLATE NOCASE", ContactsNameColumn, ContactsNameColumn, phrase);
+            var selection = string.Format("{0} like \"%{2}%\" OR {1} like \"%{2}%\" COLLATE NOCASE", ContactsNameColumn, ContactEmailColumn, phrase);
             return GetAndroidContacts(selection);
         }
 

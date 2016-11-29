@@ -38,11 +38,4 @@ namespace Mark5.Mobile.Common.Model
         }
     }
 
-    public enum OutgoingDocumentState
-    {
-        Waiting,
-        Failed,
-        Sending,
-        Locked
-    }
 }

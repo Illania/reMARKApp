@@ -187,6 +187,13 @@ namespace Mark5.Mobile.Common.Storage
                 await isFailedFile.DeleteAsync();
             }
 
+            var wasLocked = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingLock)) == ExistenceCheckResult.FileExists;
+            if (wasLocked)
+            {
+                var isLockedFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingLock);
+                await isLockedFile.DeleteAsync();
+            }
+
             var documentFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingDocument, CreationCollisionOption.ReplaceExisting);
             await documentFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(document));
 
@@ -197,7 +204,7 @@ namespace Mark5.Mobile.Common.Storage
             await infoFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(outgoingDocumentInfo));
         }
 
-        public static async Task<OutgoingDocumentContainer> GetOutgoingDocumentContainerAsync(Guid id)
+        public static async Task<OutgoingDocumentContainer> GetOutgoingDocumentContainerAsync(Guid id, bool lockDocument = false)
         {
             if (!await OutgoingFolderExistsAsync(id))
             {
@@ -214,19 +221,30 @@ namespace Mark5.Mobile.Common.Storage
 
             var infoFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingInfo);
             var info = await SerializationUtils.DeserializeAsync<OutgoingDocumentInfo>(await infoFile.ReadAllTextAsync());
-            var isLocked = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OugoingLock)) == ExistenceCheckResult.FileExists;
             var isFailed = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed)) == ExistenceCheckResult.FileExists;
-            if (isLocked)
-            {
-                info.State = OutgoingDocumentState.Locked;
-            }
-            else if (isFailed)
+
+            if (isFailed)
             {
                 info.State = OutgoingDocumentState.Failed;
             }
             else
             {
                 info.State = OutgoingDocumentState.Waiting;
+            }
+
+            if (lockDocument)
+            {
+                await LockOutgoingDocumentAsync(id);
+                info.Locked = true;
+            }
+            else
+            {
+                var isLocked = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingLock)) == ExistenceCheckResult.FileExists;
+
+                if (isLocked)
+                {
+                    info.Locked = true;
+                }
             }
 
             return new OutgoingDocumentContainer
@@ -350,14 +368,14 @@ namespace Mark5.Mobile.Common.Storage
         public static async Task LockOutgoingDocumentAsync(Guid id)
         {
             var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
-            await outgoingDocumentFolder.CreateFileAsync(Filenames.OugoingLock, CreationCollisionOption.ReplaceExisting);
+            await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingLock, CreationCollisionOption.ReplaceExisting);
         }
 
         public static async Task UnlockOutgoingDocumentAsync(Guid id)
         {
             var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
-            var lockFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OugoingLock, CreationCollisionOption.OpenIfExists);
-            await lockFile.DeleteAsync();
+            var lockFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingLock, CreationCollisionOption.OpenIfExists);
+            await lockFile?.DeleteAsync();
         }
 
         static async Task<IFolder> GetOutgoingFolderAsync(Guid id)

@@ -180,7 +180,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (LocalDocument)
                 {
-                    var outgoingContainer = await Managers.DocumentsManager.GetOutgoingDocumentContainerAsync(OutgoingDocumentGuid);
+                    var outgoingContainer = await Managers.DocumentsManager.GetOutgoingDocumentContainerAsync(OutgoingDocumentGuid, true);
                     PreviousDocument = outgoingContainer.Document;
                     PreviousDocumentPreview = outgoingContainer.DocumentPreview;
                     OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag;
@@ -192,7 +192,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
                     else
                     {
-                        sendButtonAvailable = false; //TODO probably locked should be another thing, not a state
+                        sendButtonAvailable = false;
                     }
                 }
                 else
@@ -380,6 +380,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     await subView.UpdateDocument();
                 }
 
+                DocumentPreview.DateReceivedTimestamp = DateTime.Now.ToUniversalTime().ConvertDateTimeToTimestampMilliseconds();
                 await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,
                                                                         PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1,
                                                                        0, false, false);
@@ -416,6 +417,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                if (!LocalDocument)
                {
                    await Managers.DocumentsManager.DeleteOutgoingDocumentFolder(OutgoingDocumentGuid);
+               }
+               else
+               {
+                   await Managers.DocumentsManager.UnlockOutgoingDocumentAsync(OutgoingDocumentGuid);
+                   Managers.OutgoingDocumentsManager.Notify(OutgoingDocumentGuid);
                }
            }).ContinueWith(t =>
           {

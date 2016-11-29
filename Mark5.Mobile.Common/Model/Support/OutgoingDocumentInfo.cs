@@ -22,6 +22,15 @@ namespace Mark5.Mobile.Common.Model
         public bool ConfirmDelivery { get; set; }
 
         public OutgoingDocumentState State { get; set; }
+
+        public bool Locked { get; set; }
+    }
+
+    public enum OutgoingDocumentState
+    {
+        Waiting,
+        Failed,
+        Sending,
     }
 }
 

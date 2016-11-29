@@ -178,7 +178,7 @@ namespace Mark5.Mobile.Common.Managers
 
                     var container = await FileSystemStorage.GetOutgoingDocumentContainerAsync(identifier);
 
-                    if (container == null || container.Info.State != OutgoingDocumentState.Waiting)
+                    if (container == null || container.Info.State == OutgoingDocumentState.Failed || container.Info.Locked)
                     {
                         continue;
                     }
@@ -190,7 +190,6 @@ namespace Mark5.Mobile.Common.Managers
                     bool sendSuccessful = false;
                     try
                     {
-
                         DocumentBeingSent(this, container);
 
                         var attachmentGuids = new List<Guid>();
