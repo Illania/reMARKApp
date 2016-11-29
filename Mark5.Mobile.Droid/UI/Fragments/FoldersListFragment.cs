@@ -70,7 +70,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             RecyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             RecyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
-            RecyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
+            RecyclerView.AddItemDecoration(new DividerItemDecorator(Activity, Resource.Id.list_item_section));
             RecyclerView.SetItemAnimator(new DefaultItemAnimator());
             RecyclerView.HasFixedSize = true;
 
@@ -706,7 +706,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public FolderListAdapter(Context context, RecyclerView parentRecyclerView)
             {
                 parentView = parentRecyclerView;
-                sectionHeight = ConversionUtils.ConvertDpToPixels(48);
+                sectionHeight = ConversionUtils.ConvertDpToPixels(56);
                 this.context = context;
             }
 
