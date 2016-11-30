@@ -11,7 +11,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Common.Utilities;
 using PCLStorage;
 
@@ -176,15 +175,18 @@ namespace Mark5.Mobile.Common.Storage
 
         #region OutgoingDocuments
 
-        public static async Task SaveOutgoingDocumentAsync(OutgoingDocumentInfo outgoingDocumentInfo, Document document, DocumentPreview documentPreview)
+        public static async Task SaveOutgoingDocumentAsync(OutgoingDocumentInfo outgoingDocumentInfo, Document document, DocumentPreview documentPreview, bool cleanFailedState = false)
         {
             var outgoingDocumentFolder = await GetOutgoingFolderAsync(outgoingDocumentInfo.Identifier);
 
-            var wasFailed = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed)) == ExistenceCheckResult.FileExists;
-            if (wasFailed)
+            if (cleanFailedState)
             {
-                var isFailedFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingFailed);
-                await isFailedFile.DeleteAsync();
+                var wasFailed = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed)) == ExistenceCheckResult.FileExists;
+                if (wasFailed)
+                {
+                    var isFailedFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingFailed);
+                    await isFailedFile.DeleteAsync();
+                }
             }
 
             var wasLocked = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingLock)) == ExistenceCheckResult.FileExists;
@@ -247,11 +249,25 @@ namespace Mark5.Mobile.Common.Storage
                 }
             }
 
+            var attachmentsFolder = await GetOutgoingAttachmentsFolderAsync(id);
+            var attachments = new List<OutgoingDocumentAttachmentDescription>();
+            foreach (var item in await attachmentsFolder.GetFilesAsync())
+            {
+                var attachment = new OutgoingDocumentAttachmentDescription();
+                var stream = await item.OpenAsync(PCLStorage.FileAccess.Read);
+                attachment.SizeInBytes = (int)stream.Length;
+                stream.Dispose();
+                attachment.Path = item.Path;
+                attachment.Name = item.Name;
+                attachments.Add(attachment);
+            }
+
             return new OutgoingDocumentContainer
             {
                 Document = document,
                 DocumentPreview = documentPreview,
                 Info = info,
+                Attachments = attachments,
             };
         }
 

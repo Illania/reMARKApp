@@ -345,6 +345,7 @@
     <Compile Include="Utilities\Hockey\CustomCrashManagerListener.cs" />
     <Compile Include="Utilities\Hockey\CustomFeedbackActivity.cs" />
     <Compile Include="Utilities\Hockey\CustomFeedbackManagerLister.cs" />
+    <Compile Include="Utilities\LocalNotificationService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

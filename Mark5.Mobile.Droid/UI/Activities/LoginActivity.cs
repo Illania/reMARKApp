@@ -264,8 +264,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
                     CommonConfig.Logger.Info($"Sending Firebase token to service...");
 
-                    await Managers.NotificationsManager.Subscribe(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
+                    //await Managers.NotificationsManager.Subscribe(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
                 }
+
+                LocalNotificationService.Initialize();
 
                 StartActivity(new Intent(this, typeof(MainActivity)));
                 Finish();

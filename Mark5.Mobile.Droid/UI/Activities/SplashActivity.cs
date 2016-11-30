@@ -20,6 +20,7 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Droid.Services;
+using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Utilities.Hockey;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
@@ -147,6 +148,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.Logger.Info("Retrieving system settings...");
 
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+
+                LocalNotificationService.Initialize();
 
                 CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
 

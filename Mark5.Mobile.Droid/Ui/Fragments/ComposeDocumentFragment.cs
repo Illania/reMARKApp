@@ -22,7 +22,6 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -41,6 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
         public DocumentCreationModeFlag OutgoingDocumentOriginalCreationModeFlag { get; set; }
         public Guid OutgoingDocumentGuid { get; set; }
+        public OutgoingDocumentState OutgoingDocumentState { get; set; }
         public bool LocalDocument { get; set; }
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
@@ -70,7 +70,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool resumed;
         bool templateLoaded;
         bool permissionsAsked;
-        bool sendButtonAvailable = true;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
@@ -186,13 +185,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag;
                     PreviousDocumentId = outgoingContainer.Info.PrecedingDocumentId;
                     PreviousDocumentFolderId = outgoingContainer.Info.PrecedingDocumentFolderId;
+                    OutgoingDocumentState = outgoingContainer.Info.State;
                     if (outgoingContainer.Info.State == OutgoingDocumentState.Failed)
                     {
                         await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(Resource.String.error_while_sending_document)));
                     }
-                    else
+                    if (outgoingContainer.Attachments != null)
                     {
-                        sendButtonAvailable = false;
+                        outgoingContainer.Attachments.ForEach(attachmentsView.AddAttachment);
                     }
                 }
                 else
@@ -232,7 +232,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 await subView.RefreshView();
             }
 
-            AddSendButtonIfNecessary();
             UpdateSendButtonState();
 
             await AskIfShouldUseTemplates();
@@ -373,6 +372,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void SaveModifiedOutgoingDocument()
         {
+            if (!LocalDocument)
+            {
+                return;
+            }
+
             Task.Run(async () =>
             {
                 foreach (var subView in subViews)
@@ -381,9 +385,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 DocumentPreview.DateReceivedTimestamp = DateTime.Now.ToUniversalTime().ConvertDateTimeToTimestampMilliseconds();
-                await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,
+                await Managers.DocumentsManager.SaveOutgoingDocumentAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,
                                                                         PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1,
-                                                                       0, false, false);
+                                                                          0, false, false);
             }).ContinueWith(async t =>
            {
                if (t.IsFaulted)
@@ -519,7 +523,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             attachmentItem.SetIcon(Resource.Drawable.add_attachment);
             attachmentItem.SetShowAsAction(ShowAsAction.Always);
 
-            if (sendButtonAvailable)
+            if (!LocalDocument || LocalDocument && OutgoingDocumentState == OutgoingDocumentState.Failed)
             {
                 var sendItem = optionsMenu.Add(Menu.None, MenuItemActions.SendDocument, MenuItemActions.SendDocument, Resource.String.send);
                 sendItem.SetIcon(Resource.Drawable.send_white);
@@ -547,17 +551,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var intent = new Intent(Intent.ActionGetContent);
             intent.SetType("*/*");
             intent.AddCategory(Intent.CategoryOpenable);
-            Intent i = Intent.CreateChooser(intent, "File");
+            var i = Intent.CreateChooser(intent, "File");
             Activity.StartActivityForResult(i, AttachmentRequestCode);
-        }
-
-        void AddSendButtonIfNecessary()
-        {
         }
 
         void UpdateSendButtonState()
         {
-            if (optionsMenu == null || !sendButtonAvailable)
+            if (optionsMenu == null)
             {
                 return;
             }
@@ -828,7 +828,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 LocalDocument = LocalDocument,
                 PermissionsAsked = permissionsAsked,
                 OutgoingDocumentOriginalCreationModeFlag = OutgoingDocumentOriginalCreationModeFlag,
-                SendButtonAvailable = sendButtonAvailable,
+                OutgoingDocumentState = OutgoingDocumentState,
             };
         }
 
@@ -857,7 +857,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 LocalDocument = cfs.LocalDocument;
                 permissionsAsked = cfs.PermissionsAsked;
                 OutgoingDocumentOriginalCreationModeFlag = cfs.OutgoingDocumentOriginalCreationModeFlag;
-                sendButtonAvailable = cfs.SendButtonAvailable;
+                OutgoingDocumentState = cfs.OutgoingDocumentState;
             }
         }
 
@@ -878,7 +878,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public bool TemplateLoaded { get; set; }
             public bool LocalDocument { get; set; }
             public bool PermissionsAsked { get; set; }
-            public bool SendButtonAvailable { get; set; }
+            public OutgoingDocumentState OutgoingDocumentState { get; set; }
             public DocumentCreationModeFlag CreationModeFlag { get; set; }
             public DocumentCreationModeFlag OutgoingDocumentOriginalCreationModeFlag { get; set; }
             public IComposeDocumentViewState ToState { get; set; }

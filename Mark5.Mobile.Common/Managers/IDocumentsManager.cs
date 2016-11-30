@@ -11,7 +11,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
-using Mark5.Mobile.Common.Model.Support;
 
 #pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
@@ -37,6 +36,8 @@ namespace Mark5.Mobile.Common.Managers
         Task<DocumentContainer> GetDocumentWithPreviewAsync(int folderId, int documentId, SourceType sourceType = SourceType.Auto);
 
         Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto);
+
+        Task SaveOutgoingDocumentAsync(Guid identifier, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery);
 
         Task InsertDocumentInOutgoingAsync(Guid identifier, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery);
 

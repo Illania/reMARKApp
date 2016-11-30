@@ -29,6 +29,7 @@ namespace Mark5.Mobile.Common.Model
 
     public enum OutgoingDocumentState
     {
+        None,
         Waiting,
         Failed,
         Sending,

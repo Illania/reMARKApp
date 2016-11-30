@@ -8,7 +8,8 @@
 using System;
 using Android.App;
 using Android.Content;
-using Android.Provider;
+using Android.OS;
+using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Firebase.Messaging;
 using Mark5.Mobile.Common;
@@ -16,8 +17,6 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
-using Android.OS;
-using Android.Support.V4.Content;
 
 namespace Mark5.Mobile.Droid.Utilities.Services
 {

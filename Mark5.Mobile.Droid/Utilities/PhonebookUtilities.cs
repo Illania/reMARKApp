@@ -60,9 +60,9 @@ namespace Mark5.Mobile.Droid.Utilities
 
                 if (cursor.MoveToFirst())
                 {
-                    int contactIdIndex = cursor.GetColumnIndex(ContactIdColumn);
-                    int contactsNameIndex = cursor.GetColumnIndex(ContactsNameColumn);
-                    int contactsEmailIndex = cursor.GetColumnIndex(ContactEmailColumn);
+                    var contactIdIndex = cursor.GetColumnIndex(ContactIdColumn);
+                    var contactsNameIndex = cursor.GetColumnIndex(ContactsNameColumn);
+                    var contactsEmailIndex = cursor.GetColumnIndex(ContactEmailColumn);
 
                     do
                     {

@@ -227,4 +227,6 @@
 	<string name="attachment_too_big">The attachment is bigger than the maximum allowed size on the server</string>
 	<string name="error_while_sending_document">There was an error while sending the document</string>
 	<string name="create_system_report">Create system report</string>
+	<string name="failed_send_document_notification_title">Failed to send messages</string>
+	<string name="failed_send_document_notification_content">One or more messages could not be sent</string>
 </resources>

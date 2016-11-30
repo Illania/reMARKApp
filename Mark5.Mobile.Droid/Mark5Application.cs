@@ -52,6 +52,7 @@ namespace Mark5.Mobile.Droid
                 CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
                 CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
                 CommonConfig.HttpClientHandler = () => { return new AndroidClientHandler(); };
+                CommonConfig.PhonebookUtilities = new PhonebookUtilities();
 
 #if !DEBUG
                 CommonConfig.Logger.Level = LogLevel.INFO;

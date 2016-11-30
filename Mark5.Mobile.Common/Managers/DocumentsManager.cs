@@ -16,7 +16,6 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.Common.Model.Exceptions;
-using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.ServiceReference.AppService;
@@ -190,7 +189,7 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided");
         }
 
-        public async Task InsertDocumentInOutgoingAsync(Guid id, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
+        public async Task SaveOutgoingDocumentAsync(Guid id, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
                                                        long sendOnTimestamp, bool confirmRead, bool confirmDelivery)
         {
             var outgoingDocumentInfo = new OutgoingDocumentInfo
@@ -204,7 +203,24 @@ namespace Mark5.Mobile.Common.Managers
                 Identifier = id
             };
 
-            await FileSystemStorage.SaveOutgoingDocumentAsync(outgoingDocumentInfo, document, documentPreview);
+            await FileSystemStorage.SaveOutgoingDocumentAsync(outgoingDocumentInfo, document, documentPreview, false);
+        }
+
+        public async Task InsertDocumentInOutgoingAsync(Guid id, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
+                                               long sendOnTimestamp, bool confirmRead, bool confirmDelivery)
+        {
+            var outgoingDocumentInfo = new OutgoingDocumentInfo
+            {
+                Flag = flag,
+                PrecedingDocumentId = precedingDocumentId,
+                PrecedingDocumentFolderId = precedingDocumentFolderId,
+                SendOnTimestamp = sendOnTimestamp,
+                ConfirmRead = confirmRead,
+                ConfirmDelivery = confirmDelivery,
+                Identifier = id
+            };
+
+            await FileSystemStorage.SaveOutgoingDocumentAsync(outgoingDocumentInfo, document, documentPreview, true);
             Managers.OutgoingDocumentsManager.Notify(id);
         }
 

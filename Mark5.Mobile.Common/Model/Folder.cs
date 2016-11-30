@@ -168,7 +168,7 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true,
         };
 
-        readonly static Folder documentsOutgoingFolder = new Folder
+        public readonly static Folder DocumentsOutgoingFolder = new Folder
         {
             Id = -121,
             Guid = new Guid("{00000000-0000-0000-0000-000000000121}"),
@@ -186,7 +186,7 @@ namespace Mark5.Mobile.Common.Model
             Module = ModuleType.Documents,
             Type = FolderType.None,
             HasSubFolders = true,
-            SubFolders = { documentsOutgoingFolder },
+            SubFolders = { DocumentsOutgoingFolder },
         };
 
         readonly static Folder contactsRootFolder = new Folder
