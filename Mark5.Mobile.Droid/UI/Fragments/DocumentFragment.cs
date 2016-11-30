@@ -25,7 +25,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
+using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.DocumentViews;
 using Mark5.Mobile.Droid.Utilities;
@@ -35,6 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
     public class DocumentFragment : RetainableStateFragment
     {
+
         public static class RequestCodes
         {
             public static int CommentsRequest = 1;
@@ -205,6 +206,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
+            if (item.ItemId == MenuItemActions.MarkAsRead)
+            {
+                MarkAsRead();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.MarkAsUnread)
+            {
+                MarkAsUnread();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.Reply)
+            {
+            }
+
+            if (item.ItemId == MenuItemActions.ReplyAll)
+            {
+            }
+
+            if (item.ItemId == MenuItemActions.Forward)
+            {
+            }
+
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
                 var i = new Intent(Activity, typeof(FolderListSelectionActivity));
@@ -215,6 +240,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
+
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
                 var i = new Intent(Activity, typeof(FolderListSelectionActivity));
@@ -226,6 +252,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
+
+            if (item.ItemId == MenuItemActions.SetPriority)
+            {
+                SetPriority();
+                return true;
+            }
+
             if (item.ItemId == MenuItemActions.Categories)
             {
                 var i = new Intent(Activity, typeof(CategoriesListActivity));
@@ -234,12 +267,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
+
             if (item.ItemId == MenuItemActions.Comments)
             {
                 var i = new Intent(Activity, typeof(CommentsListActivity));
                 i.PutExtra(CommentsListActivity.EntityIntentKey, SerializationUtils.Serialize(Document));
                 Activity.StartActivityForResult(i, RequestCodes.CommentsRequest);
+
+                return true;
             }
+
             if (item.ItemId == MenuItemActions.Actions)
             {
                 var i = new Intent(Activity, typeof(ObjectActionsActivity));
@@ -248,6 +285,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
+
             if (item.ItemId == MenuItemActions.Links)
             {
                 var i = new Intent(Activity, typeof(ObjectLinksActivity));
@@ -256,7 +294,162 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
+
+            if (item.ItemId == MenuItemActions.DeleteFromFolder)
+            {
+                DeleteFromFolderAction();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.Delete)
+            {
+                DeleteAction();
+                return true;
+            }
+
             return base.OnOptionsItemSelected(item);
+        }
+
+        async void MarkAsRead()
+        {
+            CommonConfig.Logger.Info($"Attempting to mark as read [documentPreview={DocumentPreview}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.marking_as_read, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.DocumentsManager.SetDocumentReadStatusAsync(DocumentPreview, Document, true, ServerConfig.SystemSettings.UserInfo.User);
+
+                RefreshView<RecipentsView>();
+                PlatformConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, DocumentPreview.Id, DocumentPreview.IsReadByCurrent, DocumentPreview.IsReadByAnyone));
+
+                dismissAction();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Marking as read failed [documentPreview={DocumentPreview}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
+        async void MarkAsUnread()
+        {
+            CommonConfig.Logger.Info($"Attempting to mark as unread [documentPreview={DocumentPreview}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.marking_as_unread, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.DocumentsManager.SetDocumentReadStatusAsync(DocumentPreview, Document, false, ServerConfig.SystemSettings.UserInfo.User);
+
+                RefreshView<RecipentsView>();
+                PlatformConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, DocumentPreview.Id, DocumentPreview.IsReadByCurrent, DocumentPreview.IsReadByAnyone));
+
+                dismissAction();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Marking as unread failed [documentPreview={DocumentPreview}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
+        async void SetPriority()
+        {
+            var priority = await Dialogs.ShowSingleSelectDialogAsync(Context, Resource.String.set_priority, new List<Priority> { Priority.Urgent, Priority.Normal, Priority.Low }, DocumentPreview.Priority);
+            if (priority == default(Priority) || priority == DocumentPreview.Priority)
+            {
+                return;
+            }
+
+            CommonConfig.Logger.Info($"Attempting to set priority [documentPreview={DocumentPreview}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.setting_priority, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.DocumentsManager.SetDocumentsPriorityAsync(new List<DocumentPreview> { DocumentPreview }, priority);
+
+                RefreshView<PriorityView>();
+                PlatformConfig.MessengerHub.Publish(new DocumentPreviewPriorityChangedMessage(this, DocumentPreview.Id, DocumentPreview.Priority));
+
+                dismissAction();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Setting priority failed [documentPreview={DocumentPreview}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
+        async void DeleteFromFolderAction()
+        {
+            var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
+            if (!yesNo)
+            {
+                return;
+            }
+
+            CommonConfig.Logger.Info($"Attempting to delete from folder [documentPreview={DocumentPreview}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting_from_folder, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { DocumentPreview }, Folder);
+
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Document, FolderId ?? Folder.Id, new List<int> { DocumentPreview.Id }));
+
+                dismissAction();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Deleting from folder failed [documentPreview={DocumentPreview}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
+        async void DeleteAction()
+        {
+            var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
+            if (!yesNo)
+            {
+                return;
+            }
+
+            CommonConfig.Logger.Info($"Attempting to delete [documentPreview={DocumentPreview}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { DocumentPreview });
+
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedMessage(this, ObjectType.Document, new List<int> { DocumentPreview.Id }));
+
+                dismissAction();
+                if (CloseRequest != null) CloseRequest();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Deleting failed [documentPreview={DocumentPreview}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
         }
 
         async void AttachmentsView_AttachmentClicked(object sender, AttachmentDescription attachmentDescription)

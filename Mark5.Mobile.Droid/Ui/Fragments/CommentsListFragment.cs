@@ -22,7 +22,7 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
+using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -350,7 +350,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 get
                 {
-                    return commentsInView.ToList();
+                    return commentsInView;
                 }
             }
 
@@ -358,7 +358,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 get
                 {
-                    return commentsInView.Count();
+                    return commentsInView.Count;
                 }
             }
 

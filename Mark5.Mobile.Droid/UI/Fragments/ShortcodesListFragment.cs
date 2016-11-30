@@ -26,7 +26,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
+using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -603,7 +603,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 get
                 {
-                    return shortcodePreviewsInView.ToList();
+                    return shortcodePreviewsInView;
                 }
             }
 
@@ -687,7 +687,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     if (position >= 0)
                     {
                         shortcodePreviewsInView.RemoveAt(position);
-                        NotifyItemChanged(position);
+                        NotifyItemRemoved(position);
                     }
                 }
             }

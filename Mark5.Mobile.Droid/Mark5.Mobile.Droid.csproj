@@ -204,11 +204,11 @@
     <Compile Include="Ui\Common\RetainedFragment.cs" />
     <Compile Include="Ui\Common\SmoothActionBarDrawerToggle.cs" />
     <Compile Include="Ui\Common\ViewUtilities.cs" />
-    <Compile Include="Ui\Common\BusMesseges\ContactPreviewCategoriesChangedMessage.cs" />
-    <Compile Include="Ui\Common\BusMesseges\DocumentPreviewCategoriesChangedMessage.cs" />
-    <Compile Include="Ui\Common\BusMesseges\DocumentPreviewCommentCountChangedMessage.cs" />
-    <Compile Include="Ui\Common\BusMesseges\DocumentPreviewReadStatusChangedMessage.cs" />
-    <Compile Include="Ui\Common\BusMesseges\EntityMovedFromFolderMessage.cs" />
+    <Compile Include="Ui\Common\HubMessages\ContactPreviewCategoriesChangedMessage.cs" />
+    <Compile Include="Ui\Common\HubMessages\DocumentPreviewCategoriesChangedMessage.cs" />
+    <Compile Include="Ui\Common\HubMessages\DocumentPreviewCommentCountChangedMessage.cs" />
+    <Compile Include="Ui\Common\HubMessages\DocumentPreviewReadStatusChangedMessage.cs" />
+    <Compile Include="Ui\Common\HubMessages\EntityMovedFromFolderMessage.cs" />
     <Compile Include="Ui\Fragments\AvailableCategoriesListFragment.cs" />
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
     <Compile Include="Ui\Fragments\CommentsListFragment.cs" />
@@ -326,6 +326,9 @@
     <Compile Include="Utilities\Hockey\CustomCrashManagerListener.cs" />
     <Compile Include="Utilities\Hockey\CustomFeedbackActivity.cs" />
     <Compile Include="Utilities\Hockey\CustomFeedbackManagerLister.cs" />
+    <Compile Include="Ui\Common\HubMessages\EntityRemovedMessage.cs" />
+    <Compile Include="Ui\Common\HubMessages\EntityRemovedFromFolderMessage.cs" />
+    <Compile Include="Ui\Common\HubMessages\DocumentPreviewPriorityChangedMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

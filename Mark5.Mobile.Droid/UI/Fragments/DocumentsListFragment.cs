@@ -27,7 +27,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
+using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -599,8 +599,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void SetPriority()
         {
-            var priority = await Dialogs.ShowSingleSelectDialogAsync(Context, Resource.String.set_priority, new List<Priority> { Priority.Urgent, Priority.Normal, Priority.Low });
-            if (priority == default(Priority))
+            var selectedPriority = CurrentAdapter.SelectedItems.All(dp => dp.Priority == CurrentAdapter.SelectedItems[0].Priority) ? CurrentAdapter.SelectedItems[0].Priority : Priority.None;
+            var priority = await Dialogs.ShowSingleSelectDialogAsync(Context, Resource.String.set_priority, new List<Priority> { Priority.Urgent, Priority.Normal, Priority.Low }, selectedPriority);
+            if (priority == default(Priority) || priority == selectedPriority)
             {
                 return;
             }
@@ -611,7 +612,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                await Managers.DocumentsManager.SetDocumentPriorityAsync(CurrentAdapter.SelectedItems, priority);
+                await Managers.DocumentsManager.SetDocumentsPriorityAsync(CurrentAdapter.SelectedItems, priority);
 
                 dismissAction();
                 actionMode?.Finish();
@@ -807,6 +808,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public void UpdatePriority(DocumentPreviewPriorityChangedMessage m)
+        {
+            var position = adapter.GetPosition(m.DocumentPreviewId);
+            if (position >= 0)
+            {
+                shouldNotifyAdapter = true;
+                var dp = adapter.Items[position];
+                dp.Priority = m.Priority;
+            }
+
+            position = searchAdapter.GetPosition(m.DocumentPreviewId);
+            if (position >= 0)
+            {
+                shouldNotifySearchAdapter = true;
+                var dp = searchAdapter.Items[position];
+                dp.Priority = m.Priority;
+            }
+        }
+
         public void UpdateCategories(DocumentPreviewCategoriesChangedMessage m)
         {
             var position = adapter.GetPosition(m.DocumentPreviewId);
@@ -847,7 +867,47 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public void UpdateMovedEntities(EntityMovedFromFolderMessage m)
+        public void UpdateMovedFromFolderEntities(EntityMovedFromFolderMessage m)
+        {
+            foreach (var entityId in m.EntitiesId)
+            {
+                var position = adapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifyAdapter = true;
+                    adapter.Items.RemoveAt(position);
+                }
+
+                position = searchAdapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifySearchAdapter = true;
+                    adapter.Items.RemoveAt(position);
+                }
+            }
+        }
+
+        public void UpdateRemovedFromFolderEntities(EntityRemovedFromFolderMessage m)
+        {
+            foreach (var entityId in m.EntitiesId)
+            {
+                var position = adapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifyAdapter = true;
+                    adapter.Items.RemoveAt(position);
+                }
+
+                position = searchAdapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifySearchAdapter = true;
+                    adapter.Items.RemoveAt(position);
+                }
+            }
+        }
+
+        public void UpdateRemovedEntities(EntityRemovedMessage m)
         {
             foreach (var entityId in m.EntitiesId)
             {
@@ -884,7 +944,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 get
                 {
-                    return documentPreviewsInView.ToList();
+                    return documentPreviewsInView;
                 }
             }
 
@@ -1073,7 +1133,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     if (position >= 0)
                     {
                         documentPreviewsInView.RemoveAt(position);
-                        NotifyItemChanged(position);
+                        NotifyItemRemoved(position);
                     }
                 }
             }

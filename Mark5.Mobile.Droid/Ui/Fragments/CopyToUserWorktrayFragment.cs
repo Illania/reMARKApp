@@ -232,7 +232,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 get
                 {
-                    return systemUsersInView.ToList();
+                    return systemUsersInView;
                 }
             }
 
