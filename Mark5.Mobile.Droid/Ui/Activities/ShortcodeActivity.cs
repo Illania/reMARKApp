@@ -30,12 +30,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string ReadOnlyModeIntentKey = "ReadOnlyMode_5676137e-22ab-4bf9-bff5-de812892c121";
         public const string NotificationGuidIntentKey = "NotificationGuid_f1cdbdf5-3f62-4545-ae60-8acfd6a5c750";
 
-        const string sfFragmentTagKey = "fragmentTagKey";
-        string sfFragmentTag;
-
         Toolbar toolbar;
-
-        ShortcodeFragment sf;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -52,7 +47,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                sf = new ShortcodeFragment();
+                var sf = new ShortcodeFragment();
 
                 if (Intent.HasExtra(FolderIdIntentKey))
                     sf.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
@@ -78,17 +73,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 sf.CloseRequest = OnBackPressed;
 
                 var ft = SupportFragmentManager.BeginTransaction();
-                sfFragmentTag = sf.GenerateTag();
-                ft.Replace(Resource.Id.fragment_container, sf, sfFragmentTag);
+                ft.Replace(Resource.Id.fragment_container, sf, sf.GenerateTag());
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ShortcodeActivity)}");
             }
             else
             {
-                sfFragmentTag = savedInstanceState.GetString(sfFragmentTagKey);
-                sf = SupportFragmentManager.FindFragmentByTag(sfFragmentTag) as ShortcodeFragment;
-
                 CommonConfig.Logger.Info($"Restored {nameof(ShortcodeActivity)}");
             }
         }

@@ -592,6 +592,46 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public void UpdateRemovedFromFolderEntities(EntityRemovedFromFolderMessage m)
+        {
+            foreach (var entityId in m.EntitiesId)
+            {
+                var position = adapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifyAdapter = true;
+                    adapter.Items.RemoveAt(position);
+                }
+
+                position = searchAdapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifySearchAdapter = true;
+                    adapter.Items.RemoveAt(position);
+                }
+            }
+        }
+
+        public void UpdateRemovedEntities(EntityRemovedMessage m)
+        {
+            foreach (var entityId in m.EntitiesId)
+            {
+                var position = adapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifyAdapter = true;
+                    adapter.Items.RemoveAt(position);
+                }
+
+                position = searchAdapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifySearchAdapter = true;
+                    adapter.Items.RemoveAt(position);
+                }
+            }
+        }
+
         #endregion
 
         #region RecyclerView Adapter/ViewHolder

@@ -23,6 +23,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Ui.Views.ShortcodeViews;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -95,6 +96,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             await RefreshData();
         }
 
+        #region Options menu
+
         static class MenuItemActions
         {
             public const int CreateNewDocument = 20;
@@ -142,6 +145,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
+            if (item.ItemId == MenuItemActions.CopyToWorktray)
+            {
+                CopyToWorktrayAction();
+                return true;
+            }
+
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
                 var i = new Intent(Activity, typeof(FolderListSelectionActivity));
@@ -152,6 +161,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
+
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
                 var i = new Intent(Activity, typeof(FolderListSelectionActivity));
@@ -163,6 +173,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
+
+            if (item.ItemId == MenuItemActions.CopyToFolder)
+            {
+                var i = new Intent(Activity, typeof(FolderListSelectionActivity));
+                i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.CopyToFolderMode);
+                i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
+                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity> { ShortcodePreview }));
+                StartActivity(i);
+
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.MoveToFolder)
+            {
+                var i = new Intent(Activity, typeof(FolderListSelectionActivity));
+                i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.MoveToFolderMode);
+                i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
+                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity> { ShortcodePreview }));
+                i.PutExtra(FolderListSelectionActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
+                StartActivity(i);
+
+                return true;
+            }
+
             if (item.ItemId == MenuItemActions.Actions)
             {
                 var i = new Intent(Activity, typeof(ObjectActionsActivity));
@@ -171,6 +205,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
+
             if (item.ItemId == MenuItemActions.Links)
             {
                 var i = new Intent(Activity, typeof(ObjectLinksActivity));
@@ -180,8 +215,115 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
+            if (item.ItemId == MenuItemActions.DeleteFromFolder)
+            {
+                DeleteFromFolderAction();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.Delete)
+            {
+                DeleteAction();
+                return true;
+            }
+
             return base.OnOptionsItemSelected(item);
         }
+
+        async void CopyToWorktrayAction()
+        {
+            var option = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_worktray, Resource.Array.copy_to_worktray_options);
+
+            if (option == 0)
+            {
+                CommonConfig.Logger.Info($"Attempting copy to worktray [shortcodePreview={ShortcodePreview}]...");
+
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
+
+                try
+                {
+                    await Managers.CommonActionsManager.CopyToWorktray(new List<IBusinessEntity> { ShortcodePreview });
+
+                    dismissAction();
+                }
+                catch (Exception ex)
+                {
+                    dismissAction();
+
+                    CommonConfig.Logger.Error($"Copying to worktray failed [shortcodePreview={ShortcodePreview}]", ex);
+
+                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                }
+            }
+
+            if (option == 1)
+            {
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, new List<IBusinessEntity> { ShortcodePreview }));
+            }
+        }
+
+        async void DeleteFromFolderAction()
+        {
+            var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
+            if (!yesNo)
+            {
+                return;
+            }
+
+            CommonConfig.Logger.Info($"Attempting to delete from folder [shortcodePreview={ShortcodePreview}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting_from_folder, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { ShortcodePreview }, Folder);
+
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Shortcode, FolderId ?? Folder.Id, new List<int> { ShortcodePreview.Id }));
+
+                dismissAction();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Deleting from folder failed [shortcodePreview={ShortcodePreview}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
+        async void DeleteAction()
+        {
+            var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
+            if (!yesNo)
+            {
+                return;
+            }
+
+            CommonConfig.Logger.Info($"Attempting to delete [shortcodePreview={ShortcodePreview}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { ShortcodePreview });
+
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedMessage(this, ObjectType.Shortcode, new List<int> { ShortcodePreview.Id }));
+
+                dismissAction();
+                if (CloseRequest != null) CloseRequest();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Deleting failed [shortcodePreview={ShortcodePreview}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
+        #endregion
 
         void AddressesView_DocumentAddressClicked(object sender, DocumentAddress e)
         {
