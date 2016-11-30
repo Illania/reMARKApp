@@ -337,27 +337,46 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public bool OnActionItemClicked(ActionMode mode, IMenuItem item)
         {
-            var selectedShortocodes = CurrentAdapter.SelectedItems;
+            if (item.ItemId == MenuItemActions.CopyToWorktray)
+            {
+                CopyToWorktrayAction();
+                return true;
+            }
 
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
                 var i = new Intent(Activity, typeof(FolderListSelectionActivity));
                 i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.CopyToFolderMode);
                 i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
-                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(selectedShortocodes.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
+                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
                 StartActivity(i);
 
+                actionMode?.Finish();
                 return true;
             }
+
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
                 var i = new Intent(Activity, typeof(FolderListSelectionActivity));
                 i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.MoveToFolderMode);
                 i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
-                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(selectedShortocodes.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
+                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
                 i.PutExtra(FolderListSelectionActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
                 StartActivity(i);
 
+                actionMode?.Finish();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.DeleteFromFolder)
+            {
+                DeleteFromFolderAction();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.Delete)
+            {
+                DeleteAction();
                 return true;
             }
 
@@ -368,6 +387,101 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CurrentAdapter.ClearSelections();
             actionMode = null;
+        }
+
+        async void CopyToWorktrayAction()
+        {
+            var option = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_worktray, Resource.Array.copy_to_worktray_options);
+
+            if (option == 0)
+            {
+                CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
+
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
+
+                try
+                {
+                    await Managers.CommonActionsManager.CopyToWorktray(adapter.SelectedItems.OfType<IBusinessEntity>().ToList());
+
+                    dismissAction();
+                    actionMode?.Finish();
+                }
+                catch (Exception ex)
+                {
+                    dismissAction();
+
+                    CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+
+                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                }
+            }
+
+            if (option == 1)
+            {
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
+            }
+        }
+
+        async void DeleteFromFolderAction()
+        {
+            var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
+            if (!yesNo)
+            {
+                return;
+            }
+
+            CommonConfig.Logger.Info($"Attempting to delete from folder [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting_from_folder, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.CommonActionsManager.RemoveFromFolder(CurrentAdapter.SelectedItems.OfType<IBusinessEntity>().ToList(), Folder);
+                adapter.RemoveItems(CurrentAdapter.SelectedItems);
+                searchAdapter.RemoveItems(CurrentAdapter.SelectedItems);
+
+                dismissAction();
+                actionMode?.Finish();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Deleting from folder failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
+        async void DeleteAction()
+        {
+            var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
+            if (!yesNo)
+            {
+                return;
+            }
+
+            CommonConfig.Logger.Info($"Attempting to delete [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.CommonActionsManager.Delete(CurrentAdapter.SelectedItems.OfType<IBusinessEntity>().ToList());
+                adapter.RemoveItems(CurrentAdapter.SelectedItems);
+                searchAdapter.RemoveItems(CurrentAdapter.SelectedItems);
+
+                dismissAction();
+                actionMode?.Finish();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Deleting failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
         }
 
         #endregion
@@ -393,6 +507,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 searchHandler.RemoveCallbacksAndMessages(null);
                 searchAdapter.Clear();
+                searchAdapter.ClearSelections();
                 recyclerView.SwapAdapter(adapter, true);
                 refreshLayout.Enabled = true;
                 return true;
@@ -465,16 +580,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (position >= 0)
                 {
                     shouldNotifyAdapter = true;
-                    adapter.RemoveItemsAtIndex(position);
-                    adapter.ClearSelections(false);
+                    adapter.Items.RemoveAt(position);
                 }
 
                 position = searchAdapter.GetPosition(entityId);
                 if (position >= 0)
                 {
                     shouldNotifySearchAdapter = true;
-                    searchAdapter.RemoveItemsAtIndex(position);
-                    searchAdapter.ClearSelections(false);
+                    searchAdapter.Items.RemoveAt(position);
                 }
             }
         }
@@ -566,31 +679,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 AppendItems(items);
             }
 
-            public int GetPosition(int shortcodePreviewsId)
+            public void RemoveItems(List<ShortcodePreview> items)
             {
-                var position = -1;
-                for (var i = 0; i < shortcodePreviewsInView.Count; i++)
+                foreach (var item in items)
                 {
-                    if (shortcodePreviewsInView[i].Id == shortcodePreviewsId)
+                    var position = GetPosition(item);
+                    if (position >= 0)
                     {
-                        position = i;
-                        break;
+                        shortcodePreviewsInView.RemoveAt(position);
+                        NotifyItemChanged(position);
                     }
                 }
-                return position;
-            }
-
-            public void RemoveItemsAtIndex(int index)
-            {
-                shortcodePreviewsInView.RemoveAt(index);
-            }
-
-            public void Clear()
-            {
-                var size = shortcodePreviewsInView.Count;
-                shortcodePreviewsInView.Clear();
-                selectedShortcodesInView.Clear();
-                NotifyItemRangeRemoved(0, size);
             }
 
             public bool IsSelected(ShortcodePreview shortcodePreview)
@@ -622,25 +721,40 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 NotifyItemChanged(position);
             }
 
-            public void ClearSelections(bool notify = true)
+            public void ClearSelections()
             {
                 var shortcodes = selectedShortcodesInView.Values.ToArray();
                 selectedShortcodesInView.Clear();
-                if (notify)
+
+                foreach (var shortcode in shortcodes)
                 {
-                    foreach (var shortcode in shortcodes)
+                    var position = GetPosition(shortcode);
+                    if (position >= 0)
                     {
-                        NotifyItemChanged(GetPosition(shortcode));
+                        NotifyItemChanged(position);
                     }
                 }
             }
 
+            public void Clear()
+            {
+                var size = shortcodePreviewsInView.Count;
+                shortcodePreviewsInView.Clear();
+                selectedShortcodesInView.Clear();
+                NotifyItemRangeRemoved(0, size);
+            }
+
             int GetPosition(ShortcodePreview shortcodePreview)
+            {
+                return GetPosition(shortcodePreview.Id);
+            }
+
+            public int GetPosition(int shortcodePreviewsId)
             {
                 var position = -1;
                 for (var i = 0; i < shortcodePreviewsInView.Count; i++)
                 {
-                    if (shortcodePreviewsInView[i].Id == shortcodePreview.Id)
+                    if (shortcodePreviewsInView[i].Id == shortcodePreviewsId)
                     {
                         position = i;
                         break;

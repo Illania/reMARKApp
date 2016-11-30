@@ -386,13 +386,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.DeleteFromFolder)
             {
-                DeleteFromFolder();
+                DeleteFromFolderAction();
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.Delete)
             {
-                Delete();
+                DeleteAction();
                 return true;
             }
 
@@ -420,6 +420,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     await Managers.CommonActionsManager.CopyToWorktray(adapter.SelectedItems.OfType<IBusinessEntity>().ToList());
 
                     dismissAction();
+                    actionMode?.Finish();
                 }
                 catch (Exception ex)
                 {
@@ -437,7 +438,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        async void DeleteFromFolder()
+        async void DeleteFromFolderAction()
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
             if (!yesNo)
@@ -468,7 +469,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        async void Delete()
+        async void DeleteAction()
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
             if (!yesNo)
@@ -642,7 +643,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     searchAdapter.Items.RemoveAt(position);
                 }
             }
-
         }
 
         #endregion
@@ -775,7 +775,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 NotifyItemChanged(position);
             }
 
-            public void ClearSelections(bool notify = true)
+            public void ClearSelections()
             {
                 var contacts = selectedContactsInView.Values.ToArray();
                 selectedContactsInView.Clear();
