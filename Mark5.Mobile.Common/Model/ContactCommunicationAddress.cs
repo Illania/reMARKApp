@@ -10,8 +10,20 @@ using SQLite;
 namespace Mark5.Mobile.Common.Model
 {
     [Table("ContactCommunicationAddress")]
-    public class ContactCommunicationAddress : CommunicationAddress
+    public class ContactCommunicationAddress
     {
+        [Column("Type")]
+        public CommunicationAddressType Type { get; set; }
+
+        [Column("Description")]
+        public string Description { get; set; }
+
+        [Column("Address")]
+        public string Address { get; set; }
+
+        [Column("IsPrimary")]
+        public bool IsPrimary { get; set; }
+
         [Column("ContactId")]
         public int ContactId { get; set; }
 
@@ -20,8 +32,12 @@ namespace Mark5.Mobile.Common.Model
         public int Id { get; set; }
 
         public ContactCommunicationAddress(int contactId, string address, CommunicationAddressType type,
-                                           string description, bool isPrimary) : base(address, type, description, isPrimary)
+                                           string description, bool isPrimary)
         {
+            Address = address;
+            Type = type;
+            IsPrimary = isPrimary;
+            Description = description;
             ContactId = contactId;
         }
 
