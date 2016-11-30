@@ -230,6 +230,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
             }
 
+            if (item.ItemId == MenuItemActions.CopyToWorktray)
+            {
+                CopyToWorktrayAction();
+                return true;
+            }
+
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
                 var i = new Intent(Activity, typeof(FolderListSelectionActivity));
@@ -357,6 +363,38 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Error($"Marking as unread failed [documentPreview={DocumentPreview}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
+        async void CopyToWorktrayAction()
+        {
+            var option = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_worktray, Resource.Array.copy_to_worktray_options);
+
+            if (option == 0)
+            {
+                CommonConfig.Logger.Info($"Attempting copy to worktray [documentPreview={DocumentPreview}]...");
+
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
+
+                try
+                {
+                    await Managers.CommonActionsManager.CopyToWorktray(new List<IBusinessEntity> { DocumentPreview });
+
+                    dismissAction();
+                }
+                catch (Exception ex)
+                {
+                    dismissAction();
+
+                    CommonConfig.Logger.Error($"Copying to worktray failed [documentPreview={DocumentPreview}]", ex);
+
+                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                }
+            }
+
+            if (option == 1)
+            {
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, new List<IBusinessEntity> { DocumentPreview }));
             }
         }
 
