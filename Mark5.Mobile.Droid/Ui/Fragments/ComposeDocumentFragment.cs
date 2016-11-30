@@ -247,7 +247,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void AttachmentsView_AttachmentClicked(object sender, IAttachmentDescription attachment)
         {
-            var option = await Dialogs.ShowListDialog(Context, Resource.String.attachment_clicked, Resource.Array.attachment_clicked_options);
+            var option = await Dialogs.ShowListDialog(Context, Resource.String.attachment_clicked, Resource.Array.attachment_clicked_options, false);
 
             if (option == 0) //Open attachment
             {

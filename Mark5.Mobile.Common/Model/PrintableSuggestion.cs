@@ -91,7 +91,9 @@ namespace Mark5.Mobile.Common.Model
             if (obj.GetType() != typeof(PrintableSuggestion))
                 return false;
             var other = (PrintableSuggestion)obj;
-            return Name == other.Name && Address == other.Address && Type == other.Type;
+            return string.Equals(Name, other.Name, StringComparison.CurrentCultureIgnoreCase)
+                         && string.Equals(Address, other.Address, StringComparison.CurrentCultureIgnoreCase)
+                         && Type == other.Type;
         }
 
         public override int GetHashCode()

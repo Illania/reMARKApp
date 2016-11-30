@@ -493,7 +493,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void CopyToWorktrayAction()
         {
-            var option = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_worktray, Resource.Array.copy_to_worktray_options);
+            var option = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_worktray, Resource.Array.copy_to_worktray_options, false);
 
             if (option == 0)
             {

@@ -31,28 +31,28 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         #region Awaitable dialogs
 
-        public static Task<bool> ShowYesNoDialogAsync(Context context, int titleId, int contentId)
+        public static Task<bool> ShowYesNoDialogAsync(Context context, int titleId, int contentId, int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no)
         {
             var tcs = new TaskCompletionSource<bool>();
             var builder = new MaterialDialog.Builder(context);
             builder.Title(titleId);
             builder.Content(contentId);
-            builder.PositiveText(Resource.String.yes);
-            builder.NegativeText(Resource.String.no);
+            builder.PositiveText(positiveTextId);
+            builder.NegativeText(negativeTextId);
             builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
             builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(false)));
             builder.Show();
             return tcs.Task;
         }
 
-        public static Task<bool> ShowYesNoDialogAsync(Context context, string title, string content)
+        public static Task<bool> ShowYesNoDialogAsync(Context context, string title, string content, int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no)
         {
             var tcs = new TaskCompletionSource<bool>();
             var builder = new MaterialDialog.Builder(context);
             builder.Title(title);
             builder.Content(content);
-            builder.PositiveText(Resource.String.yes);
-            builder.NegativeText(Resource.String.no);
+            builder.PositiveText(positiveTextId);
+            builder.NegativeText(negativeTextId);
             builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
             builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(false)));
             builder.Show();
@@ -135,7 +135,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
-        public static Task<int> ShowListDialog(Context context, int titleId, int itemsId, bool includeCancel = false)
+        public static Task<int> ShowListDialog(Context context, int titleId, int itemsId, bool includeCancel)
         {
             var tcs = new TaskCompletionSource<int>();
             var builder = new MaterialDialog.Builder(context);
@@ -150,7 +150,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
-        public static Task<int> ShowListDialog(Context context, int titleId, string[] items, bool includeCancel = false)
+        public static Task<int> ShowListDialog(Context context, int titleId, string[] items, bool includeCancel)
         {
             var tcs = new TaskCompletionSource<int>();
             var builder = new MaterialDialog.Builder(context);

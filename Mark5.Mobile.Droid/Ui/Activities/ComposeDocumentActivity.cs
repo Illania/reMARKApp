@@ -11,7 +11,6 @@ using Android;
 using Android.App;
 using Android.Content;
 using Android.OS;
-using Android.Provider;
 using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using Android.Support.V7.App;
@@ -56,6 +55,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             return intent;
         }
 
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -70,25 +70,42 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var creationModeFlag = (DocumentCreationModeFlag)Intent.Extras.GetInt(CreationModeFlagIntentKey);
-                var previousDocumentDirection = (DocumentDirection)Intent.Extras.GetInt(PreviousDocumentDirectionIntentKey);
-                var previousDocumentId = Intent.HasExtra(PreviousDocumentIdIntentKey) ? (int?)Intent.Extras.GetInt(PreviousDocumentIdIntentKey) : null;
-                var previousDocumentFolderId = Intent.HasExtra(PreviousDocumentFolderIdIntentKey) ? (int?)Intent.Extras.GetInt(PreviousDocumentFolderIdIntentKey) : null;
-                var outgoingDocumentGuid = new Guid(Intent.Extras.GetString(OutgoingDocumentGuidIntentKey));
+                cdf = new ComposeDocumentFragment();
+
+                if (Intent.HasExtra(CreationModeFlagIntentKey))
+                    cdf.CreationModeFlag = (DocumentCreationModeFlag)Intent.Extras.GetInt(CreationModeFlagIntentKey);
+
+                if (Intent.HasExtra(PreviousDocumentDirectionIntentKey))
+                    cdf.PreviousDocumentDirection = (DocumentDirection)Intent.Extras.GetInt(PreviousDocumentDirectionIntentKey);
+
+                if (Intent.HasExtra(PreviousDocumentIdIntentKey))
+                    cdf.PreviousDocumentId = Intent.Extras.GetInt(PreviousDocumentIdIntentKey);
+
+                if (Intent.HasExtra(PreviousDocumentFolderIdIntentKey))
+                    cdf.PreviousDocumentFolderId = Intent.Extras.GetInt(PreviousDocumentFolderIdIntentKey);
+
+                if (Intent.HasExtra(OutgoingDocumentGuidIntentKey))
+                {
+                    cdf.OutgoingDocumentGuid = new Guid(Intent.Extras.GetString(OutgoingDocumentGuidIntentKey));
+                    cdf.LocalDocument = true;
+                }
+                else
+                {
+                    cdf.LocalDocument = false;
+                }
+
+                cdfFragmentTag = cdf.GenerateTag();
 
                 var ft = SupportFragmentManager.BeginTransaction();
-                cdf = new ComposeDocumentFragment
-                {
-                    CreationModeFlag = creationModeFlag,
-                    PreviousDocumentId = previousDocumentId,
-                    PreviousDocumentFolderId = previousDocumentFolderId,
-                    PreviousDocumentDirection = previousDocumentDirection,
-                    OutgoingDocumentGuid = outgoingDocumentGuid,
-                    LocalDocument = outgoingDocumentGuid != Guid.Empty,
-                };
-                cdfFragmentTag = cdf.GenerateTag();
                 ft.Replace(Resource.Id.fragment_container, cdf, cdfFragmentTag);
                 ft.Commit();
+
+                if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadContacts) != Android.Content.PM.Permission.Granted
+                    || ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != Android.Content.PM.Permission.Granted)
+                {
+                    ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.ReadExternalStorage, Manifest.Permission.ReadContacts }, 769);
+                }
+
 
                 CommonConfig.Logger.Info($"Created {nameof(ComposeDocumentActivity)}");
             }

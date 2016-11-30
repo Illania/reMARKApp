@@ -21,9 +21,9 @@ namespace Mark5.Mobile.Droid.Utilities
     {
         readonly Uri contactsUri = ContactsContract.CommonDataKinds.Email.ContentUri;
 
-        const string ContactIdColumn = ContactsContract.RawContacts.InterfaceConsts.ContactId;
-        const string ContactsNameColumn = ContactsContract.Contacts.InterfaceConsts.DisplayName;
-        const string ContactEmailColumn = ContactsContract.CommonDataKinds.Email.Address;
+        string ContactIdColumn = ContactsContract.RawContacts.InterfaceConsts.ContactId;
+        string ContactsNameColumn = ContactsContract.Contacts.InterfaceConsts.DisplayName;
+        string ContactEmailColumn = ContactsContract.CommonDataKinds.Email.Address;
 
         #region IPhonebookUtilities implementation
 
