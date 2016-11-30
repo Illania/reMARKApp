@@ -163,6 +163,10 @@
     <Reference Include="AngleSharp">
       <HintPath>..\packages\AngleSharp.0.9.9\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
     </Reference>
+    <Reference Include="PreMailer.Net">
+      <HintPath>..\packages\PreMailer.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Android.Export" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Resources\Resource.designer.cs" />
@@ -194,7 +198,6 @@
     <Compile Include="Ui\Common\ActionOnClickListener.cs" />
     <Compile Include="Ui\Common\ActionOnCreateContextMenuListener.cs" />
     <Compile Include="Ui\Common\ActionOnLongClickListener.cs" />
-    <Compile Include="Ui\Common\BaseAppCompatActivity.cs" />
     <Compile Include="Ui\Common\CustomArrayAdapter.cs" />
     <Compile Include="Ui\Common\Dialogs.cs" />
     <Compile Include="Ui\Common\Divider.cs" />
