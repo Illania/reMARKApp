@@ -351,17 +351,10 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<List<PrintableSuggestion>> GetSuggestions(string phrase, SourceType sourceType = SourceType.Auto)
+        public async Task<List<PrintableSuggestion>> GetSuggestions(string phrase)
         {
-            if (sourceType == SourceType.Auto) sourceType = SourceType.Local;
-
-            if (sourceType == SourceType.Local)
-            {
-                var result = await contactsDataAccess.GetSuggestions(phrase);
-                return result;
-            }
-
-            throw new ArgumentException("Invalid sourceType provided.");
+            var result = await contactsDataAccess.GetSuggestions(phrase);
+            return result;
         }
 
     }
