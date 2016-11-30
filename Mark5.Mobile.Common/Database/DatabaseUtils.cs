@@ -69,6 +69,7 @@ namespace Mark5.Mobile.Common.Database
                 c.DeleteAll<TemplatePreview>();
                 c.DeleteAll<Template>();
                 c.DeleteAll<DefaultTemplateInfo>();
+                c.DeleteAll<RecentAddress>();
             });
             await DatabaseConnectionProvider.ContactsDatabase.RunInConnectionAsync(c =>
             {

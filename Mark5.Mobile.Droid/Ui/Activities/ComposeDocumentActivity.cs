@@ -69,20 +69,23 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var creationModeFlag = (DocumentCreationModeFlag)Intent.Extras.GetInt(CreationModeFlagIntentKey);
-                var previousDocumentDirection = (DocumentDirection)Intent.Extras.GetInt(PreviousDocumentDirectionIntentKey);
-                var previousDocumentId = Intent.HasExtra(PreviousDocumentIdIntentKey) ? (int?)Intent.Extras.GetInt(PreviousDocumentIdIntentKey) : null;
-                var previousDocumentFolderId = Intent.HasExtra(PreviousDocumentFolderIdIntentKey) ? (int?)Intent.Extras.GetInt(PreviousDocumentFolderIdIntentKey) : null;
+                cdf = new ComposeDocumentFragment();
+
+                if (Intent.HasExtra(CreationModeFlagIntentKey))
+                    cdf.CreationModeFlag = (DocumentCreationModeFlag)Intent.Extras.GetInt(CreationModeFlagIntentKey);
+
+                if (Intent.HasExtra(PreviousDocumentDirectionIntentKey))
+                    cdf.PreviousDocumentDirection = (DocumentDirection)Intent.Extras.GetInt(PreviousDocumentDirectionIntentKey);
+
+                if (Intent.HasExtra(PreviousDocumentIdIntentKey))
+                    cdf.PreviousDocumentId = Intent.Extras.GetInt(PreviousDocumentIdIntentKey);
+
+                if (Intent.HasExtra(PreviousDocumentFolderIdIntentKey))
+                    cdf.PreviousDocumentFolderId = Intent.Extras.GetInt(PreviousDocumentFolderIdIntentKey);
+
+                cdfFragmentTag = cdf.GenerateTag();
 
                 var ft = SupportFragmentManager.BeginTransaction();
-                cdf = new ComposeDocumentFragment
-                {
-                    CreationModeFlag = creationModeFlag,
-                    PreviousDocumentId = previousDocumentId,
-                    PreviousDocumentFolderId = previousDocumentFolderId,
-                    PreviousDocumentDirection = previousDocumentDirection,
-                };
-                cdfFragmentTag = cdf.GenerateTag();
                 ft.Replace(Resource.Id.fragment_container, cdf, cdfFragmentTag);
                 ft.Commit();
 
