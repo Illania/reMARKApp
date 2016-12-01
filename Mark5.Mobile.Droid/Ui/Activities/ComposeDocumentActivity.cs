@@ -42,7 +42,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             var intent = new Intent(context, typeof(ComposeDocumentActivity));
             intent.PutExtra(CreationModeFlagIntentKey, (int)creationModeFlag);
             intent.PutExtra(PreviousDocumentDirectionIntentKey, (int)previousDocumentDirection);
-            intent.PutExtra(OutgoingDocumentGuidIntentKey, outgoingDocumentGuid.ToString());
+            if (outgoingDocumentGuid != default(Guid))
+            {
+                intent.PutExtra(OutgoingDocumentGuidIntentKey, outgoingDocumentGuid.ToString());
+            }
             if (precedingDocumentId != null)
             {
                 intent.PutExtra(PreviousDocumentIdIntentKey, precedingDocumentId.Value);
@@ -136,7 +139,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         public override void OnBackPressed()
         {
-            cdf.AskIfShouldSaveAsDraft();
+            cdf.AskIfShouldSave();
         }
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)

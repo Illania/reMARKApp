@@ -41,6 +41,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public DocumentCreationModeFlag OutgoingDocumentOriginalCreationModeFlag { get; set; }
         public Guid OutgoingDocumentGuid { get; set; }
         public OutgoingDocumentState OutgoingDocumentState { get; set; }
+        public List<OutgoingDocumentAttachmentDescription> OutgoingDocumentInitialAttachments { get; set; } = new List<OutgoingDocumentAttachmentDescription>(); //TODO save
         public bool LocalDocument { get; set; }
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
@@ -192,7 +193,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
                     if (outgoingContainer.Attachments != null)
                     {
-                        outgoingContainer.Attachments.ForEach(attachmentsView.AddAttachment);
+                        OutgoingDocumentInitialAttachments.AddRange(outgoingContainer.Attachments);
                     }
                 }
                 else
@@ -231,6 +232,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 subView.CreationModeFlag = CreationModeFlag;
                 await subView.RefreshView();
             }
+
+            OutgoingDocumentInitialAttachments.ForEach(attachmentsView.AddAttachment);
 
             UpdateSendButtonState();
 
@@ -317,7 +320,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     try
                     {
-                        await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, outgoingAttachment.Name);
+                        if (!LocalDocument)
+                        {
+                            await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, outgoingAttachment.Name);
+                        }
                         attachmentsView.RemoveAttachment(sender, outgoingAttachment);
                     }
                     catch (Exception ex)
@@ -351,6 +357,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 DocumentPreview.Direction = draft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
                 DocumentPreview.DateReceivedTimestamp = DateTime.Now.ToUniversalTime().ConvertDateTimeToTimestampMilliseconds();
+                if (LocalDocument)
+                {
+                    await SynchOutgoingAttachments(false);
+                }
                 await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,
                                                                         PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1,
                                                                        0, false, false);
@@ -385,6 +395,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 DocumentPreview.DateReceivedTimestamp = DateTime.Now.ToUniversalTime().ConvertDateTimeToTimestampMilliseconds();
+                await SynchOutgoingAttachments(false);
                 await Managers.DocumentsManager.SaveOutgoingDocumentAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,
                                                                         PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1,
                                                                           0, false, false);
@@ -402,7 +413,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        public void AskIfShouldSaveAsDraft()
+        public void AskIfShouldSave()
         {
             if (LocalDocument)
             {
@@ -424,6 +435,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                }
                else
                {
+                   await SynchOutgoingAttachments(true);
                    await Managers.DocumentsManager.UnlockOutgoingDocumentAsync(OutgoingDocumentGuid);
                    Managers.OutgoingDocumentsManager.Notify(OutgoingDocumentGuid);
                }
@@ -431,6 +443,34 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
           {
               Activity.Finish();
           }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        public async Task SynchOutgoingAttachments(bool restoreState)
+        {
+            if (restoreState) //We need to remove all the newly added attachments
+            {
+                var currentAttachments = attachmentsView.GetOutgoingAttachments();
+                var initialAttachmentsNames = OutgoingDocumentInitialAttachments.Select(a => a.Name).ToList();
+
+                var attachmentsToRemove = currentAttachments.Where(a => !initialAttachmentsNames.Contains(a.Name));
+
+                foreach (var attachment in attachmentsToRemove)
+                {
+                    await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Name);
+                }
+            }
+            else //We need to remove all the attachments that are not there already
+            {
+                var currentAttachmentsNames = attachmentsView.GetOutgoingAttachments().Select(a => a.Name).ToList();
+                var initialAttachments = OutgoingDocumentInitialAttachments;
+
+                var attachmentsToRemove = initialAttachments.Where(a => !currentAttachmentsNames.Contains(a.Name));
+
+                foreach (var attachment in attachmentsToRemove)
+                {
+                    await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Name);
+                }
+            }
         }
 
         public void HandleLocalAttachment(Intent data)

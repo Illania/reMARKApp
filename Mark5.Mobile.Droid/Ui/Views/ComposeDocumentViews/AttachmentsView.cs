@@ -80,6 +80,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             return Task.CompletedTask;
         }
 
+        public List<OutgoingDocumentAttachmentDescription> GetOutgoingAttachments()
+        {
+            return attachmentsDescription.OfType<OutgoingDocumentAttachmentDescription>().ToList();
+        }
+
         public void AddAttachment(IAttachmentDescription attachment)
         {
             attachmentsDescription.Add(attachment);
