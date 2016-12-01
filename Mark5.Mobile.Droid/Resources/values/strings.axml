@@ -99,6 +99,7 @@
 	<string name="select">Select</string>
 	<string name="search">Search</string>
 	<string name="search_categories">Categories</string>
+	<string name="search_categories_none">Any</string>
 	<string name="search_contact_com_address">Communication address</string>
 	<string name="search_contact_comment">Comment</string>
 	<string name="search_contact_description">Description</string>

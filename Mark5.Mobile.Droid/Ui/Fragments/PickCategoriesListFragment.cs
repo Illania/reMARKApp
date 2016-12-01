@@ -31,12 +31,14 @@ namespace Mark5.Mobile.Droid
     {
 
         public ObjectType ObjectType { get; set; }
+        public int[] PreselectedCategoryIds { get; set; }
         public Action<List<Category>> CloseRequest { get; set; }
 
         CategoriesListAdapter CurrentAdapter
         {
             get { return (CategoriesListAdapter)recyclerView.GetAdapter(); }
         }
+
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -144,6 +146,14 @@ namespace Mark5.Mobile.Droid
                         break;
                     default:
                         throw new ArgumentException("The business entity provided does not have categories in the model");
+                }
+
+                foreach (var category in availableCategories)
+                {
+                    if (PreselectedCategoryIds.Contains(category.Id))
+                    {
+                        ToggleSelected(category);
+                    }
                 }
 
                 adapter.SetItems(availableCategories);

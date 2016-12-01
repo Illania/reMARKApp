@@ -25,9 +25,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string EntityIntentKey = "EntityIntent_20c8514c-b644-47db-842f-f2df4204d93a";
         public const string CommentsResultKey = "CommentsResult_593d8c70-d45c-425e-8e36-7389e3cc0c62";
 
-        const string cfFragmentTagKey = "fragmentTagKey";
-        string cfFragmentTag;
-
         CommentsListFragment cf;
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -49,26 +46,18 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var ft = SupportFragmentManager.BeginTransaction();
                 cf = new CommentsListFragment
                 {
-                    Entity = businessEntity,
+                    Entity = businessEntity
                 };
-                cfFragmentTag = cf.GenerateTag();
-                ft.Replace(Resource.Id.fragment_container, cf, cfFragmentTag);
+                ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(CommentsListActivity)}");
             }
             else
             {
-                cfFragmentTag = savedInstanceState.GetString(cfFragmentTagKey);
-                cf = SupportFragmentManager.FindFragmentByTag(cfFragmentTag) as CommentsListFragment;
+                cf = (CommentsListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(CommentsListActivity)}");
             }
-        }
-
-        protected override void OnSaveInstanceState(Bundle outState)
-        {
-            outState.PutString(cfFragmentTagKey, cfFragmentTag);
-            base.OnSaveInstanceState(outState);
         }
 
         public override void OnBackPressed()

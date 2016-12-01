@@ -321,6 +321,7 @@
     <Compile Include="Ui\Common\HubMessages\EntityRemovedFromFolderMessage.cs" />
     <Compile Include="Ui\Common\HubMessages\DocumentPreviewPriorityChangedMessage.cs" />
     <Compile Include="Ui\Fragments\PickCategoriesListFragment.cs" />
+    <Compile Include="Ui\Activities\PIckCategoriesListActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

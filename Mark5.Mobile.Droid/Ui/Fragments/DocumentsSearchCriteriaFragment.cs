@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System.Linq;
+using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -17,6 +18,7 @@ using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.SearchViews;
+using System.Collections.Generic;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -60,7 +62,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new DocumentWithAttachmentsOnlySearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new DocumentCategoriesSearchView(Context));
+            linearLayout.AddView(new DocumentCategoriesSearchView(Context, this));
             linearLayout.AddView(new Divider(Context));
 
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
@@ -98,6 +100,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             //((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_documents);
 
             CommonConfig.Logger.Info($"Created {nameof(DocumentFragment)}");
+        }
+
+        public override void OnActivityResult(int requestCode, int resultCode, Intent data)
+        {
+            if (resultCode == (int)Result.Ok && requestCode == AbstractCategoriesSearchView<SearchDocumentsCriteria>.CategoriesRequest)
+            {
+                var ccsv = View.FindViewById<DocumentCategoriesSearchView>(AbstractCategoriesSearchView<SearchDocumentsCriteria>.ViewId);
+                if (ccsv != null)
+                {
+                    var categories = SerializationUtils.Deserialize<List<Category>>(data.Extras.GetString(PickCategoriesListActivity.CategoriesResultKey));
+                    ccsv.SetSelectedCategoryIds(categories.Select(c => c.Id).ToList());
+                }
+            }
         }
 
         SearchDocumentsCriteria GetCriteria()
