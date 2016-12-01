@@ -7,11 +7,13 @@
 //
 using System;
 using System.Threading.Tasks;
+using Android;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.Design.Widget;
+using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -263,11 +265,19 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
                 {
                     CommonConfig.Logger.Info($"Sending Firebase token to service...");
-
-                    //await Managers.NotificationsManager.Subscribe(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
+                    //await Managers.NotificationsManager.Subscribe(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken); //TODO Disabled until service is fixed
                 }
 
                 LocalNotificationService.Initialize();
+
+                if (Build.VERSION.SdkInt > BuildVersionCodes.M && (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadContacts) != Permission.Granted
+                                    || ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != Permission.Granted))
+                {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                    RequestPermissions(new string[] { Manifest.Permission.ReadExternalStorage, Manifest.Permission.ReadContacts }, 769);
+#pragma warning restore XA0001 // Find issues with Android API usage
+                }
+
 
                 StartActivity(new Intent(this, typeof(MainActivity)));
                 Finish();
