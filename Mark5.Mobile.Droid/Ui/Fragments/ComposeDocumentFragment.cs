@@ -22,7 +22,6 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews;
@@ -132,7 +131,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnResume();
 
-            if (resumed) //On resume called again after access permission requests
+            if (resumed)
             {
                 return;
             }
@@ -145,25 +144,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             await LoadDocument();
             await ShowDocument();
 
-            AskForPermissions();
             Activity.InvalidateOptionsMenu();
             resumed = true;
-        }
-
-        void AskForPermissions()
-        {
-            if (permissionsAsked)
-            {
-                return;
-            }
-
-            if (ContextCompat.CheckSelfPermission(Activity, Manifest.Permission.ReadContacts) != Android.Content.PM.Permission.Granted
-                    || ContextCompat.CheckSelfPermission(Activity, Manifest.Permission.ReadExternalStorage) != Android.Content.PM.Permission.Granted)
-            {
-                RequestPermissions(new string[] { Manifest.Permission.ReadExternalStorage, Manifest.Permission.ReadContacts }, 769);
-            }
-
-            permissionsAsked = true;
         }
 
         async Task LoadDocument()
