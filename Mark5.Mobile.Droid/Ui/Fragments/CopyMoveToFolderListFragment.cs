@@ -199,6 +199,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
             base.OnRetainedInstanceStateRestored(restoredState as FolderListFragmentState);
+
             var flfs = restoredState as MoveToFolderListFragmentState;
             if (flfs != null)
             {

@@ -6,17 +6,20 @@
 // Copyright (c) 2016 Nordic IT
 //
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.App;
 using Android.Content;
 using Android.Support.V7.App;
+using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -24,28 +27,33 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class FolderPickerListFragment : FoldersListFragment
     {
 
-        HashSet<Folder> SelectedFolders = new HashSet<Folder>();
+        AppCompatButton doneButton;
 
-        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        HashSet<Folder> selectedFolders = new HashSet<Folder>(LambdaEqualityComparer<Folder>.Create(f => f.Id));
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
-            base.OnCreateOptionsMenu(menu, inflater);
+            var rootView = base.OnCreateView(inflater, container, savedInstanceState);
 
-            var item = menu.Add(Menu.None, 10, 10, Resource.String.done);
-            item.SetShowAsAction(ShowAsAction.Always);
+            doneButton = rootView.FindViewById<AppCompatButton>(Resource.Id.button);
+            doneButton.Text = GetString(Resource.String.done);
+            doneButton.Enabled = false;
+            doneButton.Click += DoneButton_Click;
+
+            return rootView;
         }
 
-        public override bool OnOptionsItemSelected(IMenuItem item)
+        protected override View InflateView(LayoutInflater inflater, ViewGroup container)
         {
-            if (item.ItemId == 10)
-            {
-                var intent = new Intent();
-                intent.PutExtra(FolderListSelectionActivity.FoldersResultKey, SerializationUtils.Serialize(SelectedFolders.ToList()));
-                Activity.SetResult(Result.Ok, intent);
-                Activity.Finish();
-                return true;
-            }
+            return inflater.Inflate(Resource.Layout.list_with_button, container, false); ;
+        }
 
-            return base.OnOptionsItemSelected(item);
+        void DoneButton_Click(object sender, EventArgs e)
+        {
+            var intent = new Intent();
+            intent.PutExtra(FolderListSelectionActivity.FoldersResultKey, SerializationUtils.Serialize(selectedFolders.ToList()));
+            Activity.SetResult(Result.Ok, intent);
+            Activity.Finish();
         }
 
         protected override void SetSections()
@@ -68,19 +76,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             return new FolderPickerListFragment
             {
-                SelectedFolders = SelectedFolders,
+                selectedFolders = selectedFolders,
                 RemoteFolder = folder,
             };
         }
 
         protected override void RestoreSelection()
         {
-            if (SelectedFolders.Any())
+            if (selectedFolders.Any())
             {
-                CurrentAdapter.SetSelectionForFolders(SelectedFolders);
+                CurrentAdapter.SetSelectionForFolders(selectedFolders);
             }
 
-            UpdateTitle();
+            UpdateControls();
         }
 
         protected override void Adapter_ItemClicked(object sender, int position)
@@ -98,22 +106,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var folder = CurrentAdapter.GetItemAtPosition(position);
             if (isFolderSelected)
             {
-                SelectedFolders.Add(folder.ShallowCopy());
+                selectedFolders.Add(folder.ShallowCopy());
             }
             else
             {
-                SelectedFolders.Remove(folder);
+                selectedFolders.RemoveWhere(f => f.Id == folder.Id);
             }
 
-            UpdateTitle();
+            UpdateControls();
         }
 
-        public void UpdateTitle()
+        public void UpdateControls()
         {
-            var selectedCount = SelectedFolders.Count;
-            var title = selectedCount > 0 ? Resources.GetQuantityString(Resource.Plurals.folders_selected, SelectedFolders.Count, SelectedFolders.Count)
-                                                     : GetString(Resource.String.select_folders);
-            ((AppCompatActivity)Activity).SupportActionBar.Title = title;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = selectedFolders.Count > 0
+                ? Resources.GetQuantityString(Resource.Plurals.folders_selected, selectedFolders.Count, selectedFolders.Count)
+                : GetString(Resource.String.select_folders);
+
+            doneButton.Enabled = selectedFolders.Count > 0;
         }
 
         #region Filtering 
@@ -145,7 +154,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var matchingFolders = GetMatchingFolders(newText);
                     SearchAdapter.RefreshSearch(matchingFolders);
                     SearchAdapter.ClearSelections();
-                    SearchAdapter.SetSelectionForFolders(SelectedFolders);
+                    SearchAdapter.SetSelectionForFolders(selectedFolders);
                 }
             }, 500);
             return false;
@@ -157,31 +166,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return base.GenerateTag() + $" / {nameof(FolderPickerListFragment)} [selectedFolders.Count={SelectedFolders.Count}]";
+            return base.GenerateTag() + $" / {nameof(FolderPickerListFragment)} [selectedFolders.Count={selectedFolders.Count}]";
         }
 
         public override IRetainableState OnRetainInstanceState()
         {
             var baseState = base.OnRetainInstanceState() as FolderListFragmentState;
 
-            CommonConfig.Logger.Info($"Retaining state: [selectedFolders.Count={SelectedFolders.Count}]");
+            CommonConfig.Logger.Info($"Retaining state: [selectedFolders.Count={selectedFolders.Count}]");
 
             return new PickerFolderListFragmentState
             {
                 Folder = baseState.Folder,
                 SelectedItemPositions = baseState.SelectedItemPositions,
-                SelectedFolders = SelectedFolders,
+                SelectedFolders = selectedFolders,
             };
         }
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
             base.OnRetainedInstanceStateRestored(restoredState as FolderListFragmentState);
+
             var flfs = restoredState as PickerFolderListFragmentState;
             if (flfs != null)
             {
-                SelectedFolders = flfs.SelectedFolders;
-                CommonConfig.Logger.Info($"Restored state state: [selectedFolders.Count={SelectedFolders.Count}]");
+                selectedFolders = flfs.SelectedFolders;
+                CommonConfig.Logger.Info($"Restored state state: [selectedFolders.Count={selectedFolders.Count}]");
             }
         }
 

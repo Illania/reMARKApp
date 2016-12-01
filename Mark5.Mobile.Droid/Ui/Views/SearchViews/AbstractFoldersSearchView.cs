@@ -30,10 +30,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             typedArray.Recycle();
 
             Clickable = true;
-            // TODO
-            //Click += (sender, e) =>
-            //{
-            //};
 
             foldersTitle = new AppCompatTextView(context)
             {

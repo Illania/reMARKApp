@@ -61,7 +61,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"Creating {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
-            var rootView = inflater.Inflate(Resource.Layout.list, container, false);
+            var rootView = InflateView(inflater, container);
 
             RefreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
             RefreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
@@ -87,6 +87,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             HasOptionsMenu = true;
 
             return rootView;
+        }
+
+        protected virtual View InflateView(LayoutInflater inflater, ViewGroup container)
+        {
+            return inflater.Inflate(Resource.Layout.list, container, false); ;
         }
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
@@ -240,12 +245,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Adapter.SetSections(AvailableSections);
         }
 
-        void NavigateInFolder(Folder folder)
+        void NavigateToFolder(Folder folder)
         {
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
-
             var foldersListFragment = GetFolderFragment(folder);
-
             var tag = foldersListFragment.GenerateTag();
             var ft = fragmentManager.BeginTransaction();
             ft.SetTransition((int)FragmentTransit.FragmentOpen);
@@ -268,7 +271,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Adapter_ExpandClicked(object sender, int position)
         {
-            NavigateInFolder(CurrentAdapter.GetItemAtPosition(position));
+            NavigateToFolder(CurrentAdapter.GetItemAtPosition(position));
         }
 
         protected virtual void Adapter_ItemClicked(object sender, int position)
