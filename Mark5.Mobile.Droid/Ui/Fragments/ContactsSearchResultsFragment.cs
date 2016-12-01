@@ -198,7 +198,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 get
                 {
-                    return contactPreviewsInView.ToList();
+                    return contactPreviewsInView;
                 }
             }
 

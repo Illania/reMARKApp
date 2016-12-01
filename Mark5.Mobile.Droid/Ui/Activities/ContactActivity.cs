@@ -6,18 +6,14 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
-using System.Collections.Generic;
 using Android.App;
 using Android.OS;
-using Android.Support.Design.Widget;
 using Android.Support.V7.Widget;
-using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
-using Mark5.Mobile.Droid.Ui.Views.ContactViews;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -34,14 +30,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string ReadOnlyModeIntentKey = "ReadOnlyMode_660e0fd1-17df-46f2-a4c2-44dacb9f0a76";
         public const string NotificationGuidIntentKey = "NotificationGuid_d0224832-22e3-481b-9c0d-78b361a57691";
 
-        const string cfFragmentTagKey = "fragmentTagKey";
-        string cfFragmentTag;
-
-        ContactHeaderView toolbarHeaderView;
-        ContactHeaderView floatHeaderView;
-
-        ContactFragment cf;
-
         Toolbar toolbar;
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -50,22 +38,16 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Creating {nameof(ContactActivity)}...");
 
-            SetContentView(Resource.Layout.base_layout_contact);
+            SetContentView(Resource.Layout.base_layout);
 
-            toolbar = FindViewById<Toolbar>(Resource.Id.collapsing_toolbar);
+            toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
             SupportActionBar.Title = string.Empty;
 
-            var appBarLayout = FindViewById<AppBarLayout>(Resource.Id.collapsing_appbar);
-            toolbarHeaderView = FindViewById<ContactHeaderView>(Resource.Id.toolbar_header_view);
-            floatHeaderView = FindViewById<ContactHeaderView>(Resource.Id.float_header_view);
-
-            appBarLayout.AddOnOffsetChangedListener(new AppBarListener(toolbarHeaderView));
-
             if (savedInstanceState == null)
             {
-                cf = new ContactFragment();
+                var cf = new ContactFragment();
 
                 if (Intent.HasExtra(FolderIdIntentKey))
                     cf.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
@@ -91,66 +73,15 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 cf.CloseRequest = OnBackPressed;
 
                 var ft = SupportFragmentManager.BeginTransaction();
-                cfFragmentTag = cf.GenerateTag();
-                ft.Replace(Resource.Id.fragment_container, cf, cfFragmentTag);
+                ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ContactActivity)}");
             }
             else
             {
-                cfFragmentTag = savedInstanceState.GetString(cfFragmentTagKey);
-                cf = SupportFragmentManager.FindFragmentByTag(cfFragmentTag) as ContactFragment;
-
                 CommonConfig.Logger.Info($"Restored {nameof(ContactActivity)}");
             }
         }
-
-        protected override void OnSaveInstanceState(Bundle outState)
-        {
-            outState.PutString(cfFragmentTagKey, cfFragmentTag);
-            base.OnSaveInstanceState(outState);
-        }
-
-        protected override void OnActivityResult(int requestCode, Result resultCode, Android.Content.Intent data)
-        {
-            if (resultCode == Result.Ok && cf != null)
-            {
-                if (requestCode == ContactFragment.RequestCodes.CommentsRequest)
-                {
-                    var comments = SerializationUtils.Deserialize<List<Comment>>(data.GetStringExtra(CommentsListActivity.CommentsResultKey));
-                    cf.UpdateComments(comments);
-                }
-                else if (requestCode == ContactFragment.RequestCodes.CategoriesRequest)
-                {
-                    var categories = SerializationUtils.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
-                    cf.UpdateCategories(categories);
-                }
-            }
-        }
-
-        public void SetTitles(string title, string subtitle)
-        {
-            toolbarHeaderView.SetTitles(title, subtitle);
-            floatHeaderView.SetTitles(title, subtitle);
-        }
-
-        class AppBarListener : Java.Lang.Object, AppBarLayout.IOnOffsetChangedListener
-        {
-            readonly ContactHeaderView toolbarHeaderView;
-
-            public AppBarListener(ContactHeaderView headerView)
-            {
-                toolbarHeaderView = headerView;
-            }
-
-            public void OnOffsetChanged(AppBarLayout appBarLayout, int verticalOffset)
-            {
-                float percentage = Math.Abs(verticalOffset) / (float)appBarLayout.TotalScrollRange;
-
-                toolbarHeaderView.Visibility = percentage < 1f ? ViewStates.Gone : ViewStates.Visible;
-            }
-        }
-
     }
 }

@@ -24,7 +24,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         protected AbstractSearchView(Context context)
             : base(context)
         {
-            LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
             DistanceLarge = ConversionUtils.ConvertDpToPixels(16.0f);
             DistanceNormal = ConversionUtils.ConvertDpToPixels(8.0f);

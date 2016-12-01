@@ -63,7 +63,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             copyButton.Enabled = false;
             copyButton.Click += async (sender, e) =>
             {
-                CommonConfig.Logger.Info($"Attempting copy to folder [businessEntities.Count={BusinessEntities.Count}, adapter.selectedItemCount={adapter.SelectedItemCount}]...");
+                CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={BusinessEntities.Count}, adapter.selectedItemCount={adapter.SelectedItemCount}]...");
 
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
 
@@ -77,7 +77,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     dismissAction();
 
-                    CommonConfig.Logger.Error($"Copying to folder failed [businessEntities.Count={BusinessEntities.Count}, adapter.selectedItemCount={adapter.SelectedItemCount}]", ex);
+                    CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={BusinessEntities.Count}, adapter.selectedItemCount={adapter.SelectedItemCount}]", ex);
 
                     await Dialogs.ShowErrorDialogAsync(Activity, ex);
                 }
@@ -114,18 +114,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnPause();
 
             CommonConfig.Logger.Info($"Pausing {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={BusinessEntities?.Count}]...");
-        }
-
-        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
-        {
-            //TODO
-        }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            //TODO
-
-            return true;
         }
 
         #endregion
@@ -195,9 +183,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void UpdateControls()
         {
+            if (!IsAdded || IsDetached || IsRemoving) return;
+
             if (adapter.SelectedItemCount < 1)
             {
-
                 ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
                 copyButton.Enabled = false;
             }
@@ -243,7 +232,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 get
                 {
-                    return systemUsersInView.ToList();
+                    return systemUsersInView;
                 }
             }
 

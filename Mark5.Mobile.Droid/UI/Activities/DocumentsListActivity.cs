@@ -12,7 +12,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
+using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using TinyMessenger;
 
@@ -30,9 +30,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         DocumentsListFragment dlf;
 
         TinyMessageSubscriptionToken readStatusToken;
+        TinyMessageSubscriptionToken priorityToken;
         TinyMessageSubscriptionToken categoriesToken;
         TinyMessageSubscriptionToken commentCountToken;
-        TinyMessageSubscriptionToken entityMovedToken;
+        TinyMessageSubscriptionToken entityMovedFromFolderToken;
+        TinyMessageSubscriptionToken entityRemovedFromFolderToken;
+        TinyMessageSubscriptionToken entityRemovedToken;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -63,40 +66,17 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
             else
             {
+                dlf = (DocumentsListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(DocumentsListActivity)}");
             }
 
-            readStatusToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(m =>
-            {
-                if (dlf != null && m.Sender != dlf)
-                {
-                    dlf.UpdateReadStatus(m);
-                }
-            });
-
-            categoriesToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewCategoriesChangedMessage>(m =>
-            {
-                if (dlf != null && m.Sender != dlf)
-                {
-                    dlf.UpdateCategories(m);
-                }
-            });
-
-            commentCountToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewCommentCountChangedMessage>(m =>
-            {
-                if (dlf != null && m.Sender != dlf)
-                {
-                    dlf.UpdateCommentsCount(m);
-                }
-            });
-
-            entityMovedToken = PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(m =>
-           {
-               if (dlf != null && m.Sender != dlf && dlf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Document)
-               {
-                   dlf.RemoveMovedEntities(m);
-               }
-           });
+            readStatusToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(dlf.UpdateReadStatus, m => dlf != null && m.Sender != dlf);
+            priorityToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewPriorityChangedMessage>(dlf.UpdatePriority, m => dlf != null && m.Sender != dlf);
+            categoriesToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewCategoriesChangedMessage>(dlf.UpdateCategories, m => dlf != null && m.Sender != dlf);
+            commentCountToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewCommentCountChangedMessage>(dlf.UpdateCommentsCount, m => dlf != null && m.Sender != dlf);
+            entityMovedFromFolderToken = PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(dlf.UpdateMovedFromFolderEntities, m => dlf != null && m.Sender != dlf && dlf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Document);
+            entityRemovedFromFolderToken = PlatformConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(dlf.UpdateRemovedFromFolderEntities, m => dlf != null && m.Sender != dlf && dlf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Document);
+            entityRemovedToken = PlatformConfig.MessengerHub.Subscribe<EntityRemovedMessage>(dlf.UpdateRemovedEntities, m => dlf != null && m.Sender != dlf && m.ObjectType == ObjectType.Document);
         }
 
         protected override void OnDestroy()
@@ -104,9 +84,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.OnDestroy();
 
             readStatusToken?.Dispose();
+            priorityToken?.Dispose();
             commentCountToken?.Dispose();
             categoriesToken?.Dispose();
-            entityMovedToken?.Dispose();
+            entityMovedFromFolderToken?.Dispose();
+            entityRemovedFromFolderToken?.Dispose();
+            entityRemovedToken?.Dispose();
         }
     }
 }

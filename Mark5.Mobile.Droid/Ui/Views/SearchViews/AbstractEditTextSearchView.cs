@@ -8,6 +8,7 @@
 using Android.Content;
 using Android.Support.Design.Widget;
 using Android.Views;
+using Android.Widget;
 using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
@@ -35,7 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
             EditText = new TextInputEditText(context)
             {
-                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
             EditText.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             textInputLayout.AddView(EditText);

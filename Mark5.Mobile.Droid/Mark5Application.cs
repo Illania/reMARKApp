@@ -42,7 +42,7 @@ namespace Mark5.Mobile.Droid
             {
                 var mainFolder = FileSystem.Current.LocalStorage;
 
-                CommonConfig.PathSeparator = Path.PathSeparator;
+                CommonConfig.PathSeparator = Path.DirectorySeparatorChar;
                 CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "data"), CreationCollisionOption.OpenIfExists); ;
                 CommonConfig.OutgoingFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "out"), CreationCollisionOption.OpenIfExists); ;
                 CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "db"), CreationCollisionOption.OpenIfExists); ;

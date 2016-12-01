@@ -47,7 +47,8 @@ namespace Mark5.Mobile.Droid
                 var ft = SupportFragmentManager.BeginTransaction();
                 clf = new CategoriesListFragment
                 {
-                    BusinessEntityPreview = bep
+                    BusinessEntityPreview = bep,
+                    CloseRequest = OnBackPressed
                 };
                 ft.Replace(Resource.Id.fragment_container, clf, clf.GenerateTag());
                 ft.Commit();
@@ -56,6 +57,7 @@ namespace Mark5.Mobile.Droid
             }
             else
             {
+                clf = (CategoriesListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(CategoriesListActivity)}");
             }
         }

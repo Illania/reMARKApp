@@ -59,6 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
+            android:tint="@color/darkerblue"
             android:src="@drawable/arrow_right"
             android:clickable="false" />
     </android.support.v7.widget.LinearLayoutCompat>

@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
@@ -25,6 +26,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.ContactViews;
 using Mark5.Mobile.Droid.Utilities;
@@ -95,6 +97,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
+            ((AppCompatActivity)Activity).SupportActionBar.Title = string.Empty;
+
             CommonConfig.Logger.Info($"Created {nameof(ContactFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, contact.id={ContactId ?? ContactPreview?.Id}, readOnlyMode={ReadOnlyMode}...");
         }
 
@@ -103,6 +107,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnResume();
 
             await RefreshData();
+        }
+
+        public override void OnActivityResult(int requestCode, int resultCode, Intent data)
+        {
+            if (resultCode == (int)Result.Ok)
+            {
+                if (requestCode == RequestCodes.CommentsRequest)
+                {
+                    var comments = SerializationUtils.Deserialize<List<Comment>>(data.GetStringExtra(CommentsListActivity.CommentsResultKey));
+                    UpdateComments(comments);
+                }
+                else if (requestCode == RequestCodes.CategoriesRequest)
+                {
+                    var categories = SerializationUtils.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
+                    UpdateCategories(categories);
+                }
+            }
         }
 
         #region Options menu
@@ -166,6 +187,35 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
+            if (item.ItemId == MenuItemActions.CopyToWorktray)
+            {
+                CopyToWorktrayAction();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.CopyToFolder)
+            {
+                var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
+                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Copy);
+                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
+                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity> { ContactPreview }));
+                StartActivity(i);
+
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.MoveToFolder)
+            {
+                var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
+                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Move);
+                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
+                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity> { ContactPreview }));
+                i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
+                StartActivity(i);
+
+                return true;
+            }
+
             if (item.ItemId == MenuItemActions.Categories)
             {
                 var i = new Intent(Activity, typeof(CategoriesListActivity));
@@ -174,6 +224,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
+
             if (item.ItemId == MenuItemActions.Comments)
             {
                 var i = new Intent(Activity, typeof(CommentsListActivity));
@@ -182,6 +233,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
+
             if (item.ItemId == MenuItemActions.Actions)
             {
                 var i = new Intent(Activity, typeof(ObjectActionsActivity));
@@ -190,6 +242,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return true;
             }
+
             if (item.ItemId == MenuItemActions.Links)
             {
                 var i = new Intent(Activity, typeof(ObjectLinksActivity));
@@ -199,7 +252,112 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
+            if (item.ItemId == MenuItemActions.DeleteFromFolder)
+            {
+                DeleteFromFolderAction();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.Delete)
+            {
+                DeleteAction();
+                return true;
+            }
+
             return base.OnOptionsItemSelected(item);
+        }
+
+        async void CopyToWorktrayAction()
+        {
+            var option = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_worktray, Resource.Array.copy_to_worktray_options);
+
+            if (option == 0)
+            {
+                CommonConfig.Logger.Info($"Attempting copy to worktray [contactPreview={ContactPreview}]...");
+
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
+
+                try
+                {
+                    await Managers.CommonActionsManager.CopyToWorktray(new List<IBusinessEntity> { ContactPreview });
+
+                    dismissAction();
+                }
+                catch (Exception ex)
+                {
+                    dismissAction();
+
+                    CommonConfig.Logger.Error($"Copying to worktray failed [contactPreview={ContactPreview}]", ex);
+
+                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                }
+            }
+
+            if (option == 1)
+            {
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, new List<IBusinessEntity> { ContactPreview }));
+            }
+        }
+
+        async void DeleteFromFolderAction()
+        {
+            var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
+            if (!yesNo)
+            {
+                return;
+            }
+
+            CommonConfig.Logger.Info($"Attempting to delete from folder [contactPreview={ContactPreview}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting_from_folder, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { ContactPreview }, Folder);
+
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Contact, FolderId ?? Folder.Id, new List<int> { ContactPreview.Id }));
+
+                dismissAction();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Deleting from folder failed [contactPreview={ContactPreview}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
+        async void DeleteAction()
+        {
+            var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
+            if (!yesNo)
+            {
+                return;
+            }
+
+            CommonConfig.Logger.Info($"Attempting to delete [contactPreview={ContactPreview}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { ContactPreview });
+
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedMessage(this, ObjectType.Contact, new List<int> { ContactPreview.Id }));
+
+                dismissAction();
+                if (CloseRequest != null) CloseRequest();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Deleting failed [contactPreview={ContactPreview}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
         }
 
         #endregion
@@ -239,7 +397,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             communicationCardView.AddView(communicationCardInternalLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
             communicationSubviews.OfType<LinkedContactSubview>().ForEach(lcs => lcs.ContactClicked += LinkedContactClicked);
-            communicationSubviews.OfType<ResponsibleSubview>().ForEach(rsv => rsv.ContactClicked += ResponsibleUserClicked);
             communicationSubviews.OfType<CommunicationAddressesSubview>().ForEach(rsv => rsv.AddressClicked += AddressClicked);
             communicationSubviews.ForEach(communicationCardInternalLayout.AddView);
         }
@@ -402,7 +559,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void RefreshTitle()
         {
-            ((ContactActivity)Activity).SetTitles(ContactPreview?.Name, ContactPreview?.CompanyName);
+            ((AppCompatActivity)Activity).SupportActionBar.Title = ContactPreview?.Name;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = ContactPreview?.CompanyName;
             descriptionCardTitle.Text = $"About {ContactPreview?.Name}";
         }
 
@@ -426,11 +584,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ft.Commit();
         }
 
-        void ResponsibleUserClicked(object sender, int contactId)
-        {
-            //TODO
-        }
-
         void AddressClicked(object sender, CommunicationAddress e)
         {
             //TODO 
@@ -440,13 +593,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Update methods
 
-        public void UpdateCategories(List<Category> categories)
+        void UpdateCategories(List<Category> categories)
         {
             ContactPreview?.Categories.Clear();
             ContactPreview?.Categories.AddRange(categories);
         }
 
-        public void UpdateComments(List<Comment> comments)
+        void UpdateComments(List<Comment> comments)
         {
             if (ContactPreview != null)
             {
