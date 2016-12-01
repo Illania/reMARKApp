@@ -14,6 +14,7 @@ using Android.Content;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.Widget;
+using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
@@ -66,6 +67,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             HasOptionsMenu = true;
 
             return rootView;
+        }
+
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        {
+            base.OnViewCreated(view, savedInstanceState);
+
+            ((AppCompatActivity)Activity).SupportActionBar.Title = Folder.DocumentsOutgoingFolder.Name;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
         }
 
         public override async void OnResume()
