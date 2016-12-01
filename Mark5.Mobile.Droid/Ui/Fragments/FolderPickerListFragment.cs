@@ -20,24 +20,11 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
+
     public class FolderPickerListFragment : FoldersListFragment
     {
-        override public bool LocalSectionEnabled { get; set; } = false;
 
-        public HashSet<Folder> SelectedFolders
-        {
-            get;
-            set;
-        } = new HashSet<Folder>();
-
-        protected override RetainableStateFragment GetFolderFragment(Folder folder)
-        {
-            return new FolderPickerListFragment
-            {
-                SelectedFolders = SelectedFolders,
-                RemoteFolder = folder,
-            };
-        }
+        HashSet<Folder> SelectedFolders = new HashSet<Folder>();
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
@@ -61,6 +48,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return base.OnOptionsItemSelected(item);
         }
 
+        protected override void SetSections()
+        {
+            CommonConfig.Logger.Info("Setting sections according to the folder");
+
+            if (RemoteFolder.Root)
+            {
+                AvailableSections = new List<Section> { Section.Favourites, Section.Remote };
+            }
+            else
+            {
+                AvailableSections = new List<Section> { Section.Remote };
+            }
+
+            Adapter.SetSections(AvailableSections);
+        }
+
+        protected override RetainableStateFragment GetFolderFragment(Folder folder)
+        {
+            return new FolderPickerListFragment
+            {
+                SelectedFolders = SelectedFolders,
+                RemoteFolder = folder,
+            };
+        }
+
         protected override void RestoreSelection()
         {
             if (SelectedFolders.Any())
@@ -78,7 +90,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected override void Adapter_ItemLongClicked(object sender, int position)
         {
-            UpdateSelections(position);
         }
 
         void UpdateSelections(int position)
@@ -87,7 +98,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var folder = CurrentAdapter.GetItemAtPosition(position);
             if (isFolderSelected)
             {
-                SelectedFolders.Add(folder);
+                SelectedFolders.Add(folder.ShallowCopy());
             }
             else
             {

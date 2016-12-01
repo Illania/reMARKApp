@@ -32,24 +32,23 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
+
     public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-        public Folder RemoteFolder { get; set; }
 
-        virtual public bool LocalSectionEnabled { get; set; } = true;
+        public Folder RemoteFolder { get; set; }
 
         protected FolderListAdapter Adapter;
         protected SearchFolderListAdapter SearchAdapter;
         protected SearchView SearchView;
         protected RecyclerView RecyclerView;
         protected SwipeRefreshLayout RefreshLayout;
+        protected List<Section> AvailableSections;
+        protected bool SearchEnabled;
+        protected readonly Handler SearchHandler = new Handler();
+
         ActionMode actionMode;
         List<int> recoveredSelectedItemsPosition;
-        List<Section> availableSections;
-
-        protected bool SearchEnabled;
-
-        protected readonly Handler SearchHandler = new Handler();
 
         protected FolderListAdapter CurrentAdapter
         {
@@ -149,15 +148,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             RefreshLayout.Refreshing = true;
 
-            if (availableSections.Contains(Section.Remote))
+            if (AvailableSections.Contains(Section.Remote))
             {
                 await RefreshRemote(forceRefresh);
             }
-            if (availableSections.Contains(Section.Favourites))
+            if (AvailableSections.Contains(Section.Favourites))
             {
                 await RefreshFavorites();
             }
-            if (availableSections.Contains(Section.Local))
+            if (AvailableSections.Contains(Section.Local))
             {
                 RefreshLocal();
             }
@@ -221,24 +220,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        void SetSections()
+        protected virtual void SetSections()
         {
             CommonConfig.Logger.Info("Setting sections according to the folder");
 
             if (RemoteFolder.Root)
             {
-                availableSections = new List<Section> { Section.Favourites, Section.Remote };
-                if (RemoteFolder.Module == ModuleType.Documents && LocalSectionEnabled)
+                AvailableSections = new List<Section> { Section.Favourites, Section.Remote };
+                if (RemoteFolder.Module == ModuleType.Documents)
                 {
-                    availableSections.Add(Section.Local);
+                    AvailableSections.Add(Section.Local);
                 }
             }
             else
             {
-                availableSections = new List<Section> { Section.Remote };
+                AvailableSections = new List<Section> { Section.Remote };
             }
 
-            Adapter.SetSections(availableSections);
+            Adapter.SetSections(AvailableSections);
         }
 
         void NavigateInFolder(Folder folder)
@@ -558,7 +557,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     actionMode.Finish();
 
-                    if (availableSections.Contains(Section.Favourites))
+                    if (AvailableSections.Contains(Section.Favourites))
                     {
                         await RefreshFavorites();
                     }

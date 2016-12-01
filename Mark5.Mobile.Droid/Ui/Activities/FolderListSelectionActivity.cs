@@ -25,9 +25,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         public enum ModeType
         {
-            CopyToFolderMode = 1,
-            MoveToFolderMode = 2,
-            PickerMode = 3,
+            CopyToFolder = 1,
+            MoveToFolder = 2,
+            Picker = 3,
         }
 
         public const string ModuleIntentKey = "ModuleIntent_79a3dba4-bdad-4b11-be42-af6acdf31b4e";
@@ -61,7 +61,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 switch (listMode)
                 {
-                    case ModeType.CopyToFolderMode:
+                    case ModeType.CopyToFolder:
                         SupportActionBar.SetTitle(Resource.String.select_folder);
                         var cmflf = new CopyMoveToFolderListFragment
                         {
@@ -71,7 +71,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         };
                         ft.Replace(Resource.Id.fragment_container, cmflf, cmflf.GenerateTag());
                         break;
-                    case ModeType.MoveToFolderMode:
+                    case ModeType.MoveToFolder:
                         SupportActionBar.SetTitle(Resource.String.select_folder);
                         var cmflf2 = new CopyMoveToFolderListFragment
                         {
@@ -82,7 +82,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         };
                         ft.Replace(Resource.Id.fragment_container, cmflf2, cmflf2.GenerateTag());
                         break;
-                    case ModeType.PickerMode:
+                    case ModeType.Picker:
                         SupportActionBar.SetTitle(Resource.String.select_folders);
                         var fplf = new FolderPickerListFragment
                         {
