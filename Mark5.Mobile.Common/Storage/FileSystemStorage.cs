@@ -202,11 +202,12 @@ namespace Mark5.Mobile.Common.Storage
             var documentPreviewFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingDocumentPreview, CreationCollisionOption.ReplaceExisting);
             await documentPreviewFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(documentPreview));
 
+            outgoingDocumentInfo.DateLastSavedTimestamp = DateTime.Now.ToUniversalTime().ConvertDateTimeToTimestampMilliseconds();
             var infoFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingInfo, CreationCollisionOption.ReplaceExisting);
             await infoFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(outgoingDocumentInfo));
         }
 
-        public static async Task<OutgoingDocumentContainer> GetOutgoingDocumentContainerAsync(Guid id, bool lockDocument = false)
+        public static async Task<OutgoingDocumentContainer> GetOutgoingDocumentContainerAsync(Guid id, bool lockDocument, LoadMode loadMode)
         {
             if (!await OutgoingFolderExistsAsync(id))
             {
@@ -214,9 +215,6 @@ namespace Mark5.Mobile.Common.Storage
             }
 
             var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
-
-            var documentFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingDocument);
-            var document = await SerializationUtils.DeserializeAsync<Document>(await documentFile.ReadAllTextAsync());
 
             var documentPreviewFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingDocumentPreview);
             var documentPreview = await SerializationUtils.DeserializeAsync<DocumentPreview>(await documentPreviewFile.ReadAllTextAsync());
@@ -249,17 +247,26 @@ namespace Mark5.Mobile.Common.Storage
                 }
             }
 
-            var attachmentsFolder = await GetOutgoingAttachmentsFolderAsync(id);
-            var attachments = new List<OutgoingDocumentAttachmentDescription>();
-            foreach (var item in await attachmentsFolder.GetFilesAsync())
+            Document document = null;
+            List<OutgoingDocumentAttachmentDescription> attachments = null;
+
+            if (loadMode == LoadMode.Complete)
             {
-                var attachment = new OutgoingDocumentAttachmentDescription();
-                var stream = await item.OpenAsync(PCLStorage.FileAccess.Read);
-                attachment.SizeInBytes = (int)stream.Length;
-                stream.Dispose();
-                attachment.Path = item.Path;
-                attachment.Name = item.Name;
-                attachments.Add(attachment);
+                var documentFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingDocument);
+                document = await SerializationUtils.DeserializeAsync<Document>(await documentFile.ReadAllTextAsync());
+
+                var attachmentsFolder = await GetOutgoingAttachmentsFolderAsync(id);
+                attachments = new List<OutgoingDocumentAttachmentDescription>();
+                foreach (var item in await attachmentsFolder.GetFilesAsync())
+                {
+                    var attachment = new OutgoingDocumentAttachmentDescription();
+                    var stream = await item.OpenAsync(PCLStorage.FileAccess.Read);
+                    attachment.SizeInBytes = (int)stream.Length;
+                    stream.Dispose();
+                    attachment.Path = item.Path;
+                    attachment.Name = item.Name;
+                    attachments.Add(attachment);
+                }
             }
 
             return new OutgoingDocumentContainer
@@ -267,8 +274,24 @@ namespace Mark5.Mobile.Common.Storage
                 Document = document,
                 DocumentPreview = documentPreview,
                 Info = info,
-                Attachments = attachments,
+                LocalAttachments = attachments,
+                LoadMode = loadMode,
             };
+        }
+
+        //TODO also the time should be in the info
+
+        public static async Task<List<OutgoingDocumentContainer>> GetOutgoingDocumentContainersAsync()
+        {
+            var identifiers = await GetOutgoingDocumentIdentifiersAsync();
+            var outgoingDocumentContainers = new List<OutgoingDocumentContainer>();
+
+            foreach (var id in identifiers)
+            {
+                outgoingDocumentContainers.Add(await GetOutgoingDocumentContainerAsync(id, false, LoadMode.Preview));
+            }
+
+            return outgoingDocumentContainers;
         }
 
         public static async Task<IEnumerable<Guid>> GetOutgoingDocumentIdentifiersAsync()
@@ -279,29 +302,6 @@ namespace Mark5.Mobile.Common.Storage
                 identifiers.Add(new Guid(folder.Name));
             }
             return identifiers;
-        }
-
-        public static async Task<List<OutgoingDocumentPreview>> GetOutgoingDocumentPreviewsAsync()
-        {
-            var outgoingDocumentPreviews = new List<OutgoingDocumentPreview>();
-            foreach (var outgoingDocumentFolder in await CommonConfig.OutgoingFolder.GetFoldersAsync())
-            {
-                var isReady = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingInfo)) == ExistenceCheckResult.FileExists;
-                if (!isReady)
-                {
-                    continue;
-                }
-
-                var documentPreviewFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingDocumentPreview);
-                var outgoingDocumentPreview = new OutgoingDocumentPreview(await SerializationUtils.DeserializeAsync<DocumentPreview>(await documentPreviewFile.ReadAllTextAsync()));
-                var isFailed = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed)) == ExistenceCheckResult.FileExists;
-
-                outgoingDocumentPreview.State = isFailed ? OutgoingDocumentState.Failed : OutgoingDocumentState.Waiting;
-                outgoingDocumentPreview.Identifier = new Guid(outgoingDocumentFolder.Name);
-                outgoingDocumentPreviews.Add(outgoingDocumentPreview);
-            }
-
-            return outgoingDocumentPreviews;
         }
 
         static async Task<IFolder> GetOutgoingAttachmentsFolderAsync(Guid id)

@@ -25,7 +25,6 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId = -1, int endId = -1, SourceType sourceType = SourceType.Auto);
 
-        Task<List<OutgoingDocumentPreview>> GetOutgoingDocumentPreviewsAsync();
 
         Task<Document> GetDocumentAsync(Folder folder, int documentId, SourceType sourceType = SourceType.Auto);
 
@@ -44,6 +43,8 @@ namespace Mark5.Mobile.Common.Managers
         Task<string> SaveOutgoingAttachmentAsync(Guid id, string filename, Stream attachmentStream);
 
         Task<OutgoingDocumentContainer> GetOutgoingDocumentContainerAsync(Guid id, bool lockDocument = false);
+
+        Task<List<OutgoingDocumentContainer>> GetOutgoingDocumentContainersPreviewAsync();
 
         Task RemoveOutgoingAttachmentAsync(Guid id, string filename);
 

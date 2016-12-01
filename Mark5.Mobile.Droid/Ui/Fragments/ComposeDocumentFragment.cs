@@ -137,7 +137,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
             }
 
-
             if (OutgoingDocumentGuid == Guid.Empty)
             {
                 OutgoingDocumentGuid = Guid.NewGuid();
@@ -191,9 +190,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     {
                         await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(Resource.String.error_while_sending_document)));
                     }
-                    if (outgoingContainer.Attachments != null)
+                    if (outgoingContainer.LocalAttachments != null)
                     {
-                        OutgoingDocumentInitialAttachments.AddRange(outgoingContainer.Attachments);
+                        OutgoingDocumentInitialAttachments.AddRange(outgoingContainer.LocalAttachments);
                     }
                 }
                 else
@@ -356,7 +355,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 DocumentPreview.Direction = draft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
-                DocumentPreview.DateReceivedTimestamp = DateTime.Now.ToUniversalTime().ConvertDateTimeToTimestampMilliseconds();
                 if (LocalDocument)
                 {
                     await SynchOutgoingAttachments(false);
@@ -394,7 +392,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     await subView.UpdateDocument();
                 }
 
-                DocumentPreview.DateReceivedTimestamp = DateTime.Now.ToUniversalTime().ConvertDateTimeToTimestampMilliseconds();
                 await SynchOutgoingAttachments(false);
                 await Managers.DocumentsManager.SaveOutgoingDocumentAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,
                                                                         PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1,

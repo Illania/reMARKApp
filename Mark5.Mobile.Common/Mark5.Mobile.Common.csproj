@@ -172,7 +172,6 @@
     <Compile Include="Utilities\PhonebookContactsUtilities.cs" />
     <Compile Include="Model\ContactCommunicationAddress.cs" />
     <Compile Include="Model\Support\OutgoingDocumentAttachmentDescription.cs" />
-    <Compile Include="Model\Support\OutgoingDocumentPreview.cs" />
     <Compile Include="Utilities\IDeviceInfoProvider.cs" />
     <Compile Include="Utilities\ILogger.cs" />
     <Compile Include="Utilities\SerializationUtils.cs" />

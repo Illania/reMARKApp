@@ -73,9 +73,9 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<List<OutgoingDocumentPreview>> GetOutgoingDocumentPreviewsAsync()
+        public async Task<List<OutgoingDocumentContainer>> GetOutgoingDocumentContainersPreviewAsync()
         {
-            return await FileSystemStorage.GetOutgoingDocumentPreviewsAsync();
+            return await FileSystemStorage.GetOutgoingDocumentContainersAsync();
         }
 
         public async Task<Document> GetDocumentAsync(Folder folder, int documentId, SourceType sourceType = SourceType.Auto)
@@ -226,7 +226,7 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<OutgoingDocumentContainer> GetOutgoingDocumentContainerAsync(Guid id, bool lockDocument = false)
         {
-            return await FileSystemStorage.GetOutgoingDocumentContainerAsync(id, lockDocument);
+            return await FileSystemStorage.GetOutgoingDocumentContainerAsync(id, lockDocument, LoadMode.Complete);
         }
 
         public async Task<string> SaveOutgoingAttachmentAsync(Guid id, string filename, Stream attachmentStream)

@@ -177,7 +177,7 @@ namespace Mark5.Mobile.Common.Managers
                     Guid identifier;
                     queue.TryTake(out identifier, -1, cts.Token);
 
-                    var container = await FileSystemStorage.GetOutgoingDocumentContainerAsync(identifier);
+                    var container = await FileSystemStorage.GetOutgoingDocumentContainerAsync(identifier, false, LoadMode.Complete);
 
                     if (container == null || container.Info.State == OutgoingDocumentState.Failed || container.Info.Locked)
                     {

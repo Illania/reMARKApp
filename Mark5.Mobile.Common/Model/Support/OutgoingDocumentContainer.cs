@@ -6,16 +6,56 @@
 // Copyright (c) 2016 Nordic IT
 //
 #pragma warning disable CS1701
+using System;
 using System.Collections.Generic;
 
 namespace Mark5.Mobile.Common.Model
 {
     public class OutgoingDocumentContainer
     {
-        public Document Document { get; set; }
+        Document document;
+        public Document Document
+        {
+            get
+            {
+                if (LoadMode != LoadMode.Complete)
+                {
+                    throw new InvalidOperationException($"The document is not set in LoadMode:{LoadMode}!");
+                }
+                return document;
+            }
+            set
+            {
+                document = value;
+            }
+        }
+
+        List<OutgoingDocumentAttachmentDescription> localAttachments = new List<OutgoingDocumentAttachmentDescription>();
+        public List<OutgoingDocumentAttachmentDescription> LocalAttachments
+        {
+            get
+            {
+                if (LoadMode != LoadMode.Complete)
+                {
+                    throw new InvalidOperationException($"The attachments are not set in LoadMode:{LoadMode}!");
+                }
+                return localAttachments;
+            }
+            set
+            {
+                localAttachments = value;
+            }
+        }
+
         public DocumentPreview DocumentPreview { get; set; }
-        public List<OutgoingDocumentAttachmentDescription> Attachments { get; set; }
         public OutgoingDocumentInfo Info { get; set; }
+        public LoadMode LoadMode { get; set; }
+    }
+
+    public enum LoadMode
+    {
+        Preview,
+        Complete,
     }
 }
 

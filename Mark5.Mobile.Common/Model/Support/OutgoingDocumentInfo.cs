@@ -7,7 +7,6 @@ namespace Mark5.Mobile.Common.Model
 
     public class OutgoingDocumentInfo
     {
-
         public Guid Identifier { get; set; }
 
         public DocumentCreationModeFlag Flag { get; set; }
@@ -22,9 +21,11 @@ namespace Mark5.Mobile.Common.Model
 
         public bool ConfirmDelivery { get; set; }
 
-        public OutgoingDocumentState State { get; set; }
-
         public bool Locked { get; set; }
+
+        public long DateLastSavedTimestamp { get; set; }
+
+        public OutgoingDocumentState State { get; set; }
     }
 
     public enum OutgoingDocumentState
