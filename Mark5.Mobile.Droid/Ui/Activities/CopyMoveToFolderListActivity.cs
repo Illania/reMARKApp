@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: FolderListSelectionActivity.cs
+// File: CopyMoveToFolderListActivity.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
 // Copyright (c) 2016 Nordic IT
@@ -20,14 +20,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Activity]
-    public class FolderListSelectionActivity : BaseAppCompatActivity
+    public class CopyMoveToFolderListActivity : BaseAppCompatActivity
     {
 
         public enum ModeType
         {
-            CopyToFolder = 1,
-            MoveToFolder = 2,
-            Picker = 3,
+            Copy = 1,
+            Move = 2,
         }
 
         public const string ModuleIntentKey = "ModuleIntent_79a3dba4-bdad-4b11-be42-af6acdf31b4e";
@@ -61,7 +60,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 switch (listMode)
                 {
-                    case ModeType.CopyToFolder:
+                    case ModeType.Copy:
                         SupportActionBar.SetTitle(Resource.String.select_folder);
                         var cmflf = new CopyMoveToFolderListFragment
                         {
@@ -71,7 +70,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         };
                         ft.Replace(Resource.Id.fragment_container, cmflf, cmflf.GenerateTag());
                         break;
-                    case ModeType.MoveToFolder:
+                    case ModeType.Move:
                         SupportActionBar.SetTitle(Resource.String.select_folder);
                         var cmflf2 = new CopyMoveToFolderListFragment
                         {
@@ -82,23 +81,15 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         };
                         ft.Replace(Resource.Id.fragment_container, cmflf2, cmflf2.GenerateTag());
                         break;
-                    case ModeType.Picker:
-                        SupportActionBar.SetTitle(Resource.String.select_folders);
-                        var fplf = new FolderPickerListFragment
-                        {
-                            RemoteFolder = Folder.RootPerModule(moduleType)
-                        };
-                        ft.Replace(Resource.Id.fragment_container, fplf, fplf.GenerateTag());
-                        break;
                 }
 
                 ft.Commit();
 
-                CommonConfig.Logger.Info($"Created {nameof(FolderListSelectionActivity)}");
+                CommonConfig.Logger.Info($"Created {nameof(CopyMoveToFolderListActivity)}");
             }
             else
             {
-                CommonConfig.Logger.Info($"Restored {nameof(FolderListSelectionActivity)}");
+                CommonConfig.Logger.Info($"Restored {nameof(CopyMoveToFolderListActivity)}");
             }
         }
     }

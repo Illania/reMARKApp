@@ -182,7 +182,7 @@
     <Compile Include="Ui\Activities\CopyToUserWorktrayActivity.cs" />
     <Compile Include="Ui\Activities\DocumentActivity.cs" />
     <Compile Include="Ui\Activities\DocumentsListActivity.cs" />
-    <Compile Include="Ui\Activities\FolderListSelectionActivity.cs" />
+    <Compile Include="Ui\Activities\CopyMoveToFolderListActivity.cs" />
     <Compile Include="Ui\Activities\LoginActivity.cs" />
     <Compile Include="Ui\Activities\MainActivity.cs" />
     <Compile Include="Ui\Activities\ObjectActionsActivity.cs" />
@@ -222,7 +222,6 @@
     <Compile Include="Ui\Fragments\DocumentsListFragment.cs" />
     <Compile Include="Ui\Fragments\DocumentsSearchCriteriaFragment.cs" />
     <Compile Include="Ui\Fragments\DocumentsSearchResultsFragment.cs" />
-    <Compile Include="Ui\Fragments\FolderPickerListFragment.cs" />
     <Compile Include="Ui\Fragments\FoldersListFragment.cs" />
     <Compile Include="Ui\Fragments\NotificationsFragment.cs" />
     <Compile Include="Ui\Fragments\ObjectActionsFragment.cs" />
@@ -262,9 +261,7 @@
     <Compile Include="Ui\Views\SearchViews\AbstractCheckboxSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\AbstractDateRangeSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\AbstractEditTextSearchView.cs" />
-    <Compile Include="Ui\Views\SearchViews\AbstractFoldersSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\AbstractMultiChoiceSearchView.cs" />
-    <Compile Include="Ui\Views\SearchViews\AbstractMustHaveCategoriesSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\AbstractSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\AbstractSingleChoiceSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\AbstractSpinnerEditTextSearchView.cs" />
@@ -273,13 +270,10 @@
     <Compile Include="Ui\Views\SearchViews\ContactCommentSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactDescriptionSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactFirstNameSearchView.cs" />
-    <Compile Include="Ui\Views\SearchViews\ContactFoldersSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactLastNameSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactLedgerSearchView.cs" />
-    <Compile Include="Ui\Views\SearchViews\ContactMustHaveCategoriesSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactNameSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactPostAddressSearchView.cs" />
-    <Compile Include="Ui\Views\SearchViews\ContactResponsibleSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactShortIdSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactTypeSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactVatSearchView.cs" />
@@ -288,11 +282,9 @@
     <Compile Include="Ui\Views\SearchViews\DocumentCommentsSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentDirectionsSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentExtraFieldsSearchView.cs" />
-    <Compile Include="Ui\Views\SearchViews\DocumentFoldersSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentFromToSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentHandledSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentLinesSearchView.cs" />
-    <Compile Include="Ui\Views\SearchViews\DocumentMustHaveCategoriesSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentPartialWordsSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentPrioritiesSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentReceivedDateRangeSearchView.cs" />
@@ -306,7 +298,6 @@
     <Compile Include="Ui\Views\SearchViews\MaxShortcodesSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ShortcodeAddressSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ShortcodeDescriptionSearchView.cs" />
-    <Compile Include="Ui\Views\SearchViews\ShortcodeFoldersSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ShortcodeNameSearchView.cs" />
     <Compile Include="Ui\Views\ShortcodeViews\AddressesView.cs" />
     <Compile Include="Ui\Views\ShortcodeViews\DescriptionView.cs" />

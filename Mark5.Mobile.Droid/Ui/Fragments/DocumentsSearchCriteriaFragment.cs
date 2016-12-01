@@ -62,10 +62,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new DocumentCategoriesSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new DocumentMustHaveCategoriesSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new DocumentFoldersSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
 
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
             {

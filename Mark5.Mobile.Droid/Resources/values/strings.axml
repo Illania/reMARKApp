@@ -107,8 +107,6 @@
 	<string name="search_contact_ledger">Ledger</string>
 	<string name="search_contact_name">Name</string>
 	<string name="search_contact_post_address">Post address</string>
-	<string name="search_contact_responsible">Responsible users</string>
-	<string name="search_contact_responsible_none_selected">Any</string>
 	<string name="search_contact_shortid">Short ID</string>
 	<string name="search_contact_types">Type</string>
 	<string name="search_contact_types_none_selected">All</string>
@@ -135,11 +133,9 @@
 	<string name="search_document_with_attachments_only">Only documents with attachments</string>
 	<string name="search_documents">Search documents</string>
 	<string name="search_documents_result">Results</string>
-	<string name="search_folders">Folders</string>
 	<string name="search_max_contacts">Maximum contacts in results</string>
 	<string name="search_max_documents">Maximum documents in results</string>
 	<string name="search_max_shortcodes">Maximum shortcodes in results</string>
-	<string name="search_must_have_categories">Must have categories</string>
 	<string name="search_shortcode_address">Address</string>
 	<string name="search_shortcode_description">Description</string>
 	<string name="search_shortcode_name">Name</string>

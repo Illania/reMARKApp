@@ -59,12 +59,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ContactCategoriesSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new ContactMustHaveCategoriesSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new ContactFoldersSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new ContactResponsibleSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new MaxContactsSearchView(Context));
 
             searchButton.Text = GetString(Resource.String.search);
