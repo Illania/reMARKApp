@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: CategoriesListFragment.cs
+// File: EditCategoriesListFragment.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
 // Copyright (c) 2016 Nordic IT
@@ -28,7 +28,7 @@ using Mark5.Mobile.Droid.Utilities;
 namespace Mark5.Mobile.Droid
 {
 
-    public class AvailableCategoriesListFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
+    public class EditCategoriesListFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
 
         public BusinessEntityPreview BusinessEntityPreview { get; set; }
@@ -52,7 +52,7 @@ namespace Mark5.Mobile.Droid
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(AvailableCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
+            CommonConfig.Logger.Info($"Creating {nameof(EditCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list_with_button, container, false);
 
@@ -86,7 +86,7 @@ namespace Mark5.Mobile.Droid
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.categories);
 
-            CommonConfig.Logger.Info($"Created {nameof(AvailableCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
+            CommonConfig.Logger.Info($"Created {nameof(EditCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
         }
 
         public override async void OnResume()
@@ -95,7 +95,7 @@ namespace Mark5.Mobile.Droid
 
             if (adapter.ItemCount < 1)
             {
-                CommonConfig.Logger.Info($"Refreshing {nameof(AvailableCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
+                CommonConfig.Logger.Info($"Refreshing {nameof(EditCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
                 await RefreshData();
             }
 
@@ -347,7 +347,7 @@ namespace Mark5.Mobile.Droid
 
         public override string GenerateTag()
         {
-            return $"{nameof(AvailableCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview.Id}, businessEntity.objectType={BusinessEntityPreview.ObjectType}]";
+            return $"{nameof(EditCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview.Id}, businessEntity.objectType={BusinessEntityPreview.ObjectType}]";
         }
 
         class AvailableCategoriesListFragmentState : IRetainableState
