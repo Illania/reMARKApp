@@ -19,9 +19,9 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-    public static class LocalNotificationService //TODO eventually find a better name
+    public static class LocalNotificationService
     {
-        public const int localNotificationId = 11;
+        public const int failedSendingNotificationId = 11;
 
         static public void Initialize()
         {
@@ -57,12 +57,12 @@ namespace Mark5.Mobile.Droid.Utilities
                     nb.SetVibrate(new[] { 500L, 250L, 500L });
                 }
                 var nm = (NotificationManager)Application.Context.GetSystemService(Context.NotificationService);
-                nm.Notify(localNotificationId, nb.Build());
+                nm.Notify(failedSendingNotificationId, nb.Build());
 
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Error while sending notificatio on failed document sending", ex);
+                CommonConfig.Logger.Error("Error while sending notification on failed document sending", ex);
             }
         }
     }

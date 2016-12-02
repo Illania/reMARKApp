@@ -195,8 +195,8 @@ namespace Mark5.Mobile.Common.Managers
             var outgoingDocumentInfo = new OutgoingDocumentInfo
             {
                 Flag = flag,
-                PrecedingDocumentId = precedingDocumentId,
-                PrecedingDocumentFolderId = precedingDocumentFolderId,
+                PreviousDocumentId = precedingDocumentId,
+                PreviousDocumentdFolderId = precedingDocumentFolderId,
                 SendOnTimestamp = sendOnTimestamp,
                 ConfirmRead = confirmRead,
                 ConfirmDelivery = confirmDelivery,
@@ -212,8 +212,8 @@ namespace Mark5.Mobile.Common.Managers
             var outgoingDocumentInfo = new OutgoingDocumentInfo
             {
                 Flag = flag,
-                PrecedingDocumentId = precedingDocumentId,
-                PrecedingDocumentFolderId = precedingDocumentFolderId,
+                PreviousDocumentId = precedingDocumentId,
+                PreviousDocumentdFolderId = precedingDocumentFolderId,
                 SendOnTimestamp = sendOnTimestamp,
                 ConfirmRead = confirmRead,
                 ConfirmDelivery = confirmDelivery,

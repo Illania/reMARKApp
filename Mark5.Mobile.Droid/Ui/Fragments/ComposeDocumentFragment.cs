@@ -67,9 +67,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ScrollView scrollView;
         LinearLayoutCompat linearLayout;
         bool documentShown;
-        bool resumed;
         bool templateLoaded;
-        bool permissionsAsked;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
@@ -131,11 +129,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnResume();
 
-            if (resumed)
-            {
-                return;
-            }
-
             if (OutgoingDocumentGuid == Guid.Empty)
             {
                 OutgoingDocumentGuid = Guid.NewGuid();
@@ -145,7 +138,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             await ShowDocument();
 
             Activity.InvalidateOptionsMenu();
-            resumed = true;
         }
 
         async Task LoadDocument()
@@ -164,10 +156,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var outgoingContainer = await Managers.DocumentsManager.GetOutgoingDocumentContainerAsync(OutgoingDocumentGuid, true);
                     PreviousDocument = outgoingContainer.Document;
                     PreviousDocumentPreview = outgoingContainer.DocumentPreview;
-                    OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag;
                     PreviousDocumentId = outgoingContainer.Info.PrecedingDocumentId;
                     PreviousDocumentFolderId = outgoingContainer.Info.PrecedingDocumentFolderId;
                     OutgoingDocumentState = outgoingContainer.Info.State;
+                    OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag;
                     if (outgoingContainer.Info.State == OutgoingDocumentState.Failed)
                     {
                         await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(Resource.String.error_while_sending_document)));
@@ -845,7 +837,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 AttachmentsState = attachmentsView.ReturnState(),
                 ContentState = contentView.ReturnState(),
                 LocalDocument = LocalDocument,
-                PermissionsAsked = permissionsAsked,
                 OutgoingDocumentOriginalCreationModeFlag = OutgoingDocumentOriginalCreationModeFlag,
                 OutgoingDocumentState = OutgoingDocumentState,
             };
@@ -874,7 +865,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 attachmentsView.State = cfs.AttachmentsState;
                 contentView.State = cfs.ContentState;
                 LocalDocument = cfs.LocalDocument;
-                permissionsAsked = cfs.PermissionsAsked;
                 OutgoingDocumentOriginalCreationModeFlag = cfs.OutgoingDocumentOriginalCreationModeFlag;
                 OutgoingDocumentState = cfs.OutgoingDocumentState;
             }

@@ -215,7 +215,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == 10)
             {
-
                 DeleteOutgoingDocuments(selectedOutgoingDocuments);
                 return true;
             }
@@ -338,14 +337,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected class OutgoingDocumentsListAdapter : RecyclerView.Adapter
         {
-
-            public static class ViewType
-            {
-                public const int DocumentView = 0;
-                public const int ExternalDocumentView = 1;
-                public const int OutgoingDocumentView = 2;
-            }
-
             public List<OutgoingDocumentContainer> Items
             {
                 get

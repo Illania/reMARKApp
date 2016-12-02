@@ -11,9 +11,9 @@ namespace Mark5.Mobile.Common.Model
 
         public DocumentCreationModeFlag Flag { get; set; }
 
-        public int PrecedingDocumentId { get; set; }
+        public int PreviousDocumentId { get; set; }
 
-        public int PrecedingDocumentFolderId { get; set; }
+        public int PreviousDocumentdFolderId { get; set; }
 
         public long SendOnTimestamp { get; set; } = -1;
 

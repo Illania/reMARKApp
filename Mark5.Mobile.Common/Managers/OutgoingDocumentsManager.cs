@@ -201,8 +201,8 @@ namespace Mark5.Mobile.Common.Managers
                             attachmentGuids.Add(attachmentGuid);
                         }
 
-                        await Managers.DocumentsManager.SendDocumentAsync(document, documentPreview, info.Flag, info.PrecedingDocumentId,
-                                                                                   info.PrecedingDocumentFolderId, info.SendOnTimestamp,
+                        await Managers.DocumentsManager.SendDocumentAsync(document, documentPreview, info.Flag, info.PreviousDocumentId,
+                                                                                   info.PreviousDocumentdFolderId, info.SendOnTimestamp,
                                                                                    info.ConfirmRead, info.ConfirmDelivery, attachmentGuids);
                         sendSuccessful = true;
                     }
