@@ -278,7 +278,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        protected virtual async Task RefreshData(int startId = -1, int endId = -1, bool force = false)
+        async Task RefreshData(int startId = -1, int endId = -1, bool force = false)
         {
             try
             {

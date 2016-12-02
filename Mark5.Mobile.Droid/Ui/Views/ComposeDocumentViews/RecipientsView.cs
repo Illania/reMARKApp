@@ -436,7 +436,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 var name = suggestion.Name;
                 if (!string.IsNullOrEmpty(suggestion.ShortId))
                 {
-                    name += $" ({suggestion.ShortId})";
+                    name += " " + suggestion.ShortId;
                 }
                 var address = suggestion.Address;
 

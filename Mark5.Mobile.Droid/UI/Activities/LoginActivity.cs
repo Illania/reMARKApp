@@ -7,13 +7,11 @@
 //
 using System;
 using System.Threading.Tasks;
-using Android;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.Design.Widget;
-using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -266,6 +264,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
                     CommonConfig.Logger.Info($"Sending Firebase token to service...");
                     //await Managers.NotificationsManager.Subscribe(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken); //TODO Disabled until service is fixed
+                    //TODO
+                    //TODO
                 }
 
                 LocalNotificationService.Initialize();

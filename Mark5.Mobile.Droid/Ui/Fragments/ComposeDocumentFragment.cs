@@ -156,8 +156,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var outgoingContainer = await Managers.DocumentsManager.GetOutgoingDocumentContainerAsync(OutgoingDocumentGuid, true);
                     PreviousDocument = outgoingContainer.Document;
                     PreviousDocumentPreview = outgoingContainer.DocumentPreview;
-                    PreviousDocumentId = outgoingContainer.Info.PrecedingDocumentId;
-                    PreviousDocumentFolderId = outgoingContainer.Info.PrecedingDocumentFolderId;
+                    PreviousDocumentId = outgoingContainer.Info.PreviousDocumentId;
+                    PreviousDocumentFolderId = outgoingContainer.Info.PreviousDocumentdFolderId;
                     OutgoingDocumentState = outgoingContainer.Info.State;
                     OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag;
                     if (outgoingContainer.Info.State == OutgoingDocumentState.Failed)

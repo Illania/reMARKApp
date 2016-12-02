@@ -42,7 +42,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
             };
-            subjectTextView.SetPadding(0, 0, 0, 0);
+            subjectTextView.SetPadding(0, 0, 0, 0); //EditTextView has some default padding
             subjectTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimaryBold);
             subjectTextView.SetHint(Resource.String.subject);
             subjectTextView.SetBackgroundColor(Android.Graphics.Color.Transparent);
