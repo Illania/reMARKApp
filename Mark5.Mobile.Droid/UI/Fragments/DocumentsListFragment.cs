@@ -16,6 +16,7 @@ using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
 using Android.Support.Design.Widget;
+using Android.Support.V4.Content;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
@@ -253,7 +254,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     CommonConfig.Logger.Info($"Received {documents?.Count} new documents");
 
-                    Snackbar.Make(coordinatorLayout, Resources.GetQuantityString(Resource.Plurals.new_documents_received, documents.Count, documents.Count), Snackbar.LengthShort).Show();
+                    var snackbar = Snackbar.Make(coordinatorLayout, Resources.GetQuantityString(Resource.Plurals.new_documents_received, documents.Count, documents.Count), Snackbar.LengthShort);
+                    snackbar.View.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.darkblue)));
+                    snackbar.Show();
 
                     Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
 
