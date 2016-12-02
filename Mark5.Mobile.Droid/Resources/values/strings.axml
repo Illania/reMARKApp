@@ -6,20 +6,20 @@
 	<string name="add_favorites">Add to favourites</string>
 	<string name="add_offline">Enable offline mode</string>
 	<string name="adding_comment">Adding comment</string>
-	<string name="app_name">MARK5</string>
 	<string-array name="attachment_clicked_options">
 		<item>Open attachment</item>
 		<item>Remove attachment</item>
 	</string-array>
+	<string name="app_name">MARK5</string>
 	<string name="attachment_clicked">Select action</string>
 	<string name="attachment_too_big">The attachment is bigger than the maximum allowed size on the server</string>
 	<string name="bcc">Bcc:</string>
 	<string name="by">by</string>
 	<string name="cancel">Cancel</string>
-	<string name="cancel">Cancel</string>
 	<string name="cannot_open_attachment_without_ext">Attachments without extensions cannot be opened</string>
 	<string name="categories">Categories</string>
 	<string name="cc">Cc:</string>
+	<string name="choose_application">Choose an application</string>
 	<string name="close_drawer">Close navigation drawer</string>
 	<string name="comments">Comments</string>
 	<string name="confirm">Confirm</string>
@@ -41,7 +41,6 @@
 	<string name="creator">Creator:</string>
 	<string name="date">Date:</string>
 	<string name="delete">Delete</string>
-	<string name="delete">Delete</string>
 	<string name="delete_are_you_sure">Are you sure you want to delete selected?</string>
 	<string name="delete_from_folder">Delete from folder</string>
 	<string name="delete_from_folder_are_you_sure">Are you sure you want to delete selected from folder?</string>
@@ -49,17 +48,21 @@
 	<string name="deleting_comment">Deleting comment</string>
 	<string name="deleting_from_folder">Deleting from folder...</string>
 	<string name="description">Description</string>
+	<string name="disable_notifications_folder">Disable notifications</string>
+	<string name="disabling_notifications_folders">Disabling notification on folders.</string>
 	<string name="document">Document</string>
 	<string name="documents">Documents</string>
 	<string name="done">Done</string>
-	<string name="done">Done</string>
-	<string name="edit">Edit</string>
 	<string name="edit">Edit</string>
 	<string name="edit_comment_message">Edit comment message</string>
 	<string name="editing_comment">Editing comment</string>
+	<string name="enable_notifications_folder">Enable notifications</string>
+	<string name="enabling_notifications">Enabling notifications on folders.</string>
 	<string name="error_removing_local_attachment">Error while removing local attachment</string>
 	<string name="error_saving_local_attachment">Error while saving local attachment</string>
 	<string name="error_while_sending_document">There was an error while sending the document</string>
+	<string name="failed_send_document_notification_content">One or more messages could not be sent</string>
+	<string name="failed_send_document_notification_title">Failed to send messages</string>
 	<string name="filter">Filter...</string>
 	<string name="folder_favorites">Favorites</string>
 	<string name="folder_local">Local folders</string>
@@ -67,11 +70,13 @@
 	<string name="forward">Forward</string>
 	<string name="from">From:</string>
 	<string name="hide_details">Hide details</string>
+	<string name="hide_previous_message">Hide previous message</string>
 	<string name="high_priority_document">This document has high priority</string>
 	<string name="hostname">Hostname</string>
 	<string name="hostname_invalid">Hostname is not valid.</string>
 	<string name="internet_access">Internet access:</string>
 	<string name="large_attachment">This attachment is larger than 20MB. Do you want to download it?</string>
+	<string name="line">Line</string>
 	<string name="lines">Lines:</string>
 	<string name="links">Links</string>
 	<string name="loading_document">Loading document</string>
@@ -95,6 +100,10 @@
 	<string name="no">No</string>
 	<string name="no_content">No content</string>
 	<string name="no_subject">No subject</string>
+	<string name="no_templates_content">There are no templates defined for this creation mode.</string>
+	<string name="no_templates_title">No templates</string>
+	<string name="notification_token_missing_content">The notification token was not set. Please try again later.</string>
+	<string name="notification_token_missing_title">Missing notification token.</string>
 	<string name="notifications">Notifications</string>
 	<string name="ok">OK</string>
 	<string name="on">on</string>
@@ -102,9 +111,12 @@
 	<string name="opening_attachment">Opening attachment</string>
 	<string name="password">Password</string>
 	<string name="password_invalid">Password is not valid.</string>
+	<string name="permissions_snackbar_action">Ok</string>
+	<string name="permissions_snackbar_text">Tap to grant permissions</string>
 	<string name="please_wait">Please wait...</string>
 	<string name="port">Port</string>
 	<string name="port_invalid">Port is not valid.</string>
+	<string name="priority">Priority</string>
 	<string name="read_by">Read by:</string>
 	<string name="read_by_prefix">read by</string>
 	<string name="reference">Ref.:</string>
@@ -114,8 +126,8 @@
 	<string name="reply_all">Reply all</string>
 	<string name="reply_to">Reply to:</string>
 	<string name="save">Save</string>
-	<string name="save_modifications">Save modifications</string>
 	<string name="save_draft">Save draft</string>
+	<string name="save_modifications">Save modifications</string>
 	<string name="saving_draft">Saving draft</string>
 	<string name="search">Search</string>
 	<string name="search_categories">Categories</string>
@@ -162,8 +174,8 @@
 	<string name="search_shortcode_name">Name</string>
 	<string name="search_shortcodes">Search shortcodes</string>
 	<string name="search_shortcodes_result">Result</string>
-	<string name="select_categories">Select categories</string>
 	<string name="select">Select</string>
+	<string name="select_categories">Select categories</string>
 	<string name="select_folder">Select folder</string>
 	<string name="select_folders">Select folders</string>
 	<string name="select_users">Select users</string>
@@ -176,13 +188,21 @@
 	<string name="shortcode">Shortcode</string>
 	<string name="shortcodes">Shortcodes</string>
 	<string name="show_details">Show details</string>
+	<string name="show_previous_message">Show previous message</string>
 	<string name="ssl_accept_selfsigned_warning">You chose to accept certificates. This may decrease security of the connection. Do you want to continue?</string>
 	<string name="ssl_off_warning">You chose to turn off SSL. Connection will be unsecure. Do you want to continue?</string>
+	<string name="subject">Subject</string>
 	<string name="subscribe_folder">Subscribe</string>
 	<string name="subscribing_folders">Subscribing to folders.</string>
 	<string name="subscription_token_missing_content">The subscription token was not set. Please try again later.</string>
 	<string name="subscription_token_missing_title">Missing subscription token.</string>
+	<string name="template_null">You do not have a default template set.</string>
 	<string name="template_question">Which template do you want to use?</string>
+	<string-array name="template_question_options">
+		<item>Default template</item>
+		<item>Local template</item>
+		<item>Another template</item>
+	</string-array>
 	<string name="testing_connection">Testing connection</string>
 	<string name="to">To:</string>
 	<string name="to_prefix">to</string>
@@ -197,55 +217,4 @@
 	<string name="warning">Warning</string>
 	<string name="yes">Yes</string>
 	<string name="yesterday">Yesterday</string>
-	<string name="no_templates_title">No templates</string>
-	<string name="no_templates_content">There are no templates defined for this creation mode.</string>
-	<string name="template_null">You do not have a default template set.</string>
-	<string-array name="template_question_options">
-		<item>Default template</item>
-		<item>Local template</item>
-		<item>Another template</item>
-	</string-array>
-	<string name="show_previous_message">Show previous message</string>
-	<string name="hide_previous_message">Hide previous message</string>
-	<string name="sending_document">Sending document</string>
-	<string name="saving_draft">Saving draft</string>
-	<string name="send">Send</string>
-	<string name="add_attachment">Add attachment</string>
-	<string name="save_draft">Save draft</string>
-	<string name="confirm_save_as_draft">Do you want to save the document as draft?</string>
-	<string name="save_modifications">Save modifications</string>
-	<string name="confirm_save_modified_document">Do you want to save the modified document?</string>
-	<string name="loading_document">Loading document</string>
-	<string name="error_saving_local_attachment">Error while saving local attachment</string>
-	<string name="error_removing_local_attachment">Error while removing local attachment</string>
-	<string-array name="attachment_clicked_options">
-		<item>Open attachment</item>
-		<item>Remove attachment</item>
-	</string-array>
-	<string name="attachment_clicked">Select action</string>
-	<string name="choose_application">Choose an application</string>
-	<string name="attachment_too_big">The attachment is bigger than the maximum allowed size on the server</string>
-	<string name="error_while_sending_document">There was an error while sending the document</string>
-	<string name="create_system_report">Create system report</string>
-	<string name="failed_send_document_notification_title">Failed to send messages</string>
-	<string name="failed_send_document_notification_content">One or more messages could not be sent</string>
-	<string name="permissions_snackbar_text">Tap to grant permissions</string>
-	<string name="permissions_snackbar_action">Ok</string>
-	<string name="priority">Priority</string>
-	<string name="subject">Subject</string>
-	<string name="line">Line</string>
-	<string name="set_priority">Set priority</string>
-	<string name="categories">Categories</string>
-	<string name="comments">Comments</string>
-	<string name="actions">Actions</string>
-	<string name="links">Links</string>
-	<string name="delete_from_folder">Delete from folder</string>
-	<string name="delete">Delete</string>
-	<string name="enable_notifications_folder">Enable notifications</string>
-	<string name="disable_notifications_folder">Disable notifications</string>
-	<string name="add_favorites">Add to favourites</string>
-	<string name="enabling_notifications">Enabling notifications on folders.</string>
-	<string name="disabling_notifications_folders">Disabling notification on folders.</string>
-	<string name="notification_token_missing_title">Missing notification token.</string>
-	<string name="notification_token_missing_content">The notification token was not set. Please try again later.</string>
 </resources>
