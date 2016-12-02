@@ -799,7 +799,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
                     else
                     {
-                        fh.FolderIcon.SetImageResource(Resource.Drawable.folder); //TODO need to add icon for local
+                        fh.FolderIcon.SetImageResource(Resource.Drawable.folder);
                     }
 
                     fh.SelectedOverlay.Visibility = IsItemSelected(position) ? ViewStates.Visible : ViewStates.Gone;
@@ -816,13 +816,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         switch (section)
                         {
                             case Section.Favourites:
-                                title = "Favourites";
+                                title = context.GetString(Resource.String.folder_favorites);
                                 break;
                             case Section.Remote:
-                                title = "Remote";
+                                title = context.GetString(Resource.String.folder_remote);
                                 break;
                             case Section.Local:
-                                title = "Local";
+                                title = context.GetString(Resource.String.folder_local);
                                 break;
                         }
 
