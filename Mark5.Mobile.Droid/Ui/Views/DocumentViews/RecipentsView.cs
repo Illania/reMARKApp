@@ -210,7 +210,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             tableRowFrom.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
             var fromLabel = new AppCompatTextView(Context)
             {
-                Text = Context.GetString(Resource.String.from)
+                Text = Context.GetString(Resource.String.from) + ":"
             };
             fromLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
 
@@ -226,7 +226,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             tableRowTo.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
             var toLabel = new AppCompatTextView(Context)
             {
-                Text = Context.GetString(Resource.String.to)
+                Text = Context.GetString(Resource.String.to) + ":"
             };
             toLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
 
@@ -242,7 +242,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             tableRowCc.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
             var ccLabel = new AppCompatTextView(Context)
             {
-                Text = Context.GetString(Resource.String.cc)
+                Text = Context.GetString(Resource.String.cc) + ":"
             };
             ccLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
 
@@ -258,7 +258,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             tableRowBcc.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
             var bccLabel = new AppCompatTextView(Context)
             {
-                Text = Context.GetString(Resource.String.bcc)
+                Text = Context.GetString(Resource.String.bcc) + ":"
             };
             bccLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
 

@@ -13,44 +13,20 @@ namespace Mark5.Mobile.Common.Model
 
     public class PrintableSuggestion
     {
-        public string Name
-        {
-            get;
-            set;
-        }
+        public string Name { get; set; }
 
-        public string ContactDescription
-        {
-            get;
-            set;
-        }
+        public string ContactDescription { get; set; }
 
-        public string Address
-        {
-            get;
-            set;
-        }
+        public string Address { get; set; }
 
-        public string AddressDescription
-        {
-            get;
-            set;
-        }
+        public string AddressDescription { get; set; }
 
-        public string ShortId
-        {
-            get;
-            set;
-        }
+        public string ShortId { get; set; }
 
-        public SuggestionType Type
-        {
-            get;
-            set;
-        }
+        public SuggestionType Type { get; set; }
 
         public PrintableSuggestion(RecentAddress ra)
-            : this(ra.Name, ra.Address, SuggestionType.RecentAddress)
+                : this(ra.Name, ra.Address, SuggestionType.RecentAddress)
         {
         }
 

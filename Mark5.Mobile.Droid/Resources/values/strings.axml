@@ -13,12 +13,12 @@
 	<string name="app_name">MARK5</string>
 	<string name="attachment_clicked">Select action</string>
 	<string name="attachment_too_big">The attachment is bigger than the maximum allowed size on the server</string>
-	<string name="bcc">Bcc:</string>
+	<string name="bcc">Bcc</string>
 	<string name="by">by</string>
 	<string name="cancel">Cancel</string>
 	<string name="cannot_open_attachment_without_ext">Attachments without extensions cannot be opened</string>
 	<string name="categories">Categories</string>
-	<string name="cc">Cc:</string>
+	<string name="cc">Cc</string>
 	<string name="choose_application">Choose an application</string>
 	<string name="close_drawer">Close navigation drawer</string>
 	<string name="comments">Comments</string>
@@ -68,7 +68,7 @@
 	<string name="folder_local">Local folders</string>
 	<string name="folder_remote">Folders</string>
 	<string name="forward">Forward</string>
-	<string name="from">From:</string>
+	<string name="from">From</string>
 	<string name="hide_details">Hide details</string>
 	<string name="hide_previous_message">Hide previous message</string>
 	<string name="high_priority_document">This document has high priority</string>
@@ -204,7 +204,7 @@
 		<item>Another template</item>
 	</string-array>
 	<string name="testing_connection">Testing connection</string>
-	<string name="to">To:</string>
+	<string name="to">To</string>
 	<string name="to_prefix">to</string>
 	<string name="today">Today</string>
 	<string name="type_search_query">Search query</string>

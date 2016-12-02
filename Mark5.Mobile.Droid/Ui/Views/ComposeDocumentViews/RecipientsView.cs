@@ -67,7 +67,24 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 LayoutParameters = new LayoutParams(ConversionUtils.ConvertDpToPixels(40), ViewGroup.LayoutParams.WrapContent),
             };
             titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimaryBold);
-            titleTextView.Text = type.ToString();
+
+            int titleId;
+            switch (AddressType)
+            {
+                case DocumentAddressType.To:
+                    titleId = Resource.String.to;
+                    break;
+                case DocumentAddressType.Cc:
+                    titleId = Resource.String.cc;
+                    break;
+                case DocumentAddressType.Bcc:
+                    titleId = Resource.String.bcc;
+                    break;
+                default:
+                    throw new ArgumentException("The address type is not supported!");
+            }
+
+            titleTextView.SetText(titleId);
             AddView(titleTextView);
 
             emailEditor = new AppCompatMultiAutoCompleteTextView(context);
