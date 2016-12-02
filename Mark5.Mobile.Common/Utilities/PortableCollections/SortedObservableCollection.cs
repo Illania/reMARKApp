@@ -16,7 +16,6 @@ namespace Mark5.Mobile.Common.Utilities.PortableCollections
         Comparison<TItem> lookupComparison;
         Comparison<TItem> sortingComparison;
 
-
         public SortedObservableCollection(Comparison<TItem> lookup, Comparison<TItem> sorting)
         {
             lookupComparison = lookup;

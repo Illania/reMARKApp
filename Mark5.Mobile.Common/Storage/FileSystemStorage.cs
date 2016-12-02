@@ -279,8 +279,6 @@ namespace Mark5.Mobile.Common.Storage
             };
         }
 
-        //TODO also the time should be in the info
-
         public static async Task<List<OutgoingDocumentContainer>> GetOutgoingDocumentContainersAsync()
         {
             var identifiers = await GetOutgoingDocumentIdentifiersAsync();
