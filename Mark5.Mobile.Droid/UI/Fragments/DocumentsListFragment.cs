@@ -255,7 +255,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     CommonConfig.Logger.Info($"Received {documents?.Count} new documents");
 
                     var snackbar = Snackbar.Make(coordinatorLayout, Resources.GetQuantityString(Resource.Plurals.new_documents_received, documents.Count, documents.Count), Snackbar.LengthShort);
-                    snackbar.View.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.darkblue)));
+                    snackbar.View.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.darkerblue)));
                     snackbar.Show();
 
                     Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);

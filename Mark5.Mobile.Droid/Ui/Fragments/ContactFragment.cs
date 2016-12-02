@@ -36,7 +36,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
     public class ContactFragment : RetainableStateFragment
     {
-
         static class RequestCodes
         {
             public const int CommentsRequest = 1;

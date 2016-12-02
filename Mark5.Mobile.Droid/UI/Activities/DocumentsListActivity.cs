@@ -98,18 +98,20 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.Logger.Info($"Restored {nameof(DocumentsListActivity)}");
             }
 
-            readStatusToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(dlf.UpdateReadStatus, m => dlf != null && m.Sender != dlf);
-            priorityToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewPriorityChangedMessage>(dlf.UpdatePriority, m => dlf != null && m.Sender != dlf);
-            categoriesToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewCategoriesChangedMessage>(dlf.UpdateCategories, m => dlf != null && m.Sender != dlf);
-            commentCountToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewCommentCountChangedMessage>(dlf.UpdateCommentsCount, m => dlf != null && m.Sender != dlf);
-            entityMovedFromFolderToken = PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(dlf.UpdateMovedFromFolderEntities, m => dlf != null && m.Sender != dlf && dlf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Document);
-            entityRemovedFromFolderToken = PlatformConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(dlf.UpdateRemovedFromFolderEntities, m => dlf != null && m.Sender != dlf && dlf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Document);
-            entityRemovedToken = PlatformConfig.MessengerHub.Subscribe<EntityRemovedMessage>(dlf.UpdateRemovedEntities, m => dlf != null && m.Sender != dlf && m.ObjectType == ObjectType.Document);
+            if (dlf != null)
+            {
+                readStatusToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(dlf.UpdateReadStatus, m => dlf != null && m.Sender != dlf);
+                priorityToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewPriorityChangedMessage>(dlf.UpdatePriority, m => dlf != null && m.Sender != dlf);
+                categoriesToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewCategoriesChangedMessage>(dlf.UpdateCategories, m => dlf != null && m.Sender != dlf);
+                commentCountToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewCommentCountChangedMessage>(dlf.UpdateCommentsCount, m => dlf != null && m.Sender != dlf);
+                entityMovedFromFolderToken = PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(dlf.UpdateMovedFromFolderEntities, m => dlf != null && m.Sender != dlf && dlf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Document);
+                entityRemovedFromFolderToken = PlatformConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(dlf.UpdateRemovedFromFolderEntities, m => dlf != null && m.Sender != dlf && dlf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Document);
+                entityRemovedToken = PlatformConfig.MessengerHub.Subscribe<EntityRemovedMessage>(dlf.UpdateRemovedEntities, m => dlf != null && m.Sender != dlf && m.ObjectType == ObjectType.Document);
+            }
         }
 
         protected override void OnSaveInstanceState(Bundle outState)
         {
-
             outState.PutString(dlfFragmentTagKey, dlfFragmentTag);
             outState.PutString(odlfFragmentTagKey, odlfFragmentTag);
             base.OnSaveInstanceState(outState);
