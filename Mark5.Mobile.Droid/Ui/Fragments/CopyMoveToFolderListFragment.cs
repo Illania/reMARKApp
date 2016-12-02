@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: CopyToFolderListFragment.cs
 // Author: Ferdinando Papale fp@nordic-it.com
@@ -14,12 +14,14 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
+using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
+
     public class CopyMoveToFolderListFragment : FoldersListFragment
     {
+
         public enum ActionType
         {
             Copy,
@@ -29,7 +31,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public List<IBusinessEntity> BusinessEntities { get; set; }
         public Folder FromFolder { get; set; }
         public ActionType Type { get; set; }
-        override public bool LocalSectionEnabled { get; set; } = false;
+
+        protected override void SetSections()
+        {
+            CommonConfig.Logger.Info("Setting sections according to the folder");
+
+            if (RemoteFolder.Root)
+            {
+                AvailableSections = new List<Section> { Section.Favourites, Section.Remote };
+            }
+            else
+            {
+                AvailableSections = new List<Section> { Section.Remote };
+            }
+
+            Adapter.SetSections(AvailableSections);
+        }
 
         protected override RetainableStateFragment GetFolderFragment(Folder folder)
         {
@@ -52,6 +69,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 await MoveBusinessEntityToFolder(toFolder);
             }
+        }
+
+        protected override void Adapter_ItemLongClicked(object sender, int position)
+        {
         }
 
         async Task MoveBusinessEntityToFolder(Folder toFolder)
@@ -178,6 +199,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
             base.OnRetainedInstanceStateRestored(restoredState as FolderListFragmentState);
+
             var flfs = restoredState as MoveToFolderListFragmentState;
             if (flfs != null)
             {

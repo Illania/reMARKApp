@@ -41,8 +41,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ShortcodeAddressSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new ShortcodeFoldersSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new MaxShortcodesSearchView(Context));
 
             searchButton.Text = GetString(Resource.String.search);

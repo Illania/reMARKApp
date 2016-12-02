@@ -23,7 +23,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             NoSelectionText = Resource.String.search_document_priorities_none_selected;
 
             DialogTitle = Resource.String.search_document_priorities;
-            Values = new List<Priority> { Priority.Low, Priority.Normal, Priority.Urgent };
+            Values = new List<Priority> { Priority.Urgent, Priority.Normal, Priority.Low };
 
             UpdateSubtitle();
         }

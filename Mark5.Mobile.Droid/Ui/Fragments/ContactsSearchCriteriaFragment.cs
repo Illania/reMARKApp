@@ -5,6 +5,9 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System.Collections.Generic;
+using System.Linq;
+using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -57,13 +60,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ContactLedgerSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new ContactCategoriesSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new ContactMustHaveCategoriesSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new ContactFoldersSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new ContactResponsibleSearchView(Context));
+            linearLayout.AddView(new ContactCategoriesSearchView(Context, this));
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new MaxContactsSearchView(Context));
 
@@ -86,6 +83,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             //((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_contacts);
 
             CommonConfig.Logger.Info($"Created {nameof(ContactsSearchCriteriaFragment)}");
+        }
+
+        public override void OnActivityResult(int requestCode, int resultCode, Intent data)
+        {
+            if (resultCode == (int)Result.Ok && requestCode == AbstractCategoriesSearchView<SearchDocumentsCriteria>.CategoriesRequest)
+            {
+                var ccsv = View.FindViewById<ContactCategoriesSearchView>(AbstractCategoriesSearchView<SearchContactsCriteria>.ViewId);
+                if (ccsv != null)
+                {
+                    var categories = SerializationUtils.Deserialize<List<Category>>(data.Extras.GetString(PickCategoriesListActivity.CategoriesResultKey));
+                    ccsv.SetSelectedCategoryIds(categories.Select(c => c.Id).ToList());
+                }
+            }
         }
 
         SearchContactsCriteria GetCriteria()

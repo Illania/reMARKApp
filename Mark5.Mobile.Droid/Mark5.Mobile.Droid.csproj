@@ -66,9 +66,6 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.9.0.2-beta1\lib\netstandard1.1\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="SQLite-net">
-      <HintPath>..\packages\sqlite-net-pcl.1.2.0\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\SQLite-net.dll</HintPath>
-    </Reference>
     <Reference Include="PCLStorage.Abstractions">
       <HintPath>..\packages\PCLStorage.1.0.2\lib\monoandroid\PCLStorage.Abstractions.dll</HintPath>
     </Reference>
@@ -81,21 +78,6 @@
     </Reference>
     <Reference Include="HockeySDK">
       <HintPath>..\packages\HockeySDK.Xamarin.4.1.0\lib\MonoAndroid403\HockeySDK.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.core">
-      <HintPath>..\packages\SQLitePCLRaw.core.1.1.1-pre20161109081005\lib\MonoAndroid\SQLitePCLRaw.core.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.lib.e_sqlite3">
-      <HintPath>..\packages\SQLitePCLRaw.lib.e_sqlite3.android.1.1.1-pre20161109081005\lib\MonoAndroid\SQLitePCLRaw.lib.e_sqlite3.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.provider.e_sqlite3">
-      <HintPath>..\packages\SQLitePCLRaw.provider.e_sqlite3.android.1.1.1-pre20161109081005\lib\MonoAndroid\SQLitePCLRaw.provider.e_sqlite3.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.batteries_green">
-      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.1-pre20161109081005\lib\MonoAndroid\SQLitePCLRaw.batteries_green.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.batteries_v2">
-      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.1-pre20161109081005\lib\MonoAndroid\SQLitePCLRaw.batteries_v2.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Compat">
       <HintPath>..\packages\Xamarin.Android.Support.Compat.25.0.1-rc1\lib\MonoAndroid70\Xamarin.Android.Support.Compat.dll</HintPath>
@@ -160,6 +142,27 @@
     <Reference Include="Xamarin.Firebase.Messaging">
       <HintPath>..\packages\Xamarin.Firebase.Messaging.32.961.0\lib\MonoAndroid70\Xamarin.Firebase.Messaging.dll</HintPath>
     </Reference>
+    <Reference Include="Xamarin.Android.Support.Transition">
+      <HintPath>..\packages\Xamarin.Android.Support.Transition.25.0.1-rc1\lib\MonoAndroid70\Xamarin.Android.Support.Transition.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLite-net">
+      <HintPath>..\packages\sqlite-net-pcl.1.2.1\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\SQLite-net.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.core">
+      <HintPath>..\packages\SQLitePCLRaw.core.1.1.1\lib\MonoAndroid\SQLitePCLRaw.core.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.lib.e_sqlite3">
+      <HintPath>..\packages\SQLitePCLRaw.lib.e_sqlite3.android.1.1.1\lib\MonoAndroid\SQLitePCLRaw.lib.e_sqlite3.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.provider.e_sqlite3">
+      <HintPath>..\packages\SQLitePCLRaw.provider.e_sqlite3.android.1.1.1\lib\MonoAndroid\SQLitePCLRaw.provider.e_sqlite3.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_green">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.1\lib\MonoAndroid\SQLitePCLRaw.batteries_green.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_v2">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.1\lib\MonoAndroid\SQLitePCLRaw.batteries_v2.dll</HintPath>
+    </Reference>
     <Reference Include="AngleSharp">
       <HintPath>..\packages\AngleSharp.0.9.9\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
     </Reference>
@@ -186,7 +189,7 @@
     <Compile Include="Ui\Activities\CopyToUserWorktrayActivity.cs" />
     <Compile Include="Ui\Activities\DocumentActivity.cs" />
     <Compile Include="Ui\Activities\DocumentsListActivity.cs" />
-    <Compile Include="Ui\Activities\FolderListSelectionActivity.cs" />
+    <Compile Include="Ui\Activities\CopyMoveToFolderListActivity.cs" />
     <Compile Include="Ui\Activities\LoginActivity.cs" />
     <Compile Include="Ui\Activities\MainActivity.cs" />
     <Compile Include="Ui\Activities\ObjectActionsActivity.cs" />
@@ -207,12 +210,12 @@
     <Compile Include="Ui\Common\RetainedFragment.cs" />
     <Compile Include="Ui\Common\SmoothActionBarDrawerToggle.cs" />
     <Compile Include="Ui\Common\ViewUtilities.cs" />
-    <Compile Include="Ui\Common\BusMesseges\ContactPreviewCategoriesChangedMessage.cs" />
-    <Compile Include="Ui\Common\BusMesseges\DocumentPreviewCategoriesChangedMessage.cs" />
-    <Compile Include="Ui\Common\BusMesseges\DocumentPreviewCommentCountChangedMessage.cs" />
-    <Compile Include="Ui\Common\BusMesseges\DocumentPreviewReadStatusChangedMessage.cs" />
-    <Compile Include="Ui\Common\BusMesseges\EntityMovedFromFolderMessage.cs" />
-    <Compile Include="Ui\Fragments\AvailableCategoriesListFragment.cs" />
+    <Compile Include="Ui\Common\HubMessages\ContactPreviewCategoriesChangedMessage.cs" />
+    <Compile Include="Ui\Common\HubMessages\DocumentPreviewCategoriesChangedMessage.cs" />
+    <Compile Include="Ui\Common\HubMessages\DocumentPreviewCommentCountChangedMessage.cs" />
+    <Compile Include="Ui\Common\HubMessages\DocumentPreviewReadStatusChangedMessage.cs" />
+    <Compile Include="Ui\Common\HubMessages\EntityMovedFromFolderMessage.cs" />
+    <Compile Include="Ui\Fragments\EditCategoriesListFragment.cs" />
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
     <Compile Include="Ui\Fragments\CommentsListFragment.cs" />
     <Compile Include="Ui\Fragments\ContactFragment.cs" />
@@ -225,7 +228,6 @@
     <Compile Include="Ui\Fragments\DocumentsListFragment.cs" />
     <Compile Include="Ui\Fragments\DocumentsSearchCriteriaFragment.cs" />
     <Compile Include="Ui\Fragments\DocumentsSearchResultsFragment.cs" />
-    <Compile Include="Ui\Fragments\FolderPickerListFragment.cs" />
     <Compile Include="Ui\Fragments\FoldersListFragment.cs" />
     <Compile Include="Ui\Fragments\NotificationsFragment.cs" />
     <Compile Include="Ui\Fragments\ObjectActionsFragment.cs" />
@@ -265,9 +267,7 @@
     <Compile Include="Ui\Views\SearchViews\AbstractCheckboxSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\AbstractDateRangeSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\AbstractEditTextSearchView.cs" />
-    <Compile Include="Ui\Views\SearchViews\AbstractFoldersSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\AbstractMultiChoiceSearchView.cs" />
-    <Compile Include="Ui\Views\SearchViews\AbstractMustHaveCategoriesSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\AbstractSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\AbstractSingleChoiceSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\AbstractSpinnerEditTextSearchView.cs" />
@@ -276,13 +276,10 @@
     <Compile Include="Ui\Views\SearchViews\ContactCommentSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactDescriptionSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactFirstNameSearchView.cs" />
-    <Compile Include="Ui\Views\SearchViews\ContactFoldersSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactLastNameSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactLedgerSearchView.cs" />
-    <Compile Include="Ui\Views\SearchViews\ContactMustHaveCategoriesSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactNameSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactPostAddressSearchView.cs" />
-    <Compile Include="Ui\Views\SearchViews\ContactResponsibleSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactShortIdSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactTypeSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactVatSearchView.cs" />
@@ -291,11 +288,9 @@
     <Compile Include="Ui\Views\SearchViews\DocumentCommentsSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentDirectionsSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentExtraFieldsSearchView.cs" />
-    <Compile Include="Ui\Views\SearchViews\DocumentFoldersSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentFromToSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentHandledSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentLinesSearchView.cs" />
-    <Compile Include="Ui\Views\SearchViews\DocumentMustHaveCategoriesSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentPartialWordsSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentPrioritiesSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentReceivedDateRangeSearchView.cs" />
@@ -309,7 +304,6 @@
     <Compile Include="Ui\Views\SearchViews\MaxShortcodesSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ShortcodeAddressSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ShortcodeDescriptionSearchView.cs" />
-    <Compile Include="Ui\Views\SearchViews\ShortcodeFoldersSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ShortcodeNameSearchView.cs" />
     <Compile Include="Ui\Views\ShortcodeViews\AddressesView.cs" />
     <Compile Include="Ui\Views\ShortcodeViews\DescriptionView.cs" />
@@ -345,13 +339,17 @@
     <Compile Include="Utilities\Hockey\CustomCrashManagerListener.cs" />
     <Compile Include="Utilities\Hockey\CustomFeedbackActivity.cs" />
     <Compile Include="Utilities\Hockey\CustomFeedbackManagerLister.cs" />
+    <Compile Include="Ui\Common\HubMessages\EntityRemovedMessage.cs" />
+    <Compile Include="Ui\Common\HubMessages\EntityRemovedFromFolderMessage.cs" />
+    <Compile Include="Ui\Common\HubMessages\DocumentPreviewPriorityChangedMessage.cs" />
+    <Compile Include="Ui\Fragments\PickCategoriesListFragment.cs" />
+    <Compile Include="Ui\Activities\PIckCategoriesListActivity.cs" />
     <Compile Include="Utilities\LocalNotificationService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
     <None Include="packages.config" />
-    <None Include="Ui\Activities\ContactActivity.cs.orig" />
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -435,70 +433,10 @@
     <AndroidResource Include="Resources\menu\menu_drawer.axml" />
     <AndroidResource Include="Resources\menu\menu_main.axml" />
     <AndroidResource Include="Resources\mipmap\background.png" />
-    <AndroidResource Include="Resources\mipmap-hdpi\attachment.png" />
-    <AndroidResource Include="Resources\mipmap-hdpi\comment.png" />
-    <AndroidResource Include="Resources\mipmap-hdpi\draft.png" />
-    <AndroidResource Include="Resources\mipmap-hdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\mipmap-hdpi\ic_icon.png" />
-    <AndroidResource Include="Resources\mipmap-hdpi\incoming.png" />
-    <AndroidResource Include="Resources\mipmap-hdpi\logo.png" />
-    <AndroidResource Include="Resources\mipmap-hdpi\nav_calendar.png" />
-    <AndroidResource Include="Resources\mipmap-hdpi\nav_contacts.png" />
-    <AndroidResource Include="Resources\mipmap-hdpi\nav_documents.png" />
-    <AndroidResource Include="Resources\mipmap-hdpi\nav_notifications.png" />
-    <AndroidResource Include="Resources\mipmap-hdpi\nav_search.png" />
-    <AndroidResource Include="Resources\mipmap-hdpi\nav_settings.png" />
-    <AndroidResource Include="Resources\mipmap-hdpi\nav_shortcodes.png" />
-    <AndroidResource Include="Resources\mipmap-hdpi\outgoing.png" />
-    <AndroidResource Include="Resources\mipmap-hdpi\unread.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\attachment.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\comment.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\draft.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\mipmap-xhdpi\ic_icon.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\incoming.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\logo.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\nav_calendar.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\nav_contacts.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\nav_documents.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\nav_notifications.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\nav_search.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\nav_settings.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\nav_shortcodes.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\outgoing.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\unread.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\attachment.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\comment.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\draft.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\mipmap-xxhdpi\ic_icon.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\incoming.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\logo.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\nav_calendar.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\nav_contacts.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\nav_documents.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\nav_notifications.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\nav_search.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\nav_settings.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\nav_shortcodes.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\outgoing.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\unread.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\attachment.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\comment.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\draft.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_icon.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\incoming.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\logo.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\nav_calendar.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\nav_contacts.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\nav_documents.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\nav_notifications.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\nav_search.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\nav_settings.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\nav_shortcodes.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\outgoing.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\unread.png" />
     <AndroidResource Include="Resources\values\color.axml" />
     <AndroidResource Include="Resources\values\dimens.axml" />
     <AndroidResource Include="Resources\values\plurals.xml" />
@@ -533,6 +471,71 @@
     <AndroidResource Include="Resources\mipmap-xhdpi\ic_icon_lollipop.png" />
     <AndroidResource Include="Resources\mipmap-xxhdpi\ic_icon_lollipop.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_icon_lollipop.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\search.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\search.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\search.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\search.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\attachment.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\comment.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\draft.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\drawer_header_background.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\incoming.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\logo.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\nav_calendar.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\nav_contacts.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\nav_documents.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\nav_notifications.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\nav_search.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\nav_settings.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\nav_shortcodes.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\outgoing.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\unread.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\attachment.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\comment.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\draft.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\drawer_header_background.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\incoming.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\logo.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\nav_calendar.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\nav_contacts.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\nav_documents.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\nav_notifications.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\nav_search.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\nav_settings.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\nav_shortcodes.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\outgoing.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\unread.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\attachment.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\comment.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\draft.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\drawer_header_background.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\incoming.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\logo.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\nav_calendar.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\nav_contacts.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\nav_documents.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\nav_notifications.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\nav_search.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\nav_settings.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\nav_shortcodes.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\outgoing.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\unread.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\attachment.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\comment.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\draft.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\drawer_header_background.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\incoming.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\logo.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_calendar.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_contacts.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_documents.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_notifications.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_search.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_settings.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_shortcodes.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\outgoing.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\unread.png" />
+    <AndroidResource Include="Resources\values\strings-arrays.axml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Xamarin.Build.Download.0.3.0\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.3.0\build\Xamarin.Build.Download.targets')" />
@@ -551,4 +554,5 @@
   <Import Project="..\packages\Xamarin.Android.Support.v7.Preference.25.0.1-rc1\build\Xamarin.Android.Support.v7.Preference.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.Preference.25.0.1-rc1\build\Xamarin.Android.Support.v7.Preference.targets')" />
   <Import Project="..\packages\Xamarin.Android.Support.v14.Preference.25.0.1-rc1\build\Xamarin.Android.Support.v14.Preference.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v14.Preference.25.0.1-rc1\build\Xamarin.Android.Support.v14.Preference.targets')" />
   <Import Project="..\packages\Xamarin.GooglePlayServices.Basement.32.961.0\build\Xamarin.GooglePlayServices.Basement.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Basement.32.961.0\build\Xamarin.GooglePlayServices.Basement.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Transition.25.0.1-rc1\build\Xamarin.Android.Support.Transition.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Transition.25.0.1-rc1\build\Xamarin.Android.Support.Transition.targets')" />
 </Project>

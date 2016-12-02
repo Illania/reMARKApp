@@ -25,7 +25,7 @@ namespace Mark5.Mobile.Droid.Utilities.Services
     public class PushNotificationMessagingService : FirebaseMessagingService
     {
 
-        static int NotificationIdCounter;
+        static int NotificationIdCounter = 1000;
 
         public override async void OnMessageReceived(RemoteMessage message)
         {

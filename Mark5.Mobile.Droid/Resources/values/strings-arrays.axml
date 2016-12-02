@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array name="copy_to_worktray_options">
+		<item>Own</item>
+		<item>Other users\'</item>
+	</string-array>
+	<string-array name="search_date_range_type">
+		<item>Any time</item>
+		<item>Today</item>
+		<item>Yesterday</item>
+		<item>Custom</item>
+	</string-array>
+	<string-array name="search_document_from_to">
+		<item>Search in From</item>
+		<item>Search in To</item>
+		<item>Search in From and To</item>
+	</string-array>
+	<string-array name="search_document_subject_message">
+		<item>Search in Subject or Message</item>
+		<item>Search in Subject</item>
+		<item>Search in Message</item>
+	</string-array>
+	<string-array name="ssl_modes">
+		<item>SSL Enabled</item>
+		<item>SSL Enabled (allow self-signed)</item>
+		<item>SSL Disabled</item>
+	</string-array>
+</resources>

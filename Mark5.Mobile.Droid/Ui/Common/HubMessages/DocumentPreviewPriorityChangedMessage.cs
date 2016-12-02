@@ -1,6 +1,6 @@
 ﻿//
-// Project: 
-// File: ContactPreviewCategoriesChanged.cs
+// Project: Mark5.Mobile.Droid
+// File: DocumentPreviewCategoriesChangedMessage.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
 // Copyright (c) 2016 Nordic IT
@@ -9,13 +9,13 @@ using System.Collections.Generic;
 using Mark5.Mobile.Common.Model;
 using TinyMessenger;
 
-namespace Mark5.Mobile.Droid
+namespace Mark5.Mobile.Droid.Ui.Common.HubMessages
 {
 
-    public class ContactPreviewCategoriesChangedMessage : TinyMessageBase
+    public class DocumentPreviewCategoriesChangedMessage : TinyMessageBase
     {
 
-        public int ContactPreviewId
+        public int DocumentPreviewId
         {
             get;
             private set;
@@ -27,10 +27,10 @@ namespace Mark5.Mobile.Droid
             private set;
         }
 
-        public ContactPreviewCategoriesChangedMessage(object sender, int contactPreviewId, List<Category> categories)
+        public DocumentPreviewCategoriesChangedMessage(object sender, int documentPreviewId, List<Category> categories)
             : base(sender)
         {
-            ContactPreviewId = contactPreviewId;
+            DocumentPreviewId = documentPreviewId;
             Categories = categories;
         }
     }

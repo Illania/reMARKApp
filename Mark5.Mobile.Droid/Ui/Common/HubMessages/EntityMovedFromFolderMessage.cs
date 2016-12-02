@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using Mark5.Mobile.Common.Model;
 using TinyMessenger;
 
-namespace Mark5.Mobile.Droid.Ui.Common.BusMesseges
+namespace Mark5.Mobile.Droid.Ui.Common.HubMessages
 {
 
     public class EntityMovedFromFolderMessage : TinyMessageBase
@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Droid.Ui.Common.BusMesseges
         }
 
         public EntityMovedFromFolderMessage(object sender, ObjectType objectType, int fromFolderId, List<int> entityId)
-        : base(sender)
+            : base(sender)
         {
             ObjectType = objectType;
             FromFolderId = fromFolderId;

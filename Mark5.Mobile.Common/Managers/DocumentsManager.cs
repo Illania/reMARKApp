@@ -326,7 +326,7 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task SetDocumentPriorityAsync(List<DocumentPreview> documentPreviews, Priority priority, SourceType sourceType = SourceType.Auto)
+        public async Task SetDocumentsPriorityAsync(List<DocumentPreview> documentPreviews, Priority priority, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -338,6 +338,8 @@ namespace Mark5.Mobile.Common.Managers
                     DocumentIds = documentPreviews.Select(dp => dp.Id).ToArray(),
                     Priority = priority.ConvertEnum<DataContract.Priority>()
                 });
+
+                documentPreviews.ForEach(dp => dp.Priority = priority);
 
                 await documentsDataAccess.SetDocumentPreviewsPriorityAsync(documentPreviews, priority);
 

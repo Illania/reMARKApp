@@ -27,7 +27,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
+using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -337,16 +337,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             else
             {
-                var currentAdapter = (DocumentsListAdapter)recyclerView.GetAdapter();
-                currentAdapter.SetSelected(documentPreview, !currentAdapter.IsSelected(documentPreview));
+                CurrentAdapter.SetSelected(documentPreview, !CurrentAdapter.IsSelected(documentPreview));
 
-                if (currentAdapter.SelectedItemCount < 1)
+                if (CurrentAdapter.SelectedItemCount < 1)
                 {
                     actionMode.Finish();
                 }
                 else
                 {
-                    actionMode.Title = currentAdapter.SelectedItemCount.ToString();
+                    actionMode.Title = CurrentAdapter.SelectedItemCount.ToString();
                     actionMode.Invalidate();
                 }
             }
@@ -386,19 +385,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             menu.Clear();
 
-            var currentAdapter = (DocumentsListAdapter)recyclerView.GetAdapter();
-
-            if (currentAdapter.SelectedItems.Any(dp => !dp.IsReadByCurrent))
+            if (CurrentAdapter.SelectedItems.Any(dp => !dp.IsReadByCurrent))
             {
                 menu.Add(Menu.None, MenuItemActions.MarkAsRead, MenuItemActions.MarkAsRead, Resource.String.mark_as_read);
             }
 
-            if (currentAdapter.SelectedItems.Any(dp => dp.IsReadByCurrent))
+            if (CurrentAdapter.SelectedItems.Any(dp => dp.IsReadByCurrent))
             {
                 menu.Add(Menu.None, MenuItemActions.MarkAsUnread, MenuItemActions.MarkAsUnread, Resource.String.marks_as_unread);
             }
 
-            if (currentAdapter.SelectedItemCount == 1)
+            if (CurrentAdapter.SelectedItemCount == 1)
             {
                 menu.Add(Menu.None, MenuItemActions.Reply, MenuItemActions.Reply, Resource.String.reply);
                 menu.Add(Menu.None, MenuItemActions.ReplyAll, MenuItemActions.ReplyAll, Resource.String.reply_all);
@@ -417,7 +414,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             menu.Add(Menu.None, MenuItemActions.SetPriority, MenuItemActions.SetPriority, Resource.String.set_priority);
 
-            if (currentAdapter.SelectedItemCount == 1)
+            if (CurrentAdapter.SelectedItemCount == 1)
             {
                 menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
             }
@@ -445,40 +442,87 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool ActionMode.ICallback.OnActionItemClicked(ActionMode mode, IMenuItem item)
         {
-            var selectedDocumentPreviews = CurrentAdapter.SelectedItems;
+            if (item.ItemId == MenuItemActions.MarkAsRead)
+            {
+                MarkAsRead();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.MarkAsUnread)
+            {
+                MarkAsUnread();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.Reply)
+            {
+            }
+
+            if (item.ItemId == MenuItemActions.ReplyAll)
+            {
+            }
+
+            if (item.ItemId == MenuItemActions.Forward)
+            {
+            }
+
+            if (item.ItemId == MenuItemActions.CopyToWorktray)
+            {
+                CopyToWorktrayAction();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.CopyToFolder)
+            {
+                var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
+                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Copy);
+                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
+                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
+                StartActivity(i);
+
+                actionMode?.Finish();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.MoveToFolder)
+            {
+                var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
+                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Move);
+                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
+                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
+                i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
+                StartActivity(i);
+
+                actionMode?.Finish();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.SetPriority)
+            {
+                SetPriority();
+                return true;
+            }
 
             if (item.ItemId == MenuItemActions.Categories)
             {
                 var i = new Intent(Activity, typeof(CategoriesListActivity));
-                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(selectedDocumentPreviews.First()));
+                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(CurrentAdapter.SelectedItems.First()));
                 StartActivity(i);
 
+                actionMode?.Finish();
                 return true;
             }
-            if (item.ItemId == MenuItemActions.CopyToFolder)
-            {
-                var i = new Intent(Activity, typeof(FolderListSelectionActivity));
-                i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.CopyToFolderMode);
-                i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
-                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(selectedDocumentPreviews.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
-                StartActivity(i);
 
+            if (item.ItemId == MenuItemActions.DeleteFromFolder)
+            {
+                DeleteFromFolderAction();
                 return true;
             }
-            if (item.ItemId == MenuItemActions.MoveToFolder)
-            {
-                var i = new Intent(Activity, typeof(FolderListSelectionActivity));
-                i.PutExtra(FolderListSelectionActivity.ModeIntentKey, (int)FolderListSelectionActivity.ModeType.MoveToFolderMode);
-                i.PutExtra(FolderListSelectionActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
-                i.PutExtra(FolderListSelectionActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(selectedDocumentPreviews.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
-                i.PutExtra(FolderListSelectionActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
-                StartActivity(i);
 
-                return true;
-            }
-            if (item.ItemId == MenuItemActions.CopyToWorktray)
+            if (item.ItemId == MenuItemActions.Delete)
             {
-                CopyToWorktrayAction();
+                DeleteAction();
+                return true;
             }
 
             return base.OnOptionsItemSelected(item);
@@ -486,24 +530,182 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
         {
-            var currentAdapter = (DocumentsListAdapter)recyclerView.GetAdapter();
-            currentAdapter.ClearSelections();
+            CurrentAdapter.ClearSelections();
             actionMode = null;
+        }
+
+        async void MarkAsRead()
+        {
+            CommonConfig.Logger.Info($"Attempting to mark as read [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.marking_as_read, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.DocumentsManager.SetDocumentsReadStatusAsync(CurrentAdapter.SelectedItems, true);
+                adapter.RefreshItems(CurrentAdapter.SelectedItems);
+                searchAdapter.RefreshItems(CurrentAdapter.SelectedItems);
+
+                dismissAction();
+                actionMode?.Finish();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Marking as read failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
+        async void MarkAsUnread()
+        {
+            CommonConfig.Logger.Info($"Attempting to mark as unread [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.marking_as_unread, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.DocumentsManager.SetDocumentsReadStatusAsync(CurrentAdapter.SelectedItems, false);
+                adapter.RefreshItems(CurrentAdapter.SelectedItems);
+                searchAdapter.RefreshItems(CurrentAdapter.SelectedItems);
+
+                dismissAction();
+                actionMode?.Finish();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Marking as unread failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
         }
 
         async void CopyToWorktrayAction()
         {
-            var option = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_worktray, Resource.Array.copy_to_worktray_options, false);
+            var option = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_worktray, Resource.Array.copy_to_worktray_options, true);
 
             if (option == 0)
             {
+                CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
 
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
+
+                try
+                {
+                    await Managers.CommonActionsManager.CopyToWorktray(adapter.SelectedItems.OfType<IBusinessEntity>().ToList());
+
+                    dismissAction();
+                    actionMode?.Finish();
+                }
+                catch (Exception ex)
+                {
+                    dismissAction();
+
+                    CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+
+                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                }
             }
 
             if (option == 1)
             {
-
                 StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
+            }
+        }
+
+        async void SetPriority()
+        {
+            var selectedPriority = CurrentAdapter.SelectedItems.All(dp => dp.Priority == CurrentAdapter.SelectedItems[0].Priority) ? CurrentAdapter.SelectedItems[0].Priority : Priority.None;
+            var priority = await Dialogs.ShowSingleSelectDialogAsync(Context, Resource.String.set_priority, new List<Priority> { Priority.Urgent, Priority.Normal, Priority.Low }, selectedPriority);
+            if (priority == default(Priority) || priority == selectedPriority)
+            {
+                return;
+            }
+
+            CommonConfig.Logger.Info($"Attempting to set priority [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.setting_priority, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.DocumentsManager.SetDocumentsPriorityAsync(CurrentAdapter.SelectedItems, priority);
+
+                dismissAction();
+                actionMode?.Finish();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Setting priority failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
+        async void DeleteFromFolderAction()
+        {
+            var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
+            if (!yesNo)
+            {
+                return;
+            }
+
+            CommonConfig.Logger.Info($"Attempting to delete from folder [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting_from_folder, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.CommonActionsManager.RemoveFromFolder(CurrentAdapter.SelectedItems.OfType<IBusinessEntity>().ToList(), Folder);
+                adapter.RemoveItems(CurrentAdapter.SelectedItems);
+                searchAdapter.RemoveItems(CurrentAdapter.SelectedItems);
+
+                dismissAction();
+                actionMode?.Finish();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Deleting from folder failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
+        async void DeleteAction()
+        {
+            var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
+            if (!yesNo)
+            {
+                return;
+            }
+
+            CommonConfig.Logger.Info($"Attempting to delete [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.CommonActionsManager.Delete(CurrentAdapter.SelectedItems.OfType<IBusinessEntity>().ToList());
+                adapter.RemoveItems(CurrentAdapter.SelectedItems);
+                searchAdapter.RemoveItems(CurrentAdapter.SelectedItems);
+
+                dismissAction();
+                actionMode?.Finish();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Deleting failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
         }
 
@@ -530,6 +732,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 searchHandler.RemoveCallbacksAndMessages(null);
                 searchAdapter.Clear();
+                searchAdapter.ClearSelections();
                 recyclerView.SwapAdapter(adapter, true);
                 refreshLayout.Enabled = true;
                 return true;
@@ -625,6 +828,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public void UpdatePriority(DocumentPreviewPriorityChangedMessage m)
+        {
+            var position = adapter.GetPosition(m.DocumentPreviewId);
+            if (position >= 0)
+            {
+                shouldNotifyAdapter = true;
+                var dp = adapter.Items[position];
+                dp.Priority = m.Priority;
+            }
+
+            position = searchAdapter.GetPosition(m.DocumentPreviewId);
+            if (position >= 0)
+            {
+                shouldNotifySearchAdapter = true;
+                var dp = searchAdapter.Items[position];
+                dp.Priority = m.Priority;
+            }
+        }
+
         public void UpdateCategories(DocumentPreviewCategoriesChangedMessage m)
         {
             var position = adapter.GetPosition(m.DocumentPreviewId);
@@ -665,7 +887,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public void RemoveMovedEntities(EntityMovedFromFolderMessage m)
+        public void UpdateMovedFromFolderEntities(EntityMovedFromFolderMessage m)
         {
             foreach (var entityId in m.EntitiesId)
             {
@@ -673,19 +895,56 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (position >= 0)
                 {
                     shouldNotifyAdapter = true;
-                    adapter.RemoveItemsAtIndex(position);
-                    adapter.ClearSelections(false);
+                    adapter.Items.RemoveAt(position);
                 }
 
                 position = searchAdapter.GetPosition(entityId);
                 if (position >= 0)
                 {
                     shouldNotifySearchAdapter = true;
-                    searchAdapter.RemoveItemsAtIndex(position);
-                    adapter.ClearSelections(false);
+                    adapter.Items.RemoveAt(position);
                 }
             }
+        }
 
+        public void UpdateRemovedFromFolderEntities(EntityRemovedFromFolderMessage m)
+        {
+            foreach (var entityId in m.EntitiesId)
+            {
+                var position = adapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifyAdapter = true;
+                    adapter.Items.RemoveAt(position);
+                }
+
+                position = searchAdapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifySearchAdapter = true;
+                    adapter.Items.RemoveAt(position);
+                }
+            }
+        }
+
+        public void UpdateRemovedEntities(EntityRemovedMessage m)
+        {
+            foreach (var entityId in m.EntitiesId)
+            {
+                var position = adapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifyAdapter = true;
+                    adapter.Items.RemoveAt(position);
+                }
+
+                position = searchAdapter.GetPosition(entityId);
+                if (position >= 0)
+                {
+                    shouldNotifySearchAdapter = true;
+                    adapter.Items.RemoveAt(position);
+                }
+            }
         }
 
         #endregion
@@ -705,7 +964,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 get
                 {
-                    return documentPreviewsInView.ToList();
+                    return documentPreviewsInView;
                 }
             }
 
@@ -819,10 +1078,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     edpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
 
                     edpvh.Date = dp.DateReceivedTimestamp
-                    .ConvertTimestampMillisecondsToDateTime()
-                    .ConvertUtcToServerTime()
-                    .ConvertDateTimeToTimestampMilliseconds()
-                    .FormatServerTimestampAsCompactShortDateTimeString(context);
+                         .ConvertTimestampMillisecondsToDateTime()
+                         .ConvertUtcToServerTime()
+                         .ConvertDateTimeToTimestampMilliseconds()
+                         .FormatServerTimestampAsCompactShortDateTimeString(context);
                     edpvh.Name = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
                     edpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                     edpvh.Categories = dp.Categories;
@@ -868,23 +1127,35 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 NotifyItemRangeInserted(count, items.Count);
             }
 
-            public void RemoveItemsAtIndex(int index)
-            {
-                documentPreviewsInView.RemoveAt(index);
-            }
-
             public void ReplaceItems(List<DocumentPreview> items)
             {
                 Clear();
                 AppendItems(items);
             }
 
-            public void Clear()
+            public void RefreshItems(List<DocumentPreview> items)
             {
-                var size = documentPreviewsInView.Count;
-                documentPreviewsInView.Clear();
-                selectedDocumentsInView.Clear();
-                NotifyItemRangeRemoved(0, size);
+                foreach (var item in items)
+                {
+                    var position = GetPosition(item);
+                    if (position >= 0)
+                    {
+                        NotifyItemChanged(position);
+                    }
+                }
+            }
+
+            public void RemoveItems(List<DocumentPreview> items)
+            {
+                foreach (var item in items)
+                {
+                    var position = GetPosition(item);
+                    if (position >= 0)
+                    {
+                        documentPreviewsInView.RemoveAt(position);
+                        NotifyItemRemoved(position);
+                    }
+                }
             }
 
             public bool IsSelected(DocumentPreview documentPreview)
@@ -916,17 +1187,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 NotifyItemChanged(position);
             }
 
-            public void ClearSelections(bool notify = true)
+            public void ClearSelections()
             {
                 var documents = selectedDocumentsInView.Values.ToArray();
                 selectedDocumentsInView.Clear();
-                if (notify)
+
+                foreach (var document in documents)
                 {
-                    foreach (var document in documents)
+                    var position = GetPosition(document);
+                    if (position >= 0)
                     {
-                        NotifyItemChanged(GetPosition(document));
+                        NotifyItemChanged(position);
                     }
                 }
+            }
+
+            public void Clear()
+            {
+                var size = documentPreviewsInView.Count;
+                documentPreviewsInView.Clear();
+                selectedDocumentsInView.Clear();
+                NotifyItemRangeRemoved(0, size);
             }
 
             public int GetPosition(int documentPreviewId)

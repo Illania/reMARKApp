@@ -12,7 +12,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.BusMesseges;
+using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using TinyMessenger;
 
@@ -29,7 +29,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         ContactsListFragment clf;
 
         TinyMessageSubscriptionToken categoriesToken;
-        TinyMessageSubscriptionToken entityMovedToken;
+        TinyMessageSubscriptionToken entityMovedFromFolderToken;
+        TinyMessageSubscriptionToken entityRemovedFromFolderToken;
+        TinyMessageSubscriptionToken entityRemovedToken;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -60,24 +62,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
             else
             {
+                clf = (ContactsListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(ContactsListActivity)}");
             }
 
-            categoriesToken = PlatformConfig.MessengerHub.Subscribe<ContactPreviewCategoriesChangedMessage>(m =>
-            {
-                if (clf != null && m.Sender != clf)
-                {
-                    clf.UpdateCategories(m);
-                }
-            });
-
-            entityMovedToken = PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(m =>
-            {
-                if (clf != null && m.Sender != clf && clf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Contact)
-                {
-                    clf.RemoveMovedEntities(m);
-                }
-            });
+            categoriesToken = PlatformConfig.MessengerHub.Subscribe<ContactPreviewCategoriesChangedMessage>(clf.UpdateCategories, m => clf != null && m.Sender != clf);
+            entityMovedFromFolderToken = PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(clf.UpdateMovedEntities, m => clf != null && m.Sender != clf && clf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Contact);
+            entityRemovedFromFolderToken = PlatformConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(clf.UpdateRemovedFromFolderEntities, m => clf != null && m.Sender != clf && clf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Contact);
+            entityRemovedToken = PlatformConfig.MessengerHub.Subscribe<EntityRemovedMessage>(clf.UpdateRemovedEntities, m => clf != null && m.Sender != clf && m.ObjectType == ObjectType.Contact);
         }
 
         protected override void OnDestroy()
@@ -85,7 +77,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.OnDestroy();
 
             categoriesToken?.Dispose();
-            entityMovedToken?.Dispose();
+            entityMovedFromFolderToken?.Dispose();
+            entityRemovedFromFolderToken?.Dispose();
+            entityRemovedToken?.Dispose();
         }
     }
 }
