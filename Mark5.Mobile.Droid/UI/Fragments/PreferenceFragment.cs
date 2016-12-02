@@ -30,7 +30,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         static class RequestCodes
         {
-            public static int NotificationRingtone = 1;
+            public const int NotificationRingtoneRequest = 1;
         }
 
         public override Fragment CallbackFragment
@@ -59,7 +59,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            if (resultCode == (int)Android.App.Result.Ok && requestCode == RequestCodes.NotificationRingtone)
+            if (resultCode == (int)Android.App.Result.Ok && requestCode == RequestCodes.NotificationRingtoneRequest)
             {
                 var uri = data.GetParcelableExtra(RingtoneManager.ExtraRingtonePickedUri);
                 PlatformConfig.Preferences.NotificationsRingtone = uri?.ToString() ?? string.Empty;
@@ -89,7 +89,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     i.PutExtra(RingtoneManager.ExtraRingtoneExistingUri, Android.Net.Uri.Parse(PlatformConfig.Preferences.NotificationsRingtone));
                 }
-                StartActivityForResult(i, RequestCodes.NotificationRingtone);
+                StartActivityForResult(i, RequestCodes.NotificationRingtoneRequest);
                 return true;
             }
 

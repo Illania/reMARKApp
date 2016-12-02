@@ -36,10 +36,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
     public class ContactFragment : RetainableStateFragment
     {
-        public static class RequestCodes
+
+        static class RequestCodes
         {
-            public static int CommentsRequest = 1;
-            public static int CategoriesRequest = 2;
+            public const int CommentsRequest = 1;
+            public const int CategoriesRequest = 2;
         }
 
         const float CardElevation = 2.0f;

@@ -5,14 +5,13 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System.Collections.Generic;
 using Android.Content;
+using Android.Support.V4.App;
 using Android.Support.V7.Widget;
 using Android.Views;
-using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Common.Model;
-using System.Collections.Generic;
-using Android.Support.V4.App;
-using System;
+using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
@@ -21,7 +20,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
     {
 
         public const int ViewId = 791;
-        public const int CategoriesRequest = 1337;
+
+        public static class RequestCodes
+        {
+            public const int CategoriesRequest = 1337;
+        }
 
         readonly AppCompatTextView categoriesTitle;
         readonly AppCompatTextView categoriesSubtitle;
@@ -48,7 +51,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 var i = new Intent(context, typeof(PickCategoriesListActivity));
                 i.PutExtra(PickCategoriesListActivity.ObjectTypeIntentKey, (int)ObjectType);
                 i.PutExtra(PickCategoriesListActivity.PreselectedCategoryIdsIntentKey, SelectedCategories.ToArray());
-                fragment.StartActivityForResult(i, CategoriesRequest);
+                fragment.StartActivityForResult(i, RequestCodes.CategoriesRequest);
             };
 
             categoriesTitle = new AppCompatTextView(context)
