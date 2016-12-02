@@ -12,16 +12,12 @@ namespace Mark5.Mobile.Common.Model
 {
     public class CommunicationAddress
     {
-        [Column("Type")]
         public CommunicationAddressType Type { get; set; }
 
-        [Column("Description")]
         public string Description { get; set; }
 
-        [Column("Address")]
         public string Address { get; set; }
 
-        [Column("IsPrimary")]
         public bool IsPrimary { get; set; }
 
         public CommunicationAddress(string address, CommunicationAddressType type, string description = "", bool isPrimary = false)
