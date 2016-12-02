@@ -13,41 +13,25 @@ using Android.Views;
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
 
-    public class ResponsibleSubview : CommunicationCardSubview
+    public class ResponsibleSubview : DescriptionSubview
     {
 
-        public event EventHandler<int> ContactClicked = delegate { };
-
-        public ResponsibleSubview(Context context) : base(context)
+        public ResponsibleSubview(Context context)
+            : base(context)
         {
-            IconImageView.SetImageResource(Resource.Drawable.email);
+            Title = context.GetString(Resource.String.responsible_users);
         }
 
         public override void RefreshView()
         {
-            if (Contact != null && Contact.ResponsibleUserIds.Any())
+            if (Contact?.ResponsibleUsers?.Count > 0)
             {
                 Visibility = ViewStates.Visible;
-
-                ContentLayout.RemoveAllViews();
-                foreach (var id in Contact.ResponsibleUserIds)
-                {
-                    var subsubview = new ResponsibleSubSubview(Context, this, id, Contact.ResponsibleUsers[id]);
-                    ContentLayout.AddView(subsubview);
-                }
+                Content = string.Join(", ", Contact?.ResponsibleUsers.Values);
             }
             else
             {
                 Visibility = ViewStates.Gone;
-            }
-        }
-
-        class ResponsibleSubSubview : CommunicationCardSubSubview
-        {
-            public ResponsibleSubSubview(Context context, ResponsibleSubview parentView, int responsibleUserId, string responsibleUserName)
-                : base(context, responsibleUserName, null)
-            {
-                Click += (sender, e) => parentView.ContactClicked(this, responsibleUserId);
             }
         }
     }

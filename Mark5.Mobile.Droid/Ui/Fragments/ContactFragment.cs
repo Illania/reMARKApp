@@ -395,7 +395,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             communicationCardInternalLayout.Orientation = LinearLayoutCompat.Vertical;
             communicationCardView.AddView(communicationCardInternalLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
-            communicationSubviews.OfType<LinkedContactSubview>().ForEach(lcs => lcs.ContactClicked += LinkedContactClicked);
             communicationSubviews.OfType<CommunicationAddressesSubview>().ForEach(rsv => rsv.AddressClicked += AddressClicked);
             communicationSubviews.ForEach(communicationCardInternalLayout.AddView);
         }
@@ -438,7 +437,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             relatedSubviews.Add(new LinkedContactSubview(Context, LinkedContactType.Company));
             relatedSubviews.Add(new LinkedContactSubview(Context, LinkedContactType.Department));
             relatedSubviews.Add(new LinkedContactSubview(Context, LinkedContactType.Person));
-            relatedSubviews.Add(new ResponsibleSubview(Context));
 
             relatedCardView = new CardView(Context);
             relatedCardView.Visibility = ViewStates.Gone;
@@ -448,11 +446,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var relatedCardInternalLayout = new LinearLayoutCompat(Context);
             relatedCardInternalLayout.Orientation = LinearLayoutCompat.Vertical;
-            relatedCardView.AddView(relatedCardInternalLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
-            relatedSubviews.OfType<LinkedContactSubview>().ForEach(lcs => lcs.ContactClicked += LinkedContactClicked);
-            relatedSubviews.OfType<CommunicationAddressesSubview>().ForEach(rsv => rsv.AddressClicked += AddressClicked);
+            var physicalCardTitle = new AppCompatTextView(Context);
+            physicalCardTitle.Text = GetString(Resource.String.related_contacts);
+            physicalCardTitle.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
+            physicalCardTitle.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
+
+            var padding = ConversionUtils.ConvertDpToPixels(16);
+            physicalCardTitle.SetPadding(padding, padding, padding, padding);
+
+            relatedCardInternalLayout.AddView(physicalCardTitle, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+            relatedCardInternalLayout.AddView(new Divider(Context));
+
+            relatedCardView.AddView(relatedCardInternalLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
             relatedSubviews.ForEach(relatedCardInternalLayout.AddView);
+            relatedSubviews.OfType<LinkedContactSubview>().ForEach(lcs => lcs.ContactClicked += ContactClicked);
         }
 
         public void PrepareDescriptionCard()
@@ -460,6 +468,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var descriptionSubviews = new List<ContactView>();
             descriptionSubviews.Add(new DescriptionSubview(Context));
             descriptionSubviews.Add(new ShortIdSubview(Context));
+            descriptionSubviews.Add(new ResponsibleSubview(Context));
             if (PlatformConfig.Preferences.ContactBirthdateEnabled)
                 descriptionSubviews.Add(new BirthdateSubview(Context));
             descriptionSubviews.Add(new WebPageSubview(Context));
@@ -569,14 +578,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     subview.RefreshView();
 
                     if (subview.Visibility == ViewStates.Visible)
-                    {
                         cardView.Visibility = ViewStates.Visible;
-                    }
 
                     if (i == internalLayout.ChildCount - 1)
-                    {
                         subview.HideSeparator();
-                    }
                 }
             }
         }
@@ -592,7 +597,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Subviews event handlers
 
-        void LinkedContactClicked(object sender, ContactPreview cp)
+        void AddressClicked(object sender, CommunicationAddress e)
+        {
+            //TODO 
+        }
+
+        void ContactClicked(object sender, ContactPreview cp)
         {
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
             var ft = fragmentManager.BeginTransaction();
@@ -606,11 +616,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
             ft.AddToBackStack(null);
             ft.Commit();
-        }
-
-        void AddressClicked(object sender, CommunicationAddress e)
-        {
-            //TODO 
         }
 
         #endregion

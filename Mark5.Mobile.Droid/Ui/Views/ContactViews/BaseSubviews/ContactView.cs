@@ -38,17 +38,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         public void HideSeparator()
         {
             if (Divider != null)
-            {
                 Divider.Visibility = ViewStates.Gone;
-            }
         }
 
         public void ShowSeparator()
         {
             if (Divider != null)
-            {
                 Divider.Visibility = ViewStates.Visible;
-            }
         }
 
         public abstract void RefreshView();

@@ -32,6 +32,5 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 Visibility = ViewStates.Gone;
             }
         }
-
     }
 }

@@ -58,8 +58,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             contentTextViewLayoutParams.BottomMargin = DistanceLarge;
             AddView(contentTextView, contentTextViewLayoutParams);
 
-            Divider = new Divider(Context);
-            AddView(Divider);
+            var divider = new Divider(Context);
+            AddView(divider);
         }
     }
 

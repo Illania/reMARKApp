@@ -97,11 +97,13 @@
 	<string name="read_by">Read by:</string>
 	<string name="read_by_prefix">read by</string>
 	<string name="reference">Ref.:</string>
+	<string name="related_contacts">Related</string>
 	<string name="remove_favorites">Remove from favourites</string>
 	<string name="remove_offline">Disable offline mode</string>
 	<string name="reply">Reply</string>
 	<string name="reply_all">Reply all</string>
 	<string name="reply_to">Reply to:</string>
+	<string name="responsible_users">Responsible users</string>
 	<string name="save">Save</string>
 	<string name="select">Select</string>
 	<string name="search">Search</string>
