@@ -52,7 +52,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
             IconImageView = new AppCompatImageView(context);
             IconImageView.SetImageResource(Resource.Drawable.email);
-            IconImageView.SetColorFilter(new Android.Graphics.Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            IconImageView.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
             iconImageViewLayout.AddView(IconImageView, new LayoutParams(DistanceVeryLarge, DistanceVeryLarge));
 
             ContentLayout = new LinearLayoutCompat(context);
@@ -73,10 +73,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             }
 
             var communicationAddressesForType = Contact?.CommunicationAddresses.Where(ca => ca.Type == addressType).OrderBy(ad => ad.IsPrimary != true).ToList();
-            if (Contact != null && communicationAddressesForType.Any())
+            if (communicationAddressesForType?.Count > 0)
             {
                 ContentLayout.RemoveAllViews();
-                Visibility = ViewStates.Visible;
 
                 for (int i = 0; i < communicationAddressesForType.Count; i++)
                 {
@@ -107,6 +106,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                         ContentLayout.AddView(new Divider(Context));
                     }
                 }
+
+                Visibility = ViewStates.Visible;
             }
             else
             {
