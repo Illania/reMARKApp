@@ -7,18 +7,21 @@
 //
 using System.Linq;
 using System.Text;
+using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
-using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
+
     public class PhysicalAddressesSubview : ContactView
     {
-        public PhysicalAddressesSubview(Android.Content.Context context) : base(context)
+
+        public PhysicalAddressesSubview(Context context)
+            : base(context)
         {
             Orientation = Vertical;
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
@@ -35,8 +38,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 var lastAddress = Contact.PhysicalAddresses.Last();
                 foreach (var address in Contact.PhysicalAddresses)
                 {
-                    var subsubview = new PhysicalAddressesSubSubview(Context, address, lastAddress != address);
-                    AddView(subsubview);
+                    AddView(new PhysicalAddressesSubSubview(Context, address, DistanceSmall, DistanceLarge, DistanceVeryLarge, lastAddress != address));
                 }
             }
             else
@@ -47,27 +49,29 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
         class PhysicalAddressesSubSubview : LinearLayoutCompat
         {
-            public PhysicalAddressesSubSubview(Android.Content.Context context, PhysicalAddress physicalAddress, bool addDivider = true) : base(context)
+
+            public PhysicalAddressesSubSubview(Context context, PhysicalAddress physicalAddress, int distanceSmall, int distanceLarge, int distanceVeryLarge, bool addDivider = false)
+                : base(context)
             {
                 Orientation = Vertical;
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
-                var addressTextView = new AppCompatTextView(context);
-                addressTextView.SetPadding(0, 0, ConversionUtils.ConvertDpToPixels(24), 0);
-                addressTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
-                addressTextView.Text = GetAddressText(physicalAddress);
-                var addressTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-                addressTextViewLayoutParams.TopMargin = ConversionUtils.ConvertDpToPixels(16);
-                AddView(addressTextView, addressTextViewLayoutParams);
-
                 var typeTextView = new AppCompatTextView(context);
-                typeTextView.SetPadding(0, 0, ConversionUtils.ConvertDpToPixels(24), 0);
+                typeTextView.SetPadding(0, 0, distanceVeryLarge, 0);
                 typeTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
                 typeTextView.Text = physicalAddress.Type.Name;
                 var typeTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-                typeTextViewLayoutParams.TopMargin = ConversionUtils.ConvertDpToPixels(3);
-                typeTextViewLayoutParams.BottomMargin = ConversionUtils.ConvertDpToPixels(16);
+                typeTextViewLayoutParams.TopMargin = distanceLarge;
                 AddView(typeTextView, typeTextViewLayoutParams);
+
+                var addressTextView = new AppCompatTextView(context);
+                addressTextView.SetPadding(0, 0, distanceVeryLarge, 0);
+                addressTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
+                addressTextView.Text = GetAddressText(physicalAddress);
+                var addressTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+                addressTextViewLayoutParams.TopMargin = distanceSmall;
+                addressTextViewLayoutParams.BottomMargin = distanceLarge;
+                AddView(addressTextView, addressTextViewLayoutParams);
 
                 if (addDivider)
                 {
@@ -81,27 +85,23 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 var sb = new StringBuilder();
                 if (!string.IsNullOrWhiteSpace(address.Street))
                 {
-                    sb.AppendLine(address.Street);
+                    sb.Append(address.Street);
                 }
                 if (!string.IsNullOrWhiteSpace(address.Area))
                 {
-                    sb.AppendLine(address.Area);
+                    sb.AppendLine().Append(address.Area);
                 }
                 if (!string.IsNullOrWhiteSpace(address.ZipCode))
                 {
-                    sb.Append(address.ZipCode);
-                    if (string.IsNullOrWhiteSpace(address.City))
-                    {
-                        sb.AppendLine();
-                    }
+                    sb.AppendLine().Append(address.ZipCode);
                 }
                 if (!string.IsNullOrWhiteSpace(address.City))
                 {
-                    sb.Append(" ").AppendLine(address.City);
+                    sb.Append(" ").Append(address.City);
                 }
-                if (address.Country != null)
+                if (address.Country != null && address.Country.Id != 0)
                 {
-                    sb.Append(address.Country.Name);
+                    sb.AppendLine().Append(address.Country.Name);
                 }
                 return sb.ToString();
             }

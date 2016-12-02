@@ -36,7 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class DocumentFragment : RetainableStateFragment
     {
 
-        public static class RequestCodes
+        static class RequestCodes
         {
             public static int CommentsRequest = 1;
             public static int CategoriesRequest = 2;

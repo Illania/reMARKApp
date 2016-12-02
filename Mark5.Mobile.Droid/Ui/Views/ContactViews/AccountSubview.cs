@@ -5,16 +5,19 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-
+using Android.Content;
 using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
+
     public class AccountSubview : DescriptionCardSubview
     {
-        public AccountSubview(Android.Content.Context context) : base(context)
+
+        public AccountSubview(Context context)
+            : base(context)
         {
-            Title = "Account";
+            Title = context.GetString(Resource.String.account);
         }
 
         public override void RefreshView()

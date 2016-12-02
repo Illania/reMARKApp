@@ -5,23 +5,32 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
+using Android.Content;
 using Android.Views;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
+
     public class BirthdateSubview : DescriptionCardSubview
     {
-        public BirthdateSubview(Android.Content.Context context) : base(context)
+
+        public BirthdateSubview(Context context)
+            : base(context)
         {
-            Title = "Birthdate";
+            Title = context.GetString(Resource.String.birthdate);
         }
 
         public override void RefreshView()
         {
-            if (!string.IsNullOrEmpty(Contact?.Ledger))
+            var bd = Contact?.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime();
+
+            if (bd != null && bd.Value != default(DateTime))
             {
                 Visibility = ViewStates.Visible;
-                Content = Contact.Ledger;
+                Content = bd.Value.ToLongDateString();
             }
             else
             {

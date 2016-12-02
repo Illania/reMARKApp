@@ -13,8 +13,10 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
+
     public abstract class ContactView : LinearLayoutCompat
     {
+
         protected int DistanceVeryLarge;
         protected int DistanceLarge;
         protected int DistanceNormal;
@@ -36,17 +38,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         public void HideSeparator()
         {
             if (Divider != null)
-            {
                 Divider.Visibility = ViewStates.Gone;
-            }
         }
 
         public void ShowSeparator()
         {
             if (Divider != null)
-            {
                 Divider.Visibility = ViewStates.Visible;
-            }
         }
 
         public abstract void RefreshView();

@@ -13,8 +13,10 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
+
     public class LinkedContactSubview : CommunicationCardSubview
     {
+
         LinkedContactType linkedContactType;
 
         public event EventHandler<ContactPreview> ContactClicked = delegate { };
@@ -22,7 +24,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         public LinkedContactSubview(Android.Content.Context context, LinkedContactType type) : base(context)
         {
             linkedContactType = type;
-            Title = type.ToString();
             IconImageView.SetImageResource(Resource.Drawable.email);
         }
 

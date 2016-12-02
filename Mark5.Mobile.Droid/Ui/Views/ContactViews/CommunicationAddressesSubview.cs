@@ -8,51 +8,103 @@
 using System;
 using System.Linq;
 using System.Text;
+using Android.Content;
+using Android.Graphics;
 using Android.Support.V4.Content;
+using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Views.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-    public class CommunicationAddressesSubview : CommunicationCardSubview
+
+    public class CommunicationAddressesSubview : ContactView
     {
-        CommunicationAddressType addressType;
+
+        protected readonly LinearLayoutCompat ContentLayout;
+        protected readonly AppCompatImageView IconImageView;
+
+        readonly CommunicationAddressType addressType;
 
         public event EventHandler<CommunicationAddress> AddressClicked = delegate { };
 
-        public CommunicationAddressesSubview(Android.Content.Context context, CommunicationAddressType type) : base(context)
+        public CommunicationAddressesSubview(Context context, CommunicationAddressType addressType)
+            : base(context)
         {
-            addressType = type;
-            Title = type.ToString();
+            this.addressType = addressType;
+
+            Orientation = Vertical;
+            LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+
+            var internalLayout = new LinearLayoutCompat(context);
+            internalLayout.Orientation = Horizontal;
+            internalLayout.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            AddView(internalLayout);
+
+            var iconImageViewLayout = new LinearLayoutCompat(context);
+            iconImageViewLayout.Orientation = Vertical;
+            iconImageViewLayout.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent);
+            iconImageViewLayout.SetPadding(DistanceNormal + DistanceSmall, DistanceLarge, DistanceNormal + DistanceSmall, DistanceLarge);
+
+            internalLayout.AddView(iconImageViewLayout);
+
+            IconImageView = new AppCompatImageView(context);
             IconImageView.SetImageResource(Resource.Drawable.email);
+            IconImageView.SetColorFilter(new Android.Graphics.Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            iconImageViewLayout.AddView(IconImageView, new LayoutParams(DistanceVeryLarge, DistanceVeryLarge));
+
+            ContentLayout = new LinearLayoutCompat(context);
+            ContentLayout.Orientation = Vertical;
+            ContentLayout.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1.0f);
+
+            internalLayout.AddView(ContentLayout);
+
+            Divider = new Divider(Context);
+            AddView(Divider);
         }
 
         public override void RefreshView()
         {
             if (Contact.PreferrableType == addressType)
             {
-                IconImageView.SetColorFilter(new Android.Graphics.Color(ContextCompat.GetColor(Context, Resource.Color.brown)));
+                IconImageView.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.brown)));
             }
 
-            var communicationAddressesForType = Contact?.CommunicationAddresses.Where(ca => ca.Type == addressType);
+            var communicationAddressesForType = Contact?.CommunicationAddresses.Where(ca => ca.Type == addressType).OrderBy(ad => ad.IsPrimary != true).ToList();
             if (Contact != null && communicationAddressesForType.Any())
             {
                 ContentLayout.RemoveAllViews();
                 Visibility = ViewStates.Visible;
 
-                foreach (var communicationAddress in communicationAddressesForType.OrderBy(ad => ad.IsPrimary != true))
+                for (int i = 0; i < communicationAddressesForType.Count; i++)
                 {
+                    var communicationAddress = communicationAddressesForType[i];
+                    var isLast = i == communicationAddressesForType.Count - 1;
+
+                    string titleText;
+                    string descriptionText;
+
                     if (addressType == CommunicationAddressType.IM)
                     {
                         var handleAndType = ParseIm(communicationAddress.Address);
-                        var subsubview = new CommunicationAddressesSubSubview(Context, this, communicationAddress, handleAndType.Item1, handleAndType.Item2);
-                        ContentLayout.AddView(subsubview);
+                        titleText = handleAndType.Item1;
+                        descriptionText = handleAndType.Item2;
                     }
                     else
                     {
-                        var formattedAddress = FormatAddress(communicationAddress.Address);
-                        var subsubview = new CommunicationAddressesSubSubview(Context, this, communicationAddress, formattedAddress, communicationAddress.Description);
-                        ContentLayout.AddView(subsubview);
+                        titleText = FormatAddress(communicationAddress.Address);
+                        descriptionText = communicationAddress.Description;
+                    }
+
+                    var subsubview = new CommunicationAddressesSubSubview(Context, titleText, descriptionText, communicationAddress.IsPrimary, DistanceSmall, DistanceNormal, DistanceLarge);
+                    subsubview.Click += (sender, e) => AddressClicked(this, communicationAddress);
+                    ContentLayout.AddView(subsubview);
+
+                    if (!isLast)
+                    {
+                        ContentLayout.AddView(new Divider(Context));
                     }
                 }
             }
@@ -120,14 +172,38 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             return Tuple.Create(imHandle, imTypeString);
         }
 
-        class CommunicationAddressesSubSubview : CommunicationCardSubSubview
+        class CommunicationAddressesSubSubview : LinearLayoutCompat
         {
-            public CommunicationAddressesSubSubview(Android.Content.Context context, CommunicationAddressesSubview parentView, CommunicationAddress communicationAddress, string address, string description)
-                : base(context, address, description, communicationAddress.IsPrimary)
+
+            public CommunicationAddressesSubSubview(Context context, string titleText, string descriptionText, bool primary, int distanceSmall, int distanceNormal, int distanceLarge)
+                : base(context)
             {
-                Click += (sender, e) => parentView.AddressClicked(this, communicationAddress);
+                var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
+                SetBackgroundResource(typedArray.GetResourceId(0, 0));
+                typedArray.Recycle();
+
+                Orientation = Vertical;
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+                SetPadding(distanceNormal, distanceLarge, 0, distanceLarge);
+
+                Clickable = true;
+
+                var titleTextView = new AppCompatTextView(context);
+                titleTextView.Text = titleText;
+                titleTextView.SetTextAppearanceCompat(context, primary ? Resource.Style.fontPrimaryBold : Resource.Style.fontPrimary);
+
+                AddView(titleTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+
+                if (!string.IsNullOrEmpty(descriptionText))
+                {
+                    var descriptionTextView = new AppCompatTextView(context);
+                    descriptionTextView.Text = descriptionText;
+                    var descriptionTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent, 1.0f);
+                    descriptionTextViewLayoutParams.TopMargin = distanceSmall / 2;
+                    descriptionTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
+                    AddView(descriptionTextView, descriptionTextViewLayoutParams);
+                }
             }
         }
     }
-
 }

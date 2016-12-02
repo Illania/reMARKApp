@@ -241,7 +241,6 @@
     <Compile Include="Ui\Views\ObjectActionsView.cs" />
     <Compile Include="Ui\Views\ObjectLinksView.cs" />
     <Compile Include="Ui\Views\ContactViews\AccountSubview.cs" />
-    <Compile Include="Ui\Views\ContactViews\BirthdateSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\CommunicationAddressesSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\DescriptionSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\LedgerSubview.cs" />
@@ -254,8 +253,6 @@
     <Compile Include="Ui\Views\ContactViews\BaseSubviews\CommunicationCardSubview.cs" />
     <Compile Include="Ui\Views\ContactViews\BaseSubviews\ContactView.cs" />
     <Compile Include="Ui\Views\ContactViews\BaseSubviews\DescriptionCardSubview.cs" />
-    <Compile Include="Ui\Views\ContactViews\HeaderViews\ContactHeaderView.cs" />
-    <Compile Include="Ui\Views\ContactViews\HeaderViews\ContactHeaderViewBehavior.cs" />
     <Compile Include="Ui\Views\DocumentViews\AttachmentsView.cs" />
     <Compile Include="Ui\Views\DocumentViews\ContentView.cs" />
     <Compile Include="Ui\Views\DocumentViews\DocumentView.cs" />
@@ -344,6 +341,7 @@
     <Compile Include="Ui\Common\HubMessages\DocumentPreviewPriorityChangedMessage.cs" />
     <Compile Include="Ui\Fragments\PickCategoriesListFragment.cs" />
     <Compile Include="Ui\Activities\PIckCategoriesListActivity.cs" />
+    <Compile Include="Ui\Views\ContactViews\BirthdateSubview.cs" />
     <Compile Include="Utilities\LocalNotificationService.cs" />
   </ItemGroup>
   <ItemGroup>

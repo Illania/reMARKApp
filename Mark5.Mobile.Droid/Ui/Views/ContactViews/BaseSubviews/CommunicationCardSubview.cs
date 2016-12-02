@@ -10,24 +10,16 @@ using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
+
     public abstract class CommunicationCardSubview : ContactView
     {
-        readonly AppCompatTextView titleTextView;
+
         protected readonly LinearLayoutCompat ContentLayout;
         protected readonly AppCompatImageView IconImageView;
-
-        public string Title
-        {
-            set
-            {
-                titleTextView.Text = value;
-            }
-        }
 
         protected CommunicationCardSubview(Context context)
             : base(context)
@@ -43,7 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             var iconImageViewLayout = new LinearLayoutCompat(context);
             iconImageViewLayout.Orientation = Vertical;
             iconImageViewLayout.LayoutParameters = new LayoutParams(ConversionUtils.ConvertDpToPixels(56), ViewGroup.LayoutParams.MatchParent);
-            iconImageViewLayout.SetPadding(DistanceLarge, DistanceNormal, DistanceLarge, 0);
+            iconImageViewLayout.SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, 0);
 
             internalLayout.AddView(iconImageViewLayout);
 
@@ -51,30 +43,21 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             IconImageView.SetColorFilter(new Android.Graphics.Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
             iconImageViewLayout.AddView(IconImageView, new LayoutParams(DistanceVeryLarge, DistanceVeryLarge));
 
-            var contentExternalLayout = new LinearLayoutCompat(context);
-            contentExternalLayout.Orientation = Vertical;
-            contentExternalLayout.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            internalLayout.AddView(contentExternalLayout);
-
             ContentLayout = new LinearLayoutCompat(context);
             ContentLayout.Orientation = Vertical;
             ContentLayout.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1.0f);
 
-            contentExternalLayout.AddView(ContentLayout);
-
-            Divider = new Divider(Context);
-            contentExternalLayout.AddView(Divider);
-
-            titleTextView = new AppCompatTextView(Context);
+            internalLayout.AddView(ContentLayout);
         }
 
         protected class CommunicationCardSubSubview : LinearLayoutCompat
         {
+
             public CommunicationCardSubSubview(Context context, string primaryText, string descriptionText, bool primary = false) : base(context)
             {
                 Orientation = Vertical;
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-                var paddingValue = ConversionUtils.ConvertDpToPixels(8);
+                var paddingValue = ConversionUtils.ConvertDpToPixels(16);
                 SetPadding(0, paddingValue, 0, paddingValue);
 
                 var primaryTextView = new AppCompatTextView(context);

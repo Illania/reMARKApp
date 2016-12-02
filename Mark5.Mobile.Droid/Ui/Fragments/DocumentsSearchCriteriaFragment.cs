@@ -104,7 +104,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            if (resultCode == (int)Result.Ok && requestCode == AbstractCategoriesSearchView<SearchDocumentsCriteria>.CategoriesRequest)
+            if (resultCode == (int)Result.Ok && requestCode == AbstractCategoriesSearchView<SearchDocumentsCriteria>.RequestCodes.CategoriesRequest)
             {
                 var ccsv = View.FindViewById<DocumentCategoriesSearchView>(AbstractCategoriesSearchView<SearchDocumentsCriteria>.ViewId);
                 if (ccsv != null)
