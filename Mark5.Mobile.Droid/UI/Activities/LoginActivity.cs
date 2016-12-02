@@ -270,15 +270,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 LocalNotificationService.Initialize();
 
-                if (Build.VERSION.SdkInt > BuildVersionCodes.M && (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadContacts) != Permission.Granted
-                                    || ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != Permission.Granted))
-                {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                    RequestPermissions(new string[] { Manifest.Permission.ReadExternalStorage, Manifest.Permission.ReadContacts }, 769);
-#pragma warning restore XA0001 // Find issues with Android API usage
-                }
-
-
                 StartActivity(new Intent(this, typeof(MainActivity)));
                 Finish();
             }
