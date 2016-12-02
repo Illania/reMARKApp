@@ -5,13 +5,17 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Android;
 using Android.Content;
+using Android.Content.PM;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.App;
+using Android.Support.V4.Content;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.Widget;
@@ -37,8 +41,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         AppCompatTextView navHeaderTitleTextView;
         AppCompatTextView navHeaderSubtitleTextView;
         IMenuItem lastSelectedItem;
+        CoordinatorLayout coordinatorLayout;
 
         RetainedFragment<MainActivityState> stateFragment;
+
+        bool permissionsAsked;
 
         #region Activity lifecycle
 
@@ -52,6 +59,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);
+
+            coordinatorLayout = FindViewById<CoordinatorLayout>(Resource.Id.coordinator);
 
             drawer = FindViewById<DrawerLayout>(Resource.Id.drawer_layout);
             drawerToggle = new SmoothActionBarDrawerToggle(this, drawer, Resource.String.open_drawer, Resource.String.close_drawer);
@@ -121,6 +130,41 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             drawerToggle.SyncState();
         }
 
+        protected override void OnResume()
+        {
+            base.OnResume();
+
+            if (permissionsAsked)
+                return;
+
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.M && (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadContacts) != Permission.Granted
+                || ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != Permission.Granted))
+            {
+
+                Action permissionRequestAction = () =>
+                {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                    RequestPermissions(new string[] { Manifest.Permission.ReadExternalStorage, Manifest.Permission.ReadContacts }, 769);
+#pragma warning restore XA0001 // Find issues with Android API usage
+                };
+
+                var snackbar = Snackbar.Make(coordinatorLayout, Resource.String.permissions_snackbar_text, 10000)
+                                       .SetAction(Resource.String.permissions_snackbar_action, v => permissionRequestAction());
+
+                snackbar.SetActionTextColor(ContextCompat.GetColor(this, Resource.Color.brown));
+                snackbar.View.SetBackgroundColor(new Android.Graphics.Color(ContextCompat.GetColor(this, Resource.Color.darkblue)));
+                snackbar.View.Clickable = true;
+                snackbar.View.Click += (sender, e) =>
+                {
+                    permissionRequestAction();
+                    snackbar.Dismiss();
+                };
+                snackbar.Show();
+            }
+
+            permissionsAsked = true;
+        }
+
         public override void OnBackPressed()
         {
             if (drawer.IsDrawerOpen(GravityCompat.Start))
@@ -145,6 +189,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             stateFragment.State.NavHeaderSubtitle = navHeaderSubtitleTextView.Text;
 
             stateFragment.State.LastSelectedItemId = lastSelectedItem.ItemId;
+            stateFragment.State.PermissionsAsked = permissionsAsked;
         }
 
         protected override void OnRestoreInstanceState(Bundle savedInstanceState)
@@ -153,6 +198,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             navHeaderTitleTextView.Text = stateFragment.State.NavHeaderTitle;
             navHeaderSubtitleTextView.Text = stateFragment.State.NavHeaderSubtitle;
+            permissionsAsked = stateFragment.State.PermissionsAsked;
 
             var menuItemId = stateFragment.State.LastSelectedItemId;
             var menuItem = navigationView.Menu.FindItem(menuItemId);
@@ -229,6 +275,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             public int LastSelectedItemId { get; set; }
 
             public Dictionary<int, MenuItemContent> MenuItemContents { get; set; }
+
+            public bool PermissionsAsked { get; set; }
         }
 
         #endregion

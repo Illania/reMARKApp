@@ -229,4 +229,6 @@
 	<string name="create_system_report">Create system report</string>
 	<string name="failed_send_document_notification_title">Failed to send messages</string>
 	<string name="failed_send_document_notification_content">One or more messages could not be sent</string>
+	<string name="permissions_snackbar_text">Tap to grant permissions</string>
+	<string name="permissions_snackbar_action">Ok</string>
 </resources>
