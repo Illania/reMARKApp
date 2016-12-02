@@ -15,19 +15,12 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
+
     public abstract class CommunicationCardSubview : ContactView
     {
-        readonly AppCompatTextView titleTextView;
+
         protected readonly LinearLayoutCompat ContentLayout;
         protected readonly AppCompatImageView IconImageView;
-
-        public string Title
-        {
-            set
-            {
-                titleTextView.Text = value;
-            }
-        }
 
         protected CommunicationCardSubview(Context context)
             : base(context)
@@ -64,8 +57,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
             Divider = new Divider(Context);
             contentExternalLayout.AddView(Divider);
-
-            titleTextView = new AppCompatTextView(Context);
         }
 
         protected class CommunicationCardSubSubview : LinearLayoutCompat

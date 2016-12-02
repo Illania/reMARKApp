@@ -10,12 +10,14 @@ using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
+
     public class ShortIdSubview : DescriptionCardSubview
     {
-        public ShortIdSubview(Context context) :
-            base(context)
+
+        public ShortIdSubview(Context context)
+            : base(context)
         {
-            Title = "Short Id";
+            Title = context.GetString(Resource.String.short_id);
         }
 
         public override void RefreshView()
@@ -23,7 +25,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             if (!string.IsNullOrWhiteSpace(ContactPreview?.ShortId))
             {
                 Visibility = ViewStates.Visible;
-                Content = ContactPreview?.ShortId;
+                Content = ContactPreview.ShortId;
             }
             else
             {

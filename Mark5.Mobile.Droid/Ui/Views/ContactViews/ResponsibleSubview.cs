@@ -12,13 +12,14 @@ using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
+
     public class ResponsibleSubview : CommunicationCardSubview
     {
+
         public event EventHandler<int> ContactClicked = delegate { };
 
         public ResponsibleSubview(Context context) : base(context)
         {
-            Title = "Responsible Users";
             IconImageView.SetImageResource(Resource.Drawable.email);
         }
 

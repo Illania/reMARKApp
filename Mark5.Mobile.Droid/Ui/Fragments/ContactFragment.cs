@@ -61,8 +61,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         LinearLayoutCompat linearLayout;
 
         CardView communicationCardView;
-        CardView descriptionCardView;
         CardView physicalAddressCardView;
+        CardView relatedCardView;
+        CardView descriptionCardView;
 
         AppCompatTextView descriptionCardTitle;
 
@@ -83,10 +84,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             PrepareCommunicationCard();
             PreparePhysicalAddressesCard();
+            PrepareRelatedCard();
             PrepareDescriptionCard();
 
             linearLayout.AddView(communicationCardView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
             linearLayout.AddView(physicalAddressCardView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+            linearLayout.AddView(relatedCardView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
             linearLayout.AddView(descriptionCardView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
             HasOptionsMenu = true;
@@ -381,11 +384,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.System));
             if (PlatformConfig.Preferences.ContactCommunicationTelexNumbersEnabled)
                 communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Telex));
-            communicationSubviews.Add(new LinkedContactSubview(Context, LinkedContactType.PrimaryPerson));
-            communicationSubviews.Add(new ResponsibleSubview(Context));
-            communicationSubviews.Add(new LinkedContactSubview(Context, LinkedContactType.Company));
-            communicationSubviews.Add(new LinkedContactSubview(Context, LinkedContactType.Department));
-            communicationSubviews.Add(new LinkedContactSubview(Context, LinkedContactType.Person));
 
             communicationCardView = new CardView(Context);
             communicationCardView.Visibility = ViewStates.Gone;
@@ -419,7 +417,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             physicalAddressCardInternalLayout.Orientation = LinearLayoutCompat.Vertical;
 
             var physicalCardTitle = new AppCompatTextView(Context);
-            physicalCardTitle.Text = "Addresses";
+            physicalCardTitle.Text = GetString(Resource.String.physical_addresses);
             physicalCardTitle.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
             physicalCardTitle.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
 
@@ -431,6 +429,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             physicalAddressCardView.AddView(physicalAddressCardInternalLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
             physicalAddressSubviews.ForEach(physicalAddressCardInternalLayout.AddView);
+        }
+
+        public void PrepareRelatedCard()
+        {
+            var relatedSubviews = new List<ContactView>();
+            relatedSubviews.Add(new LinkedContactSubview(Context, LinkedContactType.PrimaryPerson));
+            relatedSubviews.Add(new LinkedContactSubview(Context, LinkedContactType.Company));
+            relatedSubviews.Add(new LinkedContactSubview(Context, LinkedContactType.Department));
+            relatedSubviews.Add(new LinkedContactSubview(Context, LinkedContactType.Person));
+            relatedSubviews.Add(new ResponsibleSubview(Context));
+
+            relatedCardView = new CardView(Context);
+            relatedCardView.Visibility = ViewStates.Gone;
+            relatedCardView.Elevation = CardElevation;
+            relatedCardView.Radius = CardRadius;
+            relatedCardView.UseCompatPadding = true;
+
+            var relatedCardInternalLayout = new LinearLayoutCompat(Context);
+            relatedCardInternalLayout.Orientation = LinearLayoutCompat.Vertical;
+            relatedCardView.AddView(relatedCardInternalLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+
+            relatedSubviews.OfType<LinkedContactSubview>().ForEach(lcs => lcs.ContactClicked += LinkedContactClicked);
+            relatedSubviews.OfType<CommunicationAddressesSubview>().ForEach(rsv => rsv.AddressClicked += AddressClicked);
+            relatedSubviews.ForEach(relatedCardInternalLayout.AddView);
         }
 
         public void PrepareDescriptionCard()
@@ -524,6 +546,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             RefreshCardView(communicationCardView);
             RefreshCardView(physicalAddressCardView);
+            RefreshCardView(relatedCardView);
             RefreshCardView(descriptionCardView);
 
             linearLayout.Invalidate();

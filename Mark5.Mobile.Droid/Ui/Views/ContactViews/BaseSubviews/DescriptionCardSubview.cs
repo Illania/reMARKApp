@@ -14,24 +14,26 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
+
     public abstract class DescriptionCardSubview : ContactView
     {
+
         readonly AppCompatTextView titleTextView;
         readonly AppCompatTextView contentTextView;
-
-        public string Content
-        {
-            set
-            {
-                contentTextView.Text = value;
-            }
-        }
 
         public string Title
         {
             set
             {
                 titleTextView.Text = value;
+            }
+        }
+
+        public string Content
+        {
+            set
+            {
+                contentTextView.Text = value;
             }
         }
 
@@ -52,7 +54,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             contentTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
             contentTextView.SetPadding(0, 0, DistanceVeryLarge, 0);
             var contentTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            contentTextViewLayoutParams.TopMargin = ConversionUtils.ConvertDpToPixels(3);
+            contentTextViewLayoutParams.TopMargin = DistanceSmall;
             contentTextViewLayoutParams.BottomMargin = DistanceLarge;
             AddView(contentTextView, contentTextViewLayoutParams);
 

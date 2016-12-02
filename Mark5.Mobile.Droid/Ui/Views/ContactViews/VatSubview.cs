@@ -5,15 +5,19 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using Android.Content;
 using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
+
     public class VatSubview : DescriptionCardSubview
     {
-        public VatSubview(Android.Content.Context context) : base(context)
+
+        public VatSubview(Context context)
+            : base(context)
         {
-            Title = "VAT";
+            Title = context.GetString(Resource.String.vat);
         }
 
         public override void RefreshView()

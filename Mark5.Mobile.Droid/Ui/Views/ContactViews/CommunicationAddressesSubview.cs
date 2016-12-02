@@ -14,8 +14,10 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
+
     public class CommunicationAddressesSubview : CommunicationCardSubview
     {
+
         CommunicationAddressType addressType;
 
         public event EventHandler<CommunicationAddress> AddressClicked = delegate { };
@@ -23,7 +25,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         public CommunicationAddressesSubview(Android.Content.Context context, CommunicationAddressType type) : base(context)
         {
             addressType = type;
-            Title = type.ToString();
             IconImageView.SetImageResource(Resource.Drawable.email);
         }
 

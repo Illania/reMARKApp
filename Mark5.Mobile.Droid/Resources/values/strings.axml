@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string name="account">Account</string>
 	<string name="actions">Actions</string>
 	<string name="add_comment_hint">Insert new comment</string>
 	<string name="add_favorites">Add to favourites</string>
@@ -7,6 +8,7 @@
 	<string name="adding_comment">Adding comment</string>
 	<string name="app_name">MARK5</string>
 	<string name="bcc">Bcc:</string>
+	<string name="birthdate">Birthdate</string>
 	<string name="by">by</string>
 	<string name="cancel">Cancel</string>
 	<string name="cancel">Cancel</string>
@@ -60,6 +62,7 @@
 	<string name="hostname_invalid">Hostname is not valid.</string>
 	<string name="internet_access">Internet access:</string>
 	<string name="large_attachment">This attachment is larger than 20MB. Do you want to download it?</string>
+	<string name="ledger">Ledger</string>
 	<string name="lines">Lines:</string>
 	<string name="links">Links</string>
 	<string name="log_in">Log in</string>
@@ -87,6 +90,7 @@
 	<string name="opening_attachment">Opening attachment</string>
 	<string name="password">Password</string>
 	<string name="password_invalid">Password is not valid.</string>
+	<string name="physical_addresses">Addresses</string>
 	<string name="please_wait">Please wait...</string>
 	<string name="port">Port</string>
 	<string name="port_invalid">Port is not valid.</string>
@@ -153,6 +157,7 @@
 	<string name="setting_priority">Setting priority...</string>
 	<string name="settings">Settings</string>
 	<string name="share">Share</string>
+	<string name="short_id">Short ID</string>
 	<string name="shortcode">Shortcode</string>
 	<string name="shortcodes">Shortcodes</string>
 	<string name="show_details">Show details</string>
@@ -173,7 +178,9 @@
 	<string name="updating_categories">Updating Categories</string>
 	<string name="username">Username</string>
 	<string name="username_invalid">Username is not valid.</string>
+	<string name="vat">VAT</string>
 	<string name="warning">Warning</string>
+	<string name="webpage">Webpage</string>
 	<string name="yes">Yes</string>
 	<string name="yesterday">Yesterday</string>
 </resources>
