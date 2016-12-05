@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Android;
 using Android.Content;
 using Android.Database;
 using Android.Provider;
@@ -40,10 +39,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public DocumentCreationModeFlag OutgoingDocumentOriginalCreationModeFlag { get; set; }
         public Guid OutgoingDocumentGuid { get; set; }
         public OutgoingDocumentState OutgoingDocumentState { get; set; }
-        public List<OutgoingDocumentAttachmentDescription> OutgoingDocumentInitialAttachments { get; set; } = new List<OutgoingDocumentAttachmentDescription>(); //TODO save
+        public List<OutgoingDocumentAttachmentDescription> OutgoingDocumentInitialAttachments { get; set; } = new List<OutgoingDocumentAttachmentDescription>();
         public bool LocalDocument { get; set; }
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
+        public string[] PreconfiguredEmailAddresses { get; set; }
 
         Document PreviousDocument { get; set; }
         DocumentPreview PreviousDocumentPreview { get; set; }
@@ -207,6 +207,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             OutgoingDocumentInitialAttachments.ForEach(attachmentsView.AddAttachment);
+
+            if (CreationModeFlag == DocumentCreationModeFlag.New && PreconfiguredEmailAddresses != null)
+            {
+                toView.SetEmails(PreconfiguredEmailAddresses);
+
+            }
 
             UpdateSendButtonState();
 
@@ -839,6 +845,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 LocalDocument = LocalDocument,
                 OutgoingDocumentOriginalCreationModeFlag = OutgoingDocumentOriginalCreationModeFlag,
                 OutgoingDocumentState = OutgoingDocumentState,
+                OutgoingDocumentInitialAttachments = OutgoingDocumentInitialAttachments,
             };
         }
 
@@ -867,6 +874,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 LocalDocument = cfs.LocalDocument;
                 OutgoingDocumentOriginalCreationModeFlag = cfs.OutgoingDocumentOriginalCreationModeFlag;
                 OutgoingDocumentState = cfs.OutgoingDocumentState;
+                OutgoingDocumentInitialAttachments = cfs.OutgoingDocumentInitialAttachments;
             }
         }
 
@@ -889,6 +897,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public bool PermissionsAsked { get; set; }
             public OutgoingDocumentState OutgoingDocumentState { get; set; }
             public DocumentCreationModeFlag CreationModeFlag { get; set; }
+            public List<OutgoingDocumentAttachmentDescription> OutgoingDocumentInitialAttachments { get; set; }
             public DocumentCreationModeFlag OutgoingDocumentOriginalCreationModeFlag { get; set; }
             public IComposeDocumentViewState ToState { get; set; }
             public IComposeDocumentViewState CcState { get; set; }

@@ -195,14 +195,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             return Task.CompletedTask;
         }
 
-        #endregion
-
-        #region Utilities
-
-        void SetEmails(IEnumerable<string> emails)
+        public void SetEmails(IEnumerable<string> emails)
         {
             SetEmails(string.Join(EmailSeparator, emails));
         }
+
+        #endregion
+
+        #region Utilities
 
         void SetEmails(string emails)
         {

@@ -598,7 +598,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void AddressClicked(object sender, CommunicationAddress e)
         {
-            //TODO 
+            if (e.Type == CommunicationAddressType.Email)
+            {
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None, preconfiguredEmailAddresses: new List<string> { e.Address }));
+            }
+
+            //TODO What about the other types?
         }
 
         void ContactClicked(object sender, ContactPreview cp)

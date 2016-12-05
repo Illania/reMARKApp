@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
@@ -145,6 +146,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
+            if (item.ItemId == MenuItemActions.CreateNewDocument)
+            {
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None,
+                                                             preconfiguredEmailAddresses: Shortcode.Addresses.Where(a => a.Type == CommunicationAddressType.Email).Select(a => a.Address).ToList()));
+            }
+
             if (item.ItemId == MenuItemActions.CopyToWorktray)
             {
                 CopyToWorktrayAction();
@@ -327,7 +334,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void AddressesView_DocumentAddressClicked(object sender, DocumentAddress e)
         {
-            // TODO
+            if (e.Type == CommunicationAddressType.Email)
+            {
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None, preconfiguredEmailAddresses: new List<string> { e.Address }));
+            }
         }
 
         async Task RefreshData()
