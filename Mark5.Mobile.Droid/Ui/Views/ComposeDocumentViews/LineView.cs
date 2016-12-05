@@ -99,7 +99,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             if (CreationModeFlag == DocumentCreationModeFlag.New)
             {
-                SetLine(defaultOutgoingLine);
+                SetLine(defaultOutgoingLine ?? availableOutgoingLinesInView.First().Line);
                 return Task.CompletedTask;
             }
 
