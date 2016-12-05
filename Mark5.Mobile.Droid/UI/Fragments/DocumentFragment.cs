@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
@@ -218,6 +219,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
+            if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any() && (item.ItemId == MenuItemActions.Reply || item.ItemId == MenuItemActions.ReplyAll || item.ItemId == MenuItemActions.Forward))
+            {
+                Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
+                return true;
+            }
+
             if (item.ItemId == MenuItemActions.Reply)
             {
                 StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Reply, DocumentPreview.Direction, Document.Id, Folder.Id));

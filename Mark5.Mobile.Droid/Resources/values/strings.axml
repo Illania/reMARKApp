@@ -102,6 +102,8 @@
 	<string name="network_interface">Network interface:</string>
 	<string name="no">No</string>
 	<string name="no_content">No content</string>
+	<string name="no_lines_error_title">No lines set for user</string>
+	<string name="no_lines_error_content">It is not possible to send documents because the user does not have any line set</string>
 	<string name="no_subject">No subject</string>
 	<string name="no_templates_content">There are no templates defined for this creation mode.</string>
 	<string name="no_templates_title">No templates</string>

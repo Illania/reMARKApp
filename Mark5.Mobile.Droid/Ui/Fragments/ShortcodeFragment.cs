@@ -148,6 +148,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == MenuItemActions.CreateNewDocument)
             {
+                if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
+                {
+                    Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
+                    return true;
+                }
+
                 StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None,
                                                              preconfiguredEmailAddresses: Shortcode.Addresses.Where(a => a.Type == CommunicationAddressType.Email).Select(a => a.Address).ToList()));
             }
@@ -336,6 +342,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (e.Type == CommunicationAddressType.Email)
             {
+                if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
+                {
+                    Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
+                    return;
+                }
+
                 StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None, preconfiguredEmailAddresses: new List<string> { e.Address }));
             }
         }

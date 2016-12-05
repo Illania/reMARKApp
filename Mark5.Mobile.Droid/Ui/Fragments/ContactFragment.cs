@@ -598,6 +598,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void AddressClicked(object sender, CommunicationAddress e)
         {
+            if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
+            {
+                Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
+                return;
+            }
+
             if (e.Type == CommunicationAddressType.Email)
             {
                 StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None, preconfiguredEmailAddresses: new List<string> { e.Address }));

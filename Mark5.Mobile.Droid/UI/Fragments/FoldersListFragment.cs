@@ -145,6 +145,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == 10)
             {
+                if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
+                {
+                    Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
+                    return true;
+                }
+
                 StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None));
                 return true;
             }

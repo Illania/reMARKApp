@@ -181,6 +181,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == 10)
             {
+                if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
+                {
+                    Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
+                    return true;
+                }
+
                 StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None));
                 return true;
             }
@@ -328,6 +334,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (documentPreview.Direction == DocumentDirection.Draft)
                 {
+                    if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
+                    {
+                        Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
+                        return;
+                    }
+
                     StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Edit, documentPreview.Direction, documentPreview.Id, Folder.Id));
                 }
                 else
