@@ -97,6 +97,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 return Task.CompletedTask;
             }
 
+            if (CreationModeFlag == DocumentCreationModeFlag.New)
+            {
+                SetLine(defaultOutgoingLine);
+                return Task.CompletedTask;
+            }
+
             if (CreationModeFlag == DocumentCreationModeFlag.None)
             {
                 return Task.CompletedTask;
