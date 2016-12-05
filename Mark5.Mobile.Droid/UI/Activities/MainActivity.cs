@@ -148,7 +148,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 #pragma warning restore XA0001 // Find issues with Android API usage
                 };
 
-                var snackbar = Snackbar.Make(coordinatorLayout, Resource.String.permissions_snackbar_text, 10000)
+                var snackbar = Snackbar.Make(coordinatorLayout, Resource.String.permissions_snackbar_text, Snackbar.LengthIndefinite)
                                        .SetAction(Resource.String.permissions_snackbar_action, v => permissionRequestAction());
 
                 snackbar.SetActionTextColor(ContextCompat.GetColor(this, Resource.Color.brown));
