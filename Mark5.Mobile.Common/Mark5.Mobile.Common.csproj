@@ -180,6 +180,7 @@
     <Compile Include="Utilities\Validator.cs" />
     <Compile Include="Utilities\PortableCollections\CrossPlatformCollectionsExtensions.cs" />
     <Compile Include="Utilities\PortableCollections\IPortableConcurrentQueue.cs" />
+    <Compile Include="Utilities\CommnunicationAddressUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />

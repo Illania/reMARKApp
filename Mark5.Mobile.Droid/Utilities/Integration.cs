@@ -17,6 +17,12 @@ namespace Mark5.Mobile.Droid.Utilities
 
     public static class Integration
     {
+        public static void DialNumber(Context context, string formattedNumber)
+        {
+            var intent = new Intent(Intent.ActionDial);
+            intent.SetData(Android.Net.Uri.Parse("tel:" + formattedNumber));
+            context.StartActivity(intent);
+        }
 
         public static bool IsConnectedToMeteredConnection()
         {

@@ -607,9 +607,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (e.Type == CommunicationAddressType.Email)
             {
                 StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None, preconfiguredEmailAddresses: new List<string> { e.Address }));
+                return;
             }
-
-            //TODO What about the other types?
+            if (e.Type == CommunicationAddressType.Mobile || e.Type == CommunicationAddressType.Phone)
+            {
+                Integration.DialNumber(Context, CommnunicationAddressUtilities.FormatAddress(e));
+            }
         }
 
         void ContactClicked(object sender, ContactPreview cp)

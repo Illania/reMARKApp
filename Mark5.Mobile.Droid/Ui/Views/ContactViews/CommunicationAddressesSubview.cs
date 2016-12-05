@@ -5,15 +5,16 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Linq;
-using System.Text;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 
@@ -93,7 +94,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                     }
                     else
                     {
-                        titleText = FormatAddress(communicationAddress.Address);
+                        titleText = CommnunicationAddressUtilities.FormatAddress(communicationAddress);
                         descriptionText = communicationAddress.Description;
                     }
 
@@ -113,36 +114,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             {
                 Visibility = ViewStates.Gone;
             }
-        }
-
-        string FormatAddress(string address)
-        {
-            if (new[] { CommunicationAddressType.Fax, CommunicationAddressType.Phone, CommunicationAddressType.Mobile, CommunicationAddressType.Telex }.Contains(addressType))
-            {
-                var stringBuilder = new StringBuilder();
-                var addressParts = address.Split('|');
-
-                var countryPrefix = addressParts[0];
-                var firstPart = addressParts[1];
-                var secondPart = addressParts[2];
-
-                if (!string.IsNullOrEmpty(countryPrefix))
-                {
-                    stringBuilder.Append($"+{countryPrefix} ");
-                }
-                if (!string.IsNullOrEmpty(firstPart))
-                {
-                    stringBuilder.Append($"{firstPart} ");
-                }
-                if (!string.IsNullOrEmpty(secondPart))
-                {
-                    stringBuilder.Append(secondPart);
-                }
-
-                return stringBuilder.ToString();
-            }
-            return address;
-
         }
 
         Tuple<string, string> ParseIm(string address)
