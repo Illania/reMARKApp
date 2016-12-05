@@ -23,6 +23,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
     {
 
         readonly DocumentAddressType type;
+        LinearLayoutCompat AddressesLayout;
 
         public event EventHandler<DocumentAddress> DocumentAddressClicked = delegate { };
 
@@ -49,8 +50,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
             titleView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
             titleView.SetPadding(DistanceLarge, 0, DistanceNormal, 0);
             InnerLayout.AddView(titleView);
-
             InnerLayout.AddView(new Divider(Context));
+
+            AddressesLayout = new LinearLayoutCompat(Context)
+            {
+                LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                Orientation = LinearLayoutCompat.Vertical
+            };
+
+            InnerLayout.AddView(AddressesLayout);
         }
 
         public override void RefreshView()
@@ -59,6 +67,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
             {
                 Visibility = ViewStates.Visible;
 
+                AddressesLayout.RemoveAllViews();
                 var addresses = Shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == type).ToArray();
                 for (int i = 0; i < addresses.Length; i++)
                 {
@@ -67,19 +76,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
 
                     var av = new AddressView(Context, a, DistanceVeryLarge, DistanceNormal);
                     av.Click += (sender, e) => DocumentAddressClicked(this, a);
-                    InnerLayout.AddView(av);
+                    AddressesLayout.AddView(av);
 
                     if (isNotLast)
                     {
-                        InnerLayout.AddView(new Divider(Context, DistanceVeryLarge, 0, 0, 0));
+                        AddressesLayout.AddView(new Divider(Context, DistanceVeryLarge, 0, 0, 0));
                     }
                 }
-            }
-            else
-            {
-                Visibility = ViewStates.Gone;
-
-                InnerLayout.RemoveViews(2, InnerLayout.ChildCount - 3);
             }
         }
 
