@@ -128,7 +128,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                 {
                                     FirebaseInstanceId.Instance?.DeleteInstanceId();
                                     var _nullToken = FirebaseInstanceId.Instance?.Token; // Token will be null, but it will cause refresh
+                                }
+                                catch (Exception ex)
+                                {
+                                    CommonConfig.Logger.Error("Could not reset Firebase token!", ex);
+                                }
 
+                                try
+                                {
                                     var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Remote);
                                     ServerConfig.SystemSettings = ss;
 
@@ -139,6 +146,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                 catch (Exception ex)
                                 {
                                     dismissAction();
+
+                                    CommonConfig.Logger.Error("Could not retrieve system settings!", ex);
 
                                     await Dialogs.ShowErrorDialogAsync(Activity, ex);
                                 }

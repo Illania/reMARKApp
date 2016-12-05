@@ -260,16 +260,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 CommonConfig.Logger.Info($"Logged in - will present {nameof(MainActivity)}");
 
-                if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
-                {
-                    CommonConfig.Logger.Info($"Sending Firebase token to service...");
-                    //await Managers.NotificationsManager.Subscribe(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken); //TODO Disabled until service is fixed
-                    //TODO
-                    //TODO
-                }
-
-                LocalNotificationService.Initialize();
-
                 StartActivity(new Intent(this, typeof(MainActivity)));
                 Finish();
             }
