@@ -5872,8 +5872,5 @@
       "sqlite-net-pcl >= 1.2.1"
     ],
     ".NETStandard,Version=v1.4": []
-  },
-  "packageFolders": {
-    "/Users/ferdinandopapale/.nuget/packages/": {}
   }
 }
