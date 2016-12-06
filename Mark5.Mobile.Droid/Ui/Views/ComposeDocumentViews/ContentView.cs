@@ -50,7 +50,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                                             <head>
                                             </head>
                                             <body style=""min-height: 200px;"">
-                                                <div class=""" + EditableContentClass + @""" contenteditable=""true"" style=""width: 100%;""><br></div>
+                                                <div class=""" + EditableContentClass + @""" contenteditable=""true"" style=""width: 100%;""><br><br></div>
                                                 <div class=""" + TemplateElementClass + @""" contenteditable=""true""></div>
                                             </body>
                                         </html>";
@@ -329,6 +329,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             var parentElement = parentElements[0];
             parentElement.Children.ForEach(c => c.Remove());
+            parentElement.TextContent = string.Empty;
 
             var nodes = await ProcessInsertedContent(htmlParser, contentType, content);
 

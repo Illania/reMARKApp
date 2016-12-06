@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,15 +25,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public event EventHandler Edited = delegate { };
 
         readonly AppCompatSpinner lineSpinner;
-        readonly AppCompatImageView lineAmbiguityIndicator;
         readonly List<LineInView> availableOutgoingLinesInView;
         readonly Line defaultOutgoingLine;
-
-        bool selectionChangedProgrammatically;
+        readonly Line ambiguousFakeLine;
+        readonly Guid ambiguousFakeLineGuid = Guid.Parse("175012b3-abee-48ff-9973-2bd84f67e5fd");
 
         public bool LineSelectedIsAmbiguous
         {
-            get { return lineAmbiguityIndicator.Visibility == ViewStates.Visible; }
+            get { return GetLine().Guid == ambiguousFakeLineGuid; }
         }
 
         public LineView(Context context)
@@ -52,37 +52,28 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             defaultOutgoingLine = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultOutgoingLine;
             availableOutgoingLinesInView = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Select(l => new LineInView(l)).ToList();
 
-            lineSpinner = new AdaptedSpinner(context);
+            ambiguousFakeLine = new Line
+            {
+                Name = Resources.GetString(Resource.String.select_a_line),
+                Guid = ambiguousFakeLineGuid,
+            };
+
+            availableOutgoingLinesInView.Add(new LineInView(ambiguousFakeLine));
+
+            lineSpinner = new AppCompatSpinner(context);
             var spinnerLayoutParams = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
             spinnerLayoutParams.Weight = 1;
             lineSpinner.LayoutParameters = spinnerLayoutParams;
-            var adapter = new ArrayAdapter(context, Android.Resource.Layout.SimpleSpinnerItem, availableOutgoingLinesInView);
+
+            var adapter = new CustomAdapter(context, Android.Resource.Layout.SimpleSpinnerItem, availableOutgoingLinesInView, availableOutgoingLinesInView.Count - 1);
             adapter.SetDropDownViewResource(Resource.Layout.support_simple_spinner_dropdown_item);
             lineSpinner.Adapter = adapter;
             lineSpinner.ItemSelected += LineSpinner_ItemSelected;
             AddView(lineSpinner);
-
-            lineAmbiguityIndicator = new AppCompatImageView(context);
-            var layoutParams = new LayoutParams(ConversionUtils.ConvertDpToPixels(18), ConversionUtils.ConvertDpToPixels(18));
-            layoutParams.Gravity = (int)GravityFlags.CenterVertical;
-            lineAmbiguityIndicator.LayoutParameters = layoutParams;
-            lineAmbiguityIndicator.SetImageResource(Resource.Drawable.error);
-            lineAmbiguityIndicator.SetColorFilter(Android.Graphics.Color.Red);
-            lineAmbiguityIndicator.Visibility = ViewStates.Gone;
-            AddView(lineAmbiguityIndicator);
         }
 
         void LineSpinner_ItemSelected(object sender, AdapterView.ItemSelectedEventArgs e)
         {
-            if (selectionChangedProgrammatically) //Otherwise there is no way of knowing if event was fired due to the user changing the selection
-            {
-                selectionChangedProgrammatically = false;
-            }
-            else
-            {
-                lineAmbiguityIndicator.Visibility = ViewStates.Gone;
-            }
-
             Edited(this, EventArgs.Empty);
         }
 
@@ -99,7 +90,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             if (CreationModeFlag == DocumentCreationModeFlag.New)
             {
-                SetLine(defaultOutgoingLine ?? availableOutgoingLinesInView.First().Line);
+                if (defaultOutgoingLine != null)
+                {
+                    SetLine(defaultOutgoingLine);
+                }
+                else
+                {
+                    SetSelectLine();
+                }
                 return Task.CompletedTask;
             }
 
@@ -126,20 +124,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
             else
             {
-                var intersection = previousDocumentLines.Intersect(availableOutgoingLinesInView.Select(l => l.Line)).ToList();
+                var intersection = previousDocumentLines.Intersect(availableOutgoingLinesInView.Select(l => l.Line), LambdaEqualityComparer<Line>.Create(l => l.Guid)).ToList();
                 if (intersection.Count() == 1)
                 {
                     SetLine(intersection.First());
                 }
                 else
                 {
-                    SetLine(availableOutgoingLinesInView.First().Line);
-                    lineAmbiguityIndicator.Visibility = ViewStates.Visible;
+                    SetSelectLine();
                 }
             }
 
             return Task.CompletedTask;
-
         }
 
         public override Task UpdateDocument()
@@ -155,7 +151,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 lineSpinner.SetSelection(index);
             }
-            selectionChangedProgrammatically = true;
         }
 
         #endregion
@@ -165,6 +160,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         void SetLine(Line line)
         {
             SetLineFromGuid(line.Guid);
+        }
+
+        void SetSelectLine()
+        {
+            SetLineFromGuid(ambiguousFakeLineGuid);
         }
 
         Line GetLine()
@@ -196,24 +196,35 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #endregion
 
-        #region Spinner
+        #region CustomAdapter
 
-        class AdaptedSpinner : AppCompatSpinner
+        public class CustomAdapter : ArrayAdapter
         {
-            public AdaptedSpinner(Context context) : base(context)
+            readonly int hideentItemIndex;
+
+            public CustomAdapter(Context context, int textViewResourceId, IList objects, int hidingItemIndex)
+              : base(context, textViewResourceId, objects)
             {
+                this.hideentItemIndex = hidingItemIndex;
             }
 
-            public override void SetSelection(int position)
+            override public View GetDropDownView(int position, View convertView, ViewGroup parent)
             {
-                //The base spinner does not fire the onItemSelected event when selecting the same item
-                if (position == SelectedItemPosition)
+                View v = null;
+                if (position == hideentItemIndex)
                 {
-                    OnItemSelectedListener.OnItemSelected(this, SelectedView, position, SelectedItemId);
-                    return;
+                    var tv = new TextView(Context);
+                    tv.SetHeight(0);
+                    v = tv;
+                }
+                else
+                {
+                    v = base.GetDropDownView(position, null, parent);
                 }
 
-                base.SetSelection(position);
+                parent.VerticalScrollBarEnabled = false;
+
+                return v;
             }
         }
 
@@ -225,7 +236,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             var lineViewState = State as LineViewState;
             SetLine(lineViewState.SelectedLine);
-            lineAmbiguityIndicator.Visibility = lineViewState.LineAmbiguityIndicatorVisibility;
         }
 
         public override IComposeDocumentViewState ReturnState()
@@ -233,14 +243,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             return new LineViewState
             {
                 SelectedLine = GetLine(),
-                LineAmbiguityIndicatorVisibility = lineAmbiguityIndicator.Visibility,
             };
         }
 
         class LineViewState : IComposeDocumentViewState
         {
             public Line SelectedLine { get; set; }
-            public ViewStates LineAmbiguityIndicatorVisibility { get; set; }
         }
 
         #endregion

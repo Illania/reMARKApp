@@ -545,7 +545,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var sendItem = optionsMenu.Add(Menu.None, MenuItemActions.SendDocument, MenuItemActions.SendDocument, Resource.String.send);
                 sendItem.SetIcon(Resource.Drawable.send_white);
                 sendItem.SetShowAsAction(ShowAsAction.Always);
-                sendItem.SetEnabled(false);
+                UpdateSendButtonState();
             }
         }
 
