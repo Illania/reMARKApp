@@ -94,7 +94,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                     }
                     else
                     {
-                        titleText = CommnunicationAddressUtilities.FormatAddress(communicationAddress);
+                        titleText = AddressUtilities.FormatCommunicationAddress(communicationAddress);
                         descriptionText = communicationAddress.Description;
                     }
 

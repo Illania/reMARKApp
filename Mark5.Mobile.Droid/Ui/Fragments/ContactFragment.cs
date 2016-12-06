@@ -427,6 +427,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             physicalAddressCardView.AddView(physicalAddressCardInternalLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
             physicalAddressSubviews.ForEach(physicalAddressCardInternalLayout.AddView);
+            physicalAddressSubviews.OfType<PhysicalAddressesSubview>().ForEach(p => p.PhysicalAddressClicked += PhysicalAddressClicked);
         }
 
         public void PrepareRelatedCard()
@@ -611,7 +612,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             if (e.Type == CommunicationAddressType.Mobile || e.Type == CommunicationAddressType.Phone)
             {
-                Integration.DialNumber(Context, CommnunicationAddressUtilities.FormatAddress(e));
+                Integration.DialNumber(Context, AddressUtilities.FormatCommunicationAddress(e));
             }
         }
 
@@ -629,6 +630,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
             ft.AddToBackStack(null);
             ft.Commit();
+        }
+
+        void PhysicalAddressClicked(object sender, PhysicalAddress e)
+        {
+            Integration.OpenMap(Context, AddressUtilities.FormatPhysicalAddress(e));
         }
 
         #endregion
