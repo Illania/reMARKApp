@@ -43,6 +43,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         const string RecipentRegex = @".*<.*@.*>";
         const string RecipentFormat = "{0} <{1}>";
 
+        string savedRecipient;
+
         bool textHasChangedFlag;
         string textBeforeChange;
 
@@ -198,6 +200,56 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public void SetEmails(IEnumerable<string> emails)
         {
             SetEmails(string.Join(EmailSeparator, emails));
+        }
+
+        public void RemoveAddressFromLine(string lineAddress)
+        {
+            if (lineAddress == savedRecipient)
+            {
+                return;
+            }
+
+            var currentRecipients = GetRecipents().ToList();
+
+            if (!string.IsNullOrEmpty(savedRecipient))
+            {
+                currentRecipients.Add(savedRecipient);
+            }
+
+            var lineRelatedRecipient = currentRecipients.FirstOrDefault(r => r.Contains(lineAddress));
+            if (lineRelatedRecipient != null)
+            {
+                savedRecipient = lineRelatedRecipient;
+                currentRecipients.Remove(lineRelatedRecipient);
+            }
+            else
+            {
+                savedRecipient = null;
+            }
+
+            if (currentRecipients.Any())
+            {
+                SetRecipients(currentRecipients);
+            }
+            else
+            {
+                Clear();
+            }
+        }
+
+        IEnumerable<string> GetRecipents()
+        {
+            return emailEditor.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries).Where(s => Validator.ContainsValidEmail(s)).Select(s => s.Trim());
+        }
+
+        void SetRecipients(IEnumerable<string> recipients)
+        {
+            emailEditor.Text = string.Join(", ", recipients);
+        }
+
+        void Clear()
+        {
+            emailEditor.Text = string.Empty;
         }
 
         #endregion
@@ -369,6 +421,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             var recipientsViewState = State as RecipientsViewState;
             emailEditor.Text = recipientsViewState.Content;
+            savedRecipient = recipientsViewState.SavedRecipient;
         }
 
         public override IComposeDocumentViewState ReturnState()
@@ -376,12 +429,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             return new RecipientsViewState
             {
                 Content = emailEditor.Text,
+                SavedRecipient = savedRecipient,
             };
         }
 
         class RecipientsViewState : IComposeDocumentViewState
         {
             public string Content { get; set; }
+            public string SavedRecipient { get; set; }
         }
 
         #endregion

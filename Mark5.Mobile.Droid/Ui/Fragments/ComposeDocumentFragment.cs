@@ -227,6 +227,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             ((AppCompatActivity)Activity).SupportActionBar.Title = !subjectView.Empty ? subjectView.Subject : DefaultTitle;
             UpdateSendButtonState();
+
+            if (sender is LineView && PlatformConfig.Preferences.RemoveLine && CreationModeFlag == DocumentCreationModeFlag.ReplyAll
+                && PreviousDocumentPreview != null && PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
+            {
+                if (!lineView.LineSelectedIsAmbiguous && !string.IsNullOrEmpty(lineView.GetLine().FromAddress))
+                {
+                    toView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
+                    ccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
+                    bccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
+                }
+            }
         }
 
         async void AttachmentsView_AttachmentClicked(object sender, IAttachmentDescription attachment)

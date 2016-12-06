@@ -153,6 +153,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
+        public Line GetLine()
+        {
+            return availableOutgoingLinesInView[lineSpinner.SelectedItemPosition].Line;
+        }
+
         #endregion
 
         #region Utilities
@@ -165,11 +170,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         void SetSelectLine()
         {
             SetLineFromGuid(ambiguousFakeLineGuid);
-        }
-
-        Line GetLine()
-        {
-            return availableOutgoingLinesInView[lineSpinner.SelectedItemPosition].Line;
         }
 
         class LineInView
