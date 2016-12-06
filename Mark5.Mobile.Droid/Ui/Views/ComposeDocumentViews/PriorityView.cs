@@ -20,19 +20,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
     public class PriorityView : ComposeDocumentView
     {
         readonly AppCompatSpinner prioritySpinner;
-        readonly List<Priority> priorities = new List<Priority> { Priority.Ignore, Priority.Low, Priority.Normal, Priority.System, Priority.Urgent };
+        readonly List<Priority> priorities = new List<Priority> { Priority.Low, Priority.Normal, Priority.Urgent };
 
         public PriorityView(Context context)
             : base(context)
         {
             Orientation = Horizontal;
-            SetPadding(DistanceNormal, DistanceNormal, DistanceNormal, DistanceNormal);
+            SetPadding(DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall);
 
             var titleTextView = new AppCompatTextView(context)
             {
-                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent),
+                LayoutParameters = new LayoutParams(DistanceVeryLarge, ViewGroup.LayoutParams.WrapContent),
             };
-            titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimaryBold);
+            titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimaryLight);
             titleTextView.SetText(Resource.String.priority);
             AddView(titleTextView);
 

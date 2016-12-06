@@ -9,6 +9,7 @@
 using System;
 using System.Threading.Tasks;
 using Android.Content;
+using Android.Graphics;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
@@ -36,16 +37,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 : base(context)
         {
             Orientation = Horizontal;
-            SetPadding(DistanceNormal, DistanceNormal, DistanceNormal, DistanceNormal);
+            SetPadding(DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall);
 
             subjectTextView = new AppCompatEditText(context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
             };
-            subjectTextView.SetPadding(0, 0, 0, 0); //EditTextView has some default padding
-            subjectTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimaryBold);
+            subjectTextView.SetPadding(0, 0, 0, 0);
+            subjectTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimaryLight);
             subjectTextView.SetHint(Resource.String.subject);
-            subjectTextView.SetBackgroundColor(Android.Graphics.Color.Transparent);
+            subjectTextView.SetBackgroundColor(Color.Transparent);
             subjectTextView.AfterTextChanged += (sender, e) => Edited(this, EventArgs.Empty);
             AddView(subjectTextView);
         }

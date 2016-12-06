@@ -60,13 +60,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             AddressType = type;
 
             Orientation = Horizontal;
-            SetPadding(DistanceNormal, DistanceNormal, DistanceNormal, DistanceNormal);
+            SetPadding(DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall);
 
             var titleTextView = new AppCompatTextView(context)
             {
-                LayoutParameters = new LayoutParams(ConversionUtils.ConvertDpToPixels(40), ViewGroup.LayoutParams.WrapContent),
+                LayoutParameters = new LayoutParams(2 * DistanceLarge, ViewGroup.LayoutParams.WrapContent),
             };
-            titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimaryBold);
+            titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimaryLight);
 
             int titleId;
             switch (AddressType)
@@ -343,7 +343,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void SetEmailStyle(int start, int end)
         {
-            SetColor(start, end, Resource.Color.darkblue);
+            SetColor(start, end, Resource.Color.darkerblue);
         }
 
         void SetColor(int start, int end, int colorId)
@@ -440,7 +440,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 }
                 var address = suggestion.Address;
 
-                var colorSelection = new Color(ContextCompat.GetColor(parent.Context, Resource.Color.brown));
+                var colorSelection = new Color(ContextCompat.GetColor(parent.Context, Resource.Color.darkerblue));
 
                 var start = address.IndexOf(ActualConstraint, StringComparison.CurrentCultureIgnoreCase);
                 var end = start + ActualConstraint.Length;

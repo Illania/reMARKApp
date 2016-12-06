@@ -367,7 +367,6 @@
     <AndroidResource Include="Resources\color\drawer_item.xml" />
     <AndroidResource Include="Resources\color\drawer_item_background.xml" />
     <AndroidResource Include="Resources\color\drawer_item_icon.xml" />
-    <AndroidResource Include="Resources\drawable\.DS_Store" />
     <AndroidResource Include="Resources\drawable\circle.axml" />
     <AndroidResource Include="Resources\drawable\line_divider.axml" />
     <AndroidResource Include="Resources\drawable\rounded_background.xml" />

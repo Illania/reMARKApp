@@ -25,6 +25,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public IComposeDocumentViewState State { get; set; }
 
         protected int DistanceNone;
+        protected int DistanceVeryLarge;
         protected int DistanceLarge;
         protected int DistanceNormal;
         protected int DistanceSmall;
@@ -34,6 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
+            DistanceVeryLarge = ConversionUtils.ConvertDpToPixels(56.0f);
             DistanceLarge = ConversionUtils.ConvertDpToPixels(16.0f);
             DistanceNormal = ConversionUtils.ConvertDpToPixels(8.0f);
             DistanceSmall = ConversionUtils.ConvertDpToPixels(4.0f);

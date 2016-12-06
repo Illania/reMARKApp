@@ -39,13 +39,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             : base(context)
         {
             Orientation = Horizontal;
-            SetPadding(DistanceNormal, DistanceNormal, DistanceNormal, DistanceNormal);
+            SetPadding(DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall);
 
             var titleTextView = new AppCompatTextView(context)
             {
-                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent),
+                LayoutParameters = new LayoutParams(DistanceVeryLarge, ViewGroup.LayoutParams.WrapContent),
             };
-            titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimaryBold);
+            titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimaryLight);
             titleTextView.SetText(Resource.String.line);
             AddView(titleTextView);
 

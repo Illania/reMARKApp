@@ -12,12 +12,12 @@
         android:id="@+id/suggestionName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/darkerblue" />
+        android:textColor="@color/black" />
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/suggestionAddress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/darkerblue" />
+        android:textColor="@color/black" />
     <View
         android:id="@+id/suggestionSeparator"
         android:layout_width="match_parent"

@@ -28,8 +28,10 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
+    
     public class ComposeDocumentFragment : RetainableStateFragment
     {
+    
         const string DefaultTitle = "New document";
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
         public const int AttachmentRequestCode = 111;
@@ -229,7 +231,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void AttachmentsView_AttachmentClicked(object sender, IAttachmentDescription attachment)
         {
-            var option = await Dialogs.ShowListDialog(Context, Resource.String.attachment_clicked, Resource.Array.attachment_clicked_options, false);
+            var option = await Dialogs.ShowListDialog(Context, attachment.Name, Resource.Array.attachment_clicked_options, true);
 
             if (option == 0) //Open attachment
             {

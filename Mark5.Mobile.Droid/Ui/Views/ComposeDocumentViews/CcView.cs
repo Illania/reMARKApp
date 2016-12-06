@@ -5,7 +5,6 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
 using Android.Content;
 using Mark5.Mobile.Common.Model;
 

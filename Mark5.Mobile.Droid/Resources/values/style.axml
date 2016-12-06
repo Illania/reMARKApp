@@ -54,6 +54,7 @@
 	</style>
 	<style name="fontLargeLight" parent="TextAppearance.AppCompat.Caption">
 		<item name="android:textSize">20sp</item>
+		<item name="android:textColor">@color/lightergray</item>
 	</style>
 	<style name="fontPrimary" parent="TextAppearance.AppCompat.Body1">
 		<item name="android:textSize">16sp</item>
@@ -63,6 +64,7 @@
 	</style>
 	<style name="fontPrimaryLight" parent="TextAppearance.AppCompat.Caption">
 		<item name="android:textSize">16sp</item>
+		<item name="android:textColor">@color/lightergray</item>
 	</style>
 	<style name="fontSmall" parent="TextAppearance.AppCompat.Body1">
 		<item name="android:textSize">14sp</item>
@@ -72,6 +74,7 @@
 	</style>
 	<style name="fontSmallLight" parent="TextAppearance.AppCompat.Caption">
 		<item name="android:textSize">14sp</item>
+		<item name="android:textColor">@color/lightergray</item>
 	</style>
 	<style name="fontTiny" parent="TextAppearance.AppCompat.Body1">
 		<item name="android:textSize">12sp</item>
@@ -81,6 +84,7 @@
 	</style>
 	<style name="fontTinyLight" parent="TextAppearance.AppCompat.Caption">
 		<item name="android:textSize">12sp</item>
+		<item name="android:textColor">@color/lightergray</item>
 	</style>
 	<style name="contactViewHeaderTitle" parent="TextAppearance.AppCompat.Body2">
 		<item name="android:textSize">18sp</item>
