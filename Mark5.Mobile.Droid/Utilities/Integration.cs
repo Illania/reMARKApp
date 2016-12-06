@@ -24,6 +24,15 @@ namespace Mark5.Mobile.Droid.Utilities
             context.StartActivity(intent);
         }
 
+        public static void OpenMap(Context context, string formattedAddress)
+        {
+            var intent = new Intent(Intent.ActionView);
+            var uriString = "geo:0,0?q=" + System.Net.WebUtility.HtmlEncode(formattedAddress);
+            intent.SetData(Android.Net.Uri.Parse(uriString));
+            var chooserIntent = Intent.CreateChooser(intent, context.Resources.GetString(Resource.String.choose_application));
+            context.StartActivity(chooserIntent);
+        }
+
         public static bool IsConnectedToMeteredConnection()
         {
             var ctx = Application.Context;

@@ -11,9 +11,9 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.Utilities
 {
-    public static class CommnunicationAddressUtilities
+    public static class AddressUtilities
     {
-        public static string FormatAddress(CommunicationAddress communicationAddress)
+        public static string FormatCommunicationAddress(CommunicationAddress communicationAddress)
         {
             if (new[] { CommunicationAddressType.Fax, CommunicationAddressType.Phone, CommunicationAddressType.Mobile, CommunicationAddressType.Telex }.Contains(communicationAddress.Type))
             {
@@ -42,6 +42,12 @@ namespace Mark5.Mobile.Common.Utilities
 
             return communicationAddress.Address;
 
+        }
+
+        public static string FormatPhysicalAddress(PhysicalAddress pe)
+        {
+            var parts = new string[] { pe.Street, pe.Area, pe.City, pe.Country.Name }.Where(a => a != null && a.Any());
+            return string.Join(", ", parts);
         }
     }
 }

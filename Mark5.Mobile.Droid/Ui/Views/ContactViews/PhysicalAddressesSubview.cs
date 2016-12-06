@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.Linq;
 using System.Text;
 using Android.Content;
@@ -19,6 +20,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
     public class PhysicalAddressesSubview : ContactView
     {
+        public event EventHandler<PhysicalAddress> PhysicalAddressClicked = delegate { };
 
         public PhysicalAddressesSubview(Context context)
             : base(context)
@@ -38,7 +40,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 var lastAddress = Contact.PhysicalAddresses.Last();
                 foreach (var address in Contact.PhysicalAddresses)
                 {
-                    AddView(new PhysicalAddressesSubSubview(Context, address, DistanceSmall, DistanceLarge, DistanceVeryLarge, lastAddress != address));
+                    var subview = new PhysicalAddressesSubSubview(Context, address, DistanceSmall, DistanceLarge, DistanceVeryLarge, lastAddress != address);
+                    subview.Click += (sender, e) => PhysicalAddressClicked(this, address);
+                    AddView(subview);
                 }
             }
             else
@@ -55,6 +59,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             {
                 Orientation = Vertical;
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+
+                var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
+                SetBackgroundResource(typedArray.GetResourceId(0, 0));
+                typedArray.Recycle();
+
+                Clickable = true;
 
                 var typeTextView = new AppCompatTextView(context);
                 typeTextView.SetPadding(0, 0, distanceVeryLarge, 0);
