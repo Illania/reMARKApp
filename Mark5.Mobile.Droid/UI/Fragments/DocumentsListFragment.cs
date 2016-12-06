@@ -384,16 +384,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public const int MarkAsRead = 10;
             public const int MarkAsUnread = 11;
-            public const int Reply = 20;
-            public const int ReplyAll = 21;
-            public const int Forward = 22;
-            public const int CopyToWorktray = 30;
-            public const int CopyToFolder = 40;
-            public const int MoveToFolder = 41;
-            public const int SetPriority = 50;
-            public const int Categories = 60;
-            public const int DeleteFromFolder = 70;
-            public const int Delete = 71;
+            public const int CopyToWorktray = 20;
+            public const int CopyToFolder = 30;
+            public const int MoveToFolder = 31;
+            public const int SetPriority = 40;
+            public const int Categories = 50;
+            public const int DeleteFromFolder = 60;
+            public const int Delete = 61;
         }
 
         bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
@@ -408,13 +405,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (CurrentAdapter.SelectedItems.Any(dp => dp.IsReadByCurrent))
             {
                 menu.Add(Menu.None, MenuItemActions.MarkAsUnread, MenuItemActions.MarkAsUnread, Resource.String.marks_as_unread);
-            }
-
-            if (CurrentAdapter.SelectedItemCount == 1)
-            {
-                menu.Add(Menu.None, MenuItemActions.Reply, MenuItemActions.Reply, Resource.String.reply);
-                menu.Add(Menu.None, MenuItemActions.ReplyAll, MenuItemActions.ReplyAll, Resource.String.reply_all);
-                menu.Add(Menu.None, MenuItemActions.Forward, MenuItemActions.Forward, Resource.String.forward);
             }
 
             menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
@@ -467,18 +457,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 MarkAsUnread();
                 return true;
-            }
-
-            if (item.ItemId == MenuItemActions.Reply)
-            {
-            }
-
-            if (item.ItemId == MenuItemActions.ReplyAll)
-            {
-            }
-
-            if (item.ItemId == MenuItemActions.Forward)
-            {
             }
 
             if (item.ItemId == MenuItemActions.CopyToWorktray)

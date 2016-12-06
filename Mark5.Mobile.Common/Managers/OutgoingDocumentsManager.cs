@@ -208,7 +208,10 @@ namespace Mark5.Mobile.Common.Managers
                     }
                     catch (Exception ex)
                     {
+                        CommonConfig.Logger.Error("Could not send document", ex);
+
                         await FileSystemStorage.SetOutgoingDocumentToFailedAsync(info.Identifier, ex);
+
                         DocumentSendingFailed(this, container);
                     }
 
