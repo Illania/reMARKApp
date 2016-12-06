@@ -16,29 +16,24 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public static LambdaEqualityComparer<T> Create(Func<T, object> func)
         {
-            return new LambdaEqualityComparer<T>((t1, t2) => { return func(t1).Equals(func(t2)); });
-        }
-
-        public static LambdaEqualityComparer<T> Create(Func<T, T, bool> func)
-        {
             return new LambdaEqualityComparer<T>(func);
         }
 
-        readonly Func<T, T, bool> func;
+        readonly Func<T, object> func;
 
-        LambdaEqualityComparer(Func<T, T, bool> func)
+        LambdaEqualityComparer(Func<T, object> func)
         {
             this.func = func;
         }
 
         public bool Equals(T x, T y)
         {
-            return func(x, y);
+            return func(x).Equals(func(y));
         }
 
         public int GetHashCode(T obj)
         {
-            return obj.GetHashCode();
+            return func(obj).GetHashCode();
         }
     }
 }
