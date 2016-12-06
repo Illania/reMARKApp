@@ -66,7 +66,7 @@
 	<string name="pref_documents_mark_as_read_title">Mark as read delay</string>
 	<string name="pref_documents_read_indicator_me_summary_off">Blue dot will be shown on the list if noone read the document</string>
 	<string name="pref_documents_read_indicator_me_summary_on">Blue dot will be shown on the list if I didn\'t read the document</string>
-	<string name="pref_documents_read_indicator_me_title">Unread idicator</string>
+	<string name="pref_documents_read_indicator_me_title">Unread indicator</string>
 	<string name="pref_documents_to_load_summary">%s documents will be downloaded when a folder is opened.</string>
 	<string name="pref_documents_to_load_title">Documents to download</string>
 	<string name="pref_key_about_version">pref_key_about_version</string>
