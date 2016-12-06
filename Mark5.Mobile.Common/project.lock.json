@@ -1,4 +1,5 @@
 {
+  "locked": false,
   "version": 1,
   "targets": {
     ".NETStandard,Version=v1.4": {
@@ -22,10 +23,10 @@
           "System.Threading": "4.0.11"
         },
         "compile": {
-          "ref/netstandard1.0/Microsoft.CSharp.dll": {}
+          "ref/netcore50/Microsoft.CSharp.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/Microsoft.CSharp.dll": {}
+          "lib/netcore50/Microsoft.CSharp.dll": {}
         }
       },
       "Microsoft.NETCore.Platforms/1.1.0": {
@@ -128,10 +129,10 @@
           "System.Xml.XDocument": "4.0.11"
         },
         "compile": {
-          "lib/netstandard1.0/Newtonsoft.Json.dll": {}
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.0/Newtonsoft.Json.dll": {}
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {}
         }
       },
       "PCLStorage/1.0.2": {
@@ -285,12 +286,12 @@
           "SQLitePCLRaw.core": "1.1.0"
         },
         "compile": {
-          "lib/netstandard1.1/SQLitePCLRaw.batteries_green.dll": {},
-          "lib/netstandard1.1/SQLitePCLRaw.batteries_v2.dll": {}
+          "lib/MonoAndroid/SQLitePCLRaw.batteries_green.dll": {},
+          "lib/MonoAndroid/SQLitePCLRaw.batteries_v2.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.1/SQLitePCLRaw.batteries_green.dll": {},
-          "lib/netstandard1.1/SQLitePCLRaw.batteries_v2.dll": {}
+          "lib/MonoAndroid/SQLitePCLRaw.batteries_green.dll": {},
+          "lib/MonoAndroid/SQLitePCLRaw.batteries_v2.dll": {}
         }
       },
       "SQLitePCLRaw.core/1.1.0": {
@@ -298,10 +299,10 @@
           "NETStandard.Library": "1.6.0"
         },
         "compile": {
-          "lib/netstandard1.1/SQLitePCLRaw.core.dll": {}
+          "lib/MonoAndroid/SQLitePCLRaw.core.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.1/SQLitePCLRaw.core.dll": {}
+          "lib/MonoAndroid/SQLitePCLRaw.core.dll": {}
         }
       },
       "System.AppContext/4.3.0": {
@@ -309,7 +310,7 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.AppContext.dll": {}
+          "ref/netstandard1.6/System.AppContext.dll": {}
         },
         "runtime": {
           "lib/netstandard1.6/System.AppContext.dll": {}
@@ -343,10 +344,10 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Collections.dll": {}
+          "ref/netcore50/System.Collections.dll": {}
         },
         "runtime": {
-          "lib/portable-net45+win8+wp8+wpa81/_._": {}
+          "lib/win8/_._": {}
         }
       },
       "System.Collections.Concurrent/4.3.0": {
@@ -363,10 +364,10 @@
           "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Collections.Concurrent.dll": {}
+          "ref/netcore50/System.Collections.Concurrent.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/System.Collections.Concurrent.dll": {}
+          "lib/netcore50/System.Collections.Concurrent.dll": {}
         }
       },
       "System.Collections.NonGeneric/4.3.0": {
@@ -410,10 +411,10 @@
           "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.ComponentModel.EventBasedAsync.dll": {}
+          "ref/netcore50/System.ComponentModel.EventBasedAsync.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/System.ComponentModel.EventBasedAsync.dll": {}
+          "lib/netcore50/System.ComponentModel.EventBasedAsync.dll": {}
         }
       },
       "System.Console/4.3.0": {
@@ -435,10 +436,10 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Diagnostics.Debug.dll": {}
+          "ref/netcore50/System.Diagnostics.Debug.dll": {}
         },
         "runtime": {
-          "lib/portable-net45+win8+wp8+wpa81/_._": {}
+          "lib/win8/_._": {}
         }
       },
       "System.Diagnostics.DiagnosticSource/4.3.0": {
@@ -463,10 +464,10 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.0/System.Diagnostics.Tools.dll": {}
+          "ref/netcore50/System.Diagnostics.Tools.dll": {}
         },
         "runtime": {
-          "lib/portable-net45+win8+wp8+wpa81/_._": {}
+          "lib/win8/_._": {}
         }
       },
       "System.Diagnostics.Tracing/4.3.0": {
@@ -476,10 +477,10 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Diagnostics.Tracing.dll": {}
+          "ref/netstandard1.5/System.Diagnostics.Tracing.dll": {}
         },
         "runtime": {
-          "lib/portable-net45+win8+wpa81/_._": {}
+          "lib/win8/_._": {}
         }
       },
       "System.Dynamic.Runtime/4.0.11": {
@@ -501,10 +502,10 @@
           "System.Threading": "4.0.11"
         },
         "compile": {
-          "ref/netstandard1.3/System.Dynamic.Runtime.dll": {}
+          "ref/netcore50/System.Dynamic.Runtime.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/System.Dynamic.Runtime.dll": {}
+          "lib/netcore50/System.Dynamic.Runtime.dll": {}
         },
         "runtimeTargets": {
           "runtimes/aot/lib/netcore50/System.Dynamic.Runtime.dll": {
@@ -520,10 +521,10 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Globalization.dll": {}
+          "ref/netcore50/System.Globalization.dll": {}
         },
         "runtime": {
-          "lib/portable-net45+win8+wp8+wpa81/_._": {}
+          "lib/win8/_._": {}
         }
       },
       "System.Globalization.Calendars/4.3.0": {
@@ -569,10 +570,10 @@
           "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.IO.dll": {}
+          "ref/netstandard1.5/System.IO.dll": {}
         },
         "runtime": {
-          "lib/portable-net45+win8+wp8+wpa81/_._": {}
+          "lib/win8/_._": {}
         }
       },
       "System.IO.Compression/4.3.0": {
@@ -594,10 +595,10 @@
           "runtime.native.System.IO.Compression": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.IO.Compression.dll": {}
+          "ref/netcore50/System.IO.Compression.dll": {}
         },
         "runtime": {
-          "lib/portable-net45+win8+wpa81/_._": {}
+          "lib/win8/_._": {}
         },
         "runtimeTargets": {
           "runtimes/unix/lib/netstandard1.3/System.IO.Compression.dll": {
@@ -661,7 +662,7 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.0/System.Linq.dll": {}
+          "ref/netstandard1.6/System.Linq.dll": {}
         },
         "runtime": {
           "lib/netstandard1.6/System.Linq.dll": {}
@@ -673,7 +674,7 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Linq.Expressions.dll": {}
+          "ref/netstandard1.6/System.Linq.Expressions.dll": {}
         },
         "runtime": {
           "lib/netstandard1.6/System.Linq.Expressions.dll": {}
@@ -697,10 +698,10 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.0/_._": {}
+          "ref/netcore50/_._": {}
         },
         "runtime": {
-          "lib/netstandard1.3/System.Linq.Queryable.dll": {}
+          "lib/netcore50/System.Linq.Queryable.dll": {}
         }
       },
       "System.Net.Http/4.3.0": {
@@ -726,10 +727,10 @@
           "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Net.Http.dll": {}
+          "ref/netcore50/System.Net.Http.dll": {}
         },
         "runtime": {
-          "lib/portable-net45+win8+wpa81/_._": {}
+          "lib/win8/_._": {}
         },
         "runtimeTargets": {
           "runtimes/unix/lib/netstandard1.6/System.Net.Http.dll": {
@@ -781,10 +782,10 @@
           "System.Runtime.Handles": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Net.Primitives.dll": {}
+          "ref/netcore50/System.Net.Primitives.dll": {}
         },
         "runtime": {
-          "lib/portable-net45+win8+wp8+wpa81/_._": {}
+          "lib/win8/_._": {}
         }
       },
       "System.Net.Security/4.3.0": {
@@ -923,10 +924,10 @@
           "System.Threading": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.ObjectModel.dll": {}
+          "ref/netcore50/System.ObjectModel.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/System.ObjectModel.dll": {}
+          "lib/netcore50/System.ObjectModel.dll": {}
         }
       },
       "System.Private.DataContractSerialization/4.3.0": {
@@ -1046,10 +1047,10 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Reflection.dll": {}
+          "ref/netstandard1.5/System.Reflection.dll": {}
         },
         "runtime": {
-          "lib/portable-net45+win8+wp8+wpa81/_._": {}
+          "lib/win8/_._": {}
         }
       },
       "System.Reflection.DispatchProxy/4.3.0": {
@@ -1090,7 +1091,7 @@
           "ref/netstandard1.1/_._": {}
         },
         "runtime": {
-          "lib/netstandard1.3/System.Reflection.Emit.dll": {}
+          "lib/netcore50/System.Reflection.Emit.dll": {}
         }
       },
       "System.Reflection.Emit.ILGeneration/4.3.0": {
@@ -1100,10 +1101,10 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.0/_._": {}
+          "ref/portable-net45+wp8/_._": {}
         },
         "runtime": {
-          "lib/netstandard1.3/System.Reflection.Emit.ILGeneration.dll": {}
+          "lib/portable-net45+wp8/_._": {}
         },
         "runtimeTargets": {
           "runtimes/aot/lib/netcore50/_._": {
@@ -1120,10 +1121,10 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.0/_._": {}
+          "ref/portable-net45+wp8/_._": {}
         },
         "runtime": {
-          "lib/netstandard1.3/System.Reflection.Emit.Lightweight.dll": {}
+          "lib/portable-net45+wp8/_._": {}
         },
         "runtimeTargets": {
           "runtimes/aot/lib/netcore50/_._": {
@@ -1140,10 +1141,10 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.0/System.Reflection.Extensions.dll": {}
+          "ref/netcore50/System.Reflection.Extensions.dll": {}
         },
         "runtime": {
-          "lib/portable-net45+win8+wp8+wpa81/_._": {}
+          "lib/win8/_._": {}
         }
       },
       "System.Reflection.Primitives/4.3.0": {
@@ -1153,10 +1154,10 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.0/System.Reflection.Primitives.dll": {}
+          "ref/netcore50/System.Reflection.Primitives.dll": {}
         },
         "runtime": {
-          "lib/portable-net45+win8+wp8+wpa81/_._": {}
+          "lib/win8/_._": {}
         }
       },
       "System.Reflection.TypeExtensions/4.3.0": {
@@ -1165,7 +1166,7 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/_._": {}
+          "ref/netstandard1.5/_._": {}
         },
         "runtime": {
           "lib/netstandard1.5/System.Reflection.TypeExtensions.dll": {}
@@ -1186,10 +1187,10 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.0/System.Resources.ResourceManager.dll": {}
+          "ref/netcore50/System.Resources.ResourceManager.dll": {}
         },
         "runtime": {
-          "lib/portable-net45+win8+wp8+wpa81/_._": {}
+          "lib/win8/_._": {}
         }
       },
       "System.Runtime/4.3.0": {
@@ -1198,10 +1199,10 @@
           "Microsoft.NETCore.Targets": "1.1.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Runtime.dll": {}
+          "ref/netstandard1.5/System.Runtime.dll": {}
         },
         "runtime": {
-          "lib/portable-net45+win8+wp80+wpa81/_._": {}
+          "lib/win8/_._": {}
         }
       },
       "System.Runtime.Extensions/4.3.0": {
@@ -1211,10 +1212,10 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Runtime.Extensions.dll": {}
+          "ref/netstandard1.5/System.Runtime.Extensions.dll": {}
         },
         "runtime": {
-          "lib/portable-net45+win8+wp8+wpa81/_._": {}
+          "lib/win8/_._": {}
         }
       },
       "System.Runtime.Handles/4.3.0": {
@@ -1237,10 +1238,10 @@
           "System.Runtime.Handles": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Runtime.InteropServices.dll": {}
+          "ref/netstandard1.5/System.Runtime.InteropServices.dll": {}
         },
         "runtime": {
-          "lib/portable-net45+win8+wpa81/_._": {}
+          "lib/win8/_._": {}
         }
       },
       "System.Runtime.InteropServices.RuntimeInformation/4.3.0": {
@@ -1257,7 +1258,7 @@
           "ref/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll": {}
+          "lib/win8/System.Runtime.InteropServices.RuntimeInformation.dll": {}
         },
         "runtimeTargets": {
           "runtimes/aot/lib/netcore50/System.Runtime.InteropServices.RuntimeInformation.dll": {
@@ -1282,10 +1283,10 @@
           "System.Runtime.Extensions": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.1/System.Runtime.Numerics.dll": {}
+          "ref/netcore50/System.Runtime.Numerics.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/System.Runtime.Numerics.dll": {}
+          "lib/netcore50/System.Runtime.Numerics.dll": {}
         }
       },
       "System.Runtime.Serialization.Primitives/4.3.0": {
@@ -1294,10 +1295,10 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Runtime.Serialization.Primitives.dll": {}
+          "ref/netcore50/System.Runtime.Serialization.Primitives.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/System.Runtime.Serialization.Primitives.dll": {}
+          "lib/netcore50/System.Runtime.Serialization.Primitives.dll": {}
         },
         "runtimeTargets": {
           "runtimes/aot/lib/netcore50/System.Runtime.Serialization.Primitives.dll": {
@@ -1316,10 +1317,10 @@
           "System.Xml.ReaderWriter": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Runtime.Serialization.Xml.dll": {}
+          "ref/netcore50/System.Runtime.Serialization.Xml.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/System.Runtime.Serialization.Xml.dll": {}
+          "lib/netcore50/System.Runtime.Serialization.Xml.dll": {}
         }
       },
       "System.Security.Claims/4.3.0": {
@@ -1346,7 +1347,7 @@
           "System.Security.Cryptography.Primitives": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.4/System.Security.Cryptography.Algorithms.dll": {}
+          "ref/netstandard1.6/System.Security.Cryptography.Algorithms.dll": {}
         },
         "runtimeTargets": {
           "runtimes/osx/lib/netstandard1.6/System.Security.Cryptography.Algorithms.dll": {
@@ -1435,10 +1436,10 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.0/System.Security.Principal.dll": {}
+          "ref/netcore50/System.Security.Principal.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.0/System.Security.Principal.dll": {}
+          "lib/netcore50/System.Security.Principal.dll": {}
         }
       },
       "System.Security.Principal.Windows/4.3.0": {
@@ -1483,10 +1484,10 @@
           "System.Text.Encoding": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.ServiceModel.Http.dll": {}
+          "ref/netcore50/System.ServiceModel.Http.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/System.ServiceModel.Http.dll": {}
+          "lib/netcore50/System.ServiceModel.Http.dll": {}
         }
       },
       "System.ServiceModel.Primitives/4.3.0": {
@@ -1509,10 +1510,10 @@
           "System.Xml.ReaderWriter": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.ServiceModel.Primitives.dll": {}
+          "ref/netcore50/System.ServiceModel.Primitives.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/System.ServiceModel.Primitives.dll": {}
+          "lib/netcore50/System.ServiceModel.Primitives.dll": {}
         }
       },
       "System.Text.Encoding/4.3.0": {
@@ -1522,10 +1523,10 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Text.Encoding.dll": {}
+          "ref/netcore50/System.Text.Encoding.dll": {}
         },
         "runtime": {
-          "lib/portable-net45+win8+wp8+wpa81/_._": {}
+          "lib/win8/_._": {}
         }
       },
       "System.Text.Encoding.Extensions/4.3.0": {
@@ -1536,10 +1537,10 @@
           "System.Text.Encoding": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Text.Encoding.Extensions.dll": {}
+          "ref/netcore50/System.Text.Encoding.Extensions.dll": {}
         },
         "runtime": {
-          "lib/portable-net45+win8+wp8+wpa81/_._": {}
+          "lib/win8/_._": {}
         }
       },
       "System.Text.RegularExpressions/4.3.0": {
@@ -1547,7 +1548,7 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Text.RegularExpressions.dll": {}
+          "ref/netstandard1.6/System.Text.RegularExpressions.dll": {}
         },
         "runtime": {
           "lib/netstandard1.6/System.Text.RegularExpressions.dll": {}
@@ -1559,10 +1560,10 @@
           "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Threading.dll": {}
+          "ref/netcore50/System.Threading.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/System.Threading.dll": {}
+          "lib/netcore50/System.Threading.dll": {}
         },
         "runtimeTargets": {
           "runtimes/aot/lib/netcore50/System.Threading.dll": {
@@ -1578,10 +1579,10 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Threading.Tasks.dll": {}
+          "ref/netcore50/System.Threading.Tasks.dll": {}
         },
         "runtime": {
-          "lib/portable-net45+win8+wp8+wpa81/_._": {}
+          "lib/win8/_._": {}
         }
       },
       "System.Threading.Tasks.Extensions/4.3.0": {
@@ -1591,10 +1592,10 @@
           "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
-          "lib/netstandard1.0/_._": {}
+          "lib/portable-net45+win8+wp8+wpa81/_._": {}
         },
         "runtime": {
-          "lib/netstandard1.0/System.Threading.Tasks.Extensions.dll": {}
+          "lib/portable-net45+win8+wp8+wpa81/System.Threading.Tasks.Extensions.dll": {}
         }
       },
       "System.Threading.ThreadPool/4.3.0": {
@@ -1606,7 +1607,7 @@
           "ref/netstandard1.3/_._": {}
         },
         "runtime": {
-          "lib/netstandard1.3/System.Threading.ThreadPool.dll": {}
+          "lib/netcore50/_._": {}
         }
       },
       "System.Threading.Timer/4.3.0": {
@@ -1616,7 +1617,7 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.2/System.Threading.Timer.dll": {}
+          "ref/netcore50/System.Threading.Timer.dll": {}
         },
         "runtime": {
           "lib/win81/_._": {}
@@ -1641,10 +1642,10 @@
           "System.Threading.Tasks.Extensions": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Xml.ReaderWriter.dll": {}
+          "ref/netcore50/System.Xml.ReaderWriter.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/System.Xml.ReaderWriter.dll": {}
+          "lib/netcore50/System.Xml.ReaderWriter.dll": {}
         }
       },
       "System.Xml.XDocument/4.3.0": {
@@ -1663,10 +1664,10 @@
           "System.Xml.ReaderWriter": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/System.Xml.XDocument.dll": {}
+          "ref/netcore50/System.Xml.XDocument.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/System.Xml.XDocument.dll": {}
+          "lib/netcore50/System.Xml.XDocument.dll": {}
         }
       },
       "System.Xml.XmlDocument/4.3.0": {
@@ -1710,10 +1711,10 @@
           "System.Xml.XmlDocument": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/_._": {}
+          "ref/netcore50/_._": {}
         },
         "runtime": {
-          "lib/netstandard1.3/System.Xml.XmlSerializer.dll": {}
+          "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         },
         "runtimeTargets": {
           "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll": {
