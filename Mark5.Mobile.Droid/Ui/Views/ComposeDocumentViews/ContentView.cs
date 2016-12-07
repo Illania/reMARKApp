@@ -368,7 +368,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             var elementClasses = new[]
             {
                 EditableContentClass,
-                TemplateElementClass,
             };
 
             foreach (var elementClass in elementClasses)

@@ -395,7 +395,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void SetEmailStyle(int start, int end)
         {
-            SetColor(start, end, Resource.Color.darkerblue);
+            SetColor(start, end, Resource.Color.darkblue);
         }
 
         void SetColor(int start, int end, int colorId)
@@ -495,7 +495,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 }
                 var address = suggestion.Address;
 
-                var colorSelection = new Color(ContextCompat.GetColor(parent.Context, Resource.Color.darkerblue));
+                var colorSelection = new Color(ContextCompat.GetColor(parent.Context, Resource.Color.darkblue));
 
                 var start = address.IndexOf(ActualConstraint, StringComparison.CurrentCultureIgnoreCase);
                 var end = start + ActualConstraint.Length;
