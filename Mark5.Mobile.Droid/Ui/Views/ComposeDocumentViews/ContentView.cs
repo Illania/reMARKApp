@@ -46,14 +46,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         const string TemplateElementClass = "template_75bb41fd-4984-43f5-b61d-3dbbe87bca21";
 
         const string DefaultEditContent = @"<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.01 Transitional//EN"" ""http://www.w3.org/TR/html4/loose.dtd"">
-                                        <html>
-                                            <head>
-                                            </head>
-                                            <body style=""min-height: 200px;"">
-                                                <div class=""" + EditableContentClass + @""" contenteditable=""true"" style=""width: 100%;""><br><br></div>
-                                                <div class=""" + TemplateElementClass + @""" contenteditable=""true""></div>
-                                            </body>
-                                        </html>";
+                                            <html>
+                                                <head>
+                                                </head>
+                                                <body style=""min-height: 500px;"">
+                                                    <div class=""" + EditableContentClass + @""" contenteditable=""true"" style=""width: 100%; outline: 0px solid transparent""><br><br></div>
+                                                    <div class=""" + TemplateElementClass + @""" style=""outline: 0px solid transparent""></div>
+                                                </body>
+                                            </html>";
 
         bool oldContentLoaded;
 

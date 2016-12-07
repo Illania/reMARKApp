@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.Content;
+using Android.Graphics;
+using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
@@ -200,18 +202,38 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public class CustomAdapter : ArrayAdapter
         {
-            readonly int hideentItemIndex;
+            readonly int hiddenItemIndex;
 
-            public CustomAdapter(Context context, int textViewResourceId, IList objects, int hidingItemIndex)
+            public CustomAdapter(Context context, int textViewResourceId, IList objects, int hiddenItemIndex)
               : base(context, textViewResourceId, objects)
             {
-                this.hideentItemIndex = hidingItemIndex;
+                this.hiddenItemIndex = hiddenItemIndex;
+            }
+
+            public override View GetView(int position, View convertView, ViewGroup parent)
+            {
+                var v = base.GetView(position, convertView, parent);
+
+                var textView = v as TextView;
+                if (textView != null)
+                {
+                    if (position == hiddenItemIndex)
+                    {
+                        textView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightergray)));
+                    }
+                    else
+                    {
+                        textView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.black)));
+                    }
+                }
+
+                return v;
             }
 
             override public View GetDropDownView(int position, View convertView, ViewGroup parent)
             {
                 View v = null;
-                if (position == hideentItemIndex)
+                if (position == hiddenItemIndex)
                 {
                     var tv = new TextView(Context);
                     tv.SetHeight(0);

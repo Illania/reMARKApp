@@ -44,7 +44,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
             };
             subjectTextView.SetPadding(0, 0, 0, 0);
-            subjectTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimaryLight);
+            subjectTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             subjectTextView.SetHint(Resource.String.subject);
             subjectTextView.SetBackgroundColor(Color.Transparent);
             subjectTextView.AfterTextChanged += (sender, e) => Edited(this, EventArgs.Empty);
