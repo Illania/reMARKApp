@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: ObjectLinksFragment.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -48,7 +48,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Creating {nameof(ObjectLinksFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity.objectType={BusinessEntity?.ObjectType}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
-            rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
+            rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightergray)));
 
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);

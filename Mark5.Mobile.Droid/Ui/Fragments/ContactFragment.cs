@@ -71,7 +71,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Creating {nameof(ContactFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, contact.id={ContactId ?? ContactPreview?.Id}, readOnlyMode={ReadOnlyMode} ...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_contact, container, false);
-            rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
+            rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightergray)));
 
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
             scrollView = rootView.FindViewById<NestedScrollView>(Resource.Id.scroll_view);

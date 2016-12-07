@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: Divider.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -23,7 +23,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
             : base(context)
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ConversionUtils.ConvertDpToPixels(0.5f));
-            SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
+            SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightergray)));
         }
 
         public Divider(Context context, int leftMargin, int topMargin, int rightMargin, int bottomMargin)
@@ -41,7 +41,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
                     BottomMargin = bottomMargin
                 }
             };
-            inner.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
+            inner.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightergray)));
             AddView(inner);
         }
 

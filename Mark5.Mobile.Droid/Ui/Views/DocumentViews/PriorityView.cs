@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: PriorityView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -50,7 +50,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                         Visibility = ViewStates.Visible;
 
                         SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.brown)));
-                        message.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
+                        message.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightergray)));
                         message.Text = Context.GetString(Resource.String.high_priority_document);
                         break;
                     case Priority.Low:

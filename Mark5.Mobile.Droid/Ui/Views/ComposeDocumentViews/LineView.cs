@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: LineView.cs
 // Author: Ferdinando Papale fp@nordic-it.com
@@ -219,7 +219,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 {
                     if (position == hiddenItemIndex)
                     {
-                        textView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightergray)));
+                        textView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
                     }
                     else
                     {
