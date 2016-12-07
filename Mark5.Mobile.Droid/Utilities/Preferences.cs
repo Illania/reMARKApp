@@ -183,11 +183,19 @@ namespace Mark5.Mobile.Droid.Utilities
 
         #region Composing Documents
 
+        public bool ComposePriorityEnabled
+        { 
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_compose_priority_enabled), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_compose_priority_enabled_default));
+            }
+        }
+
         public bool RemoveLine
         {
             get
             {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_compose_remove_line), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_compose_remove_line_summary_default));
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_compose_remove_line), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_compose_remove_line_default));
             }
         }
 
@@ -215,12 +223,6 @@ namespace Mark5.Mobile.Droid.Utilities
             {
                 return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_notification_silence), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_notification_silence_default));
             }
-            set
-            {
-                var e = sp.Edit();
-                e.PutBoolean(Application.Context.GetString(Resource.String.pref_key_notification_silence), value);
-                e.Commit();
-            }
         }
 
         public string NotificationsRingtone
@@ -242,12 +244,6 @@ namespace Mark5.Mobile.Droid.Utilities
             get
             {
                 return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_notification_vibrate), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_notification_vibrate_default));
-            }
-            set
-            {
-                var e = sp.Edit();
-                e.PutBoolean(Application.Context.GetString(Resource.String.pref_key_notification_vibrate), value);
-                e.Commit();
             }
         }
 

@@ -96,7 +96,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             subViews.Add(bccView);
 
             priorityView = new PriorityView(Context);
-            subViews.Add(priorityView);
+            if (PlatformConfig.Preferences.ComposePriorityEnabled)
+                subViews.Add(priorityView);
 
             lineView = new LineView(Context);
             lineView.Edited += Subview_Edited;
