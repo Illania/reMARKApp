@@ -36,7 +36,7 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_margin="4dp"
-                android:src="@drawable/unread"
+                android:src="@drawable/pending"
                 android:tint="#123D57"
                 android:visibility="gone" />
             <android.support.v7.widget.AppCompatImageView
@@ -44,7 +44,7 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_margin="4dp"
-                android:src="@drawable/error"
+                android:src="@drawable/failed"
                 android:tint="#123D57"
                 android:visibility="gone" />
             <android.support.v7.widget.AppCompatImageView
