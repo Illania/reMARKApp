@@ -28,10 +28,10 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    
+
     public class ComposeDocumentFragment : RetainableStateFragment
     {
-    
+
         const string DefaultTitle = "New document";
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
         public const int AttachmentRequestCode = 111;
@@ -178,6 +178,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, sourceType);
                     PreviousDocument = container.Document;
                     PreviousDocumentPreview = container.DocumentPreview;
+                    if (CreationModeFlag == DocumentCreationModeFlag.Edit && PreviousDocumentPreview.Direction == DocumentDirection.Draft)
+                    {
+                        Document.Id = DocumentPreview.Id = PreviousDocument.Id;
+                    }
                 }
             }
             catch (Exception ex)
@@ -211,10 +215,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             OutgoingDocumentInitialAttachments.ForEach(attachmentsView.AddAttachment);
 
+
             if (CreationModeFlag == DocumentCreationModeFlag.New && PreconfiguredEmailAddresses != null)
             {
                 toView.SetEmails(PreconfiguredEmailAddresses);
-
             }
 
             UpdateSendButtonState();
