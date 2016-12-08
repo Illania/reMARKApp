@@ -46,7 +46,8 @@
 	<bool name="pref_contacts_sub_account_default">true</bool>
 	<bool name="pref_contacts_sub_vat_default">true</bool>
 	<bool name="pref_shortcodes_synchronised_default">false</bool>
-	<bool name="pref_compose_remove_line_summary_default">false</bool>
+	<bool name="pref_compose_priority_enabled_default">false</bool>
+	<bool name="pref_compose_remove_line_default">false</bool>
 	<string-array name="pref_compose_template_mode_entries">
 		<item>Don\'t use</item>
 		<item>Use default</item>

@@ -31,6 +31,7 @@
 	<string name="pref_cat_documents">Documents</string>
 	<string name="pref_cat_notifications">Notifications</string>
 	<string name="pref_cat_shortcodes">Shortcodes</string>
+	<string name="pref_compose_priority_enabled_title">Priority</string>
 	<string name="pref_compose_remove_line_summary_off">Do not remove line address from recipents when replying to all</string>
 	<string name="pref_compose_remove_line_summary_on">Remove line address from recipents when replying to all</string>
 	<string name="pref_compose_remove_line_title">Remove line address</string>
@@ -38,6 +39,8 @@
 	<string name="pref_compose_template_local_title">Local template</string>
 	<string name="pref_compose_template_mode_summary">Choose which template should be used when composing new document.\nCurrently: %s</string>
 	<string name="pref_compose_template_mode_title">Template behavior</string>
+	<string name="pref_compose_view_options_summary">Turn on or off visibility of compose view fields</string>
+	<string name="pref_compose_view_options_title">Compose view options</string>
 	<string name="pref_contacts_sub_account_title">Account</string>
 	<string name="pref_contacts_sub_address_title">Addresses</string>
 	<string name="pref_contacts_sub_birthdate_title">Birthdate</string>
@@ -84,9 +87,11 @@
 	<string name="pref_key_cat_contacts">pref_key_cat_contacts</string>
 	<string name="pref_key_cat_notifications">pref_key_cat_notifications</string>
 	<string name="pref_key_cat_shortcodes">pref_key_cat_shortcodes</string>
+	<string name="pref_key_compose_priority_enabled">pref_key_compose_priority_enabled</string>
 	<string name="pref_key_compose_remove_line">pref_key_compose_remove_line</string>
 	<string name="pref_key_compose_template_local">pref_key_compose_template_local</string>
 	<string name="pref_key_compose_template_mode">pref_key_compose_template_mode</string>
+	<string name="pref_key_compose_view_options">pref_key_compose_view_options</string>
 	<string name="pref_key_contacts_sub_account">pref_key_contacts_sub_account</string>
 	<string name="pref_key_contacts_sub_address">pref_key_contacts_sub_address</string>
 	<string name="pref_key_contacts_sub_birthdate">pref_key_contacts_sub_birthdate</string>

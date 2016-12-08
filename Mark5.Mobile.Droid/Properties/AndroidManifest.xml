@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="100" android:versionName="2.0" package="com.nordic_it.mark5.android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="2.0" package="com.nordic_it.mark5.android" android:versionCode="99">
 	<uses-sdk android:minSdkVersion="22" android:targetSdkVersion="25" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
