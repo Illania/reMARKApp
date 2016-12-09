@@ -45,6 +45,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task RemoveOrphans();
 
+        Task DeleteAllAsync();
     }
 }
 

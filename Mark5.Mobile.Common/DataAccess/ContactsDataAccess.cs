@@ -574,7 +574,7 @@ namespace Mark5.Mobile.Common.DataAccess
                 List<PrintableSuggestion> suggestions = null;
 
                 await contactsDatabase.RunInConnectionAsync(c =>
-               {
+                {
                    var commandString = $"select CP.{nameof(ContactPreview.Name)} as {nameof(PrintableSuggestion.Name)}," +
                       $" CP.{nameof(ContactPreview.ShortId)} as {nameof(PrintableSuggestion.ShortId)}, " +
                         $" CP.{nameof(ContactPreview.Description)} as {nameof(PrintableSuggestion.ContactDescription)}, " +
@@ -591,7 +591,7 @@ namespace Mark5.Mobile.Common.DataAccess
                    cmd.Bind("@addressType", (int)CommunicationAddressType.Email);
                    var result = cmd.ExecuteQuery<PrintableSuggestion>();
                    suggestions = result;
-               });
+                });
 
                 return suggestions;
             }
@@ -599,6 +599,16 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 return new List<PrintableSuggestion>();
             }
+        }
+
+        public async Task DeleteAllAsync()
+        {
+            await contactsDatabase.RunInConnectionAsync(c =>
+            {
+                c.DeleteAll<FolderContactLink>();
+                c.DeleteAll<ContactPreview>();
+                c.DeleteAll<Contact>();
+            });
         }
     }
 }

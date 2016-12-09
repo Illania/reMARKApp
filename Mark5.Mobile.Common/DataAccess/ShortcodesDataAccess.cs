@@ -345,6 +345,16 @@ namespace Mark5.Mobile.Common.DataAccess
                 throw new DataAccessException("Error removing orphan shortcodes and shortcode previews.", ex);
             }
         }
+
+        public async Task DeleteAllAsync()
+        {
+            await shortcodesDatabase.RunInConnectionAsync(c =>
+            {
+                c.DeleteAll<FolderShortcodeLink>();
+                c.DeleteAll<ShortcodePreview>();
+                c.DeleteAll<Shortcode>();
+            });
+        }
     }
 }
 

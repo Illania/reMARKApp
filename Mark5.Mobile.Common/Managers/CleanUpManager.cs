@@ -79,6 +79,16 @@ namespace Mark5.Mobile.Common
 
             await FileSystemStorage.SaveLastCacheCleanUpAsync(DateTime.UtcNow);
         }
+
+        public async Task ClearContactsCache()
+        {
+            await contactsDataAccess.DeleteAllAsync();
+        }
+
+        public async Task ClearShortcodeCache()
+        {
+            await shortcodesDataAccess.DeleteAllAsync();
+        }
     }
 }
 

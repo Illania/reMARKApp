@@ -19,6 +19,10 @@ namespace Mark5.Mobile.Common
         Task<bool> IsCleanUpNecessary(int intervalDays);
 
         Task CleanUp(IEnumerable<ModuleType> modules = null);
+
+        Task ClearContactsCache();
+
+        Task ClearShortcodeCache();
     }
 }
 

@@ -79,6 +79,54 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override bool OnPreferenceTreeClick(Preference preference)
         {
+            if (preference.Key == GetString(Resource.String.pref_key_contacts_synchronised) && !PlatformConfig.Preferences.SynchroniseContacts)
+            {
+                Dialogs.ShowYesNoDialog(Context, Resource.String.clear_contacts_cache_title, Resource.String.clear_contacts_cache_summary, async () => {
+
+                    var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.clearing_contacts_cache, Resource.String.please_wait);
+
+                    try
+                    {
+                        await Managers.CleanUpManager.ClearContactsCache();
+                        await Managers.CleanUpManager.CleanUp(new[] { ModuleType.Contacts });
+
+                        dismissAction();
+                    }
+                    catch (Exception ex)
+                    {
+                        dismissAction();
+
+                        CommonConfig.Logger.Error("Could not clear contacts cache!", ex);
+
+                        await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                    }
+                });
+            }
+
+            if (preference.Key == GetString(Resource.String.pref_key_shortcodes_synchronised) && !PlatformConfig.Preferences.SynchroniseShortcodes)
+            {
+                Dialogs.ShowYesNoDialog(Context, Resource.String.clear_shortcodes_cache_title, Resource.String.clear_shortcodes_cache_summary, async () =>
+                {
+                    var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.clearing_shortcodes_cache, Resource.String.please_wait);
+
+                    try
+                    {
+                        await Managers.CleanUpManager.ClearShortcodeCache();
+                        await Managers.CleanUpManager.CleanUp(new[] { ModuleType.Shortcodes });
+
+                        dismissAction();
+                    }
+                    catch (Exception ex)
+                    {
+                        dismissAction();
+
+                        CommonConfig.Logger.Error("Could not clear shortcodes cache!", ex);
+
+                        await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                    }    
+                });
+            }
+
             if (preference.Key == GetString(Resource.String.pref_key_notification_ringtone))
             {
                 var i = new Intent(RingtoneManager.ActionRingtonePicker);

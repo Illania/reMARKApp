@@ -85,6 +85,7 @@
 	<string name="pref_key_cat_cache">pref_key_cat_cache</string>
 	<string name="pref_key_cat_compose">pref_key_cat_compose</string>
 	<string name="pref_key_cat_contacts">pref_key_cat_contacts</string>
+	<string name="pref_key_cat_documents">pref_key_cat_documents</string>
 	<string name="pref_key_cat_notifications">pref_key_cat_notifications</string>
 	<string name="pref_key_cat_shortcodes">pref_key_cat_shortcodes</string>
 	<string name="pref_key_compose_priority_enabled">pref_key_compose_priority_enabled</string>
@@ -122,5 +123,4 @@
 	<string name="pref_shortcodes_synchronised_summary_on">Whenever folder is opened all shortcodes will be downloaded automatically and available offline</string>
 	<string name="pref_shortcodes_synchronised_title">Synchronise shortcodes</string>
 	<string name="push_notification_token">push_notification_token</string>
-	<string name="pref_key_cat_documents">pref_key_cat_documents</string>
 </resources>
