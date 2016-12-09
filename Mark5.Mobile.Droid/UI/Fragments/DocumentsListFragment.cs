@@ -49,6 +49,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool refreshing;
 
+        IMenu menu;
         CoordinatorLayout coordinatorLayout;
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -75,6 +76,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             coordinatorLayout = (CoordinatorLayout)container.Parent.Parent;
 
+            var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
+            emptyView.SetText(Resource.String.empty_folder);
+
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
             refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
             refreshLayout.Refresh += async (sender, e) =>
@@ -92,6 +96,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             adapter = new DocumentsListAdapter(Activity, recyclerView, async (startId) => await RefreshData(startId));
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
+            adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() => {
+                if (recyclerView.GetAdapter() != adapter) return;
+
+                emptyView.Visibility = adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
+                recyclerView.Visibility = adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
+                menu?.FindItem(Resource.Id.action_search)?.SetEnabled(adapter.ItemCount > 0);
+            }));
             recyclerView.SetAdapter(adapter);
 
             searchAdapter = new DocumentsListAdapter(Activity);
@@ -176,6 +187,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
+            this.menu = menu;
+
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
             var newItem = menu.Add(Menu.None, 10, 10, "New"); //TODO an icon should be here

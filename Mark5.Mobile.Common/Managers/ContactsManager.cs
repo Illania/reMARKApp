@@ -77,9 +77,10 @@ namespace Mark5.Mobile.Common.Managers
 
                     if (ct.IsCancellationRequested) continue;
 
+                    callback(previews);
+
                     if (previews.Count > 0)
                     {
-                        callback(previews);
                         startRowId = previews.LastOrDefault()?.RowId + 1 ?? -1;
                     }
 

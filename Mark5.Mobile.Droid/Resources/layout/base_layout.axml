@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="24dp"
             android:layout_alignParentBottom="true"
-            android:text="No connection"
+            android:text="@string/no_connection"
             android:textAppearance="@style/fontSmall"
             android:textColor="@color/white"
             android:background="@color/brown"

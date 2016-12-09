@@ -342,6 +342,7 @@
     <Compile Include="Ui\Activities\PIckCategoriesListActivity.cs" />
     <Compile Include="Ui\Views\ContactViews\BirthdateSubview.cs" />
     <Compile Include="Utilities\LocalNotificationService.cs" />
+    <Compile Include="Ui\Common\LambdaEmptyAdapterObserver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -406,7 +407,6 @@
     <AndroidResource Include="Resources\layout\activity_splash.axml" />
     <AndroidResource Include="Resources\layout\appbar.axml" />
     <AndroidResource Include="Resources\layout\base_layout.axml" />
-    <AndroidResource Include="Resources\layout\base_layout_contact.axml" />
     <AndroidResource Include="Resources\layout\base_layout_nav.axml" />
     <AndroidResource Include="Resources\layout\drawer_header.axml" />
     <AndroidResource Include="Resources\layout\linear_layout_contact.axml" />

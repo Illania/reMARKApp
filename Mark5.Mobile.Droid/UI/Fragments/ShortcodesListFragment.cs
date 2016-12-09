@@ -39,6 +39,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool refreshing;
 
+        IMenu menu;
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         ShortcodesListAdapter adapter;
@@ -66,6 +67,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
+            var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
+            emptyView.SetText(Resource.String.empty_folder);
+
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
             refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
             refreshLayout.Refresh += (sender, e) =>
@@ -84,6 +88,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             adapter = new ShortcodesListAdapter();
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
+            adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
+            {
+                if (recyclerView.GetAdapter() != adapter) return;
+
+                emptyView.Visibility = adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
+                recyclerView.Visibility = adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
+                menu?.FindItem(Resource.Id.action_search)?.SetEnabled(adapter.ItemCount > 0);
+            }));
             recyclerView.SetAdapter(adapter);
 
             searchAdapter = new ShortcodesListAdapter();
@@ -143,6 +155,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
+            this.menu = menu;
+
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
             var searchItem = menu.FindItem(Resource.Id.action_search);

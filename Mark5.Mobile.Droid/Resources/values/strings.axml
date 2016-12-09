@@ -64,6 +64,7 @@
 	<string name="edit">Edit</string>
 	<string name="edit_comment_message">Edit comment message</string>
 	<string name="editing_comment">Editing comment</string>
+	<string name="empty_folder">This folder is empty</string>
 	<string name="enable_notifications_folder">Enable notifications</string>
 	<string name="enabling_notifications">Enabling notifications on folders.</string>
 	<string name="error_removing_local_attachment">Error while removing local attachment</string>
@@ -107,6 +108,7 @@
 	<string name="moving_to_folder">Moving to folder</string>
 	<string name="network_interface">Network interface:</string>
 	<string name="no">No</string>
+	<string name="no_connection">No connection</string>
 	<string name="no_content">No content</string>
 	<string name="no_lines_error_title">No lines set for user</string>
 	<string name="no_lines_error_content">It is not possible to send documents because the user does not have any line set</string>
