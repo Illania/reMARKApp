@@ -608,6 +608,7 @@ namespace Mark5.Mobile.Common.DataAccess
                 c.DeleteAll<FolderContactLink>();
                 c.DeleteAll<ContactPreview>();
                 c.DeleteAll<Contact>();
+                c.DeleteAll<ContactCommunicationAddress>();
             });
         }
     }
