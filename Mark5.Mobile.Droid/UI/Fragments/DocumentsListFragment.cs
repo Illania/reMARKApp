@@ -60,6 +60,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool shouldNotifyAdapter;
         bool shouldNotifySearchAdapter;
 
+
         readonly Handler searchHandler = new Handler();
 
         AutoRefreshWorker autoRefreshWorker;
@@ -81,14 +82,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 actionMode?.Finish();
                 actionMode = null;
 
-                await RefreshData(force: true);
+                await RefreshData(forceClear: true);
             };
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
-            adapter = new DocumentsListAdapter(Activity, async (startId) => await RefreshData(startId));
+            adapter = new DocumentsListAdapter(Activity, recyclerView, async (startId) => await RefreshData(startId));
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
             recyclerView.SetAdapter(adapter);
@@ -147,6 +148,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, () => { return adapter?.Items?.FirstOrDefault(); }, AutoRefreshIntervalMs);
             autoRefreshWorker.Start();
 
+            if (Folder.Type == FolderType.Draft)
+            {
+                Managers.OutgoingDocumentsManager.DocumentSendingSuccessful += OutgoingDocumentsManager_DocumentSendingSuccessful;
+            }
+
             CommonConfig.Logger.Info($"Started automatic refresh");
         }
 
@@ -161,6 +167,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             autoRefreshWorker?.Stop();
 
             CommonConfig.Logger.Info($"Stopped automatic refresh");
+
+            if (Folder.Type == FolderType.Draft)
+            {
+                Managers.OutgoingDocumentsManager.DocumentSendingSuccessful -= OutgoingDocumentsManager_DocumentSendingSuccessful;
+            }
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -284,11 +295,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        async Task RefreshData(int startId = -1, int endId = -1, bool force = false)
+        async Task RefreshData(int startId = -1, int endId = -1, bool forceClear = false)
         {
             try
             {
-                CommonConfig.Logger.Info($"Attempting refresh [startId={startId}, endId={endId}, force={force}]...");
+                CommonConfig.Logger.Info($"Attempting refresh [startId={startId}, endId={endId}, force={forceClear}]...");
 
                 if (refreshing) return;
 
@@ -297,19 +308,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 CommonConfig.Logger.Info($"Refresh running...");
 
-                if (force)
+                if (forceClear)
                 {
                     adapter.Clear();
                 }
 
                 var documentPreviews = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, startId, endId);
+                adapter.EnableLoadMore = documentPreviews.Count >= PlatformConfig.Preferences.DocumentsToDownload;
+                CommonConfig.Logger.Info($"Enable load more documents set to {adapter.EnableLoadMore}");
 
                 Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
                 adapter.AppendItems(documentPreviews);
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Downloading documents failed [folder.name={Folder?.Name}, folder.id={Folder?.Id}, startId={startId}, endId={endId}, force={force}]", ex);
+                CommonConfig.Logger.Error($"Downloading documents failed [folder.name={Folder?.Name}, folder.id={Folder?.Id}, startId={startId}, endId={endId}, force={forceClear}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
@@ -322,6 +335,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 CommonConfig.Logger.Info($"Refresh finished");
             }
+        }
+
+        #endregion
+
+        #region OutgoingDocumentsManager callbacks
+
+        async void OutgoingDocumentsManager_DocumentSendingSuccessful(object sender, OutgoingDocumentContainer e)
+        {
+            if (e.DocumentPreview.Id >= 0)
+            {
+                Activity.RunOnUiThread(async () =>
+                   {
+                       await RefreshData(forceClear: true);
+                   });
+            }
+
         }
 
         #endregion
@@ -985,10 +1014,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
+            public bool EnableLoadMore { get; set; }
+
             readonly List<DocumentPreview> documentPreviewsInView = new List<DocumentPreview>(1000);
             readonly Dictionary<int, DocumentPreview> selectedDocumentsInView = new Dictionary<int, DocumentPreview>();
-            readonly Action<int> loadMoreAction;
             readonly Context context;
+            readonly RecyclerView recyclerView;
+            readonly Action<int> loadMoreAction;
 
             public event EventHandler<DocumentPreview> ItemClicked = delegate { };
             public event EventHandler<DocumentPreview> ItemLongClicked = delegate { };
@@ -1001,8 +1033,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 this.context = context;
             }
 
-            public DocumentsListAdapter(Context context, Action<int> loadMoreAction)
+            public DocumentsListAdapter(Context context, RecyclerView recyclerView, Action<int> loadMoreAction)
             {
+                this.recyclerView = recyclerView;
                 this.context = context;
                 this.loadMoreAction = loadMoreAction;
             }
@@ -1014,10 +1047,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
+                var dp = documentPreviewsInView[position];
+
                 if (holder is DocumentPreviewViewHolder)
                 {
                     var dpvh = holder as DocumentPreviewViewHolder;
-                    var dp = documentPreviewsInView[position];
 
                     dpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
                     dpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
@@ -1056,16 +1090,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
 
                     dpvh.Selected = selectedDocumentsInView.ContainsKey(dp.Id);
-
-                    if (loadMoreAction != null && position == ItemCount - 1)
-                    {
-                        loadMoreAction(dp.Id);
-                    }
                 }
                 else if (holder is ExternalDocumentPreviewViewHolder)
                 {
                     var edpvh = holder as ExternalDocumentPreviewViewHolder;
-                    var dp = documentPreviewsInView[position];
 
                     edpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
                     edpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
@@ -1081,11 +1109,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     edpvh.CommentIndicator = dp.CommentsCount > 0;
 
                     edpvh.Selected = selectedDocumentsInView.ContainsKey(dp.Id);
+                }
 
-                    if (loadMoreAction != null && position == ItemCount - 1)
-                    {
-                        loadMoreAction(dp.Id);
-                    }
+                if (recyclerView != null && loadMoreAction != null && position == ItemCount - 1 && EnableLoadMore)
+                {
+                    loadMoreAction(dp.Id);
                 }
             }
 
