@@ -7,12 +7,12 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Managers;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using Mark5.Mobile.Common.Model;
 
+#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Utilities
 {
     public class SuggestionsRetrievalService
@@ -41,7 +41,7 @@ namespace Mark5.Mobile.Common.Utilities
                 var filtered = new List<PrintableSuggestion>();
                 try
                 {
-                    var recentAddresses = await Managers.Managers.DocumentsManager.GetRecentAddressesAsync(); //TODO Discuss with Bartosz about when to call this
+                    var recentAddresses = await Managers.Managers.DocumentsManager.GetRecentAddressesAsync();
                     filtered = recentAddresses.Where(r => r.Address.ContainsCaseInsensitive(phrase) || r.Name.ContainsCaseInsensitive(phrase))
                                                  .Select(ra => new PrintableSuggestion(ra)).ToList();
                 }

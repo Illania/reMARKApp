@@ -13,6 +13,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
+using Android.Graphics;
+using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Webkit;
@@ -24,6 +26,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -87,6 +90,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
             };
+            var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
+            showOldContentButton.SetBackgroundResource(typedArray.GetResourceId(0, 0));
+            typedArray.Recycle();
+            showOldContentButton.SetTextAppearanceCompat(context, Resource.Style.fontSmallBold);
+            showOldContentButton.SetTextColor(new Color(ContextCompat.GetColor(context, Resource.Color.brown)));
             showOldContentButton.SetText(Resource.String.show_previous_message);
             showOldContentButton.Visibility = ViewStates.Gone;
             showOldContentButton.Click += ShowOldContentButton_Click;
@@ -111,9 +119,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             if (oldContentWebView.Visibility == ViewStates.Gone)
             {
+                showOldContentButton.Enabled = false;
+                showOldContentButton.SetText(Resource.String.showing_previous_message);
+
+                await Task.Delay(100); // Let the button animation run
                 await LoadOldContent();
 
                 showOldContentButton.SetText(Resource.String.hide_previous_message);
+                showOldContentButton.Enabled = true;
                 oldContentWebView.Visibility = ViewStates.Visible;
             }
             else

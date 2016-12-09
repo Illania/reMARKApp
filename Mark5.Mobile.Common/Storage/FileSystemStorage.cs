@@ -330,7 +330,7 @@ namespace Mark5.Mobile.Common.Storage
             {
                 var attachment = new Attachment();
                 attachment.Stream = await item.OpenAsync(PCLStorage.FileAccess.Read);
-                attachment.Size = (int)attachment.Stream.Length; //TODO check this
+                attachment.Size = (int)attachment.Stream.Length;
                 attachment.Extension = Path.GetExtension(item.Name);
                 attachment.Filename = Path.GetFileNameWithoutExtension(item.Name);
                 attachments.Add(attachment);

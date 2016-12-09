@@ -88,7 +88,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
-            adapter = new DocumentsListAdapter(Activity, async (startId) => await RefreshData(startId));
+            adapter = new DocumentsListAdapter(Activity, recyclerView, async (startId) => await RefreshData(startId));
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
             recyclerView.SetAdapter(adapter);
@@ -987,8 +987,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             readonly List<DocumentPreview> documentPreviewsInView = new List<DocumentPreview>(1000);
             readonly Dictionary<int, DocumentPreview> selectedDocumentsInView = new Dictionary<int, DocumentPreview>();
-            readonly Action<int> loadMoreAction;
             readonly Context context;
+            readonly RecyclerView recyclerView;
+            readonly Action<int> loadMoreAction;
 
             public event EventHandler<DocumentPreview> ItemClicked = delegate { };
             public event EventHandler<DocumentPreview> ItemLongClicked = delegate { };
@@ -1001,8 +1002,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 this.context = context;
             }
 
-            public DocumentsListAdapter(Context context, Action<int> loadMoreAction)
+            public DocumentsListAdapter(Context context, RecyclerView recyclerView, Action<int> loadMoreAction)
             {
+                this.recyclerView = recyclerView;
                 this.context = context;
                 this.loadMoreAction = loadMoreAction;
             }
@@ -1014,10 +1016,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
+                var dp = documentPreviewsInView[position];
+
                 if (holder is DocumentPreviewViewHolder)
                 {
                     var dpvh = holder as DocumentPreviewViewHolder;
-                    var dp = documentPreviewsInView[position];
 
                     dpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
                     dpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
@@ -1056,16 +1059,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
 
                     dpvh.Selected = selectedDocumentsInView.ContainsKey(dp.Id);
-
-                    if (loadMoreAction != null && position == ItemCount - 1)
-                    {
-                        loadMoreAction(dp.Id);
-                    }
                 }
                 else if (holder is ExternalDocumentPreviewViewHolder)
                 {
                     var edpvh = holder as ExternalDocumentPreviewViewHolder;
-                    var dp = documentPreviewsInView[position];
 
                     edpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
                     edpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
@@ -1081,8 +1078,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     edpvh.CommentIndicator = dp.CommentsCount > 0;
 
                     edpvh.Selected = selectedDocumentsInView.ContainsKey(dp.Id);
+                }
 
-                    if (loadMoreAction != null && position == ItemCount - 1)
+                if (recyclerView != null && loadMoreAction != null && position == ItemCount - 1)
+                {
+                    var lm = recyclerView.GetLayoutManager() as LinearLayoutManager;
+                    var numberOfVisisblePositions = lm.FindLastCompletelyVisibleItemPosition() - lm.FindFirstCompletelyVisibleItemPosition();
+
+                    if (ItemCount > numberOfVisisblePositions)
                     {
                         loadMoreAction(dp.Id);
                     }
