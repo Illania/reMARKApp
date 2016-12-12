@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
 using Android.Database;
 using Android.Provider;
@@ -34,7 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         const string DefaultTitle = "New document";
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
-        public const int AttachmentRequestCode = 111;
+        const int AttachmentRequestCode = 111;
 
         public DocumentDirection PreviousDocumentDirection { get; set; }
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
@@ -141,6 +142,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             await LoadDocument();
 
             Activity.InvalidateOptionsMenu();
+        }
+
+        public override void OnActivityResult(int requestCode, int resultCode, Intent data)
+        {
+            if (requestCode == AttachmentRequestCode && resultCode == (int)Result.Ok)
+            {
+                HandleLocalAttachment(data);
+            }
         }
 
         async Task LoadDocument()
@@ -472,7 +481,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public void HandleLocalAttachment(Intent data)
+        void HandleLocalAttachment(Intent data)
         {
             OutgoingDocumentAttachmentDescription attachment = null;
             bool attachmentTooBig = false;
@@ -591,7 +600,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             intent.SetType("*/*");
             intent.AddCategory(Intent.CategoryOpenable);
             var i = Intent.CreateChooser(intent, "File");
-            Activity.StartActivityForResult(i, AttachmentRequestCode);
+            StartActivityForResult(i, AttachmentRequestCode);
         }
 
         void UpdateSendButtonState()
@@ -845,7 +854,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            return new ComposeDocumentFragmentState()
+            return new ComposeDocumentFragmentState
             {
                 Document = Document,
                 DocumentPreview = DocumentPreview,
@@ -867,7 +876,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 LocalDocument = LocalDocument,
                 OutgoingDocumentOriginalCreationModeFlag = OutgoingDocumentOriginalCreationModeFlag,
                 OutgoingDocumentState = OutgoingDocumentState,
-                OutgoingDocumentInitialAttachments = OutgoingDocumentInitialAttachments,
+                OutgoingDocumentInitialAttachments = OutgoingDocumentInitialAttachments
             };
         }
 

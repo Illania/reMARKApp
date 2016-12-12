@@ -223,7 +223,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var i = new Intent(Activity, typeof(CategoriesListActivity));
                 i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(ContactPreview));
-                Activity.StartActivityForResult(i, RequestCodes.CategoriesRequest);
+                StartActivityForResult(i, RequestCodes.CategoriesRequest);
 
                 return true;
             }
@@ -232,7 +232,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var i = new Intent(Activity, typeof(CommentsListActivity));
                 i.PutExtra(CommentsListActivity.EntityIntentKey, SerializationUtils.Serialize(Contact));
-                Activity.StartActivityForResult(i, RequestCodes.CommentsRequest);
+                StartActivityForResult(i, RequestCodes.CommentsRequest);
 
                 return true;
             }

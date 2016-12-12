@@ -142,14 +142,5 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             cdf.AskIfShouldSave();
         }
-
-        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
-        {
-            if (requestCode == ComposeDocumentFragment.AttachmentRequestCode && resultCode == Result.Ok)
-            {
-                cdf.HandleLocalAttachment(data);
-            }
-        }
-
     }
 }
