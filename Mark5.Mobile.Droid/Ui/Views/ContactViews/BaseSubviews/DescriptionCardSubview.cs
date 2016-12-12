@@ -43,6 +43,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             SetPadding(DistanceVeryLarge, 0, 0, 0);
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
+            LongClickable = true;
+            LongClick += (sender, e) =>
+            {
+                if (!string.IsNullOrWhiteSpace(contentTextView.Text))
+                {
+                    Integration.CopyToClipboard(context, contentTextView.Text);
+                }
+            };
+
             titleTextView = new AppCompatTextView(context);
             titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             titleTextView.SetPadding(0, 0, DistanceVeryLarge, 0);

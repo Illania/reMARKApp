@@ -11,6 +11,7 @@ using Android.Content;
 using Android.Net;
 using Android.OS;
 using Android.Support.V4.Net;
+using Android.Widget;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -38,6 +39,16 @@ namespace Mark5.Mobile.Droid.Utilities
             var ctx = Application.Context;
             var cm = (ConnectivityManager)ctx.GetSystemService(Context.ConnectivityService);
             return ConnectivityManagerCompat.IsActiveNetworkMetered(cm);
+        }
+
+        public static void CopyToClipboard(Context context, string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return;
+                
+            var cm = (ClipboardManager)context.GetSystemService(Context.ClipboardService);
+            cm.PrimaryClip = ClipData.NewPlainText(text, text);
+
+            Toast.MakeText(context, Resource.String.copied_to_clipboard, ToastLength.Short).Show();
         }
 
         public static bool IsRootedMethod1()

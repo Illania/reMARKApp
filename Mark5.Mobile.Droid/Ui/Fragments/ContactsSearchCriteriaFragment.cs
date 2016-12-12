@@ -54,6 +54,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ContactPostAddressSearchView(Context));
             linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new ContactCountrySearchView(Context));
+            linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ContactCommentSearchView(Context));
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ContactCategoriesSearchView(Context, this));

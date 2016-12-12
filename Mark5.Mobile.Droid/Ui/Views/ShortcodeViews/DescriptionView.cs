@@ -11,6 +11,7 @@ using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
 {
@@ -51,6 +52,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
             contentView.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
 
             InnerLayout.AddView(contentView);
+
+            LongClickable = true;
+            LongClick += (sender, e) =>
+            {
+                if (!string.IsNullOrWhiteSpace(contentView.Text))
+                {
+                    Integration.CopyToClipboard(Context, contentView.Text);
+                }
+            };
         }
 
         public override void RefreshView()

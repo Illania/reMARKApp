@@ -17,6 +17,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
@@ -175,6 +176,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                     descriptionTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
                     AddView(descriptionTextView, descriptionTextViewLayoutParams);
                 }
+
+                LongClickable = true;
+                LongClick += (sender, e) =>
+                {
+                    if (!string.IsNullOrWhiteSpace(titleTextView.Text))
+                    {
+                        Integration.CopyToClipboard(context, titleTextView.Text);
+                    }
+                };
             }
         }
     }

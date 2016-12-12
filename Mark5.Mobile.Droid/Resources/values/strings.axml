@@ -40,6 +40,7 @@
 	<string name="connection_status">Connection status</string>
 	<string name="contact">Contact</string>
 	<string name="contacts">Contacts</string>
+	<string name="copied_to_clipboard">Copied to clipboard</string>
 	<string name="copy_to_folder">Copy to folder</string>
 	<string name="copy_to_worktray">Copy to worktray</string>
 	<string name="copying_to_folder">Copying to folder</string>
@@ -154,6 +155,8 @@
 	<string name="search_categories_none">Any</string>
 	<string name="search_contact_com_address">Communication address</string>
 	<string name="search_contact_comment">Comment</string>
+	<string name="search_contact_country">Country</string>
+	<string name="search_contact_country_none_selected">Any</string>
 	<string name="search_contact_description">Description</string>
 	<string name="search_contact_first_name">First name</string>
 	<string name="search_contact_last_name">Last name</string>

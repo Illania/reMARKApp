@@ -14,6 +14,7 @@ using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
@@ -82,6 +83,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 addressTextViewLayoutParams.TopMargin = distanceSmall;
                 addressTextViewLayoutParams.BottomMargin = distanceLarge;
                 AddView(addressTextView, addressTextViewLayoutParams);
+
+                LongClickable = true;
+                LongClick += (sender, e) =>
+                {
+                    if (!string.IsNullOrWhiteSpace(addressTextView.Text))
+                    {
+                        Integration.CopyToClipboard(context, addressTextView.Text);
+                    }
+                };
 
                 if (addDivider)
                 {

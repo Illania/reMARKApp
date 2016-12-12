@@ -341,6 +341,7 @@
     <Compile Include="Ui\Views\ContactViews\BirthdateSubview.cs" />
     <Compile Include="Utilities\LocalNotificationService.cs" />
     <Compile Include="Ui\Common\LambdaEmptyAdapterObserver.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactCountrySearchView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
