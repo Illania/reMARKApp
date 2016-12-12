@@ -56,10 +56,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ContactCommentSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new ContactVatSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new ContactLedgerSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ContactCategoriesSearchView(Context, this));
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new MaxContactsSearchView(Context));

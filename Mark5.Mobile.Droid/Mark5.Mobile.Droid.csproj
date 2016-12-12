@@ -273,12 +273,10 @@
     <Compile Include="Ui\Views\SearchViews\ContactDescriptionSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactFirstNameSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactLastNameSearchView.cs" />
-    <Compile Include="Ui\Views\SearchViews\ContactLedgerSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactNameSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactPostAddressSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactShortIdSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactTypeSearchView.cs" />
-    <Compile Include="Ui\Views\SearchViews\ContactVatSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentAttachmentNamesSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentCategoriesSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentCommentsSearchView.cs" />

@@ -23,14 +23,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             if (criteria.DateRange == null || !criteria.DateRange.Enabled)
             {
                 DateRangeType.SetSelection(0);
-                UpdateFromToFields();
+                UpdateTimestamps();
+                UpdateText();
             }
             else
             {
                 DateRangeType.SetSelection(3);
                 FromTimestamp = criteria.DateRange.StartTimestamp;
                 ToTimestamp = criteria.DateRange.EndTimestamp;
-                UpdateFromToFields();
+                UpdateTimestamps();
+                UpdateText();
             }
         }
 

@@ -184,15 +184,15 @@ namespace Mark5.Mobile.Droid.Ui.Common
         {
             var tcs = new TaskCompletionSource<long>();
             var datePicker = new DatePicker(context);
-            if (initialTimestamp >= 0) datePicker.DateTime = initialTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime();
-            if (minTimestamp >= 0) datePicker.MinDate = minTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime().ConvertDateTimeToTimestampMilliseconds();
-            if (maxTimestamp >= 0) datePicker.MaxDate = maxTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime().ConvertDateTimeToTimestampMilliseconds();
+            if (initialTimestamp >= 0) datePicker.DateTime = initialTimestamp.ConvertTimestampMillisecondsToDateTime();
+            if (minTimestamp >= 0) datePicker.MinDate = minTimestamp;
+            if (maxTimestamp >= 0) datePicker.MaxDate = maxTimestamp;
             var builder = new MaterialDialog.Builder(context);
             builder.CustomView(datePicker, false);
-            builder.PositiveText(Resource.String.ok);
+            builder.PositiveText(Resource.String.ok);  
             builder.OnPositive(new SingleButtonCallback(() =>
             {
-                tcs.SetResult(datePicker.DateTime.ConvertServerTimeToUtc().ConvertDateTimeToTimestampMilliseconds());
+                tcs.SetResult(datePicker.DateTime.ConvertDateTimeToTimestampMilliseconds());
             }));
             builder.NegativeText(Resource.String.cancel);
             builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(initialTimestamp)));

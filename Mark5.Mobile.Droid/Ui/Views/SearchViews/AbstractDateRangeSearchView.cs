@@ -24,8 +24,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         protected readonly AppCompatTextView DateRangeFrom;
         protected readonly AppCompatTextView DateRangeTo;
 
-        protected long FromTimestamp;
-        protected long ToTimestamp;
+        protected long FromTimestamp = -1;
+        protected long ToTimestamp = -1;
 
         protected AbstractDateRangeSearchView(Context context)
             : base(context)
@@ -39,7 +39,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 Adapter = CustomArrayAdapter.CreateWithoutLeftPadding(context, Resource.Array.search_date_range_type, Android.Resource.Layout.SimpleSpinnerItem, Resource.Layout.support_simple_spinner_dropdown_item)
             };
             DateRangeType.SetSelection(0);
-            DateRangeType.ItemSelected += (sender, e) => UpdateFromToFields();
+            DateRangeType.ItemSelected += (sender, e) =>
+            {
+                UpdateTimestamps();
+                UpdateText();
+            };
             AddView(DateRangeType);
 
             FromToLayout = new LinearLayoutCompat(context)
@@ -66,7 +70,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             DateRangeFrom.Click += async (sender, e) =>
             {
                 FromTimestamp = await Dialogs.ShowDatePicker(context, FromTimestamp, maxTimestamp: ToTimestamp);
-                UpdateFromToFields();
+                UpdateText();
             };
             FromToLayout.AddView(DateRangeFrom);
 
@@ -83,14 +87,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             DateRangeTo.Click += async (sender, e) =>
             {
                 ToTimestamp = await Dialogs.ShowDatePicker(context, ToTimestamp, FromTimestamp);
-                UpdateFromToFields();
+                UpdateText();
             };
             FromToLayout.AddView(DateRangeTo);
 
-            UpdateFromToFields();
+            UpdateTimestamps();
+            UpdateText();
         }
 
-        protected void UpdateFromToFields()
+        protected void UpdateTimestamps()
         {
             var mode = DateRangeType.SelectedItemPosition;
 
@@ -122,9 +127,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 FromTimestamp = new DateTime(weekAgo.Year, weekAgo.Month, weekAgo.Day, 0, 0, 0, DateTimeKind.Utc).ConvertDateTimeToTimestampMilliseconds();
                 ToTimestamp = new DateTime(now.Year, now.Month, now.Day, 23, 59, 59, DateTimeKind.Utc).ConvertDateTimeToTimestampMilliseconds();
             }
+        }
 
-            DateRangeFrom.Text = FromTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime().ConvertDateTimeToTimestampMilliseconds().FormatServerTimestampAsDateString(Context);
-            DateRangeTo.Text = ToTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime().ConvertDateTimeToTimestampMilliseconds().FormatServerTimestampAsDateString(Context);
+        protected void UpdateText()
+        {
+            DateRangeFrom.Text = FromTimestamp.FormatServerTimestampAsDateString(Context);
+            DateRangeTo.Text = ToTimestamp.FormatServerTimestampAsDateString(Context);
         }
     }
 }
