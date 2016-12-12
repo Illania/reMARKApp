@@ -57,17 +57,17 @@ namespace Mark5.Mobile.Common.Model
 
         #region Serialization
 
-        [Column("AddressBytes")]
-        public byte[] AddressesBytes
+        [Column("AddressString")]
+        public string AddressString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(Addresses);
+                return SerializationUtils.Serialize(Addresses);
             }
             set
             {
 
-                Addresses = SerializationUtils.DeserializeFromByteArray<List<DocumentAddress>>(value);
+                Addresses = SerializationUtils.Deserialize<List<DocumentAddress>>(value);
             }
         }
 

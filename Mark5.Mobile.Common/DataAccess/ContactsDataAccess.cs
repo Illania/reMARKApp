@@ -335,9 +335,9 @@ namespace Mark5.Mobile.Common.DataAccess
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
                     var cmd = c.CreateCommand($"update \"{nameof(ContactPreview)}\" " +
-                                              $"set \"{nameof(ContactPreview.CategoriesBytes)}\" = @categoriesBytes " +
+                                              $"set \"{nameof(ContactPreview.CategoriesString)}\" = @categoriesString " +
                                               $"where \"{nameof(ContactPreview.Id)}\" = @contactPreviewId");
-                    cmd.Bind("@categoriesBytes", new CategoriesValue { Categories = categories }.CategoriesBytes);
+                    cmd.Bind("@categoriesString", new CategoriesValue { Categories = categories }.CategoriesString);
                     cmd.Bind("@contactPreviewId", contactPreview.Id);
                     cmd.ExecuteNonQuery();
                 });
@@ -354,7 +354,7 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsBytes)}\" " +
+                    var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsString)}\" " +
                                               $"from \"{nameof(Contact)}\" " +
                                               $"where \"{nameof(Contact.Id)}\" = @contactId");
                     cmd.Bind("@contactId", contact.Id);
@@ -370,9 +370,9 @@ namespace Mark5.Mobile.Common.DataAccess
                     comments.Add(comment);
 
                     cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " +
-                                          $"set \"{nameof(Contact.CommentsBytes)}\" = @commentsBytes " +
+                                          $"set \"{nameof(Contact.CommentsString)}\" = @commentsString " +
                                           $"where \"{nameof(Contact.Id)}\" = @contactId");
-                    cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
+                    cmd.Bind("@commentsString", new CommentsValue { Comments = comments }.CommentsString);
                     cmd.Bind("@contactId", contact.Id);
                     cmd.ExecuteNonQuery();
 
@@ -396,7 +396,7 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsBytes)}\" " +
+                    var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsString)}\" " +
                                     $"from \"{nameof(Contact)}\" " +
                                     $"where \"{nameof(Contact.Id)}\" = @contactId");
                     cmd.Bind("@contactId", contact.Id);
@@ -414,9 +414,9 @@ namespace Mark5.Mobile.Common.DataAccess
                     comments = comments.OrderBy(cm => cm.DateAddedTimestamp).ToList();
 
                     cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " +
-                                          $"set \"{nameof(Contact.CommentsBytes)}\" = @commentsBytes " +
+                                          $"set \"{nameof(Contact.CommentsString)}\" = @commentsString " +
                                           $"where \"{nameof(Contact.Id)}\" = @contactId");
-                    cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
+                    cmd.Bind("@commentsString", new CommentsValue { Comments = comments }.CommentsString);
                     cmd.Bind("@contactId", contact.Id);
                     cmd.ExecuteNonQuery();
                 });
@@ -433,7 +433,7 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsBytes)}\" " +
+                    var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsString)}\" " +
                                     $"from \"{nameof(Contact)}\" " +
                                     $"where \"{nameof(Contact.Id)}\" = @contactId");
                     cmd.Bind("@contactId", contact.Id);
@@ -449,9 +449,9 @@ namespace Mark5.Mobile.Common.DataAccess
                     comments.RemoveAll(cm => cm.Id == comment.Id);
 
                     cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " +
-                                          $"set \"{nameof(Contact.CommentsBytes)}\" = @commentsBytes " +
+                                          $"set \"{nameof(Contact.CommentsString)}\" = @commentsString " +
                                           $"where \"{nameof(Contact.Id)}\" = @contactId");
-                    cmd.Bind("@commentsBytes", new CommentsValue { Comments = comments }.CommentsBytes);
+                    cmd.Bind("@commentsString", new CommentsValue { Comments = comments }.CommentsString);
                     cmd.Bind("@contactId", contact.Id);
                     cmd.ExecuteNonQuery();
 

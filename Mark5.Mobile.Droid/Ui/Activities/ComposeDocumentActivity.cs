@@ -103,6 +103,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     cdf.LocalDocument = false;
                 }
 
+                cdf.CloseRequest = OnBackPressed;
+
                 cdfFragmentTag = cdf.GenerateTag();
 
                 var ft = SupportFragmentManager.BeginTransaction();

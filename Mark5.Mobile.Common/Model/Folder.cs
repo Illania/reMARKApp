@@ -86,16 +86,16 @@ namespace Mark5.Mobile.Common.Model
 
         #region Serialization
 
-        [Column("OptionalParametersBytes")]
-        public byte[] OptionalParametersBytes
+        [Column("OptionalParametersString")]
+        public string OptionalParametersString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(OptionalParameters);
+                return SerializationUtils.Serialize(OptionalParameters);
             }
             set
             {
-                OptionalParameters = SerializationUtils.DeserializeFromByteArray<OptionalParameters>(value);
+                OptionalParameters = SerializationUtils.Deserialize<OptionalParameters>(value);
             }
         }
 
@@ -143,7 +143,7 @@ namespace Mark5.Mobile.Common.Model
                     documentsRootFolder,
                     contactsRootFolder,
                     shortcodesRootFolder,
-                    calendarRootFolder,
+                    calendarRootFolder
                 }.Contains(this);
             }
         }
@@ -155,7 +155,7 @@ namespace Mark5.Mobile.Common.Model
             Name = "DOCUMENTS_ROOT",
             Module = ModuleType.Documents,
             Type = FolderType.None,
-            HasSubFolders = true,
+            HasSubFolders = true
         };
 
         readonly static Folder documentsFavoriteRootFolder = new Folder
@@ -165,7 +165,7 @@ namespace Mark5.Mobile.Common.Model
             Name = "DOCUMENTS_FAVORITE_ROOT",
             Module = ModuleType.Documents,
             Type = FolderType.None,
-            HasSubFolders = true,
+            HasSubFolders = true
         };
 
         public readonly static Folder DocumentsOutgoingFolder = new Folder
@@ -175,7 +175,7 @@ namespace Mark5.Mobile.Common.Model
             Name = "Outgoing",
             Module = ModuleType.Documents,
             Type = FolderType.None,
-            HasSubFolders = false,
+            HasSubFolders = false
         };
 
         readonly static Folder documentsLocalRootFolder = new Folder
@@ -186,7 +186,7 @@ namespace Mark5.Mobile.Common.Model
             Module = ModuleType.Documents,
             Type = FolderType.None,
             HasSubFolders = true,
-            SubFolders = { DocumentsOutgoingFolder },
+            SubFolders = { DocumentsOutgoingFolder }
         };
 
         readonly static Folder contactsRootFolder = new Folder
@@ -196,7 +196,7 @@ namespace Mark5.Mobile.Common.Model
             Name = "CONTACTS_ROOT",
             Module = ModuleType.Contacts,
             Type = FolderType.None,
-            HasSubFolders = true,
+            HasSubFolders = true
         };
 
         readonly static Folder contactsFavoriteRootFolder = new Folder
@@ -206,7 +206,7 @@ namespace Mark5.Mobile.Common.Model
             Name = "CONTACTS_FAVORITE_ROOT",
             Module = ModuleType.Contacts,
             Type = FolderType.None,
-            HasSubFolders = true,
+            HasSubFolders = true
         };
 
         readonly static Folder shortcodesRootFolder = new Folder
@@ -216,7 +216,7 @@ namespace Mark5.Mobile.Common.Model
             Name = "SHORTCODES_ROOT",
             Module = ModuleType.Shortcodes,
             Type = FolderType.None,
-            HasSubFolders = true,
+            HasSubFolders = true
         };
 
         readonly static Folder shortcodesFavoriteRootFolder = new Folder
@@ -226,7 +226,7 @@ namespace Mark5.Mobile.Common.Model
             Name = "SHORTCODES_FAVORITE_ROOT",
             Module = ModuleType.Shortcodes,
             Type = FolderType.None,
-            HasSubFolders = true,
+            HasSubFolders = true
         };
 
         readonly static Folder calendarRootFolder = new Folder
@@ -236,7 +236,7 @@ namespace Mark5.Mobile.Common.Model
             Name = "CALENDAR_ROOT",
             Module = ModuleType.Calendar,
             Type = FolderType.None,
-            HasSubFolders = true,
+            HasSubFolders = true
         };
 
         readonly static Folder calendarFavoriteRootFolder = new Folder
@@ -246,7 +246,7 @@ namespace Mark5.Mobile.Common.Model
             Name = "CALENDAR_FAVORITE_ROOT",
             Module = ModuleType.Calendar,
             Type = FolderType.None,
-            HasSubFolders = true,
+            HasSubFolders = true
         };
 
         public static Folder RootPerModule(ModuleType module, bool favorite = false)

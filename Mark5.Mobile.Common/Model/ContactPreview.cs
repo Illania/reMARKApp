@@ -81,29 +81,29 @@ namespace Mark5.Mobile.Common.Model
 
         #region Serialization
 
-        [Column("CategoriesBytes")]
-        public byte[] CategoriesBytes
+        [Column("CategoriesString")]
+        public string CategoriesString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(Categories);
+                return SerializationUtils.Serialize(Categories);
             }
             set
             {
-                Categories = SerializationUtils.DeserializeFromByteArray<List<Category>>(value);
+                Categories = SerializationUtils.Deserialize<List<Category>>(value);
             }
         }
 
-        [Column("PrimaryAddressBytes")]
-        public byte[] PrimaryAddressBytes
+        [Column("PrimaryAddressString")]
+        public string PrimaryAddressString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(PrimaryAddress);
+                return SerializationUtils.Serialize(PrimaryAddress);
             }
             set
             {
-                PrimaryAddress = SerializationUtils.DeserializeFromByteArray<CommunicationAddress>(value);
+                PrimaryAddress = SerializationUtils.Deserialize<CommunicationAddress>(value);
             }
         }
 

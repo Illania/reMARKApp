@@ -46,6 +46,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
         public string[] PreconfiguredEmailAddresses { get; set; }
+        public Action CloseRequest { get; set; }
 
         Document PreviousDocument { get; set; }
         DocumentPreview PreviousDocumentPreview { get; set; }
@@ -138,7 +139,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             await LoadDocument();
-            await ShowDocument();
 
             Activity.InvalidateOptionsMenu();
         }
@@ -183,15 +183,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         Document.Id = DocumentPreview.Id = PreviousDocument.Id;
                     }
                 }
+
+                dismissAction();
+
+                await ShowDocument();
             }
             catch (Exception ex)
             {
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                Activity.Finish();
-            }
 
-            dismissAction();
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+
+                if (CloseRequest != null) CloseRequest();
+            }
         }
 
         async Task ShowDocument()

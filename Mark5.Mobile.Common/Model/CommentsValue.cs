@@ -16,19 +16,19 @@ namespace Mark5.Mobile.Common.Model
     public class CommentsValue
     {
 
-        [Column("CommentsBytes")]
-        public byte[] CommentsBytes { get; set; }
+        [Column("CommentsString")]
+        public string CommentsString { get; set; }
 
         [Ignore]
         public List<Comment> Comments
         {
             get
             {
-                return SerializationUtils.DeserializeFromByteArray<List<Comment>>(CommentsBytes);
+                return SerializationUtils.Deserialize<List<Comment>>(CommentsString);
             }
             set
             {
-                CommentsBytes = SerializationUtils.SerializeToByteArray(value);
+                CommentsString = SerializationUtils.Serialize(value);
             }
         }
     }

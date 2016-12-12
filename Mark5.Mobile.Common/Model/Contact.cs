@@ -191,81 +191,81 @@ namespace Mark5.Mobile.Common.Model
 
         #region Serialization
 
-        [Column("PrimaryPersonBytes")]
-        public byte[] PrimaryPersonBytes
+        [Column("PrimaryPersonString")]
+        public string PrimaryPersonString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(PrimaryPerson);
+                return SerializationUtils.Serialize(PrimaryPerson);
             }
             set
             {
-                PrimaryPerson = SerializationUtils.DeserializeFromByteArray<ContactPreview>(value);
+                PrimaryPerson = SerializationUtils.Deserialize<ContactPreview>(value);
             }
         }
 
-        [Column("ChildrenBytes")]
-        public byte[] ChildrenBytes
+        [Column("ChildrenString")]
+        public string ChildrenString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(Children);
+                return SerializationUtils.Serialize(Children);
             }
             set
             {
-                Children = SerializationUtils.DeserializeFromByteArray<List<ContactPreview>>(value);
+                Children = SerializationUtils.Deserialize<List<ContactPreview>>(value);
             }
         }
 
-        [Column("ResponsibleUserIdsBytes")]
-        public byte[] ResponsibleUserIdsBytes
+        [Column("ResponsibleUserIdsString")]
+        public string ResponsibleUserIdsString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(ResponsibleUserIds);
+                return SerializationUtils.Serialize(ResponsibleUserIds);
             }
             set
             {
-                ResponsibleUserIds = SerializationUtils.DeserializeFromByteArray<List<int>>(value);
+                ResponsibleUserIds = SerializationUtils.Deserialize<List<int>>(value);
             }
         }
 
-        [Column("ResponsibleUsersBytes")]
-        public byte[] ResponsibleUsersBytes
+        [Column("ResponsibleUsersString")]
+        public string ResponsibleUsersString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(ResponsibleUsers);
+                return SerializationUtils.Serialize(ResponsibleUsers);
             }
             set
             {
-                ResponsibleUsers = SerializationUtils.DeserializeFromByteArray<Dictionary<int, string>>(value);
+                ResponsibleUsers = SerializationUtils.Deserialize<Dictionary<int, string>>(value);
             }
         }
 
-        [Column("PhysicalAddressesBytes")]
-        public byte[] PhysicalAddressesBytes
+        [Column("PhysicalAddressesString")]
+        public string PhysicalAddressesString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(PhysicalAddresses);
+                return SerializationUtils.Serialize(PhysicalAddresses);
             }
             set
             {
-                PhysicalAddresses = SerializationUtils.DeserializeFromByteArray<List<PhysicalAddress>>(value);
+                PhysicalAddresses = SerializationUtils.Deserialize<List<PhysicalAddress>>(value);
             }
         }
 
-        [Column("CommentsBytes")]
-        public byte[] CommentsBytes
+        [Column("CommentsString")]
+        public string CommentsString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(Comments);
+                return SerializationUtils.Serialize(Comments);
             }
             set
             {
-                Comments = SerializationUtils.DeserializeFromByteArray<List<Comment>>(value);
+                Comments = SerializationUtils.Deserialize<List<Comment>>(value);
             }
         }
 

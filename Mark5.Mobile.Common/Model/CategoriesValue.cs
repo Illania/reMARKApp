@@ -16,19 +16,19 @@ namespace Mark5.Mobile.Common.Model
     public class CategoriesValue
     {
 
-        [Column("CategoriesBytes")]
-        public byte[] CategoriesBytes { get; set; }
+        [Column("CategoriesString")]
+        public string CategoriesString { get; set; }
 
         [Ignore]
         public List<Category> Categories
         {
             get
             {
-                return SerializationUtils.DeserializeFromByteArray<List<Category>>(CategoriesBytes);
+                return SerializationUtils.Deserialize<List<Category>>(CategoriesString);
             }
             set
             {
-                CategoriesBytes = SerializationUtils.SerializeToByteArray(value);
+                CategoriesString = SerializationUtils.Serialize(value);
             }
         }
     }

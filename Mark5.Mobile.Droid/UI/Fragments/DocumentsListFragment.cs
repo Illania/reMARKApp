@@ -354,7 +354,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region OutgoingDocumentsManager callbacks
 
-        async void OutgoingDocumentsManager_DocumentSendingSuccessful(object sender, OutgoingDocumentContainer e)
+        void OutgoingDocumentsManager_DocumentSendingSuccessful(object sender, OutgoingDocumentContainer e)
         {
             if (e.DocumentPreview.Id >= 0)
             {

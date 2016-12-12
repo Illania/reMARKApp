@@ -168,55 +168,55 @@ namespace Mark5.Mobile.Common.Model
 
         #region Serialization
 
-        [Column("UserIdsBytes")]
-        public byte[] UserIdsBytes
+        [Column("UserIdsString")]
+        public string UserIdsString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(UserIds);
+                return SerializationUtils.Serialize(UserIds);
             }
             set
             {
-                UserIds = SerializationUtils.DeserializeFromByteArray<List<int>>(value);
+                UserIds = SerializationUtils.Deserialize<List<int>>(value);
             }
         }
 
-        [Column("UsersBytes")]
-        public byte[] UsersBytes
+        [Column("UsersString")]
+        public string UsersString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(Users);
+                return SerializationUtils.Serialize(Users);
             }
             set
             {
-                Users = SerializationUtils.DeserializeFromByteArray<Dictionary<int, string>>(value);
+                Users = SerializationUtils.Deserialize<Dictionary<int, string>>(value);
             }
         }
 
-        [Column("DepartmentIdsBytes")]
-        public byte[] DepartmentIdsBytes
+        [Column("DepartmentIdsString")]
+        public string DepartmentIdsString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(DepartmentIds);
+                return SerializationUtils.Serialize(DepartmentIds);
             }
             set
             {
-                DepartmentIds = SerializationUtils.DeserializeFromByteArray<List<int>>(value);
+                DepartmentIds = SerializationUtils.Deserialize<List<int>>(value);
             }
         }
 
-        [Column("DepartmentsBytes")]
-        public byte[] DepartmentsBytes
+        [Column("DepartmentsString")]
+        public string DepartmentsString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(Departments);
+                return SerializationUtils.Serialize(Departments);
             }
             set
             {
-                Departments = SerializationUtils.DeserializeFromByteArray<Dictionary<int, string>>(value);
+                Departments = SerializationUtils.Deserialize<Dictionary<int, string>>(value);
             }
         }
 

@@ -118,42 +118,42 @@ namespace Mark5.Mobile.Common.Model
 
         #region Serialization
 
-        [Column("CategoryBytes")]
-        public byte[] CategoryBytes
+        [Column("CategoryString")]
+        public string CategoryString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(Category);
+                return SerializationUtils.Serialize(Category);
             }
             set
             {
-                Category = SerializationUtils.DeserializeFromByteArray<CalendarCategory>(value);
+                Category = SerializationUtils.Deserialize<CalendarCategory>(value);
             }
         }
 
-        [Column("ResourcesBytes")]
-        public byte[] ResourcesBytes
+        [Column("ResourcesString")]
+        public string ResourcesString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(Resources);
+                return SerializationUtils.Serialize(Resources);
             }
             set
             {
-                Resources = SerializationUtils.DeserializeFromByteArray<List<CalendarResource>>(value);
+                Resources = SerializationUtils.Deserialize<List<CalendarResource>>(value);
             }
         }
 
-        [Column("ParticipantsBytes")]
-        public byte[] ParticipantsBytes
+        [Column("ParticipantsString")]
+        public string ParticipantsString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(Participants);
+                return SerializationUtils.Serialize(Participants);
             }
             set
             {
-                Participants = SerializationUtils.DeserializeFromByteArray<List<Participant>>(value);
+                Participants = SerializationUtils.Deserialize<List<Participant>>(value);
             }
         }
 

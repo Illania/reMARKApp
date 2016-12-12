@@ -15,33 +15,33 @@ namespace Mark5.Mobile.Common.Model
     public class ReadByValue
     {
 
-        [Column("ReadByUserIdsBytes")]
-        public byte[] ReadByUserIdsBytes { get; set; }
+        [Column("ReadByUserIdsString")]
+        public string ReadByUserIdsString { get; set; }
 
         public List<int> ReadByUserIds
         {
             get
             {
-                return SerializationUtils.DeserializeFromByteArray<List<int>>(ReadByUserIdsBytes);
+                return SerializationUtils.Deserialize<List<int>>(ReadByUserIdsString);
             }
             set
             {
-                ReadByUserIdsBytes = SerializationUtils.SerializeToByteArray(value);
+                ReadByUserIdsString = SerializationUtils.Serialize(value);
             }
         }
 
-        [Column("ReadByUserNamesBytes")]
-        public byte[] ReadByUserNamesBytes { get; set; }
+        [Column("ReadByUserNamesString")]
+        public string ReadByUserNamesString { get; set; }
 
         public Dictionary<int, string> ReadByUserNames
         {
             get
             {
-                return SerializationUtils.DeserializeFromByteArray<Dictionary<int, string>>(ReadByUserNamesBytes);
+                return SerializationUtils.Deserialize<Dictionary<int, string>>(ReadByUserNamesString);
             }
             set
             {
-                ReadByUserNamesBytes = SerializationUtils.SerializeToByteArray(value);
+                ReadByUserNamesString = SerializationUtils.Serialize(value);
             }
         }
     }

@@ -166,81 +166,81 @@ namespace Mark5.Mobile.Common.Model
 
         #region Serialization
 
-        [Column("LinesBytes")]
-        public byte[] LinesBytes
+        [Column("LinesString")]
+        public string LinesString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(Lines);
+                return SerializationUtils.Serialize(Lines);
             }
             set
             {
-                Lines = SerializationUtils.DeserializeFromByteArray<List<Line>>(value);
+                Lines = SerializationUtils.Deserialize<List<Line>>(value);
             }
         }
 
-        [Column("ReadByUserIdsBytes")]
-        public byte[] ReadByUserIdsBytes
+        [Column("ReadByUserIdsString")]
+        public string ReadByUserIdsString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(ReadByUserIds);
+                return SerializationUtils.Serialize(ReadByUserIds);
             }
             set
             {
-                ReadByUserIds = SerializationUtils.DeserializeFromByteArray<List<int>>(value);
+                ReadByUserIds = SerializationUtils.Deserialize<List<int>>(value);
             }
         }
 
-        [Column("ReadByUserNamesBytes")]
-        public byte[] ReadByUserNamesBytes
+        [Column("ReadByUserNamesString")]
+        public string ReadByUserNamesString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(ReadByUserNames);
+                return SerializationUtils.Serialize(ReadByUserNames);
             }
             set
             {
-                ReadByUserNames = SerializationUtils.DeserializeFromByteArray<Dictionary<int, string>>(value);
+                ReadByUserNames = SerializationUtils.Deserialize<Dictionary<int, string>>(value);
             }
         }
 
-        [Column("AttachmentsBytes")]
-        public byte[] AttachmentsBytes
+        [Column("AttachmentsString")]
+        public string AttachmentsString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(Attachments);
+                return SerializationUtils.Serialize(Attachments);
             }
             set
             {
-                Attachments = SerializationUtils.DeserializeFromByteArray<List<AttachmentDescription>>(value);
+                Attachments = SerializationUtils.Deserialize<List<AttachmentDescription>>(value);
             }
         }
 
-        [Column("CommentsBytes")]
-        public byte[] CommentsBytes
+        [Column("CommentsString")]
+        public string CommentsString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(Comments);
+                return SerializationUtils.Serialize(Comments);
             }
             set
             {
-                Comments = SerializationUtils.DeserializeFromByteArray<List<Comment>>(value);
+                Comments = SerializationUtils.Deserialize<List<Comment>>(value);
             }
         }
 
-        [Column("ExtraFieldsBytes")]
-        public byte[] ExtraFieldsBytes
+        [Column("ExtraFieldsString")]
+        public string ExtraFieldsString
         {
             get
             {
-                return SerializationUtils.SerializeToByteArray(ExtraFields);
+                return SerializationUtils.Serialize(ExtraFields);
             }
             set
             {
-                ExtraFields = SerializationUtils.DeserializeFromByteArray<Dictionary<DocumentExtraFieldInfo, string>>(value);
+                ExtraFields = SerializationUtils.Deserialize<Dictionary<DocumentExtraFieldInfo, string>>(value);
             }
         }
 
