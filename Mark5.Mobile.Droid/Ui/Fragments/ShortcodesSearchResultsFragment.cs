@@ -141,6 +141,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 refreshLayout.Refreshing = true;
 
                 var searchResults = await Managers.SearchManager.SearchShortcodesAsync(Criteria);
+
+                if (searchResults?.ShortcodePreviews?.Count < 1)
+                {
+                    await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.no_results, Resource.String.no_results_shortcodes);
+                    if (CloseRequest != null) CloseRequest();
+                    return;
+                }
+
                 searchId = searchResults.SearchId;
                 adapter.AppendItems(searchResults.ShortcodePreviews);
             }

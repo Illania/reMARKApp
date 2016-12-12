@@ -141,6 +141,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 refreshLayout.Refreshing = true;
 
                 var searchResults = await Managers.SearchManager.SearchDocumentsAsync(Criteria);
+
+                if (searchResults?.DocumentPreviews?.Count < 1) 
+                {
+                    await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.no_results, Resource.String.no_results_documents);
+                    if (CloseRequest != null) CloseRequest();
+                    return;
+                }
+
                 searchId = searchResults.SearchId;
                 adapter.AppendItems(searchResults.DocumentPreviews);
             }
