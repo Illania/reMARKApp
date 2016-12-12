@@ -105,7 +105,7 @@ namespace Mark5.Mobile.Droid.Ui.Views
                 var subtitleView = new AppCompatTextView(Context)
                 {
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                    Text = objectLink.IsReverse ? $"ID: {objectLink.FromObjectId}" : $"ID: {objectLink.ToObjectId}"
+                    Text = objectLink.Description
                 };
                 subtitleView.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
                 AddView(subtitleView);
