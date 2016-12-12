@@ -199,7 +199,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
-                || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed)
+                || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed
+                || DocumentPreview.Direction == DocumentDirection.Draft)
             {
                 menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
             }
