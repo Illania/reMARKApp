@@ -58,8 +58,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new DocumentAttachmentNamesSearchView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new DocumentSearchInAttachmentsSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.AttachmentSearchEnabled)
+            {
+                linearLayout.AddView(new DocumentSearchInAttachmentsSearchView(Context));
+                linearLayout.AddView(new Divider(Context));
+            }
             linearLayout.AddView(new DocumentWithAttachmentsOnlySearchView(Context));
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new DocumentCategoriesSearchView(Context, this));

@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.Content;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
@@ -20,6 +21,7 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views;
 
@@ -140,32 +142,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return str;
         }
 
-        async void ObjectLinksView(object sender, ObjectLink ol)
+        void ObjectLinksView(object sender, ObjectLink ol)
         {
-            /*if (ol.IsReverse)
+            if (ol.IsReverse)
             {
                 if (ol.FromObjectType == ObjectType.Document)
                 {
-                    var folders = await Managers.FoldersManager.GetFoldersAsync(Folder.RootPerModule(ModuleType.Documents), 0);
-                    var documentsBrowserAllId = folders.FirstOrDefault(f => f.Name == "Browser (All)")?.Id;
-                    if (!documentsBrowserAllId.HasValue) return;
-
                     var i = new Intent(Activity, typeof(DocumentActivity));
-                    i.PutExtra(DocumentActivity.FolderIdIntentKey, documentsBrowserAllId.Value);
                     i.PutExtra(DocumentActivity.DocumentIdIntentKey, ol.FromObjectId);
                     StartActivity(i);
                 }
                 else if (ol.FromObjectType == ObjectType.Contact)
                 {
+                    var i = new Intent(Activity, typeof(ContactActivity));
+                    i.PutExtra(ContactActivity.ContactIdIntentKey, ol.FromObjectId);
+                    StartActivity(i);
                 }
                 else if (ol.FromObjectType == ObjectType.Shortcode)
                 {
-                    var folders = await Managers.FoldersManager.GetFoldersAsync(Folder.RootPerModule(ModuleType.Shortcodes), 0);
-                    var documentsBrowserAllId = folders.FirstOrDefault(f => f.Name == "Browser (All)")?.Id;
-                    if (!documentsBrowserAllId.HasValue) return;
-
                     var i = new Intent(Activity, typeof(ShortcodeActivity));
-                    i.PutExtra(ShortcodeActivity.FolderIdIntentKey, documentsBrowserAllId.Value);
                     i.PutExtra(ShortcodeActivity.ShortcodeIdIntentKey, ol.FromObjectId);
                     StartActivity(i);
                 }
@@ -174,30 +169,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (ol.ToObjectType == ObjectType.Document)
                 {
-                    var folders = await Managers.FoldersManager.GetFoldersAsync(Folder.RootPerModule(ModuleType.Documents), 0);
-                    var documentsBrowserAllId = folders.FirstOrDefault(f => f.Name == "Browser (All)")?.Id;
-                    if (!documentsBrowserAllId.HasValue) return;
-
                     var i = new Intent(Activity, typeof(DocumentActivity));
-                    i.PutExtra(DocumentActivity.FolderIdIntentKey, documentsBrowserAllId.Value);
                     i.PutExtra(DocumentActivity.DocumentIdIntentKey, ol.ToObjectId);
                     StartActivity(i);
                 }
                 else if (ol.ToObjectType == ObjectType.Contact)
                 {
+                    var i = new Intent(Activity, typeof(ContactActivity));
+                    i.PutExtra(ContactActivity.ContactIdIntentKey, ol.ToObjectId);
+                    StartActivity(i);
                 }
                 else if (ol.ToObjectType == ObjectType.Shortcode)
                 {
-                    var folders = await Managers.FoldersManager.GetFoldersAsync(Folder.RootPerModule(ModuleType.Shortcodes), 0);
-                    var documentsBrowserAllId = folders.FirstOrDefault(f => f.Name == "Browser (All)")?.Id;
-                    if (!documentsBrowserAllId.HasValue) return;
-
                     var i = new Intent(Activity, typeof(ShortcodeActivity));
-                    i.PutExtra(ShortcodeActivity.FolderIdIntentKey, documentsBrowserAllId.Value);
                     i.PutExtra(ShortcodeActivity.ShortcodeIdIntentKey, ol.ToObjectId);
                     StartActivity(i);
                 }
-            }*/
+            }
         }
 
         public override IRetainableState OnRetainInstanceState()
