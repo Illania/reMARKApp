@@ -84,7 +84,6 @@ namespace Mark5.ServiceReference.FileTransferService
                 using (var client = new HttpClient(httpClientHandler()))
                 {
                     var uri = (new Uri(endpointUrl)).AppendPathSegments(Segments.Attachment, req.Id)
-                                    .SetQueryParam("folderId", req.FolderId)
                                     .SetQueryParam("documentId", req.DocumentId);
                     var request = new HttpRequestMessage(HttpMethod.Get, uri);
                     request.Headers.Add(Headers.Token, req.Token);

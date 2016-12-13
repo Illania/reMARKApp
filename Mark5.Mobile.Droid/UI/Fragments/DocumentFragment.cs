@@ -47,11 +47,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public int? FolderId { get; set; }
         public Folder Folder { get; set; }
-        public int SearchId { get; set; }
+        public int? SearchId { get; set; }
         public int? DocumentId { get; set; }
         public DocumentPreview DocumentPreview { get; set; }
         public Document Document { get; set; }
-        public bool ReadOnlyMode { get; set; } = false;
         public Action CloseRequest { get; set; }
         public Guid NotificationGuid { get; set; }
 
@@ -63,7 +62,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}, readOnlyMode={ReadOnlyMode}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
 
@@ -95,7 +94,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = string.Empty;
 
-            CommonConfig.Logger.Info($"Created {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}, readOnlyMode={ReadOnlyMode}]");
+            CommonConfig.Logger.Info($"Created {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}]");
         }
 
         public override async void OnResume()
@@ -154,7 +153,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
-            if (ReadOnlyMode) return;
             if (DocumentPreview == null) return;
 
             if (!DocumentPreview.IsReadByCurrent)
@@ -220,27 +218,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any() && (item.ItemId == MenuItemActions.Reply || item.ItemId == MenuItemActions.ReplyAll || item.ItemId == MenuItemActions.Forward))
-            {
-                Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
-                return true;
-            }
-
-            if (item.ItemId == MenuItemActions.Reply)
-            {
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Reply, DocumentPreview.Direction, Document.Id, Folder.Id));
-                return true;
-            }
-            if (item.ItemId == MenuItemActions.ReplyAll)
-            {
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.ReplyAll, DocumentPreview.Direction, Document.Id, Folder.Id));
-                return true;
-            }
-            if (item.ItemId == MenuItemActions.Forward)
-            {
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Forward, DocumentPreview.Direction, Document.Id, Folder.Id));
-                return true;
-            }
             if (item.ItemId == MenuItemActions.MarkAsRead)
             {
                 MarkAsRead();
@@ -250,6 +227,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.MarkAsUnread)
             {
                 MarkAsUnread();
+                return true;
+            }
+
+            if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any() && (item.ItemId == MenuItemActions.Reply || item.ItemId == MenuItemActions.ReplyAll || item.ItemId == MenuItemActions.Forward))
+            {
+                Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.Reply)
+            {
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Reply, DocumentPreview.Direction, Document.Id, SearchId ?? FolderId ?? Folder?.Id));
+                return true;
+            }
+            if (item.ItemId == MenuItemActions.ReplyAll)
+            {
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.ReplyAll, DocumentPreview.Direction, Document.Id, SearchId ?? Folder?.Id));
+                return true;
+            }
+            if (item.ItemId == MenuItemActions.Forward)
+            {
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Forward, DocumentPreview.Direction, Document.Id, SearchId ?? FolderId ?? Folder?.Id));
                 return true;
             }
 
@@ -468,7 +467,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { DocumentPreview }, Folder);
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Document, FolderId ?? Folder.Id, new List<int> { DocumentPreview.Id }));
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Document, Folder.Id, new List<int> { DocumentPreview.Id }));
 
                 dismissAction();
             }
@@ -519,16 +518,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                string path = null;
-
-                if (Folder != null)
-                {
-                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Folder, Document, false, SourceType.Local);
-                }
-                if (SearchId <= -999)
-                {
-                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, SearchId, Document, false, SourceType.Local);
-                }
+                var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, false, SourceType.Local);
 
                 if (string.IsNullOrWhiteSpace(path))
                 {
@@ -541,14 +531,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         return;
                     }
 
-                    if (Folder != null)
-                    {
-                        path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Folder, Document, false, SourceType.Remote);
-                    }
-                    if (SearchId <= -999)
-                    {
-                        path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, SearchId, Document, false, SourceType.Remote);
-                    }
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, false, SourceType.Remote);
                 }
 
                 if (string.IsNullOrWhiteSpace(path))
@@ -584,16 +567,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                string path = null;
-
-                if (Folder != null)
-                {
-                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Folder, Document, false, SourceType.Local);
-                }
-                if (SearchId <= -999)
-                {
-                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, SearchId, Document, false, SourceType.Local);
-                }
+                var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, false, SourceType.Local);
 
                 if (string.IsNullOrWhiteSpace(path))
                 {
@@ -606,14 +580,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         return;
                     }
 
-                    if (Folder != null)
-                    {
-                        path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Folder, Document, false, SourceType.Remote);
-                    }
-                    if (SearchId <= -999)
-                    {
-                        path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, SearchId, Document, false, SourceType.Remote);
-                    }
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, false, SourceType.Remote);
                 }
 
                 if (string.IsNullOrWhiteSpace(path))
@@ -648,7 +615,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
                 }
 
-                if (Folder != null || FolderId.HasValue)
+                if (FolderId.HasValue || Folder != null)
                 {
                     if (DocumentId.HasValue && DocumentPreview == null && Document == null)
                     {
@@ -663,11 +630,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
                 }
 
-                if (SearchId <= -999)
+                if (SearchId.HasValue && SearchId <= -999)
                 {
                     if (DocumentPreview != null && Document == null)
                     {
-                        Document = await Managers.SearchManager.GetDocumentAsync(SearchId, DocumentPreview);
+                        Document = await Managers.SearchManager.GetDocumentAsync(SearchId.Value, DocumentPreview);
                     }
                 }
 
@@ -675,7 +642,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Downloading document failed [folder.name={Folder?.Name}, searchId={SearchId}, folder.id={FolderId ?? Folder?.Id}, documentId={DocumentId ?? DocumentPreview?.Id}, readOnlyMode={ReadOnlyMode}]", ex);
+                CommonConfig.Logger.Error($"Downloading document failed [folder.name={Folder?.Name}, searchId={SearchId}, folder.id={FolderId ?? Folder?.Id}, documentId={DocumentId ?? DocumentPreview?.Id}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
@@ -814,8 +781,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 SearchId = SearchId,
                 DocumentId = DocumentId,
                 DocumentPreview = DocumentPreview,
-                Document = Document,
-                ReadOnlyMode = ReadOnlyMode
+                Document = Document
             };
         }
 
@@ -830,7 +796,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 DocumentId = dfs.DocumentId;
                 DocumentPreview = dfs.DocumentPreview;
                 Document = dfs.Document;
-                ReadOnlyMode = dfs.ReadOnlyMode;
             }
         }
 
@@ -846,15 +811,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public Folder Folder { get; set; }
 
-            public int SearchId { get; set; }
+            public int? SearchId { get; set; }
 
             public int? DocumentId { get; set; }
 
             public DocumentPreview DocumentPreview { get; set; }
 
             public Document Document { get; set; }
-
-            public bool ReadOnlyMode { get; set; }
         }
     }
 }

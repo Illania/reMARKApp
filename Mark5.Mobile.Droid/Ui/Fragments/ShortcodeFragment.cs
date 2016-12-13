@@ -36,12 +36,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public int? FolderId { get; set; }
         public Folder Folder { get; set; }
-        public int SearchId { get; set; }
+        public int? SearchId { get; set; }
         public int? ShortcodeId { get; set; }
         public ShortcodePreview ShortcodePreview { get; set; }
         public Shortcode Shortcode { get; set; }
         public Action CloseRequest { get; set; }
-        public bool ReadOnlyMode { get; set; }
         public Guid NotificationGuid { get; set; }
 
         ProgressBar progress;
@@ -50,7 +49,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(ShortcodeFragment)} [folder.name={Folder?.Name}, searchId={SearchId}, folder.id={FolderId ?? Folder?.Id}, shortcodeId={ShortcodeId ?? ShortcodePreview?.Id}, readOnlyMode={ReadOnlyMode}...");
+            CommonConfig.Logger.Info($"Creating {nameof(ShortcodeFragment)} [folder.name={Folder?.Name}, searchId={SearchId}, folder.id={FolderId ?? Folder?.Id}, shortcodeId={ShortcodeId ?? ShortcodePreview?.Id}...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
             rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightergray)));
@@ -87,7 +86,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = string.Empty;
 
-            CommonConfig.Logger.Info($"Created {nameof(ShortcodeFragment)} [folder.name={Folder?.Name}, searchId={SearchId}, folder.id={FolderId ?? Folder?.Id}, shortcodeId={ShortcodeId ?? ShortcodePreview?.Id}, readOnlyMode={ReadOnlyMode}]");
+            CommonConfig.Logger.Info($"Created {nameof(ShortcodeFragment)} [folder.name={Folder?.Name}, searchId={SearchId}, folder.id={FolderId ?? Folder?.Id}, shortcodeId={ShortcodeId ?? ShortcodePreview?.Id}]");
         }
 
         public override async void OnResume()
@@ -113,7 +112,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
-            if (ReadOnlyMode) return;
             if (ShortcodePreview == null) return;
 
             menu.Add(Menu.None, MenuItemActions.CreateNewDocument, MenuItemActions.CreateNewDocument, Resource.String.create_new_document);
@@ -361,7 +359,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
                 }
 
-                if (Folder != null || FolderId.HasValue)
+                if (FolderId.HasValue || Folder != null)
                 {
                     if (ShortcodeId.HasValue && ShortcodePreview == null && Shortcode == null)
                     {
@@ -376,11 +374,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
                 }
 
-                if (SearchId <= -999)
+                if (SearchId.HasValue && SearchId <= -999)
                 {
                     if (ShortcodePreview != null && Shortcode == null)
                     {
-                        Shortcode = await Managers.SearchManager.GetShortcodeAsync(SearchId, ShortcodePreview);
+                        Shortcode = await Managers.SearchManager.GetShortcodeAsync(SearchId.Value, ShortcodePreview);
                     }
                 }
 
@@ -388,7 +386,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Downloading shortcode failed [folder.name={Folder?.Name}, searchId={SearchId}, folder.id={FolderId ?? Folder?.Id}, shortcodeId={ShortcodeId ?? ShortcodePreview?.Id}, readOnlyMode={ReadOnlyMode}]", ex);
+                CommonConfig.Logger.Error($"Downloading shortcode failed [folder.name={Folder?.Name}, searchId={SearchId}, folder.id={FolderId ?? Folder?.Id}, shortcodeId={ShortcodeId ?? ShortcodePreview?.Id}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
@@ -429,8 +427,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 SearchId = SearchId,
                 ShortcodeId = ShortcodeId,
                 ShortcodePreview = ShortcodePreview,
-                Shortcode = Shortcode,
-                ReadOnlyMode = ReadOnlyMode
+                Shortcode = Shortcode
             };
         }
 
@@ -445,7 +442,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 ShortcodeId = sfs.ShortcodeId;
                 ShortcodePreview = sfs.ShortcodePreview;
                 Shortcode = sfs.Shortcode;
-                ReadOnlyMode = sfs.ReadOnlyMode;
             }
         }
 
@@ -461,15 +457,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public Folder Folder { get; set; }
 
-            public int SearchId { get; set; }
+            public int? SearchId { get; set; }
 
             public int? ShortcodeId { get; set; }
 
             public ShortcodePreview ShortcodePreview { get; set; }
 
             public Shortcode Shortcode { get; set; }
-
-            public bool ReadOnlyMode { get; set; }
         }
     }
 }

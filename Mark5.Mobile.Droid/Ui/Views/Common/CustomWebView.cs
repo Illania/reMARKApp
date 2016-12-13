@@ -7,22 +7,23 @@
 //
 using System;
 using Android.Content;
-using Android.Support.V4.View;
 using Android.Views;
 using Android.Webkit;
 
 namespace Mark5.Mobile.Droid.Ui.Views.Common
 {
+    
     class CustomWebView : WebView
     {
+        
         public CustomWebView(Context context)
-    : base(context)
+            : base(context)
         {
         }
 
         public override bool OnTouchEvent(MotionEvent e)
         {
-            if (MotionEventCompat.FindPointerIndex(e, 0) != -1)
+            if (e.FindPointerIndex(0) != -1)
             {
                 RequestDisallowInterceptTouchEvent(e.PointerCount > 1);
             }

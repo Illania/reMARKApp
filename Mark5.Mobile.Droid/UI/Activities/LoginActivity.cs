@@ -72,7 +72,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 usernameEditText.Text = savedInstanceState.GetString("username");
                 passwordEditText.Text = savedInstanceState.GetString("password");
                 hostnameEditText.Text = savedInstanceState.GetString("hostname");
-                portEditText.SetSelection(savedInstanceState.GetInt("ssl"));
+                portEditText.Text = savedInstanceState.GetString("port");
+                sslSpinner.SetSelection(savedInstanceState.GetInt("ssl"));
             }
 
             CommonConfig.Logger.Info($"Created {nameof(LoginActivity)}");

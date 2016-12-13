@@ -47,12 +47,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public int? FolderId { get; set; }
         public Folder Folder { get; set; }
-        public int SearchId { get; set; }
+        public int? SearchId { get; set; }
         public int? ContactId { get; set; }
         public ContactPreview ContactPreview { get; set; }
         public Contact Contact { get; set; }
         public Action CloseRequest { get; set; }
-        public bool ReadOnlyMode { get; set; }
         public Guid NotificationGuid { get; set; }
 
         ProgressBar progress;
@@ -68,7 +67,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(ContactFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, contact.id={ContactId ?? ContactPreview?.Id}, readOnlyMode={ReadOnlyMode} ...");
+            CommonConfig.Logger.Info($"Creating {nameof(ContactFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, contact.id={ContactId ?? ContactPreview?.Id}...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_contact, container, false);
             rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightergray)));
@@ -102,7 +101,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = string.Empty;
 
-            CommonConfig.Logger.Info($"Created {nameof(ContactFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, contact.id={ContactId ?? ContactPreview?.Id}, readOnlyMode={ReadOnlyMode}...");
+            CommonConfig.Logger.Info($"Created {nameof(ContactFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, contact.id={ContactId ?? ContactPreview?.Id}...");
         }
 
         public override async void OnResume()
@@ -146,7 +145,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
-            if (ReadOnlyMode) return;
             if (ContactPreview == null) return;
 
             menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
@@ -512,7 +510,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
                 }
 
-                if (Folder != null || FolderId.HasValue)
+                if (FolderId.HasValue || Folder != null)
                 {
                     if (ContactId.HasValue && ContactPreview == null && Contact == null)
                     {
@@ -527,11 +525,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
                 }
 
-                if (SearchId <= -999)
+                if (SearchId.HasValue && SearchId <= -999)
                 {
                     if (ContactPreview != null && Contact == null)
                     {
-                        Contact = await Managers.SearchManager.GetContactAsync(SearchId, ContactPreview);
+                        Contact = await Managers.SearchManager.GetContactAsync(SearchId.Value, ContactPreview);
                     }
                 }
 
@@ -539,7 +537,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Downloading contact failed [folder.name={Folder?.Name}, searchId={SearchId}, folder.id={FolderId ?? Folder?.Id}, contactId={ContactId ?? ContactPreview?.Id}, readOnlyMode={ReadOnlyMode}]", ex);
+                CommonConfig.Logger.Error($"Downloading contact failed [folder.name={Folder?.Name}, searchId={SearchId}, folder.id={FolderId ?? Folder?.Id}, contactId={ContactId ?? ContactPreview?.Id}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
@@ -670,8 +668,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 SearchId = SearchId,
                 ContactId = ContactId,
                 Contact = Contact,
-                ContactPreview = ContactPreview,
-                ReadOnlyMode = ReadOnlyMode
+                ContactPreview = ContactPreview
             };
         }
 
@@ -686,7 +683,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Contact = cfs.Contact;
                 ContactPreview = cfs.ContactPreview;
                 ContactId = cfs.ContactId;
-                ReadOnlyMode = cfs.ReadOnlyMode;
             }
         }
 
@@ -706,15 +702,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public Folder Folder { get; set; }
 
-            public int SearchId { get; set; }
+            public int? SearchId { get; set; }
 
             public int? ContactId { get; set; }
 
             public Contact Contact { get; set; }
 
             public ContactPreview ContactPreview { get; set; }
-
-            public bool ReadOnlyMode { get; set; }
         }
 
         #endregion

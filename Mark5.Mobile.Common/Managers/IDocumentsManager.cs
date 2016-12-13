@@ -25,7 +25,6 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId = -1, int endId = -1, SourceType sourceType = SourceType.Auto);
 
-
         Task<Document> GetDocumentAsync(Folder folder, int documentId, SourceType sourceType = SourceType.Auto);
 
         Task<Document> GetDocumentAsync(int folderId, int documentId, SourceType sourceType = SourceType.Auto);
@@ -80,9 +79,7 @@ namespace Mark5.Mobile.Common.Managers
 
         Task DeleteComment(Document document, Comment comment, SourceType sourceType = SourceType.Auto);
 
-        Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, Folder folder, Document document, bool checkMD5 = false, SourceType sourceType = SourceType.Auto);
-
-        Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, int folderId, Document document, bool checkMD5 = false, SourceType sourceType = SourceType.Auto);
+        Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, Document document, bool checkMD5 = false, SourceType sourceType = SourceType.Auto);
 
         Task<Guid> UploadTemporaryAttachmentAsync(Attachment attachment, SourceType sourceType = SourceType.Auto);
     }

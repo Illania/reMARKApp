@@ -177,7 +177,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var i = new Intent(Activity, typeof(ContactActivity));
             i.PutExtra(ContactActivity.SearchIdIntentKey, searchId);
             i.PutExtra(ContactActivity.ContactPreviewIntentKey, SerializationUtils.Serialize(contactPreview));
-            i.PutExtra(ContactActivity.ReadOnlyModeIntentKey, true);
             StartActivity(i);
         }
 

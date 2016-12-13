@@ -32,8 +32,6 @@ namespace Mark5.ServiceReference.DataContract
         public int Id { get; set; } = -1;
 
         public int DocumentId { get; set; } = -1;
-
-        public int FolderId { get; set; } = -1;
     }
 
     public class GetAttachmentResponse

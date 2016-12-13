@@ -641,12 +641,7 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, Folder folder, Document document, bool checkMD5 = false, SourceType sourceType = SourceType.Auto)
-        {
-            return await GetAttachmentAsync(attachmentDescription, folder.Id, document, checkMD5, sourceType);
-        }
-
-        public async Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, int folderId, Document document, bool checkMD5 = false, SourceType sourceType = SourceType.Auto)
+        public async Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, Document document, bool checkMD5 = false, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -657,7 +652,6 @@ namespace Mark5.Mobile.Common.Managers
                 {
                     Token = Token,
                     Id = attachmentDescription.Id,
-                    FolderId = folderId,
                     DocumentId = document.Id
                 }, async stream => { path = await FileSystemStorage.SaveAttachmentAsync(attachmentDescription, stream); });
 
