@@ -5,14 +5,16 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
+using Android.App;
 using Android.Content;
 using Android.Graphics;
-using Android.OS;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Util;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 
@@ -28,6 +30,8 @@ namespace Mark5.Mobile.Droid.Ui.Views
         int distanceSmall;
 
         LinearLayoutCompat innerLayout;
+
+        public event EventHandler<ObjectLink> ObjectLinkClicked = delegate { };
 
         public ObjectLinksView(Context context, string title, ObjectLink[] objectLinks)
             : base(context)
@@ -72,10 +76,12 @@ namespace Mark5.Mobile.Droid.Ui.Views
 
             for (int i = 0; i < objectLinks.Length; i++)
             {
-                var objectLink = objectLinks[i];
+                var ol = objectLinks[i];
                 var isNotLast = i != objectLinks.Length - 1;
 
-                innerLayout.AddView(new ObjectLinkView(Context, objectLink, distanceVeryLarge, distanceNormal));
+                var olv = new ObjectLinkView(Context, ol, distanceVeryLarge, distanceNormal);
+                olv.Click += (sender, e) => ObjectLinkClicked(this, ol);
+                innerLayout.AddView(olv);
 
                 if (isNotLast)
                 {
@@ -87,7 +93,7 @@ namespace Mark5.Mobile.Droid.Ui.Views
         class ObjectLinkView : LinearLayoutCompat
         {
 
-            public ObjectLinkView(Context context, ObjectLink objectLink, int distanceVeryLarge, int distanceNormal)
+            public ObjectLinkView(Context context, ObjectLink ol, int distanceVeryLarge, int distanceNormal)
                 : base(context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
@@ -97,7 +103,7 @@ namespace Mark5.Mobile.Droid.Ui.Views
                 var titleView = new AppCompatTextView(Context)
                 {
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                    Text = objectLink.IsReverse ? objectLink.TypeInfo.DescriptionComplexReverse : objectLink.TypeInfo.DescriptionComplex
+                    Text = ol.IsReverse ? ol.TypeInfo.DescriptionComplexReverse : ol.TypeInfo.DescriptionComplex
                 };
                 titleView.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
                 AddView(titleView);
@@ -105,10 +111,31 @@ namespace Mark5.Mobile.Droid.Ui.Views
                 var subtitleView = new AppCompatTextView(Context)
                 {
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                    Text = objectLink.Description
+                    Text = ol.Description
                 };
                 subtitleView.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
                 AddView(subtitleView);
+
+                if (ol.IsReverse)
+                {   
+                    Clickable |= (ol.FromObjectType == ObjectType.Document || ol.FromObjectType == ObjectType.Contact || ol.FromObjectType == ObjectType.Shortcode);
+                    if (Clickable)
+                    {
+                        var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
+                        SetBackgroundResource(typedArray.GetResourceId(0, 0));
+                        typedArray.Recycle();
+                    }
+                }
+                else
+                {
+                    Clickable |= (ol.ToObjectType == ObjectType.Document || ol.ToObjectType == ObjectType.Contact || ol.ToObjectType == ObjectType.Shortcode);
+                    if (Clickable)
+                    {
+                        var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
+                        SetBackgroundResource(typedArray.GetResourceId(0, 0));
+                        typedArray.Recycle();
+                    }
+                }
             }
         }
 
