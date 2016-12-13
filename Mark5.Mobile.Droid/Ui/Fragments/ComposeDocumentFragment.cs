@@ -427,6 +427,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 Dialogs.ShowYesNoDialog(Context, Resource.String.save_modifications, Resource.String.confirm_save_modified_document, SaveModifiedOutgoingDocument, SaveAndCloseComposeActivity);
             }
+            else if (PreviousDocumentDirection == DocumentDirection.Draft)
+            {
+                Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_change_draft, () => SendDocument(true), SaveAndCloseComposeActivity);
+            }
             else
             {
                 Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft, () => SendDocument(true), SaveAndCloseComposeActivity);
