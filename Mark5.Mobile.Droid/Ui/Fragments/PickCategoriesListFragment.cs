@@ -39,7 +39,6 @@ namespace Mark5.Mobile.Droid
             get { return (CategoriesListAdapter)recyclerView.GetAdapter(); }
         }
 
-
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         SearchView searchView;
@@ -320,7 +319,7 @@ namespace Mark5.Mobile.Droid
         class CategoriesListAdapter : RecyclerView.Adapter
         {
 
-            readonly List<Category> categoriesInView = new List<Category>();
+            readonly List<Category> categoriesInView = new List<Category>(200);
             readonly Dictionary<int, Category> selectedCategoriesInView;
 
             public override int ItemCount { get { return categoriesInView.Count; } }
@@ -335,16 +334,16 @@ namespace Mark5.Mobile.Droid
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var category = categoriesInView[position];
-                var viewHolder = holder as CategoryViewHolder;
+                var c = categoriesInView[position];
+                var cvh = holder as CategoryViewHolder;
 
-                viewHolder.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, category)));
+                cvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, c)));
 
-                viewHolder.Name = category.Name;
-                viewHolder.HexColor = category.HexColor;
-                viewHolder.Description = category.Description;
+                cvh.Name = c.Name;
+                cvh.HexColor = c.HexColor;
+                cvh.Description = c.Description;
 
-                viewHolder.Selected = selectedCategoriesInView.ContainsKey(category.Id);
+                cvh.Selected = selectedCategoriesInView.ContainsKey(c.Id);
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)

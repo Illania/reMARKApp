@@ -14,6 +14,7 @@ using Android.Graphics.Drawables;
 using Android.Graphics.Drawables.Shapes;
 using Android.OS;
 using Android.Support.V4.Content;
+using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -27,16 +28,27 @@ using Mark5.Mobile.Droid.Ui.Common;
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
 
-    public class CopyToUserWorktrayFragment : RetainableStateFragment
+    public class CopyToUserWorktrayFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
 
         public List<IBusinessEntity> BusinessEntities { get; set; }
         public Action CloseRequest { get; set; }
 
+        CopyToUserWorktrayAdapter CurrentAdapter
+        {
+            get { return (CopyToUserWorktrayAdapter)recyclerView.GetAdapter(); }
+        }
+
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
+        SearchView searchView;
         CopyToUserWorktrayAdapter adapter;
+        CopyToUserWorktrayAdapter searchAdapter;
         AppCompatButton copyButton;
+
+        readonly Dictionary<int, SystemUser> selectedSystemUsers = new Dictionary<int, SystemUser>();
+
+        readonly Handler searchHandler = new Handler();
 
         #region Fragment overrides
 
@@ -54,22 +66,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
-            adapter = new CopyToUserWorktrayAdapter();
+            adapter = new CopyToUserWorktrayAdapter(selectedSystemUsers);
             adapter.ItemClicked += Adapter_ItemClicked;
             recyclerView.SetAdapter(adapter);
+
+            searchAdapter = new CopyToUserWorktrayAdapter(selectedSystemUsers);
+            searchAdapter.ItemClicked += Adapter_ItemClicked;
 
             copyButton = rootView.FindViewById<AppCompatButton>(Resource.Id.button);
             copyButton.Text = GetString(Resource.String.copy_to_worktray);
             copyButton.Enabled = false;
             copyButton.Click += async (sender, e) =>
             {
-                CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={BusinessEntities.Count}, adapter.selectedItemCount={adapter.SelectedItemCount}]...");
+                CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={BusinessEntities.Count}, selectedUsers.Count={selectedSystemUsers.Count}]...");
 
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
 
                 try
                 {
-                    await Managers.CommonActionsManager.CopyToUserWorktray(BusinessEntities, adapter.SelectedItems);
+                    await Managers.CommonActionsManager.CopyToUserWorktray(BusinessEntities, selectedSystemUsers.Values.ToList());
 
                     if (CloseRequest != null) CloseRequest();
                 }
@@ -77,11 +92,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     dismissAction();
 
-                    CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={BusinessEntities.Count}, adapter.selectedItemCount={adapter.SelectedItemCount}]", ex);
+                    CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={BusinessEntities.Count}, selectedUsers.Count={selectedSystemUsers.Count}]", ex);
 
                     await Dialogs.ShowErrorDialogAsync(Activity, ex);
                 }
             };
+
+            HasOptionsMenu = true;
 
             return rootView;
         }
@@ -109,11 +126,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override void OnPause()
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
-            base.OnPause();
+            inflater.Inflate(Resource.Menu.menu_main, menu);
 
-            CommonConfig.Logger.Info($"Pausing {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={BusinessEntities?.Count}]...");
+            var searchItem = menu.FindItem(Resource.Id.action_search);
+            MenuItemCompat.SetOnActionExpandListener(searchItem, this);
+            searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
+            searchView.QueryHint = GetString(Resource.String.filter);
+            searchView.SetOnQueryTextListener(this);
+        }
+
+        void Adapter_ItemClicked(object sender, SystemUser e)
+        {
+            ToggleSelected(e);
+            UpdateControls();
         }
 
         #endregion
@@ -122,13 +149,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            CommonConfig.Logger.Info($"Retaining state [businessEntities.Count={BusinessEntities?.Count}, systemUsers.Count={adapter?.ItemCount}, selectedSystemUsers.Cound={adapter?.SelectedItemCount}]...");
+            CommonConfig.Logger.Info($"Retaining state [businessEntities.Count={BusinessEntities?.Count}, systemUsers.Count={adapter?.ItemCount}, selectedSystemUsers.Count={selectedSystemUsers.Count}]...");
 
             return new CopyToUserWorktrayFragmentState
             {
                 BusinessEntities = BusinessEntities,
                 SystemUsers = adapter.Items,
-                SelectedSystemUsers = adapter.SelectedItems
+                SelectedSystemUsers = selectedSystemUsers
             };
         }
 
@@ -140,8 +167,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Info($"Restoring state [dlfs.businessEntities.Count={dlfs.BusinessEntities?.Count}, dlfs.systemUsers.Count={dlfs.SystemUsers?.Count}, dlfs.selectedSystemUsers.Cound={dlfs.SelectedSystemUsers?.Count}]...");
 
                 BusinessEntities = dlfs.BusinessEntities;
-                adapter.AppendItems(dlfs.SystemUsers);
-                adapter.SetSelected(dlfs.SelectedSystemUsers, true);
+                adapter.SetItems(dlfs.SystemUsers);
+
+                selectedSystemUsers.Clear();
+                foreach (var kv in dlfs.SelectedSystemUsers)
+                {
+                    selectedSystemUsers.Add(kv.Key, kv.Value);
+                }
 
                 UpdateControls();
             }
@@ -165,7 +197,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 refreshLayout.Refreshing = true;
 
                 var userDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
-                adapter.AppendItems(userDepartments.Users.Where(su => su.Username != ServerConfig.SystemSettings.UserInfo.User.Username).OrderBy(su => su.Username).ToList());
+                adapter.SetItems(userDepartments.Users.Where(su => su.Username != ServerConfig.SystemSettings.UserInfo.User.Username).OrderBy(su => su.Username).ToList());
             }
             catch (Exception ex)
             {
@@ -181,30 +213,111 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        void ToggleSelected(SystemUser systemUser)
+        {
+            var isSelected = selectedSystemUsers.ContainsKey(systemUser.Id);
+            if (isSelected)
+            {
+                selectedSystemUsers.Remove(systemUser.Id);
+            }
+            else
+            {
+                selectedSystemUsers.Add(systemUser.Id, systemUser);
+            }
+
+            var position = CurrentAdapter.GetPosition(systemUser);
+            if (position >= 0)
+            {
+                CurrentAdapter.NotifyItemChanged(position);
+            }
+        }
+
         void UpdateControls()
         {
             if (!IsAdded || IsDetached || IsRemoving) return;
 
-            if (adapter.SelectedItemCount < 1)
+            if (selectedSystemUsers.Count < 1)
             {
                 ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
                 copyButton.Enabled = false;
             }
             else
             {
-                ((AppCompatActivity)Activity).SupportActionBar.Title = Resources.GetQuantityString(Resource.Plurals.users_selected, adapter.SelectedItemCount, adapter.SelectedItemCount);
+                ((AppCompatActivity)Activity).SupportActionBar.Title = Resources.GetQuantityString(Resource.Plurals.users_selected, selectedSystemUsers.Count, selectedSystemUsers.Count);
                 copyButton.Enabled = true;
             }
         }
 
         #endregion
 
-        #region Adapter callbacks
+        #region Filtering
 
-        void Adapter_ItemClicked(object sender, SystemUser systemUser)
+        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
-            adapter.SetSelected(systemUser, !adapter.IsSelected(systemUser));
-            UpdateControls();
+            if (item.ItemId == Resource.Id.action_search)
+            {
+                recyclerView.SwapAdapter(searchAdapter, true);
+                return true;
+            }
+
+            return false;
+        }
+
+        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
+        {
+            if (item.ItemId == Resource.Id.action_search)
+            {
+                searchHandler.RemoveCallbacksAndMessages(null);
+                searchAdapter.Clear();
+                recyclerView.SwapAdapter(adapter, true);
+                return true;
+            }
+
+            return false;
+        }
+
+        bool SearchView.IOnQueryTextListener.OnQueryTextChange(string newText)
+        {
+            searchHandler.RemoveCallbacksAndMessages(null);
+            searchHandler.PostDelayed(() =>
+            {
+                if (string.IsNullOrWhiteSpace(newText))
+                {
+                    searchAdapter.Clear();
+                }
+                else
+                {
+                    searchAdapter.ReplaceItems(adapter.Items.Where(su => MatchesQuery(su, newText)).ToList());
+                }
+            }, 500);
+            return false;
+        }
+
+        bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string newText)
+        {
+            return false;
+        }
+
+        static bool MatchesQuery(SystemUser su, string query)
+        {
+            if (su.Username.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+            {
+                return true;
+            }
+            if (su.FirstName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+            {
+                return true;
+            }
+            if (su.LastName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+            {
+                return true;
+            }
+            if (su.PatronymicName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         #endregion
@@ -218,7 +331,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public List<SystemUser> SystemUsers { get; set; }
 
-            public List<SystemUser> SelectedSystemUsers { get; set; }
+            public Dictionary<int, SystemUser> SelectedSystemUsers { get; set; }
         }
 
         #endregion
@@ -228,40 +341,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         class CopyToUserWorktrayAdapter : RecyclerView.Adapter
         {
 
-            public List<SystemUser> Items
-            {
-                get
-                {
-                    return systemUsersInView;
-                }
-            }
-
-            public List<SystemUser> SelectedItems
-            {
-                get
-                {
-                    return selectedSystemUsersInView.Values.ToList();
-                }
-            }
-
-            public override int ItemCount
-            {
-                get
-                {
-                    return systemUsersInView.Count;
-                }
-            }
-
-            public int SelectedItemCount
-            {
-                get
-                {
-                    return selectedSystemUsersInView.Count;
-                }
-            }
-
             readonly List<SystemUser> systemUsersInView = new List<SystemUser>(100);
-            readonly Dictionary<int, SystemUser> selectedSystemUsersInView = new Dictionary<int, SystemUser>();
+            readonly Dictionary<int, SystemUser> selectedSystemUsersInView;
+
+            public override int ItemCount { get { return systemUsersInView.Count; } }
+            public List<SystemUser> Items { get { return systemUsersInView; } }
+
+            public CopyToUserWorktrayAdapter(Dictionary<int, SystemUser> selectedSystemUsersInView)
+            {
+                this.selectedSystemUsersInView = selectedSystemUsersInView;
+            }
 
             public event EventHandler<SystemUser> ItemClicked = delegate { };
 
@@ -286,54 +375,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return new UserViewHolder(itemView);
             }
 
-            public void AppendItems(List<SystemUser> items)
+            public void SetItems(List<SystemUser> items)
             {
                 var count = systemUsersInView.Count;
                 systemUsersInView.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
 
-            public bool IsSelected(SystemUser systemUser)
+            public void Clear()
             {
-                return selectedSystemUsersInView.ContainsKey(systemUser.Id);
+                var count = systemUsersInView.Count;
+                systemUsersInView.Clear();
+                NotifyItemRangeRemoved(0, count);
             }
 
-            public void SetSelected(List<SystemUser> systemUsers, bool selected)
+            public void ReplaceItems(List<SystemUser> items)
             {
-                foreach (var contact in systemUsers)
-                {
-                    SetSelected(contact, selected);
-                }
-            }
-
-            public void SetSelected(SystemUser systemUser, bool selected)
-            {
-                var position = GetPosition(systemUser);
-                if (position < 0) return;
-
-                if (selected)
-                {
-                    selectedSystemUsersInView[systemUser.Id] = systemUser;
-                }
-                else
-                {
-                    selectedSystemUsersInView.Remove(systemUser.Id);
-                }
-                NotifyItemChanged(position);
-            }
-
-            public int GetPosition(int systemUserId)
-            {
-                var position = -1;
-                for (var i = 0; i < systemUsersInView.Count; i++)
-                {
-                    if (systemUsersInView[i].Id == systemUserId)
-                    {
-                        position = i;
-                        break;
-                    }
-                }
-                return position;
+                Clear();
+                SetItems(items);
             }
 
             public int GetPosition(SystemUser systemUser)
