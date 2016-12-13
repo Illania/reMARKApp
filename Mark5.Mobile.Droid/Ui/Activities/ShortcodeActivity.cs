@@ -24,7 +24,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         public const string FolderIdIntentKey = "FolderId_e3f108c2-2b12-458c-ae4b-195c4036d334";
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
-        public const string SearchIdIntentKey = "SearchId_17ad833a-b475-4835-8f81-87fe435ed75d";
         public const string ShortcodeIdIntentKey = "ShortcodeId_3b7133eb-aa8c-44e9-be83-e984c5c43967";
         public const string ShortcodePreviewIntentKey = "ShortcodePreview_0bd291a4-22a5-431c-ad6e-4c8b273eeb98";
         public const string NotificationGuidIntentKey = "NotificationGuid_f1cdbdf5-3f62-4545-ae60-8acfd6a5c750";
@@ -53,9 +52,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (Intent.HasExtra(FolderIntentKey))
                     sf.Folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
-
-                if (Intent.HasExtra(SearchIdIntentKey))
-                    sf.SearchId = Intent.Extras.GetInt(SearchIdIntentKey);
 
                 if (Intent.HasExtra(ShortcodeIdIntentKey))
                     sf.ShortcodeId = Intent.Extras.GetInt(ShortcodeIdIntentKey);

@@ -7,7 +7,6 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
@@ -34,8 +33,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public SearchShortcodesCriteria Criteria { get; set; }
         public Action CloseRequest { get; set; }
-
-        int searchId;
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -105,7 +102,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return new ShortcodeSearchResultsFragmentState
             {
                 Criteria = Criteria,
-                SearchId = searchId,
                 ShortcodePreviews = adapter.Items
             };
         }
@@ -118,7 +114,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Info($"Restoring state [dlfs.criteria={dlfs.Criteria}, dlfs.items.count={dlfs.ShortcodePreviews?.Count}]...");
 
                 Criteria = dlfs.Criteria;
-                searchId = dlfs.SearchId;
                 adapter.AppendItems(dlfs.ShortcodePreviews);
             }
         }
@@ -140,17 +135,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 refreshLayout.Refreshing = true;
 
-                var searchResults = await Managers.SearchManager.SearchShortcodesAsync(Criteria);
+                var shortcodePreviews = await Managers.SearchManager.SearchShortcodesAsync(Criteria);
 
-                if (searchResults?.ShortcodePreviews?.Count < 1)
+                if (shortcodePreviews.Count < 1)
                 {
                     await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.no_results, Resource.String.no_results_shortcodes);
                     if (CloseRequest != null) CloseRequest();
                     return;
                 }
 
-                searchId = searchResults.SearchId;
-                adapter.AppendItems(searchResults.ShortcodePreviews);
+                adapter.AppendItems(shortcodePreviews);
             }
             catch (Exception ex)
             {
@@ -175,7 +169,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void Adapter_ItemClicked(object sender, ShortcodePreview shortcodePreview)
         {
             var i = new Intent(Activity, typeof(ShortcodeActivity));
-            i.PutExtra(ShortcodeActivity.SearchIdIntentKey, searchId);
             i.PutExtra(ShortcodeActivity.ShortcodePreviewIntentKey, SerializationUtils.Serialize(shortcodePreview));
             StartActivity(i);
         }
@@ -186,8 +179,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ShortcodeSearchResultsFragmentState : IRetainableState
         {
-
-            public int SearchId { get; set; }
 
             public SearchShortcodesCriteria Criteria { get; set; }
 

@@ -28,11 +28,11 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<Shortcode> GetShortcodeAsync(Folder folder, int shortcodeId, SourceType sourceType = SourceType.Auto);
 
-        Task<Shortcode> GetShortcodeAsync(int folderId, int shortcodeId, SourceType sourceType = SourceType.Auto);
+        Task<Shortcode> GetShortcodeAsync(int? folderId, int shortcodeId, SourceType sourceType = SourceType.Auto);
 
         Task<ShortcodeContainer> GetShortcodeWithPreviewAsync(Folder folder, int shortcodeId, SourceType sourceType = SourceType.Auto);
 
-        Task<ShortcodeContainer> GetShortcodeWithPreviewAsync(int folderId, int shortcodeId, SourceType sourceType = SourceType.Auto);
+        Task<ShortcodeContainer> GetShortcodeWithPreviewAsync(int? folderId, int shortcodeId, SourceType sourceType = SourceType.Auto);
     }
 }
 

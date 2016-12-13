@@ -120,15 +120,10 @@
     <Compile Include="Model\ReadNotificationInfo.cs" />
     <Compile Include="Model\RecentAddress.cs" />
     <Compile Include="Model\SavedSearch.cs" />
-    <Compile Include="Model\SearchCalendarAppointmentsResult.cs" />
     <Compile Include="Model\SearchCalendarEventsCriteria.cs" />
-    <Compile Include="Model\SearchCalendarTasksResult.cs" />
     <Compile Include="Model\SearchContactsCriteria.cs" />
-    <Compile Include="Model\SearchContactsResult.cs" />
     <Compile Include="Model\SearchDocumentsCriteria.cs" />
-    <Compile Include="Model\SearchDocumentsResult.cs" />
     <Compile Include="Model\SearchShortcodesCriteria.cs" />
-    <Compile Include="Model\SearchShortcodesResult.cs" />
     <Compile Include="Model\SendDocumentInfo.cs" />
     <Compile Include="Model\Shortcode.cs" />
     <Compile Include="Model\ShortcodePreview.cs" />

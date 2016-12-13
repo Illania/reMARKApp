@@ -83,7 +83,7 @@ namespace Mark5.Mobile.Common.Managers
             return await GetDocumentAsync(folder.Id, documentId, sourceType);
         }
 
-        public async Task<Document> GetDocumentAsync(int folderId, int documentId, SourceType sourceType = SourceType.Auto)
+        public async Task<Document> GetDocumentAsync(int? folderId, int documentId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -92,7 +92,7 @@ namespace Mark5.Mobile.Common.Managers
                 var result = await AppServiceProxy.GetDocumentAsync(new DataContract.GetDocumentParameters
                 {
                     Token = Token,
-                    FolderId = folderId,
+                    FolderId = folderId ?? -1,
                     DocumentId = documentId,
                     BodyRequest = DocumentBodyTypeRequest.ConvertEnum<DataContract.DocumentBodyTypeRequest>(),
                     IncludePreview = false
@@ -115,10 +115,10 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<DocumentContainer> GetDocumentWithPreviewAsync(Folder folder, int documentId, SourceType sourceType = SourceType.Auto)
         {
-            return await GetDocumentWithPreviewAsync(folder.Id, documentId, sourceType);
+            return await GetDocumentWithPreviewAsync(folder?.Id, documentId, sourceType);
         }
 
-        public async Task<DocumentContainer> GetDocumentWithPreviewAsync(int folderId, int documentId, SourceType sourceType = SourceType.Auto)
+        public async Task<DocumentContainer> GetDocumentWithPreviewAsync(int? folderId, int documentId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -127,7 +127,7 @@ namespace Mark5.Mobile.Common.Managers
                 var result = await AppServiceProxy.GetDocumentAsync(new DataContract.GetDocumentParameters
                 {
                     Token = Token,
-                    FolderId = folderId,
+                    FolderId = folderId ?? -1,
                     DocumentId = documentId,
                     BodyRequest = DocumentBodyTypeRequest.ConvertEnum<DataContract.DocumentBodyTypeRequest>(),
                     IncludePreview = true

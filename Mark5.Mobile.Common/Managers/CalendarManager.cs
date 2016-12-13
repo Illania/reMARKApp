@@ -111,7 +111,7 @@ namespace Mark5.Mobile.Common.Managers
                 var result = await AppServiceProxy.GetCalendarAppointmentAsync(new DataContract.GetCalendarAppointmentParameters
                 {
                     Token = Token,
-                    FolderId = folder.Id,
+                    FolderId = folder?.Id ?? -1,
                     CalendarAppointmentId = calendarAppointmentId
                 });
 
@@ -139,7 +139,7 @@ namespace Mark5.Mobile.Common.Managers
                 var result = await AppServiceProxy.GetCalendarTaskAsync(new DataContract.GetCalendarTaskParameters
                 {
                     Token = Token,
-                    FolderId = folder.Id,
+                    FolderId = folder?.Id ?? -1,
                     CalendarTaskId = calendarTaskId
                 });
 

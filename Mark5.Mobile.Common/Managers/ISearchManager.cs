@@ -20,26 +20,15 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<List<SavedSearch>> GetSavedSearches(SourceType sourceType = SourceType.Auto);
 
-        Task<SearchDocumentsResult> SearchDocumentsAsync(SearchDocumentsCriteria criteria, SourceType sourceType = SourceType.Auto);
+        Task<List<DocumentPreview>> SearchDocumentsAsync(SearchDocumentsCriteria criteria, SourceType sourceType = SourceType.Auto);
 
-        Task<SearchContactsResult> SearchContactsAsync(SearchContactsCriteria critera, SourceType sourceType = SourceType.Auto);
+        Task<List<ContactPreview>> SearchContactsAsync(SearchContactsCriteria critera, SourceType sourceType = SourceType.Auto);
 
-        Task<SearchShortcodesResult> SearchShortcodesAsync(SearchShortcodesCriteria criteria, SourceType sourceType = SourceType.Auto);
+        Task<List<ShortcodePreview>> SearchShortcodesAsync(SearchShortcodesCriteria criteria, SourceType sourceType = SourceType.Auto);
 
-        Task<SearchCalendarTasksResult> SearchCalendarTasksAsync(SearchCalendarEventsCriteria criteria, SourceType sourceType = SourceType.Auto);
+        Task<List<CalendarTask>> SearchCalendarTasksAsync(SearchCalendarEventsCriteria criteria, SourceType sourceType = SourceType.Auto);
 
-        Task<SearchCalendarAppointmentsResult> SearchCalendarAppointmentsAsync(SearchCalendarEventsCriteria criteria, SourceType sourceType = SourceType.Auto);
-
-        Task<Document> GetDocumentAsync(int searchId, DocumentPreview documentPreview, SourceType sourceType = SourceType.Auto);
-
-        Task<Contact> GetContactAsync(int searchId, ContactPreview contactPreview, SourceType sourceType = SourceType.Auto);
-
-        Task<Shortcode> GetShortcodeAsync(int searchId, ShortcodePreview shortcodePreview, SourceType sourceType = SourceType.Auto);
-
-        Task<CalendarTask> GetCalendarTaskAsync(int searchId, int taskId, SourceType sourceType = SourceType.Auto);
-
-        Task<CalendarAppointment> GetCalendarAppointmentAsync(int searchId, int appointmentId, SourceType sourceType = SourceType.Auto);
-
+        Task<List<CalendarAppointment>> SearchCalendarAppointmentsAsync(SearchCalendarEventsCriteria criteria, SourceType sourceType = SourceType.Auto);
     }
 }
 

@@ -47,7 +47,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public int? FolderId { get; set; }
         public Folder Folder { get; set; }
-        public int? SearchId { get; set; }
         public int? DocumentId { get; set; }
         public DocumentPreview DocumentPreview { get; set; }
         public Document Document { get; set; }
@@ -62,7 +61,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
 
@@ -94,7 +93,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = string.Empty;
 
-            CommonConfig.Logger.Info($"Created {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}]");
+            CommonConfig.Logger.Info($"Created {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}]");
         }
 
         public override async void OnResume()
@@ -238,17 +237,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.Reply)
             {
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Reply, DocumentPreview.Direction, Document.Id, SearchId ?? FolderId ?? Folder?.Id));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Reply, DocumentPreview.Direction, Document.Id, FolderId ?? Folder?.Id));
                 return true;
             }
             if (item.ItemId == MenuItemActions.ReplyAll)
             {
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.ReplyAll, DocumentPreview.Direction, Document.Id, SearchId ?? Folder?.Id));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.ReplyAll, DocumentPreview.Direction, Document.Id, FolderId ?? Folder?.Id));
                 return true;
             }
             if (item.ItemId == MenuItemActions.Forward)
             {
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Forward, DocumentPreview.Direction, Document.Id, SearchId ?? FolderId ?? Folder?.Id));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Forward, DocumentPreview.Direction, Document.Id, FolderId ?? Folder?.Id));
                 return true;
             }
 
@@ -615,34 +614,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
                 }
 
-                if (FolderId.HasValue || Folder != null)
+                if (DocumentId.HasValue && DocumentPreview == null && Document == null)
                 {
-                    if (DocumentId.HasValue && DocumentPreview == null && Document == null)
-                    {
-                        var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(FolderId ?? Folder.Id, DocumentId.Value);
-                        DocumentPreview = container.DocumentPreview;
-                        Document = container.Document;
-                    }
-
-                    if (DocumentPreview != null && Document == null)
-                    {
-                        Document = await Managers.DocumentsManager.GetDocumentAsync(FolderId ?? Folder.Id, DocumentPreview.Id);
-                    }
+                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(FolderId ?? Folder?.Id, DocumentId.Value);
+                    DocumentPreview = container.DocumentPreview;
+                    Document = container.Document;
                 }
 
-                if (SearchId.HasValue && SearchId <= -999)
+                if (DocumentPreview != null && Document == null)
                 {
-                    if (DocumentPreview != null && Document == null)
-                    {
-                        Document = await Managers.SearchManager.GetDocumentAsync(SearchId.Value, DocumentPreview);
-                    }
+                    Document = await Managers.DocumentsManager.GetDocumentAsync(FolderId ?? Folder?.Id, DocumentPreview.Id);
                 }
 
                 RefreshView();
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Downloading document failed [folder.name={Folder?.Name}, searchId={SearchId}, folder.id={FolderId ?? Folder?.Id}, documentId={DocumentId ?? DocumentPreview?.Id}]", ex);
+                CommonConfig.Logger.Error($"Downloading document failed [folder.name={Folder?.Name}, folder.id={FolderId ?? Folder?.Id}, documentId={DocumentId ?? DocumentPreview?.Id}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
@@ -778,7 +766,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 FolderId = FolderId,
                 Folder = Folder,
-                SearchId = SearchId,
                 DocumentId = DocumentId,
                 DocumentPreview = DocumentPreview,
                 Document = Document
@@ -792,7 +779,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 FolderId = dfs.FolderId;
                 Folder = dfs.Folder;
-                SearchId = dfs.SearchId;
                 DocumentId = dfs.DocumentId;
                 DocumentPreview = dfs.DocumentPreview;
                 Document = dfs.Document;
@@ -810,8 +796,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int? FolderId { get; set; }
 
             public Folder Folder { get; set; }
-
-            public int? SearchId { get; set; }
 
             public int? DocumentId { get; set; }
 

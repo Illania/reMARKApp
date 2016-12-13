@@ -1713,9 +1713,6 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "SearchResults", Order = 0)]
         public List<DocumentPreview> SearchResults { get; set; } = new List<DocumentPreview>();
-
-        [DataMember(Name = "SearchId", Order = 0)]
-        public int SearchId { get; set; } = -1;
     }
 
     [DataContract(Name = "SearchContactsParameters", Namespace = "com.nordic-it.appservice.v3")]
@@ -1788,9 +1785,6 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "SearchResults", Order = 0)]
         public List<ContactPreview> SearchResults { get; set; } = new List<ContactPreview>();
-
-        [DataMember(Name = "SearchId", Order = 0)]
-        public int SearchId { get; set; } = -1;
     }
 
     [DataContract(Name = "SearchShortcodesParameters", Namespace = "com.nordic-it.appservice.v3")]
@@ -1828,9 +1822,6 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "ShortcodePreviews", Order = 0)]
         public List<ShortcodePreview> ShortcodePreviews { get; set; } = new List<ShortcodePreview>();
-
-        [DataMember(Name = "SearchId", Order = 0)]
-        public int SearchId { get; set; } = -1;
     }
 
     [DataContract(Name = "SearchCalendarEventsParameters", Namespace = "com.nordic-it.appservice.v3")]
@@ -1913,9 +1904,6 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "CalendarTasks", Order = 0)]
         public List<CalendarTask> CalendarTasks { get; set; } = new List<CalendarTask>();
-
-        [DataMember(Name = "SearchId", Order = 0)]
-        public int SearchId { get; set; } = -1;
     }
 
     [DataContract(Name = "SavedSearch", Namespace = "com.nordic-it.appservice.v3")]

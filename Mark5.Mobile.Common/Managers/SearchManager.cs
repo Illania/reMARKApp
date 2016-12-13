@@ -53,7 +53,7 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<SearchDocumentsResult> SearchDocumentsAsync(SearchDocumentsCriteria criteria, SourceType sourceType = SourceType.Auto)
+        public async Task<List<DocumentPreview>> SearchDocumentsAsync(SearchDocumentsCriteria criteria, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -92,11 +92,7 @@ namespace Mark5.Mobile.Common.Managers
                     ExtraFields = criteria.ExtraFields
                 });
 
-                return new SearchDocumentsResult
-                {
-                    SearchId = result.SearchId,
-                    DocumentPreviews = result.SearchResults.WhereNotNull().OrderByDescending(dp => dp.DateReceived).Select(dp => dp.Convert()).ToList()
-                };
+                return result.SearchResults.WhereNotNull().OrderByDescending(dp => dp.DateReceived).Select(dp => dp.Convert()).ToList();
             }
 
             if (sourceType == SourceType.Local)
@@ -107,7 +103,7 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<SearchContactsResult> SearchContactsAsync(SearchContactsCriteria criteria, SourceType sourceType = SourceType.Auto)
+        public async Task<List<ContactPreview>> SearchContactsAsync(SearchContactsCriteria criteria, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -136,11 +132,7 @@ namespace Mark5.Mobile.Common.Managers
                     FiledInFolderFolderType = criteria.FiledInFolderFolderType.ConvertEnum<DataContract.FiledInFolderFolderType>()
                 });
 
-                return new SearchContactsResult
-                {
-                    SearchId = result.SearchId,
-                    ContactPreviews = result.SearchResults.WhereNotNull().OrderBy(cp => cp.RowId).Select(cp => cp.Convert()).ToList()
-                };
+                return result.SearchResults.WhereNotNull().OrderBy(cp => cp.RowId).Select(cp => cp.Convert()).ToList();
             }
 
             if (sourceType == SourceType.Local)
@@ -151,8 +143,36 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        public async Task<List<ShortcodePreview>> SearchShortcodesAsync(SearchShortcodesCriteria criteria, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
-        public async Task<SearchCalendarTasksResult> SearchCalendarTasksAsync(SearchCalendarEventsCriteria criteria, SourceType sourceType = SourceType.Auto)
+            if (sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.SearchShortcodesAsync(new DataContract.SearchShortcodesParameters
+                {
+                    Token = Token,
+                    SavedSearchFilterHash = criteria.SavedSearchFilterHash,
+                    MaxToFetch = criteria.MaxToFetch,
+                    Name = criteria.Name,
+                    Description = criteria.Description,
+                    Address = criteria.Address,
+                    FiledInFolderType = criteria.FiledInFolderType.ConvertEnum<DataContract.FiledInFolderType>(),
+                    FiledInFolderFolderType = criteria.FiledInFolderFolderType.ConvertEnum<DataContract.FiledInFolderFolderType>()
+                });
+
+                return result.ShortcodePreviews.WhereNotNull().OrderBy(sp => sp.RowId).Select(sp => sp.Convert()).ToList();
+            }
+
+            if (sourceType == SourceType.Local)
+            {
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task<List<CalendarTask>> SearchCalendarTasksAsync(SearchCalendarEventsCriteria criteria, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -183,11 +203,7 @@ namespace Mark5.Mobile.Common.Managers
                     FiledInFolderIds = criteria.FiledInFolderIds
                 });
 
-                return new SearchCalendarTasksResult
-                {
-                    SearchId = result.SearchId,
-                    CalendarTasks = result.CalendarTasks.WhereNotNull().Select(ct => ct.Convert()).ToList()
-                };
+                return result.CalendarTasks.WhereNotNull().Select(ct => ct.Convert()).ToList();
             }
 
             if (sourceType == SourceType.Local)
@@ -199,7 +215,7 @@ namespace Mark5.Mobile.Common.Managers
 
         }
 
-        public async Task<SearchCalendarAppointmentsResult> SearchCalendarAppointmentsAsync(SearchCalendarEventsCriteria criteria, SourceType sourceType = SourceType.Auto)
+        public async Task<List<CalendarAppointment>> SearchCalendarAppointmentsAsync(SearchCalendarEventsCriteria criteria, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -230,11 +246,7 @@ namespace Mark5.Mobile.Common.Managers
                     FiledInFolderIds = criteria.FiledInFolderIds
                 });
 
-                return new SearchCalendarAppointmentsResult
-                {
-                    SearchId = result.SearchId,
-                    CalendarAppointments = result.CalendarAppointments.WhereNotNull().Select(ct => ct.Convert()).ToList()
-                };
+                return result.CalendarAppointments.WhereNotNull().Select(ct => ct.Convert()).ToList();
             }
 
             if (sourceType == SourceType.Local)
@@ -244,164 +256,6 @@ namespace Mark5.Mobile.Common.Managers
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
-
-        public async Task<SearchShortcodesResult> SearchShortcodesAsync(SearchShortcodesCriteria criteria, SourceType sourceType = SourceType.Auto)
-        {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
-
-            if (sourceType == SourceType.Remote)
-            {
-                var result = await AppServiceProxy.SearchShortcodesAsync(new DataContract.SearchShortcodesParameters
-                {
-                    Token = Token,
-                    SavedSearchFilterHash = criteria.SavedSearchFilterHash,
-                    MaxToFetch = criteria.MaxToFetch,
-                    Name = criteria.Name,
-                    Description = criteria.Description,
-                    Address = criteria.Address,
-                    FiledInFolderType = criteria.FiledInFolderType.ConvertEnum<DataContract.FiledInFolderType>(),
-                    FiledInFolderFolderType = criteria.FiledInFolderFolderType.ConvertEnum<DataContract.FiledInFolderFolderType>()
-                });
-
-                return new SearchShortcodesResult
-                {
-                    SearchId = result.SearchId,
-                    ShortcodePreviews = result.ShortcodePreviews.WhereNotNull().OrderBy(sp => sp.RowId).Select(sp => sp.Convert()).ToList()
-                };
-            }
-
-            if (sourceType == SourceType.Local)
-            {
-                throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
-
-            throw new ArgumentException("Invalid sourceType provided.");
-        }
-
-        public async Task<Document> GetDocumentAsync(int searchId, DocumentPreview documentPreview, SourceType sourceType = SourceType.Auto)
-        {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
-
-            if (sourceType == SourceType.Remote)
-            {
-                var result = await AppServiceProxy.GetDocumentAsync(new DataContract.GetDocumentParameters
-                {
-                    Token = Token,
-                    FolderId = searchId,
-                    DocumentId = documentPreview.Id,
-                    BodyRequest = DocumentBodyTypeRequest.ConvertEnum<DataContract.DocumentBodyTypeRequest>(),
-                    IncludePreview = false
-                });
-
-                return result.Document.Convert();
-            }
-
-            if (sourceType == SourceType.Local)
-            {
-                throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
-
-            throw new ArgumentException("Invalid sourceType provided.");
-        }
-
-        public async Task<Contact> GetContactAsync(int searchId, ContactPreview contactPreview, SourceType sourceType = SourceType.Auto)
-        {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
-
-            if (sourceType == SourceType.Remote)
-            {
-                var result = await AppServiceProxy.GetContactAsync(new DataContract.GetContactParameters
-                {
-                    Token = Token,
-                    FolderId = searchId,
-                    ContactId = contactPreview.Id,
-                    IncludePreview = false
-                });
-
-                return result.Contact.Convert();
-            }
-
-            if (sourceType == SourceType.Local)
-            {
-                throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
-
-            throw new ArgumentException("Invalid sourceType provided.");
-        }
-
-        public async Task<Shortcode> GetShortcodeAsync(int searchId, ShortcodePreview shortcodePreview, SourceType sourceType = SourceType.Auto)
-        {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
-
-            if (sourceType == SourceType.Remote)
-            {
-                var result = await AppServiceProxy.GetShortcodeAsync(new DataContract.GetShortcodeParameters
-                {
-                    Token = Token,
-                    FolderId = searchId,
-                    ShortcodeId = shortcodePreview.Id,
-                    IncludePreview = false
-                });
-
-                return result.Shortcode.Convert();
-            }
-
-            if (sourceType == SourceType.Local)
-            {
-                throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
-
-            throw new ArgumentException("Invalid sourceType provided.");
-        }
-
-        public async Task<CalendarTask> GetCalendarTaskAsync(int searchId, int taskId, SourceType sourceType = SourceType.Auto)
-        {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
-
-            if (sourceType == SourceType.Remote)
-            {
-                var result = await AppServiceProxy.GetCalendarTaskAsync(new DataContract.GetCalendarTaskParameters
-                {
-                    Token = Token,
-                    FolderId = searchId,
-                    CalendarTaskId = taskId
-                });
-
-                return result.CalendarTask.Convert();
-            }
-
-            if (sourceType == SourceType.Local)
-            {
-                throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
-
-            throw new ArgumentException("Invalid sourceType provided.");
-        }
-
-        public async Task<CalendarAppointment> GetCalendarAppointmentAsync(int searchId, int appointmentId, SourceType sourceType = SourceType.Auto)
-        {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
-
-            if (sourceType == SourceType.Remote)
-            {
-                var result = await AppServiceProxy.GetCalendarAppointmentAsync(new DataContract.GetCalendarAppointmentParameters
-                {
-                    Token = Token,
-                    FolderId = searchId,
-                    CalendarAppointmentId = appointmentId
-                });
-
-                return result.CalendarAppointment.Convert();
-            }
-
-            if (sourceType == SourceType.Local)
-            {
-                throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
-
-            throw new ArgumentException("Invalid sourceType provided.");
-        }
-
     }
 }
 

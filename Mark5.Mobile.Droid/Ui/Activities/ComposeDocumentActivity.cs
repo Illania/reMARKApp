@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: ComposeDocumentActivity.cs
 // Author: Ferdinando Papale fp@nordic-it.com
@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         const string CreationModeFlagIntentKey = "CreationModeFlagIntent_290d1383-175d-4e2d-8f5e-ca899baff3f7";
         const string PreviousDocumentIdIntentKey = "PreviousDocumentIdIntent_a2066147-a27b-454f-bc5c-03e6b8266697";
-        const string PreviousDocumentFolderOrSearchIdIntentKey = "PreviousDocumentFolderOrSearchIdIntent_ac0d9a31-2ddc-497b-8fbe-7fd5a51b2257";
+        const string PreviousDocumentFolderIdIntentKey = "PreviousDocumentFolderIdIntent_ac0d9a31-2ddc-497b-8fbe-7fd5a51b2257";
         const string PreviousDocumentDirectionIntentKey = "PreviousDocumentDirectionIntent_edefdcd2-764f-439d-891b-178b8de29333";
         const string OutgoingDocumentGuidIntentKey = "OutgoingDocumentGuidIntent_7901fa2b-f096-4e9e-82b9-5aeae9f39d05";
         const string PreconfiguredEmailAddressesIntentKey = "PreconfiguredEmailAddressesIntent_25ff402c-268e-477c-890c-80d68e60ab01";
@@ -36,7 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         string cdfFragmentTag;
 
         public static Intent CreateIntent(Context context, DocumentCreationModeFlag creationModeFlag, DocumentDirection previousDocumentDirection, int? precedingDocumentId = null,
-                                          int? precedingDocumentFolderOrSearchId = null, Guid outgoingDocumentGuid = default(Guid), List<string> preconfiguredEmailAddresses = null)
+                                          int? precedingDocumentFolderId = null, Guid outgoingDocumentGuid = default(Guid), List<string> preconfiguredEmailAddresses = null)
         {
             var intent = new Intent(context, typeof(ComposeDocumentActivity));
             intent.PutExtra(CreationModeFlagIntentKey, (int)creationModeFlag);
@@ -49,9 +49,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 intent.PutExtra(PreviousDocumentIdIntentKey, precedingDocumentId.Value);
             }
-            if (precedingDocumentFolderOrSearchId != null)
+            if (precedingDocumentFolderId != null)
             {
-                intent.PutExtra(PreviousDocumentFolderOrSearchIdIntentKey, precedingDocumentFolderOrSearchId.Value);
+                intent.PutExtra(PreviousDocumentFolderIdIntentKey, precedingDocumentFolderId.Value);
             }
             if (preconfiguredEmailAddresses != null)
             {
@@ -87,8 +87,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (Intent.HasExtra(PreviousDocumentIdIntentKey))
                     cdf.PreviousDocumentId = Intent.Extras.GetInt(PreviousDocumentIdIntentKey);
 
-                if (Intent.HasExtra(PreviousDocumentFolderOrSearchIdIntentKey))
-                    cdf.PreviousDocumentFolderOrSearchId = Intent.Extras.GetInt(PreviousDocumentFolderOrSearchIdIntentKey);
+                if (Intent.HasExtra(PreviousDocumentFolderIdIntentKey))
+                    cdf.PreviousDocumentFolderId = Intent.Extras.GetInt(PreviousDocumentFolderIdIntentKey);
 
                 if (Intent.HasExtra(PreconfiguredEmailAddressesIntentKey))
                     cdf.PreconfiguredEmailAddresses = Intent.Extras.GetStringArray(PreconfiguredEmailAddressesIntentKey);

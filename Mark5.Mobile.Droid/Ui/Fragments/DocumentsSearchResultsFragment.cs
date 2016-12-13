@@ -35,8 +35,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public SearchDocumentsCriteria Criteria { get; set; }
         public Action CloseRequest { get; set; }
 
-        int searchId;
-
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         DocumentSearchResultsAdapter adapter;
@@ -105,7 +103,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return new DocumentSearchResultsFragmentState
             {
                 Criteria = Criteria,
-                SearchId = searchId,
                 DocumentPreviews = adapter.Items
             };
         }
@@ -118,7 +115,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Info($"Restoring state [dlfs.criteria={dlfs.Criteria}, dlfs.items.count={dlfs.DocumentPreviews?.Count}]...");
 
                 Criteria = dlfs.Criteria;
-                searchId = dlfs.SearchId;
                 adapter.AppendItems(dlfs.DocumentPreviews);
             }
         }
@@ -140,17 +136,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 refreshLayout.Refreshing = true;
 
-                var searchResults = await Managers.SearchManager.SearchDocumentsAsync(Criteria);
+                var documentPreviews = await Managers.SearchManager.SearchDocumentsAsync(Criteria);
 
-                if (searchResults?.DocumentPreviews?.Count < 1) 
+                if (documentPreviews.Count < 1) 
                 {
                     await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.no_results, Resource.String.no_results_documents);
                     if (CloseRequest != null) CloseRequest();
                     return;
                 }
 
-                searchId = searchResults.SearchId;
-                adapter.AppendItems(searchResults.DocumentPreviews);
+                adapter.AppendItems(documentPreviews);
             }
             catch (Exception ex)
             {
@@ -175,7 +170,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void Adapter_ItemClicked(object sender, DocumentPreview documentPreview)
         {
             var i = new Intent(Activity, typeof(DocumentActivity));
-            i.PutExtra(DocumentActivity.SearchIdIntentKey, searchId);
             i.PutExtra(DocumentActivity.DocumentPreviewIntentKey, SerializationUtils.Serialize(documentPreview));
             StartActivity(i);
         }
@@ -186,9 +180,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class DocumentSearchResultsFragmentState : IRetainableState
         {
-
-            public int SearchId { get; set; }
-
+            
             public SearchDocumentsCriteria Criteria { get; set; }
 
             public List<DocumentPreview> DocumentPreviews { get; set; }

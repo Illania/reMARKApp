@@ -96,7 +96,12 @@ namespace Mark5.Mobile.Common.Managers
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        public async Task<Shortcode> GetShortcodeAsync(int folderId, int shortcodeId, SourceType sourceType = SourceType.Auto)
+        public async Task<Shortcode> GetShortcodeAsync(Folder folder, int shortcodeId, SourceType sourceType = SourceType.Auto)
+        {
+            return await GetShortcodeAsync(folder?.Id, shortcodeId, sourceType);
+        }
+
+        public async Task<Shortcode> GetShortcodeAsync(int? folderId, int shortcodeId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -105,7 +110,7 @@ namespace Mark5.Mobile.Common.Managers
                 var result = await AppServiceProxy.GetShortcodeAsync(new DataContract.GetShortcodeParameters
                 {
                     Token = Token,
-                    FolderId = folderId,
+                    FolderId = folderId ?? -1,
                     ShortcodeId = shortcodeId,
                     IncludePreview = false
                 });
@@ -125,17 +130,12 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<Shortcode> GetShortcodeAsync(Folder folder, int shortcodeId, SourceType sourceType = SourceType.Auto)
-        {
-            return await GetShortcodeAsync(folder.Id, shortcodeId, sourceType);
-        }
-
         public async Task<ShortcodeContainer> GetShortcodeWithPreviewAsync(Folder folder, int shortcodeId, SourceType sourceType = SourceType.Auto)
         {
-            return await GetShortcodeWithPreviewAsync(folder.Id, shortcodeId, sourceType);
+            return await GetShortcodeWithPreviewAsync(folder?.Id, shortcodeId, sourceType);
         }
 
-        public async Task<ShortcodeContainer> GetShortcodeWithPreviewAsync(int folderId, int shortcodeId, SourceType sourceType = SourceType.Auto)
+        public async Task<ShortcodeContainer> GetShortcodeWithPreviewAsync(int? folderId, int shortcodeId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -144,7 +144,7 @@ namespace Mark5.Mobile.Common.Managers
                 var result = await AppServiceProxy.GetShortcodeAsync(new DataContract.GetShortcodeParameters
                 {
                     Token = Token,
-                    FolderId = folderId,
+                    FolderId = folderId ?? -1,
                     ShortcodeId = shortcodeId,
                     IncludePreview = true
                 });

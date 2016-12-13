@@ -35,8 +35,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public SearchContactsCriteria Criteria { get; set; }
         public Action CloseRequest { get; set; }
 
-        int searchId;
-
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         ContactSearchResultsAdapter adapter;
@@ -105,7 +103,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return new ContactSearchResultsFragmentState
             {
                 Criteria = Criteria,
-                SearchId = searchId,
                 ContactPreviews = adapter.Items
             };
         }
@@ -118,7 +115,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Info($"Restoring state [dlfs.criteria={dlfs.Criteria}, dlfs.items.count={dlfs.ContactPreviews?.Count}]...");
 
                 Criteria = dlfs.Criteria;
-                searchId = dlfs.SearchId;
                 adapter.AppendItems(dlfs.ContactPreviews);
             }
         }
@@ -140,17 +136,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 refreshLayout.Refreshing = true;
 
-                var searchResults = await Managers.SearchManager.SearchContactsAsync(Criteria);
+                var contactPreviews = await Managers.SearchManager.SearchContactsAsync(Criteria);
 
-                if (searchResults?.ContactPreviews?.Count < 1)
+                if (contactPreviews.Count < 1)
                 {
                     await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.no_results, Resource.String.no_results_contacts);
                     if (CloseRequest != null) CloseRequest();
                     return;
                 }
 
-                searchId = searchResults.SearchId;
-                adapter.AppendItems(searchResults.ContactPreviews);
+                adapter.AppendItems(contactPreviews);
             }
             catch (Exception ex)
             {
@@ -175,7 +170,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void Adapter_ItemClicked(object sender, ContactPreview contactPreview)
         {
             var i = new Intent(Activity, typeof(ContactActivity));
-            i.PutExtra(ContactActivity.SearchIdIntentKey, searchId);
             i.PutExtra(ContactActivity.ContactPreviewIntentKey, SerializationUtils.Serialize(contactPreview));
             StartActivity(i);
         }
@@ -186,9 +180,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ContactSearchResultsFragmentState : IRetainableState
         {
-
-            public int SearchId { get; set; }
-
+            
             public SearchContactsCriteria Criteria { get; set; }
 
             public List<ContactPreview> ContactPreviews { get; set; }

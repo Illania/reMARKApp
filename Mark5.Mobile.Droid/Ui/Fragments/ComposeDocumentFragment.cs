@@ -44,7 +44,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public OutgoingDocumentState OutgoingDocumentState { get; set; }
         public List<OutgoingDocumentAttachmentDescription> OutgoingDocumentInitialAttachments { get; set; } = new List<OutgoingDocumentAttachmentDescription>();
         public bool LocalDocument { get; set; }
-        public int? PreviousDocumentFolderOrSearchId { get; set; }
+        public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
         public string[] PreconfiguredEmailAddresses { get; set; }
         public Action CloseRequest { get; set; }
@@ -75,7 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"{nameof(ComposeDocumentFragment)} [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderOrSearchId={PreviousDocumentFolderOrSearchId}, CreationModeFlag={CreationModeFlag}]");
+            CommonConfig.Logger.Info($"{nameof(ComposeDocumentFragment)} [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
 
@@ -169,7 +169,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     PreviousDocument = outgoingContainer.Document;
                     PreviousDocumentPreview = outgoingContainer.DocumentPreview;
                     PreviousDocumentId = outgoingContainer.Info.PreviousDocumentId;
-                    PreviousDocumentFolderOrSearchId = outgoingContainer.Info.PreviousDocumentdFolderId;
+                    PreviousDocumentFolderId = outgoingContainer.Info.PreviousDocumentdFolderId;
                     OutgoingDocumentState = outgoingContainer.Info.State;
                     OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag;
                     if (outgoingContainer.Info.State == OutgoingDocumentState.Failed)
@@ -184,7 +184,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 else
                 {
                     var sourceType = PreviousDocumentDirection == DocumentDirection.Draft ? SourceType.Auto : SourceType.Local;
-                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderOrSearchId.Value, PreviousDocumentId.Value, sourceType); // TODO
+                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, sourceType); // TODO
                     PreviousDocument = container.Document;
                     PreviousDocumentPreview = container.DocumentPreview;
                     if (CreationModeFlag == DocumentCreationModeFlag.Edit && PreviousDocumentPreview.Direction == DocumentDirection.Draft)
@@ -313,7 +313,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 catch (Exception ex)
                 {
-                    CommonConfig.Logger.Error($"Failed to view attachment [AttachmentName={outgoingAttachment?.Name}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderOrSearchId={PreviousDocumentFolderOrSearchId}, CreationModeFlag={CreationModeFlag}]", ex);
+                    CommonConfig.Logger.Error($"Failed to view attachment [AttachmentName={outgoingAttachment?.Name}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
                     dismissAction();
                     await Dialogs.ShowErrorDialogAsync(Activity, ex);
                 }
@@ -338,7 +338,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
                     catch (Exception ex)
                     {
-                        CommonConfig.Logger.Error($"Error while removing attachment [AttachmentName={outgoingAttachment?.Name}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderOrSearchId={PreviousDocumentFolderOrSearchId}, CreationModeFlag={CreationModeFlag}]", ex);
+                        CommonConfig.Logger.Error($"Error while removing attachment [AttachmentName={outgoingAttachment?.Name}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
                         await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(Resource.String.error_removing_local_attachment)));
                     }
                 }
@@ -371,7 +371,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     await SynchOutgoingAttachments(false);
                 }
                 await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,
-                                                                        PreviousDocumentId ?? -1, PreviousDocumentFolderOrSearchId ?? -1,
+                                                                        PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1,
                                                                        0, false, false);
             }).ContinueWith(async t =>
            {
@@ -379,7 +379,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                if (t.IsFaulted)
                {
-                   CommonConfig.Logger.Error($"Failed to insert document in outgoing [isDraft={draft}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderOrSearchId={PreviousDocumentFolderOrSearchId}, CreationModeFlag={CreationModeFlag}] ", t.Exception.InnerException);
+                   CommonConfig.Logger.Error($"Failed to insert document in outgoing [isDraft={draft}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", t.Exception.InnerException);
                    await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
                }
                else
@@ -405,13 +405,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await SynchOutgoingAttachments(false);
                 await Managers.DocumentsManager.SaveOutgoingDocumentAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,
-                                                                        PreviousDocumentId ?? -1, PreviousDocumentFolderOrSearchId ?? -1,
+                                                                        PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1,
                                                                           0, false, false);
             }).ContinueWith(async t =>
            {
                if (t.IsFaulted)
                {
-                   CommonConfig.Logger.Error($"Failed to save modified outgoing document [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderOrSearchId={PreviousDocumentFolderOrSearchId}, CreationModeFlag={CreationModeFlag}] ", t.Exception.InnerException);
+                   CommonConfig.Logger.Error($"Failed to save modified outgoing document [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", t.Exception.InnerException);
                    await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
                }
                else
@@ -539,7 +539,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (t.IsFaulted)
                 {
-                    CommonConfig.Logger.Error($"Failed to save attachment to memory [AttachmentName={attachment?.Name}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderOrSearchId={PreviousDocumentFolderOrSearchId}, CreationModeFlag={CreationModeFlag}]", t.Exception.InnerException);
+                    CommonConfig.Logger.Error($"Failed to save attachment to memory [AttachmentName={attachment?.Name}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", t.Exception.InnerException);
                     var resourceStringId = attachmentTooBig ? Resource.String.attachment_too_big : Resource.String.error_saving_local_attachment;
                     await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(resourceStringId)));
                 }
@@ -702,7 +702,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderOrSearchId={PreviousDocumentFolderOrSearchId}, CreationModeFlag={CreationModeFlag}] ", ex);
+                CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
@@ -753,7 +753,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderOrSearchId={PreviousDocumentFolderOrSearchId}, CreationModeFlag={CreationModeFlag}] ", ex);
+                CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
@@ -778,7 +778,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while getting template [template.Id={templatePreview?.Id}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderOrSearchId={PreviousDocumentFolderOrSearchId}, CreationModeFlag={CreationModeFlag}] ", ex);
+                CommonConfig.Logger.Error($"Error while getting template [template.Id={templatePreview?.Id}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
@@ -860,7 +860,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 DocumentPreview = DocumentPreview,
                 PreviousDocument = PreviousDocument,
                 PreviousDocumentPreview = PreviousDocumentPreview,
-                PreviousDocumentFolderOrSearchId = PreviousDocumentFolderOrSearchId,
+                PreviousDocumentFolderId = PreviousDocumentFolderId,
                 PreviousDocumentId = PreviousDocumentId,
                 OutgoingDocumentGuid = OutgoingDocumentGuid,
                 CreationModeFlag = CreationModeFlag,
@@ -889,7 +889,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 DocumentPreview = cfs.DocumentPreview;
                 PreviousDocument = cfs.PreviousDocument;
                 PreviousDocumentPreview = cfs.PreviousDocumentPreview;
-                PreviousDocumentFolderOrSearchId = cfs.PreviousDocumentFolderOrSearchId;
+                PreviousDocumentFolderId = cfs.PreviousDocumentFolderId;
                 PreviousDocumentId = cfs.PreviousDocumentId;
                 OutgoingDocumentGuid = cfs.OutgoingDocumentGuid;
                 CreationModeFlag = cfs.CreationModeFlag;
@@ -911,7 +911,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(ComposeDocumentFragment)} [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderOrSearchId={PreviousDocumentFolderOrSearchId}, CreationModeFlag={CreationModeFlag}]";
+            return $"{nameof(ComposeDocumentFragment)} [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]";
         }
 
         class ComposeDocumentFragmentState : IRetainableState
@@ -920,7 +920,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public DocumentPreview DocumentPreview { get; set; }
             public Document PreviousDocument { get; set; }
             public DocumentPreview PreviousDocumentPreview { get; set; }
-            public int? PreviousDocumentFolderOrSearchId { get; set; }
+            public int? PreviousDocumentFolderId { get; set; }
             public int? PreviousDocumentId { get; set; }
             public Guid OutgoingDocumentGuid { get; set; }
             public bool TemplateLoaded { get; set; }

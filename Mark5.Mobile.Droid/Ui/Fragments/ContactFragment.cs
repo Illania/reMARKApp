@@ -47,7 +47,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public int? FolderId { get; set; }
         public Folder Folder { get; set; }
-        public int? SearchId { get; set; }
         public int? ContactId { get; set; }
         public ContactPreview ContactPreview { get; set; }
         public Contact Contact { get; set; }
@@ -67,7 +66,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(ContactFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, contact.id={ContactId ?? ContactPreview?.Id}...");
+            CommonConfig.Logger.Info($"Creating {nameof(ContactFragment)} [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_contact, container, false);
             rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightergray)));
@@ -101,7 +100,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = string.Empty;
 
-            CommonConfig.Logger.Info($"Created {nameof(ContactFragment)} [folder.id={FolderId ?? Folder?.Id}, searchId={SearchId}, contact.id={ContactId ?? ContactPreview?.Id}...");
+            CommonConfig.Logger.Info($"Created {nameof(ContactFragment)} [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}...");
         }
 
         public override async void OnResume()
@@ -316,7 +315,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { ContactPreview }, Folder);
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Contact, FolderId ?? Folder.Id, new List<int> { ContactPreview.Id }));
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Contact, Folder.Id, new List<int> { ContactPreview.Id }));
 
                 dismissAction();
             }
@@ -510,34 +509,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
                 }
 
-                if (FolderId.HasValue || Folder != null)
+                if (ContactId.HasValue && ContactPreview == null && Contact == null)
                 {
-                    if (ContactId.HasValue && ContactPreview == null && Contact == null)
-                    {
-                        var container = await Managers.ContactsManager.GetContactWithPreviewAsync(FolderId ?? Folder.Id, ContactId.Value);
-                        ContactPreview = container.ContactPreview;
-                        Contact = container.Contact;
-                    }
-
-                    if (ContactPreview != null && Contact == null)
-                    {
-                        Contact = await Managers.ContactsManager.GetContactAsync(FolderId ?? Folder.Id, ContactPreview.Id);
-                    }
+                    var container = await Managers.ContactsManager.GetContactWithPreviewAsync(FolderId ?? Folder?.Id, ContactId.Value);
+                    ContactPreview = container.ContactPreview;
+                    Contact = container.Contact;
                 }
 
-                if (SearchId.HasValue && SearchId <= -999)
+                if (ContactPreview != null && Contact == null)
                 {
-                    if (ContactPreview != null && Contact == null)
-                    {
-                        Contact = await Managers.SearchManager.GetContactAsync(SearchId.Value, ContactPreview);
-                    }
+                    Contact = await Managers.ContactsManager.GetContactAsync(FolderId ?? Folder?.Id, ContactPreview.Id);
                 }
 
                 RefreshView();
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Downloading contact failed [folder.name={Folder?.Name}, searchId={SearchId}, folder.id={FolderId ?? Folder?.Id}, contactId={ContactId ?? ContactPreview?.Id}]", ex);
+                CommonConfig.Logger.Error($"Downloading contact failed [folder.name={Folder?.Name}, folder.id={FolderId ?? Folder?.Id}, contactId={ContactId ?? ContactPreview?.Id}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
@@ -665,7 +653,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 FolderId = FolderId,
                 Folder = Folder,
-                SearchId = SearchId,
                 ContactId = ContactId,
                 Contact = Contact,
                 ContactPreview = ContactPreview
@@ -679,7 +666,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 FolderId = cfs.FolderId;
                 Folder = cfs.Folder;
-                SearchId = cfs.SearchId;
                 Contact = cfs.Contact;
                 ContactPreview = cfs.ContactPreview;
                 ContactId = cfs.ContactId;
@@ -701,8 +687,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int? FolderId { get; set; }
 
             public Folder Folder { get; set; }
-
-            public int? SearchId { get; set; }
 
             public int? ContactId { get; set; }
 

@@ -27,11 +27,11 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<Document> GetDocumentAsync(Folder folder, int documentId, SourceType sourceType = SourceType.Auto);
 
-        Task<Document> GetDocumentAsync(int folderId, int documentId, SourceType sourceType = SourceType.Auto);
+        Task<Document> GetDocumentAsync(int? folderId, int documentId, SourceType sourceType = SourceType.Auto);
 
         Task<DocumentContainer> GetDocumentWithPreviewAsync(Folder folder, int documentId, SourceType sourceType = SourceType.Auto);
 
-        Task<DocumentContainer> GetDocumentWithPreviewAsync(int folderId, int documentId, SourceType sourceType = SourceType.Auto);
+        Task<DocumentContainer> GetDocumentWithPreviewAsync(int? folderId, int documentId, SourceType sourceType = SourceType.Auto);
 
         Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto);
 
