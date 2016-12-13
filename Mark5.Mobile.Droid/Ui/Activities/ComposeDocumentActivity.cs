@@ -61,7 +61,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             return intent;
         }
 
-
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);

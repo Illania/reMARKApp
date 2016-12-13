@@ -156,6 +156,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (PreviousDocument != null || CreationModeFlag == DocumentCreationModeFlag.New)
             {
+                await ShowDocument();
                 return;
             }
 
@@ -426,6 +427,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (LocalDocument)
             {
                 Dialogs.ShowYesNoDialog(Context, Resource.String.save_modifications, Resource.String.confirm_save_modified_document, SaveModifiedOutgoingDocument, SaveAndCloseComposeActivity);
+            }
+            else if (PreviousDocumentDirection == DocumentDirection.Draft)
+            {
+                Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_change_draft, () => SendDocument(true), SaveAndCloseComposeActivity);
             }
             else
             {
