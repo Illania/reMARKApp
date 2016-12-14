@@ -62,10 +62,10 @@ namespace Mark5.Mobile.IOS
                 var mainFolder = FileSystem.Current.LocalStorage;
 
                 CommonConfig.PathSeparator = Path.DirectorySeparatorChar;
-                CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "data"), CreationCollisionOption.OpenIfExists);
-                CommonConfig.OutgoingFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "out"), CreationCollisionOption.OpenIfExists);
-                CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "db"), CreationCollisionOption.OpenIfExists);
-                CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("..", "cache", "att"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "data"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.OutgoingFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "out"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "db"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("Caches", "v2", "att"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.Logger = new SimpleLogger();
                 CommonConfig.ReachabilityService = new ReachabilityService();
                 CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
@@ -83,6 +83,7 @@ namespace Mark5.Mobile.IOS
 
                 PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();
                 PlatformConfig.Preferences = new Preferences();
+                PlatformConfig.ReachabilityReceiver = new ReachabilityReceiver();
             }).Wait();
         }
 

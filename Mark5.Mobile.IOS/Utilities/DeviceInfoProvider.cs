@@ -15,10 +15,10 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
+    
     public class DeviceInfoProvider : IDeviceInfoProvider
     {
         
-
         public DeviceType GetDeviceType()
         {
             return DeviceType.IOS;
@@ -45,6 +45,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 Label = "MARK5 Device ID",
                 Description = "MARK5 Device Identifier",
+                Generic = NSData.FromString("MARK5_Device_ID"),
                 ValueData = NSData.FromString(newId)
             };
 
