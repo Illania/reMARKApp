@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Droid.Utilities
 {
     public static class LocalNotificationService
     {
-        public const int failedSendingNotificationId = 11;
+        public const int FailedSendingNotificationId = 11;
 
         static public void Initialize()
         {
@@ -57,7 +57,7 @@ namespace Mark5.Mobile.Droid.Utilities
                     nb.SetVibrate(new[] { 500L, 250L, 500L });
                 }
                 var nm = (NotificationManager)Application.Context.GetSystemService(Context.NotificationService);
-                nm.Notify(failedSendingNotificationId, nb.Build());
+                nm.Notify(FailedSendingNotificationId, nb.Build());
 
             }
             catch (Exception ex)

@@ -40,9 +40,9 @@ namespace Mark5.ServiceReference.FileTransferService
         }
 
         readonly string endpointUrl;
-        readonly Func<HttpClientHandler> httpClientHandler;
+        readonly Func<HttpMessageHandler> httpClientHandler;
 
-        public FileTransferServiceProxy(bool ssl, string hostname, int port, Func<HttpClientHandler> httpClientHandler)
+        public FileTransferServiceProxy(bool ssl, string hostname, int port, Func<HttpMessageHandler> httpClientHandler)
         {
             endpointUrl = $"{(ssl ? "https" : "http")}://{hostname}:{port}/fts3";
             this.httpClientHandler = httpClientHandler;

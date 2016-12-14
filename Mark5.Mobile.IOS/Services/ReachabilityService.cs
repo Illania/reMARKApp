@@ -1,5 +1,5 @@
 ﻿//
-// Project: Mark5.Mobile.Droid
+// Project: Mark5.Mobile.IOS
 // File: ReachabilityService.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
@@ -9,21 +9,18 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Android.App;
-using Android.Content;
-using Android.Net;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Services;
 using Mark5.Mobile.Common.Tester;
 
-namespace Mark5.Mobile.Droid.Services
+namespace Mark5.Mobile.IOS.Services
 {
-
+    
     public class ReachabilityService : IReachabilityService
     {
-
+        
         const string GoogleRequestUrl = "http://clients3.google.com/generate_204";
 
         public bool IsReachable
@@ -82,12 +79,7 @@ namespace Mark5.Mobile.Droid.Services
 
         public bool CheckNetworkAvailability()
         {
-            var cm = (ConnectivityManager)Application.Context.GetSystemService(Context.ConnectivityService);
-            var result = cm.ActiveNetworkInfo?.IsConnected ?? false;
-
-            CommonConfig.Logger.Info($"Network availability: {result}");
-
-            return result;
+            return Reachability.InternetConnectionStatus() != NetworkStatus.NotReachable;
         }
 
         public async Task<bool> CheckWithGoogle()
@@ -170,4 +162,3 @@ namespace Mark5.Mobile.Droid.Services
         }
     }
 }
-

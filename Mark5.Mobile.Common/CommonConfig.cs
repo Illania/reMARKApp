@@ -36,7 +36,7 @@ namespace Mark5.Mobile.Common
 
         public static Type ConcurrentQueueType { get; set; }
 
-        public static Func<HttpClientHandler> HttpClientHandler { get; set; }
+        public static Func<HttpMessageHandler> HttpClientHandler { get; set; }
 
         public static IPhonebookUtilities PhonebookUtilities { get; set; }
     }
