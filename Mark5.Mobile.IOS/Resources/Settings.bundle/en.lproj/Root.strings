@@ -1,1 +1,7 @@
-﻿"" = "";
+﻿"about" = "About MARK5";
+"accept_selfsigned" = "Accept self-signed certificates";
+"open_settings_app" = "Open Settings app";
+"security" = "Security";
+"security_footer" = "SSL should remain enabled to provide secure communication. Otherwise, communication between MARK5 on your iOS device and MARK5 server will be unsecure.";
+"ssl" = "SSL";
+"version" = "Version";

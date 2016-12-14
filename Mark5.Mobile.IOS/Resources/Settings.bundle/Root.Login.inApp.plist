@@ -10,15 +10,15 @@
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
-			<string>Security</string>
+			<string>security</string>
 			<key>FooterText</key>
-			<string>SSL should remain enabled to provide secure communication. Otherwise, communication between MARK5 on your iOS device and MARK5 server will be unsecure.</string>
+			<string>security_footer</string>
 		</dict>
 		<dict>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
-			<string>SSL</string>
+			<string>ssl</string>
 			<key>Key</key>
 			<string>sslEnabled</string>
 			<key>DefaultValue</key>
@@ -28,7 +28,7 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
-			<string>Accept self-signed certificates</string>
+			<string>accept_selfsigned</string>
 			<key>Key</key>
 			<string>acceptSelfSigned</string>
 			<key>DefaultValue</key>
@@ -38,13 +38,13 @@
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
-			<string>About MARK5</string>
+			<string>about</string>
 		</dict>
 		<dict>
 			<key>Type</key>
 			<string>IASKCustomViewSpecifier</string>
 			<key>Title</key>
-			<string>Version</string>
+			<string>version</string>
 			<key>Key</key>
 			<string>appVersion</string>
 			<key>DefaultValue</key>
@@ -60,7 +60,7 @@
 			<key>Key</key>
 			<string>openSettingsApp</string>
 			<key>Title</key>
-			<string>Open Settings app</string>
+			<string>open_settings_app</string>
 		</dict>
 	</array>
 </dict>

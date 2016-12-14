@@ -155,6 +155,7 @@
     <Folder Include="Ui\Common\" />
     <Folder Include="Resources\startscreens\" />
     <Folder Include="Resources\Settings.bundle\" />
+    <Folder Include="Resources\Base.lproj\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -217,9 +218,9 @@
     <BundleResource Include="Resources\startscreens\start-screen-logo-retinahd47.png" />
     <BundleResource Include="Resources\startscreens\start-screen-logo-retinahd55-landscape.png" />
     <BundleResource Include="Resources\startscreens\start-screen-logo-retinahd55.png" />
-    <BundleResource Include="Resources\Settings.bundle\en.lproj\Root.Restricted.strings" />
     <BundleResource Include="Resources\Settings.bundle\en.lproj\Root.strings" />
     <BundleResource Include="Resources\Settings.bundle\Root.Login.inApp.plist" />
+    <BundleResource Include="Resources\Base.lproj\Localizable.strings" />
   </ItemGroup>
   <ItemGroup>
     <XamarinComponentReference Include="InAppSettingsKit">

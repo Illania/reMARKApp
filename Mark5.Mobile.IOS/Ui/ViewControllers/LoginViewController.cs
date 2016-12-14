@@ -61,7 +61,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIButton settingsButton;
 
         UITextField usernameTextField;
-        UITextField hostNameTextField;
+        UITextField hostnameTextField;
         UITextField passwordTextField;
         UITextField portTextField;
         UIButton loginButton;
@@ -115,7 +115,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             usernameTextField.ResignFirstResponder();
             passwordTextField.ResignFirstResponder();
-            hostNameTextField.ResignFirstResponder();
+            hostnameTextField.ResignFirstResponder();
             portTextField.ResignFirstResponder();
 
             authenticator = null;
@@ -235,7 +235,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             settingsButton = new UIButton();
             settingsButton.TitleLabel.Font = Theme.DefaultBoldFont;
-            settingsButton.SetTitle("Settings", UIControlState.Normal);
+            settingsButton.SetTitle(NSBundle.MainBundle.LocalizedString("settings", "Settings"), UIControlState.Normal);
             settingsButton.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(settingsButton);
             View.AddConstraints(new[]
@@ -254,7 +254,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             usernameTextField.AutocorrectionType = UITextAutocorrectionType.No;
             usernameTextField.ClearButtonMode = UITextFieldViewMode.WhileEditing;
             usernameTextField.ReturnKeyType = UIReturnKeyType.Next;
-            usernameTextField.AttributedPlaceholder = new NSAttributedString("Username");
+            usernameTextField.AttributedPlaceholder = new NSAttributedString(NSBundle.MainBundle.LocalizedString("username", "Username"));
             usernameTextField.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(usernameTextField);
             usernameTextFieldTopConstraint = NSLayoutConstraint.Create(usernameTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, logoImageView, NSLayoutAttribute.Bottom, 1.0f, TextFieldToLogoImageViewInitialDistance);
@@ -275,7 +275,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             passwordTextField.ClearButtonMode = UITextFieldViewMode.WhileEditing;
             passwordTextField.SecureTextEntry = true;
             passwordTextField.ReturnKeyType = UIReturnKeyType.Next;
-            passwordTextField.AttributedPlaceholder = new NSAttributedString("Password");
+            passwordTextField.AttributedPlaceholder = new NSAttributedString(NSBundle.MainBundle.LocalizedString("password", "Password"));
             passwordTextField.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(passwordTextField);
             passwordTextFieldTopConstraint = NSLayoutConstraint.Create(passwordTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, usernameTextField, NSLayoutAttribute.Bottom, 1.0f, 50.0f);
@@ -287,23 +287,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(passwordTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, TextFieldHeight)
                 });
 
-            hostNameTextField = new UITextField();
-            hostNameTextField.BorderStyle = UITextBorderStyle.RoundedRect;
-            hostNameTextField.Font = Theme.DefaultFont;
-            hostNameTextField.AutocapitalizationType = UITextAutocapitalizationType.None;
-            hostNameTextField.AutocorrectionType = UITextAutocorrectionType.No;
-            hostNameTextField.ClearButtonMode = UITextFieldViewMode.WhileEditing;
-            hostNameTextField.ReturnKeyType = UIReturnKeyType.Next;
-            hostNameTextField.AttributedPlaceholder = new NSAttributedString("Hostname");
-            hostNameTextField.TranslatesAutoresizingMaskIntoConstraints = false;
-            View.AddSubview(hostNameTextField);
-            hostnameTextFieldTopConstraint = NSLayoutConstraint.Create(hostNameTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, passwordTextField, NSLayoutAttribute.Bottom, 1.0f, TextFieldToTextFieldInitialDistance);
+            hostnameTextField = new UITextField();
+            hostnameTextField.BorderStyle = UITextBorderStyle.RoundedRect;
+            hostnameTextField.Font = Theme.DefaultFont;
+            hostnameTextField.AutocapitalizationType = UITextAutocapitalizationType.None;
+            hostnameTextField.AutocorrectionType = UITextAutocorrectionType.No;
+            hostnameTextField.ClearButtonMode = UITextFieldViewMode.WhileEditing;
+            hostnameTextField.ReturnKeyType = UIReturnKeyType.Next;
+            hostnameTextField.AttributedPlaceholder = new NSAttributedString(NSBundle.MainBundle.LocalizedString("hostname", "Hostname"));
+            hostnameTextField.TranslatesAutoresizingMaskIntoConstraints = false;
+            View.AddSubview(hostnameTextField);
+            hostnameTextFieldTopConstraint = NSLayoutConstraint.Create(hostnameTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, passwordTextField, NSLayoutAttribute.Bottom, 1.0f, TextFieldToTextFieldInitialDistance);
             View.AddConstraints(new[]
                 {
                     hostnameTextFieldTopConstraint,
-                    NSLayoutConstraint.Create(hostNameTextField, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(hostNameTextField, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, TextFieldWidth),
-                    NSLayoutConstraint.Create(hostNameTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, TextFieldHeight)
+                    NSLayoutConstraint.Create(hostnameTextField, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(hostnameTextField, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, TextFieldWidth),
+                    NSLayoutConstraint.Create(hostnameTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, TextFieldHeight)
                 });
 
             portTextField = new UITextField();
@@ -314,10 +314,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             portTextField.ClearButtonMode = UITextFieldViewMode.WhileEditing;
             portTextField.KeyboardType = UIKeyboardType.NumberPad;
             portTextField.ReturnKeyType = UIReturnKeyType.Go;
-            portTextField.AttributedPlaceholder = new NSAttributedString("Port");
+            portTextField.AttributedPlaceholder = new NSAttributedString(NSBundle.MainBundle.LocalizedString("port", "Port"));
             portTextField.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(portTextField);
-            portTextFieldTopConstraint = NSLayoutConstraint.Create(portTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, hostNameTextField, NSLayoutAttribute.Bottom, 1.0f, TextFieldToTextFieldInitialDistance);
+            portTextFieldTopConstraint = NSLayoutConstraint.Create(portTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, hostnameTextField, NSLayoutAttribute.Bottom, 1.0f, TextFieldToTextFieldInitialDistance);
             View.AddConstraints(new[]
                 {
                     portTextFieldTopConstraint,
@@ -327,7 +327,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 });
 
             loginButton = new UIButton();
-            loginButton.SetTitle("Login", UIControlState.Normal);
+            loginButton.SetTitle(NSBundle.MainBundle.LocalizedString("login", "Login"), UIControlState.Normal);
             loginButton.TitleLabel.Font = Theme.DefaultBoldFont;
             loginButton.TranslatesAutoresizingMaskIntoConstraints = false;
             loginButton.Enabled = false;
@@ -417,11 +417,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             passwordTextField.EditingChanged += TextField_EditingChanged;
             passwordTextField.ShouldReturn = (textField) =>
             {
-                hostNameTextField.BecomeFirstResponder();
+                hostnameTextField.BecomeFirstResponder();
                 return true;
             };
-            hostNameTextField.EditingChanged += TextField_EditingChanged;
-            hostNameTextField.ShouldReturn = (textField) =>
+            hostnameTextField.EditingChanged += TextField_EditingChanged;
+            hostnameTextField.ShouldReturn = (textField) =>
             {
                 portTextField.BecomeFirstResponder();
                 return true;
@@ -443,8 +443,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             usernameTextField.ShouldReturn = null;
             passwordTextField.EditingChanged -= TextField_EditingChanged;
             passwordTextField.ShouldReturn = null;
-            hostNameTextField.EditingChanged -= TextField_EditingChanged;
-            hostNameTextField.ShouldReturn = null;
+            hostnameTextField.EditingChanged -= TextField_EditingChanged;
+            hostnameTextField.ShouldReturn = null;
             portTextField.EditingChanged -= TextField_EditingChanged;
             portTextField.ShouldReturn = null;
             loginButton.TouchUpInside -= LoginButton_TouchUpInside;
@@ -497,7 +497,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var username = usernameTextField.Text;
                 var password = passwordTextField.Text;
-                var hostname = hostNameTextField.Text;
+                var hostname = hostnameTextField.Text;
                 var port = portTextField.Text;
 
                 var errors = false;
@@ -661,7 +661,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var result = true;
             result &= Validator.IsUsernameValid(usernameTextField.Text);
             result &= Validator.IsPasswordValid(passwordTextField.Text);
-            result &= Validator.IsHostNameValid(hostNameTextField.Text);
+            result &= Validator.IsHostNameValid(hostnameTextField.Text);
             result &= Validator.IsPortValid(portTextField.Text);
 
             loginButton.Enabled = result;
