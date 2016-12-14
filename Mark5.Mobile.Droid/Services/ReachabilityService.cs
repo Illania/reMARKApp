@@ -124,7 +124,7 @@ namespace Mark5.Mobile.Droid.Services
 
                 using (var httpClient = new HttpClient(CommonConfig.HttpClientHandler())
                 {
-                    Timeout = new TimeSpan(0, 0, 2),
+                    Timeout = new TimeSpan(0, 0, 2)
                 })
                 using (var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
                 {

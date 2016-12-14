@@ -10,14 +10,6 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.Utilities
 {
-    static public class PhonebookContactsUtilties
-    {
-        static public IPhonebookUtilities SharedInstance
-        {
-            get;
-            set;
-        }
-    }
 
     public interface IPhonebookUtilities
     {

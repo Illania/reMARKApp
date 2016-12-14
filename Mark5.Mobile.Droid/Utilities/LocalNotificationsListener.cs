@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: LocalNotificationService.cs
+// File: LocalNotificationsListener.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
 // Copyright (c) 2016 Nordic IT
@@ -19,16 +19,18 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-    public static class LocalNotificationService
+    
+    public static class LocalNotificationsListener
     {
-        public const int failedSendingNotificationId = 11;
+        
+        public const int FailedSendingNotificationId = 11;
 
         static public void Initialize()
         {
             Managers.OutgoingDocumentsManager.DocumentSendingFailed += OutgoingDocumentsManager_DocumentSendingFailed;
         }
 
-        static void OutgoingDocumentsManager_DocumentSendingFailed(object sender, Common.Model.OutgoingDocumentContainer e)
+        static void OutgoingDocumentsManager_DocumentSendingFailed(object sender, OutgoingDocumentContainer e)
         {
             try
             {
@@ -57,7 +59,7 @@ namespace Mark5.Mobile.Droid.Utilities
                     nb.SetVibrate(new[] { 500L, 250L, 500L });
                 }
                 var nm = (NotificationManager)Application.Context.GetSystemService(Context.NotificationService);
-                nm.Notify(failedSendingNotificationId, nb.Build());
+                nm.Notify(FailedSendingNotificationId, nb.Build());
 
             }
             catch (Exception ex)
