@@ -58,6 +58,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIView logoContainer;
         UIImageView logoImageView;
 
+        UIButton settingsButton;
+
         UITextField usernameTextField;
         UITextField hostNameTextField;
         UITextField passwordTextField;
@@ -83,22 +85,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.LoadView();
 
-            authenticator = AuthenticatorFactory.Create();
-
-            InitView();
-            InitSubViews();
-        }
-
-        public override void ViewDidLoad()
-        {
-            base.ViewDidLoad();
-
-            SetNeedsStatusBarAppearanceUpdate();
+            InitializeView();
+            InitializeSubViews();
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
+
+            authenticator = AuthenticatorFactory.Create();
+
+            InitializeHandlers();
 
             NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.DidChangeFrameNotification, OnKeyboardDidChangeFrameNotification);
         }
@@ -121,6 +118,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             hostNameTextField.ResignFirstResponder();
             portTextField.ResignFirstResponder();
 
+            authenticator = null;
+
+            DeinitializeHandlers();
+
             NSNotificationCenter.DefaultCenter.RemoveObservers(new[]
                 {
                     UIKeyboard.DidChangeFrameNotification
@@ -129,9 +130,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
-        #region Init methods
+        #region Initialize methods
 
-        void InitView()
+        void InitializeView()
         {
             string logoFileName;
             string backgroundFileName;
@@ -232,19 +233,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 });
             View.SendSubviewToBack(backgroundImageView);
 
-            var settingsButton = new UIButton();
+            settingsButton = new UIButton();
             settingsButton.TitleLabel.Font = Theme.DefaultBoldFont;
             settingsButton.SetTitle("Settings", UIControlState.Normal);
-            settingsButton.TouchUpInside += (sender, e) =>
-            {
-                var rsv = new LoginSettingsViewController.RestrictedSettingsValues { SslMode = sslMode };
-                var rsvc = new LoginSettingsViewController(rsv);
-                rsvc.RestrictedSettingsValuesUpdatedDelegate = (values) =>
-                {
-                    sslMode = values.SslMode;
-                };
-                PresentViewController(new UINavigationController(rsvc), true, null);
-            };
             settingsButton.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(settingsButton);
             View.AddConstraints(new[]
@@ -254,7 +245,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 });
         }
 
-        void InitSubViews()
+        void InitializeSubViews()
         {
             usernameTextField = new UITextField();
             usernameTextField.BorderStyle = UITextBorderStyle.RoundedRect;
@@ -264,12 +255,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             usernameTextField.ClearButtonMode = UITextFieldViewMode.WhileEditing;
             usernameTextField.ReturnKeyType = UIReturnKeyType.Next;
             usernameTextField.AttributedPlaceholder = new NSAttributedString("Username");
-            usernameTextField.ShouldReturn += textField =>
-            {
-                passwordTextField.BecomeFirstResponder();
-                return true;
-            };
-            usernameTextField.EditingChanged += (sender, e) => ValidateForm();
             usernameTextField.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(usernameTextField);
             usernameTextFieldTopConstraint = NSLayoutConstraint.Create(usernameTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, logoImageView, NSLayoutAttribute.Bottom, 1.0f, TextFieldToLogoImageViewInitialDistance);
@@ -291,12 +276,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             passwordTextField.SecureTextEntry = true;
             passwordTextField.ReturnKeyType = UIReturnKeyType.Next;
             passwordTextField.AttributedPlaceholder = new NSAttributedString("Password");
-            passwordTextField.ShouldReturn += textField =>
-            {
-                hostNameTextField.BecomeFirstResponder();
-                return true;
-            };
-            passwordTextField.EditingChanged += (sender, e) => ValidateForm();
             passwordTextField.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(passwordTextField);
             passwordTextFieldTopConstraint = NSLayoutConstraint.Create(passwordTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, usernameTextField, NSLayoutAttribute.Bottom, 1.0f, 50.0f);
@@ -316,12 +295,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             hostNameTextField.ClearButtonMode = UITextFieldViewMode.WhileEditing;
             hostNameTextField.ReturnKeyType = UIReturnKeyType.Next;
             hostNameTextField.AttributedPlaceholder = new NSAttributedString("Hostname");
-            hostNameTextField.ShouldReturn += textField =>
-            {
-                portTextField.BecomeFirstResponder();
-                return true;
-            };
-            hostNameTextField.EditingChanged += (sender, e) => ValidateForm();
             hostNameTextField.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(hostNameTextField);
             hostnameTextFieldTopConstraint = NSLayoutConstraint.Create(hostNameTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, passwordTextField, NSLayoutAttribute.Bottom, 1.0f, TextFieldToTextFieldInitialDistance);
@@ -342,12 +315,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             portTextField.KeyboardType = UIKeyboardType.NumberPad;
             portTextField.ReturnKeyType = UIReturnKeyType.Go;
             portTextField.AttributedPlaceholder = new NSAttributedString("Port");
-            portTextField.ShouldReturn += textField =>
-            {
-                textField.BecomeFirstResponder();
-                return true;
-            };
-            portTextField.EditingChanged += (sender, e) => ValidateForm();
             portTextField.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(portTextField);
             portTextFieldTopConstraint = NSLayoutConstraint.Create(portTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, hostNameTextField, NSLayoutAttribute.Bottom, 1.0f, TextFieldToTextFieldInitialDistance);
@@ -362,7 +329,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             loginButton = new UIButton();
             loginButton.SetTitle("Login", UIControlState.Normal);
             loginButton.TitleLabel.Font = Theme.DefaultBoldFont;
-            loginButton.TouchUpInside += LoginButton_TouchUpInside;
             loginButton.TranslatesAutoresizingMaskIntoConstraints = false;
             loginButton.Enabled = false;
             View.AddSubview(loginButton);
@@ -414,12 +380,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CAMediaTimingFunction.FromName(CAMediaTimingFunction.EaseInEaseOut),
                 CAMediaTimingFunction.FromName(CAMediaTimingFunction.EaseInEaseOut)
             };
-            bounceAnimation.AnimationStopped += (sender, e) =>
-            {
-                View.LayoutIfNeeded();
-
-                StartShowFieldsAnimation();
-            };
+            bounceAnimation.AnimationStopped += BounceAnimation_AnimationStopped;
             logoContainer.Layer.AddAnimation(bounceAnimation, "bounceAnimation");
         }
 
@@ -444,12 +405,90 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             UIView.AnimateNotify(AnimationDuration, AnimationInitialDelay + (AnimationDelay * 5), Damping, SpringVelocity, UIViewAnimationOptions.CurveEaseOut, View.LayoutIfNeeded, null);
         }
 
+        void InitializeHandlers()
+        {
+            settingsButton.TouchUpInside += SettingsButton_TouchUpInside;
+            usernameTextField.EditingChanged += TextField_EditingChanged;
+            usernameTextField.ShouldReturn = (textField) =>
+            {
+                passwordTextField.BecomeFirstResponder();
+                return true;
+            };
+            passwordTextField.EditingChanged += TextField_EditingChanged;
+            passwordTextField.ShouldReturn = (textField) =>
+            {
+                hostNameTextField.BecomeFirstResponder();
+                return true;
+            };
+            hostNameTextField.EditingChanged += TextField_EditingChanged;
+            hostNameTextField.ShouldReturn = (textField) =>
+            {
+                portTextField.BecomeFirstResponder();
+                return true;
+            };
+            portTextField.EditingChanged += TextField_EditingChanged;
+            portTextField.ShouldReturn = (textField) =>
+            {
+                portTextField.ResignFirstResponder();
+                loginButton.SendActionForControlEvents(UIControlEvent.TouchUpInside);
+                return true;
+            };
+            loginButton.TouchUpInside += LoginButton_TouchUpInside;
+        }
+
+        void DeinitializeHandlers()
+        {
+            settingsButton.TouchUpInside -= SettingsButton_TouchUpInside;
+            usernameTextField.EditingChanged -= TextField_EditingChanged;
+            usernameTextField.ShouldReturn = null;
+            passwordTextField.EditingChanged -= TextField_EditingChanged;
+            passwordTextField.ShouldReturn = null;
+            hostNameTextField.EditingChanged -= TextField_EditingChanged;
+            hostNameTextField.ShouldReturn = null;
+            portTextField.EditingChanged -= TextField_EditingChanged;
+            portTextField.ShouldReturn = null;
+            loginButton.TouchUpInside -= LoginButton_TouchUpInside;
+        }
+
+        #endregion
+
+        #region EventHandlers
+
+        void SettingsButton_TouchUpInside(object sender, EventArgs e)
+        {
+            var rsv = new LoginSettingsViewController.RestrictedSettingsValues { SslMode = sslMode };
+            var loginSettingsViewController = new LoginSettingsViewController(rsv);
+            loginSettingsViewController.RestrictedSettingsValuesUpdated += LoginSettingsViewController_RestrictedSettingsValuesUpdated;
+            PresentViewController(new UINavigationController(loginSettingsViewController), true, null);
+        }
+
+        void TextField_EditingChanged(object sender, EventArgs e) => ValidateForm();
+
+        void LoginSettingsViewController_RestrictedSettingsValuesUpdated(object sender, LoginSettingsViewController.RestrictedSettingsValues values)
+        {
+            sslMode = values.SslMode;
+
+            var loginSettingsViewController = (LoginSettingsViewController)sender;
+            loginSettingsViewController.RestrictedSettingsValuesUpdated -= LoginSettingsViewController_RestrictedSettingsValuesUpdated;
+        }
+
+        void BounceAnimation_AnimationStopped(object sender, CAAnimationStateEventArgs e)
+        {
+            View.LayoutIfNeeded();
+            StartShowFieldsAnimation();
+
+            var bounceAnimation = (CAKeyFrameAnimation)sender;
+            bounceAnimation.AnimationStopped -= BounceAnimation_AnimationStopped;
+        }
+
         #endregion
 
         #region Actions
 
         async void LoginButton_TouchUpInside(object sender, EventArgs e)
         {
+            loginButton.TouchUpInside -= LoginButton_TouchUpInside;
+
             CommonConfig.Logger.Info($"Attempting login...");
 
             Func<Task> dismissAction = null;
@@ -467,18 +506,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.Logger.Info($"Invalid username was entered: {username}");
 
                     errors = true;
-                    var alert = UIAlertController.Create("Wrong username", "You need to provide a valid username.", UIAlertControllerStyle.Alert);
-                    alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
-                    PresentViewController(alert, true, null);
+                    await Dialogs.ShowConfirmDialogAsync(this, "Wrong username", "You need to provide valid username.");
                 }
                 else if (!Validator.IsPasswordValid(password))
                 {
                     CommonConfig.Logger.Info($"Invalid password was entered: {password}");
 
                     errors = true;
-                    var alert = UIAlertController.Create("Wrong password", "You need to provide a valid password.", UIAlertControllerStyle.Alert);
-                    alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
-                    PresentViewController(alert, true, null);
+                    await Dialogs.ShowConfirmDialogAsync(this, "Wrong password", "You need to provide valid password");
                 }
                 else if (!Validator.IsHostNameValid(hostname))
                 {
@@ -578,6 +613,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Error("Log in failed", ex);
 
                 await Dialogs.ShowConfirmDialogAsync(this, "failed", "login failed");
+
+                loginButton.TouchUpInside += LoginButton_TouchUpInside;
             }
         }
 

@@ -30,8 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public SslMode SslMode { get; set; }
         }
 
-        public delegate void RestrictedSettingsValuesUpdated(RestrictedSettingsValues values);
-        public RestrictedSettingsValuesUpdated RestrictedSettingsValuesUpdatedDelegate;
+        public event EventHandler<RestrictedSettingsValues> RestrictedSettingsValuesUpdated;
         
         NSObject observer;
 
@@ -66,7 +65,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         
         public void SettingsViewControllerDidEnd(AppSettingsViewController sender)
         {
-            if (RestrictedSettingsValuesUpdatedDelegate != null)
+            if (RestrictedSettingsValuesUpdated != null)
             {
                 var sslEnabled = SettingsStore.GetBool(SslEnabledKey);
                 var acceptSelfSigned = SettingsStore.GetBool(AcceptSelfSignedKey);
@@ -86,7 +85,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     rsv.SslMode = SslMode.Off;
                 }
 
-                RestrictedSettingsValuesUpdatedDelegate(rsv);
+                RestrictedSettingsValuesUpdated(this, rsv);
             }
 
             DismissViewController(true, null);
