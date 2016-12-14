@@ -7,6 +7,7 @@
 //
 
 using Mark5.Mobile.Droid.Utilities;
+using Mark5.Mobile.IOS.Services;
 using Mark5.Mobile.IOS.Utilities;
 
 namespace Mark5.Mobile.IOS
@@ -20,6 +21,8 @@ namespace Mark5.Mobile.IOS
         public static SSLCertificateVerificationManager SSLCertificateVerificationManager { get; set; }
 
         public static Preferences Preferences { get; set; }
+
+        public static ReachabilityReceiver ReachabilityReceiver { get; set; }
     }
 }
 

@@ -149,7 +149,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
 
-                LocalNotificationService.Initialize();
+                LocalNotificationsListener.Initialize();
 
                 CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
 

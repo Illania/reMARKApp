@@ -339,9 +339,9 @@
     <Compile Include="Ui\Fragments\PickCategoriesListFragment.cs" />
     <Compile Include="Ui\Activities\PIckCategoriesListActivity.cs" />
     <Compile Include="Ui\Views\ContactViews\BirthdateSubview.cs" />
-    <Compile Include="Utilities\LocalNotificationService.cs" />
     <Compile Include="Ui\Common\LambdaEmptyAdapterObserver.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactCountrySearchView.cs" />
+    <Compile Include="Utilities\LocalNotificationsListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

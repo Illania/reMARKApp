@@ -123,6 +123,10 @@
     <Reference Include="HockeySDK.iOSBindings">
       <HintPath>..\packages\HockeySDK.Xamarin.4.1.0\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.2-beta1\lib\netstandard1.1\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
@@ -133,6 +137,9 @@
     <Folder Include="Resources\" />
     <Folder Include="Utilities\" />
     <Folder Include="Services\" />
+    <Folder Include="Ui\" />
+    <Folder Include="Ui\ViewControllers\" />
+    <Folder Include="Ui\Common\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -152,9 +159,15 @@
     <Compile Include="Utilities\DeviceInfoProvider.cs" />
     <Compile Include="Utilities\PortableConcurrentQueue.cs" />
     <Compile Include="Services\ReachabilityService.cs" />
-    <Compile Include="Services\Reachability.cs" />
+    <Compile Include="Services\ReachabilityProvider.cs" />
     <Compile Include="Utilities\PhonebookUtilities.cs" />
     <Compile Include="Utilities\InsecureNSUrlSessionHandler.cs" />
+    <Compile Include="Ui\ViewControllers\LoginViewController.cs" />
+    <Compile Include="Ui\Common\Theme.cs" />
+    <Compile Include="Ui\Common\UIFontExtensions.cs" />
+    <Compile Include="ServerConfig.cs" />
+    <Compile Include="Ui\ViewControllers\MainViewController.cs" />
+    <Compile Include="Services\ReachabilityReceiver.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

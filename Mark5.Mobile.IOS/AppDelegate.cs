@@ -10,10 +10,16 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
+using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.IOS.Services;
+using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.ViewControllers;
 using Mark5.Mobile.IOS.Utilities;
 using PCLStorage;
 using UIKit;
@@ -25,7 +31,31 @@ namespace Mark5.Mobile.IOS
     public class AppDelegate : UIApplicationDelegate
     {
 
+        public override UIWindow Window
+        {
+            get;
+            set;
+        }
+
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
+        {
+            InitializeCommon();
+            var isLoggedIn = InitializePlatform();
+
+            Window = new UIWindow(UIScreen.MainScreen.Bounds);
+            Theme.ApplyTheme(Window);
+
+            UIViewController vc;
+            if (isLoggedIn) vc = new MainViewController();
+            else vc = new LoginViewController();
+
+            Window.RootViewController = vc;
+            Window.MakeKeyAndVisible();
+
+            return true;
+        }
+
+        void InitializeCommon()
         {
             Task.Run(async () =>
             {
@@ -54,8 +84,102 @@ namespace Mark5.Mobile.IOS
                 PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();
                 PlatformConfig.Preferences = new Preferences();
             }).Wait();
+        }
 
-            return true;
+        bool InitializePlatform()
+        {
+            return Task.Run(async () =>
+            {
+                var authenticator = AuthenticatorFactory.Create();
+                if (!await authenticator.IsAuthenticatedAsync())
+                {
+                    CommonConfig.Logger.Info($"Writing required file system storage version...");
+
+                    await FileSystemStorageUpdater.WriteRequiredStorageVersion();
+
+                    CommonConfig.Logger.Info($"User was not authenticated - will present {nameof(LoginViewController)}");
+
+                    return false;
+                }
+
+                CommonConfig.Logger.Info("Updating file system storage...");
+
+                var updated = await FileSystemStorageUpdater.UpdateStorage();
+
+                CommonConfig.Logger.Info(updated ? "File system storage updated" : "File system storage update not required");
+
+                CommonConfig.Logger.Info($"User is authenticated - initializing...");
+
+                var ci = await authenticator.GetConnectionInfoAsync();
+
+                CommonConfig.Logger.Info($"Current connection info: {ci}");
+
+                switch (ci.SslMode)
+                {
+                    case SslMode.AllowSelfSigned:
+                        PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
+                        break;
+                    default:
+                        PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
+                        break;
+                }
+
+                CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
+
+                Managers.Initialize(ci);
+                Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
+                Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                var policies = Managers.DownloadManager.DownloadPolicies;
+                policies[ObjectType.Document] = new DownloadFoldersPolicy();
+                if (PlatformConfig.Preferences.SynchroniseContacts)
+                {
+                    policies[ObjectType.Contact] = new DownloadAllPolicy();
+                }
+                if (PlatformConfig.Preferences.SynchroniseShortcodes)
+                {
+                    policies[ObjectType.Shortcode] = new DownloadAllPolicy();
+                }
+
+                if (PlatformConfig.Preferences.ClearCache)
+                {
+                    CommonConfig.Logger.Info("Clearing cache...");
+
+                    await DatabaseUtils.ResetDatabases();
+                    PlatformConfig.Preferences.ClearCache = false;
+
+                    CommonConfig.Logger.Info("Cleared cache");
+                }
+
+                if (await Managers.CleanUpManager.IsCleanUpNecessary(PlatformConfig.Preferences.CleanCacheIntervalDays))
+                {
+                    CommonConfig.Logger.Info("Cleaning up cache....");
+
+                    await Managers.CleanUpManager.CleanUp();
+
+                    CommonConfig.Logger.Info("Cleaned up cache");
+                }
+
+                CommonConfig.Logger.Info($"Starting {nameof(IDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
+
+                await Managers.DownloadManager.Start();
+                await Managers.OutgoingDocumentsManager.Start();
+
+                CommonConfig.Logger.Info($"Refreshing reachability status...");
+                await CommonConfig.ReachabilityService.Refresh();
+
+                CommonConfig.Logger.Info($"Registering {nameof(ReachabilityReceiver)}...");
+                PlatformConfig.ReachabilityReceiver.Register();
+
+                CommonConfig.Logger.Info("Retrieving system settings...");
+
+                ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+
+                CommonConfig.Logger.Info($"Initialized - will present {nameof(MainViewController)}");
+
+                return true;
+            }).Result;
         }
     }
 }
