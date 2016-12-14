@@ -31,7 +31,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void EnableSelfSignedCertificates()
         {
-            CommonConfig.Logger.Warning("**** ENABLING CUSTOM VALIDATION CALLBACK ****");
+            CommonConfig.Logger.Warning("**** ENABLING CUSTOM SSL VALIDATION CALLBACK ****");
 
             ServicePointManager.ServerCertificateValidationCallback = remoteCertificateValidationCallback;
             CommonConfig.HttpClientHandler = () => { return new InsecureNSUrlSessionHandler(); };
@@ -39,7 +39,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void DisableSelfSignedCertificates()
         {
-            CommonConfig.Logger.Info("Disabling custom validation callback.");
+            CommonConfig.Logger.Info("Using standard SSL validation callback");
 
             ServicePointManager.ServerCertificateValidationCallback = null;
             CommonConfig.HttpClientHandler = () => { return new NSUrlSessionHandler(); };

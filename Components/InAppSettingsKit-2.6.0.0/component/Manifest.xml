@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<component format="1" id="InAppSettingsKit">
+  <name>InAppSettingsKit</name>
+  <publisher>Xamarin Inc</publisher>
+  <publisher-url>https://xamarin.com</publisher-url>
+  <version>2.6.0.0</version>
+  <summary>This iOS framework allows settings to be in-app in addition to being in the Settings app.</summary>
+  <samples>
+    <sample id="InAppSettingsKitSample">
+      <name>InAppSettingsKit Sample</name>
+      <summary>InAppSettingsKit Sample</summary>
+    </sample>
+  </samples>
+</component>
