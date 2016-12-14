@@ -604,7 +604,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (dismissAction != null) await dismissAction();
 
-                PresentViewController(new UINavigationController(new MainViewController()), false, null);
+                PresentViewController(new MainViewController
+                {
+                    ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
+                }, true, null);
             }
             catch (Exception ex)
             {
