@@ -154,6 +154,7 @@
     <Folder Include="Ui\ViewControllers\" />
     <Folder Include="Ui\Common\" />
     <Folder Include="Resources\startscreens\" />
+    <Folder Include="Resources\Settings.bundle\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -185,6 +186,7 @@
     <Compile Include="Utilities\Integration.cs" />
     <Compile Include="Ui\Common\KeyboardUtilities.cs" />
     <Compile Include="Ui\Common\Dialogs.cs" />
+    <Compile Include="Ui\ViewControllers\LoginSettingsViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
@@ -215,6 +217,9 @@
     <BundleResource Include="Resources\startscreens\start-screen-logo-retinahd47.png" />
     <BundleResource Include="Resources\startscreens\start-screen-logo-retinahd55-landscape.png" />
     <BundleResource Include="Resources\startscreens\start-screen-logo-retinahd55.png" />
+    <BundleResource Include="Resources\Settings.bundle\en.lproj\Root.Restricted.strings" />
+    <BundleResource Include="Resources\Settings.bundle\en.lproj\Root.strings" />
+    <BundleResource Include="Resources\Settings.bundle\Root.Login.inApp.plist" />
   </ItemGroup>
   <ItemGroup>
     <XamarinComponentReference Include="InAppSettingsKit">

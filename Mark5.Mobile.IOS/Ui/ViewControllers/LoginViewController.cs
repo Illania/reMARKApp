@@ -75,6 +75,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         IAuthenticator authenticator;
 
+        SslMode sslMode = SslMode.On;
 
         #region UIViewController overrides
 
@@ -230,6 +231,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(backgroundImageView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, View, NSLayoutAttribute.Height, 1.0f, 0.0f)
                 });
             View.SendSubviewToBack(backgroundImageView);
+
+            var settingsButton = new UIButton();
+            settingsButton.TitleLabel.Font = Theme.DefaultBoldFont;
+            settingsButton.SetTitle("Settings", UIControlState.Normal);
+            settingsButton.TouchUpInside += (sender, e) =>
+            {
+                var rsv = new LoginSettingsViewController.RestrictedSettingsValues { SslMode = sslMode };
+                var rsvc = new LoginSettingsViewController(rsv);
+                rsvc.RestrictedSettingsValuesUpdatedDelegate = (values) =>
+                {
+                    sslMode = values.SslMode;
+                };
+                PresentViewController(new UINavigationController(rsvc), true, null);
+            };
+            settingsButton.TranslatesAutoresizingMaskIntoConstraints = false;
+            View.AddSubview(settingsButton);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(settingsButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 20.0f),
+                    NSLayoutConstraint.Create(settingsButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, -5.0f)
+                });
         }
 
         void InitSubViews()
@@ -339,6 +361,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             loginButton = new UIButton();
             loginButton.SetTitle("Login", UIControlState.Normal);
+            loginButton.TitleLabel.Font = Theme.DefaultBoldFont;
             loginButton.TouchUpInside += LoginButton_TouchUpInside;
             loginButton.TranslatesAutoresizingMaskIntoConstraints = false;
             loginButton.Enabled = false;
@@ -476,8 +499,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     return;
                 }
-
-                var sslMode = SslMode.Off;
 
                 if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialogAsync(this, "Warning", "sllow selfsigned is on"))
                 {
