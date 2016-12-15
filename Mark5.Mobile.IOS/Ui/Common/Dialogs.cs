@@ -7,7 +7,6 @@
 //
 
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using UIKit;
 
@@ -19,22 +18,32 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         #region Awaitable dialogs
 
-        public static Task<bool> ShowYesNoDialogAsync(UIViewController nv, string title, string content, string positiveText = "Yes", string negativeText = "No")
+        public static Task<bool> ShowYesNoDialogAsync(UIViewController vc, string title, string content)
+        {
+            return ShowYesNoDialogAsync(vc, title, content, Localization.GetString("yes"), Localization.GetString("no"));
+        }
+
+        public static Task<bool> ShowYesNoDialogAsync(UIViewController vc, string title, string content, string positiveText, string negativeText)
         {
             var tcs = new TaskCompletionSource<bool>();
             var alert = UIAlertController.Create(title, content, UIAlertControllerStyle.Alert);
             alert.AddAction(UIAlertAction.Create(positiveText, UIAlertActionStyle.Default, a => tcs.SetResult(true)));
             alert.AddAction(UIAlertAction.Create(negativeText, UIAlertActionStyle.Cancel, a => tcs.SetResult(false)));
-            nv.PresentViewController(alert, true, null);
+            vc.PresentViewController(alert, true, null);
             return tcs.Task;
         }
 
-        public static Task ShowConfirmDialogAsync(UIViewController nv, string title, string content)
+        public static Task ShowConfirmDialogAsync(UIViewController vc, string title, string content)
+        {
+            return ShowConfirmDialogAsync(vc, title, content, Localization.GetString("ok"));
+        }
+
+        public static Task ShowConfirmDialogAsync(UIViewController vc, string title, string content, string confirmationText)
         {
             var tcs = new TaskCompletionSource<bool>();
             var alert = UIAlertController.Create(title, content, UIAlertControllerStyle.Alert);
-            alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, a => tcs.SetResult(true)));
-            nv.PresentViewController(alert, true, null);
+            alert.AddAction(UIAlertAction.Create(confirmationText, UIAlertActionStyle.Default, a => tcs.SetResult(true)));
+            vc.PresentViewController(alert, true, null);
             return tcs.Task;
         }
 
@@ -42,10 +51,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         #region Non-awaitable dialogs
 
-        public static Func<Task> ShowInfiniteProgressDialog(UIViewController nv, string title, string content, CancellationTokenSource cts = null)
+        public static Func<Task> ShowInfiniteProgressDialog(UIViewController vc, string title, string content)
         {
             var alert = UIAlertController.Create(title, content, UIAlertControllerStyle.Alert);
-            nv.PresentViewController(alert, true, null);
+            vc.PresentViewController(alert, true, null);
 
             return () =>
             {
