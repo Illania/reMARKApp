@@ -491,7 +491,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"Attempting login...");
 
-            Func<Task> dismissAction = null;
+            Action dismissAction = null;
 
             try
             {
@@ -550,7 +550,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Info("Logging in...");
 
-                dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Localization.GetString("logging_in"), Localization.GetString("please_wait___"));
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_in___"));
 
                 switch (sslMode)
                 {
@@ -605,7 +605,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Info($"Logged in - will present {nameof(MainViewController)}");
 
-                if (dismissAction != null) await dismissAction();
+                if (dismissAction != null) dismissAction();
 
                 PresentViewController(new MainViewController
                 {
@@ -614,7 +614,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             catch (Exception ex)
             {
-                if (dismissAction != null) await dismissAction();
+                if (dismissAction != null) dismissAction();
 
                 CommonConfig.Logger.Error("Log in failed", ex);
 

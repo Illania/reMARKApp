@@ -130,6 +130,9 @@
     <Reference Include="SQLitePCLRaw.batteries_v2">
       <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.1\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
     </Reference>
+    <Reference Include="SVProgressHUD">
+      <HintPath>..\packages\SVProgressHUD.2.1\lib\Xamarin.iOS10\SVProgressHUD.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
@@ -189,6 +192,7 @@
     <Compile Include="Ui\Common\Dialogs.cs" />
     <Compile Include="Ui\ViewControllers\LoginSettingsViewController.cs" />
     <Compile Include="Ui\Common\Localization.cs" />
+    <Compile Include="Utilities\SystemReportCollector.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
