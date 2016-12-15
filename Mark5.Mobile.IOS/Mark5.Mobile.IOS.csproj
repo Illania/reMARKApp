@@ -156,6 +156,8 @@
     <Folder Include="Resources\startscreens\" />
     <Folder Include="Resources\Settings.bundle\" />
     <Folder Include="Resources\Base.lproj\" />
+    <Folder Include="Ui\ViewControllers\ComposeDocumentView\" />
+    <Folder Include="Ui\ViewControllers\ComposeDocumentView\Subviews\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -189,6 +191,17 @@
     <Compile Include="Ui\Common\Dialogs.cs" />
     <Compile Include="Ui\ViewControllers\LoginSettingsViewController.cs" />
     <Compile Include="Ui\Common\Localization.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\ComposeDocumentViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ComposeDocumentSubview.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ToView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\BccView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\CcView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\RecipientsView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\SubjectsView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\PriorityView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\LineView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ContentView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\AttachmentsView.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
