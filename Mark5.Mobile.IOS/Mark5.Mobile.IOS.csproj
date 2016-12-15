@@ -188,6 +188,7 @@
     <Compile Include="Ui\Common\KeyboardUtilities.cs" />
     <Compile Include="Ui\Common\Dialogs.cs" />
     <Compile Include="Ui\ViewControllers\LoginSettingsViewController.cs" />
+    <Compile Include="Ui\Common\Localization.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

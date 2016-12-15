@@ -235,7 +235,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             settingsButton = new UIButton();
             settingsButton.TitleLabel.Font = Theme.DefaultBoldFont;
-            settingsButton.SetTitle(NSBundle.MainBundle.LocalizedString("settings", "Settings"), UIControlState.Normal);
+            settingsButton.SetTitle(Localization.GetString("settings"), UIControlState.Normal);
             settingsButton.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(settingsButton);
             View.AddConstraints(new[]
@@ -254,7 +254,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             usernameTextField.AutocorrectionType = UITextAutocorrectionType.No;
             usernameTextField.ClearButtonMode = UITextFieldViewMode.WhileEditing;
             usernameTextField.ReturnKeyType = UIReturnKeyType.Next;
-            usernameTextField.AttributedPlaceholder = new NSAttributedString(NSBundle.MainBundle.LocalizedString("username", "Username"));
+            usernameTextField.AttributedPlaceholder = new NSAttributedString(Localization.GetString("username"));
             usernameTextField.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(usernameTextField);
             usernameTextFieldTopConstraint = NSLayoutConstraint.Create(usernameTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, logoImageView, NSLayoutAttribute.Bottom, 1.0f, TextFieldToLogoImageViewInitialDistance);
@@ -275,7 +275,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             passwordTextField.ClearButtonMode = UITextFieldViewMode.WhileEditing;
             passwordTextField.SecureTextEntry = true;
             passwordTextField.ReturnKeyType = UIReturnKeyType.Next;
-            passwordTextField.AttributedPlaceholder = new NSAttributedString(NSBundle.MainBundle.LocalizedString("password", "Password"));
+            passwordTextField.AttributedPlaceholder = new NSAttributedString(Localization.GetString("password"));
             passwordTextField.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(passwordTextField);
             passwordTextFieldTopConstraint = NSLayoutConstraint.Create(passwordTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, usernameTextField, NSLayoutAttribute.Bottom, 1.0f, 50.0f);
@@ -294,7 +294,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             hostnameTextField.AutocorrectionType = UITextAutocorrectionType.No;
             hostnameTextField.ClearButtonMode = UITextFieldViewMode.WhileEditing;
             hostnameTextField.ReturnKeyType = UIReturnKeyType.Next;
-            hostnameTextField.AttributedPlaceholder = new NSAttributedString(NSBundle.MainBundle.LocalizedString("hostname", "Hostname"));
+            hostnameTextField.AttributedPlaceholder = new NSAttributedString(Localization.GetString("hostname"));
             hostnameTextField.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(hostnameTextField);
             hostnameTextFieldTopConstraint = NSLayoutConstraint.Create(hostnameTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, passwordTextField, NSLayoutAttribute.Bottom, 1.0f, TextFieldToTextFieldInitialDistance);
@@ -314,7 +314,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             portTextField.ClearButtonMode = UITextFieldViewMode.WhileEditing;
             portTextField.KeyboardType = UIKeyboardType.NumberPad;
             portTextField.ReturnKeyType = UIReturnKeyType.Go;
-            portTextField.AttributedPlaceholder = new NSAttributedString(NSBundle.MainBundle.LocalizedString("port", "Port"));
+            portTextField.AttributedPlaceholder = new NSAttributedString(Localization.GetString("port"));
             portTextField.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(portTextField);
             portTextFieldTopConstraint = NSLayoutConstraint.Create(portTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, hostnameTextField, NSLayoutAttribute.Bottom, 1.0f, TextFieldToTextFieldInitialDistance);
@@ -327,7 +327,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 });
 
             loginButton = new UIButton();
-            loginButton.SetTitle(NSBundle.MainBundle.LocalizedString("login", "Login"), UIControlState.Normal);
+            loginButton.SetTitle(Localization.GetString("login"), UIControlState.Normal);
             loginButton.TitleLabel.Font = Theme.DefaultBoldFont;
             loginButton.TranslatesAutoresizingMaskIntoConstraints = false;
             loginButton.Enabled = false;
@@ -506,48 +506,51 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.Logger.Info($"Invalid username was entered: {username}");
 
                     errors = true;
-                    await Dialogs.ShowConfirmDialogAsync(this, "Wrong username", "You need to provide valid username.");
+                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("wrong_username_title"), Localization.GetString("wrong_username_summary"));
                 }
                 else if (!Validator.IsPasswordValid(password))
                 {
                     CommonConfig.Logger.Info($"Invalid password was entered: {password}");
 
                     errors = true;
-                    await Dialogs.ShowConfirmDialogAsync(this, "Wrong password", "You need to provide valid password");
+                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("wrong_password_title"), Localization.GetString("wrong_password_summary"));
                 }
                 else if (!Validator.IsHostNameValid(hostname))
                 {
                     CommonConfig.Logger.Info($"Invalid hostname was entered: {hostname}");
 
                     errors = true;
-                    await Dialogs.ShowConfirmDialogAsync(this, "Wrong hostname", "You need to provide valid hostname.");
+                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("wrong_hostname_title"), Localization.GetString("wrong_hostname_summary"));
                 }
                 else if (!Validator.IsPortValid(port))
                 {
                     CommonConfig.Logger.Info($"Invalid port was entered: {port}");
 
                     errors = true;
-                    await Dialogs.ShowConfirmDialogAsync(this, "Wrong port", "You need to provide valid port number.");
+                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("wrong_port_title"), Localization.GetString("wrong_port_summary"));
                 }
 
                 if (errors)
                 {
+                    loginButton.TouchUpInside += LoginButton_TouchUpInside;
+                    return;
+                }
+                
+                if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("warning"), Localization.GetString("warning_ssl_off"), Localization.GetString("continue"), Localization.GetString("cancel")))
+                {
+                    loginButton.TouchUpInside += LoginButton_TouchUpInside;
                     return;
                 }
 
-                if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialogAsync(this, "Warning", "sllow selfsigned is on"))
+                if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("warning"), Localization.GetString("warning_selfsigned_on"), Localization.GetString("continue"), Localization.GetString("cancel")))
                 {
-                    return;
-                }
-
-                if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialogAsync(this, "warning", "ssl off"))
-                {
+                    loginButton.TouchUpInside += LoginButton_TouchUpInside;
                     return;
                 }
 
                 CommonConfig.Logger.Info("Logging in...");
 
-                dismissAction = Dialogs.ShowInfiniteProgressDialog(this, "Logging in", "Please wait");
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Localization.GetString("logging_in"), Localization.GetString("please_wait___"));
 
                 switch (sslMode)
                 {
