@@ -66,7 +66,7 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.OutgoingFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "out"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "db"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("Caches", "v2", "att"), CreationCollisionOption.OpenIfExists);
-                CommonConfig.Logger = new SimpleLogger();
+                CommonConfig.Logger = new ConsoleAndFileLogger();
                 CommonConfig.ReachabilityService = new ReachabilityService();
                 CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
                 CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);

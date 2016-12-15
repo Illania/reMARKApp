@@ -130,9 +130,6 @@
     <Reference Include="SQLitePCLRaw.batteries_v2">
       <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.1\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
     </Reference>
-    <Reference Include="SVProgressHUD">
-      <HintPath>..\packages\SVProgressHUD.2.1\lib\Xamarin.iOS10\SVProgressHUD.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
@@ -173,7 +170,7 @@
     <Compile Include="AppDelegate.cs" />
     <Compile Include="PlatformConfig.cs" />
     <Compile Include="Utilities\SSLCertificateVerificationManager.cs" />
-    <Compile Include="Utilities\SimpleLogger.cs" />
+    <Compile Include="Utilities\ConsoleAndFileLogger.cs" />
     <Compile Include="Utilities\Preferences.cs" />
     <Compile Include="Utilities\DeviceInfoProvider.cs" />
     <Compile Include="Utilities\PortableConcurrentQueue.cs" />

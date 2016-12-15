@@ -24,17 +24,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string AcceptSelfSignedKey = "acceptSelfSigned";
         const string AppVersionKey = "appVersion";
 
-        public class RestrictedSettingsValues
+        public class SettingsValues
         {
 
             public SslMode SslMode { get; set; }
         }
 
-        public event EventHandler<RestrictedSettingsValues> RestrictedSettingsValuesUpdated;
+        public event EventHandler<SettingsValues> RestrictedSettingsValuesUpdated;
         
         NSObject observer;
 
-        public LoginSettingsViewController(RestrictedSettingsValues values)
+        public LoginSettingsViewController(SettingsValues values)
         {
             Delegate = this;
             File = "Root.Login.inApp";
@@ -70,7 +70,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var sslEnabled = SettingsStore.GetBool(SslEnabledKey);
                 var acceptSelfSigned = SettingsStore.GetBool(AcceptSelfSignedKey);
 
-                var rsv = new RestrictedSettingsValues();
+                var rsv = new SettingsValues();
 
                 if (sslEnabled && !acceptSelfSigned)
                 {

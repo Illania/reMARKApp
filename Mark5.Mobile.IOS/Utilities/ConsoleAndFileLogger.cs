@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.IOS
-// File: SimpleLogger.cs
+// File: ConsoleAndFileLogger.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -14,7 +14,7 @@ using Mark5.Mobile.Common.Utilities;
 namespace Mark5.Mobile.IOS.Utilities
 {
     
-    public class SimpleLogger : AbstractLogger
+    public class ConsoleAndFileLogger : AbstractLogger
     {
         
         protected override void WriteToLog(LogLevel logLevel, string message, Exception exception, bool includeStackTrace = false)
@@ -44,8 +44,16 @@ namespace Mark5.Mobile.IOS.Utilities
                 logMessageBuilder.AppendLine($"{exception.GetType()}: ").AppendLine(exception.Message).Append(" ").Append(exception.StackTrace);
             }
 
-            Console.WriteLine(logMessageBuilder);
+            var log = logMessageBuilder.ToString();
+
+            WriteToConsole(log);
+            WriteToFile(log);
         }
+
+        public string ReadLastLogFile() => string.Empty; // TODO
+
+        static void WriteToConsole(string log) => Console.WriteLine(log);
+        static void WriteToFile(string log) => Console.WriteLine(log); // TODO
 
         static string GetStackInfo(int depth)
         {

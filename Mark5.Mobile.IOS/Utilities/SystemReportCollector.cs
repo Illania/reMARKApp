@@ -7,7 +7,11 @@
 //
 
 using System;
+using System.Text;
 using Foundation;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Utilities
@@ -35,10 +39,76 @@ namespace Mark5.Mobile.IOS.Utilities
             return avc;
         }
 
-        
         public static string CreateFullReport()
         {
-            return "";
+            var sb = new StringBuilder();
+
+            sb.Append(CreateSystemInfoReport());
+            sb.AppendLine();
+            sb.Append(CreateLogReport());
+
+            return sb.ToString();
+        }
+
+        public static string CreateSystemInfoReport()
+        {
+            var sb = new StringBuilder();
+
+            sb.AppendLine("===== General =====");
+            sb.AppendLine("Platform: iOS");
+            sb.AppendLine("Version: " + NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"] + " (" + NSBundle.MainBundle.InfoDictionary["CFBundleVersion"] + ")");
+            sb.AppendLine("Date: " + DateTime.UtcNow);
+            sb.AppendLine();
+
+            sb.AppendLine("===== Device information =====");
+            sb.AppendLine("Name: " + UIDevice.CurrentDevice.Name);
+            sb.AppendLine("UserInterfaceIdiom: " + UIDevice.CurrentDevice.UserInterfaceIdiom.ToString());
+            sb.AppendLine("Model: " + UIDevice.CurrentDevice.Model);
+            sb.AppendLine("LocalizedModel: " + UIDevice.CurrentDevice.LocalizedModel);
+            sb.AppendLine("SystemName: " + UIDevice.CurrentDevice.SystemName);
+            sb.AppendLine("SystemVersion: " + UIDevice.CurrentDevice.SystemVersion);
+            sb.AppendLine("IsMultitaskingSupported: " + UIDevice.CurrentDevice.IsMultitaskingSupported);
+            sb.AppendLine("BatteryMonitoringEnabled: " + UIDevice.CurrentDevice.BatteryMonitoringEnabled);
+            sb.AppendLine("BatteryLevel: " + UIDevice.CurrentDevice.BatteryLevel);
+            sb.AppendLine("BatteryState: " + UIDevice.CurrentDevice.BatteryState.ToString());
+
+            sb.AppendLine("===== Connection information =====");
+            sb.AppendLine("Username: " + Managers.ActiveConnectionInfo?.Username);
+            sb.AppendLine("Hostname: " + Managers.ActiveConnectionInfo?.Hostname);
+            sb.AppendLine("Port: " + Managers.ActiveConnectionInfo?.Port);
+            sb.AppendLine("SSL: " + Managers.ActiveConnectionInfo?.SslMode);
+            sb.AppendLine("Friendly device name: " + Managers.ActiveConnectionInfo?.FriendlyDeviceName);
+            sb.AppendLine("Installation ID: " + Managers.ActiveConnectionInfo?.InstallationId);
+            sb.AppendLine("APNS Token: " + PlatformConfig.Preferences.PushNotificationToken);
+            sb.AppendLine();
+
+            sb.AppendLine("===== Server information =====");
+            sb.AppendLine(SerializationUtils.Serialize(ServerConfig.SystemSettings));
+            sb.AppendLine();
+
+            sb.AppendLine("===== Preferences =====");
+            foreach (var kv in PlatformConfig.Preferences.All)
+            {
+                sb.AppendLine(kv.Key + ": " + kv.Value);
+            }
+            sb.AppendLine();
+
+            sb.AppendLine("===== Memory information =====");
+            sb.AppendLine("Free disk space: " + Integration.GetFreeDiskSpace() / 1024 /1024);
+            sb.AppendLine("Total disk space: " + Integration.GetTotalDiskSpace() / 1024 / 1024);
+            sb.AppendLine("[MONO] Total memory: " + GC.GetTotalMemory(false) / 1024);
+            sb.AppendLine("[MONO] Total memory after GC: " + GC.GetTotalMemory(true) / 1024);
+            sb.AppendLine();
+            
+            return sb.ToString();
+        }
+
+        public static string CreateLogReport()
+        {
+            var sb = new StringBuilder();
+            sb.Append("===== logcat =====");
+            sb.AppendLine(((ConsoleAndFileLogger)CommonConfig.Logger).ReadLastLogFile());
+            return sb.ToString();
         }
     }
 }
