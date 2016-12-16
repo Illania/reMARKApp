@@ -608,6 +608,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (dismissAction != null) dismissAction();
 
                 UIApplication.SharedApplication.RegisterUserNotificationSettings(UIUserNotificationSettings.GetSettingsForTypes(UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound, null));
+                UIApplication.SharedApplication.RegisterForRemoteNotifications();
 
                 PresentViewController(new MainViewController
                 {

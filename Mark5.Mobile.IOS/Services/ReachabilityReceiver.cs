@@ -16,13 +16,13 @@ namespace Mark5.Mobile.IOS.Services
         
         public void Register()
         {
-            Reachability.InternetConnectionStatus();
-            Reachability.ReachabilityChanged += Reachability_ReachabilityChanged;
+            ReachabilityProvider.InternetConnectionStatus();
+            ReachabilityProvider.ReachabilityChanged += Reachability_ReachabilityChanged;
         }
 
         public void Unregister()
         {
-            Reachability.ReachabilityChanged -= Reachability_ReachabilityChanged;
+            ReachabilityProvider.ReachabilityChanged -= Reachability_ReachabilityChanged;
         }
 
         void Reachability_ReachabilityChanged(object sender, EventArgs e)

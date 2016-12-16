@@ -45,9 +45,7 @@ namespace Mark5.Mobile.IOS
                 InitializeCommon();
 
                 CommonConfig.Logger.Info("MARK5 initializing...");
-
                 var isLoggedIn = InitializePlatform();
-
                 CommonConfig.Logger.Info("MARK5 initialized");
 
                 Window = new UIWindow(UIScreen.MainScreen.Bounds);
@@ -72,15 +70,23 @@ namespace Mark5.Mobile.IOS
         {
             CommonConfig.Logger.Info($"Received APNS token: {deviceToken}");
 
-            PlatformConfig.Preferences.PushNotificationToken = deviceToken.ToString();
+            var newToken = deviceToken.ToString();
+            var oldToken = PlatformConfig.Preferences.PushNotificationToken;
+            PlatformConfig.Preferences.PushNotificationToken = newToken;
 
-            Managers.NotificationsManager.Subscribe(DeviceType.IOS, deviceToken.ToString()).FireAndForget();
+            if (!string.IsNullOrWhiteSpace(oldToken) && oldToken != newToken)
+            {
+                CommonConfig.Logger.Info($"New APNS token is different, so try to unsubscribe old one...");
+                Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, oldToken).FireAndForget();
+            }
+        
+            CommonConfig.Logger.Info($"Sending new APNS token...");
+            Managers.NotificationsManager.Subscribe(DeviceType.IOS, newToken).FireAndForget();
         }
 
         public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error)
         {
             CommonConfig.Logger.Error("Failed to received APNS Token", new NSErrorException(error));
-
             PlatformConfig.Preferences.PushNotificationToken = string.Empty;
         }
 
@@ -125,24 +131,18 @@ namespace Mark5.Mobile.IOS
                 if (!await authenticator.IsAuthenticatedAsync())
                 {
                     CommonConfig.Logger.Info($"Writing required file system storage version...");
-
                     await FileSystemStorageUpdater.WriteRequiredStorageVersion();
-
                     CommonConfig.Logger.Info($"User was not authenticated - will present {nameof(LoginViewController)}");
 
                     return false;
                 }
 
                 CommonConfig.Logger.Info("Updating file system storage...");
-
                 var updated = await FileSystemStorageUpdater.UpdateStorage();
-
                 CommonConfig.Logger.Info(updated ? "File system storage updated" : "File system storage update not required");
 
                 CommonConfig.Logger.Info($"User is authenticated - initializing...");
-
                 var ci = await authenticator.GetConnectionInfoAsync();
-
                 CommonConfig.Logger.Info($"Current connection info: {ci}");
 
                 switch (ci.SslMode)
@@ -156,7 +156,6 @@ namespace Mark5.Mobile.IOS
                 }
 
                 CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
-
                 Managers.Initialize(ci);
                 Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
                 Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
@@ -176,24 +175,19 @@ namespace Mark5.Mobile.IOS
                 if (PlatformConfig.Preferences.ClearCache)
                 {
                     CommonConfig.Logger.Info("Clearing cache...");
-
                     await DatabaseUtils.ResetDatabases();
                     PlatformConfig.Preferences.ClearCache = false;
-
                     CommonConfig.Logger.Info("Cleared cache");
                 }
 
                 if (await Managers.CleanUpManager.IsCleanUpNecessary(PlatformConfig.Preferences.CleanCacheIntervalDays))
                 {
                     CommonConfig.Logger.Info("Cleaning up cache....");
-
                     await Managers.CleanUpManager.CleanUp();
-
                     CommonConfig.Logger.Info("Cleaned up cache");
                 }
 
                 CommonConfig.Logger.Info($"Starting {nameof(IDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
-
                 await Managers.DownloadManager.Start();
                 await Managers.OutgoingDocumentsManager.Start();
 
@@ -204,12 +198,14 @@ namespace Mark5.Mobile.IOS
                 PlatformConfig.ReachabilityReceiver.Register();
 
                 CommonConfig.Logger.Info("Retrieving system settings...");
-
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
 
-                CommonConfig.Logger.Info("Refreshing APNS token...");
-
-                UIApplication.SharedApplication.RegisterUserNotificationSettings(UIUserNotificationSettings.GetSettingsForTypes(UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound, null));
+                BeginInvokeOnMainThread(() =>
+                {
+                    CommonConfig.Logger.Info("Refreshing APNS token...");
+                    UIApplication.SharedApplication.RegisterUserNotificationSettings(UIUserNotificationSettings.GetSettingsForTypes(UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound, null));
+                    UIApplication.SharedApplication.RegisterForRemoteNotifications();
+                });
 
                 CommonConfig.Logger.Info($"Initialized - will present {nameof(MainViewController)}");
 
