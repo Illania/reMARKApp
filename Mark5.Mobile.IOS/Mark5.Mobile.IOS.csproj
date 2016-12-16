@@ -202,6 +202,8 @@
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\LineView.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ContentView.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\AttachmentsView.cs" />
+    <Compile Include="Utilities\UiTextViewExtensions.cs" />
+    <Compile Include="Utilities\StringExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
