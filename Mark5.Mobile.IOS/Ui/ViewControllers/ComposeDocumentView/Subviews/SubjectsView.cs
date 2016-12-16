@@ -7,6 +7,7 @@
 //
 using System;
 using System.Threading.Tasks;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
@@ -67,16 +68,37 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
         }
 
         //TODO remember about all the unsubscription from view
+
         #region Overrides
 
         public override Task RefreshView()
         {
-            throw new NotImplementedException();
+            if (CreationModeFlag == DocumentCreationModeFlag.None || CreationModeFlag == DocumentCreationModeFlag.New)
+            {
+                return Task.CompletedTask;
+            }
+
+            switch (CreationModeFlag)
+            {
+                case DocumentCreationModeFlag.Edit:
+                    textView.Text = PreviousDocumentPreview.Subject;
+                    break;
+                case DocumentCreationModeFlag.Reply:
+                case DocumentCreationModeFlag.ReplyAll:
+                    textView.Text = $"Re: {PreviousDocumentPreview.Subject}";
+                    break;
+                case DocumentCreationModeFlag.Forward:
+                    textView.Text = $"Fw: {PreviousDocumentPreview.Subject}";
+                    break;
+            }
+
+            return Task.CompletedTask;
         }
 
         public override Task UpdateDocument()
         {
-            throw new NotImplementedException();
+            DocumentPreview.Subject = textView.Text;
+            return Task.CompletedTask;
         }
 
         #endregion

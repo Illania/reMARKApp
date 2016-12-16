@@ -59,7 +59,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
                 });
 
             selectedPriorityLabel = new UILabel();
-            selectedPriorityLabel.Text = GetPriorityText(selectedPriority);
+            selectedPriorityLabel.Text = GetPriorityText(Priority.Normal);
             selectedPriorityLabel.Font = Theme.DefaultFont;
             selectedPriorityLabel.Opaque = false;
             selectedPriorityLabel.Lines = 1;
@@ -82,12 +82,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
 
         public override Task RefreshView()
         {
-            throw new NotImplementedException();
+            if (CreationModeFlag == DocumentCreationModeFlag.Edit)
+            {
+                SelectPriority(PreviousDocumentPreview.Priority);
+            }
+
+            return Task.CompletedTask;
         }
 
         public override Task UpdateDocument()
         {
-            throw new NotImplementedException();
+            DocumentPreview.Priority = selectedPriority;
+            return Task.CompletedTask;
         }
 
         #endregion
@@ -108,10 +114,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
             ActionSheetWillAppear(this, EventArgs.Empty);
 
             var selectPriorityActionSheet = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
-            selectPriorityActionSheet.AddAction(UIAlertAction.Create("Urgent", UIAlertActionStyle.Default, a => SelectPriority(Priority.Urgent)));
-            selectPriorityActionSheet.AddAction(UIAlertAction.Create("Normal", UIAlertActionStyle.Default, a => SelectPriority(Priority.Normal)));
-            selectPriorityActionSheet.AddAction(UIAlertAction.Create("Low", UIAlertActionStyle.Default, a => SelectPriority(Priority.Low)));
-            selectPriorityActionSheet.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, a => selectedPriorityLabel.TextColor = UIColor.DarkTextColor));
+            selectPriorityActionSheet.AddAction(UIAlertAction.Create(GetPriorityText(Priority.Urgent), UIAlertActionStyle.Default, a => SelectPriority(Priority.Urgent)));
+            selectPriorityActionSheet.AddAction(UIAlertAction.Create(GetPriorityText(Priority.Normal), UIAlertActionStyle.Default, a => SelectPriority(Priority.Normal)));
+            selectPriorityActionSheet.AddAction(UIAlertAction.Create(GetPriorityText(Priority.Low), UIAlertActionStyle.Default, a => SelectPriority(Priority.Low)));
+            selectPriorityActionSheet.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => selectedPriorityLabel.TextColor = UIColor.DarkTextColor));
             if (selectPriorityActionSheet.PopoverPresentationController != null)
             {
                 //selectPriorityActionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(selectedPriorityLabel); //TODO
@@ -149,8 +155,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
         }
 
         #endregion
-
-
 
     }
 }

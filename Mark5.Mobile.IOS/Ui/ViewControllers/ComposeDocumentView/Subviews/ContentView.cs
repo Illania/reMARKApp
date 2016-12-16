@@ -13,7 +13,6 @@ using System.Text;
 using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
-using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
@@ -144,14 +143,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
 
         #region Overrides
 
-        public override Task RefreshView()
+        public override async Task RefreshView()
         {
-            throw new NotImplementedException();
+            if (CreationModeFlag == DocumentCreationModeFlag.Edit)
+            {
+                var result = GetContentAndTypeFromDocument();
+                var content = result.Item1;
+                var nsDocumentType = result.Item2;
+                var contentAttributedString = content.ToNSAttributedString(nsDocumentType, Theme.DefaultDocumentFont);
+                if (contentAttributedString != null && contentAttributedString.Length > 0)
+                {
+                    editTextView.AttributedText = contentAttributedString;
+                }
+            }
+            else
+            {
+                expandButton.Hidden &= PreviousDocument == null;
+            }
         }
 
-        public override Task UpdateDocument()
+        public override async Task UpdateDocument()
         {
-            throw new NotImplementedException();
+            Document.HtmlBody = GetHtmlText();
+            //TODO need to update also the document preview preview, but we need anglesharp for that
+
         }
 
         #endregion
@@ -243,7 +258,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
 
         #region Public methods
 
-
         public string GetHtmlText()
         {
             return RetrieveCombinedText().ToHTMLString(Theme.DefaultOutgoingDocumentFont);
@@ -287,37 +301,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
             }
 
             editTextView.SelectedRange = new NSRange(location, 0);
-        }
-
-        public void SetPreviousDocument(Document previousDocument)
-        {
-            if (creationModeFlag == DocumentCreationModeFlag.None)
-            {
-                throw new InvalidOperationException("The creation mode has not been set!");
-            }
-
-            if (previousDocument != null)
-            {
-                this.PreviousDocument = previousDocument;
-
-                if (creationModeFlag == DocumentCreationModeFlag.Edit)
-                {
-                    var result = GetContentAndTypeFromDocument();
-                    var content = result.Item1;
-                    var nsDocumentType = result.Item2;
-                    var contentAttributedString = content.ToNSAttributedString(nsDocumentType, Theme.DefaultDocumentFont);
-                    if (contentAttributedString != null && contentAttributedString.Length > 0)
-                    {
-                        editTextView.AttributedText = contentAttributedString;
-                    }
-                }
-
-                editTextView.SelectedRange = new NSRange(0, 0);
-            }
-            else
-            {
-                CommonConfig.Logger.Info(string.Format("Cannot insert previous document content because it is not completely loaded (or null). [previousDocument={0}]", previousDocument));
-            }
         }
 
         #endregion

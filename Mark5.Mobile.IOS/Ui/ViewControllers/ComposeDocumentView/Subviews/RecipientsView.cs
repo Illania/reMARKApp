@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CoreGraphics;
@@ -18,6 +19,7 @@ using Mark5.Mobile.Common.IOS.Utilities.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
@@ -157,12 +159,76 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
             }
         }
 
-
         #region Overrides
 
         public override Task RefreshView()
         {
-            throw new NotImplementedException();
+            if (CreationModeFlag == DocumentCreationModeFlag.New || CreationModeFlag == DocumentCreationModeFlag.None
+                || CreationModeFlag == DocumentCreationModeFlag.Forward)
+            {
+                return Task.CompletedTask;
+            }
+
+            if (CreationModeFlag == DocumentCreationModeFlag.Edit)
+            {
+                SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
+            }
+
+            if (CreationModeFlag == DocumentCreationModeFlag.Reply)
+            {
+                if (AddressType != DocumentAddressType.To)
+                {
+                    return Task.CompletedTask;
+                }
+
+                if (PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
+                {
+                    var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo).Select(da => da.Address);
+                    if (replyToAddresses == null || !replyToAddresses.Any())
+                    {
+                        SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Address));
+                    }
+                    else
+                    {
+                        SetEmails(replyToAddresses);
+                    }
+                }
+                else if (PreviousDocumentPreview.Direction == DocumentDirection.Outgoing)
+                {
+                    SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To).Select(da => da.Address));
+                }
+            }
+
+            if (CreationModeFlag == DocumentCreationModeFlag.ReplyAll)
+            {
+                if (PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
+                {
+                    var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo).Select(da => da.Address);
+
+                    if (AddressType == DocumentAddressType.To)
+                    {
+                        if (replyToAddresses == null || !replyToAddresses.Any())
+                        {
+                            SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From || da.AddressType == DocumentAddressType.To).Select(da => da.Address));
+                        }
+                        else
+                        {
+                            SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To).Select(da => da.Address).Union(replyToAddresses));
+                        }
+                    }
+                    else if (AddressType == DocumentAddressType.Cc)
+                    {
+                        var ccAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.Cc).Select(da => da.Address);
+                        SetEmails(ccAddresses);
+                    }
+                }
+                if (PreviousDocumentPreview.Direction == DocumentDirection.Outgoing)
+                {
+                    SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == AddressType).Select(da => da.Address));
+                }
+            }
+
+            return Task.CompletedTask;
         }
 
         public override Task UpdateDocument()
@@ -413,6 +479,240 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
 
                     expanded = false;
                 });
+        }
+
+        #endregion
+
+        #region Public methods
+
+        public IEnumerable<string> GetEmails()
+        {
+            MatchCollection matches;
+            return Validator.ContainsValidEmails(TextView.Text, out matches) ? matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() : new List<string>();
+        }
+
+        public IEnumerable<string> GetRecipents()
+        {
+            return TextView.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries).Where(Validator.ContainsValidEmails).Select(s => s.Trim());
+        }
+
+        //TODO
+        //public IEnumerable<RecentAddress> GetNewRecentAddresses()
+        //{
+        //    var newRecents = new HashSet<RecentAddress>();
+        //    foreach (var recipent in GetRecipents())
+        //    {
+        //        if (Regex.Match(recipent, RecipentRegex).Success)
+        //        {
+        //            var name = recipent.SafeSubstringBeforeLast('<').Trim();
+        //            var address = recipent.SafeSubstringAfterLast('<').SafeSubstringBeforeLast('>').Trim();
+        //            newRecents.Add(new RecentAddress(name, address));
+        //        }
+        //        else
+        //        {
+        //            newRecents.Add(new RecentAddress(recipent));
+        //        }
+        //    }
+
+        //    return newRecents;
+        //}
+
+        public void SetEmails(IEnumerable<string> emails)
+        {
+            SetEmails(string.Join(EmailSeparator, emails));
+        }
+
+        public void SetEmails(string emails)
+        {
+            MatchCollection matches;
+            if (Validator.ContainsValidEmails(emails, out matches))
+            {
+                var sb = new StringBuilder();
+                sb.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
+
+                sb.Append(EmailSeparator);
+
+                TextView.TextStorage.BeginEditing();
+                TextView.TextStorage.SetString(sb.ToNSAttributedString());
+                TextView.TextStorage.EndEditing();
+                TextView.SelectedRange = new NSRange(TextView.Text.Length, 0);
+
+                CorrectMarkup();
+
+                Edited(this, EventArgs.Empty);
+            }
+            else
+            {
+                CommonConfig.Logger.Info(string.Format("No valid emails found in {0}.", emails));
+            }
+        }
+
+        public void SetRecipents(IEnumerable<string> recipents)
+        {
+            SetRecipents(string.Join(EmailSeparator, recipents));
+        }
+
+        public void SetRecipents(string recipents)
+        {
+            TextView.TextStorage.BeginEditing();
+            TextView.TextStorage.SetString(recipents.ToNSAttributedString());
+            TextView.TextStorage.EndEditing();
+            TextView.SelectedRange = new NSRange(TextView.Text.Length, 0);
+
+            CorrectMarkup();
+
+            Edited(this, EventArgs.Empty);
+        }
+
+        public void AddEmails(IEnumerable<string> emails)
+        {
+            AddEmails(string.Join(EmailSeparator, emails));
+        }
+
+        public void AddEmails(string emails)
+        {
+            MatchCollection matches;
+            if (Validator.ContainsValidEmails(emails, out matches))
+            {
+                var newEmails = new StringBuilder();
+                newEmails.Append(TextView.Text);
+                if (!TextView.Text.EndsWith(EmailSeparator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(TextView.Text))
+                {
+                    newEmails.Append(EmailSeparator);
+                }
+                newEmails.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
+                newEmails.Append(EmailSeparator);
+
+                TextView.TextStorage.BeginEditing();
+                TextView.TextStorage.SetString(newEmails.ToNSAttributedString());
+                TextView.TextStorage.EndEditing();
+                TextView.SelectedRange = new NSRange(TextView.Text.Length, 0);
+
+                CorrectMarkup();
+
+                Edited(this, EventArgs.Empty);
+            }
+            else
+            {
+                CommonConfig.Logger.Info(string.Format("No valid emails found in {0}.", emails));
+                if (Log.IsInfoEnabled())
+                {
+                    Log.Info(string.Format("No valid emails found in {0}.", emails));
+                }
+            }
+        }
+
+        public void AddRecipent(string name, string address)
+        {
+            var newEmails = new StringBuilder();
+            newEmails.Append(TextView.Text);
+            if (!TextView.Text.EndsWith(EmailSeparator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(TextView.Text))
+            {
+                newEmails.Append(EmailSeparator);
+            }
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                newEmails.Append(address);
+            }
+            else
+            {
+                newEmails.Append(string.Format(RecipentFormat, name, address));
+            }
+            newEmails.Append(EmailSeparator);
+
+            TextView.TextStorage.BeginEditing();
+            TextView.TextStorage.SetString(newEmails.ToNSAttributedString());
+            TextView.TextStorage.EndEditing();
+            TextView.SelectedRange = new NSRange(TextView.Text.Length, 0);
+
+            CorrectMarkup();
+
+            Edited(this, EventArgs.Empty);
+        }
+
+        public void SetRecipients(IEnumerable<string> recipients)
+        {
+            var emailText = string.Join(", ", recipients);
+
+            TextView.TextStorage.BeginEditing();
+            TextView.TextStorage.SetString(emailText.ToNSAttributedString());
+            TextView.TextStorage.EndEditing();
+
+            CorrectMarkup();
+
+            Edited(this, EventArgs.Empty);
+        }
+
+        public void RemoveAddressFromLine(string lineAddress)
+        {
+            if (lineAddress == savedRecipient)
+            {
+                return;
+            }
+
+            var currentRecipients = GetRecipents().ToList();
+
+            if (!string.IsNullOrEmpty(savedRecipient))
+            {
+                currentRecipients.Add(savedRecipient);
+            }
+
+            var lineRelatedRecipient = currentRecipients.FirstOrDefault(r => r.Contains(lineAddress));
+            if (lineRelatedRecipient != null)
+            {
+                savedRecipient = lineRelatedRecipient;
+                currentRecipients.Remove(lineRelatedRecipient);
+            }
+            else
+            {
+                savedRecipient = null;
+            }
+
+            if (currentRecipients.Any())
+            {
+                SetRecipients(currentRecipients);
+            }
+            else
+            {
+                Clear();
+            }
+        }
+
+        public void Clear()
+        {
+            TextView.TextStorage.BeginEditing();
+            TextView.TextStorage.SetString(string.Empty.ToNSAttributedString());
+            TextView.TextStorage.EndEditing();
+
+            Edited(this, EventArgs.Empty);
+        }
+
+        public void StartEditing()
+        {
+            TextView.BecomeFirstResponder();
+            ExpandView();
+
+            TextView.SelectedRange = new NSRange(TextView.Text.Length, 0);
+        }
+
+        public void EndEditing()
+        {
+            TextView.ResignFirstResponder();
+        }
+
+        public void SetText(string text)
+        {
+            TextView.Text = text;
+            CorrectMarkup();
+            TextView.SelectedRange = new NSRange(text.Length, 0);
+            TextView.BecomeFirstResponder();
+
+            Edited(this, EventArgs.Empty);
+        }
+
+        public string GetText()
+        {
+            return TextView.Text;
         }
 
         #endregion
