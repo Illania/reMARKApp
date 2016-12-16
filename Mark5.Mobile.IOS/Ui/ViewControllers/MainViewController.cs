@@ -5,44 +5,60 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System.IO;
 using Foundation;
+using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
+    
     public class MainViewController : UITabBarController
     {
+        
+        UINavigationController searchNavigationController;
+        DocumentSplitViewController documentSplitViewController;
+        ContactSplitViewController contactSplitViewController;
+        ShortcodeSplitViewController shortcodeSplitViewController;
+        UINavigationController notificationsNavigationController;
+        UINavigationController settingsNavigationController;
 
         public override void LoadView()
         {
             base.LoadView();
 
-            documentSplitViewController = new DocumentsSplitViewController();
-            documentSplitViewController.TabBarItem.Title = "Documents";
-            documentSplitViewController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("Icons", "documents.png"));
-            documentSplitViewController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("Icons", "documents-filled.png"));
+            var searchViewController = new SearchViewController();
+            searchViewController.TabBarItem.Title = Localization.GetString("search");
+            searchViewController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "documents.png")); // TODO put correct icon
+            searchViewController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "documents-filled.png")); // TODO put correct icon
+            searchNavigationController = new UINavigationController(searchViewController);
 
-            contactSplitViewController = new ContactsSplitViewController();
-            contactSplitViewController.TabBarItem.Title = "Contacts";
-            contactSplitViewController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("Icons", "contacts.png"));
-            contactSplitViewController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("Icons", "contacts-filled.png"));
+            documentSplitViewController = new DocumentSplitViewController();
+            documentSplitViewController.TabBarItem.Title = Localization.GetString("documents");
+            documentSplitViewController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "documents.png"));
+            documentSplitViewController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "documents-filled.png"));
 
-            shortcodeSplitViewController = new ShortcodesSplitViewController();
-            shortcodeSplitViewController.TabBarItem.Title = "Shortcodes";
-            shortcodeSplitViewController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("Icons", "shortcodes.png"));
-            shortcodeSplitViewController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("Icons", "shortcodes-filled.png"));
+            contactSplitViewController = new ContactSplitViewController();
+            contactSplitViewController.TabBarItem.Title = Localization.GetString("contacts");
+            contactSplitViewController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "contacts.png"));
+            contactSplitViewController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "contacts-filled.png"));
 
-            notificationsListViewController = new NotificationsListViewController();
-            notificationsListViewController.TabBarItem.Title = "Notifications";
-            notificationsListViewController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("Icons", "notifications.png"));
-            notificationsListViewController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("Icons", "notifications-filled.png"));
-            notificationsNavigationController = new CustomUINavigationController(notificationsListViewController);
+            shortcodeSplitViewController = new ShortcodeSplitViewController();
+            shortcodeSplitViewController.TabBarItem.Title = Localization.GetString("shortcodes");
+            shortcodeSplitViewController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "shortcodes.png"));
+            shortcodeSplitViewController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "shortcodes-filled.png"));
 
-            settingsViewController = new SettingsViewController();
-            settingsViewController.TabBarItem.Title = "Settings";
-            settingsViewController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("Icons", "settings.png"));
-            settingsViewController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("Icons", "settings-filled.png"));
-            settingsNavigationController = new CustomUINavigationController(settingsViewController);
+            var notificationsListViewController = new NotificationsListViewController();
+            notificationsListViewController.TabBarItem.Title = Localization.GetString("notifications");
+            notificationsListViewController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "notifications.png"));
+            notificationsListViewController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "notifications-filled.png"));
+            notificationsNavigationController = new UINavigationController(notificationsListViewController);
+
+            var settingsViewController = new SettingsViewController();
+            settingsViewController.TabBarItem.Title = Localization.GetString("settings");;
+            settingsViewController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "settings.png"));
+            settingsViewController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "settings-filled.png"));
+            settingsNavigationController = new UINavigationController(settingsViewController);
         }
         
         public override void ViewWillAppear(bool animated)
@@ -53,11 +69,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             ViewControllers = new UIViewController[]
                 {
+                    searchNavigationController,
                     documentSplitViewController,
                     contactSplitViewController,
                     shortcodeSplitViewController,
                     notificationsNavigationController,
-                    settingsNavigationController,
+                    settingsNavigationController
                 };
         }
 
