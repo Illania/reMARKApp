@@ -71,6 +71,7 @@ namespace Mark5.Mobile.IOS.Utilities
             sb.AppendLine("BatteryMonitoringEnabled: " + UIDevice.CurrentDevice.BatteryMonitoringEnabled);
             sb.AppendLine("BatteryLevel: " + UIDevice.CurrentDevice.BatteryLevel);
             sb.AppendLine("BatteryState: " + UIDevice.CurrentDevice.BatteryState.ToString());
+            sb.AppendLine();
 
             sb.AppendLine("===== Connection information =====");
             sb.AppendLine("Username: " + Managers.ActiveConnectionInfo?.Username);
@@ -106,8 +107,8 @@ namespace Mark5.Mobile.IOS.Utilities
         public static string CreateLogReport()
         {
             var sb = new StringBuilder();
-            sb.Append("===== logcat =====");
-            sb.AppendLine(((ConsoleAndFileLogger)CommonConfig.Logger).ReadLastLogFile());
+            sb.Append("===== log =====");
+            sb.AppendLine(((ConsoleAndFileLogger)CommonConfig.Logger).ReadLogFile());
             return sb.ToString();
         }
     }

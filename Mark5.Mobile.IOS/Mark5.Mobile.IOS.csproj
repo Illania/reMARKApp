@@ -156,6 +156,7 @@
     <Folder Include="Resources\startscreens\" />
     <Folder Include="Resources\Settings.bundle\" />
     <Folder Include="Resources\Base.lproj\" />
+    <Folder Include="Model\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />

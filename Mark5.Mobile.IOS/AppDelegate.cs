@@ -40,7 +40,12 @@ namespace Mark5.Mobile.IOS
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
             InitializeCommon();
+
+            CommonConfig.Logger.Info("MARK5 initializing...");
+
             var isLoggedIn = InitializePlatform();
+
+            CommonConfig.Logger.Info("MARK5 initialized");
 
             Window = new UIWindow(UIScreen.MainScreen.Bounds);
             Theme.ApplyTheme(Window);
@@ -79,6 +84,7 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.Logger.Level = LogLevel.DEBUG;
 #endif
 
+                ((ConsoleAndFileLogger)CommonConfig.Logger).CleanUpOldLogFiles();
                 await DatabaseUtils.InitializeDatabases();
 
                 PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();

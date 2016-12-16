@@ -7,11 +7,13 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using InAppSettingsKit;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -22,7 +24,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         const string SslEnabledKey = "sslEnabled";
         const string AcceptSelfSignedKey = "acceptSelfSigned";
+        const string CreateReportKey = "createReport";
         const string AppVersionKey = "appVersion";
+        const string OpenSettingsAppKey = "openSettingsApp";
 
         public class SettingsValues
         {
@@ -142,7 +146,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         [Export("settingsViewController:buttonTappedForSpecifier:")]
         public virtual void ButtonTappedForSpecifier(AppSettingsViewController sender, SettingsSpecifier specifier)
         {
-            if (specifier.Key == "openSettingsApp")
+            if (specifier.Key == CreateReportKey)
+            {
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
+
+                Task.Run(() =>
+                {
+                    return SystemReportCollector.CreateFullReport();
+                }).ContinueWith(t =>
+                {
+                    if (dismissAction != null) dismissAction();
+
+                    if (!t.IsFaulted)
+                    {
+                        PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, null);
+                    }
+                }, TaskScheduler.FromCurrentSynchronizationContext());
+            }
+
+            if (specifier.Key == OpenSettingsAppKey)
             {
                 UIApplication.SharedApplication.OpenUrl(new NSUrl(UIApplication.OpenSettingsUrlString), new NSDictionary(), null);
             }
