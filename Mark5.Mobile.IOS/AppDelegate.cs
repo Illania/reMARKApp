@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -39,25 +40,48 @@ namespace Mark5.Mobile.IOS
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
-            InitializeCommon();
+            try
+            {
+                InitializeCommon();
 
-            CommonConfig.Logger.Info("MARK5 initializing...");
+                CommonConfig.Logger.Info("MARK5 initializing...");
 
-            var isLoggedIn = InitializePlatform();
+                var isLoggedIn = InitializePlatform();
 
-            CommonConfig.Logger.Info("MARK5 initialized");
+                CommonConfig.Logger.Info("MARK5 initialized");
 
-            Window = new UIWindow(UIScreen.MainScreen.Bounds);
-            Theme.ApplyTheme(Window);
+                Window = new UIWindow(UIScreen.MainScreen.Bounds);
+                Theme.ApplyTheme(Window);
 
-            UIViewController vc;
-            if (isLoggedIn) vc = new MainViewController();
-            else vc = new LoginViewController();
+                UIViewController vc;
+                if (isLoggedIn) vc = new MainViewController();
+                else vc = new LoginViewController();
 
-            Window.RootViewController = vc;
-            Window.MakeKeyAndVisible();
+                Window.RootViewController = vc;
+                Window.MakeKeyAndVisible();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger?.Error(ex);
+            }
 
             return true;
+        }
+
+        public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
+        {
+            CommonConfig.Logger.Info($"Received APNS token: {deviceToken}");
+
+            PlatformConfig.Preferences.PushNotificationToken = deviceToken.ToString();
+
+            Managers.NotificationsManager.Subscribe(DeviceType.IOS, deviceToken.ToString()).FireAndForget();
+        }
+
+        public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error)
+        {
+            CommonConfig.Logger.Error("Failed to received APNS Token", new NSErrorException(error));
+
+            PlatformConfig.Preferences.PushNotificationToken = string.Empty;
         }
 
         void InitializeCommon()
@@ -182,6 +206,10 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.Logger.Info("Retrieving system settings...");
 
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+
+                CommonConfig.Logger.Info("Refreshing APNS token...");
+
+                UIApplication.SharedApplication.RegisterUserNotificationSettings(UIUserNotificationSettings.GetSettingsForTypes(UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound, null));
 
                 CommonConfig.Logger.Info($"Initialized - will present {nameof(MainViewController)}");
 

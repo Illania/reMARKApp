@@ -607,6 +607,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (dismissAction != null) dismissAction();
 
+                UIApplication.SharedApplication.RegisterUserNotificationSettings(UIUserNotificationSettings.GetSettingsForTypes(UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound, null));
+
                 PresentViewController(new MainViewController
                 {
                     ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
