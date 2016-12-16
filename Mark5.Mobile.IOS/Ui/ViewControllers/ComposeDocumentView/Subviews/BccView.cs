@@ -5,12 +5,13 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
+using Mark5.Mobile.Common.Model;
+
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
 {
-    public class BccView : ComposeDocumentSubview
+    public class BccView : RecipientsView
     {
-        public BccView()
+        public BccView(): base(DocumentAddressType.Bcc)
         {
         }
     }

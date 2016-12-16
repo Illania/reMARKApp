@@ -22,3 +22,18 @@
 "wrong_username_summary" = "You need to provide valid username.";
 "wrong_username_title" = "Wrong username";
 "yes" = "Yes";
+"to" = "To";
+"cc" = "Cc";
+"bcc" = "Bcc";
+"line" = "Line";
+"priority" = "Priority";
+"subject" = "Subject";
+"low" = "Low";
+"normal" = "Normal";
+"urgent" = "Urgent";
+"hide_original_message" = "Hide original message";
+"show_original_message" = "Show original message";
+
+
+
+

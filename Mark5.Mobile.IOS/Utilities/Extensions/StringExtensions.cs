@@ -7,10 +7,10 @@
 //
 using System;
 using Foundation;
-using Mark5.Mobile.Common.Utilities.Logging;
+using Mark5.Mobile.Common;
 using UIKit;
 
-namespace Mark5.Mobile.Common.IOS.Utilities.Extensions
+namespace Mark5.Mobile.IOS.Utilities
 {
 
     public static class StringExtensions

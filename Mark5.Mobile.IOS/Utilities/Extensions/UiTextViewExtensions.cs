@@ -10,7 +10,7 @@ using CoreGraphics;
 using Foundation;
 using UIKit;
 
-namespace Mark5.Mobile.Common.IOS.Utilities.Extensions
+namespace Mark5.Mobile.IOS.Utilities
 {
 
     public static class UITextViewExtensions

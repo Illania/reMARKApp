@@ -5,12 +5,13 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
+using Mark5.Mobile.Common.Model;
+
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
 {
     public class ToView : RecipientsView
     {
-        public ToView()
+        public ToView() : base(DocumentAddressType.To)
         {
         }
     }

@@ -6,12 +6,469 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using CoreGraphics;
+using Foundation;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.IOS.Utilities.Extensions;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.Ui.Common;
+using UIKit;
+
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
 {
     public class RecipientsView : ComposeDocumentSubview
     {
-        public RecipientsView()
+        protected const string EmailSeparator = ", ";
+        protected const string RecipentRegex = @".*<.*@.*>";
+        protected const string RecipentFormat = "{0} <{1}>";
+
+        public bool SuggestionOverlayActive;
+        bool selectionChangedProgrammatically;
+        protected bool CollapseExpandAnimationEnabled = true;
+
+        string savedRecipient;
+
+        readonly DocumentAddressType AddressType;
+
+        protected UILabel Label;
+        protected UIButton AddButton;
+        protected CustomUITextView TextView;
+        UITapGestureRecognizer textViewTapGestureRecognizer;
+
+        NSLayoutConstraint heightConstraint;
+
+        Dictionary<UIView, NSLayoutConstraint[]> constraintsStash;
+
+        public event EventHandler Edited = delegate { };
+        public event EventHandler<AddButtonTappedEventArgs> AddButtonTapped = delegate { };
+        public event EventHandler<RecipentTappedEventArgs> RecipentTapped = delegate { };
+        public event EventHandler<string> SearchRequested = delegate { };
+        public event EventHandler CommaOrEnterPressed = delegate { };
+
+        bool expanded;
+
+        public RecipientsView(DocumentAddressType type)
         {
+            constraintsStash = new Dictionary<UIView, NSLayoutConstraint[]>();
+            AddressType = type;
+            Initialize();
+        }
+
+        void Initialize(bool hideAdd = false)
+        {
+            Label = new UILabel();
+            Label.Text = GetTitleFromAddressType();
+            Label.Font = Theme.DefaultFont;
+            Label.TextColor = UIColor.LightGray;
+            Label.Opaque = false;
+            Label.TranslatesAutoresizingMaskIntoConstraints = false;
+            Label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            Label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            Label.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            AddSubview(Label);
+            AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(Label, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1.0f, VerticalMargin),
+                    NSLayoutConstraint.Create(Label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1.0f, HorizontalMargin),
+                });
+
+            if (!hideAdd)
+            {
+                var addButtonIcon = UIImage.FromBundle(Path.Combine("Icons", "add.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                AddButton = new UIButton();
+                AddButton.SetImage(addButtonIcon, UIControlState.Normal);
+                AddButton.BackgroundColor = UIColor.Clear;
+                AddButton.TouchUpInside += HandleAddButtonTapped;
+                AddButton.TranslatesAutoresizingMaskIntoConstraints = false;
+                AddButton.ContentEdgeInsets = new UIEdgeInsets(5.0f, 5.0f, 5.0f, 5.0f);
+                AddButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+                AddButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+                AddButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+                AddSubview(AddButton);
+                AddConstraints(new[]
+                    {
+                        NSLayoutConstraint.Create(AddButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1.0f, VerticalMargin - AddButton.ContentEdgeInsets.Top),
+                        NSLayoutConstraint.Create(AddButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin - AddButton.ContentEdgeInsets.Right),
+                    });
+            }
+
+            var textStorage = new NSTextStorage();
+            textStorage.AddAttribute(UIStringAttributeKey.Font, Theme.DefaultFont, new NSRange(0, 0));
+
+            var layoutManager = new NSLayoutManager();
+            textStorage.AddLayoutManager(layoutManager);
+
+            var textContainer = new NSTextContainer();
+            layoutManager.AddTextContainer(textContainer);
+
+            TextView = new CustomUITextView(CGRect.Empty, textContainer);
+            TextView.AutocapitalizationType = UITextAutocapitalizationType.None;
+            TextView.AutocorrectionType = UITextAutocorrectionType.No;
+            TextView.Font = Theme.DefaultFont;
+            TextView.Opaque = false;
+            TextView.TextContainer.LineFragmentPadding = 0.0f;
+            TextView.TextContainerInset = UIEdgeInsets.Zero;
+            TextView.ClipsToBounds = false;
+            TextView.ScrollEnabled = false;
+            TextView.KeyboardType = UIKeyboardType.EmailAddress;
+            TextView.TranslatesAutoresizingMaskIntoConstraints = false;
+            TextView.TextContainer.MaximumNumberOfLines = 1;
+            TextView.TextContainer.LineBreakMode = UILineBreakMode.TailTruncation;
+            TextView.Started += HandleEditingStarted;
+            TextView.Changed += HandleTextViewChanged;
+            TextView.SelectionChanged += HandleTextViewSelectionChanged;
+            TextView.DeletedBackward += HandleTextViewDeletedBackward;
+            TextView.Ended += HandleEditingEnded;
+            TextView.ShouldChangeText += HandleShouldTextViewChange;
+            AddSubview(TextView);
+            AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1.0f, VerticalMargin),
+                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, Label, NSLayoutAttribute.Right, 1.0f, InnerMargin),
+                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1.0f, -VerticalMargin),
+                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, !hideAdd ? (UIView)AddButton : this, !hideAdd ? NSLayoutAttribute.Left : NSLayoutAttribute.Right, 1.0f, !hideAdd ? -InnerMargin : -HorizontalMargin),
+                });
+
+            textViewTapGestureRecognizer = new UITapGestureRecognizer();
+            textViewTapGestureRecognizer.AddTarget(HandleTextTapped);
+            textViewTapGestureRecognizer.NumberOfTapsRequired = 1;
+
+            heightConstraint = NSLayoutConstraint.Create(this, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, 0.0f);
+        }
+
+        string GetTitleFromAddressType()
+        {
+            switch (AddressType)
+            {
+                case DocumentAddressType.To:
+                    return Localization.GetString("to");
+                case DocumentAddressType.Cc:
+                    return Localization.GetString("cc");
+                case DocumentAddressType.Bcc:
+                    return Localization.GetString("bcc");
+                default:
+                    throw new ArgumentException("The address type is not supported!");
+            }
+        }
+
+
+        #region Overrides
+
+        public override Task RefreshView()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task UpdateDocument()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region Event handlers
+
+        void HandleTextTapped()
+        {
+            if (!expanded && TextView.IsTruncated())
+            {
+                ExpandView();
+                return;
+            }
+
+            var tapPosition = TextView.GetClosestPositionToPoint(textViewTapGestureRecognizer.LocationInView(TextView));
+            var offset = TextView.GetOffsetFromPosition(TextView.BeginningOfDocument, tapPosition);
+
+            var beforeSubstring = TextView.Text.SafeSubstring(0, (int)offset).SafeSubstringAfterLast(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
+            var afterSubstring = TextView.Text.SafeSubstring((int)offset).SafeSubstringBefore(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
+
+            var tappedRecipent = beforeSubstring + afterSubstring;
+
+            CommonConfig.Logger.Trace($"Tapped recipent. [recipent={tappedRecipent}]");
+
+            RecipentTapped(this, new RecipentTappedEventArgs(tappedRecipent));
+        }
+
+        void HandleTextViewSelectionChanged(object sender, EventArgs e)
+        {
+            if (selectionChangedProgrammatically)
+            {
+                selectionChangedProgrammatically = false;
+                return;
+            }
+
+            var selection = TextView.SelectedRange;
+
+            if (TextView.Text.Length == selection.Location && selection.Length == 0)
+            {
+                return;
+            }
+
+            if (TextView.Text.Length > selection.Location)
+            {
+                var beforeCursorString = TextView.Text.SafeSubstring(0, (int)selection.Location);
+                var afterCursorString = TextView.Text.SafeSubstring((int)selection.Location, TextView.Text.Length);
+
+                var indexInSecondPartString = afterCursorString.IndexOf(EmailSeparator, StringComparison.CurrentCultureIgnoreCase);
+                if (indexInSecondPartString == -1)
+                {
+                    indexInSecondPartString = afterCursorString.Length;
+                }
+                var indexAfter = beforeCursorString.Length + indexInSecondPartString + EmailSeparator.Length;
+
+                var indexBefore = beforeCursorString.LastIndexOf(EmailSeparator, StringComparison.CurrentCultureIgnoreCase);
+                var start = indexBefore < 0 ? 0 : indexBefore + EmailSeparator.Length;
+
+                var length = indexAfter - start;
+
+                if (start >= 0 && length >= 0)
+                {
+                    selectionChangedProgrammatically = true; //Used to avoid calling the same function twice
+                    TextView.SelectedRange = new NSRange(start, length);
+                }
+            }
+        }
+
+        protected virtual void HandleTextViewChanged(object sender, EventArgs e)
+        {
+            Edited(this, EventArgs.Empty);
+
+            SearchRequested(this, GetStringToSearch());
+
+            if (!Validator.ContainsValidEmails(TextView.Text))
+            {
+                TextView.TextStorage.RemoveAttribute(UIStringAttributeKey.ForegroundColor, new NSRange(0, TextView.Text.Length));
+            }
+
+            CorrectMarkup();
+        }
+
+        void HandleTextViewDeletedBackward(object sender, int numberOfCharactersDeleted)
+        {
+            if (numberOfCharactersDeleted > 1)
+            {
+                TextView.SelectedRange = new NSRange(TextView.Text.Length, 0);
+            }
+
+            var textSubstring = TextView.Text.SafeSubstring(0, (int)(TextView.SelectedRange.Location + TextView.SelectedRange.Length));
+            if (textSubstring.EndsWith(EmailSeparator.Trim(), StringComparison.CurrentCultureIgnoreCase))
+            {
+                var startIndex = TextView.Text.LastIndexOf(EmailSeparator, StringComparison.CurrentCultureIgnoreCase);
+                if (startIndex < 0)
+                {
+                    startIndex = 0;
+                }
+                else
+                {
+                    startIndex += EmailSeparator.Length;
+                }
+
+                TextView.SelectedRange = new NSRange(startIndex, TextView.Text.Length - startIndex);
+            }
+        }
+
+        bool HandleShouldTextViewChange(UITextView textViewToChange, NSRange range, string text)
+        {
+
+            if (textViewToChange.Text.Length > range.Location && text.Length == 1) //The second condition is needed to avoid problems when deleting
+            {
+                textViewToChange.SelectedRange = new NSRange(textViewToChange.Text.Length, 0);
+            }
+            else if (textViewToChange == TextView && (text == Environment.NewLine || text == "," || text == "\t"))
+            {
+                var splittedField = textViewToChange.Text.Split(new[] { EmailSeparator }, StringSplitOptions.None);
+                if (splittedField.Last().Equals(string.Empty))
+                {
+                    CommaOrEnterPressed(this, EventArgs.Empty);
+                    return false;
+                }
+
+                textViewToChange.TextStorage.BeginEditing();
+                textViewToChange.TextStorage.Insert(EmailSeparator.ToNSAttributedString(), range.Location + range.Length);
+                textViewToChange.TextStorage.EndEditing();
+                textViewToChange.SelectedRange = new NSRange(range.Location + range.Length + EmailSeparator.Length, 0);
+
+                CorrectMarkup();
+                CommaOrEnterPressed(this, EventArgs.Empty);
+                return false;
+            }
+
+            return true;
+        }
+
+        void HandleEditingStarted(object sender, EventArgs e)
+        {
+            HandleScrollToView(sender, e);
+
+            ExpandView();
+        }
+
+        void HandleEditingEnded(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(TextView.Text) && !TextView.Text.EndsWith(EmailSeparator, StringComparison.CurrentCultureIgnoreCase))
+            {
+                TextView.TextStorage.BeginEditing();
+                TextView.TextStorage.Insert(EmailSeparator.ToNSAttributedString(), TextView.Text.Length);
+                TextView.TextStorage.EndEditing();
+            }
+
+            CorrectMarkup();
+
+            CollapseView();
+        }
+
+        void HandleAddButtonTapped(object sender, EventArgs e)
+        {
+            AddButtonTapped(sender, new AddButtonTappedEventArgs(this));
+        }
+
+        string GetStringToSearch()
+        {
+            var text = TextView.Text;
+            var splittedField = text.Split(new[] { EmailSeparator }, StringSplitOptions.None);
+            if (splittedField.Any())
+            {
+                var last = splittedField.Last();
+                if (string.IsNullOrEmpty(last))
+                {
+                    return string.Empty;
+                }
+                return last.Last() != ',' ? last : string.Empty;
+            }
+            return string.Empty;
+        }
+
+        #endregion
+
+        #region Helper methods
+
+        protected void CorrectMarkup()
+        {
+            TextView.TextStorage.BeginEditing();
+
+            TextView.TextStorage.AddAttribute(UIStringAttributeKey.Font, Theme.DefaultFont, new NSRange(0, TextView.Text.Length));
+            TextView.TextStorage.RemoveAttribute(UIStringAttributeKey.ForegroundColor, new NSRange(0, TextView.Text.Length));
+
+            var matches = Regex.Matches(TextView.Text, @"[^,]*", RegexOptions.IgnoreCase);
+
+            foreach (Match match in matches)
+            {
+                var textInMatch = TextView.Text.SafeSubstring(match.Index, match.Length);
+                if (Validator.ContainsValidEmails(textInMatch))
+                {
+                    TextView.TextStorage.AddAttribute(UIStringAttributeKey.ForegroundColor, Theme.TintColor, new NSRange(match.Index, match.Length));
+                }
+            }
+
+            TextView.TextStorage.EndEditing();
+        }
+
+        public void ExpandView()
+        {
+            if (expanded)
+            {
+                return;
+            }
+
+            // Work around to force text view layout
+            TextView.TextStorage.BeginEditing();
+            TextView.TextStorage.Insert(" ".ToNSAttributedString(), 0);
+            TextView.TextStorage.DeleteRange(new NSRange(0, 1));
+            TextView.TextStorage.EndEditing();
+
+            var duration = CollapseExpandAnimationEnabled ? 0.2d : 0;
+            Animate(duration, () =>
+                {
+                    TextView.TextContainer.MaximumNumberOfLines = 0;
+                    TextView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
+
+                    Superview.SetNeedsLayout();
+                    Superview.LayoutIfNeeded();
+
+                    expanded = true;
+                });
+        }
+
+        public void CollapseView()
+        {
+            if (!expanded || SuggestionOverlayActive)
+            {
+                return;
+            }
+
+            var duration = CollapseExpandAnimationEnabled ? 0.2d : 0;
+            Animate(duration, () =>
+                {
+                    TextView.TextContainer.MaximumNumberOfLines = 1;
+                    TextView.TextContainer.LineBreakMode = UILineBreakMode.TailTruncation;
+
+                    Superview.SetNeedsLayout();
+                    Superview.LayoutIfNeeded();
+
+                    expanded = false;
+                });
+        }
+
+        #endregion
+
+    }
+
+    public class CustomUITextView : UITextView
+    {
+
+        public event EventHandler WillDeleteBackward = delegate { };
+        public event EventHandler<int> DeletedBackward = delegate { };
+
+        public CustomUITextView(CGRect frame, NSTextContainer textContainer)
+            : base(frame, textContainer)
+        {
+        }
+
+        public override void DeleteBackward()
+        {
+            var beforeTextCount = Text.Length;
+            WillDeleteBackward(this, EventArgs.Empty);
+
+            base.DeleteBackward();
+
+            var afterTextCount = Text.Length;
+            DeletedBackward(this, beforeTextCount - afterTextCount);
+        }
+    }
+
+    public class AddButtonTappedEventArgs : EventArgs
+    {
+
+        public RecipientsView ParentView
+        {
+            get;
+            private set;
+        }
+
+        public AddButtonTappedEventArgs(RecipientsView parentView)
+        {
+            ParentView = parentView;
+        }
+    }
+
+    public class RecipentTappedEventArgs : EventArgs
+    {
+
+        public string Recipent
+        {
+            get;
+            private set;
+        }
+
+        public RecipentTappedEventArgs(string recipent)
+        {
+            Recipent = recipent;
         }
     }
 }

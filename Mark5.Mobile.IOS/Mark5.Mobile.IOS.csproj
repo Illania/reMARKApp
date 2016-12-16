@@ -158,6 +158,7 @@
     <Folder Include="Resources\Base.lproj\" />
     <Folder Include="Ui\ViewControllers\ComposeDocumentView\" />
     <Folder Include="Ui\ViewControllers\ComposeDocumentView\Subviews\" />
+    <Folder Include="Utilities\Extensions\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -202,8 +203,12 @@
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\LineView.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ContentView.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\AttachmentsView.cs" />
-    <Compile Include="Utilities\UiTextViewExtensions.cs" />
-    <Compile Include="Utilities\StringExtensions.cs" />
+    <Compile Include="Utilities\Extensions\ContentTypeExtensions.cs" />
+    <Compile Include="Utilities\Extensions\ObjectExtensions.cs" />
+    <Compile Include="Utilities\Extensions\UiViewExtension.cs" />
+    <Compile Include="Utilities\Extensions\UiTextViewExtensions.cs" />
+    <Compile Include="Utilities\Extensions\StringExtensions.cs" />
+    <Compile Include="Utilities\Extensions\NSAttributedStringExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
