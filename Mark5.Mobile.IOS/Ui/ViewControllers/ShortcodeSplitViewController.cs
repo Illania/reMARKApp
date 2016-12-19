@@ -5,12 +5,12 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using UIKit;
+using Mark5.Mobile.IOS.Ui.Common;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     
-    public class ShortcodeSplitViewController : UIViewController
+    public class ShortcodeSplitViewController : SplitViewController
     {
     }
 }

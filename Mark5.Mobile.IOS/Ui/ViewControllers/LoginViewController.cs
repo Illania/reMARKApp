@@ -7,7 +7,6 @@
 //
 using System;
 using System.IO;
-using System.Threading.Tasks;
 using CoreAnimation;
 using CoreGraphics;
 using Foundation;
@@ -24,7 +23,7 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
 
-    public class LoginViewController : UIViewController
+    public class LoginViewController : ViewController
     {
 
         #region Animation and layout controls

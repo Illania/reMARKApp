@@ -199,6 +199,9 @@
     <Compile Include="Ui\ViewControllers\ShortcodeSplitViewController.cs" />
     <Compile Include="Ui\ViewControllers\NotificationsListViewController.cs" />
     <Compile Include="Ui\ViewControllers\SettingsViewController.cs" />
+    <Compile Include="Ui\Common\NavigationController.cs" />
+    <Compile Include="Ui\Common\SplitViewController.cs" />
+    <Compile Include="Ui\Common\ViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

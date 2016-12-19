@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: MainViewController.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -16,12 +16,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class MainViewController : UITabBarController
     {
         
-        UINavigationController searchNavigationController;
+        NavigationController searchNavigationController;
         DocumentSplitViewController documentSplitViewController;
         ContactSplitViewController contactSplitViewController;
         ShortcodeSplitViewController shortcodeSplitViewController;
-        UINavigationController notificationsNavigationController;
-        UINavigationController settingsNavigationController;
+        NavigationController notificationsNavigationController;
+        NavigationController settingsNavigationController;
 
         public override void LoadView()
         {
@@ -29,9 +29,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var searchViewController = new SearchViewController();
             searchViewController.TabBarItem.Title = Localization.GetString("search");
-            searchViewController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "documents.png")); // TODO put correct icon
-            searchViewController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "documents-filled.png")); // TODO put correct icon
-            searchNavigationController = new UINavigationController(searchViewController);
+            searchViewController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "documents.png")); // TODO ICON put correct icon
+            searchViewController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "documents-filled.png")); // TODO ICON put correct icon
+            searchNavigationController = new NavigationController(searchViewController);
 
             documentSplitViewController = new DocumentSplitViewController();
             documentSplitViewController.TabBarItem.Title = Localization.GetString("documents");
@@ -52,13 +52,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             notificationsListViewController.TabBarItem.Title = Localization.GetString("notifications");
             notificationsListViewController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "notifications.png"));
             notificationsListViewController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "notifications-filled.png"));
-            notificationsNavigationController = new UINavigationController(notificationsListViewController);
+            notificationsNavigationController = new NavigationController(notificationsListViewController);
 
             var settingsViewController = new SettingsViewController();
             settingsViewController.TabBarItem.Title = Localization.GetString("settings");;
             settingsViewController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "settings.png"));
             settingsViewController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "settings-filled.png"));
-            settingsNavigationController = new UINavigationController(settingsViewController);
+            settingsNavigationController = new NavigationController(settingsViewController);
         }
         
         public override void ViewWillAppear(bool animated)
