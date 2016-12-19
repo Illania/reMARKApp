@@ -160,9 +160,11 @@
     <Folder Include="Resources\Base.lproj\" />
     <Folder Include="Model\" />
     <Folder Include="Ui\ViewControllers\FoldersList\" />
+    <Folder Include="Ui\TableViewCells\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
+    <InterfaceDefinition Include="Ui\TableViewCells\FoldersListViewCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -207,6 +209,10 @@
     <Compile Include="Ui\ViewControllers\FoldersList\AbstractFoldersListViewController.cs" />
     <Compile Include="Ui\ViewControllers\FoldersList\BrowseFoldersListViewController.cs" />
     <Compile Include="Ui\ViewControllers\DocumentViewController.cs" />
+    <Compile Include="Ui\TableViewCells\FoldersListViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\FoldersListViewCell.designer.cs">
+      <DependentUpon>FoldersListViewCell.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

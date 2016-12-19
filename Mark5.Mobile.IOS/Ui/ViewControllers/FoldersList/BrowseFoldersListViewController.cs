@@ -5,7 +5,6 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
 using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
@@ -17,16 +16,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         public BrowseFoldersListViewController(ModuleType module)
             : base(module)
         {
-        }
-        
-        protected override void FolderSelected(Folder folder)
-        {
-            // TODO
-        }
-
-        protected override void FolderDeselected(Folder folder)
-        {
-            // TODO
         }
     }
 }

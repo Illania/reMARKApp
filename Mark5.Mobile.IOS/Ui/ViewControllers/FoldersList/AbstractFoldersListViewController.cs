@@ -14,6 +14,7 @@ using Foundation;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.TableViewCells;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
@@ -129,23 +130,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         void InitializeSearchBar()
         {
-            /*DefinesPresentationContext = true;
-
-            SearchResultsController = new UITableViewController();
-            SearchResultsController.TableView.CellLayoutMarginsFollowReadableWidth = false;
-            FoldersListSearchViewSource = new FoldersListSearchViewSource(this, SearchResultsController.TableView);
-            SearchResultsController.TableView.Source = FoldersListSearchViewSource;
-
-            searchController = new UISearchController(searchResultsController)
-            {
-                HidesNavigationBarDuringPresentation = true,
-                DimsBackgroundDuringPresentation = true,
-                ObscuresBackgroundDuringPresentation = true,
-                SearchResultsUpdater = new FoldersListSearchResultsUpdater(FoldersListSearchViewSource),
-            };
-            searchController.SearchBar.Placeholder = "Filter";
-
-            FoldersListView.TableHeaderView = searchController.SearchBar;*/
+            // TODO
         }
 
         void ComposeDocumentItem_Clicked(object sender, EventArgs e)
@@ -203,9 +188,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             RefreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
-        protected abstract void FolderSelected(Folder folder);
+        protected virtual void FolderSelected(Folder folder)
+        {
+        }
 
-        protected abstract void FolderDeselected(Folder folder);
+        protected virtual void FolderDeselected(Folder folder)
+        {
+        }
+
+        protected virtual void FolderExpand(Folder folder)
+        {
+        }
 
         protected class DataSource : UITableViewSource, IDisposable
         {
@@ -267,9 +260,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
-                var cell = new UITableViewCell(UITableViewCellStyle.Default, "cell");
-                cell.TextLabel.Text = foldersInView[indexPath.LongSection][indexPath.Row].Name;
+                var cell = tableView.DequeueReusableCell(FoldersListViewCell.Key) as FoldersListViewCell;
+                if (cell == null)
+                {
+                    cell = FoldersListViewCell.Create();
+                    cell.ExpandCollapseClicked += Cell_ExpandCollapseClicked;
+                }
+
+                cell.Initialize(foldersInView[indexPath.LongSection][indexPath.Row]);
+
                 return cell;
+            }
+
+            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                return 44f;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
@@ -294,20 +299,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 viewController.FolderDeselected(folder);
             }
 
+            void Cell_ExpandCollapseClicked(object sender, Folder f)
+            {
+                viewController.FolderExpand(f);
+            }
+
             public override string TitleForHeader(UITableView tableView, nint section)
             {
                 if (section == Section.Favorites)
-                {
                     return Localization.GetString("favorites");
-                }
+
                 if (section == Section.Folders)
-                {
                     return Localization.GetString("folders");
-                }
+
                 if (section == Section.Local)
-                {
                     return Localization.GetString("local");
-                }
 
                 throw new ArgumentException(nameof(section));
             }
@@ -330,10 +336,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public void Clear()
             {
+                for (var i = 0; i < firstLoad.Length; i++)
+                    firstLoad[i] = true;
+
                 foreach (var kv in foldersInView)
                     kv.Value.Clear();
             }
-
        }
-    }
+   }
 }
