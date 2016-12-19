@@ -38,3 +38,9 @@
 "shortcodes" = "Shortcodes";
 "notifications" = "Notifications";
 "settings" = "Settings";
+"favorites" = "Favorites";
+"folders" = "Folders";
+"local_folders" = "Local folders";
+"edit" = "Edit";
+"pull_to_refresh" = "Pull to refresh";
+"refreshing___" = "Refreshing...";

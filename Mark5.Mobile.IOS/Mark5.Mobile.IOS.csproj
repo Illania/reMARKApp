@@ -159,6 +159,7 @@
     <Folder Include="Resources\Settings.bundle\" />
     <Folder Include="Resources\Base.lproj\" />
     <Folder Include="Model\" />
+    <Folder Include="Ui\ViewControllers\FoldersList\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -203,6 +204,9 @@
     <Compile Include="Ui\Common\SplitViewController.cs" />
     <Compile Include="Ui\Common\ViewController.cs" />
     <Compile Include="Ui\Common\ITaggedViewController.cs" />
+    <Compile Include="Ui\ViewControllers\FoldersList\AbstractFoldersListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\FoldersList\BrowseFoldersListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

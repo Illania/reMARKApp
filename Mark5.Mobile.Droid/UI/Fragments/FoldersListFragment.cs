@@ -226,7 +226,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"Refreshing local folders...");
 
-            var localRootFolder = Folder.LocalRootPerModule(RemoteFolder.Module);
+            var localRootFolder = Folder.LocalRootForModule(RemoteFolder.Module);
             Adapter.Refresh(localRootFolder.SubFolders, Section.Local);
         }
 
@@ -679,7 +679,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected List<Folder> GetMatchingFolders(string query)
         {
-            var folder = Folder.RootPerModule(RemoteFolder.Module);
+            var folder = Folder.RootForModule(RemoteFolder.Module);
             var flattenedFolders = folder.SubFolders.Flatten(f => f.SubFolders);
             return flattenedFolders.Where(f => f.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0).ToList();
         }

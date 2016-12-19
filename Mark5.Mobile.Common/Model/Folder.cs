@@ -249,7 +249,7 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true
         };
 
-        public static Folder RootPerModule(ModuleType module, bool favorite = false)
+        public static Folder RootForModule(ModuleType module, bool favorite = false)
         {
             switch (module)
             {
@@ -266,7 +266,7 @@ namespace Mark5.Mobile.Common.Model
             }
         }
 
-        public static Folder LocalRootPerModule(ModuleType module)
+        public static Folder LocalRootForModule(ModuleType module)
         {
             switch (module)
             {

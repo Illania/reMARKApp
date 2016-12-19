@@ -65,7 +65,7 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<List<Folder>> GetFavoriteFoldersAsync(ModuleType module)
         {
-            var rootFavoriteFolder = Folder.RootPerModule(module, true);
+            var rootFavoriteFolder = Folder.RootForModule(module, true);
 
             if (!rootFavoriteFolder.SubFolders.Any())
             {
