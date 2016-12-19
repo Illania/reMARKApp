@@ -7,7 +7,9 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.Common.StackView;
@@ -28,8 +30,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
         public string[] PreconfiguredEmailAddresses { get; set; }
-        
-        bool showedDocumentOnAppear;
+
+        Document PreviousDocument { get; set; }
+        DocumentPreview PreviousDocumentPreview { get; set; }
+
+        Document Document { get; set; } = new Document();
+        DocumentPreview DocumentPreview { get; set; } = new DocumentPreview();
 
         ToView toView;
         CcView ccView;
@@ -76,11 +82,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 OutgoingDocumentGuid = Guid.NewGuid();
             }
 
-            if (!showedDocumentOnAppear)
-            {
-                showedDocumentOnAppear = true;
-                ShowDocument();
-            }
+            PreviousDocumentDirection = DocumentDirection.None;
+            CreationModeFlag = DocumentCreationModeFlag.New;
+
+            LoadDocument();
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -136,6 +141,86 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
         #endregion
+
+        async Task LoadDocument()
+        {
+            if (PreviousDocument != null || CreationModeFlag == DocumentCreationModeFlag.New)
+            {
+                await ShowDocument();
+                return;
+            }
+
+            //TODO
+            //var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.loading_document, Resource.String.please_wait);
+
+            try
+            {
+                if (LocalDocument)
+                {
+                    var outgoingContainer = await Managers.DocumentsManager.GetOutgoingDocumentContainerAsync(OutgoingDocumentGuid, true);
+                    PreviousDocument = outgoingContainer.Document;
+                    PreviousDocumentPreview = outgoingContainer.DocumentPreview;
+                    PreviousDocumentId = outgoingContainer.Info.PreviousDocumentId;
+                    PreviousDocumentFolderId = outgoingContainer.Info.PreviousDocumentdFolderId;
+                    OutgoingDocumentState = outgoingContainer.Info.State;
+                    OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag;
+                    if (outgoingContainer.Info.State == OutgoingDocumentState.Failed)
+                    {
+                        //TODO
+                        //await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(Resource.String.error_while_sending_document)));
+                    }
+                    if (outgoingContainer.LocalAttachments != null)
+                    {
+                        OutgoingDocumentInitialAttachments.AddRange(outgoingContainer.LocalAttachments);
+                    }
+                }
+                else
+                {
+                    var sourceType = PreviousDocumentDirection == DocumentDirection.Draft ? SourceType.Auto : SourceType.Local;
+                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, sourceType); // TODO
+                    PreviousDocument = container.Document;
+                    PreviousDocumentPreview = container.DocumentPreview;
+                    if (CreationModeFlag == DocumentCreationModeFlag.Edit && PreviousDocumentPreview.Direction == DocumentDirection.Draft)
+                    {
+                        Document.Id = DocumentPreview.Id = PreviousDocument.Id;
+                    }
+                }
+
+
+                await ShowDocument();
+            }
+            catch (Exception ex)
+            {
+                //TODO
+                //dismissAction();
+
+                //await Dialogs.ShowErrorDialogAsync(Activity, ex);
+
+                //if (CloseRequest != null) CloseRequest();
+            }
+        }
+
+        async Task ShowDocument()
+        {
+            foreach (var subView in subViews)
+            {
+                subView.Document = Document;
+                subView.DocumentPreview = DocumentPreview;
+                subView.PreviousDocument = PreviousDocument;
+                subView.PreviousDocumentPreview = PreviousDocumentPreview;
+                subView.CreationModeFlag = CreationModeFlag;
+                await subView.RefreshView();
+            }
+
+            if (CreationModeFlag == DocumentCreationModeFlag.New && PreconfiguredEmailAddresses != null)
+            {
+                toView.SetEmails(PreconfiguredEmailAddresses);
+            }
+
+            //await AskIfShouldUseTemplates(); //TODO
+        }
+
+
 
 
     }

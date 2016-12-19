@@ -39,8 +39,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             this.viewController = viewController;
 
-            defaultOutgoingLine = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultOutgoingLine;
-            availableOutgoingLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines;
+            //defaultOutgoingLine = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultOutgoingLine;
+            //availableOutgoingLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines;
 
             Initialize();
         }
@@ -48,7 +48,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         void Initialize()
         {
             label = new UILabel();
-            label.Text = "Line:";
+            label.Text = "Line:"; //TODO localization
             label.Font = Theme.DefaultFont;
             label.TextColor = UIColor.LightGray;
             label.Opaque = false;
@@ -95,7 +95,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 }
                 else
                 {
-                    SetSelectLine();
+                    SetLine(null);
                 }
                 return Task.CompletedTask;
             }
@@ -130,7 +130,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 }
                 else
                 {
-                    SetSelectLine();
+                    SetLine(null);
                 }
             }
 
@@ -163,13 +163,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             Edited(this, EventArgs.Empty);
         }
-
-        void SetSelectLine()
-        {
-            //TODO set message to show that the user need to select the line
-
-        }
-
 
         #endregion
 
