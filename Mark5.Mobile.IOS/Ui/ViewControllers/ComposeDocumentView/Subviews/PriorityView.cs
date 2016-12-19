@@ -14,9 +14,9 @@ using Mark5.Mobile.IOS.Ui.Common;
 using ObjCRuntime;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-    public class PriorityView : ComposeDocumentSubview
+    public class PriorityView : ComposeDocumentView
     {
         Priority selectedPriority;
 

@@ -159,6 +159,8 @@
     <Folder Include="Ui\ViewControllers\ComposeDocumentView\" />
     <Folder Include="Ui\ViewControllers\ComposeDocumentView\Subviews\" />
     <Folder Include="Utilities\Extensions\" />
+    <Folder Include="Ui\ViewControllers\Common\" />
+    <Folder Include="Ui\ViewControllers\Common\StackView\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -193,7 +195,7 @@
     <Compile Include="Ui\ViewControllers\LoginSettingsViewController.cs" />
     <Compile Include="Ui\Common\Localization.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\ComposeDocumentViewController.cs" />
-    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ComposeDocumentSubview.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ComposeDocumentView.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ToView.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\BccView.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\CcView.cs" />
@@ -209,6 +211,9 @@
     <Compile Include="Utilities\Extensions\UiTextViewExtensions.cs" />
     <Compile Include="Utilities\Extensions\StringExtensions.cs" />
     <Compile Include="Utilities\Extensions\NSAttributedStringExtensions.cs" />
+    <Compile Include="Ui\ViewControllers\Common\StackView\StackViewController.cs" />
+    <Compile Include="Ui\ViewControllers\Common\StackView\SeparatorSubView.cs" />
+    <Compile Include="Ui\ViewControllers\Common\StackView\StackSubView.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

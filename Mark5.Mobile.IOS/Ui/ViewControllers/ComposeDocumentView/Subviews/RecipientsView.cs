@@ -15,16 +15,15 @@ using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.IOS.Utilities.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-    public class RecipientsView : ComposeDocumentSubview
+    public class RecipientsView : ComposeDocumentView
     {
         protected const string EmailSeparator = ", ";
         protected const string RecipentRegex = @".*<.*@.*>";
@@ -496,27 +495,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
             return TextView.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries).Where(Validator.ContainsValidEmails).Select(s => s.Trim());
         }
 
-        //TODO
-        //public IEnumerable<RecentAddress> GetNewRecentAddresses()
-        //{
-        //    var newRecents = new HashSet<RecentAddress>();
-        //    foreach (var recipent in GetRecipents())
-        //    {
-        //        if (Regex.Match(recipent, RecipentRegex).Success)
-        //        {
-        //            var name = recipent.SafeSubstringBeforeLast('<').Trim();
-        //            var address = recipent.SafeSubstringAfterLast('<').SafeSubstringBeforeLast('>').Trim();
-        //            newRecents.Add(new RecentAddress(name, address));
-        //        }
-        //        else
-        //        {
-        //            newRecents.Add(new RecentAddress(recipent));
-        //        }
-        //    }
-
-        //    return newRecents;
-        //}
-
         public void SetEmails(IEnumerable<string> emails)
         {
             SetEmails(string.Join(EmailSeparator, emails));
@@ -533,7 +511,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
                 sb.Append(EmailSeparator);
 
                 TextView.TextStorage.BeginEditing();
-                TextView.TextStorage.SetString(sb.ToNSAttributedString());
+                TextView.TextStorage.SetString(sb.ToString().ToNSAttributedString());
                 TextView.TextStorage.EndEditing();
                 TextView.SelectedRange = new NSRange(TextView.Text.Length, 0);
 
@@ -584,7 +562,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
                 newEmails.Append(EmailSeparator);
 
                 TextView.TextStorage.BeginEditing();
-                TextView.TextStorage.SetString(newEmails.ToNSAttributedString());
+                TextView.TextStorage.SetString(newEmails.ToString().ToNSAttributedString());
                 TextView.TextStorage.EndEditing();
                 TextView.SelectedRange = new NSRange(TextView.Text.Length, 0);
 
@@ -595,10 +573,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
             else
             {
                 CommonConfig.Logger.Info(string.Format("No valid emails found in {0}.", emails));
-                if (Log.IsInfoEnabled())
-                {
-                    Log.Info(string.Format("No valid emails found in {0}.", emails));
-                }
             }
         }
 
@@ -621,7 +595,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
             newEmails.Append(EmailSeparator);
 
             TextView.TextStorage.BeginEditing();
-            TextView.TextStorage.SetString(newEmails.ToNSAttributedString());
+            TextView.TextStorage.SetString(newEmails.ToString().ToNSAttributedString());
             TextView.TextStorage.EndEditing();
             TextView.SelectedRange = new NSRange(TextView.Text.Length, 0);
 

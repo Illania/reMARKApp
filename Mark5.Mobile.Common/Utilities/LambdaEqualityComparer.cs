@@ -1,5 +1,5 @@
 ﻿//
-// Project: Mark5.Mobile.Droid
+// Project: Mark5.Mobile.Common
 // File: IEqualityComparerFactory.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
@@ -8,7 +8,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Mark5.Mobile.Droid.Utilities
+namespace Mark5.Mobile.Common.Utilities
 {
 
     public class LambdaEqualityComparer<T> : IEqualityComparer<T>

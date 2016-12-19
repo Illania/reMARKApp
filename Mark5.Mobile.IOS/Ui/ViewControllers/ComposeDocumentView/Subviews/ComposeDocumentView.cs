@@ -8,11 +8,12 @@
 using System;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.IOS.Ui.ViewControllers.Common.StackView;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-    public abstract class ComposeDocumentSubview : UIView
+    public abstract class ComposeDocumentView : StackSubView
     {
         public DocumentPreview DocumentPreview { get; set; }
         public Document Document { get; set; }
@@ -21,11 +22,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
 
         protected float MinimumHeight = 21.0f;
-        protected float HorizontalMargin = 15.0f;
-        protected float VerticalMargin = 12.0f;
-        protected float InnerMargin = 5.0f;
 
-        protected ComposeDocumentSubview()
+        protected ComposeDocumentView()
         {
             Initialize();
         }
@@ -41,23 +39,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
 
         protected void HandleScrollToView(object sender, EventArgs e)
         {
-            var parentScrollView = Superview as UIScrollView;
-            if (parentScrollView != null)
-            {
-                var frame = Frame;
-                frame.Height += HorizontalMargin;
-                if (frame.Height > parentScrollView.Frame.Height + parentScrollView.ContentOffset.Y)
-                {
-                    frame.Height = parentScrollView.Frame.Height + parentScrollView.ContentOffset.Y;
-                }
+            //TODO this was for the form view, don't know if it'll work with the stackview
+            //var parentScrollView = Superview as UIScrollView;
+            //if (parentScrollView != null)
+            //{
+            //    var frame = Frame;
+            //    frame.Height += HorizontalMargin;
+            //    if (frame.Height > parentScrollView.Frame.Height + parentScrollView.ContentOffset.Y)
+            //    {
+            //        frame.Height = parentScrollView.Frame.Height + parentScrollView.ContentOffset.Y;
+            //    }
 
-                parentScrollView.ScrollRectToVisible(frame, true);
-            }
+            //    parentScrollView.ScrollRectToVisible(frame, true);
+            //}
         }
 
         #endregion
-
-        //TODO PinView
 
         public abstract Task RefreshView();
 

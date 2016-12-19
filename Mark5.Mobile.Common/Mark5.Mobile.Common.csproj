@@ -176,6 +176,7 @@
     <Compile Include="Utilities\PortableCollections\CrossPlatformCollectionsExtensions.cs" />
     <Compile Include="Utilities\PortableCollections\IPortableConcurrentQueue.cs" />
     <Compile Include="Utilities\AddressUtilities.cs" />
+    <Compile Include="Utilities\LambdaEqualityComparer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />

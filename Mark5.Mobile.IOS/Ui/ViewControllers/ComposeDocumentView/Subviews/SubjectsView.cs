@@ -11,9 +11,9 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-    public class SubjectsView : ComposeDocumentSubview
+    public class SubjectsView : ComposeDocumentView
     {
         public event EventHandler Edited = delegate { };
 

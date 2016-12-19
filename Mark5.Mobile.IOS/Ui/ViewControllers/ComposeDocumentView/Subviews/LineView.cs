@@ -11,13 +11,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using ObjCRuntime;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-    public class LineView : ComposeDocumentSubview
+    public class LineView : ComposeDocumentView
     {
         const string DefaultMessage = "Tap to select lines"; //TODO localization string
 
@@ -30,21 +31,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
         UILabel selectedLineLabel;
 
         readonly UIViewController viewController;
-        readonly Line defaultLine;
-        readonly List<Line> availableLines;
+        readonly Line defaultOutgoingLine;
+        readonly List<Line> availableOutgoingLines;
         bool ignoreSelectLineLabelTap;
 
-        public LineView(UIViewController viewController, Line defaultLine, List<Line> lines)
+        public LineView(UIViewController viewController)
         {
             this.viewController = viewController;
-            selectedLine = defaultLine;
-            availableLines = new List<Line>(lines.Where(l => l != null));
-            this.defaultLine = defaultLine;
 
-            if (defaultLine != null && !lines.Select(l => l.Guid).Contains(defaultLine.Guid))
-            {
-                lines.Insert(0, defaultLine);
-            }
+            defaultOutgoingLine = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultOutgoingLine;
+            availableOutgoingLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines;
 
             Initialize();
         }
@@ -91,7 +87,54 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
 
         public override Task RefreshView()
         {
-            throw new NotImplementedException();
+            if (CreationModeFlag == DocumentCreationModeFlag.New)
+            {
+                if (defaultOutgoingLine != null)
+                {
+                    SetLine(defaultOutgoingLine);
+                }
+                else
+                {
+                    SetSelectLine();
+                }
+                return Task.CompletedTask;
+            }
+
+            if (CreationModeFlag == DocumentCreationModeFlag.None)
+            {
+                return Task.CompletedTask;
+            }
+
+            if (CreationModeFlag == DocumentCreationModeFlag.Edit)
+            {
+                SetLine(PreviousDocument.Lines.First());
+            }
+
+            if (availableOutgoingLines.Count == 1)
+            {
+                SetLine(availableOutgoingLines.First());
+                return Task.CompletedTask;
+            }
+
+            var previousDocumentLines = PreviousDocument.Lines;
+            if (previousDocumentLines.Contains(defaultOutgoingLine))
+            {
+                SetLine(defaultOutgoingLine);
+            }
+            else
+            {
+                var intersection = previousDocumentLines.Intersect(availableOutgoingLines, LambdaEqualityComparer<Line>.Create(l => l.Guid)).ToList();
+                if (intersection.Count() == 1)
+                {
+                    SetLine(intersection.First());
+                }
+                else
+                {
+                    SetSelectLine();
+                }
+            }
+
+            return Task.CompletedTask;
         }
 
         public override Task UpdateDocument()
@@ -103,11 +146,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
 
         #region Helpet methods
 
-        void SelectLine(Line line)
+        void SetLine(Line line)
         {
             selectedLineLabel.TextColor = UIColor.DarkTextColor;
 
-            if (line != null && availableLines.Select(l => l.Guid).Contains(line.Guid))
+            if (line != null && availableOutgoingLines.Select(l => l.Guid).Contains(line.Guid))
             {
                 selectedLine = line;
                 selectedLineLabel.Text = line.Name;
@@ -120,6 +163,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
 
             Edited(this, EventArgs.Empty);
         }
+
+        void SetSelectLine()
+        {
+            //TODO set message to show that the user need to select the line
+
+        }
+
 
         #endregion
 
@@ -139,9 +189,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
             ActionSheetWillAppear(this, EventArgs.Empty);
 
             var linesActionSheet = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
-            foreach (var line in availableLines)
+            foreach (var line in availableOutgoingLines)
             {
-                linesActionSheet.AddAction(UIAlertAction.Create(line.Name, UIAlertActionStyle.Default, a => SelectLine(line)));
+                linesActionSheet.AddAction(UIAlertAction.Create(line.Name, UIAlertActionStyle.Default, a => SetLine(line)));
             }
             linesActionSheet.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, a => selectedLineLabel.TextColor = UIColor.DarkTextColor));
             if (linesActionSheet.PopoverPresentationController != null)

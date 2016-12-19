@@ -6,12 +6,24 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
-namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
+using System.Threading.Tasks;
+
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-    public class AttachmentsView : ComposeDocumentSubview
+    public class AttachmentsView : ComposeDocumentView
     {
         public AttachmentsView()
         {
+        }
+
+        public override Task RefreshView()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task UpdateDocument()
+        {
+            throw new NotImplementedException();
         }
     }
 }
