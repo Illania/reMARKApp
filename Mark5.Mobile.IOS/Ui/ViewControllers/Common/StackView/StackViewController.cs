@@ -7,6 +7,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.Common.StackView
