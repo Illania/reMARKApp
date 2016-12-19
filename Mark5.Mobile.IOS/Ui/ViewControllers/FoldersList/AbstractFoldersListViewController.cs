@@ -7,6 +7,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using CoreGraphics;
@@ -307,13 +308,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             public override string TitleForHeader(UITableView tableView, nint section)
             {
                 if (section == Section.Favorites)
-                    return Localization.GetString("favorites");
+                    return Localization.GetString("favorites").ToUpper(CultureInfo.CurrentCulture);
 
                 if (section == Section.Folders)
-                    return Localization.GetString("folders");
+                    return Localization.GetString("folders").ToUpper(CultureInfo.CurrentCulture);
 
                 if (section == Section.Local)
-                    return Localization.GetString("local");
+                    return Localization.GetString("local_folders").ToUpper(CultureInfo.CurrentCulture);
 
                 throw new ArgumentException(nameof(section));
             }
