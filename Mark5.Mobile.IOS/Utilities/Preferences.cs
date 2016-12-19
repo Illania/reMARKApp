@@ -8,6 +8,7 @@
 using Mark5.Mobile.Common.Model;
 using System.Collections.Generic;
 using Foundation;
+using System;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
@@ -25,6 +26,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         class Keys
         {
+            public const string MainTabsOrderKey = "MainTabsOrder";
 
             public const string DocumentsToDownloadKey = "DocumentsToDownload";
             public const string MarkAsReadDelaySecondsKey = "MarkAsReadDelaySeconds";
@@ -76,6 +78,25 @@ namespace Mark5.Mobile.IOS.Utilities
                     dict.Add(kv.Key.ToString(), kv.Value.ToString());
                 }
                 return dict;
+            }
+        }
+
+        public string[] MainTabsOrder
+        {
+            get
+            {
+                var order = ud.StringForKey(Keys.MainTabsOrderKey);
+                if (string.IsNullOrWhiteSpace(order))
+                {
+                    return null;
+                }
+
+                return order.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            }
+            set
+            {
+                ud.SetString(string.Join(",", value), Keys.MainTabsOrderKey);
+                ud.Synchronize();
             }
         }
 

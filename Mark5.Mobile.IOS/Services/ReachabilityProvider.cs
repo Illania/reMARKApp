@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.IOS
-// File: Reachability.cs
+// File: ReachabilityProvider.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -14,7 +14,8 @@ namespace Mark5.Mobile.IOS.Services
 {
     
     // https://github.com/xamarin/ios-samples/blob/master/ReachabilitySample/reachability.cs
-    public static class Reachability
+    // with small modifications for IPv4
+    public static class ReachabilityProvider
     {
 
         public static string HostName = "www.google.com";
@@ -71,7 +72,7 @@ namespace Mark5.Mobile.IOS.Services
             if (adHocWiFiNetworkReachability == null)
             {
                 var ipAddress = new IPAddress(new byte[] { 169, 254, 0, 0 });
-                adHocWiFiNetworkReachability = new NetworkReachability(ipAddress.MapToIPv6());
+                adHocWiFiNetworkReachability = new NetworkReachability(ipAddress);
                 adHocWiFiNetworkReachability.SetNotification(OnChange);
                 adHocWiFiNetworkReachability.Schedule(CFRunLoop.Current, CFRunLoop.ModeDefault);
             }
@@ -86,7 +87,7 @@ namespace Mark5.Mobile.IOS.Services
             if (defaultRouteReachability == null)
             {
                 var ipAddress = new IPAddress(0);
-                defaultRouteReachability = new NetworkReachability(ipAddress.MapToIPv6());
+                defaultRouteReachability = new NetworkReachability(ipAddress);
                 defaultRouteReachability.SetNotification(OnChange);
                 defaultRouteReachability.Schedule(CFRunLoop.Current, CFRunLoop.ModeDefault);
             }

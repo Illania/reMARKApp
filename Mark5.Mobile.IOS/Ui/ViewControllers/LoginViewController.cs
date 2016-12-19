@@ -7,7 +7,6 @@
 //
 using System;
 using System.IO;
-using System.Threading.Tasks;
 using CoreAnimation;
 using CoreGraphics;
 using Foundation;
@@ -24,7 +23,7 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
 
-    public class LoginViewController : UIViewController
+    public class LoginViewController : ViewController
     {
 
         #region Animation and layout controls
@@ -456,15 +455,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void SettingsButton_TouchUpInside(object sender, EventArgs e)
         {
-            var rsv = new LoginSettingsViewController.RestrictedSettingsValues { SslMode = sslMode };
-            var loginSettingsViewController = new LoginSettingsViewController(rsv);
+            var sv = new LoginSettingsViewController.SettingsValues { SslMode = sslMode };
+            var loginSettingsViewController = new LoginSettingsViewController(sv);
             loginSettingsViewController.RestrictedSettingsValuesUpdated += LoginSettingsViewController_RestrictedSettingsValuesUpdated;
             PresentViewController(new UINavigationController(loginSettingsViewController), true, null);
         }
 
         void TextField_EditingChanged(object sender, EventArgs e) => ValidateForm();
 
-        void LoginSettingsViewController_RestrictedSettingsValuesUpdated(object sender, LoginSettingsViewController.RestrictedSettingsValues values)
+        void LoginSettingsViewController_RestrictedSettingsValuesUpdated(object sender, LoginSettingsViewController.SettingsValues values)
         {
             sslMode = values.SslMode;
 
@@ -491,7 +490,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"Attempting login...");
 
-            Func<Task> dismissAction = null;
+            Action dismissAction = null;
 
             try
             {
@@ -550,7 +549,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Info("Logging in...");
 
-                dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Localization.GetString("logging_in"), Localization.GetString("please_wait___"));
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_in___"));
 
                 switch (sslMode)
                 {
@@ -605,7 +604,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Info($"Logged in - will present {nameof(MainViewController)}");
 
-                if (dismissAction != null) await dismissAction();
+                if (dismissAction != null) dismissAction();
+
+                UIApplication.SharedApplication.RegisterUserNotificationSettings(UIUserNotificationSettings.GetSettingsForTypes(UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound, null));
+                UIApplication.SharedApplication.RegisterForRemoteNotifications();
 
                 PresentViewController(new MainViewController
                 {
@@ -614,7 +616,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             catch (Exception ex)
             {
-                if (dismissAction != null) await dismissAction();
+                if (dismissAction != null) dismissAction();
 
                 CommonConfig.Logger.Error("Log in failed", ex);
 

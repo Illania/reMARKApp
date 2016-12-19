@@ -38,6 +38,20 @@
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
+			<string>advanced</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>IASKButtonSpecifier</string>
+			<key>Key</key>
+			<string>createReport</string>
+			<key>Title</key>
+			<string>create_report</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
 			<string>about</string>
 		</dict>
 		<dict>

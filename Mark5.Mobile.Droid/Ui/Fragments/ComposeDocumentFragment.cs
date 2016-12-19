@@ -185,7 +185,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 else
                 {
                     var sourceType = PreviousDocumentDirection == DocumentDirection.Draft ? SourceType.Auto : SourceType.Local;
-                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, sourceType); // TODO
+                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, sourceType);
                     PreviousDocument = container.Document;
                     PreviousDocumentPreview = container.DocumentPreview;
                     if (CreationModeFlag == DocumentCreationModeFlag.Edit && PreviousDocumentPreview.Direction == DocumentDirection.Draft)

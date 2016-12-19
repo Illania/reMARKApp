@@ -38,7 +38,7 @@
     <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignKey>iPhone Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
     <MtouchUseSGen>true</MtouchUseSGen>
     <MtouchUseRefCounting>true</MtouchUseRefCounting>
     <MtouchFloat32>true</MtouchFloat32>
@@ -48,6 +48,7 @@
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
+    <CodesignProvision>34b8ceec-d334-4820-bfc8-80df2a22fc5e</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>pdbonly</DebugType>
@@ -73,7 +74,7 @@
     <DefineConstants>DEBUG;ENABLE_TEST_CLOUD;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignKey>iPhone Developer: Lars Hansen (TUYUES9KMZ)</CodesignKey>
     <DeviceSpecificBuild>true</DeviceSpecificBuild>
     <MtouchDebug>true</MtouchDebug>
     <MtouchFastDev>true</MtouchFastDev>
@@ -86,6 +87,7 @@
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
+    <CodesignProvision>881b021c-8647-46eb-b639-9f145156fcb7</CodesignProvision>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -161,6 +163,7 @@
     <Folder Include="Utilities\Extensions\" />
     <Folder Include="Ui\ViewControllers\Common\" />
     <Folder Include="Ui\ViewControllers\Common\StackView\" />
+    <Folder Include="Model\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -175,7 +178,7 @@
     <Compile Include="AppDelegate.cs" />
     <Compile Include="PlatformConfig.cs" />
     <Compile Include="Utilities\SSLCertificateVerificationManager.cs" />
-    <Compile Include="Utilities\SimpleLogger.cs" />
+    <Compile Include="Utilities\ConsoleAndFileLogger.cs" />
     <Compile Include="Utilities\Preferences.cs" />
     <Compile Include="Utilities\DeviceInfoProvider.cs" />
     <Compile Include="Utilities\PortableConcurrentQueue.cs" />
@@ -194,6 +197,17 @@
     <Compile Include="Ui\Common\Dialogs.cs" />
     <Compile Include="Ui\ViewControllers\LoginSettingsViewController.cs" />
     <Compile Include="Ui\Common\Localization.cs" />
+    <Compile Include="Utilities\SystemReportCollector.cs" />
+    <Compile Include="Ui\ViewControllers\SearchViewController.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentSplitViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ContactSplitViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ShortcodeSplitViewController.cs" />
+    <Compile Include="Ui\ViewControllers\NotificationsListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\SettingsViewController.cs" />
+    <Compile Include="Ui\Common\NavigationController.cs" />
+    <Compile Include="Ui\Common\SplitViewController.cs" />
+    <Compile Include="Ui\Common\ViewController.cs" />
+    <Compile Include="Ui\Common\ITaggedViewController.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\ComposeDocumentViewController.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ComposeDocumentView.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ToView.cs" />
@@ -247,6 +261,124 @@
     <BundleResource Include="Resources\Settings.bundle\en.lproj\Root.strings" />
     <BundleResource Include="Resources\Settings.bundle\Root.Login.inApp.plist" />
     <BundleResource Include="Resources\Base.lproj\Localizable.strings" />
+    <BundleResource Include="Resources\icons\actions%402x.png" />
+    <BundleResource Include="Resources\icons\actions%403x.png" />
+    <BundleResource Include="Resources\icons\add%402x.png" />
+    <BundleResource Include="Resources\icons\add%403x.png" />
+    <BundleResource Include="Resources\icons\arrow-down%402x.png" />
+    <BundleResource Include="Resources\icons\arrow-down%403x.png" />
+    <BundleResource Include="Resources\icons\arrow-up%402x.png" />
+    <BundleResource Include="Resources\icons\arrow-up%403x.png" />
+    <BundleResource Include="Resources\icons\attachment%402x.png" />
+    <BundleResource Include="Resources\icons\attachment%403x.png" />
+    <BundleResource Include="Resources\icons\checkmark%402x.png" />
+    <BundleResource Include="Resources\icons\checkmark%403x.png" />
+    <BundleResource Include="Resources\icons\comments%402x.png" />
+    <BundleResource Include="Resources\icons\comments%403x.png" />
+    <BundleResource Include="Resources\icons\company%402x.png" />
+    <BundleResource Include="Resources\icons\company%403x.png" />
+    <BundleResource Include="Resources\icons\compose%402x.png" />
+    <BundleResource Include="Resources\icons\compose%403x.png" />
+    <BundleResource Include="Resources\icons\contacts-cp%402x.png" />
+    <BundleResource Include="Resources\icons\contacts-cp%403x.png" />
+    <BundleResource Include="Resources\icons\contacts-filled%402x.png" />
+    <BundleResource Include="Resources\icons\contacts-filled%403x.png" />
+    <BundleResource Include="Resources\icons\contacts-small%402x.png" />
+    <BundleResource Include="Resources\icons\contacts-small%403x.png" />
+    <BundleResource Include="Resources\icons\contacts%402x.png" />
+    <BundleResource Include="Resources\icons\contacts%403x.png" />
+    <BundleResource Include="Resources\icons\department%402x.png" />
+    <BundleResource Include="Resources\icons\department%403x.png" />
+    <BundleResource Include="Resources\icons\detail-disclosure%402x.png" />
+    <BundleResource Include="Resources\icons\detail-disclosure%403x.png" />
+    <BundleResource Include="Resources\icons\documents-filled%402x.png" />
+    <BundleResource Include="Resources\icons\documents-filled%403x.png.png" />
+    <BundleResource Include="Resources\icons\documents-small%402x.png" />
+    <BundleResource Include="Resources\icons\documents-small%403x.png" />
+    <BundleResource Include="Resources\icons\documents%402x.png" />
+    <BundleResource Include="Resources\icons\documents%403x.png" />
+    <BundleResource Include="Resources\icons\drafts%402x.png" />
+    <BundleResource Include="Resources\icons\drafts%403x.png" />
+    <BundleResource Include="Resources\icons\email%402x.png" />
+    <BundleResource Include="Resources\icons\email%403x.png" />
+    <BundleResource Include="Resources\icons\empty-dot%402x.png" />
+    <BundleResource Include="Resources\icons\empty-dot%403x.png" />
+    <BundleResource Include="Resources\icons\expand%402x.png" />
+    <BundleResource Include="Resources\icons\expand%403x.png" />
+    <BundleResource Include="Resources\icons\failed%402x.png" />
+    <BundleResource Include="Resources\icons\failed%403x.png" />
+    <BundleResource Include="Resources\icons\favorite%402x.png" />
+    <BundleResource Include="Resources\icons\favorite%403x.png" />
+    <BundleResource Include="Resources\icons\flag%402x.png" />
+    <BundleResource Include="Resources\icons\flag%403x.png" />
+    <BundleResource Include="Resources\icons\folder%402x.png" />
+    <BundleResource Include="Resources\icons\folder%403x.png" />
+    <BundleResource Include="Resources\icons\full-dot%402x.png" />
+    <BundleResource Include="Resources\icons\full-dot%403x.png" />
+    <BundleResource Include="Resources\icons\incoming%402x.png" />
+    <BundleResource Include="Resources\icons\incoming%403x.png" />
+    <BundleResource Include="Resources\icons\map%402x.png" />
+    <BundleResource Include="Resources\icons\map%403x.png" />
+    <BundleResource Include="Resources\icons\mark5Contacts%402x.png" />
+    <BundleResource Include="Resources\icons\mark5Contacts%403x.png" />
+    <BundleResource Include="Resources\icons\message%402x.png" />
+    <BundleResource Include="Resources\icons\message%403x.png" />
+    <BundleResource Include="Resources\icons\notifications-filled%402x.png" />
+    <BundleResource Include="Resources\icons\notifications-filled%403x.png" />
+    <BundleResource Include="Resources\icons\notifications-small%402x.png" />
+    <BundleResource Include="Resources\icons\notifications-small%403x.png" />
+    <BundleResource Include="Resources\icons\notifications%402x.png" />
+    <BundleResource Include="Resources\icons\notifications%403x.png" />
+    <BundleResource Include="Resources\icons\offline%402x.png" />
+    <BundleResource Include="Resources\icons\offline%403x.png" />
+    <BundleResource Include="Resources\icons\okay%402x.png" />
+    <BundleResource Include="Resources\icons\okay%403x.png" />
+    <BundleResource Include="Resources\icons\outgoing%402x.png" />
+    <BundleResource Include="Resources\icons\outgoing%403x.png" />
+    <BundleResource Include="Resources\icons\pencil%402x.png" />
+    <BundleResource Include="Resources\icons\pencil%403x.png" />
+    <BundleResource Include="Resources\icons\pending%402x.png" />
+    <BundleResource Include="Resources\icons\pending%403x.png" />
+    <BundleResource Include="Resources\icons\phone%402x.png" />
+    <BundleResource Include="Resources\icons\phone%403x.png" />
+    <BundleResource Include="Resources\icons\phonebook%402x.png" />
+    <BundleResource Include="Resources\icons\phonebook%403x.png" />
+    <BundleResource Include="Resources\icons\recent%402x.png" />
+    <BundleResource Include="Resources\icons\recent%403x.png" />
+    <BundleResource Include="Resources\icons\reply%402x.png" />
+    <BundleResource Include="Resources\icons\reply%403x.png" />
+    <BundleResource Include="Resources\icons\search%402x.png" />
+    <BundleResource Include="Resources\icons\search%403x.png" />
+    <BundleResource Include="Resources\icons\settings-filled%402x.png" />
+    <BundleResource Include="Resources\icons\settings-filled%403x.png" />
+    <BundleResource Include="Resources\icons\settings%402x.png" />
+    <BundleResource Include="Resources\icons\settings%403x.png" />
+    <BundleResource Include="Resources\icons\shortcodes-filled%402x.png" />
+    <BundleResource Include="Resources\icons\shortcodes-filled%403x.png" />
+    <BundleResource Include="Resources\icons\shortcodes-small%402x.png" />
+    <BundleResource Include="Resources\icons\shortcodes-small%403x.png" />
+    <BundleResource Include="Resources\icons\shortcodes%402x.png" />
+    <BundleResource Include="Resources\icons\shortcodes%403x.png" />
+    <BundleResource Include="Resources\icons\trash%402x.png" />
+    <BundleResource Include="Resources\icons\trash%403x.png" />
+    <BundleResource Include="Resources\icons\view%402x.png" />
+    <BundleResource Include="Resources\icons\view%403x.png" />
+    <BundleResource Include="Resources\icons\worktray%402x.png" />
+    <BundleResource Include="Resources\icons\worktray%403x.png" />
+    <BundleResource Include="Resources\icons\Folders list\draft%402x.png" />
+    <BundleResource Include="Resources\icons\Folders list\draft%403x.png" />
+    <BundleResource Include="Resources\icons\Folders list\folder%402x.png" />
+    <BundleResource Include="Resources\icons\Folders list\folder%403x.png" />
+    <BundleResource Include="Resources\icons\Folders list\inbox%402x.png" />
+    <BundleResource Include="Resources\icons\Folders list\inbox%403x.png" />
+    <BundleResource Include="Resources\icons\Folders list\outbox%402x.png" />
+    <BundleResource Include="Resources\icons\Folders list\outbox%403x.png" />
+    <BundleResource Include="Resources\icons\Folders list\outgoing%402x.png" />
+    <BundleResource Include="Resources\icons\Folders list\outgoing%403x.png" />
+    <BundleResource Include="Resources\icons\Folders list\spam%402x.png" />
+    <BundleResource Include="Resources\icons\Folders list\spam%403x.png" />
+    <BundleResource Include="Resources\icons\Folders list\worktray%402x.png" />
+    <BundleResource Include="Resources\icons\Folders list\worktray%403x.png" />
   </ItemGroup>
   <ItemGroup>
     <XamarinComponentReference Include="InAppSettingsKit">

@@ -38,7 +38,7 @@ namespace Mark5.Mobile.IOS.Services
             IsReachable = CheckNetworkAvailability();
         }
 
-        public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.ServiceConnection, bool testOnly = false)
+        public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.ServiceConnection, bool testOnly = false)
         {
             if (!testOnly)
             {
@@ -79,7 +79,7 @@ namespace Mark5.Mobile.IOS.Services
 
         public bool CheckNetworkAvailability()
         {
-            return Reachability.InternetConnectionStatus() != NetworkStatus.NotReachable;
+            return ReachabilityProvider.InternetConnectionStatus() != NetworkStatus.NotReachable;
         }
 
         public async Task<bool> CheckWithGoogle()

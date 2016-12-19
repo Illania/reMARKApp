@@ -49,6 +49,7 @@ namespace Mark5.Mobile.Droid.Utilities
             var sb = new StringBuilder();
 
             sb.AppendLine("===== General =====");
+            sb.AppendLine("Platform: Android");
             var pi = Application.Context.PackageManager.GetPackageInfo(Application.Context.PackageName, 0);
             sb.AppendLine("Version: " + pi.VersionName + " (" + pi.VersionCode + ")");
             sb.AppendLine("Date: " + DateTime.UtcNow);

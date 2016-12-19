@@ -8,6 +8,10 @@
 
 using System;
 using System.Threading.Tasks;
+using Mark5.Mobile.Common.DataAccess.Exceptions;
+using Mark5.Mobile.Common.Model.Exceptions;
+using Mark5.Mobile.IOS.Utilities;
+using Mark5.ServiceReference.Exceptions;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
@@ -51,19 +55,132 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         #region Non-awaitable dialogs
 
-        public static Func<Task> ShowInfiniteProgressDialog(UIViewController vc, string title, string content)
+        public static Action ShowInfiniteProgressDialog(string content)
         {
-            var alert = UIAlertController.Create(title, content, UIAlertControllerStyle.Alert);
-            vc.PresentViewController(alert, true, null);
-
-            return () =>
-            {
-                var tcs = new TaskCompletionSource<bool>();
-                alert.DismissViewController(true, () => tcs.SetResult(true));
-                return tcs.Task;
-            };
+            // TODO
+            //SVProgressHUD.ShowWithStatus(Localization.GetString(content));
+            //return SVProgressHUD.Dismiss;
+            return null;
         }
 
         #endregion
+
+        #region Error dialogs
+
+        public static Task ShowErrorDialogAsync(UIViewController vc, Exception ex)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            var alert = UIAlertController.Create(GetErrorTitle(ex), GetErrorContent(ex), UIAlertControllerStyle.Alert);
+            alert.AddAction(UIAlertAction.Create(Localization.GetString("ok"), UIAlertActionStyle.Default, a => tcs.SetResult(true)));
+            if (ShouldShowCreateReport(ex))
+            {
+                alert.AddAction(UIAlertAction.Create(Localization.GetString("report"), UIAlertActionStyle.Cancel, a =>
+                {
+                    var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
+                    Task.Run(() =>
+                    {
+                        return SystemReportCollector.CreateFullReport();
+                    }).ContinueWith(t =>
+                    {
+                        dismissAction();
+
+                        if (!t.IsFaulted)
+                        {   
+                            vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, () =>
+                            {
+                                tcs.SetResult(true);
+                            });
+                        }
+                        else
+                        {
+                            tcs.SetResult(true);
+                        }
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                }));
+            }
+            vc.PresentViewController(alert, true, null);
+            return tcs.Task;
+        }
+
+        static string GetErrorTitle(Exception ex)
+        {
+            if (ex is AppServiceException)
+            {
+                return Localization.GetString("error_String.appserviceexception_title");
+            }
+            if (ex is FileTransferServiceException)
+            {
+                return Localization.GetString("error_String.filetransferserviceexception_title");
+            }
+            if (ex is DataNotFoundException)
+            {
+                return Localization.GetString("error_String.datanotfoundexception_title");
+            }
+            if (ex is DataAccessException)
+            {
+                return Localization.GetString("error_String.dataaccessexception_title");
+            }
+            if (ex is InvalidSourceTypeException)
+            {
+                return Localization.GetString("error_String.invalidsourcetypeexception_title");
+            }
+
+            return Localization.GetString("error_generalexception_title");
+        }
+
+        static string GetErrorContent(Exception ex)
+        {
+            if (ex is AppServiceException)
+            {
+                return ex.Message;
+            }
+            if (ex is FileTransferServiceException)
+            {
+                return ex.Message;
+            }
+            if (ex is DataNotFoundException)
+            {
+                return Localization.GetString("error_String.datanotfoundexception_message");
+            }
+            if (ex is DataAccessException)
+            {
+                return ex.Message;
+            }
+            if (ex is InvalidSourceTypeException)
+            {
+                return Localization.GetString("error_String.invalidsourcetypeexception_message");
+            }
+
+            return ex.Message;
+        }
+
+        static bool ShouldShowCreateReport(Exception ex)
+        {
+            if (ex is AppServiceException)
+            {
+                return true;
+            }
+            if (ex is FileTransferServiceException)
+            {
+                return true;
+            }
+            if (ex is DataNotFoundException)
+            {
+                return false;
+            }
+            if (ex is DataAccessException)
+            {
+                return true;
+            }
+            if (ex is InvalidSourceTypeException)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        #endregion
+
     }
 }
