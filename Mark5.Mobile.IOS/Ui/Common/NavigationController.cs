@@ -5,14 +5,15 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
     
-    public class NavigationController : UINavigationController
+    public class NavigationController : UINavigationController, ITaggedViewController
     {
+
+        public string Tag { get; set; }
 
         public NavigationController(UIViewController rootViewController)
             : base(rootViewController)

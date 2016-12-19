@@ -202,6 +202,7 @@
     <Compile Include="Ui\Common\NavigationController.cs" />
     <Compile Include="Ui\Common\SplitViewController.cs" />
     <Compile Include="Ui\Common\ViewController.cs" />
+    <Compile Include="Ui\Common\ITaggedViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

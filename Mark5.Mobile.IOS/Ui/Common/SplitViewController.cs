@@ -5,13 +5,14 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
-    
-    public class SplitViewController : UISplitViewController
+
+    public class SplitViewController : UISplitViewController, ITaggedViewController
     {
+        
+        public string Tag { get; set; }
     }
 }
