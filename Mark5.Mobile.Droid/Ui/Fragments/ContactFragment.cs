@@ -377,7 +377,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Mobile));
             communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Phone));
             communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Skype));
-            communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.System));
             if (PlatformConfig.Preferences.ContactCommunicationTelexNumbersEnabled)
                 communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Telex));
 

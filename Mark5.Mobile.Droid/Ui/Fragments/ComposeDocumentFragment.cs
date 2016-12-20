@@ -573,13 +573,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             optionsMenu.Clear();
 
             var attachmentItem = menu.Add(Menu.None, MenuItemActions.AddAttachment, MenuItemActions.AddAttachment, Resource.String.add_attachment);
-            attachmentItem.SetIcon(Resource.Drawable.add_attachment);
+            attachmentItem.SetIcon(Resource.Drawable.actions_attachment);
             attachmentItem.SetShowAsAction(ShowAsAction.Always);
 
             if (!LocalDocument || LocalDocument && OutgoingDocumentState == OutgoingDocumentState.Failed)
             {
                 var sendItem = optionsMenu.Add(Menu.None, MenuItemActions.SendDocument, MenuItemActions.SendDocument, Resource.String.send);
-                sendItem.SetIcon(Resource.Drawable.send_white);
+                sendItem.SetIcon(Resource.Drawable.actions_send);
                 sendItem.SetShowAsAction(ShowAsAction.Always);
                 UpdateSendButtonState();
             }

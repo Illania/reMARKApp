@@ -47,13 +47,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
             var iconImageViewLayout = new LinearLayoutCompat(context);
             iconImageViewLayout.Orientation = Vertical;
-            iconImageViewLayout.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent);
+            iconImageViewLayout.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
             iconImageViewLayout.SetPadding(DistanceNormal + DistanceSmall, DistanceLarge, DistanceNormal + DistanceSmall, DistanceLarge);
 
             internalLayout.AddView(iconImageViewLayout);
 
             IconImageView = new AppCompatImageView(context);
-            IconImageView.SetImageResource(Resource.Drawable.email);
+            IconImageView.SetImageResource(GetDrawableIdForAddressType(addressType));
             IconImageView.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
             iconImageViewLayout.AddView(IconImageView, new LayoutParams(DistanceVeryLarge, DistanceVeryLarge));
 
@@ -143,6 +143,31 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             }
 
             return Tuple.Create(imHandle, imTypeString);
+        }
+
+        int GetDrawableIdForAddressType(CommunicationAddressType type)
+        {
+            switch (type)
+            {
+                case CommunicationAddressType.Email:
+                    return Resource.Drawable.contacts_email;
+                case CommunicationAddressType.Fax:
+                    return Resource.Drawable.contacts_fax;
+                case CommunicationAddressType.IM:
+                    return Resource.Drawable.contacts_im;
+                case CommunicationAddressType.Internal:
+                    return Resource.Drawable.contacts_internal;
+                case CommunicationAddressType.Mobile:
+                    return Resource.Drawable.contacts_mobile;
+                case CommunicationAddressType.Skype:
+                    return Resource.Drawable.contacts_skype;
+                case CommunicationAddressType.Phone:
+                    return Resource.Drawable.contacts_phone;
+                case CommunicationAddressType.Telex:
+                    return Resource.Drawable.contacts_telex;
+                default:
+                    throw new ArgumentException("Invalid address type!");
+            }
         }
 
         class CommunicationAddressesSubSubview : LinearLayoutCompat

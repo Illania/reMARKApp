@@ -45,14 +45,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
             var iconImageViewLayout = new LinearLayoutCompat(context);
             iconImageViewLayout.Orientation = Vertical;
-            iconImageViewLayout.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent);
+            iconImageViewLayout.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
             iconImageViewLayout.SetPadding(DistanceNormal + DistanceSmall, DistanceLarge, DistanceNormal + DistanceSmall, DistanceLarge);
 
             internalLayout.AddView(iconImageViewLayout);
 
             IconImageView = new AppCompatImageView(context);
-            IconImageView.SetImageResource(Resource.Drawable.email);
-            IconImageView.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            IconImageView.SetImageResource(GetDrawableIdForContactType(contactType));
+            IconImageView.SetColorFilter(new Color(ContextCompat.GetColor(Context, contactType == LinkedContactType.PrimaryPerson ? Resource.Color.brown : Resource.Color.darkblue)));
             iconImageViewLayout.AddView(IconImageView, new LayoutParams(DistanceVeryLarge, DistanceVeryLarge));
 
             ContentLayout = new LinearLayoutCompat(context);
@@ -112,6 +112,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             else
             {
                 Visibility = ViewStates.Gone;
+            }
+        }
+
+        int GetDrawableIdForContactType(LinkedContactType type)
+        {
+            switch (type)
+            {
+                case LinkedContactType.PrimaryPerson:
+                case LinkedContactType.Person:
+                    return Resource.Drawable.contacts_person;
+                case LinkedContactType.Department:
+                    return Resource.Drawable.contacts_department;
+                case LinkedContactType.Company:
+                    return Resource.Drawable.contacts_company;
+                default:
+                    throw new ArgumentException("Invalid linked contact type!");
             }
         }
 

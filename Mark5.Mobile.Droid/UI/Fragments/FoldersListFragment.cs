@@ -131,10 +131,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
-            var newItem = menu.Add(Menu.None, 10, 10, "New"); //TODO an icon should be here
+            var newItem = menu.Add(Menu.None, 10, 10, "New");
+            newItem.SetIcon(Resource.Drawable.action_new);
             newItem.SetShowAsAction(ShowAsAction.Always);
 
             var searchItem = menu.FindItem(Resource.Id.action_search);
+            searchItem.SetIcon(Resource.Drawable.action_search);
             MenuItemCompat.SetOnActionExpandListener(searchItem, this);
             SearchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
             SearchView.QueryHint = GetString(Resource.String.filter);
