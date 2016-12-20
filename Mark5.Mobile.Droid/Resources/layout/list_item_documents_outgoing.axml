@@ -52,7 +52,7 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_margin="4dp"
-                android:src="@drawable/outgoing"
+                android:src="@drawable/sending"
                 android:tint="#123D57"
                 android:visibility="gone" />
             <android.support.v7.widget.AppCompatImageView

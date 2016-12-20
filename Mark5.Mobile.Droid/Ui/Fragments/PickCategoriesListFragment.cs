@@ -107,6 +107,7 @@ namespace Mark5.Mobile.Droid
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
             var searchItem = menu.FindItem(Resource.Id.action_search);
+            searchItem.SetIcon(Resource.Drawable.action_search);
             MenuItemCompat.SetOnActionExpandListener(searchItem, this);
             searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
             searchView.QueryHint = GetString(Resource.String.filter);

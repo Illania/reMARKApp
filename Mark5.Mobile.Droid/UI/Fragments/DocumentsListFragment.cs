@@ -96,7 +96,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             adapter = new DocumentsListAdapter(Activity, recyclerView, async (startId) => await RefreshData(startId));
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
-            adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() => {
+            adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
+            {
                 if (recyclerView.GetAdapter() != adapter) return;
                 if (refreshing) return;
 
@@ -192,10 +193,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
-            var newItem = menu.Add(Menu.None, 10, 10, "New"); //TODO an icon should be here
+            var newItem = menu.Add(Menu.None, 10, 10, "New");
+            newItem.SetIcon(Resource.Drawable.action_new);
             newItem.SetShowAsAction(ShowAsAction.Always);
 
             var searchItem = menu.FindItem(Resource.Id.action_search);
+            searchItem.SetIcon(Resource.Drawable.action_search);
             MenuItemCompat.SetOnActionExpandListener(searchItem, this);
             searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
             searchView.QueryHint = GetString(Resource.String.filter);

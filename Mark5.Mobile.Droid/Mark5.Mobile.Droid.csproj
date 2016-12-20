@@ -377,7 +377,6 @@
     <AndroidResource Include="Resources\drawable-hdpi\folder_outgoing.png" />
     <AndroidResource Include="Resources\drawable-hdpi\folder_spam.png" />
     <AndroidResource Include="Resources\drawable-hdpi\folder_worktray.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\send.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\arrow_right.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\email.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\folder.png" />
@@ -385,7 +384,6 @@
     <AndroidResource Include="Resources\drawable-xhdpi\folder_outgoing.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\folder_spam.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\folder_worktray.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\send.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\arrow_right.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\email.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\folder.png" />
@@ -393,7 +391,6 @@
     <AndroidResource Include="Resources\drawable-xxhdpi\folder_outgoing.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\folder_spam.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\folder_worktray.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\send.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\arrow_right.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\email.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\folder.png" />
@@ -401,7 +398,6 @@
     <AndroidResource Include="Resources\drawable-xxxhdpi\folder_outgoing.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\folder_spam.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\folder_worktray.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\send.png" />
     <AndroidResource Include="Resources\layout\activity_login.axml" />
     <AndroidResource Include="Resources\layout\activity_splash.axml" />
     <AndroidResource Include="Resources\layout\appbar.axml" />
@@ -442,19 +438,11 @@
     <AndroidResource Include="Resources\values\values-preferences.axml" />
     <AndroidResource Include="Resources\values-v21\style.axml" />
     <AndroidResource Include="Resources\xml\filepaths.xml" />
-    <AndroidResource Include="Resources\drawable-hdpi\send.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\send.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\send.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\send.png" />
     <AndroidResource Include="Resources\layout\suggestion_dropdown.axml" />
     <AndroidResource Include="Resources\drawable-hdpi\error.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\error.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\error.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\error.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\send_white.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\send_white.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\send_white.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\send_white.png" />
     <AndroidResource Include="Resources\drawable-hdpi\add_attachment.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\add_attachment.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\add_attachment.png" />

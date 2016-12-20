@@ -38,7 +38,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public Action CloseRequest { get; set; }
 
         bool refreshing;
-        
+
         IMenu menu;
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -66,7 +66,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Creating {nameof(ContactsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
-            
+
             var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
             emptyView.SetText(Resource.String.empty_folder);
 
@@ -163,6 +163,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
             var searchItem = menu.FindItem(Resource.Id.action_search);
+            searchItem.SetIcon(Resource.Drawable.action_search);
             MenuItemCompat.SetOnActionExpandListener(searchItem, this);
             searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
             searchView.QueryHint = GetString(Resource.String.filter);
