@@ -37,7 +37,8 @@
 "contacts" = "Contacts";
 "shortcodes" = "Shortcodes";
 "notifications" = "Notifications";
-"settings" = "Settings";"yes" = "Yes";
+"settings" = "Settings";
+"yes" = "Yes";
 "to" = "To";
 "cc" = "Cc";
 "bcc" = "Bcc";
@@ -50,7 +51,3 @@
 "hide_original_message" = "Hide original message";
 "show_original_message" = "Show original message";
 "new_document" = "New Document";
-
-
-
-

@@ -143,7 +143,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #region Overrides
 
-        public override async Task RefreshView()
+        public override  Task RefreshView()
         {
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
@@ -160,13 +160,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             {
                 expandButton.Hidden &= PreviousDocument == null;
             }
+
+            return Task.CompletedTask;
         }
 
-        public override async Task UpdateDocument()
+        public override  Task UpdateDocument()
         {
             Document.HtmlBody = GetHtmlText();
             //TODO need to update also the document preview preview, but we need anglesharp for that
-
+            return Task.CompletedTask;
         }
 
         #endregion
