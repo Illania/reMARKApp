@@ -41,14 +41,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         {
         }
 
-        public void Initialize(Folder folder, bool isFavorite, bool isOffline)
+        public void Initialize(Folder folder, bool sectionIsFavorites, bool folderIsOffline)
         {
             this.folder = folder;
 
             FolderNameLabel.Text = folder.Name;
             FolderIconImage.Image = GetIcon(folder);
 
-            if (isFavorite)
+            if (folder.Subscribed)
             {
                 FolderIconImage.TintColor = Theme.Brown;
                 FolderCheckedIndicatorImage.TintColor = Theme.Brown;
@@ -61,7 +61,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 FolderCheckedIndicatorImage.Alpha = 0f;
             }
 
-            if (isOffline)
+            if (folderIsOffline)
             {
                 OfflineIndicatorLeadingConstraint.Constant = 10f;
                 OfflineIndicatorWidthConstraint.Constant = 15f;

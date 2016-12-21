@@ -43,12 +43,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected CancellationTokenSource searchCancellationTokenSource;
         protected readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
+        /// <summary>
+        /// Initializes a new instance of the
+        /// <see cref="T:Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList.AbstractFoldersListViewController"/> class.
+        /// </summary>
+        /// <param name="module">Module</param>
         protected AbstractFoldersListViewController(ModuleType module)
         {
             isRootOfFoldersList = true;
             folder = Folder.RootForModule(module);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the
+        /// <see cref="T:Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList.AbstractFoldersListViewController"/> class.
+        /// 
+        /// This constructor MUST NOT be public!
+        /// </summary>
+        /// <param name="folder">Folder</param>
         protected AbstractFoldersListViewController(Folder folder)
         {
             isRootOfFoldersList = false;
@@ -261,7 +273,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     List<Folder> folders;
                     if (!forceRefresh && folder.HasSubFolders && folder.SubFolders != null && folder.SubFolders.Count > 0)
                     {
-                        folders = folder.SubFolders;
+                        folders = await Managers.FoldersManager.GetFoldersAsync(folder, 3, SourceType.Local);
                     }
                     else
                     {
@@ -282,7 +294,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     }
 
                     ds.FavoriteStatus = favoritesStatus;
-                    ds.OfflineStatus = offlineStatus;
+                    ds.CachingStatus = offlineStatus;
 
                     ds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
                     ds.SetFolders(GrouppedDataSource.Section.Local, Folder.LocalRootForModule(ModuleType.Documents).SubFolders);
@@ -314,7 +326,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     }
 
                     ds.FavoriteStatus = favoritesStatus;
-                    ds.OfflineStatus = offlineStatus;
+                    ds.CachingStatus = offlineStatus;
 
                     ds.SetFolders(folders);
                 }
@@ -344,6 +356,154 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         protected virtual void FolderExpand(Folder folder)
         {
+        }
+
+        #endregion
+
+        #region Action handlers
+
+        public async void AddToFavorites(Folder folder)
+        {
+            await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
+
+            var gds = FoldersListView.Source as GrouppedDataSource;
+            if (gds != null)
+            {
+                gds.FavoriteStatus[folder.Id] = true;
+
+                var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(folder.Module);
+                gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
+
+                var indexPaths = gds.GetIndexPaths(folder.Id);
+                FoldersListView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+            }
+
+            var ds = FoldersListView.Source as DataSource;
+            if (ds != null)
+            {
+                ds.FavoriteStatus[folder.Id] = true;
+
+                var indexPaths = ds.GetIndexPaths(folder.Id);
+                FoldersListView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+            }
+        }
+
+        public async void RemoveFromFavorites(Folder folder)
+        {
+            await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
+
+            var gds = FoldersListView.Source as GrouppedDataSource;
+            if (gds != null)
+            {
+                gds.FavoriteStatus[folder.Id] = false;
+
+                var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(folder.Module);
+                gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
+
+                var indexPaths = gds.GetIndexPaths(folder.Id);
+                FoldersListView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+            }
+
+            var ds = FoldersListView.Source as DataSource;
+            if (ds != null)
+            {
+                ds.FavoriteStatus[folder.Id] = false;
+
+                var indexPaths = ds.GetIndexPaths(folder.Id);
+                FoldersListView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+            }
+        }
+
+        public async void EnableNotifications(Folder folder)
+        {
+            await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, folder.Module, new List<Folder>{ folder }, true);
+
+            var gds = FoldersListView.Source as GrouppedDataSource;
+            if (gds != null)
+            {
+                var folders = gds.GetFolders(folder.Id);
+                folders.ForEach(f => f.Subscribed = true);
+                var indexPaths = gds.GetIndexPaths(folder.Id);
+                FoldersListView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+            }
+
+            var ds = FoldersListView.Source as DataSource;
+            if (ds != null)
+            {
+                var folders = ds.GetFolders(folder.Id);
+                folders.ForEach(f => f.Subscribed = true);
+                var indexPaths = ds.GetIndexPaths(folder.Id);
+                FoldersListView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+            }
+        }
+
+        public async void DisableNotifications(Folder folder)
+        {
+            await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, folder.Module, new List<Folder> { folder }, false);
+
+            var gds = FoldersListView.Source as GrouppedDataSource;
+            if (gds != null)
+            {
+                var folders = gds.GetFolders(folder.Id);
+                folders.ForEach(f => f.Subscribed = false);
+                var indexPaths = gds.GetIndexPaths(folder.Id);
+                FoldersListView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+            }
+
+            var ds = FoldersListView.Source as DataSource;
+            if (ds != null)
+            {
+                var folders = ds.GetFolders(folder.Id);
+                folders.ForEach(f => f.Subscribed = false);
+                var indexPaths = ds.GetIndexPaths(folder.Id);
+                FoldersListView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+            }
+        }
+
+        public async void EnableCaching(Folder folder)
+        {
+            await Managers.FoldersManager.AddOfflineFolderAsync(folder.Module, folder);
+
+            var gds = FoldersListView.Source as GrouppedDataSource;
+            if (gds != null)
+            {
+                gds.CachingStatus[folder.Id] = true;
+
+                var indexPaths = gds.GetIndexPaths(folder.Id);
+                FoldersListView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+            }
+
+            var ds = FoldersListView.Source as DataSource;
+            if (ds != null)
+            {
+                ds.CachingStatus[folder.Id] = true;
+
+                var indexPaths = ds.GetIndexPaths(folder.Id);
+                FoldersListView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+            }
+        }
+
+        public async void DisableCaching(Folder folder)
+        {
+            await Managers.FoldersManager.RemoveOfflineFolderAsync(folder.Module, folder);
+
+            var gds = FoldersListView.Source as GrouppedDataSource;
+            if (gds != null)
+            {
+                gds.CachingStatus[folder.Id] = false;
+
+                var indexPaths = gds.GetIndexPaths(folder.Id);
+                FoldersListView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+            }
+
+            var ds = FoldersListView.Source as DataSource;
+            if (ds != null)
+            {
+                ds.CachingStatus[folder.Id] = false;
+
+                var indexPaths = ds.GetIndexPaths(folder.Id);
+                FoldersListView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+            }
         }
 
         #endregion
@@ -419,7 +579,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
 
             public Dictionary<int, bool> FavoriteStatus { get; set; }
-            public Dictionary<int, bool> OfflineStatus { get; set; }
+            public Dictionary<int, bool> CachingStatus { get; set; }
 
             AbstractFoldersListViewController viewController;
             UITableView tableView;
@@ -456,12 +616,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 }
 
                 var f = foldersInView[indexPath.Row];
-                var isFavorite = false;
-                FavoriteStatus.TryGetValue(f.Id, out isFavorite);
-                var isOffline = false;
-                OfflineStatus.TryGetValue(f.Id, out isOffline);
+                var folderIsCached = false;
+                CachingStatus.TryGetValue(f.Id, out folderIsCached);
 
-                cell.Initialize(f, isFavorite, isOffline);
+                cell.Initialize(f, false, folderIsCached);
 
                 return cell;
             }
@@ -503,6 +661,54 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 viewController.FolderExpand(f);
             }
 
+            public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                var f = foldersInView[indexPath.Row];
+
+                var actions = new List<UITableViewRowAction>();
+
+                if (FavoriteStatus[f.Id])
+                {
+                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("remove_from_favorites"), (a, ip) => { viewController.RemoveFromFavorites(foldersInView[ip.Row]); tableView.Editing = false; });
+                    action.BackgroundColor = Theme.Brown;
+                    actions.Add(action);
+                }
+                else
+                {
+                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("add_to_favorites"), (a, ip) => { viewController.AddToFavorites(foldersInView[ip.Row]); tableView.Editing = false; });
+                    action.BackgroundColor = Theme.Brown;
+                    actions.Add(action);
+                }
+
+                if (CachingStatus[f.Id])
+                {
+                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_caching"), (a, ip) => { viewController.DisableCaching(foldersInView[ip.Row]); tableView.Editing = false; });
+                    action.BackgroundColor = Theme.DarkBlue;
+                    actions.Add(action);
+                }
+                else
+                {
+                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_caching"), (a, ip) => { viewController.EnableCaching(foldersInView[ip.Row]); tableView.Editing = false; });
+                    action.BackgroundColor = Theme.DarkBlue;
+                    actions.Add(action);
+                }
+
+                if (f.Subscribed)
+                {
+                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_notifications"), (a, ip) => { viewController.DisableNotifications(foldersInView[ip.Row]); tableView.Editing = false; });
+                    action.BackgroundColor = Theme.Blue;
+                    actions.Add(action);
+                }
+                else
+                {
+                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_notifications"), (a, ip) => { viewController.EnableNotifications(foldersInView[ip.Row]); tableView.Editing = false; });
+                    action.BackgroundColor = Theme.Blue;
+                    actions.Add(action);
+                }
+
+                return actions.ToArray();
+            }
+
             protected override void Dispose(bool disposing)
             {
                 viewController = null;
@@ -510,6 +716,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 loading = true;
                 foldersInView = null;
+                FavoriteStatus = null;
+                CachingStatus = null;
             }
 
             public void SetFolders(List<Folder> folders)
@@ -520,11 +728,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
             }
 
-            public void Reset()
+            public Folder[] GetFolders(int folderId)
             {
-                loading = true;
-                foldersInView.Clear();
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+                var folders = new List<Folder>();
+                for (int i = 0; i < foldersInView.Count; i++)
+                {
+                    var f = foldersInView[i];
+                    if (f.Id == folderId)
+                    {
+                        folders.Add(f);
+                    }
+                }
+
+                return folders.ToArray();
+            }
+
+            public NSIndexPath[] GetIndexPaths(int folderId)
+            {
+                var indexPaths = new List<NSIndexPath>();
+                for (int i = 0; i < foldersInView.Count; i++)
+                {
+                    var f = foldersInView[i];
+                    if (f.Id == folderId)
+                    {
+                        indexPaths.Add(NSIndexPath.FromRowSection(i, 0));
+                    }
+                }
+
+                return indexPaths.ToArray();
             }
         }
 
@@ -547,7 +778,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
 
             public Dictionary<int, bool> FavoriteStatus { get; set; }
-            public Dictionary<int, bool> OfflineStatus { get; set; }
+            public Dictionary<int, bool> CachingStatus { get; set; }
 
             AbstractFoldersListViewController viewController;
             UITableView tableView;
@@ -608,12 +839,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 }
 
                 var f = foldersInView[indexPath.LongSection][indexPath.Row];
-                var isFavorite = false;
-                FavoriteStatus.TryGetValue(f.Id, out isFavorite);
-                var isOffline = false;
-                OfflineStatus.TryGetValue(f.Id, out isOffline);
+                var sectionIsFavorites = Section.Favorites == indexPath.LongSection;
+                var folderIsCached = false;
+                CachingStatus.TryGetValue(f.Id, out folderIsCached);
 
-                cell.Initialize(f, isFavorite, isOffline);
+                cell.Initialize(f, sectionIsFavorites, folderIsCached);
 
                 return cell;
             }
@@ -676,28 +906,50 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
+                var f = foldersInView[indexPath.LongSection][indexPath.Row];
+
                 var actions = new List<UITableViewRowAction>();
 
-                if (indexPath.Section == Section.Favorites)
+                if (indexPath.Section == Section.Favorites || indexPath.Section == Section.Folders)
                 {
-                    var rff = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("remove_from_favorites"), (arg1, arg2) => { });
-                    rff.BackgroundColor = Theme.Brown;
-                    actions.Add(rff);
-                }
+                    if (FavoriteStatus[f.Id])
+                    {
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("remove_from_favorites"), (a, ip) => { viewController.RemoveFromFavorites(foldersInView[ip.LongSection][ip.Row]); tableView.Editing = false; });
+                        action.BackgroundColor = Theme.Brown;
+                        actions.Add(action);
+                    }
+                    else
+                    {
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("add_to_favorites"), (a, ip) => { viewController.AddToFavorites(foldersInView[ip.LongSection][ip.Row]); tableView.Editing = false; });
+                        action.BackgroundColor = Theme.Brown;
+                        actions.Add(action);
+                    }
 
-                if (indexPath.Section == Section.Folders)
-                {
-                    var rff = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("remove_from_favorites"), (arg1, arg2) => { });
-                    rff.BackgroundColor = Theme.Brown;
-                    actions.Add(rff);
+                    if (CachingStatus[f.Id])
+                    {
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_caching"), (a, ip) => { viewController.DisableCaching(foldersInView[ip.LongSection][ip.Row]); tableView.Editing = false; });
+                        action.BackgroundColor = Theme.DarkBlue;
+                        actions.Add(action);
+                    }
+                    else
+                    {
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_caching"), (a, ip) => { viewController.EnableCaching(foldersInView[ip.LongSection][ip.Row]); tableView.Editing = false; });
+                        action.BackgroundColor = Theme.DarkBlue;
+                        actions.Add(action);
+                    }
 
-                    var ec = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_caching"), (arg1, arg2) => { });
-                    ec.BackgroundColor = Theme.DarkBlue;
-                    actions.Add(ec);
-
-                    var n = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("notify"), (arg1, arg2) => { });
-                    n.BackgroundColor = Theme.Blue;
-                    actions.Add(n);
+                    if (f.Subscribed)
+                    {
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_notifications"), (a, ip) => { viewController.DisableNotifications(foldersInView[ip.LongSection][ip.Row]); tableView.Editing = false; });
+                        action.BackgroundColor = Theme.Blue;
+                        actions.Add(action);
+                    }
+                    else
+                    {
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_notifications"), (a, ip) => { viewController.EnableNotifications(foldersInView[ip.LongSection][ip.Row]); tableView.Editing = false; });
+                        action.BackgroundColor = Theme.Blue;
+                        actions.Add(action);
+                    }
                 }
 
                 return actions.ToArray();
@@ -710,6 +962,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 loading = null;
                 foldersInView = null;
+                FavoriteStatus = null;
+                CachingStatus = null;
             }
 
             public void SetFolders(nint section, List<Folder> folders)
@@ -731,6 +985,40 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 tableView.ReloadSections(NSIndexSet.FromIndex(Section.Favorites), UITableViewRowAnimation.Automatic);
                 tableView.ReloadSections(NSIndexSet.FromIndex(Section.Folders), UITableViewRowAnimation.Automatic);
                 tableView.ReloadSections(NSIndexSet.FromIndex(Section.Local), UITableViewRowAnimation.Automatic);
+            }
+
+            public Folder[] GetFolders(int folderId)
+            {
+                var folders = new List<Folder>();
+                foreach (var folderInView in foldersInView)
+                {
+                    for (int i = 0; i < folderInView.Value.Count; i++)
+                    {
+                        var f = folderInView.Value[i];
+                        if (f.Id == folderId)
+                        {
+                            folders.Add(f);
+                        }
+                    }
+                }
+                return folders.ToArray();
+            }
+
+            public NSIndexPath[] GetIndexPaths(int folderId)
+            {
+                var indexPaths = new List<NSIndexPath>();
+                foreach (var folderInView in foldersInView)
+                {
+                    for (int i = 0; i < folderInView.Value.Count; i++)
+                    {
+                        var f = folderInView.Value[i];
+                        if (f.Id == folderId)
+                        {
+                            indexPaths.Add(NSIndexPath.FromRowSection(i, folderInView.Key));
+                        }
+                    }
+                }
+                return indexPaths.ToArray();
             }
         }
 

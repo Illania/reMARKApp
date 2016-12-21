@@ -1,10 +1,15 @@
-﻿"back" = "Back";
+﻿"add_to_favorites" = "Add to\nfavorites";
+"back" = "Back";
 "cancel" = "Cancel";
 "contacts" = "Contacts";
 "continue" = "Continue";
 "creating_system_report___" = "Creating system report...";
+"disable_caching" = "Disable\ncaching";
+"disable_notifications" = "Don't\nnotify";
 "documents" = "Documents";
 "edit" = "Edit";
+"enable_caching" = "Enable\ncaching";
+"enable_notifications" = "Notify";
 "error_appserviceexception_title" = "Error";
 "error_dataaccessexception_title" = "Cache error occured";
 "error_datanotfoundexception_message" = "This item is not available offline";
@@ -14,6 +19,7 @@
 "error_invalidsourcetypeexception_message" = "This action cannot be performed offline";
 "error_invalidsourcetypeexception_title" = "Unavailable offline";
 "favorites" = "Favorites";
+"filter" = "Filter";
 "folders" = "Folders";
 "hostname" = "Hostname";
 "local_folders" = "Local folders";
@@ -27,6 +33,7 @@
 "port" = "Port";
 "pull_to_refresh" = "Pull to refresh";
 "refreshing___" = "Refreshing...";
+"remove_from_favorites" = "Remove from\nfavorites";
 "report" = "Report";
 "search" = "Search";
 "settings" = "Settings";
@@ -45,9 +52,3 @@
 "wrong_username_summary" = "You need to provide valid username.";
 "wrong_username_title" = "Wrong username";
 "yes" = "Yes";
-"remove_from_favorites" = "Remove from\nfavorites";
-"add_to_favorites" = "Add to\nfavorites";
-"enable_caching" = "Enable\ncaching";
-"notify" = "Notify";
-"dont_notify" = "Don't\nnotify";
-"filter" = "Filter";
