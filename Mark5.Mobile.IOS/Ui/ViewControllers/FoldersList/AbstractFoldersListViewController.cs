@@ -106,6 +106,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             var ds = FoldersListView?.DataSource as GrouppedDataSource;
             ds?.Reset();
 
+            var gds = FoldersListView?.DataSource as DataSource;
+            gds?.Reset();
+
             base.DidReceiveMemoryWarning();
         }
 
