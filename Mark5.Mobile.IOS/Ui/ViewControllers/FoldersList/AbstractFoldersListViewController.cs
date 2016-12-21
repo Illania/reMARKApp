@@ -10,19 +10,22 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
-    
-    public abstract class AbstractFoldersListViewController : ViewController
+
+    public abstract class AbstractFoldersListViewController : ViewController, IUISearchResultsUpdating
     {
 
         protected bool isRootOfFoldersList;
@@ -33,6 +36,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         protected UIRefreshControl RefreshControl;
         protected UITableView FoldersListView;
+        protected UISearchController SearchController;
+        protected UITableViewController SearchResultsController;
+        protected SearchDataSource SearchResultsDataSource;
+
+        protected CancellationTokenSource searchCancellationTokenSource;
+        protected readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
         protected AbstractFoldersListViewController(ModuleType module)
         {
@@ -45,6 +54,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             isRootOfFoldersList = false;
             this.folder = folder;
         }
+
+        #region UIViewController overrides
 
         public override void LoadView()
         {
@@ -82,9 +93,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             var ds = FoldersListView?.DataSource as GrouppedDataSource;
             ds?.Reset();
-            
+
             base.DidReceiveMemoryWarning();
         }
+
+        #endregion
+
+        #region Initialize/deinitialize
 
         void InitializeNavigationBarTitle()
         {
@@ -169,20 +184,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         void InitializeSearchBar()
         {
-            // TODO
-        }
+            DefinesPresentationContext = true;
 
-        void ComposeDocumentItem_Clicked(object sender, EventArgs e)
-        {
-            // TODO
-        }
+            SearchResultsController = new UITableViewController();
+            SearchResultsDataSource = new SearchDataSource(this, SearchResultsController.TableView);
+            SearchResultsController.TableView.Source = SearchResultsDataSource;
 
-        void EditModeItem_Clicked(object sender, EventArgs e)
-        {
-            // TODO
-        }
+            SearchController = new UISearchController(SearchResultsController)
+            {
+                HidesNavigationBarDuringPresentation = true,
+                DimsBackgroundDuringPresentation = true,
+                ObscuresBackgroundDuringPresentation = true,
+                SearchResultsUpdater = this
+            };
+            SearchController.SearchBar.Placeholder = Localization.GetString("filter");
 
-        void RefreshControl_ValueChanged(object sender, EventArgs e) => RefreshData(true);
+            FoldersListView.TableHeaderView = SearchController.SearchBar;
+        }
 
         void InitializeHandlers()
         {
@@ -205,6 +223,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
         }
+
+        #endregion
+
+        #region NavigationBar handlers
+
+        void ComposeDocumentItem_Clicked(object sender, EventArgs e)
+        {
+            // TODO
+        }
+
+        void EditModeItem_Clicked(object sender, EventArgs e)
+        {
+            // TODO
+        }
+
+        #endregion
+
+        #region Refreshing
+
+        void RefreshControl_ValueChanged(object sender, EventArgs e) => RefreshData(true);
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void RefreshData(bool forceRefresh = false)
@@ -278,7 +316,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     ds.FavoriteStatus = favoritesStatus;
                     ds.OfflineStatus = offlineStatus;
 
-                    ds.SetFolders(folders); 
+                    ds.SetFolders(folders);
                 }
             }
             catch (Exception ex)
@@ -292,6 +330,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             RefreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
+        #endregion
+
+        #region FoldersList handlers
+
         protected virtual void FolderSelected(Folder folder)
         {
         }
@@ -303,6 +345,67 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected virtual void FolderExpand(Folder folder)
         {
         }
+
+        #endregion
+
+        #region Searching
+
+        void IUISearchResultsUpdating.UpdateSearchResultsForSearchController(UISearchController searchController)
+        {
+            var searchText = searchController.SearchBar.Text;
+
+            if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
+            {
+                searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
+                searchCancellationTokenSourceList.Clear();
+                SearchResultsDataSource.Reset();
+            }
+            else
+            {
+                if (searchCancellationTokenSource != null)
+                {
+                    searchCancellationTokenSource.Cancel();
+                    searchCancellationTokenSourceList.Remove(searchCancellationTokenSource);
+                    searchCancellationTokenSource = null;
+                }
+
+                searchCancellationTokenSource = new CancellationTokenSource();
+                searchCancellationTokenSourceList.Add(searchCancellationTokenSource);
+
+                DoSearchFolders(searchText, searchCancellationTokenSource.Token);
+            }
+        }
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void DoSearchFolders(string searchText, CancellationToken cancellationToken)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            try
+            {
+                await Task.Delay(500);
+
+                if (cancellationToken.IsCancellationRequested) return;
+
+                var root = Folder.RootForModule(folder.Module);
+                var flattenedFolders = root.SubFolders
+                                             .Flatten(f => f.SubFolders)
+                                             .Where(f => f.Name.IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                                             .OrderBy(f => f.Name)
+                                             .ToList();
+
+                if (cancellationToken.IsCancellationRequested) return;
+
+                SearchResultsDataSource.SetFolders(flattenedFolders);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error(ex);
+            }
+        }
+
+        #endregion
+
+        #region DataSources
 
         protected class DataSource : UITableViewSource, IDisposable
         {
@@ -421,6 +524,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 loading = true;
                 foldersInView.Clear();
+                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
             }
         }
 
@@ -458,7 +562,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (module == ModuleType.Documents)
                 {
-                    loading = new []{ true, true, true};
+                    loading = new[] { true, true, true };
                     foldersInView = new Dictionary<nint, List<Folder>>
                     {
                         [Section.Favorites] = new List<Folder>(),
@@ -623,7 +727,116 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 foreach (var kv in foldersInView)
                     kv.Value.Clear();
+
+                tableView.ReloadSections(NSIndexSet.FromIndex(Section.Favorites), UITableViewRowAnimation.Automatic);
+                tableView.ReloadSections(NSIndexSet.FromIndex(Section.Folders), UITableViewRowAnimation.Automatic);
+                tableView.ReloadSections(NSIndexSet.FromIndex(Section.Local), UITableViewRowAnimation.Automatic);
             }
-       }
-   }
+        }
+
+        protected class SearchDataSource : UITableViewSource, IDisposable
+        {
+
+            public bool Empty
+            {
+                get
+                {
+                    return foldersInView.Count < 1;
+                }
+            }
+
+            AbstractFoldersListViewController viewController;
+            UITableView tableView;
+
+            bool loading;
+            List<Folder> foldersInView;
+
+            public SearchDataSource(AbstractFoldersListViewController viewController, UITableView tableView)
+            {
+                this.tableView = tableView;
+                this.viewController = viewController;
+
+                loading = true;
+                foldersInView = new List<Folder>();
+            }
+
+            public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (loading)
+                {
+                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
+                }
+
+                if (foldersInView.Count < 1)
+                {
+                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                }
+
+                var cell = tableView.DequeueReusableCell(SearchFoldersTableViewCell.Key) as SearchFoldersTableViewCell ?? SearchFoldersTableViewCell.Create();
+
+                cell.Initialize(foldersInView[indexPath.Row]);
+
+                return cell;
+            }
+
+            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                return 44f;
+            }
+
+            public override nint RowsInSection(UITableView tableview, nint section)
+            {
+                if (loading)
+                {
+                    return 1;
+                }
+
+                if (foldersInView.Count < 1)
+                {
+                    return 1;
+                }
+
+                return foldersInView.Count;
+            }
+
+            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+            {
+                var f = foldersInView[indexPath.Row];
+                viewController.FolderSelected(f);
+            }
+
+            public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
+            {
+                var f = foldersInView[indexPath.Row];
+                viewController.FolderDeselected(f);
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                viewController = null;
+                tableView = null;
+
+                loading = true;
+                foldersInView = null;
+            }
+
+            public void SetFolders(List<Folder> folders)
+            {
+                foldersInView.Clear();
+                foldersInView.AddRange(folders);
+                loading = false;
+                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+            }
+
+            public void Reset()
+            {
+                loading = true;
+                foldersInView.Clear();
+                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+            }
+        }
+
+    #endregion
+
+    }
 }

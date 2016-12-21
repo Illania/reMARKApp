@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="50" id="cxk-wN-pdQ" customClass="SearchFoldersTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cxk-wN-pdQ" id="YTl-1W-gDM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Folder name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="K58-rF-1fp">
+                        <rect key="frame" x="38" y="4" width="272" height="21"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="p0Y-3F-e36"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Folder path" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="N8M-HQ-cI6">
+                        <rect key="frame" x="38" y="27" width="272" height="21"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                        <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="UM3-Vm-X5e">
+                        <rect key="frame" x="10" y="14" width="20" height="20"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="20" id="fU7-kX-gfy"/>
+                        </constraints>
+                    </imageView>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottomMargin" secondItem="N8M-HQ-cI6" secondAttribute="bottom" constant="-7" id="3es-hl-MWL"/>
+                    <constraint firstItem="N8M-HQ-cI6" firstAttribute="top" secondItem="K58-rF-1fp" secondAttribute="bottom" constant="2" id="Foy-Iw-yiP"/>
+                    <constraint firstItem="K58-rF-1fp" firstAttribute="leading" secondItem="UM3-Vm-X5e" secondAttribute="trailing" constant="8" symbolic="YES" id="JIm-Rw-xIP"/>
+                    <constraint firstItem="K58-rF-1fp" firstAttribute="leading" secondItem="N8M-HQ-cI6" secondAttribute="leading" id="Umn-VQ-XYj"/>
+                    <constraint firstItem="K58-rF-1fp" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="topMargin" constant="-4" id="eEw-bb-d2U"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="K58-rF-1fp" secondAttribute="trailing" constant="2" id="gqq-T2-qBR"/>
+                    <constraint firstItem="K58-rF-1fp" firstAttribute="trailing" secondItem="N8M-HQ-cI6" secondAttribute="trailing" id="mXp-vf-seS"/>
+                    <constraint firstItem="UM3-Vm-X5e" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY" id="sYV-wI-JB4"/>
+                    <constraint firstItem="UM3-Vm-X5e" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="topMargin" constant="6" id="vrI-qr-iBE"/>
+                    <constraint firstItem="UM3-Vm-X5e" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" constant="2" id="x2r-nx-YdU"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="FolderIconImage" destination="UM3-Vm-X5e" id="jJ8-yu-Rmw"/>
+                <outlet property="FolderNameLabel" destination="K58-rF-1fp" id="ZGJ-F8-rQl"/>
+                <outlet property="FolderPathLabel" destination="N8M-HQ-cI6" id="GSu-OX-VxH"/>
+            </connections>
+            <point key="canvasLocation" x="69" y="62"/>
+        </tableViewCell>
+    </objects>
+</document>

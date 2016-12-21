@@ -50,3 +50,4 @@
 "enable_caching" = "Enable\ncaching";
 "notify" = "Notify";
 "dont_notify" = "Don't\nnotify";
+"filter" = "Filter";

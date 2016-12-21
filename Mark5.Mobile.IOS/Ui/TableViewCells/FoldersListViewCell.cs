@@ -45,7 +45,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         {
             this.folder = folder;
 
-            // TODO
             FolderNameLabel.Text = folder.Name;
             FolderIconImage.Image = GetIcon(folder);
 
