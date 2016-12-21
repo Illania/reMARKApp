@@ -165,6 +165,8 @@
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
     <InterfaceDefinition Include="Ui\TableViewCells\FoldersListViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\WaitTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\EmptyTableViewCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -212,6 +214,14 @@
     <Compile Include="Ui\TableViewCells\FoldersListViewCell.cs" />
     <Compile Include="Ui\TableViewCells\FoldersListViewCell.designer.cs">
       <DependentUpon>FoldersListViewCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\TableViewCells\WaitTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\WaitTableViewCell.designer.cs">
+      <DependentUpon>WaitTableViewCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\TableViewCells\EmptyTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\EmptyTableViewCell.designer.cs">
+      <DependentUpon>EmptyTableViewCell.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
