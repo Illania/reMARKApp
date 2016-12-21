@@ -637,7 +637,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (foldersInView.Count < 1)
                 {
-                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                    var emptyCell = tableView.DequeueReusableCell(WaitTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                    emptyCell.Initialize(Localization.GetString("no_folders_in_section"));
+                    return emptyCell;
                 }
 
                 var cell = tableView.DequeueReusableCell(FoldersTableViewCell.Key) as FoldersTableViewCell;
@@ -873,7 +875,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (foldersInView[indexPath.LongSection].Count < 1)
                 {
-                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                    var emptyCell = tableView.DequeueReusableCell(WaitTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+
+                    if (indexPath.LongSection == Section.Favorites)
+                    {
+                        emptyCell.Initialize(Localization.GetString("no_folders_in_favorites"));
+                    }
+                    else
+                    {
+                        emptyCell.Initialize(Localization.GetString("no_folders_in_section"));
+                    }
+
+                    return emptyCell;
                 }
 
                 var cell = tableView.DequeueReusableCell(FoldersTableViewCell.Key) as FoldersTableViewCell;
@@ -1151,7 +1164,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (foldersInView.Count < 1)
                 {
-                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                    var emptyCell = tableView.DequeueReusableCell(WaitTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                    emptyCell.Initialize(Localization.GetString("no_folders_found"));
+                    return emptyCell;
                 }
 
                 var cell = tableView.DequeueReusableCell(FoldersSearchResultsTableViewCell.Key) as FoldersSearchResultsTableViewCell ?? FoldersSearchResultsTableViewCell.Create();
