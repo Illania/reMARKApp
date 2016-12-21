@@ -28,7 +28,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
     public abstract class AbstractFoldersListViewController : ViewController, IUISearchResultsUpdating
     {
 
-        protected readonly Folder Folder;
+        protected readonly Folder ParentFolder;
         protected readonly bool IsRootOfFoldersList;
         protected readonly bool DisableRowActions;
         protected readonly bool DisableNavigationBarActions;
@@ -49,7 +49,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected AbstractFoldersListViewController(ModuleType module, bool disableRowActions, bool disableNavigationBarActions, bool disableSearch)
         {
             IsRootOfFoldersList = true;
-            Folder = Folder.RootForModule(module);
+            ParentFolder = Folder.RootForModule(module);
             DisableRowActions = disableRowActions;
             DisableNavigationBarActions = disableNavigationBarActions;
             DisableSearch = disableSearch;
@@ -61,7 +61,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected AbstractFoldersListViewController(Folder folder, bool disableRowActions, bool disableNavigationBarActions, bool disableSearch)
         {
             IsRootOfFoldersList = false;
-            Folder = folder;
+            ParentFolder = folder;
             DisableRowActions = disableRowActions;
             DisableNavigationBarActions = disableNavigationBarActions;
             DisableSearch = disableSearch;
@@ -90,6 +90,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             base.ViewDidAppear(animated);
 
+            CommonConfig.Logger.Info($"{nameof(AbstractFoldersListViewController)} appeared");
+
             RefreshData();
         }
 
@@ -103,6 +105,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         public override void DidReceiveMemoryWarning()
         {
+            CommonConfig.Logger.Warning($"{nameof(AbstractFoldersListViewController)} received memory warning");
+
             var ds = FoldersTableView?.DataSource as DataSource;
             ds?.Reset();
 
@@ -124,7 +128,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
             else
             {
-                NavigationItem.Title = Folder.Name;
+                NavigationItem.Title = ParentFolder.Name;
                 NavigationItem.Prompt = Localization.GetString("documents");
             }
         }
@@ -141,7 +145,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             if (DisableNavigationBarActions) return;
 
-            if (Folder.Module == ModuleType.Documents)
+            if (ParentFolder.Module == ModuleType.Documents)
             {
                 ComposeDocumentItem = new UIBarButtonItem();
                 ComposeDocumentItem.Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"));
@@ -157,7 +161,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 return;
             }
 
-            if (Folder.Module == ModuleType.Contacts || Folder.Module == ModuleType.Shortcodes)
+            if (ParentFolder.Module == ModuleType.Contacts || ParentFolder.Module == ModuleType.Shortcodes)
             {
                 if (IsRootOfFoldersList)
                 {
@@ -169,7 +173,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 return;
             }
 
-            throw new ArgumentException(nameof(Folder.Module));
+            throw new ArgumentException(nameof(ParentFolder.Module));
         }
 
         void InitializeView()
@@ -179,7 +183,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             FoldersTableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
             FoldersTableView.ClipsToBounds = false;
             if (IsRootOfFoldersList)
-                FoldersTableView.Source = new GrouppedDataSource(this, FoldersTableView, Folder.Module, DisableRowActions);
+                FoldersTableView.Source = new GrouppedDataSource(this, FoldersTableView, ParentFolder.Module, DisableRowActions);
             else
                 FoldersTableView.Source = new DataSource(this, FoldersTableView, DisableRowActions);
             FoldersTableView.AllowsSelectionDuringEditing = false;
@@ -249,8 +253,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             // TODO
         }
-
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void EditModeItem_Clicked(object sender, EventArgs e)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             EditModeItem.Clicked -= EditModeItem_Clicked;
 
@@ -262,7 +267,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 try
                 {
                     var gds = FoldersTableView.Source as GrouppedDataSource;
-                    await Managers.FoldersManager.SetFavoriteFoldersAsync(Folder.Module, gds.GetFavoriteFolders());
+                    await Managers.FoldersManager.SetFavoriteFoldersAsync(ParentFolder.Module, gds.GetFavoriteFolders());
                 }
                 catch (Exception ex)
                 {
@@ -292,22 +297,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
 
+            CommonConfig.Logger.Info($"Refreshing folders list [parentFolder={ParentFolder}]");
+
             try
             {
                 if (IsRootOfFoldersList)
                 {
                     var ds = FoldersTableView.Source as GrouppedDataSource;
 
-                    var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(Folder.Module);
+                    var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(ParentFolder.Module);
 
                     List<Folder> folders;
-                    if (!forceRefresh && Folder.HasSubFolders && Folder.SubFolders != null && Folder.SubFolders.Count > 0)
+                    if (!forceRefresh && ParentFolder.HasSubFolders && ParentFolder.SubFolders != null && ParentFolder.SubFolders.Count > 0)
                     {
-                        folders = await Managers.FoldersManager.GetFoldersAsync(Folder, 3, SourceType.Local);
+                        folders = await Managers.FoldersManager.GetFoldersAsync(ParentFolder, 3, SourceType.Local);
                     }
                     else
                     {
-                        folders = await Managers.FoldersManager.GetFoldersAsync(Folder, 3);
+                        folders = await Managers.FoldersManager.GetFoldersAsync(ParentFolder, 3);
                     }
 
                     var favoriteIds = favorites.Select(f => f.Id);
@@ -319,8 +326,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                     foreach (var id in allIds)
                     {
-                        favoritesStatus[id] = await Managers.FoldersManager.IsFolderFavouriteAsync(Folder.Module, id);
-                        offlineStatus[id] = await Managers.FoldersManager.IsFolderOfflineAsync(Folder.Module, id);
+                        favoritesStatus[id] = await Managers.FoldersManager.IsFolderFavouriteAsync(ParentFolder.Module, id);
+                        offlineStatus[id] = await Managers.FoldersManager.IsFolderOfflineAsync(ParentFolder.Module, id);
                     }
 
                     ds.FavoriteStatus = favoritesStatus;
@@ -335,13 +342,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     var ds = FoldersTableView.Source as DataSource;
 
                     List<Folder> folders;
-                    if (!forceRefresh && Folder.HasSubFolders && Folder.SubFolders != null && Folder.SubFolders.Count > 0)
+                    if (!forceRefresh && ParentFolder.HasSubFolders && ParentFolder.SubFolders != null && ParentFolder.SubFolders.Count > 0)
                     {
-                        folders = Folder.SubFolders;
+                        folders = ParentFolder.SubFolders;
                     }
                     else
                     {
-                        folders = await Managers.FoldersManager.GetFoldersAsync(Folder);
+                        folders = await Managers.FoldersManager.GetFoldersAsync(ParentFolder);
                     }
 
                     var folderIds = folders.Select(f => f.Id).Distinct();
@@ -351,19 +358,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                     foreach (var id in folderIds)
                     {
-                        favoritesStatus[id] = await Managers.FoldersManager.IsFolderFavouriteAsync(Folder.Module, id);
-                        offlineStatus[id] = await Managers.FoldersManager.IsFolderOfflineAsync(Folder.Module, id);
+                        favoritesStatus[id] = await Managers.FoldersManager.IsFolderFavouriteAsync(ParentFolder.Module, id);
+                        offlineStatus[id] = await Managers.FoldersManager.IsFolderOfflineAsync(ParentFolder.Module, id);
                     }
 
                     ds.FavoriteStatus = favoritesStatus;
                     ds.CachingStatus = offlineStatus;
 
                     ds.SetFolders(folders);
+
+                    CommonConfig.Logger.Info($"Refreshed folders list [parentFolder={ParentFolder}]");
                 }
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Could not load folders", ex);
+                CommonConfig.Logger.Error($"Could not refresh folders [parentFolder={ParentFolder}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
@@ -390,149 +399,215 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         #endregion
 
-        #region Action handlers
+        #region Row actions handlers
 
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void AddToFavorites(Folder folder)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
-
-            var gds = FoldersTableView.Source as GrouppedDataSource;
-            if (gds != null)
+            try
             {
-                gds.FavoriteStatus[folder.Id] = true;
+                await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
 
-                var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(folder.Module);
-                gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
+                var gds = FoldersTableView.Source as GrouppedDataSource;
+                if (gds != null)
+                {
+                    gds.FavoriteStatus[folder.Id] = true;
 
-                var indexPaths = gds.GetIndexPaths(folder.Id);
-                FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                    var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(folder.Module);
+                    gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
+
+                    var indexPaths = gds.GetIndexPaths(folder.Id);
+                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                }
+
+                var ds = FoldersTableView.Source as DataSource;
+                if (ds != null)
+                {
+                    ds.FavoriteStatus[folder.Id] = true;
+
+                    var indexPaths = ds.GetIndexPaths(folder.Id);
+                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                }
             }
-
-            var ds = FoldersTableView.Source as DataSource;
-            if (ds != null)
+            catch (Exception ex)
             {
-                ds.FavoriteStatus[folder.Id] = true;
+                CommonConfig.Logger.Error("Could not add folder to favorites", ex);
 
-                var indexPaths = ds.GetIndexPaths(folder.Id);
-                FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
 
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void RemoveFromFavorites(Folder folder)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
-
-            var gds = FoldersTableView.Source as GrouppedDataSource;
-            if (gds != null)
+            try
             {
-                gds.FavoriteStatus[folder.Id] = false;
+                await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
 
-                var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(folder.Module);
-                gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
+                var gds = FoldersTableView.Source as GrouppedDataSource;
+                if (gds != null)
+                {
+                    gds.FavoriteStatus[folder.Id] = false;
 
-                var indexPaths = gds.GetIndexPaths(folder.Id);
-                FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                    var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(folder.Module);
+                    gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
+
+                    var indexPaths = gds.GetIndexPaths(folder.Id);
+                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                }
+
+                var ds = FoldersTableView.Source as DataSource;
+                if (ds != null)
+                {
+                    ds.FavoriteStatus[folder.Id] = false;
+
+                    var indexPaths = ds.GetIndexPaths(folder.Id);
+                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                }
             }
-
-            var ds = FoldersTableView.Source as DataSource;
-            if (ds != null)
+            catch (Exception ex)
             {
-                ds.FavoriteStatus[folder.Id] = false;
+                CommonConfig.Logger.Error("Could not remote folder from favorites", ex);
 
-                var indexPaths = ds.GetIndexPaths(folder.Id);
-                FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
 
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void EnableNotifications(Folder folder)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, folder.Module, new List<Folder>{ folder }, true);
-
-            var gds = FoldersTableView.Source as GrouppedDataSource;
-            if (gds != null)
+            try
             {
-                var folders = gds.GetFolders(folder.Id);
-                folders.ForEach(f => f.Subscribed = true);
-                var indexPaths = gds.GetIndexPaths(folder.Id);
-                FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, folder.Module, new List<Folder> { folder }, true);
+
+                var gds = FoldersTableView.Source as GrouppedDataSource;
+                if (gds != null)
+                {
+                    var folders = gds.GetFolders(folder.Id);
+                    folders.ForEach(f => f.Subscribed = true);
+                    var indexPaths = gds.GetIndexPaths(folder.Id);
+                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                }
+
+                var ds = FoldersTableView.Source as DataSource;
+                if (ds != null)
+                {
+                    var folders = ds.GetFolders(folder.Id);
+                    folders.ForEach(f => f.Subscribed = true);
+                    var indexPaths = ds.GetIndexPaths(folder.Id);
+                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                }
             }
-
-            var ds = FoldersTableView.Source as DataSource;
-            if (ds != null)
+            catch (Exception ex)
             {
-                var folders = ds.GetFolders(folder.Id);
-                folders.ForEach(f => f.Subscribed = true);
-                var indexPaths = ds.GetIndexPaths(folder.Id);
-                FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                CommonConfig.Logger.Error("Could not enable notifications for folder", ex);
+
+                await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
 
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void DisableNotifications(Folder folder)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, folder.Module, new List<Folder> { folder }, false);
-
-            var gds = FoldersTableView.Source as GrouppedDataSource;
-            if (gds != null)
+            try
             {
-                var folders = gds.GetFolders(folder.Id);
-                folders.ForEach(f => f.Subscribed = false);
-                var indexPaths = gds.GetIndexPaths(folder.Id);
-                FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, folder.Module, new List<Folder> { folder }, false);
+
+                var gds = FoldersTableView.Source as GrouppedDataSource;
+                if (gds != null)
+                {
+                    var folders = gds.GetFolders(folder.Id);
+                    folders.ForEach(f => f.Subscribed = false);
+                    var indexPaths = gds.GetIndexPaths(folder.Id);
+                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                }
+
+                var ds = FoldersTableView.Source as DataSource;
+                if (ds != null)
+                {
+                    var folders = ds.GetFolders(folder.Id);
+                    folders.ForEach(f => f.Subscribed = false);
+                    var indexPaths = ds.GetIndexPaths(folder.Id);
+                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                }
             }
-
-            var ds = FoldersTableView.Source as DataSource;
-            if (ds != null)
+            catch (Exception ex)
             {
-                var folders = ds.GetFolders(folder.Id);
-                folders.ForEach(f => f.Subscribed = false);
-                var indexPaths = ds.GetIndexPaths(folder.Id);
-                FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                CommonConfig.Logger.Error("Could not disable notifications for folder", ex);
+
+                await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
 
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void EnableCaching(Folder folder)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            await Managers.FoldersManager.AddOfflineFolderAsync(folder.Module, folder);
-
-            var gds = FoldersTableView.Source as GrouppedDataSource;
-            if (gds != null)
+            try
             {
-                gds.CachingStatus[folder.Id] = true;
+                await Managers.FoldersManager.AddOfflineFolderAsync(folder.Module, folder);
 
-                var indexPaths = gds.GetIndexPaths(folder.Id);
-                FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                var gds = FoldersTableView.Source as GrouppedDataSource;
+                if (gds != null)
+                {
+                    gds.CachingStatus[folder.Id] = true;
+
+                    var indexPaths = gds.GetIndexPaths(folder.Id);
+                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                }
+
+                var ds = FoldersTableView.Source as DataSource;
+                if (ds != null)
+                {
+                    ds.CachingStatus[folder.Id] = true;
+
+                    var indexPaths = ds.GetIndexPaths(folder.Id);
+                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                }
             }
-
-            var ds = FoldersTableView.Source as DataSource;
-            if (ds != null)
+            catch (Exception ex)
             {
-                ds.CachingStatus[folder.Id] = true;
+                CommonConfig.Logger.Error("Could not enabled caching for folder", ex);
 
-                var indexPaths = ds.GetIndexPaths(folder.Id);
-                FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
 
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void DisableCaching(Folder folder)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            await Managers.FoldersManager.RemoveOfflineFolderAsync(folder.Module, folder);
-
-            var gds = FoldersTableView.Source as GrouppedDataSource;
-            if (gds != null)
+            try
             {
-                gds.CachingStatus[folder.Id] = false;
+                await Managers.FoldersManager.RemoveOfflineFolderAsync(folder.Module, folder);
 
-                var indexPaths = gds.GetIndexPaths(folder.Id);
-                FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                var gds = FoldersTableView.Source as GrouppedDataSource;
+                if (gds != null)
+                {
+                    gds.CachingStatus[folder.Id] = false;
+
+                    var indexPaths = gds.GetIndexPaths(folder.Id);
+                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                }
+
+                var ds = FoldersTableView.Source as DataSource;
+                if (ds != null)
+                {
+                    ds.CachingStatus[folder.Id] = false;
+
+                    var indexPaths = ds.GetIndexPaths(folder.Id);
+                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                }
             }
-
-            var ds = FoldersTableView.Source as DataSource;
-            if (ds != null)
+            catch (Exception ex)
             {
-                ds.CachingStatus[folder.Id] = false;
+                CommonConfig.Logger.Error("Could not disable caching for folder", ex);
 
-                var indexPaths = ds.GetIndexPaths(folder.Id);
-                FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
 
@@ -576,7 +651,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (cancellationToken.IsCancellationRequested) return;
 
-                var root = Folder.RootForModule(Folder.Module);
+                var root = Folder.RootForModule(ParentFolder.Module);
                 var flattenedFolders = root.SubFolders
                                              .Flatten(f => f.SubFolders)
                                              .Where(f => f.Name.IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase) >= 0)
@@ -969,14 +1044,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
             {
-                if (tableView.Editing)
-                {
-                    return indexPath.LongSection == Section.Favorites;
-                }
-                else
-                {
-                    return indexPath.LongSection != Section.Local;
-                }
+                return tableView.Editing ? indexPath.LongSection == Section.Favorites : indexPath.LongSection != Section.Local;
             }
             
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
@@ -1233,7 +1301,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-    #endregion
+        #endregion
 
     }
 }
