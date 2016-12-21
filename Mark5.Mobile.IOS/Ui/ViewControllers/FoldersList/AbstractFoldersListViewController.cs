@@ -103,10 +103,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         public override void DidReceiveMemoryWarning()
         {
-            var ds = FoldersListView?.DataSource as GrouppedDataSource;
+            var ds = FoldersListView?.DataSource as DataSource;
             ds?.Reset();
 
-            var gds = FoldersListView?.DataSource as DataSource;
+            var gds = FoldersListView?.DataSource as GrouppedDataSource;
             gds?.Reset();
 
             base.DidReceiveMemoryWarning();
@@ -734,6 +734,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 foldersInView.Clear();
                 foldersInView.AddRange(folders);
                 loading = false;
+                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+            }
+
+            public void Reset()
+            {
+                loading = true;
+
+                foldersInView.Clear();
+                
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
             }
 
