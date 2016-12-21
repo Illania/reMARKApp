@@ -13,25 +13,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
     public class BrowseFoldersListViewController : AbstractFoldersListViewController
     {
 
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="T:Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList.BrowseFoldersListViewController"/> class.
-        /// </summary>
-        /// <param name="module">Module.</param>
         public BrowseFoldersListViewController(ModuleType module)
-            : base(module)
+            : base(module, false, false, false)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="T:Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList.BrowseFoldersListViewController"/> class.
-        /// 
         /// This constructor MUST NOT be public!
         /// </summary>
-        /// <param name="folder">Folder.</param>
         protected BrowseFoldersListViewController(Folder folder)
-            : base(folder)
+            : base(folder, false, false, false)
         {
         }
 

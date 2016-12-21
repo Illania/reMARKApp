@@ -28,8 +28,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
     public abstract class AbstractFoldersListViewController : ViewController, IUISearchResultsUpdating
     {
 
-        protected bool isRootOfFoldersList;
-        protected Folder folder { get; private set; }
+        protected readonly Folder Folder;
+        protected readonly bool IsRootOfFoldersList;
+        protected readonly bool DisableRowActions;
+        protected readonly bool DisableNavigationBarActions;
+        protected readonly bool DisableSearch;
 
         protected UIBarButtonItem EditModeItem;
         protected UIBarButtonItem ComposeDocumentItem;
@@ -43,28 +46,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected CancellationTokenSource searchCancellationTokenSource;
         protected readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="T:Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList.AbstractFoldersListViewController"/> class.
-        /// </summary>
-        /// <param name="module">Module</param>
-        protected AbstractFoldersListViewController(ModuleType module)
+        protected AbstractFoldersListViewController(ModuleType module, bool disableRowActions, bool disableNavigationBarActions, bool disableSearch)
         {
-            isRootOfFoldersList = true;
-            folder = Folder.RootForModule(module);
+            IsRootOfFoldersList = true;
+            Folder = Folder.RootForModule(module);
+            DisableRowActions = disableRowActions;
+            DisableNavigationBarActions = disableNavigationBarActions;
+            DisableSearch = disableSearch;
         }
 
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="T:Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList.AbstractFoldersListViewController"/> class.
-        /// 
         /// This constructor MUST NOT be public!
         /// </summary>
-        /// <param name="folder">Folder</param>
-        protected AbstractFoldersListViewController(Folder folder)
+        protected AbstractFoldersListViewController(Folder folder, bool disableRowActions, bool disableNavigationBarActions, bool disableSearch)
         {
-            isRootOfFoldersList = false;
-            this.folder = folder;
+            IsRootOfFoldersList = false;
+            Folder = folder;
+            DisableRowActions = disableRowActions;
+            DisableNavigationBarActions = disableNavigationBarActions;
+            DisableSearch = disableSearch;
         }
 
         #region UIViewController overrides
@@ -115,20 +115,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         void InitializeNavigationBarTitle()
         {
-            if (isRootOfFoldersList)
+            if (IsRootOfFoldersList)
             {
                 NavigationItem.Title = Localization.GetString("documents");
             }
             else
             {
-                NavigationItem.Title = folder.Name;
+                NavigationItem.Title = Folder.Name;
                 NavigationItem.Prompt = Localization.GetString("documents");
             }
         }
 
         void ClearNavigationBarTitle()
         {
-            if (isRootOfFoldersList)
+            if (IsRootOfFoldersList)
             {
                 NavigationItem.Title = Localization.GetString("back");
             }
@@ -136,13 +136,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         void InitializeNavigationBar()
         {
-            if (folder.Module == ModuleType.Documents)
+            if (DisableNavigationBarActions) return;
+
+            if (Folder.Module == ModuleType.Documents)
             {
                 ComposeDocumentItem = new UIBarButtonItem();
                 ComposeDocumentItem.Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"));
                 NavigationItem.SetRightBarButtonItem(ComposeDocumentItem, false);
 
-                if (isRootOfFoldersList)
+                if (IsRootOfFoldersList)
                 {
                     EditModeItem = new UIBarButtonItem();
                     EditModeItem.Title = Localization.GetString("edit");
@@ -152,9 +154,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 return;
             }
 
-            if (folder.Module == ModuleType.Contacts || folder.Module == ModuleType.Shortcodes)
+            if (Folder.Module == ModuleType.Contacts || Folder.Module == ModuleType.Shortcodes)
             {
-                if (isRootOfFoldersList)
+                if (IsRootOfFoldersList)
                 {
                     EditModeItem = new UIBarButtonItem();
                     EditModeItem.Title = Localization.GetString("edit");
@@ -164,7 +166,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 return;
             }
 
-            throw new ArgumentException(nameof(folder.Module));
+            throw new ArgumentException(nameof(Folder.Module));
         }
 
         void InitializeView()
@@ -173,10 +175,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             FoldersListView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
             FoldersListView.ClipsToBounds = false;
-            if (isRootOfFoldersList)
-                FoldersListView.Source = new GrouppedDataSource(this, FoldersListView, folder.Module);
+            if (IsRootOfFoldersList)
+                FoldersListView.Source = new GrouppedDataSource(this, FoldersListView, Folder.Module, DisableRowActions);
             else
-                FoldersListView.Source = new DataSource(this, FoldersListView);
+                FoldersListView.Source = new DataSource(this, FoldersListView, DisableRowActions);
             FoldersListView.AllowsSelectionDuringEditing = false;
             FoldersListView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(FoldersListView);
@@ -264,20 +266,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             try
             {
-                if (isRootOfFoldersList)
+                if (IsRootOfFoldersList)
                 {
                     var ds = FoldersListView.Source as GrouppedDataSource;
 
-                    var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(folder.Module);
+                    var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(Folder.Module);
 
                     List<Folder> folders;
-                    if (!forceRefresh && folder.HasSubFolders && folder.SubFolders != null && folder.SubFolders.Count > 0)
+                    if (!forceRefresh && Folder.HasSubFolders && Folder.SubFolders != null && Folder.SubFolders.Count > 0)
                     {
-                        folders = await Managers.FoldersManager.GetFoldersAsync(folder, 3, SourceType.Local);
+                        folders = await Managers.FoldersManager.GetFoldersAsync(Folder, 3, SourceType.Local);
                     }
                     else
                     {
-                        folders = await Managers.FoldersManager.GetFoldersAsync(folder, 3);
+                        folders = await Managers.FoldersManager.GetFoldersAsync(Folder, 3);
                     }
 
                     var favoriteIds = favorites.Select(f => f.Id);
@@ -289,8 +291,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                     foreach (var id in allIds)
                     {
-                        favoritesStatus[id] = await Managers.FoldersManager.IsFolderFavouriteAsync(folder.Module, id);
-                        offlineStatus[id] = await Managers.FoldersManager.IsFolderOfflineAsync(folder.Module, id);
+                        favoritesStatus[id] = await Managers.FoldersManager.IsFolderFavouriteAsync(Folder.Module, id);
+                        offlineStatus[id] = await Managers.FoldersManager.IsFolderOfflineAsync(Folder.Module, id);
                     }
 
                     ds.FavoriteStatus = favoritesStatus;
@@ -305,13 +307,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     var ds = FoldersListView.Source as DataSource;
 
                     List<Folder> folders;
-                    if (!forceRefresh && folder.HasSubFolders && folder.SubFolders != null && folder.SubFolders.Count > 0)
+                    if (!forceRefresh && Folder.HasSubFolders && Folder.SubFolders != null && Folder.SubFolders.Count > 0)
                     {
-                        folders = folder.SubFolders;
+                        folders = Folder.SubFolders;
                     }
                     else
                     {
-                        folders = await Managers.FoldersManager.GetFoldersAsync(folder);
+                        folders = await Managers.FoldersManager.GetFoldersAsync(Folder);
                     }
 
                     var folderIds = folders.Select(f => f.Id).Distinct();
@@ -321,8 +323,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                     foreach (var id in folderIds)
                     {
-                        favoritesStatus[id] = await Managers.FoldersManager.IsFolderFavouriteAsync(folder.Module, id);
-                        offlineStatus[id] = await Managers.FoldersManager.IsFolderOfflineAsync(folder.Module, id);
+                        favoritesStatus[id] = await Managers.FoldersManager.IsFolderFavouriteAsync(Folder.Module, id);
+                        offlineStatus[id] = await Managers.FoldersManager.IsFolderOfflineAsync(Folder.Module, id);
                     }
 
                     ds.FavoriteStatus = favoritesStatus;
@@ -546,7 +548,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (cancellationToken.IsCancellationRequested) return;
 
-                var root = Folder.RootForModule(folder.Module);
+                var root = Folder.RootForModule(Folder.Module);
                 var flattenedFolders = root.SubFolders
                                              .Flatten(f => f.SubFolders)
                                              .Where(f => f.Name.IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase) >= 0)
@@ -583,14 +585,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             AbstractFoldersListViewController viewController;
             UITableView tableView;
+            readonly bool disableRowActions;
 
             bool loading;
             List<Folder> foldersInView;
 
-            public DataSource(AbstractFoldersListViewController viewController, UITableView tableView)
+            public DataSource(AbstractFoldersListViewController viewController, UITableView tableView, bool disableRowActions)
             {
-                this.tableView = tableView;
                 this.viewController = viewController;
+                this.tableView = tableView;
+                this.disableRowActions = disableRowActions;
 
                 loading = true;
                 foldersInView = new List<Folder>();
@@ -663,6 +667,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
+                if (disableRowActions) return new UITableViewRowAction[0];
+
                 var f = foldersInView[indexPath.Row];
 
                 var actions = new List<UITableViewRowAction>();
@@ -782,14 +788,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             AbstractFoldersListViewController viewController;
             UITableView tableView;
+            readonly bool disableRowActions;
 
             bool[] loading;
             Dictionary<nint, List<Folder>> foldersInView;
 
-            public GrouppedDataSource(AbstractFoldersListViewController viewController, UITableView tableView, ModuleType module)
+            public GrouppedDataSource(AbstractFoldersListViewController viewController, UITableView tableView, ModuleType module, bool disableRowActions)
             {
-                this.tableView = tableView;
                 this.viewController = viewController;
+                this.tableView = tableView;
+                this.disableRowActions = disableRowActions;
 
                 if (module == ModuleType.Documents)
                 {
@@ -906,6 +914,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
+                if (disableRowActions) return new UITableViewRowAction[0];
+
                 var f = foldersInView[indexPath.LongSection][indexPath.Row];
 
                 var actions = new List<UITableViewRowAction>();
