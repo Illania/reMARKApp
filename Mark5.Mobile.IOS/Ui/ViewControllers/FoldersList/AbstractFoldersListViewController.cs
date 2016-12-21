@@ -333,8 +333,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     ds.FavoriteStatus = favoritesStatus;
                     ds.CachingStatus = offlineStatus;
 
+                    if (ParentFolder.Module == ModuleType.Documents)
+                    {
+                        ds.SetFolders(GrouppedDataSource.Section.Local, Folder.LocalRootForModule(ModuleType.Documents).SubFolders);
+                    }
                     ds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
-                    ds.SetFolders(GrouppedDataSource.Section.Local, Folder.LocalRootForModule(ModuleType.Documents).SubFolders);
                     ds.SetFolders(GrouppedDataSource.Section.Folders, folders);
                 }
                 else
@@ -1164,7 +1167,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 tableView.ReloadSections(NSIndexSet.FromIndex(Section.Favorites), UITableViewRowAnimation.Automatic);
                 tableView.ReloadSections(NSIndexSet.FromIndex(Section.Folders), UITableViewRowAnimation.Automatic);
-                tableView.ReloadSections(NSIndexSet.FromIndex(Section.Local), UITableViewRowAnimation.Automatic);
+
+                if (foldersInView.ContainsKey(Section.Local))
+                {
+                    tableView.ReloadSections(NSIndexSet.FromIndex(Section.Local), UITableViewRowAnimation.Automatic);
+                }
             }
 
             public Folder[] GetFolders(int folderId)
