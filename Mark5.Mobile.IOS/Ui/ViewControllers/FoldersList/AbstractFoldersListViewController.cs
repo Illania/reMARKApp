@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using CoreGraphics;
 using Foundation;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -80,7 +81,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         public override void DidReceiveMemoryWarning()
         {
             var ds = FoldersListView?.DataSource as GrouppedDataSource;
-            ds?.Clear();
+            ds?.Reset();
             
             base.DidReceiveMemoryWarning();
         }
@@ -148,7 +149,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (isRootOfFoldersList)
                 FoldersListView.Source = new GrouppedDataSource(this, FoldersListView, folder.Module);
             else
-                FoldersListView.Source = new DataSource(this, FoldersListView, folder.Module);
+                FoldersListView.Source = new DataSource(this, FoldersListView);
             FoldersListView.AllowsSelectionDuringEditing = false;
             FoldersListView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(FoldersListView);
@@ -181,7 +182,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             // TODO
         }
 
-        void RefreshControl_ValueChanged(object sender, EventArgs e) => RefreshData();
+        void RefreshControl_ValueChanged(object sender, EventArgs e) => RefreshData(true);
 
         void InitializeHandlers()
         {
@@ -205,7 +206,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
         }
 
-        async void RefreshData()
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void RefreshData(bool forceRefresh = false)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
 
@@ -216,7 +219,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     var ds = FoldersListView.Source as GrouppedDataSource;
 
                     var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(folder.Module);
-                    var folders = await Managers.FoldersManager.GetFoldersAsync(folder);
+
+                    List<Folder> folders;
+                    if (!forceRefresh && folder.HasSubFolders && folder.SubFolders != null && folder.SubFolders.Count > 0)
+                    {
+                        folders = folder.SubFolders;
+                    }
+                    else
+                    {
+                        folders = await Managers.FoldersManager.GetFoldersAsync(folder, 3);
+                    }
 
                     var favoriteIds = favorites.Select(f => f.Id);
                     var folderIds = folders.Select(f => f.Id);
@@ -242,7 +254,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 {
                     var ds = FoldersListView.Source as DataSource;
 
-                    var folders = await Managers.FoldersManager.GetFoldersAsync(folder);
+                    List<Folder> folders;
+                    if (!forceRefresh && folder.HasSubFolders && folder.SubFolders != null && folder.SubFolders.Count > 0)
+                    {
+                        folders = folder.SubFolders;
+                    }
+                    else
+                    {
+                        folders = await Managers.FoldersManager.GetFoldersAsync(folder);
+                    }
 
                     var folderIds = folders.Select(f => f.Id).Distinct();
 
@@ -263,6 +283,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
             catch (Exception ex)
             {
+                CommonConfig.Logger.Error("Could not load folders", ex);
+
+                await Dialogs.ShowErrorDialogAsync(this, ex);
             }
 
             RefreshControl.EndRefreshing();
@@ -298,21 +321,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             AbstractFoldersListViewController viewController;
             UITableView tableView;
 
-            bool firstLoad;
+            bool loading;
             List<Folder> foldersInView;
 
-
-            public DataSource(AbstractFoldersListViewController viewController, UITableView tableView, ModuleType module)
+            public DataSource(AbstractFoldersListViewController viewController, UITableView tableView)
             {
                 this.tableView = tableView;
                 this.viewController = viewController;
 
-                firstLoad = true;
+                loading = true;
                 foldersInView = new List<Folder>();
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
+                if (loading)
+                {
+                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
+                }
+
+                if (foldersInView.Count < 1)
+                {
+                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                }
+
                 var cell = tableView.DequeueReusableCell(FoldersListViewCell.Key) as FoldersListViewCell;
                 if (cell == null)
                 {
@@ -338,6 +370,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
+                if (loading)
+                {
+                    return 1;
+                }
+
+                if (foldersInView.Count < 1)
+                {
+                    return 1;
+                }
+
                 return foldersInView.Count;
             }
 
@@ -363,7 +405,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 viewController = null;
                 tableView = null;
 
-                firstLoad = true;
+                loading = true;
                 foldersInView = null;
             }
 
@@ -371,12 +413,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 foldersInView.Clear();
                 foldersInView.AddRange(folders);
+                loading = false;
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
             }
 
-            public void Clear()
+            public void Reset()
             {
-                firstLoad = true;
+                loading = true;
                 foldersInView.Clear();
             }
         }
@@ -405,9 +448,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             AbstractFoldersListViewController viewController;
             UITableView tableView;
 
-            bool[] firstLoad;
+            bool[] loading;
             Dictionary<nint, List<Folder>> foldersInView;
-
 
             public GrouppedDataSource(AbstractFoldersListViewController viewController, UITableView tableView, ModuleType module)
             {
@@ -416,7 +458,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (module == ModuleType.Documents)
                 {
-                    firstLoad = new []{ true, true, true};
+                    loading = new []{ true, true, true};
                     foldersInView = new Dictionary<nint, List<Folder>>
                     {
                         [Section.Favorites] = new List<Folder>(),
@@ -429,7 +471,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (module == ModuleType.Contacts || module == ModuleType.Shortcodes)
                 {
-                    firstLoad = new[] { true, true };
+                    loading = new[] { true, true };
                     foldersInView = new Dictionary<nint, List<Folder>>
                     {
                         [Section.Favorites] = new List<Folder>(),
@@ -444,6 +486,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
+                if (loading[indexPath.LongSection])
+                {
+                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
+                }
+
+                if (foldersInView[indexPath.LongSection].Count < 1)
+                {
+                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                }
+
                 var cell = tableView.DequeueReusableCell(FoldersListViewCell.Key) as FoldersListViewCell;
                 if (cell == null)
                 {
@@ -469,6 +521,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
+                if (loading[section])
+                {
+                    return 1;
+                }
+
+                if (foldersInView[section].Count < 1)
+                {
+                    return 1;
+                }
+
                 return foldersInView[section].Count;
             }
 
@@ -542,7 +604,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 viewController = null;
                 tableView = null;
 
-                firstLoad = null;
+                loading = null;
                 foldersInView = null;
             }
 
@@ -550,13 +612,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 foldersInView[section].Clear();
                 foldersInView[section].AddRange(folders);
+                loading[section] = false;
                 tableView.ReloadSections(NSIndexSet.FromIndex(section), UITableViewRowAnimation.Automatic);
             }
 
-            public void Clear()
+            public void Reset()
             {
-                for (var i = 0; i < firstLoad.Length; i++)
-                    firstLoad[i] = true;
+                for (var i = 0; i < loading.Length; i++)
+                    loading[i] = true;
 
                 foreach (var kv in foldersInView)
                     kv.Value.Clear();
