@@ -20,6 +20,8 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<List<Folder>> GetFavoriteFoldersAsync(ModuleType module);
 
+        Task SetFavoriteFoldersAsync(ModuleType module, List<Folder> folders);
+
         Task AddFavoriteFolderAsync(ModuleType module, Folder folder);
 
         Task RemoveFavoriteFolderAsync(ModuleType module, Folder folder);

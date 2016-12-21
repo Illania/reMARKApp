@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: AbstractFoldersListViewController.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -250,9 +250,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             // TODO
         }
 
-        void EditModeItem_Clicked(object sender, EventArgs e)
+        async void EditModeItem_Clicked(object sender, EventArgs e)
         {
-            // TODO
+            EditModeItem.Clicked -= EditModeItem_Clicked;
+
+            if (FoldersListView.Editing)
+            {
+                EditModeItem.Title = Localization.GetString("edit");
+                FoldersListView.SetEditing(false, true);
+
+                try
+                {
+                    var gds = FoldersListView.Source as GrouppedDataSource;
+                    await Managers.FoldersManager.SetFavoriteFoldersAsync(Folder.Module, gds.GetFavoriteFolders());
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Could not save favorite folders order", ex);
+
+                    await Dialogs.ShowErrorDialogAsync(this, ex);
+                }
+            }
+            else
+            {
+                EditModeItem.Title = Localization.GetString("done");
+                FoldersListView.SetEditing(true, true);
+            }
+
+            EditModeItem.Clicked += EditModeItem_Clicked;
         }
 
         #endregion
@@ -678,39 +703,39 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (FavoriteStatus[f.Id])
                 {
-                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("remove_from_favorites"), (a, ip) => { viewController.RemoveFromFavorites(foldersInView[ip.Row]); tableView.Editing = false; });
+                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("remove_from_favorites"), (a, ip) => { viewController.RemoveFromFavorites(foldersInView[ip.Row]); tableView.SetEditing(false, true); });
                     action.BackgroundColor = Theme.Brown;
                     actions.Add(action);
                 }
                 else
                 {
-                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("add_to_favorites"), (a, ip) => { viewController.AddToFavorites(foldersInView[ip.Row]); tableView.Editing = false; });
+                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("add_to_favorites"), (a, ip) => { viewController.AddToFavorites(foldersInView[ip.Row]); tableView.SetEditing(false, true); });
                     action.BackgroundColor = Theme.Brown;
                     actions.Add(action);
                 }
 
                 if (CachingStatus[f.Id])
                 {
-                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_caching"), (a, ip) => { viewController.DisableCaching(foldersInView[ip.Row]); tableView.Editing = false; });
+                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_caching"), (a, ip) => { viewController.DisableCaching(foldersInView[ip.Row]); tableView.SetEditing(false, true); });
                     action.BackgroundColor = Theme.DarkBlue;
                     actions.Add(action);
                 }
                 else
                 {
-                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_caching"), (a, ip) => { viewController.EnableCaching(foldersInView[ip.Row]); tableView.Editing = false; });
+                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_caching"), (a, ip) => { viewController.EnableCaching(foldersInView[ip.Row]); tableView.SetEditing(false, true); });
                     action.BackgroundColor = Theme.DarkBlue;
                     actions.Add(action);
                 }
 
                 if (f.Subscribed)
                 {
-                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_notifications"), (a, ip) => { viewController.DisableNotifications(foldersInView[ip.Row]); tableView.Editing = false; });
+                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_notifications"), (a, ip) => { viewController.DisableNotifications(foldersInView[ip.Row]); tableView.SetEditing(false, true); });
                     action.BackgroundColor = Theme.Blue;
                     actions.Add(action);
                 }
                 else
                 {
-                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_notifications"), (a, ip) => { viewController.EnableNotifications(foldersInView[ip.Row]); tableView.Editing = false; });
+                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_notifications"), (a, ip) => { viewController.EnableNotifications(foldersInView[ip.Row]); tableView.SetEditing(false, true); });
                     action.BackgroundColor = Theme.Blue;
                     actions.Add(action);
                 }
@@ -924,6 +949,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 throw new ArgumentException(nameof(section));
             }
 
+            public override bool ShouldIndentWhileEditing(UITableView tableView, NSIndexPath indexPath)
+            {
+                return false;
+            }
+
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (tableView.Editing)
+                {
+                    return indexPath.LongSection == Section.Favorites;
+                }
+                else
+                {
+                    return indexPath.LongSection != Section.Local;
+                }
+            }
+            
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
                 if (disableRowActions) return new UITableViewRowAction[0];
@@ -936,45 +978,70 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 {
                     if (FavoriteStatus[f.Id])
                     {
-                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("remove_from_favorites"), (a, ip) => { viewController.RemoveFromFavorites(foldersInView[ip.LongSection][ip.Row]); tableView.Editing = false; });
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("remove_from_favorites"), (a, ip) => { viewController.RemoveFromFavorites(foldersInView[ip.LongSection][ip.Row]); tableView.SetEditing(false, true); });
                         action.BackgroundColor = Theme.Brown;
                         actions.Add(action);
                     }
                     else
                     {
-                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("add_to_favorites"), (a, ip) => { viewController.AddToFavorites(foldersInView[ip.LongSection][ip.Row]); tableView.Editing = false; });
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("add_to_favorites"), (a, ip) => { viewController.AddToFavorites(foldersInView[ip.LongSection][ip.Row]); tableView.SetEditing(false, true); });
                         action.BackgroundColor = Theme.Brown;
                         actions.Add(action);
                     }
 
                     if (CachingStatus[f.Id])
                     {
-                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_caching"), (a, ip) => { viewController.DisableCaching(foldersInView[ip.LongSection][ip.Row]); tableView.Editing = false; });
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_caching"), (a, ip) => { viewController.DisableCaching(foldersInView[ip.LongSection][ip.Row]); tableView.SetEditing(false, true); });
                         action.BackgroundColor = Theme.DarkBlue;
                         actions.Add(action);
                     }
                     else
                     {
-                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_caching"), (a, ip) => { viewController.EnableCaching(foldersInView[ip.LongSection][ip.Row]); tableView.Editing = false; });
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_caching"), (a, ip) => { viewController.EnableCaching(foldersInView[ip.LongSection][ip.Row]); tableView.SetEditing(false, true); });
                         action.BackgroundColor = Theme.DarkBlue;
                         actions.Add(action);
                     }
 
                     if (f.Subscribed)
                     {
-                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_notifications"), (a, ip) => { viewController.DisableNotifications(foldersInView[ip.LongSection][ip.Row]); tableView.Editing = false; });
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_notifications"), (a, ip) => { viewController.DisableNotifications(foldersInView[ip.LongSection][ip.Row]); tableView.SetEditing(false, true); });
                         action.BackgroundColor = Theme.Blue;
                         actions.Add(action);
                     }
                     else
                     {
-                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_notifications"), (a, ip) => { viewController.EnableNotifications(foldersInView[ip.LongSection][ip.Row]); tableView.Editing = false; });
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_notifications"), (a, ip) => { viewController.EnableNotifications(foldersInView[ip.LongSection][ip.Row]); tableView.SetEditing(false, true); });
                         action.BackgroundColor = Theme.Blue;
                         actions.Add(action);
                     }
                 }
 
                 return actions.ToArray();
+            }
+
+            public override UITableViewCellEditingStyle EditingStyleForRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                return tableView.Editing ? UITableViewCellEditingStyle.None : UITableViewCellEditingStyle.Delete;
+            }
+
+            public override bool CanMoveRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                return indexPath.Section == Section.Favorites;
+            }
+
+            public override NSIndexPath CustomizeMoveTarget(UITableView tableView, NSIndexPath sourceIndexPath, NSIndexPath proposedIndexPath)
+            {
+                return proposedIndexPath.Section == Section.Favorites ? proposedIndexPath : sourceIndexPath;
+            }
+
+            public override void MoveRow(UITableView tableView, NSIndexPath sourceIndexPath, NSIndexPath destinationIndexPath)
+            {
+                var oldRow = sourceIndexPath.Row;
+                var newRow = destinationIndexPath.Row;
+
+                var rowToMove = foldersInView[Section.Favorites][oldRow];
+                foldersInView[Section.Favorites].RemoveAt(oldRow);
+                foldersInView[Section.Favorites].Insert(newRow, rowToMove);
             }
 
             protected override void Dispose(bool disposing)
@@ -1024,6 +1091,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     }
                 }
                 return folders.ToArray();
+            }
+
+            public List<Folder> GetFavoriteFolders()
+            {
+                return foldersInView[Section.Favorites].Select(f => f.ShallowCopy()).ToList();
             }
 
             public NSIndexPath[] GetIndexPaths(int folderId)

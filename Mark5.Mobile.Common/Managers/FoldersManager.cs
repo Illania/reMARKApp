@@ -77,10 +77,27 @@ namespace Mark5.Mobile.Common.Managers
                     return new List<Folder>();
                 }
 
-                rootFavoriteFolder.SubFolders.AddRange(moduleFavoriteFolders);
+                rootFavoriteFolder.SubFolders.AddRange(moduleFavoriteFolders.OrderBy(f => f.Position));
             }
 
             return rootFavoriteFolder.SubFolders;
+        }
+
+        public async Task SetFavoriteFoldersAsync(ModuleType module, List<Folder> folders)
+        {
+            var moduleFavoriteFolders = folders.Select(f => f.ShallowCopy()).ToList();
+
+            var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
+
+            for (var i = 0; i < moduleFavoriteFolders.Count; i++)
+            {
+                moduleFavoriteFolders[i].Position = i;
+            }
+
+            favoriteFolders[module] = moduleFavoriteFolders;
+
+            await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
+
         }
 
         public async Task AddFavoriteFolderAsync(ModuleType module, Folder folder)
@@ -93,6 +110,12 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
+            
+            for (var i = 0; i < moduleFavoriteFolders.Count; i++)
+            {
+                moduleFavoriteFolders[i].Position = i;
+            }
+
             favoriteFolders[module] = moduleFavoriteFolders;
 
             await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
@@ -104,6 +127,12 @@ namespace Mark5.Mobile.Common.Managers
             moduleFavoriteFolders.RemoveAll(f => f.Id == folder.Id);
 
             var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
+
+            for (var i = 0; i < moduleFavoriteFolders.Count; i++)
+            {
+                moduleFavoriteFolders[i].Position = i;
+            }
+
             favoriteFolders[module] = moduleFavoriteFolders;
 
             await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
