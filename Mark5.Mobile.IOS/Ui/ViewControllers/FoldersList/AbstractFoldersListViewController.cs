@@ -185,7 +185,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (IsRootOfFoldersList)
                 FoldersTableView.Source = new GrouppedDataSource(this, FoldersTableView, ParentFolder.Module, DisableRowActions);
             else
-                FoldersTableView.Source = new DataSource(this, FoldersTableView, DisableRowActions);
+                FoldersTableView.Source = new DataSource(this, FoldersTableView, ParentFolder.Module, DisableRowActions);
             FoldersTableView.AllowsSelectionDuringEditing = false;
             FoldersTableView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(FoldersTableView);
@@ -688,15 +688,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             AbstractFoldersListViewController viewController;
             UITableView tableView;
+            readonly ModuleType module;
             readonly bool disableRowActions;
 
             bool loading;
             List<Folder> foldersInView;
 
-            public DataSource(AbstractFoldersListViewController viewController, UITableView tableView, bool disableRowActions)
+            public DataSource(AbstractFoldersListViewController viewController, UITableView tableView, ModuleType module, bool disableRowActions)
             {
                 this.viewController = viewController;
                 this.tableView = tableView;
+                this.module = module;
                 this.disableRowActions = disableRowActions;
 
                 loading = true;
@@ -791,30 +793,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     actions.Add(action);
                 }
 
-                if (CachingStatus[f.Id])
+                if (module == ModuleType.Documents)
                 {
-                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_caching"), (a, ip) => { viewController.DisableCaching(foldersInView[ip.Row]); tableView.SetEditing(false, true); });
-                    action.BackgroundColor = Theme.DarkBlue;
-                    actions.Add(action);
-                }
-                else
-                {
-                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_caching"), (a, ip) => { viewController.EnableCaching(foldersInView[ip.Row]); tableView.SetEditing(false, true); });
-                    action.BackgroundColor = Theme.DarkBlue;
-                    actions.Add(action);
-                }
+                    if (CachingStatus[f.Id])
+                    {
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_caching"), (a, ip) => { viewController.DisableCaching(foldersInView[ip.Row]); tableView.SetEditing(false, true); });
+                        action.BackgroundColor = Theme.DarkBlue;
+                        actions.Add(action);
+                    }
+                    else
+                    {
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_caching"), (a, ip) => { viewController.EnableCaching(foldersInView[ip.Row]); tableView.SetEditing(false, true); });
+                        action.BackgroundColor = Theme.DarkBlue;
+                        actions.Add(action);
+                    }
 
-                if (f.Subscribed)
-                {
-                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_notifications"), (a, ip) => { viewController.DisableNotifications(foldersInView[ip.Row]); tableView.SetEditing(false, true); });
-                    action.BackgroundColor = Theme.Blue;
-                    actions.Add(action);
-                }
-                else
-                {
-                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_notifications"), (a, ip) => { viewController.EnableNotifications(foldersInView[ip.Row]); tableView.SetEditing(false, true); });
-                    action.BackgroundColor = Theme.Blue;
-                    actions.Add(action);
+                    if (f.Subscribed)
+                    {
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_notifications"), (a, ip) => { viewController.DisableNotifications(foldersInView[ip.Row]); tableView.SetEditing(false, true); });
+                        action.BackgroundColor = Theme.Blue;
+                        actions.Add(action);
+                    }
+                    else
+                    {
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_notifications"), (a, ip) => { viewController.EnableNotifications(foldersInView[ip.Row]); tableView.SetEditing(false, true); });
+                        action.BackgroundColor = Theme.Blue;
+                        actions.Add(action);
+                    }
                 }
 
                 return actions.ToArray();
@@ -902,6 +907,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             AbstractFoldersListViewController viewController;
             UITableView tableView;
+            readonly ModuleType module;
             readonly bool disableRowActions;
 
             bool[] loading;
@@ -911,6 +917,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 this.viewController = viewController;
                 this.tableView = tableView;
+                this.module = module;
                 this.disableRowActions = disableRowActions;
 
                 if (module == ModuleType.Documents)
@@ -1044,7 +1051,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
             {
-                return tableView.Editing ? indexPath.LongSection == Section.Favorites : indexPath.LongSection != Section.Local;
+                return tableView.Editing ? (indexPath.LongSection == Section.Favorites && foldersInView[Section.Favorites].Count > 0) : indexPath.LongSection != Section.Local;
             }
             
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
@@ -1070,30 +1077,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         actions.Add(action);
                     }
 
-                    if (CachingStatus[f.Id])
+                    if (module == ModuleType.Documents)
                     {
-                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_caching"), (a, ip) => { viewController.DisableCaching(foldersInView[ip.LongSection][ip.Row]); tableView.SetEditing(false, true); });
-                        action.BackgroundColor = Theme.DarkBlue;
-                        actions.Add(action);
-                    }
-                    else
-                    {
-                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_caching"), (a, ip) => { viewController.EnableCaching(foldersInView[ip.LongSection][ip.Row]); tableView.SetEditing(false, true); });
-                        action.BackgroundColor = Theme.DarkBlue;
-                        actions.Add(action);
-                    }
+                        if (CachingStatus[f.Id])
+                        {
+                            var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_caching"), (a, ip) => { viewController.DisableCaching(foldersInView[ip.LongSection][ip.Row]); tableView.SetEditing(false, true); });
+                            action.BackgroundColor = Theme.DarkBlue;
+                            actions.Add(action);
+                        }
+                        else
+                        {
+                            var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_caching"), (a, ip) => { viewController.EnableCaching(foldersInView[ip.LongSection][ip.Row]); tableView.SetEditing(false, true); });
+                            action.BackgroundColor = Theme.DarkBlue;
+                            actions.Add(action);
+                        }
 
-                    if (f.Subscribed)
-                    {
-                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_notifications"), (a, ip) => { viewController.DisableNotifications(foldersInView[ip.LongSection][ip.Row]); tableView.SetEditing(false, true); });
-                        action.BackgroundColor = Theme.Blue;
-                        actions.Add(action);
-                    }
-                    else
-                    {
-                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_notifications"), (a, ip) => { viewController.EnableNotifications(foldersInView[ip.LongSection][ip.Row]); tableView.SetEditing(false, true); });
-                        action.BackgroundColor = Theme.Blue;
-                        actions.Add(action);
+                        if (f.Subscribed)
+                        {
+                            var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_notifications"), (a, ip) => { viewController.DisableNotifications(foldersInView[ip.LongSection][ip.Row]); tableView.SetEditing(false, true); });
+                            action.BackgroundColor = Theme.Blue;
+                            actions.Add(action);
+                        }
+                        else
+                        {
+                            var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_notifications"), (a, ip) => { viewController.EnableNotifications(foldersInView[ip.LongSection][ip.Row]); tableView.SetEditing(false, true); });
+                            action.BackgroundColor = Theme.Blue;
+                            actions.Add(action);
+                        }
                     }
                 }
 
