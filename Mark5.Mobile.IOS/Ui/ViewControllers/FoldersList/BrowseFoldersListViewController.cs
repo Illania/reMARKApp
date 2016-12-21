@@ -17,5 +17,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             : base(module)
         {
         }
+
+        public BrowseFoldersListViewController(Folder folder)
+            : base(folder)
+        {
+        }
+
+        protected override void FolderSelected(Folder folder)
+        {
+            base.FolderSelected(folder);
+        }
+
+        protected override void FolderExpand(Folder folder)
+        {
+            base.FolderExpand(folder);
+
+            var vc = new BrowseFoldersListViewController(folder);
+            NavigationController.PushViewController(vc, true);
+        }
     }
 }

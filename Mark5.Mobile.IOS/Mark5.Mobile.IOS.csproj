@@ -350,20 +350,20 @@
     <BundleResource Include="Resources\icons\view%403x.png" />
     <BundleResource Include="Resources\icons\worktray%402x.png" />
     <BundleResource Include="Resources\icons\worktray%403x.png" />
-    <BundleResource Include="Resources\icons\Folders list\draft%402x.png" />
-    <BundleResource Include="Resources\icons\Folders list\draft%403x.png" />
-    <BundleResource Include="Resources\icons\Folders list\folder%402x.png" />
-    <BundleResource Include="Resources\icons\Folders list\folder%403x.png" />
-    <BundleResource Include="Resources\icons\Folders list\inbox%402x.png" />
-    <BundleResource Include="Resources\icons\Folders list\inbox%403x.png" />
-    <BundleResource Include="Resources\icons\Folders list\outbox%402x.png" />
-    <BundleResource Include="Resources\icons\Folders list\outbox%403x.png" />
-    <BundleResource Include="Resources\icons\Folders list\outgoing%402x.png" />
-    <BundleResource Include="Resources\icons\Folders list\outgoing%403x.png" />
-    <BundleResource Include="Resources\icons\Folders list\spam%402x.png" />
-    <BundleResource Include="Resources\icons\Folders list\spam%403x.png" />
-    <BundleResource Include="Resources\icons\Folders list\worktray%402x.png" />
-    <BundleResource Include="Resources\icons\Folders list\worktray%403x.png" />
+    <BundleResource Include="Resources\icons\folderslist\draft%402x.png" />
+    <BundleResource Include="Resources\icons\folderslist\draft%403x.png" />
+    <BundleResource Include="Resources\icons\folderslist\folder%402x.png" />
+    <BundleResource Include="Resources\icons\folderslist\folder%403x.png" />
+    <BundleResource Include="Resources\icons\folderslist\inbox%402x.png" />
+    <BundleResource Include="Resources\icons\folderslist\inbox%403x.png" />
+    <BundleResource Include="Resources\icons\folderslist\outbox%402x.png" />
+    <BundleResource Include="Resources\icons\folderslist\outbox%403x.png" />
+    <BundleResource Include="Resources\icons\folderslist\outgoing%402x.png" />
+    <BundleResource Include="Resources\icons\folderslist\outgoing%403x.png" />
+    <BundleResource Include="Resources\icons\folderslist\spam%402x.png" />
+    <BundleResource Include="Resources\icons\folderslist\spam%403x.png" />
+    <BundleResource Include="Resources\icons\folderslist\worktray%402x.png" />
+    <BundleResource Include="Resources\icons\folderslist\worktray%403x.png" />
   </ItemGroup>
   <ItemGroup>
     <XamarinComponentReference Include="InAppSettingsKit">

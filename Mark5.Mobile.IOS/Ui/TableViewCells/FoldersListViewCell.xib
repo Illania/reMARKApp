@@ -4,7 +4,6 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -15,35 +14,35 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cxk-wN-pdQ" id="YTl-1W-gDM">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="QP8-BO-FLP">
-                        <rect key="frame" x="8" y="12" width="20" height="20"/>
+                        <rect key="frame" x="10" y="12" width="20" height="20"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="20" id="T1q-tE-xLD"/>
                             <constraint firstAttribute="height" constant="20" id="cZN-fl-hJP"/>
                         </constraints>
                     </imageView>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="vNG-BT-Bj6">
-                        <rect key="frame" x="17" y="21" width="15" height="15"/>
+                        <rect key="frame" x="18" y="21" width="15" height="15"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="15" id="Cne-la-dzv"/>
                             <constraint firstAttribute="height" constant="15" id="QhL-mY-epB"/>
                         </constraints>
                     </imageView>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="cF6-V3-kcJ">
-                        <rect key="frame" x="38" y="14" width="15" height="15"/>
+                        <rect key="frame" x="40" y="14" width="15" height="15"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="15" id="JxL-UE-wyq"/>
                             <constraint firstAttribute="height" constant="15" id="P4t-6k-8w6"/>
                         </constraints>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Folder name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Z2j-wy-c3r">
-                        <rect key="frame" x="61" y="11" width="207" height="21"/>
+                        <rect key="frame" x="63" y="11" width="205" height="21"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="HVt-pw-SxT"/>
-                            <constraint firstAttribute="width" constant="207" id="dJb-dS-zPI"/>
+                            <constraint firstAttribute="width" constant="205" id="dJb-dS-zPI"/>
                         </constraints>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
@@ -65,12 +64,12 @@
                     <constraint firstItem="QP8-BO-FLP" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY" id="303-gw-ReX"/>
                     <constraint firstItem="cF6-V3-kcJ" firstAttribute="leading" secondItem="QP8-BO-FLP" secondAttribute="trailing" constant="10" id="4AQ-IJ-2Hu"/>
                     <constraint firstAttribute="trailing" secondItem="FY4-3d-pGM" secondAttribute="trailing" id="9Vb-Td-fA2"/>
-                    <constraint firstItem="vNG-BT-Bj6" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="17" id="BTe-bQ-CMc"/>
+                    <constraint firstItem="vNG-BT-Bj6" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="18" id="BTe-bQ-CMc"/>
                     <constraint firstItem="FY4-3d-pGM" firstAttribute="leading" secondItem="Z2j-wy-c3r" secondAttribute="trailing" constant="8" id="J2W-E4-YUu"/>
                     <constraint firstItem="vNG-BT-Bj6" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY" constant="7" id="JVK-gE-fey"/>
                     <constraint firstItem="Z2j-wy-c3r" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY" id="SiX-Ym-kBO"/>
                     <constraint firstItem="Z2j-wy-c3r" firstAttribute="leading" secondItem="cF6-V3-kcJ" secondAttribute="trailing" constant="8" id="bW2-5J-jrq"/>
-                    <constraint firstItem="QP8-BO-FLP" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="8" id="eoa-8r-Pzs"/>
+                    <constraint firstItem="QP8-BO-FLP" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="10" id="eoa-8r-Pzs"/>
                     <constraint firstItem="cF6-V3-kcJ" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY" id="n5y-TK-YZG"/>
                     <constraint firstItem="FY4-3d-pGM" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="top" id="niM-4r-PUs"/>
                 </constraints>
@@ -81,9 +80,10 @@
                 <outlet property="FolderIconImage" destination="QP8-BO-FLP" id="QhB-t0-sVj"/>
                 <outlet property="FolderNameLabel" destination="Z2j-wy-c3r" id="yGZ-7m-v2p"/>
                 <outlet property="OfflineIndicatorImage" destination="cF6-V3-kcJ" id="9Do-32-k03"/>
-                <outlet property="OfflineIndicatorLeadingConstraint" destination="4AQ-IJ-2Hu" id="3pL-fO-8W2"/>
+                <outlet property="OfflineIndicatorLeadingConstraint" destination="4AQ-IJ-2Hu" id="Qkt-lA-JNY"/>
+                <outlet property="OfflineIndicatorWidthConstraint" destination="JxL-UE-wyq" id="R7i-CZ-lcD"/>
             </connections>
-            <point key="canvasLocation" x="155" y="2"/>
+            <point key="canvasLocation" x="4" y="-97"/>
         </tableViewCell>
     </objects>
 </document>

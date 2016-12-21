@@ -46,7 +46,7 @@ namespace Mark5.Mobile.Common.Managers
                     Depth = depth
                 });
 
-                var folders = foldersResult.Folders.WhereNotNull().Select(f => f.Convert()).ToList();
+                var folders = foldersResult.Folders.WhereNotNull().Select(f => f.Convert()).OrderBy(f => f.Position).ToList();
                 ProcessFolders(folders, parentFolder);
                 parentFolder.SubFolders = folders;
 
@@ -111,8 +111,13 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<bool> IsFolderFavouriteAsync(ModuleType module, Folder folder)
         {
+            return await IsFolderFavouriteAsync(module, folder.Id);
+        }
+
+        public async Task<bool> IsFolderFavouriteAsync(ModuleType module, int folderId)
+        {
             var moduleFavoriteFolders = await GetFavoriteFoldersAsync(module);
-            return moduleFavoriteFolders.FirstOrDefault(f => f.Id == folder.Id) != null;
+            return moduleFavoriteFolders.FirstOrDefault(f => f.Id == folderId) != null;
         }
 
         public async Task AddOfflineFolderAsync(ModuleType module, Folder folder)
@@ -152,6 +157,11 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<bool> IsFolderOfflineAsync(ModuleType module, Folder folder)
         {
+            return await IsFolderOfflineAsync(module, folder.Id);
+        }
+
+        public async Task<bool> IsFolderOfflineAsync(ModuleType module, int folderId)
+        {
             var offlineFolders = await FileSystemStorage.GetOfflineFoldersAsync();
 
             List<Folder> moduleOfflineFolders;
@@ -160,7 +170,7 @@ namespace Mark5.Mobile.Common.Managers
                 return false;
             }
 
-            return moduleOfflineFolders.FirstOrDefault(f => f.Id == folder.Id) != null;
+            return moduleOfflineFolders.Any(f => f.Id == folderId);
         }
 
         #region Helper methods

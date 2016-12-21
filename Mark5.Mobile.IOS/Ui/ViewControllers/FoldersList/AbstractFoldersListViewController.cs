@@ -23,20 +23,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
     
     public abstract class AbstractFoldersListViewController : ViewController
     {
-        
-        protected ModuleType Module { get; private set; }
 
-        UIBarButtonItem editModeItem;
-        UIBarButtonItem composeDocumentItem;
+        protected bool isRootOfFoldersList;
+        protected Folder folder { get; private set; }
 
-        UIRefreshControl RefreshControl;
-        UITableView FoldersListView;
+        protected UIBarButtonItem EditModeItem;
+        protected UIBarButtonItem ComposeDocumentItem;
 
-        UITableViewController SearchResultsController;
+        protected UIRefreshControl RefreshControl;
+        protected UITableView FoldersListView;
 
         protected AbstractFoldersListViewController(ModuleType module)
         {
-            Module = module;
+            isRootOfFoldersList = true;
+            folder = Folder.RootForModule(module);
+        }
+
+        protected AbstractFoldersListViewController(Folder folder)
+        {
+            isRootOfFoldersList = false;
+            this.folder = folder;
         }
 
         public override void LoadView()
@@ -52,6 +58,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             base.ViewWillAppear(animated);
 
+            InitializeNavigationBarTitle();
             InitializeHandlers();
         }
 
@@ -66,42 +73,70 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             base.ViewWillDisappear(animated);
 
+            ClearNavigationBarTitle();
             DeinitializeHandlers();
         }
 
         public override void DidReceiveMemoryWarning()
         {
-            var ds = FoldersListView?.DataSource as DataSource;
+            var ds = FoldersListView?.DataSource as GrouppedDataSource;
             ds?.Clear();
             
             base.DidReceiveMemoryWarning();
         }
 
+        void InitializeNavigationBarTitle()
+        {
+            if (isRootOfFoldersList)
+            {
+                NavigationItem.Title = Localization.GetString("documents");
+            }
+            else
+            {
+                NavigationItem.Title = folder.Name;
+                NavigationItem.Prompt = Localization.GetString("documents");
+            }
+        }
+
+        void ClearNavigationBarTitle()
+        {
+            if (isRootOfFoldersList)
+            {
+                NavigationItem.Title = Localization.GetString("back");
+            }
+        }
+
         void InitializeNavigationBar()
         {
-            if (Module == ModuleType.Documents)
+            if (folder.Module == ModuleType.Documents)
             {
-                composeDocumentItem = new UIBarButtonItem();
-                composeDocumentItem.Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"));
-                NavigationItem.SetRightBarButtonItem(composeDocumentItem, false);
+                ComposeDocumentItem = new UIBarButtonItem();
+                ComposeDocumentItem.Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"));
+                NavigationItem.SetRightBarButtonItem(ComposeDocumentItem, false);
 
-                editModeItem = new UIBarButtonItem();
-                editModeItem.Title = Localization.GetString("edit");
-                NavigationItem.SetLeftBarButtonItem(editModeItem, false);
+                if (isRootOfFoldersList)
+                {
+                    EditModeItem = new UIBarButtonItem();
+                    EditModeItem.Title = Localization.GetString("edit");
+                    NavigationItem.SetLeftBarButtonItem(EditModeItem, false);
+                }
 
                 return;
             }
 
-            if (Module == ModuleType.Contacts || Module == ModuleType.Shortcodes)
+            if (folder.Module == ModuleType.Contacts || folder.Module == ModuleType.Shortcodes)
             {
-                editModeItem = new UIBarButtonItem();
-                editModeItem.Title = Localization.GetString("edit");
-                NavigationItem.SetLeftBarButtonItem(editModeItem, false);
+                if (isRootOfFoldersList)
+                {
+                    EditModeItem = new UIBarButtonItem();
+                    EditModeItem.Title = Localization.GetString("edit");
+                    NavigationItem.SetLeftBarButtonItem(EditModeItem, false);
+                }
 
                 return;
             }
 
-            throw new ArgumentException(nameof(Module));
+            throw new ArgumentException(nameof(folder.Module));
         }
 
         void InitializeView()
@@ -109,9 +144,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             AutomaticallyAdjustsScrollViewInsets = true;
 
             FoldersListView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
-            FoldersListView.CellLayoutMarginsFollowReadableWidth = false;
             FoldersListView.ClipsToBounds = false;
-            FoldersListView.Source = new DataSource(this, FoldersListView, Module);
+            if (isRootOfFoldersList)
+                FoldersListView.Source = new GrouppedDataSource(this, FoldersListView, folder.Module);
+            else
+                FoldersListView.Source = new DataSource(this, FoldersListView, folder.Module);
             FoldersListView.AllowsSelectionDuringEditing = false;
             FoldersListView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(FoldersListView);
@@ -148,22 +185,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         void InitializeHandlers()
         {
-            if (composeDocumentItem != null)
-                composeDocumentItem.Clicked += ComposeDocumentItem_Clicked;
+            if (ComposeDocumentItem != null)
+                ComposeDocumentItem.Clicked += ComposeDocumentItem_Clicked;
 
-            if (editModeItem != null)
-                editModeItem.Clicked += EditModeItem_Clicked;
+            if (EditModeItem != null)
+                EditModeItem.Clicked += EditModeItem_Clicked;
 
             RefreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
         void DeinitializeHandlers()
         {
-            if (composeDocumentItem != null)
-                composeDocumentItem.Clicked -= ComposeDocumentItem_Clicked;
+            if (ComposeDocumentItem != null)
+                ComposeDocumentItem.Clicked -= ComposeDocumentItem_Clicked;
 
-            if (editModeItem != null)
-                editModeItem.Clicked -= EditModeItem_Clicked;
+            if (EditModeItem != null)
+                EditModeItem.Clicked -= EditModeItem_Clicked;
 
             RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
         }
@@ -174,12 +211,55 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             try
             {
-                var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(Module);
-                var folders = await Managers.FoldersManager.GetFoldersAsync(Folder.RootForModule(Module));
+                if (isRootOfFoldersList)
+                {
+                    var ds = FoldersListView.Source as GrouppedDataSource;
 
-                var ds = FoldersListView.Source as DataSource;
-                ds.SetFolders(DataSource.Section.Favorites, favorites);
-                ds.SetFolders(DataSource.Section.Folders, folders);
+                    var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(folder.Module);
+                    var folders = await Managers.FoldersManager.GetFoldersAsync(folder);
+
+                    var favoriteIds = favorites.Select(f => f.Id);
+                    var folderIds = folders.Select(f => f.Id);
+                    var allIds = favoriteIds.Union(folderIds).Distinct();
+
+                    var favoritesStatus = new Dictionary<int, bool>();
+                    var offlineStatus = new Dictionary<int, bool>();
+
+                    foreach (var id in allIds)
+                    {
+                        favoritesStatus[id] = await Managers.FoldersManager.IsFolderFavouriteAsync(folder.Module, id);
+                        offlineStatus[id] = await Managers.FoldersManager.IsFolderOfflineAsync(folder.Module, id);
+                    }
+
+                    ds.FavoriteStatus = favoritesStatus;
+                    ds.OfflineStatus = offlineStatus;
+
+                    ds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
+                    ds.SetFolders(GrouppedDataSource.Section.Local, Folder.LocalRootForModule(ModuleType.Documents).SubFolders);
+                    ds.SetFolders(GrouppedDataSource.Section.Folders, folders);
+                }
+                else
+                {
+                    var ds = FoldersListView.Source as DataSource;
+
+                    var folders = await Managers.FoldersManager.GetFoldersAsync(folder);
+
+                    var folderIds = folders.Select(f => f.Id).Distinct();
+
+                    var favoritesStatus = new Dictionary<int, bool>();
+                    var offlineStatus = new Dictionary<int, bool>();
+
+                    foreach (var id in folderIds)
+                    {
+                        favoritesStatus[id] = await Managers.FoldersManager.IsFolderFavouriteAsync(folder.Module, id);
+                        offlineStatus[id] = await Managers.FoldersManager.IsFolderOfflineAsync(folder.Module, id);
+                    }
+
+                    ds.FavoriteStatus = favoritesStatus;
+                    ds.OfflineStatus = offlineStatus;
+
+                    ds.SetFolders(folders); 
+                }
             }
             catch (Exception ex)
             {
@@ -208,9 +288,101 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 get
                 {
-                    return foldersInView.All(kv => kv.Value.Count < 1);
+                    return foldersInView.Count < 1;
                 }
             }
+
+            public Dictionary<int, bool> FavoriteStatus { get; set; }
+            public Dictionary<int, bool> OfflineStatus { get; set; }
+
+            AbstractFoldersListViewController viewController;
+            UITableView tableView;
+
+            bool firstLoad;
+            List<Folder> foldersInView;
+
+
+            public DataSource(AbstractFoldersListViewController viewController, UITableView tableView, ModuleType module)
+            {
+                this.tableView = tableView;
+                this.viewController = viewController;
+
+                firstLoad = true;
+                foldersInView = new List<Folder>();
+            }
+
+            public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+            {
+                var cell = tableView.DequeueReusableCell(FoldersListViewCell.Key) as FoldersListViewCell;
+                if (cell == null)
+                {
+                    cell = FoldersListViewCell.Create();
+                    cell.ExpandCollapseClicked += Cell_ExpandCollapseClicked;
+                }
+
+                var f = foldersInView[indexPath.Row];
+                var isFavorite = false;
+                FavoriteStatus.TryGetValue(f.Id, out isFavorite);
+                var isOffline = false;
+                OfflineStatus.TryGetValue(f.Id, out isOffline);
+
+                cell.Initialize(f, isFavorite, isOffline);
+
+                return cell;
+            }
+
+            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                return 44f;
+            }
+
+            public override nint RowsInSection(UITableView tableview, nint section)
+            {
+                return foldersInView.Count;
+            }
+
+            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+            {
+                var f = foldersInView[indexPath.Row];
+                viewController.FolderSelected(f);
+            }
+
+            public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
+            {
+                var f = foldersInView[indexPath.Row];
+                viewController.FolderDeselected(f);
+            }
+
+            void Cell_ExpandCollapseClicked(object sender, Folder f)
+            {
+                viewController.FolderExpand(f);
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                viewController = null;
+                tableView = null;
+
+                firstLoad = true;
+                foldersInView = null;
+            }
+
+            public void SetFolders(List<Folder> folders)
+            {
+                foldersInView.Clear();
+                foldersInView.AddRange(folders);
+                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+            }
+
+            public void Clear()
+            {
+                firstLoad = true;
+                foldersInView.Clear();
+            }
+        }
+
+        protected class GrouppedDataSource : UITableViewSource, IDisposable
+        {
 
             public static class Section
             {
@@ -219,6 +391,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 public static readonly nint Local = 2;
             }
 
+            public bool Empty
+            {
+                get
+                {
+                    return foldersInView.All(kv => kv.Value.Count < 1);
+                }
+            }
+
+            public Dictionary<int, bool> FavoriteStatus { get; set; }
+            public Dictionary<int, bool> OfflineStatus { get; set; }
+
             AbstractFoldersListViewController viewController;
             UITableView tableView;
 
@@ -226,7 +409,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             Dictionary<nint, List<Folder>> foldersInView;
 
 
-            public DataSource(AbstractFoldersListViewController viewController, UITableView tableView, ModuleType module)
+            public GrouppedDataSource(AbstractFoldersListViewController viewController, UITableView tableView, ModuleType module)
             {
                 this.tableView = tableView;
                 this.viewController = viewController;
@@ -268,7 +451,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     cell.ExpandCollapseClicked += Cell_ExpandCollapseClicked;
                 }
 
-                cell.Initialize(foldersInView[indexPath.LongSection][indexPath.Row]);
+                var f = foldersInView[indexPath.LongSection][indexPath.Row];
+                var isFavorite = false;
+                FavoriteStatus.TryGetValue(f.Id, out isFavorite);
+                var isOffline = false;
+                OfflineStatus.TryGetValue(f.Id, out isOffline);
+
+                cell.Initialize(f, isFavorite, isOffline);
 
                 return cell;
             }
@@ -290,14 +479,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var folder = foldersInView[indexPath.LongSection][indexPath.Row];
-                viewController.FolderSelected(folder);
+                var f = foldersInView[indexPath.LongSection][indexPath.Row];
+                viewController.FolderSelected(f);
             }
 
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
             {
-                var folder = foldersInView[indexPath.LongSection][indexPath.Row];
-                viewController.FolderDeselected(folder);
+                var f = foldersInView[indexPath.LongSection][indexPath.Row];
+                viewController.FolderDeselected(f);
             }
 
             void Cell_ExpandCollapseClicked(object sender, Folder f)
@@ -317,6 +506,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     return Localization.GetString("local_folders").ToUpper(CultureInfo.CurrentCulture);
 
                 throw new ArgumentException(nameof(section));
+            }
+
+            public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                var actions = new List<UITableViewRowAction>();
+
+                if (indexPath.Section == Section.Favorites)
+                {
+                    var rff = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("remove_from_favorites"), (arg1, arg2) => { });
+                    rff.BackgroundColor = Theme.Brown;
+                    actions.Add(rff);
+                }
+
+                if (indexPath.Section == Section.Folders)
+                {
+                    var rff = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("remove_from_favorites"), (arg1, arg2) => { });
+                    rff.BackgroundColor = Theme.Brown;
+                    actions.Add(rff);
+
+                    var ec = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_caching"), (arg1, arg2) => { });
+                    ec.BackgroundColor = Theme.DarkBlue;
+                    actions.Add(ec);
+
+                    var n = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("notify"), (arg1, arg2) => { });
+                    n.BackgroundColor = Theme.Blue;
+                    actions.Add(n);
+                }
+
+                return actions.ToArray();
             }
 
             protected override void Dispose(bool disposing)

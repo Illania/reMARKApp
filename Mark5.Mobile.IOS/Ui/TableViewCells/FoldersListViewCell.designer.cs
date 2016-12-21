@@ -38,9 +38,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 		
 		void ReleaseDesignerOutlets ()
 		{
-			if (FolderIconImage != null) {
-				FolderIconImage.Dispose ();
-				FolderIconImage = null;
+			if (ExpandCollapseButton != null) {
+				ExpandCollapseButton.Dispose ();
+				ExpandCollapseButton = null;
 			}
 
 			if (FolderCheckedIndicatorImage != null) {
@@ -48,9 +48,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 				FolderCheckedIndicatorImage = null;
 			}
 
-			if (OfflineIndicatorImage != null) {
-				OfflineIndicatorImage.Dispose ();
-				OfflineIndicatorImage = null;
+			if (FolderIconImage != null) {
+				FolderIconImage.Dispose ();
+				FolderIconImage = null;
 			}
 
 			if (FolderNameLabel != null) {
@@ -58,9 +58,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 				FolderNameLabel = null;
 			}
 
-			if (ExpandCollapseButton != null) {
-				ExpandCollapseButton.Dispose ();
-				ExpandCollapseButton = null;
+			if (OfflineIndicatorImage != null) {
+				OfflineIndicatorImage.Dispose ();
+				OfflineIndicatorImage = null;
 			}
 
 			if (OfflineIndicatorWidthConstraint != null) {
