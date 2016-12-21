@@ -9,8 +9,8 @@ using System.CodeDom.Compiler;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-	[Register ("SearchFoldersTableViewCell")]
-	partial class SearchFoldersTableViewCell
+	[Register ("FoldersSearchResultsTableViewCell")]
+	partial class FoldersSearchResultsTableViewCell
 	{
 		[Outlet]
 		UIKit.UIImageView FolderIconImage { get; set; }

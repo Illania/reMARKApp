@@ -164,10 +164,10 @@
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
-    <InterfaceDefinition Include="Ui\TableViewCells\FoldersListViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\FoldersTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\WaitTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\EmptyTableViewCell.xib" />
-    <InterfaceDefinition Include="Ui\TableViewCells\SearchFoldersTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -212,9 +212,9 @@
     <Compile Include="Ui\ViewControllers\FoldersList\AbstractFoldersListViewController.cs" />
     <Compile Include="Ui\ViewControllers\FoldersList\BrowseFoldersListViewController.cs" />
     <Compile Include="Ui\ViewControllers\DocumentViewController.cs" />
-    <Compile Include="Ui\TableViewCells\FoldersListViewCell.cs" />
-    <Compile Include="Ui\TableViewCells\FoldersListViewCell.designer.cs">
-      <DependentUpon>FoldersListViewCell.cs</DependentUpon>
+    <Compile Include="Ui\TableViewCells\FoldersTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\FoldersTableViewCell.designer.cs">
+      <DependentUpon>FoldersTableViewCell.cs</DependentUpon>
     </Compile>
     <Compile Include="Ui\TableViewCells\WaitTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\WaitTableViewCell.designer.cs">
@@ -224,9 +224,9 @@
     <Compile Include="Ui\TableViewCells\EmptyTableViewCell.designer.cs">
       <DependentUpon>EmptyTableViewCell.cs</DependentUpon>
     </Compile>
-    <Compile Include="Ui\TableViewCells\SearchFoldersTableViewCell.cs" />
-    <Compile Include="Ui\TableViewCells\SearchFoldersTableViewCell.designer.cs">
-      <DependentUpon>SearchFoldersTableViewCell.cs</DependentUpon>
+    <Compile Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.designer.cs">
+      <DependentUpon>FoldersSearchResultsTableViewCell.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.IOS
-// File: SearchFoldersTableViewCell.cs
+// File: FoldersSearchResultsTableViewCell.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -14,20 +14,18 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
     
-    public partial class SearchFoldersTableViewCell : UITableViewCell
+    public partial class FoldersSearchResultsTableViewCell : UITableViewCell
     {
         
-        public static readonly NSString Key = new NSString("SearchFoldersTableViewCell");
-        public static readonly UINib Nib = UINib.FromName("SearchFoldersTableViewCell", NSBundle.MainBundle);
+        public static readonly NSString Key = new NSString("FoldersSearchResultsTableViewCell");
+        public static readonly UINib Nib = UINib.FromName("FoldersSearchResultsTableViewCell", NSBundle.MainBundle);
 
-        Folder folder;
-
-        public static SearchFoldersTableViewCell Create()
+        public static FoldersSearchResultsTableViewCell Create()
         {
-            return (SearchFoldersTableViewCell)Nib.Instantiate(null, null)[0];
+            return (FoldersSearchResultsTableViewCell)Nib.Instantiate(null, null)[0];
         }
 
-        protected SearchFoldersTableViewCell(IntPtr handle)
+        protected FoldersSearchResultsTableViewCell(IntPtr handle)
             : base(handle)
         {
         }

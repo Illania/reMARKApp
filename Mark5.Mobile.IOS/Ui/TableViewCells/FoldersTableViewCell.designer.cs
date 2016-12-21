@@ -9,8 +9,8 @@ using System.CodeDom.Compiler;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-	[Register ("FoldersListViewCell")]
-	partial class FoldersListViewCell
+	[Register ("FoldersTableViewCell")]
+	partial class FoldersTableViewCell
 	{
 		[Outlet]
 		UIKit.UIButton ExpandCollapseButton { get; set; }

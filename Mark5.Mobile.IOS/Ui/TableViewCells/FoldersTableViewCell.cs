@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.IOS
-// File: FoldersListViewCell.cs
+// File: FoldersTableViewCell.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -15,19 +15,19 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
     
-    public partial class FoldersListViewCell : UITableViewCell
+    public partial class FoldersTableViewCell : UITableViewCell
     {
     
-        public static readonly UINib Nib = UINib.FromName("FoldersListViewCell", NSBundle.MainBundle);
-        public static readonly NSString Key = new NSString("FoldersListViewCell");
+        public static readonly UINib Nib = UINib.FromName("FoldersTableViewCell", NSBundle.MainBundle);
+        public static readonly NSString Key = new NSString("FoldersTableViewCell");
 
         Folder folder;
 
         public event EventHandler<Folder> ExpandCollapseClicked;
 
-        public static FoldersListViewCell Create()
+        public static FoldersTableViewCell Create()
         {
-            var cell = (FoldersListViewCell)Nib.Instantiate(null, null)[0];
+            var cell = (FoldersTableViewCell)Nib.Instantiate(null, null)[0];
             cell.FolderCheckedIndicatorImage.Image = UIImage.FromBundle(Path.Combine("Icons", "checkmark.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             cell.FolderCheckedIndicatorImage.TintColor = Theme.Brown;
             cell.OfflineIndicatorImage.Image = UIImage.FromBundle(Path.Combine("Icons", "offline.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
@@ -36,7 +36,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             return cell;
         }
 
-        public FoldersListViewCell(IntPtr handle)
+        public FoldersTableViewCell(IntPtr handle)
             : base(handle)
         {
         }
