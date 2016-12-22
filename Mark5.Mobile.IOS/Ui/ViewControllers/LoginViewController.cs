@@ -23,7 +23,7 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
 
-    public class LoginViewController : ViewController
+    public class LoginViewController : AbstractViewController
     {
 
         #region Animation and layout controls
@@ -604,14 +604,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Info($"Registering {nameof(ReachabilityReceiver)}...");
                 PlatformConfig.ReachabilityReceiver.Register();
 
-                CommonConfig.Logger.Info($"Logged in - will present {nameof(MainViewController)}");
+                CommonConfig.Logger.Info($"Logged in - will present {nameof(SplitMainViewController)}");
 
                 if (dismissAction != null) dismissAction();
 
                 UIApplication.SharedApplication.RegisterUserNotificationSettings(UIUserNotificationSettings.GetSettingsForTypes(UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound, null));
                 UIApplication.SharedApplication.RegisterForRemoteNotifications();
 
-                PresentViewController(new MainViewController
+                PresentViewController(new SplitMainViewController
                 {
                     ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
                 }, true, null);

@@ -12,7 +12,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
     
     public class NavigationController : UINavigationController, ITaggedViewController
     {
-        UIModalPresentationStyle pageSheet;
 
         public string Tag { get; set; }
 

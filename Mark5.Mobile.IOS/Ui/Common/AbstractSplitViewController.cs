@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.IOS
-// File: SplitViewController.cs
+// File: AbstractSplitViewController.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -12,12 +12,12 @@ using Mark5.Mobile.Common.Extensions;
 namespace Mark5.Mobile.IOS.Ui.Common
 {
 
-    public abstract class SplitViewController : UISplitViewController, ITaggedViewController
+    public abstract class AbstractSplitViewController : UISplitViewController, ITaggedViewController
     {
         
         public string Tag { get; set; }
 
-        protected SplitViewController()
+        protected AbstractSplitViewController()
         {
             PreferredDisplayMode = UISplitViewControllerDisplayMode.AllVisible;
 

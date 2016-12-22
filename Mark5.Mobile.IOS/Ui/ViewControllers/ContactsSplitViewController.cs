@@ -12,7 +12,7 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     
-    public class ContactsSplitViewController : SplitViewController
+    public class ContactsSplitViewController : AbstractSplitViewController
     {
 
         protected override NavigationController CreatePrimaryNavigationController()

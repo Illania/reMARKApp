@@ -10,7 +10,7 @@ using Mark5.Mobile.IOS.Ui.Common;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     
-    public class NotificationsListViewController : ViewController
+    public class NotificationsListViewController : AbstractViewController
     {
     }
 }

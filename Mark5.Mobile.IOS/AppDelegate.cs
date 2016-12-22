@@ -52,8 +52,12 @@ namespace Mark5.Mobile.IOS
                 Theme.ApplyTheme(Window);
 
                 UIViewController vc;
-                if (isLoggedIn) vc = new MainViewController();
-                else vc = new LoginViewController();
+                if (!isLoggedIn)
+                    vc = new LoginViewController();
+                else if (Integration.IsIPhone())
+                    vc = new SimpleMainViewController();
+                else
+                    vc = new SplitMainViewController();
 
                 Window.RootViewController = vc;
                 Window.MakeKeyAndVisible();
@@ -64,6 +68,15 @@ namespace Mark5.Mobile.IOS
             }
 
             return true;
+        }
+
+        public override void ReceiveMemoryWarning(UIApplication application)
+        {
+            base.ReceiveMemoryWarning(application);
+
+            CommonConfig.Logger.Warning("Received memery warning!");
+
+            GC.Collect();
         }
 
         public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
@@ -207,7 +220,7 @@ namespace Mark5.Mobile.IOS
                     UIApplication.SharedApplication.RegisterForRemoteNotifications();
                 });
 
-                CommonConfig.Logger.Info($"Initialized - will present {nameof(MainViewController)}");
+                CommonConfig.Logger.Info($"Initialized - will present {nameof(SplitMainViewController)}");
 
                 return true;
             }).Result;

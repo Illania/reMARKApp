@@ -191,7 +191,7 @@
     <Compile Include="Ui\Common\Theme.cs" />
     <Compile Include="Ui\Common\UIFontExtensions.cs" />
     <Compile Include="ServerConfig.cs" />
-    <Compile Include="Ui\ViewControllers\MainViewController.cs" />
+    <Compile Include="Ui\ViewControllers\SplitMainViewController.cs" />
     <Compile Include="Services\ReachabilityReceiver.cs" />
     <Compile Include="Utilities\Integration.cs" />
     <Compile Include="Ui\Common\KeyboardUtilities.cs" />
@@ -206,8 +206,8 @@
     <Compile Include="Ui\ViewControllers\NotificationsListViewController.cs" />
     <Compile Include="Ui\ViewControllers\SettingsViewController.cs" />
     <Compile Include="Ui\Common\NavigationController.cs" />
-    <Compile Include="Ui\Common\SplitViewController.cs" />
-    <Compile Include="Ui\Common\ViewController.cs" />
+    <Compile Include="Ui\Common\AbstractSplitViewController.cs" />
+    <Compile Include="Ui\Common\AbstractViewController.cs" />
     <Compile Include="Ui\Common\ITaggedViewController.cs" />
     <Compile Include="Ui\ViewControllers\FoldersList\AbstractFoldersListViewController.cs" />
     <Compile Include="Ui\ViewControllers\FoldersList\BrowseFoldersListViewController.cs" />
@@ -233,6 +233,8 @@
     <Compile Include="Ui\ViewControllers\ContactViewController.cs" />
     <Compile Include="Ui\ViewControllers\ShortcodeViewController.cs" />
     <Compile Include="Ui\Common\PopoverPresentationControllerDelegate.cs" />
+    <Compile Include="Ui\ViewControllers\SimpleMainViewController.cs" />
+    <Compile Include="Ui\ViewControllers\AbstractMainViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
