@@ -13,7 +13,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 	partial class FoldersTableViewCell
 	{
 		[Outlet]
-		UIKit.UIButton ExpandCollapseButton { get; set; }
+		UIKit.UIButton ExpandButton { get; set; }
 
 		[Outlet]
 		UIKit.UIImageView FolderCheckedIndicatorImage { get; set; }
@@ -33,14 +33,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 		[Outlet]
 		UIKit.NSLayoutConstraint OfflineIndicatorWidthConstraint { get; set; }
 
-		[Action ("ExpandCollapseButtonTouchUpInside:")]
-		partial void ExpandCollapseButtonTouchUpInside (Foundation.NSObject sender);
+		[Action ("ExpandButtonTouchUpInside:")]
+		partial void ExpandButtonTouchUpInside (Foundation.NSObject sender);
 		
 		void ReleaseDesignerOutlets ()
 		{
-			if (ExpandCollapseButton != null) {
-				ExpandCollapseButton.Dispose ();
-				ExpandCollapseButton = null;
+			if (ExpandButton != null) {
+				ExpandButton.Dispose ();
+				ExpandButton = null;
 			}
 
 			if (FolderCheckedIndicatorImage != null) {

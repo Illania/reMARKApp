@@ -105,7 +105,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(AbstractFoldersListViewController)} received memory warning");
+            CommonConfig.Logger.Warning($"{nameof(AbstractFoldersListViewController)} received memory warning!");
 
             var ds = FoldersTableView?.DataSource as DataSource;
             ds?.Reset();
@@ -122,14 +122,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         void InitializeNavigationBarTitle()
         {
+            Func<string> getTitle = () =>
+            {
+                switch (ParentFolder.Module)
+                {
+                    case ModuleType.Documents:
+                        return Localization.GetString("documents");
+                    case ModuleType.Contacts:
+                        return Localization.GetString("contacts");
+                    case ModuleType.Shortcodes:
+                        return Localization.GetString("shortcodes");
+                    case ModuleType.Calendar:
+                        return Localization.GetString("contacts");
+                    default:
+                        return string.Empty;
+                }
+            };
+
             if (IsRootOfFoldersList)
             {
-                NavigationItem.Title = Localization.GetString("documents");
+                NavigationItem.Title = getTitle();
             }
             else
             {
                 NavigationItem.Title = ParentFolder.Name;
-                NavigationItem.Prompt = Localization.GetString("documents");
+                NavigationItem.Prompt = getTitle();
             }
         }
 
@@ -161,7 +178,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 return;
             }
 
-            if (ParentFolder.Module == ModuleType.Contacts || ParentFolder.Module == ModuleType.Shortcodes)
+            if (ParentFolder.Module == ModuleType.Contacts || ParentFolder.Module == ModuleType.Shortcodes || ParentFolder.Module == ModuleType.Calendar)
             {
                 if (IsRootOfFoldersList)
                 {
@@ -253,6 +270,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             // TODO
         }
+
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void EditModeItem_Clicked(object sender, EventArgs e)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
@@ -266,7 +284,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 try
                 {
-                    var gds = FoldersTableView.Source as GrouppedDataSource;
+                    var gds = (GrouppedDataSource)FoldersTableView.Source;
                     await Managers.FoldersManager.SetFavoriteFoldersAsync(ParentFolder.Module, gds.GetFavoriteFolders());
                 }
                 catch (Exception ex)
@@ -303,7 +321,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 if (IsRootOfFoldersList)
                 {
-                    var ds = FoldersTableView.Source as GrouppedDataSource;
+                    var gds = (GrouppedDataSource)FoldersTableView.Source;
 
                     var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(ParentFolder.Module);
 
@@ -330,19 +348,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         offlineStatus[id] = await Managers.FoldersManager.IsFolderOfflineAsync(ParentFolder.Module, id);
                     }
 
-                    ds.FavoriteStatus = favoritesStatus;
-                    ds.CachingStatus = offlineStatus;
+                    gds.FavoriteStatus = favoritesStatus;
+                    gds.CachingStatus = offlineStatus;
 
                     if (ParentFolder.Module == ModuleType.Documents)
                     {
-                        ds.SetFolders(GrouppedDataSource.Section.Local, Folder.LocalRootForModule(ModuleType.Documents).SubFolders);
+                        gds.SetFolders(GrouppedDataSource.Section.Local, Folder.LocalRootForModule(ModuleType.Documents).SubFolders);
                     }
-                    ds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
-                    ds.SetFolders(GrouppedDataSource.Section.Folders, folders);
+                    gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
+                    gds.SetFolders(GrouppedDataSource.Section.Folders, folders);
                 }
                 else
                 {
-                    var ds = FoldersTableView.Source as DataSource;
+                    var ds = (DataSource)FoldersTableView.Source;
 
                     List<Folder> folders;
                     if (!forceRefresh && ParentFolder.HasSubFolders && ParentFolder.SubFolders != null && ParentFolder.SubFolders.Count > 0)
@@ -746,14 +764,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             public override nint RowsInSection(UITableView tableview, nint section)
             {
                 if (loading)
-                {
                     return 1;
-                }
 
                 if (foldersInView.Count < 1)
-                {
                     return 1;
-                }
 
                 return foldersInView.Count;
             }
@@ -936,7 +950,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     return;
                 }
 
-                if (module == ModuleType.Contacts || module == ModuleType.Shortcodes)
+                if (module == ModuleType.Contacts || module == ModuleType.Shortcodes || module == ModuleType.Calendar)
                 {
                     loading = new[] { true, true };
                     foldersInView = new Dictionary<nint, List<Folder>>
@@ -1165,13 +1179,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 foreach (var kv in foldersInView)
                     kv.Value.Clear();
 
-                tableView.ReloadSections(NSIndexSet.FromIndex(Section.Favorites), UITableViewRowAnimation.Automatic);
-                tableView.ReloadSections(NSIndexSet.FromIndex(Section.Folders), UITableViewRowAnimation.Automatic);
-
-                if (foldersInView.ContainsKey(Section.Local))
+                if (module == ModuleType.Documents)
                 {
                     tableView.ReloadSections(NSIndexSet.FromIndex(Section.Local), UITableViewRowAnimation.Automatic);
                 }
+
+                tableView.ReloadSections(NSIndexSet.FromIndex(Section.Favorites), UITableViewRowAnimation.Automatic);
+                tableView.ReloadSections(NSIndexSet.FromIndex(Section.Folders), UITableViewRowAnimation.Automatic);
             }
 
             public Folder[] GetFolders(int folderId)

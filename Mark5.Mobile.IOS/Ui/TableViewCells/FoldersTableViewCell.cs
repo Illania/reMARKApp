@@ -32,7 +32,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             cell.FolderCheckedIndicatorImage.TintColor = Theme.Brown;
             cell.OfflineIndicatorImage.Image = UIImage.FromBundle(Path.Combine("Icons", "offline.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             cell.OfflineIndicatorImage.TintColor = Theme.DarkBlue;
-            cell.ExpandCollapseButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "expand.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            cell.ExpandButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "expand.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             return cell;
         }
 
@@ -74,17 +74,17 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             if (folder.HasSubFolders)
             {
-                ExpandCollapseButton.Alpha = 1f;
-                ExpandCollapseButton.Hidden = false;
+                ExpandButton.Alpha = 1f;
+                ExpandButton.Hidden = false;
             }
             else
             {
-                ExpandCollapseButton.Alpha = 0f;
-                ExpandCollapseButton.Hidden = true;
+                ExpandButton.Alpha = 0f;
+                ExpandButton.Hidden = true;
             }
         }
 
-        partial void ExpandCollapseButtonTouchUpInside(NSObject sender)
+        partial void ExpandButtonTouchUpInside(NSObject sender)
         {
             if (ExpandCollapseClicked != null && folder != null)
                 ExpandCollapseClicked(this, folder);

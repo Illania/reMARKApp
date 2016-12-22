@@ -21,7 +21,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PreferredDisplayMode = UISplitViewControllerDisplayMode.AllVisible;
             ViewControllers = new UIViewController[]
             {
-                new NavigationController(new BrowseFoldersListViewController(ModuleType.Contacts)),
+                new NavigationController(new BrowseFoldersListViewController(ModuleType.Documents)),
                 new NavigationController(new DocumentViewController())
             };
 

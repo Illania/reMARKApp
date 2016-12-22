@@ -55,7 +55,7 @@
                         </constraints>
                         <inset key="contentEdgeInsets" minX="14" minY="14" maxX="15" maxY="15"/>
                         <connections>
-                            <action selector="ExpandCollapseButtonTouchUpInside:" destination="cxk-wN-pdQ" eventType="touchUpInside" id="aJD-dE-cMN"/>
+                            <action selector="ExpandButtonTouchUpInside:" destination="cxk-wN-pdQ" eventType="touchUpInside" id="aJD-dE-cMN"/>
                         </connections>
                     </button>
                 </subviews>
@@ -75,7 +75,7 @@
                 </constraints>
             </tableViewCellContentView>
             <connections>
-                <outlet property="ExpandCollapseButton" destination="FY4-3d-pGM" id="Zex-w9-qN2"/>
+                <outlet property="ExpandButton" destination="FY4-3d-pGM" id="Zex-w9-qN2"/>
                 <outlet property="FolderCheckedIndicatorImage" destination="vNG-BT-Bj6" id="hii-Sz-akK"/>
                 <outlet property="FolderIconImage" destination="QP8-BO-FLP" id="QhB-t0-sVj"/>
                 <outlet property="FolderNameLabel" destination="Z2j-wy-c3r" id="yGZ-7m-v2p"/>
