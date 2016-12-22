@@ -23,7 +23,7 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
 
-    public class LoginViewController : ViewController
+    public class LoginViewController : AbstractViewController
     {
 
         #region Animation and layout controls
@@ -458,7 +458,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var sv = new LoginSettingsViewController.SettingsValues { SslMode = sslMode };
             var loginSettingsViewController = new LoginSettingsViewController(sv);
             loginSettingsViewController.RestrictedSettingsValuesUpdated += LoginSettingsViewController_RestrictedSettingsValuesUpdated;
-            PresentViewController(new UINavigationController(loginSettingsViewController), true, null);
+            PresentViewController(new NavigationController(loginSettingsViewController, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void TextField_EditingChanged(object sender, EventArgs e) => ValidateForm();
@@ -484,7 +484,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void LoginButton_TouchUpInside(object sender, EventArgs e)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             loginButton.TouchUpInside -= LoginButton_TouchUpInside;
 
@@ -602,14 +604,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Info($"Registering {nameof(ReachabilityReceiver)}...");
                 PlatformConfig.ReachabilityReceiver.Register();
 
-                CommonConfig.Logger.Info($"Logged in - will present {nameof(MainViewController)}");
+                CommonConfig.Logger.Info($"Logged in - will present {nameof(SplitMainViewController)}");
 
                 if (dismissAction != null) dismissAction();
 
                 UIApplication.SharedApplication.RegisterUserNotificationSettings(UIUserNotificationSettings.GetSettingsForTypes(UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound, null));
                 UIApplication.SharedApplication.RegisterForRemoteNotifications();
 
-                PresentViewController(new MainViewController
+                PresentViewController(new SplitMainViewController
                 {
                     ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
                 }, true, null);
@@ -620,7 +622,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Error("Log in failed", ex);
 
-                await Dialogs.ShowConfirmDialogAsync(this, "failed", "login failed");
+                await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("login_failed"), Localization.GetString("login_failed_desc"));
 
                 loginButton.TouchUpInside += LoginButton_TouchUpInside;
             }
