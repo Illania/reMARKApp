@@ -136,8 +136,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             subViews.Add(contentView);
 
             AddArrangedViewsWithSeparators(subViews);
-            StackView.Alpha = 0.0f;
-
         }
 
         #endregion
@@ -176,7 +174,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
                 else
                 {
-                    var sourceType = PreviousDocumentDirection == DocumentDirection.Draft ? SourceType.Auto : SourceType.Local;
+                    var sourceType = SourceType.Auto;
+                    //TODO eventually this could be improved by first checking the cache
                     var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, sourceType); // TODO
                     PreviousDocument = container.Document;
                     PreviousDocumentPreview = container.DocumentPreview;
@@ -185,7 +184,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         Document.Id = DocumentPreview.Id = PreviousDocument.Id;
                     }
                 }
-
 
                 await ShowDocument();
             }
@@ -219,9 +217,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             //await AskIfShouldUseTemplates(); //TODO
         }
-
-
-
 
     }
 }
