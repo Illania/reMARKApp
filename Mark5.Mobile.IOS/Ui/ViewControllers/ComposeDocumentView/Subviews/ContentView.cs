@@ -7,81 +7,96 @@
 //
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using AngleSharp.Dom;
+using AngleSharp.Html;
+using AngleSharp.Parser.Html;
 using CoreGraphics;
 using Foundation;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
+using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-    public class ContentView : ComposeDocumentView
+    public class ContentView : ComposeDocumentView, IWKNavigationDelegate
     {
-        public event EventHandler Edited = delegate { };
 
-        UITextView editTextView;
-        UITextView previousTextView;
         UIButton expandButton;
 
-        DocumentCreationModeFlag creationModeFlag;
-
-        NSTextContainer editContentContainer;
-        NSLayoutManager editContentLayoutManager;
-        NSTextStorage editContentStorage;
-        NSTextContainer previousContentContainer;
-        NSLayoutManager previousContentLayoutManager;
-        NSTextStorage previousContentStorage;
+        WKWebView newContentWebView;
+        WKWebView oldContentWebView;
 
         bool previousDocumentContentLoaded;
+        string oldContent;
+        bool oldContentLoaded;
 
         Dictionary<UIView, NSLayoutConstraint[]> constraintsStash;
         NSLayoutConstraint zeroHeightConstraint;
         NSLayoutConstraint minimumHeightConstraint;
 
+        const string EditableContentClass = "content_c176f8ef-2579-4f1f-86c1-f289beaba2ae";
+        const string TemplateElementClass = "template_75bb41fd-4984-43f5-b61d-3dbbe87bca21";
+
+        const string DefaultEditContent = @"<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.01 Transitional//EN"" ""http://www.w3.org/TR/html4/loose.dtd"">
+                                            <html>
+                                                <head>
+                                                    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0 "">
+                                                </head>
+                                                <body>
+                                                    <div class=""" + EditableContentClass + @""" contenteditable=""true"" style=""width: 100%""><br></div>
+                                                    <div class=""" + TemplateElementClass + @""" style=""outline: 0px solid transparent""></div>
+                                                </body>
+                                            </html>";
+
+
+        const string GetWebContentJs = "document.documentElement.outerHTML;";
+        const string GetPlainTextContentJs = "document.body.innerText;";
+
         public ContentView()
         {
-            MinimumHeight = 200.0f;
             constraintsStash = new Dictionary<UIView, NSLayoutConstraint[]>();
 
-            Initialize();
+            InitializeNewContentControls();
+            InitializePreviousContentControls();
         }
 
-        void Initialize()
+        void InitializeNewContentControls()
         {
-            editContentContainer = new NSTextContainer();
+            var preferences = new WKPreferences();
+            preferences.JavaScriptCanOpenWindowsAutomatically = false;
+            preferences.JavaScriptEnabled = true;
 
-            editContentLayoutManager = new NSLayoutManager();
-            editContentLayoutManager.AddTextContainer(editContentContainer);
+            var configuration = new WKWebViewConfiguration();
+            configuration.Preferences = preferences;
+            configuration.SuppressesIncrementalRendering = false;
+            configuration.AllowsInlineMediaPlayback = false;
 
-            editContentStorage = new NSTextStorage();
-            editContentStorage.AddLayoutManager(editContentLayoutManager);
+            newContentWebView = new WKWebView(CGRect.Empty, configuration);
+            newContentWebView.TranslatesAutoresizingMaskIntoConstraints = false;
+            newContentWebView.Opaque = false;
 
-            editTextView = new UITextView(CGRect.Empty, editContentContainer);
-            editTextView.Font = Theme.DefaultDocumentFont;
-            editTextView.Opaque = false;
-            editTextView.AutocapitalizationType = UITextAutocapitalizationType.Sentences;
-            editTextView.AutocorrectionType = UITextAutocorrectionType.Yes;
-            editTextView.SpellCheckingType = UITextSpellCheckingType.Yes;
-            editTextView.DataDetectorTypes = UIDataDetectorType.All;
-            editTextView.ScrollEnabled = false;
-            editTextView.ClipsToBounds = false;
-            editTextView.TranslatesAutoresizingMaskIntoConstraints = false;
-            editTextView.Changed += (sender, e) => Edited(this, EventArgs.Empty);
-            editTextView.SelectionChanged += HandleTextViewSelectionChanged;
-            editTextView.Started += HandleScrollToView;
-            AddSubview(editTextView);
+            newContentWebView.ScrollView.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
+            newContentWebView.ScrollView.ScrollEnabled = false;
+
+            AddSubview(newContentWebView);
             AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(editTextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1.0f, VerticalMargin),
-                    NSLayoutConstraint.Create(editTextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1.0f, HorizontalMargin),
-                    NSLayoutConstraint.Create(editTextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin),
-                    NSLayoutConstraint.Create(editTextView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, 200),
+                    NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1.0f, VerticalMargin),
+                    NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1.0f, HorizontalMargin),
+                    NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin),
+                    NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, 200)
                 });
+
+            newContentWebView.LoadHtmlString(DefaultEditContent, null);
         }
 
         void InitializePreviousContentControls()
@@ -89,71 +104,64 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             expandButton = UIButton.FromType(UIButtonType.System);
             expandButton.SetTitle(Localization.GetString("show_original_message"), UIControlState.Normal);
             expandButton.TranslatesAutoresizingMaskIntoConstraints = false;
-            expandButton.Font = Theme.DefaultFont;
+            expandButton.TitleLabel.Font = Theme.DefaultFont;
             expandButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Center;
             expandButton.Opaque = false;
+            expandButton.Hidden = true;
             expandButton.TouchUpInside += HandleExpandButtonTapped;
 
             AddSubview(expandButton);
             AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(expandButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, editTextView, NSLayoutAttribute.Bottom, 1.0f, 0),
+                NSLayoutConstraint.Create(expandButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, newContentWebView, NSLayoutAttribute.Bottom, 1.0f, 0),
                 NSLayoutConstraint.Create(expandButton, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1.0f, 2*HorizontalMargin),
-                NSLayoutConstraint.Create(expandButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1.0f, -2*HorizontalMargin),
+                NSLayoutConstraint.Create(expandButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1.0f, -2*HorizontalMargin)
             });
 
-            previousContentContainer = new NSTextContainer();
+            var preferences = new WKPreferences();
+            preferences.JavaScriptCanOpenWindowsAutomatically = false; //TODO check all the parameters
+            preferences.JavaScriptEnabled = false;
 
-            previousContentLayoutManager = new NSLayoutManager();
-            previousContentLayoutManager.AddTextContainer(previousContentContainer);
+            var configuration = new WKWebViewConfiguration();
+            configuration.Preferences = preferences;
+            configuration.SuppressesIncrementalRendering = false;
+            configuration.AllowsInlineMediaPlayback = false;
 
-            previousContentStorage = new NSTextStorage();
-            previousContentStorage.AddLayoutManager(previousContentLayoutManager);
+            oldContentWebView = new WKWebView(CGRect.Empty, configuration);
+            oldContentWebView.Hidden = true;
+            oldContentWebView.TranslatesAutoresizingMaskIntoConstraints = false;
+            oldContentWebView.Opaque = false;
 
-            previousTextView = new UITextView(CGRect.Empty, previousContentContainer);
-            previousTextView.Hidden = true;
-            previousTextView.Layer.BorderWidth = 0.7f;
-            previousTextView.Layer.BorderColor = new UITableView().SeparatorColor.CGColor;
-            previousTextView.Font = Theme.DefaultDocumentFont;
-            previousTextView.Opaque = false;
-            previousTextView.AutocapitalizationType = UITextAutocapitalizationType.Sentences;
-            previousTextView.AutocorrectionType = UITextAutocorrectionType.Yes;
-            previousTextView.SpellCheckingType = UITextSpellCheckingType.Yes;
-            previousTextView.DataDetectorTypes = UIDataDetectorType.All;
-            previousTextView.ScrollEnabled = false;
-            previousTextView.ClipsToBounds = false;
-            previousTextView.TranslatesAutoresizingMaskIntoConstraints = false;
-            previousTextView.Changed += (sender, e) => Edited(this, EventArgs.Empty);
-            previousTextView.SelectionChanged += HandleTextViewSelectionChanged;
-            previousTextView.Started += HandleScrollToView;
-            AddSubview(previousTextView);
+            oldContentWebView.ScrollView.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
+            oldContentWebView.ScrollView.ScrollEnabled = false;
+            AddSubview(oldContentWebView);
 
-            minimumHeightConstraint = NSLayoutConstraint.Create(previousTextView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, 0.5f);
-            zeroHeightConstraint = NSLayoutConstraint.Create(previousTextView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, 0.0f);
+            minimumHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, 0.5f);
+            zeroHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, 0.0f);
 
             AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(previousTextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, expandButton, NSLayoutAttribute.Bottom, 1.0f, 0),
-                NSLayoutConstraint.Create(previousTextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1.0f, HorizontalMargin),
-                NSLayoutConstraint.Create(previousTextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin),
-                NSLayoutConstraint.Create(previousTextView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1.0f, -VerticalMargin),
-                zeroHeightConstraint,
+                NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, expandButton, NSLayoutAttribute.Bottom, 1.0f, 0),
+                NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1.0f, HorizontalMargin),
+                NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin),
+                NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1.0f, -VerticalMargin),
+                zeroHeightConstraint
             });
         }
 
-        #region Overrides
+        #region Public methods
 
-        public override  Task RefreshView()
+        public override async Task RefreshView()
         {
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
-                var result = GetContentAndTypeFromDocument();
-                var content = result.Item1;
-                var nsDocumentType = result.Item2;
-                var contentAttributedString = content.ToNSAttributedString(nsDocumentType, Theme.DefaultDocumentFont);
-                if (contentAttributedString != null && contentAttributedString.Length > 0)
+                if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
                 {
-                    editTextView.AttributedText = contentAttributedString;
+                    await SetWebContentPart(EditableContentClass, ContentType.Html, PreviousDocument.HtmlBody);
+                }
+                else
+                {
+                    await SetWebContentPart(EditableContentClass, ContentType.PlainText, PreviousDocument.PlainTextBody);
                 }
             }
             else
@@ -161,52 +169,248 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 expandButton.Hidden &= PreviousDocument == null;
             }
 
-            return Task.CompletedTask;
         }
 
-        public override  Task UpdateDocument()
+        public override async Task UpdateDocument()
         {
-            Document.HtmlBody = GetHtmlText();
-            //TODO need to update also the document preview preview, but we need anglesharp for that
-            return Task.CompletedTask;
+            Document.HtmlBody = await RetrieveCombinedText();
+            DocumentPreview.Preview = await GetPreview(Document.HtmlBody);
+        }
+
+        public async Task InsertTemplate(Template template)
+        {
+            await SetWebContentPart(TemplateElementClass, template.ContentType, template.Content);
+        }
+
+        public async Task InsertLocalTemplate(string localTemplate)
+        {
+            await SetWebContentPart(TemplateElementClass, ContentType.PlainText, localTemplate);
+        }
+
+        #endregion
+
+        #region
+
+        async Task LoadOldContent()
+        {
+            if (!oldContentLoaded && CreationModeFlag != DocumentCreationModeFlag.Edit && PreviousDocument != null)
+            {
+                if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
+                {
+                    oldContent = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
+                }
+                else if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
+                {
+                    oldContent = await GetBodyWithHeader(PreviousDocument.HtmlBody, ContentType.Html);
+                }
+                else
+                {
+                    oldContent = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
+                }
+
+                oldContentWebView.LoadHtmlString(oldContent, null);
+                oldContentLoaded = true;
+            }
+        }
+
+        string GetHtmlHeader()
+        {
+            var date = DateTime.Now.ToString(); //TODO modify
+
+            var header = new StringBuilder();
+            header.Append("<br/><hr/>");
+            header.Append(string.Format("<b>From</b>: {0}", GetAddressTextFromPreviousDocument(DocumentAddressType.From))).Append("</br>");
+            header.Append(string.Format("<b>Date</b>: {0}", date)).Append("</br>");
+            header.Append(string.Format("<b>To</b>: {0}", GetAddressTextFromPreviousDocument(DocumentAddressType.To))).Append("</br>");
+            var ccText = GetAddressTextFromPreviousDocument(DocumentAddressType.Cc);
+            if (!string.IsNullOrWhiteSpace(ccText))
+            {
+                header.Append(string.Format("<b>Cc</b>: {0}", ccText)).Append("</br>");
+            }
+            header.Append(string.Format("<b>Subject</b>: {0}", PreviousDocumentPreview.Subject)).Append("</br>");
+            header.Append("<br/><br/>");
+
+            return header.ToString();
+        }
+
+        string GetAddressTextFromPreviousDocument(DocumentAddressType addressType)
+        {
+            var sb = new StringBuilder();
+            var addresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == addressType).ToList();
+            for (int i = 0; i < addresses.Count; i++)
+            {
+                var hasName = !string.IsNullOrWhiteSpace(addresses[i].Name);
+                if (hasName)
+                {
+                    sb.Append(addresses[i].Name).Append(" &lt;");
+                }
+                sb.Append(addresses[i].Address);
+                if (hasName)
+                {
+                    sb.Append("&gt;");
+                }
+                if (i < addresses.Count - 1)
+                {
+                    sb.Append(", ");
+                }
+            }
+            return sb.ToString();
+        }
+
+        async Task<string> GetBodyWithHeader(string content, ContentType contentType)
+        {
+            if (contentType == ContentType.Html)
+            {
+                var htmlHeader = GetHtmlHeader();
+
+                var htmlParser = new HtmlParser();
+                var htmlDocument = await htmlParser.ParseAsync(content);
+                var body = htmlDocument.Body;
+                var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
+                body.InsertBefore(parsedHeader.Body, body.FirstChild);
+
+                var textWriter = new StringWriter();
+                htmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
+
+                return textWriter.ToString();
+            }
+
+            if (contentType == ContentType.PlainText)
+            {
+                var htmlHeader = GetHtmlHeader();
+
+                var htmlParser = new HtmlParser();
+                var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
+
+                var contentHtml = parsedHeader.CreateElement("pre");
+                contentHtml.TextContent = content;
+
+                parsedHeader.Body.Append(contentHtml);
+
+                var textWriter = new StringWriter();
+                parsedHeader.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
+
+                return textWriter.ToString();
+            }
+            return "";
+        }
+
+        async Task<string> RetrieveCombinedText()
+        {
+            var newContentString = (await newContentWebView.EvaluateJavaScriptAsync(GetWebContentJs) as NSString);
+
+            await LoadOldContent();
+
+            if (!string.IsNullOrEmpty(oldContent))
+            {
+                var htmlParser = new HtmlParser();
+                var newContentParsed = await htmlParser.ParseAsync(newContentString);
+                var oldContentParsed = await htmlParser.ParseAsync(oldContent);
+                var oldContentInDiv = newContentParsed.CreateElement("div");
+                oldContentInDiv.InnerHtml = oldContentParsed.Body.InnerHtml;
+                newContentParsed.Body.Append(oldContentInDiv);
+                var textWriter = new StringWriter();
+                newContentParsed.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
+                return textWriter.ToString();
+            }
+
+            return newContentString;
+        }
+
+        static async Task<string> GetPreview(string htmlText)
+        {
+            var htmlParser = new HtmlParser();
+            var newContentParsed = await htmlParser.ParseAsync(htmlText);
+            var textContent = newContentParsed.Body.TextContent;
+            return textContent.SafeSubstring(0, 300).TrimStart();
+        }
+
+        async Task SetWebContentPart(string parentElementClass, ContentType contentType, string content)
+        {
+            var currentContent = (await newContentWebView.EvaluateJavaScriptAsync(GetWebContentJs) as NSString);
+
+            var htmlParser = new HtmlParser();
+            var currentHtmlDocument = await htmlParser.ParseAsync(currentContent);
+
+            var parentElements = currentHtmlDocument.QuerySelectorAll("div." + parentElementClass);
+
+            if (parentElements.Length < 1)
+            {
+                CommonConfig.Logger.Error("Could not find div element with class: " + parentElementClass);
+                return;
+            }
+
+            if (parentElements.Length > 1)
+            {
+                CommonConfig.Logger.Warning("Found more than one div element with class: " + parentElementClass);
+            }
+
+            var parentElement = parentElements[0];
+            parentElement.Children.ForEach(c => c.Remove());
+            parentElement.TextContent = string.Empty;
+
+            var nodes = await ProcessInsertedContent(htmlParser, contentType, content);
+
+            parentElement.Append(nodes.ToArray());
+
+            var textWriter = new StringWriter();
+            currentHtmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
+
+            newContentWebView.StopLoading();
+            newContentWebView.LoadHtmlString(textWriter.ToString(), null);
+        }
+
+        static async Task<IHtmlCollection<IElement>> ProcessInsertedContent(HtmlParser htmlParser, ContentType contentToInsertType, string contentToInsert)
+        {
+            if (contentToInsertType == ContentType.Html)
+            {
+                var inlinedContentToInsert = await InlineStyles(contentToInsert);
+
+                var htmlDocument = await htmlParser.ParseAsync(inlinedContentToInsert);
+
+                return htmlDocument.Body.Children;
+            }
+
+            if (contentToInsertType == ContentType.PlainText)
+            {
+                var htmlDocument = await htmlParser.ParseAsync("<div><pre>" + contentToInsert + "</pre></div>");
+                return htmlDocument.Body.Children;
+            }
+
+            throw new ArgumentException(string.Format("Unsupported contentType. [contentType={0}]", contentToInsertType));
+        }
+
+        static Task<string> InlineStyles(string content)
+        {
+            var tcs = new TaskCompletionSource<string>();
+
+            var inlineResult = PreMailer.Net.PreMailer.MoveCssInline(content, true, null, null, true, true);
+            if (inlineResult.Warnings != null && inlineResult.Warnings.Count > 0)
+            {
+                CommonConfig.Logger.Warning("There were warnings when inlining CSS:\n" + string.Join("\n", inlineResult.Warnings));
+            }
+
+            tcs.SetResult(inlineResult.Html);
+            return tcs.Task;
         }
 
         #endregion
 
         #region Event handlers
 
-        void HandleTextViewSelectionChanged(object sender, EventArgs e)
+        async void HandleExpandButtonTapped(object sender, EventArgs e)
         {
-            var textView = sender as UITextView;
-            var parentScrollView = Superview as UIScrollView;
-            if (parentScrollView != null && textView.SelectedTextRange != null)
-            {
-                var cursorRect = ConvertRectToView(textView.GetCaretRectForPosition(textView.SelectedTextRange.Start), parentScrollView);
-                var bottomOfVisibleArea = parentScrollView.ContentOffset.Y + parentScrollView.Frame.Bottom - parentScrollView.ContentInset.Bottom;
-                if (!nfloat.IsInfinity(cursorRect.Bottom) && cursorRect.Bottom > bottomOfVisibleArea)
-                {
-                    var newVerticalOffset = parentScrollView.ContentOffset.Y + cursorRect.Bottom - bottomOfVisibleArea + textView.Font.LineHeight;
-                    if (!nfloat.IsInfinity(newVerticalOffset))
-                    {
-                        parentScrollView.SetContentOffset(new CGPoint(parentScrollView.ContentOffset.X, newVerticalOffset), true);
-                    }
-                }
-            }
-        }
-
-        void HandleExpandButtonTapped(object sender, EventArgs e)
-        {
-            if (previousTextView.Hidden)
+            if (oldContentWebView.Hidden)
             {
                 expandButton.SetTitle(Localization.GetString("hide_original_message"), UIControlState.Normal);
-                previousTextView.Hidden = false;
+                oldContentWebView.Hidden = false;
 
-                LoadPreviousDocumentContent();
+                await LoadOldContent();
 
                 RemoveConstraint(zeroHeightConstraint);
                 AddConstraint(minimumHeightConstraint);
 
-                previousTextView.RestoreConstaints(constraintsStash);
+                oldContentWebView.RestoreConstaints(constraintsStash);
 
                 constraintsStash.Clear();
 
@@ -215,9 +419,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             else
             {
                 expandButton.SetTitle(Localization.GetString("show_original_message"), UIControlState.Normal);
-                previousTextView.Hidden = true;
+                oldContentWebView.Hidden = true;
 
-                constraintsStash = previousTextView.BackupConstaints();
+                constraintsStash = oldContentWebView.BackupConstaints();
 
                 RemoveConstraint(minimumHeightConstraint);
                 AddConstraint(zeroHeightConstraint);
@@ -226,184 +430,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
         }
 
-        void LoadPreviousDocumentContent()
-        {
-            if (PreviousDocument == null || previousDocumentContentLoaded || CreationModeFlag == DocumentCreationModeFlag.Edit)
-            {
-                return;
-            }
-
-            var result = GetContentAndTypeFromDocument(); //TODO need either to pass the document or to change name
-            var content = result.Item1;
-            var nsDocumentType = result.Item2;
-
-            var attributedContent = content.ToNSAttributedString(nsDocumentType, Theme.DefaultDocumentFont);
-            var attributedHeader = GetAttributedHeader();
-
-            var mutableAttributedString = new NSMutableAttributedString();
-
-            if (attributedHeader != null && attributedHeader.Length > 0)
-            {
-                mutableAttributedString.Append(attributedHeader);
-            }
-
-            if (attributedContent != null && attributedContent.Length > 0)
-            {
-                mutableAttributedString.Append(attributedContent);
-            }
-
-            previousTextView.TextStorage.Insert(mutableAttributedString, 0);
-            previousDocumentContentLoaded = true;
-        }
-
         #endregion
 
-        #region Public methods
-
-        public string GetHtmlText()
-        {
-            return RetrieveCombinedText().ToHTMLString(Theme.DefaultOutgoingDocumentFont);
-        }
-
-        public string GetPlainText()
-        {
-            return RetrieveCombinedText().Value;
-        }
-
-        public void SetCreationModeFlag(DocumentCreationModeFlag modeFlag)
-        {
-            if (creationModeFlag != DocumentCreationModeFlag.None)
-            {
-                throw new InvalidOperationException("The creation mode has already been set");
-            }
-
-            creationModeFlag = modeFlag;
-            if (creationModeFlag == DocumentCreationModeFlag.New || creationModeFlag == DocumentCreationModeFlag.Edit)
-            {
-                //If not added there are problems with the view not expanding to accomodate longer emails
-                AddConstraint(NSLayoutConstraint.Create(editTextView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1.0f, -VerticalMargin));
-            }
-            else
-            {
-                InitializePreviousContentControls();
-            }
-        }
-
-        public void InsertTemplate(Template template)
-        {
-            InsertTemplateAt(template.Content, template.ContentType);
-        }
-
-        public void InsertTemplateAt(string templateString, ContentType contentType, int location = 0)
-        {
-            var templateAttributedContent = templateString.ToNSAttributedString(contentType.ToNSDocumentType(), Theme.DefaultDocumentFont);
-            if (templateAttributedContent != null && templateAttributedContent.Length > 0)
-            {
-                editTextView.TextStorage.Insert(templateAttributedContent, location);
-            }
-
-            editTextView.SelectedRange = new NSRange(location, 0);
-        }
-
-        #endregion
-
-        #region Utilities
-
-        Tuple<string, NSDocumentType> GetContentAndTypeFromDocument()
-        {
-            NSDocumentType nsDocumentType = NSDocumentType.Unknown;
-            string content;
-            if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
-            {
-                nsDocumentType = NSDocumentType.PlainText;
-                content = PreviousDocument.PlainTextBody;
-            }
-
-            if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
-            {
-                nsDocumentType = NSDocumentType.PlainText;
-                content = PreviousDocument.PlainTextBody;
-            }
-            else if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
-            {
-                nsDocumentType = NSDocumentType.HTML;
-                content = PreviousDocument.HtmlBody;
-            }
-            else
-            {
-                nsDocumentType = NSDocumentType.PlainText;
-                content = PreviousDocument.PlainTextBody;
-            }
-
-            return new Tuple<string, NSDocumentType>(content, nsDocumentType);
-        }
-
-        NSAttributedString RetrieveCombinedText()
-        {
-            if (creationModeFlag == DocumentCreationModeFlag.Edit || creationModeFlag == DocumentCreationModeFlag.New)
-            {
-                return editTextView.AttributedText;
-            }
-
-            LoadPreviousDocumentContent();
-
-            var mutableAttributedString = new NSMutableAttributedString();
-            mutableAttributedString.Append(editTextView.AttributedText);
-            mutableAttributedString.Append(previousTextView.AttributedText);
-
-            return mutableAttributedString;
-        }
-
-        NSAttributedString GetAttributedHeader()
-        {
-            var header = new StringBuilder();
-
-            var fromText = GetAddressText(PreviousDocumentPreview, DocumentAddressType.From);
-            var toText = GetAddressText(PreviousDocumentPreview, DocumentAddressType.To);
-            var ccText = GetAddressText(PreviousDocumentPreview, DocumentAddressType.Cc);
-            var subject = PreviousDocumentPreview.Subject;
-
-            header.Append("<br/>");
-            header.Append(string.Format("<b>From</b>: {0}", WebUtility.HtmlEncode(fromText))).Append("</br>");
-            header.Append(string.Format("<b>Date</b>: {0}", PreviousDocumentPreview.DateReceivedTimestamp)).Append("</br>"); //TODO need to fix the dates
-            header.Append(string.Format("<b>To</b>: {0}", WebUtility.HtmlEncode(toText))).Append("</br>");
-            if (!string.IsNullOrWhiteSpace(ccText))
-            {
-                header.Append(string.Format("<b>Cc</b>: {0}", WebUtility.HtmlEncode(ccText))).Append("</br>");
-            }
-            header.Append(string.Format("<b>Subject</b>: {0}", WebUtility.HtmlEncode(subject))).Append("</br>");
-            header.Append("<br/>");
-
-            var attributedHeader = header.ToString().ToNSAttributedString(NSDocumentType.HTML, Theme.DefaultDocumentFont);
-
-            return attributedHeader;
-        }
-
-        string GetAddressText(DocumentPreview document, DocumentAddressType addressType)
-        {
-            var sb = new StringBuilder();
-            var addresses = document.Addresses.Where(da => da.AddressType == addressType).ToList();
-            for (int i = 0; i < addresses.Count; i++)
-            {
-                var hasName = !string.IsNullOrWhiteSpace(addresses[i].Name);
-                if (hasName)
-                {
-                    sb.Append(addresses[i].Name).Append(" <");
-                }
-                sb.Append(addresses[i].Address);
-                if (hasName)
-                {
-                    sb.Append(">");
-                }
-                if (i < addresses.Count - 1)
-                {
-                    sb.Append(", ");
-                }
-
-            }
-            return sb.ToString();
-        }
-
-        #endregion
     }
 }
