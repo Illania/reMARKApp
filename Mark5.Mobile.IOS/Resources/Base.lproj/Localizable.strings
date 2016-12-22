@@ -51,3 +51,5 @@
 "hide_original_message" = "Hide original message";
 "show_original_message" = "Show original message";
 "new_document" = "New Document";
+"line" = "Line";
+"tap_select_line" = "Tap to select a line";
