@@ -159,9 +159,15 @@
     <Folder Include="Resources\Settings.bundle\" />
     <Folder Include="Resources\Base.lproj\" />
     <Folder Include="Model\" />
+    <Folder Include="Ui\ViewControllers\FoldersList\" />
+    <Folder Include="Ui\TableViewCells\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
+    <InterfaceDefinition Include="Ui\TableViewCells\FoldersTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\WaitTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\EmptyTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -185,7 +191,7 @@
     <Compile Include="Ui\Common\Theme.cs" />
     <Compile Include="Ui\Common\UIFontExtensions.cs" />
     <Compile Include="ServerConfig.cs" />
-    <Compile Include="Ui\ViewControllers\MainViewController.cs" />
+    <Compile Include="Ui\ViewControllers\SplitMainViewController.cs" />
     <Compile Include="Services\ReachabilityReceiver.cs" />
     <Compile Include="Utilities\Integration.cs" />
     <Compile Include="Ui\Common\KeyboardUtilities.cs" />
@@ -194,15 +200,41 @@
     <Compile Include="Ui\Common\Localization.cs" />
     <Compile Include="Utilities\SystemReportCollector.cs" />
     <Compile Include="Ui\ViewControllers\SearchViewController.cs" />
-    <Compile Include="Ui\ViewControllers\DocumentSplitViewController.cs" />
-    <Compile Include="Ui\ViewControllers\ContactSplitViewController.cs" />
-    <Compile Include="Ui\ViewControllers\ShortcodeSplitViewController.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentsSplitViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ContactsSplitViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ShortcodesSplitViewController.cs" />
     <Compile Include="Ui\ViewControllers\NotificationsListViewController.cs" />
     <Compile Include="Ui\ViewControllers\SettingsViewController.cs" />
     <Compile Include="Ui\Common\NavigationController.cs" />
-    <Compile Include="Ui\Common\SplitViewController.cs" />
-    <Compile Include="Ui\Common\ViewController.cs" />
+    <Compile Include="Ui\Common\AbstractSplitViewController.cs" />
+    <Compile Include="Ui\Common\AbstractViewController.cs" />
     <Compile Include="Ui\Common\ITaggedViewController.cs" />
+    <Compile Include="Ui\ViewControllers\FoldersList\AbstractFoldersListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\FoldersList\BrowseFoldersListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentViewController.cs" />
+    <Compile Include="Ui\TableViewCells\FoldersTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\FoldersTableViewCell.designer.cs">
+      <DependentUpon>FoldersTableViewCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\TableViewCells\WaitTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\WaitTableViewCell.designer.cs">
+      <DependentUpon>WaitTableViewCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\TableViewCells\EmptyTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\EmptyTableViewCell.designer.cs">
+      <DependentUpon>EmptyTableViewCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.designer.cs">
+      <DependentUpon>FoldersSearchResultsTableViewCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\Common\IPrimaryViewController.cs" />
+    <Compile Include="Ui\Common\ISecondaryViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ContactViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ShortcodeViewController.cs" />
+    <Compile Include="Ui\Common\PopoverPresentationControllerDelegate.cs" />
+    <Compile Include="Ui\ViewControllers\SimpleMainViewController.cs" />
+    <Compile Include="Ui\ViewControllers\AbstractMainViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
@@ -340,20 +372,20 @@
     <BundleResource Include="Resources\icons\view%403x.png" />
     <BundleResource Include="Resources\icons\worktray%402x.png" />
     <BundleResource Include="Resources\icons\worktray%403x.png" />
-    <BundleResource Include="Resources\icons\Folders list\draft%402x.png" />
-    <BundleResource Include="Resources\icons\Folders list\draft%403x.png" />
-    <BundleResource Include="Resources\icons\Folders list\folder%402x.png" />
-    <BundleResource Include="Resources\icons\Folders list\folder%403x.png" />
-    <BundleResource Include="Resources\icons\Folders list\inbox%402x.png" />
-    <BundleResource Include="Resources\icons\Folders list\inbox%403x.png" />
-    <BundleResource Include="Resources\icons\Folders list\outbox%402x.png" />
-    <BundleResource Include="Resources\icons\Folders list\outbox%403x.png" />
-    <BundleResource Include="Resources\icons\Folders list\outgoing%402x.png" />
-    <BundleResource Include="Resources\icons\Folders list\outgoing%403x.png" />
-    <BundleResource Include="Resources\icons\Folders list\spam%402x.png" />
-    <BundleResource Include="Resources\icons\Folders list\spam%403x.png" />
-    <BundleResource Include="Resources\icons\Folders list\worktray%402x.png" />
-    <BundleResource Include="Resources\icons\Folders list\worktray%403x.png" />
+    <BundleResource Include="Resources\icons\folderslist\draft%402x.png" />
+    <BundleResource Include="Resources\icons\folderslist\draft%403x.png" />
+    <BundleResource Include="Resources\icons\folderslist\folder%402x.png" />
+    <BundleResource Include="Resources\icons\folderslist\folder%403x.png" />
+    <BundleResource Include="Resources\icons\folderslist\inbox%402x.png" />
+    <BundleResource Include="Resources\icons\folderslist\inbox%403x.png" />
+    <BundleResource Include="Resources\icons\folderslist\outbox%402x.png" />
+    <BundleResource Include="Resources\icons\folderslist\outbox%403x.png" />
+    <BundleResource Include="Resources\icons\folderslist\outgoing%402x.png" />
+    <BundleResource Include="Resources\icons\folderslist\outgoing%403x.png" />
+    <BundleResource Include="Resources\icons\folderslist\spam%402x.png" />
+    <BundleResource Include="Resources\icons\folderslist\spam%403x.png" />
+    <BundleResource Include="Resources\icons\folderslist\worktray%402x.png" />
+    <BundleResource Include="Resources\icons\folderslist\worktray%403x.png" />
   </ItemGroup>
   <ItemGroup>
     <XamarinComponentReference Include="InAppSettingsKit">

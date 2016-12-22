@@ -249,24 +249,41 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true
         };
 
-        public static Folder RootPerModule(ModuleType module, bool favorite = false)
+        public static Folder RootForModule(ModuleType module)
         {
             switch (module)
             {
                 case ModuleType.Documents:
-                    return favorite ? documentsFavoriteRootFolder : documentsRootFolder;
+                    return documentsRootFolder;
                 case ModuleType.Contacts:
-                    return favorite ? contactsFavoriteRootFolder : contactsRootFolder;
+                    return contactsRootFolder;
                 case ModuleType.Shortcodes:
-                    return favorite ? shortcodesFavoriteRootFolder : shortcodesRootFolder;
+                    return shortcodesRootFolder;
                 case ModuleType.Calendar:
-                    return favorite ? calendarFavoriteRootFolder : calendarRootFolder;
+                    return calendarRootFolder;
                 default:
-                    throw new ArgumentException("Input module not valid");
+                    throw new ArgumentException(nameof(module));
             }
         }
 
-        public static Folder LocalRootPerModule(ModuleType module)
+        public static Folder FavoritesRootForModule(ModuleType module)
+        {
+            switch (module)
+            {
+                case ModuleType.Documents:
+                    return documentsFavoriteRootFolder;
+                case ModuleType.Contacts:
+                    return contactsFavoriteRootFolder;
+                case ModuleType.Shortcodes:
+                    return shortcodesFavoriteRootFolder;
+                case ModuleType.Calendar:
+                    return calendarFavoriteRootFolder;
+                default:
+                    throw new ArgumentException(nameof(module));
+            }
+        }
+
+        public static Folder LocalRootForModule(ModuleType module)
         {
             switch (module)
             {

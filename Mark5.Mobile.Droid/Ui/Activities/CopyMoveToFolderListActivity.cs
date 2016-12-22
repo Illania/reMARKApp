@@ -64,7 +64,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         SupportActionBar.SetTitle(Resource.String.select_folder);
                         var cmflf = new CopyMoveToFolderListFragment
                         {
-                            RemoteFolder = Folder.RootPerModule(moduleType),
+                            RemoteFolder = Folder.RootForModule(moduleType),
                             BusinessEntities = be,
                             Type = CopyMoveToFolderListFragment.ActionType.Copy
                         };
@@ -74,7 +74,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         SupportActionBar.SetTitle(Resource.String.select_folder);
                         var cmflf2 = new CopyMoveToFolderListFragment
                         {
-                            RemoteFolder = Folder.RootPerModule(moduleType),
+                            RemoteFolder = Folder.RootForModule(moduleType),
                             BusinessEntities = be,
                             FromFolder = fromFolder,
                             Type = CopyMoveToFolderListFragment.ActionType.Move

@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -38,10 +39,13 @@ namespace Mark5.Mobile.IOS
             set;
         }
 
-        public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
+        public override bool WillFinishLaunching(UIApplication application, NSDictionary launchOptions)
         {
             try
             {
+                var startupTime = new Stopwatch();
+                startupTime.Start();
+
                 InitializeCommon();
 
                 CommonConfig.Logger.Info("MARK5 initializing...");
@@ -52,18 +56,36 @@ namespace Mark5.Mobile.IOS
                 Theme.ApplyTheme(Window);
 
                 UIViewController vc;
-                if (isLoggedIn) vc = new MainViewController();
-                else vc = new LoginViewController();
+                if (!isLoggedIn)
+                    vc = new LoginViewController();
+                else if (Integration.IsIPad())
+                    vc = new SplitMainViewController();
+                else
+                    vc = new SimpleMainViewController();
 
                 Window.RootViewController = vc;
                 Window.MakeKeyAndVisible();
+
+                startupTime.Stop();
+                CommonConfig.Logger.Info($"Total startup time: {startupTime.ElapsedMilliseconds}ms");
+
+                return true;
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger?.Error(ex);
-            }
 
-            return true;
+                return false;
+            }
+        }
+
+        public override void ReceiveMemoryWarning(UIApplication application)
+        {
+            base.ReceiveMemoryWarning(application);
+
+            CommonConfig.Logger.Warning("Received memery warning!");
+
+            GC.Collect();
         }
 
         public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
@@ -207,7 +229,7 @@ namespace Mark5.Mobile.IOS
                     UIApplication.SharedApplication.RegisterForRemoteNotifications();
                 });
 
-                CommonConfig.Logger.Info($"Initialized - will present {nameof(MainViewController)}");
+                CommonConfig.Logger.Info($"Initialized - will present {nameof(SplitMainViewController)}");
 
                 return true;
             }).Result;

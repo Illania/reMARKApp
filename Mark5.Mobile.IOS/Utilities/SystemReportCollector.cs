@@ -20,7 +20,7 @@ namespace Mark5.Mobile.IOS.Utilities
     public static class SystemReportCollector
     {
 
-        public static UIViewController CreateShareReportController(string report)
+        public static UIActivityViewController CreateShareReportController(string report)
         {
             var avc = new UIActivityViewController(new[] { new NSString(report) }, null)
             {

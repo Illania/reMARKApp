@@ -127,9 +127,9 @@ namespace Mark5.Mobile.IOS.Services
                     return result;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                CommonConfig.Logger.Info("Cannot check service connection availability", ex);
+                CommonConfig.Logger.Info($"Service connection availability: false");
 
                 return false;
             }
@@ -153,9 +153,9 @@ namespace Mark5.Mobile.IOS.Services
 
                 return result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                CommonConfig.Logger.Info("Cannot check service availability", ex);
+                CommonConfig.Logger.Info($"Service availability: false");
 
                 return false;
             }

@@ -339,7 +339,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
                     var foldersListFragment = new FoldersListFragment
                     {
-                        RemoteFolder = Folder.RootPerModule(ModuleType)
+                        RemoteFolder = Folder.RootForModule(ModuleType)
                     };
 
                     var tag = foldersListFragment.GenerateTag();

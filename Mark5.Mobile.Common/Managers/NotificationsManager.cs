@@ -171,6 +171,8 @@ namespace Mark5.Mobile.Common.Managers
                     Enabled = enabled
                 });
 
+                folders.ForEach(f => f.Subscribed = enabled);
+
                 await foldersDataAccess.SetSubscribed(moduleType, folders, enabled);
 
                 var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync() ?? new Dictionary<ModuleType, List<Folder>>();

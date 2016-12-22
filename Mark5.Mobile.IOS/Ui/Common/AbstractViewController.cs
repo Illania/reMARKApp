@@ -10,7 +10,7 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.Common
 {
     
-    public class ViewController : UIViewController, ITaggedViewController
+    public abstract class AbstractViewController : UIViewController, ITaggedViewController
     {
 
         public string Tag { get; set; }

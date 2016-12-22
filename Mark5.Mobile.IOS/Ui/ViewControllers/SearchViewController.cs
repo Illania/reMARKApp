@@ -10,7 +10,7 @@ using Mark5.Mobile.IOS.Ui.Common;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
 
-    public class SearchViewController : ViewController
+    public class SearchViewController : AbstractViewController
     {
     }
 }
