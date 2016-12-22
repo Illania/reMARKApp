@@ -20,7 +20,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
     public class LineView : ComposeDocumentView
     {
-        const string DefaultMessage = "Tap to select lines"; //TODO localization string
+        string defaultMessage = Localization.GetString("tap_select_line");
 
         Line selectedLine;
 
@@ -48,7 +48,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         void Initialize()
         {
             label = new UILabel();
-            label.Text = "Line:"; //TODO localization
+            label.Text = Localization.GetString("line") + ": ";
             label.Font = Theme.DefaultFont;
             label.TextColor = UIColor.LightGray;
             label.Opaque = false;
@@ -66,7 +66,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 });
 
             selectedLineLabel = new UILabel();
-            selectedLineLabel.Text = selectedLine == null ? DefaultMessage : selectedLine.Name;
+            selectedLineLabel.Text = selectedLine == null ? defaultMessage : selectedLine.Name;
             selectedLineLabel.Font = Theme.DefaultFont;
             selectedLineLabel.Opaque = false;
             selectedLineLabel.Lines = 1;
@@ -139,7 +139,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public override Task UpdateDocument()
         {
-            throw new NotImplementedException();
+            Document.Lines.Add(selectedLine);
+            return Task.CompletedTask;  
         }
 
         #endregion
@@ -158,7 +159,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             else
             {
                 selectedLine = null;
-                selectedLineLabel.Text = DefaultMessage;
+                selectedLineLabel.Text = defaultMessage;
             }
 
             Edited(this, EventArgs.Empty);

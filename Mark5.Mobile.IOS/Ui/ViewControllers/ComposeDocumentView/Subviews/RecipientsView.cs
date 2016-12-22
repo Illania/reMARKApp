@@ -80,10 +80,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 });
 
             if (!hideAdd)
-            { //TODO
-               // var addButtonIcon = UIImage.FromBundle(Path.Combine("Icons", "add.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            {
+                var addButtonIcon = UIImage.FromBundle(Path.Combine("Icons", "add.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                 AddButton = new UIButton();
-                //AddButton.SetImage(addButtonIcon, UIControlState.Normal);
+                AddButton.SetImage(addButtonIcon, UIControlState.Normal);
                 AddButton.BackgroundColor = UIColor.Clear;
                 AddButton.TouchUpInside += HandleAddButtonTapped;
                 AddButton.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -232,7 +232,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public override Task UpdateDocument()
         {
-            throw new NotImplementedException();
+            foreach (var email in GetEmails())
+            {
+                DocumentPreview.Addresses.Add(new DocumentAddress { Address = email, AddressType = this.AddressType, Type = CommunicationAddressType.Email });
+            }
+            return Task.CompletedTask;
         }
 
         #endregion
