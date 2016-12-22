@@ -174,8 +174,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     EditModeItem.Title = Localization.GetString("edit");
                     NavigationItem.SetLeftBarButtonItem(EditModeItem, false);
                 }
-
-                return;
             }
 
             if (ParentFolder.Module == ModuleType.Contacts || ParentFolder.Module == ModuleType.Shortcodes || ParentFolder.Module == ModuleType.Calendar)
@@ -186,11 +184,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     EditModeItem.Title = Localization.GetString("edit");
                     NavigationItem.SetLeftBarButtonItem(EditModeItem, false);
                 }
-
-                return;
             }
-
-            throw new ArgumentException(nameof(ParentFolder.Module));
         }
 
         void InitializeView()
@@ -946,8 +940,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         [Section.Folders] = new List<Folder>(),
                         [Section.Local] = new List<Folder>()
                     };
-
-                    return;
                 }
 
                 if (module == ModuleType.Contacts || module == ModuleType.Shortcodes || module == ModuleType.Calendar)
@@ -958,11 +950,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         [Section.Favorites] = new List<Folder>(),
                         [Section.Folders] = new List<Folder>()
                     };
-
-                    return;
                 }
-
-                throw new ArgumentException(nameof(module));
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -1058,7 +1046,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 if (section == Section.Local)
                     return Localization.GetString("local_folders").ToUpper(CultureInfo.CurrentCulture);
 
-                throw new ArgumentException(nameof(section));
+                return string.Empty;
             }
 
             public override bool ShouldIndentWhileEditing(UITableView tableView, NSIndexPath indexPath)
