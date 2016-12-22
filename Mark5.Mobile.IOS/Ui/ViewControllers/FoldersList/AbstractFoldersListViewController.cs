@@ -25,7 +25,7 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
 
-    public abstract class AbstractFoldersListViewController : ViewController, IUISearchResultsUpdating
+    public abstract class AbstractFoldersListViewController : ViewController, IPrimaryViewController, IUISearchResultsUpdating
     {
 
         protected readonly Folder ParentFolder;

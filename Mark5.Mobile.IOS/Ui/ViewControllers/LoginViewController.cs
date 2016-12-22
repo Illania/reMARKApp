@@ -458,7 +458,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var sv = new LoginSettingsViewController.SettingsValues { SslMode = sslMode };
             var loginSettingsViewController = new LoginSettingsViewController(sv);
             loginSettingsViewController.RestrictedSettingsValuesUpdated += LoginSettingsViewController_RestrictedSettingsValuesUpdated;
-            PresentViewController(new UINavigationController(loginSettingsViewController), true, null);
+            PresentViewController(new NavigationController(loginSettingsViewController, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void TextField_EditingChanged(object sender, EventArgs e) => ValidateForm();
@@ -622,7 +622,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Error("Log in failed", ex);
 
-                await Dialogs.ShowConfirmDialogAsync(this, "failed", "login failed");
+                await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("login_failed"), Localization.GetString("login_failed_desc"));
 
                 loginButton.TouchUpInside += LoginButton_TouchUpInside;
             }

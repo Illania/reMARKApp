@@ -26,6 +26,8 @@
 "local_folders" = "Local folders";
 "logging_in___" = "Logging in...";
 "login" = "Login";
+"login_failed" = "Login failed";
+"login_failed_desc" = "Could not log in to MARK5. Please check your credentials and server address.";
 "no" = "No";
 "no_folders_found" = "No folders found";
 "no_folders_in_favorites" = "No folders were added to favorites yet";

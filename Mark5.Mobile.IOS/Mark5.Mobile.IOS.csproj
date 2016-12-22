@@ -200,9 +200,9 @@
     <Compile Include="Ui\Common\Localization.cs" />
     <Compile Include="Utilities\SystemReportCollector.cs" />
     <Compile Include="Ui\ViewControllers\SearchViewController.cs" />
-    <Compile Include="Ui\ViewControllers\DocumentSplitViewController.cs" />
-    <Compile Include="Ui\ViewControllers\ContactSplitViewController.cs" />
-    <Compile Include="Ui\ViewControllers\ShortcodeSplitViewController.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentsSplitViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ContactsSplitViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ShortcodesSplitViewController.cs" />
     <Compile Include="Ui\ViewControllers\NotificationsListViewController.cs" />
     <Compile Include="Ui\ViewControllers\SettingsViewController.cs" />
     <Compile Include="Ui\Common\NavigationController.cs" />
@@ -228,6 +228,11 @@
     <Compile Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.designer.cs">
       <DependentUpon>FoldersSearchResultsTableViewCell.cs</DependentUpon>
     </Compile>
+    <Compile Include="Ui\Common\IPrimaryViewController.cs" />
+    <Compile Include="Ui\Common\ISecondaryViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ContactViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ShortcodeViewController.cs" />
+    <Compile Include="Ui\Common\PopoverPresentationControllerDelegate.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

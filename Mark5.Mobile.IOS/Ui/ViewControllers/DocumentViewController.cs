@@ -5,12 +5,15 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
 
-    public class DocumentViewController : UIViewController
+    public class DocumentViewController : UIViewController, ISecondaryViewController
     {
+        
+        public bool Empty { get { return true; } }
     }
 }

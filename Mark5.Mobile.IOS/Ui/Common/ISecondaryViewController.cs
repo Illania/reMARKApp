@@ -1,18 +1,16 @@
 ﻿//
 // Project: Mark5.Mobile.IOS
-// File: ViewController.cs
+// File: ISecondaryViewController.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
-using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
-    
-    public abstract class ViewController : UIViewController, ITaggedViewController
+    public interface ISecondaryViewController
     {
 
-        public string Tag { get; set; }
+        bool Empty { get; }
     }
 }

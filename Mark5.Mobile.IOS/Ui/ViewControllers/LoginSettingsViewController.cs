@@ -159,7 +159,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     if (!t.IsFaulted)
                     {
-                        PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, null);
+                        var src = SystemReportCollector.CreateShareReportController(t.Result);
+                        if (src.PopoverPresentationController != null) src.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(sender.TableView, sender.TableView.CellAt(sender.SettingsReader.GetIndexPath(specifier.Key)));
+                        PresentViewController(src, true, null);
                     }
                 }, TaskScheduler.FromCurrentSynchronizationContext());
             }

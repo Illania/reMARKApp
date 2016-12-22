@@ -4,6 +4,6 @@
 "create_report" = "Create system report";
 "open_settings_app" = "Open Settings app";
 "security" = "Security";
-"security_footer" = "SSL should remain enabled to provide secure communication. Otherwise, communication between MARK5 on your iOS device and MARK5 server will be unsecure.";
+"security_footer" = "SSL should remain enabled to provide secure communication. Otherwise, communication between MARK5 on your iOS device and MARK5 server can be intercepted.";
 "ssl" = "SSL";
 "version" = "Version";
