@@ -29,9 +29,9 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string MainTabsOrderKey = "MainTabsOrder";
 
             public const string DocumentsToDownloadKey = "DocumentsToDownload";
-            public const string MarkAsReadDelaySecondsKey = "MarkAsReadDelaySeconds";
             public const string UnreadIndicatorMeKey = "UnreadIndicatorMe";
             public const string CompactDocumentsListKey = "CompactDocumentsList";
+            public const string MarkAsReadDelaySecondsKey = "MarkAsReadDelaySeconds";
             public const string LargeAttachmentWarningKey = "LargeAttachmentWarning";
             public const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
 
