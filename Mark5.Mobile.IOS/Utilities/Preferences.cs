@@ -57,6 +57,7 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string CleanCacheIntervalDaysKey = "CleanCacheIntervalDays";
             public const string ClearCacheKey = "ClearCache";
             public const string EnableReportingKey = "EnableReporting";
+
             public const string PushNotificationTokenKey = "PushNotificationToken";
         }
 
