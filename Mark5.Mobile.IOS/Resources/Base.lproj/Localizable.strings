@@ -84,3 +84,7 @@
 "template_null" = "You do not have a default template set.";
 "no_templates_content" = "There are no templates defined for this creation mode.";
 "no_templates_title" = "No templates";
+"template_selection_title" = "Do you want to use a template in this message?";
+"template_selection_default" = "Default template";
+"template_selection_local" = "Local template";
+"template_selection_another" = "Another template";

@@ -276,8 +276,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             else if (useTemplate == Preferences.TemplateUsageMode.AlwaysAsk)
             {
-                //var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, Resource.Array.template_question_options, true); //TODO
-                int result = 0;
+                var templateListStrings = new string[] { Localization.GetString("template_selection_default"), Localization.GetString("template_selection_local"), Localization.GetString("template_selection_another") };
+                var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("template_selection_title"), templateListStrings);
                 switch (result)
                 {
                     case 0:

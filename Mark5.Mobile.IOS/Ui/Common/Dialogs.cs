@@ -51,6 +51,20 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return tcs.Task;
         }
 
+        public static Task<int> ShowListDialogAsync(UIViewController vc, string message, string[] listStrings)
+        {
+            var tcs = new TaskCompletionSource<int>();
+            var actionSheet = UIAlertController.Create(null, message, UIAlertControllerStyle.ActionSheet);
+            var index = 0;
+            foreach (var listString in listStrings)
+            {
+                actionSheet.AddAction(UIAlertAction.Create(listString, UIAlertActionStyle.Default, a => tcs.SetResult(index++)));
+            }
+            actionSheet.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+            vc.PresentViewController(actionSheet, true, null);
+            return tcs.Task;
+        }
+
         #endregion
 
         #region Non-awaitable dialogs
@@ -85,7 +99,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                         dismissAction();
 
                         if (!t.IsFaulted)
-                        {   
+                        {
                             vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, () =>
                             {
                                 tcs.SetResult(true);
