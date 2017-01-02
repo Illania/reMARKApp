@@ -226,7 +226,7 @@
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\BccView.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\CcView.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\RecipientsView.cs" />
-    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\SubjectsView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\SubjectView.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\PriorityView.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\LineView.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ContentView.cs" />

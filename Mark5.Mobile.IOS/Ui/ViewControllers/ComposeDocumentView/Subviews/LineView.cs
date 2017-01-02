@@ -34,6 +34,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         readonly Line defaultOutgoingLine;
         readonly List<Line> availableOutgoingLines;
 
+        public bool LineSelectedIsAmbiguous
+        {
+            get { return selectedLine == null; }
+        }
+
         public LineView(UIViewController viewController)
         {
             this.viewController = viewController;
@@ -82,7 +87,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 });
         }
 
-        #region Overrides
+        #region Public methods
 
         public override Task RefreshView()
         {
@@ -139,12 +144,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public override Task UpdateDocument()
         {
             Document.Lines.Add(selectedLine);
-            return Task.CompletedTask;  
+            return Task.CompletedTask;
+        }
+
+        public void SetLineFromGuid(Guid lineGuid)
+        {
+            var line = availableOutgoingLines.First(l => l.Guid == lineGuid);
+            if (line != null)
+            {
+                SetLine(line);
+            }
         }
 
         #endregion
 
-        #region Helpet methods
+        #region Helper methods
 
         void SetLine(Line line)
         {

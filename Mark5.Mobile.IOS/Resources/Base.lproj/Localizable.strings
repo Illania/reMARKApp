@@ -78,4 +78,9 @@
 "show_original_message" = "Show original message";
 "new_document" = "New Document";
 "line" = "Line";
-"tap_select_line" = "Tap to select a line";"yes" = "Yes";
+"tap_select_line" = "Tap to select a line";
+"yes" = "Yes";
+"error_while_sending_document" = "Error while sending document.";
+"template_null" = "You do not have a default template set.";
+"no_templates_content" = "There are no templates defined for this creation mode.";
+"no_templates_title" = "No templates";

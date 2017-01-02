@@ -54,6 +54,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         bool expanded;
 
+        public bool Empty
+        {
+            get { return string.IsNullOrEmpty(TextView.Text); }
+        }
+
         public RecipientsView(DocumentAddressType type)
         {
             constraintsStash = new Dictionary<UIView, NSLayoutConstraint[]>();

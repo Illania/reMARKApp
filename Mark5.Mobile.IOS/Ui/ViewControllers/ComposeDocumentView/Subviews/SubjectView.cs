@@ -13,14 +13,19 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-    public class SubjectsView : ComposeDocumentView
+    public class SubjectView : ComposeDocumentView
     {
         public event EventHandler Edited = delegate { };
 
         UILabel label;
         UITextView textView;
 
-        public SubjectsView()
+        public bool Empty
+        {
+            get { return string.IsNullOrEmpty(textView?.Text); }
+        }
+
+        public SubjectView()
         {
             Initialize();
         }
@@ -69,7 +74,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         //TODO remember about all the unsubscription from view
 
-        #region Overrides
+        #region Public methods
 
         public override Task RefreshView()
         {
@@ -99,6 +104,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             DocumentPreview.Subject = textView.Text;
             return Task.CompletedTask;
+        }
+
+        public void SetSubject(string subject)
+        {
+            textView.Text = subject;
         }
 
         #endregion

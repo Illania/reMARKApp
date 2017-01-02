@@ -7,6 +7,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
@@ -14,6 +15,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.Common.StackView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -42,9 +44,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         BccView bccView;
         LineView lineView;
         PriorityView priorityView;
-        SubjectsView subjectView;
+        SubjectView subjectView;
         ContentView contentView;
         readonly List<ComposeDocumentView> subViews = new List<ComposeDocumentView>();
+
+        bool templateLoaded;
 
         UIBarButtonItem cancelButtonItem;
         UIBarButtonItem sendButtonItem;
@@ -129,7 +133,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (PlatformConfig.Preferences.ComposePriorityEnabled)
                 subViews.Add(priorityView);
 
-            subjectView = new SubjectsView();
+            subjectView = new SubjectView();
             subViews.Add(subjectView);
 
             contentView = new ContentView();
@@ -165,7 +169,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     if (outgoingContainer.Info.State == OutgoingDocumentState.Failed)
                     {
                         //TODO
-                        //await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(Resource.String.error_while_sending_document)));
+                        await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_while_sending_document")));
                     }
                     if (outgoingContainer.LocalAttachments != null)
                     {
@@ -192,9 +196,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 //TODO
                 //dismissAction();
 
-                //await Dialogs.ShowErrorDialogAsync(Activity, ex);
-
-                //if (CloseRequest != null) CloseRequest();
+                await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
 
@@ -217,6 +219,241 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             //await AskIfShouldUseTemplates(); //TODO
         }
+
+        #region Navigation Bar items related
+
+        bool IsFormValid()
+        {
+            if (subjectView.Empty)
+            {
+                return false;
+            }
+
+            var recipientAdded = false;
+            foreach (var recipientView in new List<RecipientsView> { toView, ccView, bccView })
+            {
+                recipientAdded |= !recipientView.Empty;
+            }
+
+            if (!recipientAdded)
+            {
+                return false;
+            }
+
+            return !lineView.LineSelectedIsAmbiguous;
+        }
+
+        #endregion
+
+        #region Template methods
+
+        async Task AskIfShouldUseTemplates()
+        {
+            if (templateLoaded)
+            {
+                return;
+            }
+
+            if (CreationModeFlag == DocumentCreationModeFlag.Edit)
+            {
+                CommonConfig.Logger.Info("Document opened in edit mode, no need to add template");
+                return;
+            }
+
+            var useTemplate = PlatformConfig.Preferences.UseTemplate;
+            if (useTemplate == Preferences.TemplateUsageMode.DontUse)
+            {
+                return;
+            }
+
+            if (useTemplate == Preferences.TemplateUsageMode.Local)
+            {
+                await GetLocalTemplate();
+            }
+            else if (useTemplate == Preferences.TemplateUsageMode.Default)
+            {
+                await GetDefaultTemplate();
+            }
+            else if (useTemplate == Preferences.TemplateUsageMode.AlwaysAsk)
+            {
+                //var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, Resource.Array.template_question_options, true); //TODO
+                int result = 0;
+                switch (result)
+                {
+                    case 0:
+                        await GetDefaultTemplate(true);
+                        break;
+                    case 1:
+                        await GetLocalTemplate();
+                        break;
+                    case 2:
+                        await GetAllTemplates();
+                        break;
+                }
+            }
+
+            templateLoaded = true;
+        }
+
+        async Task GetAllTemplates()
+        {
+            //var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_templates, Resource.String.please_wait); //TODO
+            List<TemplatePreview> templatesPreviews = null;
+
+            try
+            {
+                templatesPreviews = await Managers.DocumentsManager.GetTemplatePreviewsAsync();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
+
+                //dismissAction();
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+            finally
+            {
+                //dismissAction();
+            }
+
+            if (templatesPreviews != null)
+            {
+                var templatesForCreationMode = templatesPreviews.Where(t => t.CreationMode.HasFlag(CreationModeFlag));
+                if (templatesForCreationMode.Any())
+                {
+                    var templateNames = templatesForCreationMode.Select(t => (t.Private ? "[Private] " : "[Public] ") + t.Name).ToArray();
+                    //var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, templateNames, true); //TODO 
+                    int result = 0;
+                    var selectedPreview = templatesPreviews[result];
+                    await GetTemplate(selectedPreview);
+                }
+                else
+                {
+                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("no_templates_title"), Localization.GetString("no_templates_content"));
+                }
+            }
+        }
+
+        async Task GetLocalTemplate()
+        {
+            var localTemplate = PlatformConfig.Preferences.LocalTemplate;
+            await contentView.InsertLocalTemplate(localTemplate);
+        }
+
+        async Task GetDefaultTemplate(bool errorMessageIfNull = false)
+        {
+            //var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait);
+
+            try
+            {
+                var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(CreationModeFlag);
+                if (template != null)
+                {
+                    await ApplyTemplate(template);
+                }
+                else if (errorMessageIfNull)
+                {
+                    throw new Exception(Localization.GetString("template_null"));
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
+
+                //dismissAction(); //TODO
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+            finally
+            {
+                //dismissAction(); //TODO
+            }
+        }
+
+        async Task GetTemplate(TemplatePreview templatePreview)
+        {
+            //var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait); TODO
+
+            try
+            {
+                var template = await Managers.DocumentsManager.GetTemplateAsync(templatePreview.Id);
+                if (template != null)
+                {
+                    await ApplyTemplate(template);
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while getting template [template.Id={templatePreview?.Id}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
+
+                //dismissAction();
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+            finally
+            {
+                //dismissAction();
+            }
+        }
+
+        async Task ApplyTemplate(Template template)
+        {
+            ProcessTemplate(template);
+
+            await contentView.InsertTemplate(template);
+
+            if (!string.IsNullOrEmpty(template.Subject))
+            {
+                subjectView.SetSubject(template.Subject);
+            }
+
+            lineView.SetLineFromGuid(template.LineGuid);
+        }
+
+        void ProcessTemplate(Template template)
+        {
+            var templateContent = template.Content;
+
+            var currentTime = DateTime.Now;
+            var dateString = currentTime.ToString("dd-MM-yyyy");
+            var timeString = currentTime.ToString("HH:mm");
+
+            string fromNameString = string.Empty;
+            if (PreviousDocumentPreview != null && PreviousDocumentPreview.Addresses != null)
+            {
+                fromNameString = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Name).FirstOrDefault() ?? string.Empty;
+            }
+
+            if (template.ContentType == ContentType.Html)
+            {
+                templateContent = templateContent.Replace("&lt;FROMNAME&gt;", fromNameString);
+                templateContent = templateContent.Replace("&lt;DATE&gt;", dateString);
+                templateContent = templateContent.Replace("&lt;TIME&gt;", timeString);
+            }
+            else
+            {
+                templateContent = templateContent.Replace("<FROMNAME>", fromNameString);
+                templateContent = templateContent.Replace("<DATE>", dateString);
+                templateContent = templateContent.Replace("<TIME>", timeString);
+            }
+
+            if (template.ContentType == ContentType.Html)
+            {
+                templateContent = templateContent.Replace("&lt;CUR&gt;", string.Empty);
+                templateContent = templateContent.Replace("&lt;SOURCETEXT&gt;", string.Empty);
+                templateContent = templateContent.Replace("&lt;COMPANYNAME&gt;", string.Empty);
+                templateContent = templateContent.Replace("&lt;FROMNAMEWITHCOMPANY&gt;", string.Empty);
+            }
+            else
+            {
+                templateContent = templateContent.Replace("<CUR>", string.Empty);
+                templateContent = templateContent.Replace("<SOURCETEXT>", string.Empty);
+                templateContent = templateContent.Replace("<COMPANYNAME>", string.Empty);
+                templateContent = templateContent.Replace("<FROMNAMEWITHCOMPANY>", string.Empty);
+            }
+
+            template.Content = templateContent;
+        }
+
+        #endregion
 
     }
 }
