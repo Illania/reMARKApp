@@ -55,11 +55,13 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             var tcs = new TaskCompletionSource<int>();
             var actionSheet = UIAlertController.Create(null, message, UIAlertControllerStyle.ActionSheet);
-            var index = 0;
-            foreach (var listString in listStrings)
+
+            for (int i = 0; i < listStrings.Length; i++)
             {
-                actionSheet.AddAction(UIAlertAction.Create(listString, UIAlertActionStyle.Default, a => tcs.SetResult(index++)));
+                var ab = i; //TODO make it elegant (can't use i, because it's the variable, not the value, that's captured in the lambda)
+                actionSheet.AddAction(UIAlertAction.Create(listStrings[i], UIAlertActionStyle.Default, a => tcs.SetResult(ab)));
             }
+
             actionSheet.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
             vc.PresentViewController(actionSheet, true, null);
             return tcs.Task;

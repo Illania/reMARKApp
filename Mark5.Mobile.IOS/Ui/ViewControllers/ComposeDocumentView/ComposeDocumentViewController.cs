@@ -178,7 +178,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var sourceType = SourceType.Auto;
                     //TODO eventually this could be improved by first checking the cache
-                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, sourceType); // TODO
+                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, sourceType);
                     PreviousDocument = container.Document;
                     PreviousDocumentPreview = container.DocumentPreview;
                     if (CreationModeFlag == DocumentCreationModeFlag.Edit && PreviousDocumentPreview.Direction == DocumentDirection.Draft)
@@ -214,7 +214,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 toView.SetEmails(PreconfiguredEmailAddresses);
             }
 
-            //await AskIfShouldUseTemplates(); //TODO
+            await AskIfShouldUseTemplates();
         }
 
         #region Navigation Bar items related
@@ -257,7 +257,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
             }
 
-            var useTemplate = PlatformConfig.Preferences.UseTemplate;
+            //var useTemplate = PlatformConfig.Preferences.UseTemplate;
+            var useTemplate = Preferences.TemplateUsageMode.AlwaysAsk;
+
             if (useTemplate == Preferences.TemplateUsageMode.DontUse)
             {
                 return;
@@ -319,8 +321,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (templatesForCreationMode.Any())
                 {
                     var templateNames = templatesForCreationMode.Select(t => (t.Private ? "[Private] " : "[Public] ") + t.Name).ToArray();
-                    //var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, templateNames, true); //TODO 
-                    int result = 0;
+
+                    var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("template_question"), templateNames);
                     var selectedPreview = templatesPreviews[result];
                     await GetTemplate(selectedPreview);
                 }
