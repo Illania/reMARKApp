@@ -104,12 +104,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitNavigationBar()
         {
             cancelButtonItem = new UIBarButtonItem();
-            cancelButtonItem.Title = "Cancel";
+            cancelButtonItem.Title = Localization.GetString("cancel");
             //cancelButtonItem.Clicked += DoCancel; //TODO
             NavigationItem.SetLeftBarButtonItem(cancelButtonItem, false);
 
             sendButtonItem = new UIBarButtonItem();
-            sendButtonItem.Title = "Send";
+            sendButtonItem.Title = Localization.GetString("send");
             //sendButtonItem.Clicked += DoSend; //TODO
             sendButtonItem.Enabled = false;
             NavigationItem.SetRightBarButtonItem(sendButtonItem, false);
@@ -152,8 +152,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
             }
 
-            //TODO
-            //var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.loading_document, Resource.String.please_wait);
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_document___"));
 
             try
             {
@@ -168,7 +167,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag;
                     if (outgoingContainer.Info.State == OutgoingDocumentState.Failed)
                     {
-                        //TODO
                         await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_while_sending_document")));
                     }
                     if (outgoingContainer.LocalAttachments != null)
@@ -189,13 +187,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
                 }
 
+                dismissAction();
                 await ShowDocument();
             }
             catch (Exception ex)
             {
-                //TODO
-                //dismissAction();
-
+                dismissAction();
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
@@ -297,7 +294,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async Task GetAllTemplates()
         {
-            //var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_templates, Resource.String.please_wait); //TODO
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_templates___"));
             List<TemplatePreview> templatesPreviews = null;
 
             try
@@ -308,12 +305,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
 
-                //dismissAction();
+                dismissAction();
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
             finally
             {
-                //dismissAction();
+                dismissAction();
             }
 
             if (templatesPreviews != null)
@@ -342,7 +339,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async Task GetDefaultTemplate(bool errorMessageIfNull = false)
         {
-            //var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait);
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_template___"));
 
             try
             {
@@ -360,18 +357,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
 
-                //dismissAction(); //TODO
+                dismissAction();
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
             finally
             {
-                //dismissAction(); //TODO
+                dismissAction();
             }
         }
 
         async Task GetTemplate(TemplatePreview templatePreview)
         {
-            //var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait); TODO
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_template___"));
 
             try
             {
@@ -385,12 +382,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Error($"Error while getting template [template.Id={templatePreview?.Id}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
 
-                //dismissAction();
+                dismissAction();
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
             finally
             {
-                //dismissAction();
+                dismissAction();
             }
         }
 

@@ -88,3 +88,7 @@
 "template_selection_default" = "Default template";
 "template_selection_local" = "Local template";
 "template_selection_another" = "Another template";
+"loading_templates___" = "Loading templates...";
+"loading_template___" = "Loading template...";
+"loading_document___" = "Loading document...";
+"send" = "Send";
