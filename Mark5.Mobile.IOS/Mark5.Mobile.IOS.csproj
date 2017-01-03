@@ -172,6 +172,8 @@
     <Folder Include="Model\" />
     <Folder Include="Ui\ViewControllers\FoldersList\" />
     <Folder Include="Ui\TableViewCells\" />
+    <Folder Include="Ui\ViewControllers\DocumentView\" />
+    <Folder Include="Ui\ViewControllers\DocumentView\Subviews\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -242,7 +244,6 @@
     <Compile Include="Ui\ViewControllers\Common\StackView\StackSubView.cs" />
     <Compile Include="Ui\ViewControllers\FoldersList\AbstractFoldersListViewController.cs" />
     <Compile Include="Ui\ViewControllers\FoldersList\BrowseFoldersListViewController.cs" />
-    <Compile Include="Ui\ViewControllers\DocumentViewController.cs" />
     <Compile Include="Ui\TableViewCells\FoldersTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\FoldersTableViewCell.designer.cs">
       <DependentUpon>FoldersTableViewCell.cs</DependentUpon>
@@ -266,6 +267,21 @@
     <Compile Include="Ui\Common\PopoverPresentationControllerDelegate.cs" />
     <Compile Include="Ui\ViewControllers\SimpleMainViewController.cs" />
     <Compile Include="Ui\ViewControllers\AbstractMainViewController.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\DocumentViewController.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\ToView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\CcView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\BccView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\FromView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\SubjectView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\DateReceivedView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\PriorityView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\ContentView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\ReferenceNumberView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\CreatorView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\OriginatorView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\AttachmentsView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\DocumentView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\RecipientsView.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
