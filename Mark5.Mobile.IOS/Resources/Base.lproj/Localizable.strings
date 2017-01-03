@@ -6,11 +6,13 @@
 "creating_system_report___" = "Creating system report...";
 "disable_caching" = "Disable\ncaching";
 "disable_notifications" = "Don't\nnotify";
+"disabled" = "Disabled";
 "documents" = "Documents";
 "done" = "Done";
 "edit" = "Edit";
 "enable_caching" = "Enable\ncaching";
 "enable_notifications" = "Notify";
+"enabled" = "Enabled";
 "error_appserviceexception_title" = "Error";
 "error_dataaccessexception_title" = "Cache error occured";
 "error_datanotfoundexception_message" = "This item is not available offline";

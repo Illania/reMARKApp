@@ -241,9 +241,43 @@
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
+			<string>Account</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>Title</key>
+			<string>username</string>
+			<key>Key</key>
+			<string>username</string>
+			<key>DefaultValue</key>
+			<string></string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>Title</key>
+			<string>server</string>
+			<key>Key</key>
+			<string>serverAddress</string>
+			<key>DefaultValue</key>
+			<string></string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>Title</key>
+			<string>ssl</string>
+			<key>Key</key>
+			<string>sslEnabled</string>
+			<key>DefaultValue</key>
+			<string></string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
 			<string>advanced</string>
-			<key>FooterText</key>
-			<string>enable_reporting_desc</string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -251,7 +285,7 @@
 			<key>Title</key>
 			<string>create_system_report</string>
 			<key>Key</key>
-			<string>CreateSystemReport</string>
+			<string>createSystemReport</string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -259,7 +293,7 @@
 			<key>Title</key>
 			<string>send_feedback</string>
 			<key>Key</key>
-			<string>SendFeedback</string>
+			<string>sendFeedback</string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -267,7 +301,13 @@
 			<key>Title</key>
 			<string>update_config</string>
 			<key>Key</key>
-			<string>UpdateConfig</string>
+			<string>updateConfig</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>FooterText</key>
+			<string>enable_reporting_desc</string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -278,6 +318,34 @@
 			<string>EnableReporting</string>
 			<key>DefaultValue</key>
 			<true/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>about</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>Title</key>
+			<string>version</string>
+			<key>Key</key>
+			<string>version</string>
+			<key>DefaultValue</key>
+			<string></string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>IASKButtonSpecifier</string>
+			<key>Key</key>
+			<string>openSettingsApp</string>
+			<key>Title</key>
+			<string>open_settings_app</string>
 		</dict>
 	</array>
 </dict>

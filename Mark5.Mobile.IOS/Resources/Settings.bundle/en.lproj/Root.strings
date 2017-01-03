@@ -33,6 +33,7 @@
 "security" = "Security";
 "security_footer" = "SSL should remain enabled to provide secure communication. Otherwise, communication between MARK5 on your iOS device and MARK5 server can be intercepted.";
 "send_feedback" = "Send feedback";
+"server" = "Server";
 "shortcodes" = "Shortcodes";
 "ssl" = "SSL";
 "synchronise_contacts" = "Synchronise contacts";
@@ -41,4 +42,5 @@
 "update_config" = "Update system configuration";
 "use_template" = "Use template";
 "use_template_short" = "Use template";
+"username" = "Username";
 "version" = "Version";
