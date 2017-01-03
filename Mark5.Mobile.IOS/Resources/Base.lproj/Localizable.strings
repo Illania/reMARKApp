@@ -93,3 +93,9 @@
 "loading_document___" = "Loading document...";
 "send" = "Send";
 "template_question" = "Which template do you want to use?";
+"date_received" = "Date received";
+"creator" = "Creator";
+"from" = "From";
+"originator" = "Originator";
+"read_by" = "Read by";
+"reference_number" = "Reference number";

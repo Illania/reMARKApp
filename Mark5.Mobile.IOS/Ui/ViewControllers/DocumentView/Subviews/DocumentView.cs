@@ -31,5 +31,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         }
 
         public abstract Task RefreshView();
+
+        public abstract void UpdateVisibility();
+
     }
 }

@@ -6,19 +6,38 @@
 // Copyright (c) 2017 Nordic IT
 //
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Mark5.Mobile.IOS.Ui.Common;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 {
-    public class OriginatorView : DocumentView
+    public class OriginatorView : TextSubView
     {
         public OriginatorView()
+            : base(Localization.GetString("originator"))
         {
         }
 
         public override Task RefreshView()
         {
-            throw new NotImplementedException();
+            if (Document != null)
+            {
+                TextView.Text = Document.Lines != null ? string.Join(", ", Document.Lines.Select(l => l.Name).OrderBy(n => n)) : string.Empty;
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public override void UpdateVisibility()
+        {
+            if (Document == null)
+            {
+                Hidden = true;
+                return;
+            }
+
+            Hidden = string.IsNullOrWhiteSpace(Document.Lines != null ? string.Join(", ", Document.Lines.Select(l => l.Name)) : string.Empty);
         }
     }
 }
