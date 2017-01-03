@@ -283,6 +283,7 @@
     <Compile Include="Ui\ViewControllers\DocumentView\Subviews\DocumentView.cs" />
     <Compile Include="Ui\ViewControllers\DocumentView\Subviews\RecipientsView.cs" />
     <Compile Include="Ui\ViewControllers\DocumentView\Subviews\ReadByView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\TextSubView.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
