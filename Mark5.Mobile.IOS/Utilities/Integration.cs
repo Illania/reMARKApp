@@ -78,5 +78,14 @@ namespace Mark5.Mobile.IOS.Utilities
 
         #endregion
 
+        #region Apple apps
+
+        public static void OpenLink(NSUrl url)
+        {
+            UIApplication.SharedApplication.OpenUrl(url); //TODO deprecated
+        }
+
+        #endregion
+
     }
 }
