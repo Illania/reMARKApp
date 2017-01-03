@@ -19,14 +19,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         {
         }
 
-        public override Task RefreshView()
+        public override void RefreshView()
         {
             if (Document != null)
             {
                 TextView.Text = string.Join(", ", Document.ReadByUserNames.OrderBy(n => n));
             }
-
-            return Task.CompletedTask;
         }
 
         public override void UpdateVisibility()

@@ -5,20 +5,37 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
-using System;
 using System.Threading.Tasks;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.IOS.Ui.Common;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 {
-    public class PriorityView : DocumentView
+
+    public class PriorityView : TextSubView
     {
         public PriorityView()
+            : base(Localization.GetString("priority"))
         {
         }
 
-        public override Task RefreshView()
+        public override void RefreshView()
         {
-            throw new NotImplementedException();
+            if (DocumentPreview != null)
+            {
+                TextView.Text = DocumentPreview.Priority.ToString();
+            }
+        }
+
+        public override void UpdateVisibility()
+        {
+            if (DocumentPreview == null)
+            {
+                Hidden = true;
+                return;
+            }
+
+            Hidden = DocumentPreview.Priority == Priority.None || DocumentPreview.Priority == Priority.Normal;
         }
     }
 }

@@ -19,14 +19,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         {
         }
 
-        public override Task RefreshView() //TODO remember to check if the Task is necessary
+        public override void RefreshView() //TODO remember to check if the Task is necessary
         {
             if (DocumentPreview != null)
             {
                 TextView.Text = DocumentPreview.Direction == DocumentDirection.Outgoing ? DocumentPreview.Creator : string.Empty;
             }
-
-            return Task.CompletedTask;
         }
 
         public override void UpdateVisibility()

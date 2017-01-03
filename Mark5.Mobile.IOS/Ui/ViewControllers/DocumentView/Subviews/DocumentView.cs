@@ -30,7 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
         }
 
-        public abstract Task RefreshView();
+        public abstract void RefreshView();
 
         public abstract void UpdateVisibility();
 
