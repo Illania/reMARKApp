@@ -5,58 +5,48 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
-using System;
 using Foundation;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.IOS.Utilities;
-using ObjCRuntime;
 using UIKit;
+using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 {
-    public class ContentView : DocumentSubView, IUIWebViewDelegate
+    public class ContentView : DocumentSubView, IUIWebViewDelegate, IWKNavigationDelegate
     {
-
         const int ResizeLimit = 10;
         const int MaximumSizeForScalesPagesToFit = 10000;
 
-        bool changeListenerAdded;
-        int resizeLimitCounter;
+        float defaultHeight = 200.0f;
 
-        float defaultHeight;
-
-        UIWebView webView;
+        WKWebView webView;
         NSLayoutConstraint heightConstraint;
 
-        Selector contentSizeSelector;
 
         public ContentView()
         {
-            defaultHeight = 200.0f; //TODO desktop rendering
-
             Initialize();
         }
 
         void Initialize()
         {
-            webView = new UIWebView();
-            webView.ShouldStartLoad = (webView, request, navigationType) =>
-            {
-                if (navigationType == UIWebViewNavigationType.LinkClicked)
-                {
-                    Integration.OpenLink(request.Url);
-                }
+            var preferences = new WKPreferences();
+            preferences.JavaScriptCanOpenWindowsAutomatically = false;
+            preferences.JavaScriptEnabled = true;
 
-                return navigationType == UIWebViewNavigationType.Other;
-            };
+            var configuration = new WKWebViewConfiguration();
+            configuration.Preferences = preferences;
+
+            webView = new WKWebView(CoreGraphics.CGRect.Empty, configuration);
+            webView.NavigationDelegate = this;
             webView.Opaque = false;
             webView.BackgroundColor = UIColor.White;
             webView.ScrollView.Bounces = false;
             webView.ScrollView.ScrollsToTop = false;
-            webView.ScalesPageToFit = false; //TODO desktop rendering
             webView.TranslatesAutoresizingMaskIntoConstraints = false;
             AddSubview(webView);
-            heightConstraint = NSLayoutConstraint.Create(webView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, defaultHeight);
+            heightConstraint = NSLayoutConstraint.Create(webView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, defaultHeight);
             AddConstraints(new[]
                 {
                     heightConstraint,
@@ -67,25 +57,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 });
         }
 
-        public void Recycle()
+        #region IWKNavigationDelegate
+
+        [Export("webView:didFinishNavigation:")]
+        async void DidFinishNavigation(WKWebView wkWebView, WKNavigation navigation)
         {
-            //UnregisterChangeListeners(); //TODO
-
-            Document = null;
-
-            if (webView != null)
+            BeginInvokeOnMainThread(async () =>
             {
-                webView.LoadData("", "text/plain", "UTF-8", new NSUrl("/"));
-                webView.RemoveFromSuperview();
-                webView.Delegate = null;
-                webView.WeakDelegate = null;
-                webView = null;
-            }
+                var scrollHeight = (await webView.EvaluateJavaScriptAsync("document.body.scrollHeight") as NSNumber).FloatValue;
+                var offsetHeight = (await webView.EvaluateJavaScriptAsync("document.body.offsetHeight") as NSNumber).FloatValue;
+                var clientHeight = (await webView.EvaluateJavaScriptAsync("document.documentElement.clientHeight") as NSNumber).FloatValue;
+                var scrollHeight2 = (await webView.EvaluateJavaScriptAsync("document.documentElement.scrollHeight") as NSNumber).FloatValue;
+                var offsetHeight2 = (await webView.EvaluateJavaScriptAsync("document.documentElement.offsetHeight") as NSNumber).FloatValue;
 
-            contentSizeSelector = null;
+                CommonConfig.Logger.Error($"BODY: Scroll height -- {scrollHeight}");
+                CommonConfig.Logger.Error($"BODY: Offset height -- {offsetHeight}");
+                CommonConfig.Logger.Error($"ELEMENT: Scroll height -- {scrollHeight2}");
+                CommonConfig.Logger.Error($"ELEMENT: Offset height -- {offsetHeight2}");
+                CommonConfig.Logger.Error($"ELEMENT: Client height -- {clientHeight}");
 
-            GC.Collect();
+                heightConstraint.Constant = scrollHeight / 2;
+            });
         }
+
+        #endregion
 
         #region DocumentSubView
 
@@ -108,8 +103,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             {
                 SetContent(ContentType.PlainText, Document.PlainTextBody);
             }
-
-
         }
 
         public override void UpdateVisibility()
@@ -124,10 +117,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         void SetContent(ContentType contentType, string content)
         {
             webView.StopLoading();
-
-            //UnregisterChangeListeners();
-            //RegisterChangeListeners();
-
             heightConstraint.Constant = defaultHeight;
 
             switch (contentType)
@@ -147,11 +136,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         void Clear()
         {
             webView.StopLoading();
-
-            //webView.ScalesPageToFit = Settings.DesktopRendering;
-            //UnregisterChangeListeners();
-            //RegisterChangeListeners();
-
             heightConstraint.Constant = defaultHeight;
 
             SetContent(ContentType.PlainText, string.Empty);
