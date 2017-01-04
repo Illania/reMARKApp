@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 {
-    public class AttachmentsView : DocumentView
+    public class AttachmentsView : DocumentSubView
     {
         public AttachmentsView()
         {

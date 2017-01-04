@@ -14,7 +14,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 {
-    public class ContentView : DocumentView, IUIWebViewDelegate
+    public class ContentView : DocumentSubView, IUIWebViewDelegate
     {
 
         const int ResizeLimit = 10;
@@ -69,7 +69,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         public void Recycle()
         {
-            //UnregisterChangeListeners();
+            //UnregisterChangeListeners(); //TODO
 
             Document = null;
 

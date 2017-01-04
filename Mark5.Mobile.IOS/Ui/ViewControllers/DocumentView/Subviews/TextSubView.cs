@@ -10,7 +10,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 {
-    public abstract class TextSubView : DocumentView
+    public abstract class TextSubView : DocumentSubView
     {
         UILabel label;
         protected UITextView TextView;

@@ -13,12 +13,12 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 {
-    public abstract class DocumentView : StackSubView
+    public abstract class DocumentSubView : StackSubView
     {
         public DocumentPreview DocumentPreview { get; set; }
         public Document Document { get; set; }
 
-        protected DocumentView()
+        protected DocumentSubView()
         {
             Initialize();
         }

@@ -18,14 +18,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         {
         }
 
-        public override Task RefreshView()
+        public override void RefreshView()
         {
             if (DocumentPreview != null)
             {
                 TextView.Text = DocumentPreview.ReferenceNumber;
             }
-
-            return Task.CompletedTask;
         }
 
         public override void UpdateVisibility()

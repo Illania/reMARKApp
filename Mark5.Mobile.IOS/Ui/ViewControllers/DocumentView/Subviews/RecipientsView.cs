@@ -20,7 +20,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 {
-    public class RecipientsView : DocumentView
+    public class RecipientsView : DocumentSubView
     {
         const string EmailSeparator = ", ";
         const string RecipentRegex = @"[^,]*";
