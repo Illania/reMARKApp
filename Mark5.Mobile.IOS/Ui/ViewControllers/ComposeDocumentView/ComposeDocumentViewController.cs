@@ -72,6 +72,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
+            InitializeHandlers()
+
             //TODO subscription to keyboard notifications
         }
 
@@ -95,6 +97,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void ViewWillDisappear(bool animated)
         {
             base.ViewWillDisappear(animated);
+            DeInitializeHandlers();
         }
 
         #endregion
@@ -105,12 +108,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             cancelButtonItem = new UIBarButtonItem();
             cancelButtonItem.Title = Localization.GetString("cancel");
-            //cancelButtonItem.Clicked += DoCancel; //TODO
             NavigationItem.SetLeftBarButtonItem(cancelButtonItem, false);
 
             sendButtonItem = new UIBarButtonItem();
             sendButtonItem.Title = Localization.GetString("send");
-            //sendButtonItem.Clicked += DoSend; //TODO
             sendButtonItem.Enabled = false;
             NavigationItem.SetRightBarButtonItem(sendButtonItem, false);
         }
@@ -140,6 +141,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             subViews.Add(contentView);
 
             AddArrangedViewsWithSeparators(subViews);
+        }
+
+        void InitializeHandlers()
+        {
+            cancelButtonItem.Clicked += CancelButtonItem_Clicked;
+            sendButtonItem.Clicked += SendButtonItem_Clicked;
+        }
+
+        void DeInitializeHandlers()
+        {
+            cancelButtonItem.Clicked -= CancelButtonItem_Clicked;
+            sendButtonItem.Clicked -= SendButtonItem_Clicked;
         }
 
         #endregion
@@ -242,6 +255,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
+        #region Actions
+
+        void SendButtonItem_Clicked(object sender, EventArgs e)
+        {
+            //TODO
+        }
+
+        void CancelButtonItem_Clicked(object sender, EventArgs e)
+        {
+            //TODO
+        }
+
+        #endregion
+
         #region Template methods
 
         async Task AskIfShouldUseTemplates()
@@ -273,9 +300,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 await GetDefaultTemplate();
             }
-            else if (useTemplate == Preferences.TemplateUsageMode.AlwaysAsk)
+            else if (useTemplate == Preferences.TemplateUsageMode.AlwaysAsk) //TODO popover delegate not set
             {
-                var templateListStrings = new string[] { Localization.GetString("template_selection_default"), Localization.GetString("template_selection_local"), Localization.GetString("template_selection_another") };
+                var templateListStrings = new string[] { Localization.GetString("template_selection_default"),
+                    Localization.GetString("template_selection_local"),
+                    Localization.GetString("template_selection_another") };
                 var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("template_selection_title"), templateListStrings);
                 switch (result)
                 {

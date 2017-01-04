@@ -99,3 +99,13 @@
 "originator" = "Originator";
 "read_by" = "Read by";
 "reference_number" = "Reference number";
+"categories" = "Categories";
+"mark_as_read" = "Mark as read";
+"mark_as_unread" = "Mark as unread";
+"reply" = "Reply";
+"reply_all" = "Reply all";
+"forward" = "Forward";
+"copy_to_worktray" = "Copy to worktray";
+"copy_to_folder" = "Copy to folder";
+"delete_from_folder" = "Delete from folder";
+
