@@ -18,12 +18,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         public override void RefreshView()
         {
-            throw new NotImplementedException();
+            //TODO
         }
 
         public override void UpdateVisibility()
         {
-            throw new NotImplementedException();
+            //TODO
         }
     }
 }
