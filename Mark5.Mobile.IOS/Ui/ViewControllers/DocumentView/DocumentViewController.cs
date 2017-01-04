@@ -342,13 +342,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             Title = DocumentPreview.Subject;
 
             StackView.ArrangedSubviews.OfType<DocumentSubView>().ForEach(v =>
-           {
-               v.Document = Document;
-               v.DocumentPreview = DocumentPreview;
-               v.RefreshView();
-               v.UpdateVisibility();
-           });
+            {
+                v.Document = Document;
+                v.DocumentPreview = DocumentPreview;
+                v.RefreshView();
+            });
 
+            StackView.ArrangedSubviews.OfType<DocumentSubView>().ForEach(v => v.UpdateVisibility());
+            CorrectSeparators();
+
+            UIView.Animate(0.075d, StackView.LayoutIfNeeded);
             UIView.Animate(0.1d, () => StackView.Alpha = 1.0f);
         }
 
@@ -358,7 +361,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void HandleRecipentTapped(object sender, RecipentTappedEventArgs e)
         {
-            throw new NotImplementedException();
+            //TODO
         }
 
         #endregion
