@@ -72,7 +72,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            InitializeHandlers()
+            InitializeHandlers();
 
             //TODO subscription to keyboard notifications
         }
