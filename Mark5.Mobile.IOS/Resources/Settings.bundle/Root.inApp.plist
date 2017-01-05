@@ -229,13 +229,11 @@
 		</dict>
 		<dict>
 			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-			<key>Title</key>
-			<string>Title</string>
+			<string>IASKCustomViewSpecifier</string>
 			<key>Key</key>
-			<string>Key</string>
+			<string>localTemplate</string>
 			<key>DefaultValue</key>
-			<string>DefaultValue</string>
+			<string>Sent from MARK5.</string>
 		</dict>
 		<dict>
 			<key>Type</key>

@@ -168,6 +168,7 @@
     <InterfaceDefinition Include="Ui\TableViewCells\WaitTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\EmptyTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\EditTextViewCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -235,6 +236,10 @@
     <Compile Include="Ui\Common\PopoverPresentationControllerDelegate.cs" />
     <Compile Include="Ui\ViewControllers\SimpleMainViewController.cs" />
     <Compile Include="Ui\ViewControllers\AbstractMainViewController.cs" />
+    <Compile Include="Ui\TableViewCells\EditTextViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\EditTextViewCell.designer.cs">
+      <DependentUpon>EditTextViewCell.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

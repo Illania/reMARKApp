@@ -12,6 +12,7 @@ using InAppSettingsKit;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -23,6 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string Value1CellId = "Value1CellId";
 
         const string UsernameKey = "username";
+        const string LocalTemplateKey = "localTemplate";
         const string ServerAddressKey = "serverAddress";
         const string SslEnabledKey = "sslEnabled";
         const string VersionKey = "version";
@@ -38,6 +40,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NeverShowPrivacySettings = false;
             ShowCreditsFooter = false;
             Delegate = this;
+        }
+
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            RefreshHiddenSettings();
+            NSNotificationCenter.DefaultCenter.AddObserver(new NSString(InAppSettingsKit.SettingsStore.AppSettingChangedNotification), n => RefreshHiddenSettings());
         }
 
         public override nfloat GetHeightForFooter(UITableView tableView, nint section)
@@ -155,6 +165,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void SettingsViewControllerDidEnd(AppSettingsViewController sender)
         {
             // Nothing to do
+        }
+
+        void RefreshHiddenSettings()
+        {
+            SetHiddenKeys(PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk ? null : new[] { LocalTemplateKey }, false);
         }
     }
 }
