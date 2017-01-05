@@ -35,7 +35,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             configuration.Preferences = preferences;
 
             webView = new WKWebView(CoreGraphics.CGRect.Empty, configuration);
-            webView.NavigationDelegate = this;
+            webView.NavigationDelegate = this; //TODO talk with Bartosz about this (no difference between this and a weak delegate)
             webView.Opaque = false;
             webView.BackgroundColor = UIColor.White;
             webView.ScrollView.Bounces = false;
