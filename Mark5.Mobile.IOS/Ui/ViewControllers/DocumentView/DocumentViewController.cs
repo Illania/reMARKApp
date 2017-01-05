@@ -347,16 +347,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
-        #region Handlers
+        #region Actions
 
         void HandleRecipentTapped(object sender, RecipentTappedEventArgs e)
         {
             //TODO
         }
-
-        #endregion
-
-        #region Actions
 
         void Flag_Clicked(object sender, EventArgs e) //TODO use dialogs? what about the popover
         {
