@@ -109,16 +109,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DeInitializeHandlers();
         }
 
-        public override void ViewDidDisappear(bool animated)
-        {
-            base.ViewDidDisappear(animated);
-
-            if ((NavigationController == null || NavigationController.ViewControllers == null || !NavigationController.ViewControllers.Contains(this)) && content != null)
-            {
-                content.Recycle();
-            }
-        }
-
         #endregion
 
         #region Init methods
@@ -290,7 +280,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             flag.Clicked -= Flag_Clicked;
             fileTo.Clicked -= FileTo_Clicked;
-            replyActions.Clicked -= ReplyActions_Clicked;
+            replyActions.Clicked -= ReplyActions_Clicked; //TODO uniform naming
             userActions.Clicked -= DoShowUserActions;
             commentsButton.TouchUpInside -= DoShowComments;
         }

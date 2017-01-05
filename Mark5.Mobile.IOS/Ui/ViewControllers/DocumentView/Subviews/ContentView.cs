@@ -13,16 +13,12 @@ using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 {
-    public class ContentView : DocumentSubView, IUIWebViewDelegate, IWKNavigationDelegate
+    public class ContentView : DocumentSubView, IWKNavigationDelegate
     {
-        const int ResizeLimit = 10;
-        const int MaximumSizeForScalesPagesToFit = 10000;
-
         float defaultHeight = 200.0f;
 
         WKWebView webView;
         NSLayoutConstraint heightConstraint;
-
 
         public ContentView()
         {
@@ -60,23 +56,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         #region IWKNavigationDelegate
 
         [Export("webView:didFinishNavigation:")]
-        async void DidFinishNavigation(WKWebView wkWebView, WKNavigation navigation)
+        void DidFinishNavigation(WKWebView wkWebView, WKNavigation navigation)
         {
             BeginInvokeOnMainThread(async () =>
             {
-                var scrollHeight = (await webView.EvaluateJavaScriptAsync("document.body.scrollHeight") as NSNumber).FloatValue;
-                var offsetHeight = (await webView.EvaluateJavaScriptAsync("document.body.offsetHeight") as NSNumber).FloatValue;
-                var clientHeight = (await webView.EvaluateJavaScriptAsync("document.documentElement.clientHeight") as NSNumber).FloatValue;
-                var scrollHeight2 = (await webView.EvaluateJavaScriptAsync("document.documentElement.scrollHeight") as NSNumber).FloatValue;
-                var offsetHeight2 = (await webView.EvaluateJavaScriptAsync("document.documentElement.offsetHeight") as NSNumber).FloatValue;
-
-                CommonConfig.Logger.Error($"BODY: Scroll height -- {scrollHeight}");
-                CommonConfig.Logger.Error($"BODY: Offset height -- {offsetHeight}");
-                CommonConfig.Logger.Error($"ELEMENT: Scroll height -- {scrollHeight2}");
-                CommonConfig.Logger.Error($"ELEMENT: Offset height -- {offsetHeight2}");
-                CommonConfig.Logger.Error($"ELEMENT: Client height -- {clientHeight}");
-
-                heightConstraint.Constant = scrollHeight / 2;
+                //TODO No idea about why the following line is necessary (withouth it works strangely)
+                await webView.EvaluateJavaScriptAsync("");
+                heightConstraint.Constant = webView.ScrollView.ContentSize.Height;
+                SetNeedsLayout();
             });
         }
 
