@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Common.Services
 
         event EventHandler<ReachabilityRefreshedEventArgs> ReachabilityRefreshed;
 
-        Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.ServiceConnection, bool testOnly = false);
+        Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.Service, bool testOnly = false);
     }
 
     public class ReachabilityRefreshedEventArgs : EventArgs
