@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
@@ -40,8 +41,10 @@ namespace Mark5.Mobile.Common.Tester
 
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                CommonConfig.Logger.Error("Error occured when checking reachability.", ex);
+
                 return false;
             }
         }
