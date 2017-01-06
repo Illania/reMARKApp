@@ -12,6 +12,7 @@ using InAppSettingsKit;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
@@ -28,8 +29,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string ServerAddressKey = "serverAddress";
         const string SslEnabledKey = "sslEnabled";
         const string VersionKey = "version";
-        const string CreateSystemReportKey = "createSystemReport";
+        const string LogoutKey = "logout";
         const string SendFeedbackKey = "sendFeedback";
+        const string CreateSystemReportKey = "createSystemReport";
         const string UpdateConfigKey = "updateConfig";
         const string OpenSettingsAppKey = "openSettingsApp";
 
@@ -46,8 +48,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
-            RefreshHiddenSettings();
             NSNotificationCenter.DefaultCenter.AddObserver(new NSString(InAppSettingsKit.SettingsStore.AppSettingChangedNotification), n => RefreshHiddenSettings());
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+
+            RefreshHiddenSettings();
         }
 
         public override nfloat GetHeightForFooter(UITableView tableView, nint section)
@@ -68,6 +76,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         [Export("tableView:cellForSpecifier:")]
         public virtual UITableViewCell GetCellForSpecifier(UITableView tableView, SettingsSpecifier specifier)
         {
+            if (specifier.Key == LocalTemplateKey)
+            {
+                var cell = (EditTextViewCell)tableView.DequeueReusableCell(EditTextViewCell.Key);
+                if (cell == null)
+                {
+                    cell = (EditTextViewCell)EditTextViewCell.Nib.Instantiate(null, null)[0];
+                    cell.ContentChanged += (sender, e) => PlatformConfig.Preferences.LocalTemplate = cell.Content;
+                }
+                cell.Content = PlatformConfig.Preferences.LocalTemplate;
+
+                return cell;
+            }
+
             if (specifier.Key == UsernameKey)
             {
                 var cell = tableView.DequeueReusableCell(Value1CellId) ?? new UITableViewCell(UITableViewCellStyle.Value1, Value1CellId);
@@ -128,20 +149,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             switch (specifier.Key)
             {
+                case LocalTemplateKey:
+                    return 150f;
                 case UsernameKey:
                 case ServerAddressKey:
                 case SslEnabledKey:
                 case VersionKey:
-                    return 44.0f;
+                    return 44f;
                 default:
-                    return 0.0f;
+                    return 0f;
             }
         }
 
         [Export("settingsViewController:buttonTappedForSpecifier:")]
         public virtual void ButtonTappedForSpecifier(AppSettingsViewController sender, SettingsSpecifier specifier)
         {
-            if (specifier.Key == CreateSystemReportKey)
+            if (specifier.Key == LogoutKey)
             {
                 
             }
@@ -149,6 +172,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (specifier.Key == SendFeedbackKey)
             {
                 
+            }
+
+            if (specifier.Key == CreateSystemReportKey)
+            {
+
             }
 
             if (specifier.Key == UpdateConfigKey)

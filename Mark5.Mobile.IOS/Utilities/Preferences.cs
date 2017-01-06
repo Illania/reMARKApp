@@ -282,6 +282,11 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 return ud.StringForKey(Keys.LocalTemplateKey);
             }
+            set
+            {
+                ud.SetString(value, Keys.LocalTemplateKey);
+                ud.Synchronize();
+            }
         }
 
         #endregion

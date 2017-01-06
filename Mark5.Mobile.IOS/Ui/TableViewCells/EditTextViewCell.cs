@@ -30,6 +30,18 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             }
         }
 
+        public event EventHandler ContentChanged
+        {
+            add
+            {
+                ContentTextView.Changed += value;
+            }
+            remove
+            {
+                ContentTextView.Changed -= value;
+            }
+        }
+
         protected EditTextViewCell(IntPtr handle)
             : base(handle)
         {

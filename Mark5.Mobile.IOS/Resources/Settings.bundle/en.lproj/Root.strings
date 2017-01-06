@@ -9,6 +9,7 @@
 "compose_options" = "Compose view options";
 "compose_priority_enabled" = "Show priority field";
 "contacts" = "Contacts";
+"contact_section_visibility" = "Sections";
 "create_report" = "Create system report";
 "create_system_report" = "Create system report";
 "default_template" = "Default MARK5 template";
@@ -25,6 +26,7 @@
 "large_attachment_warning_desc" = "Show warning when trying to download large attachment over cellular connection.";
 "local_template" = "Local template";
 "local_template_short" = "Local";
+"logout" = "Log out";
 "mark_as_read_delay_seconds" = "Mark as read after";
 "me" = "Me";
 "open_settings_app" = "Open Settings app";

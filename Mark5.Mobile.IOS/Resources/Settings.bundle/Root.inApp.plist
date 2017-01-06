@@ -136,13 +136,13 @@
 		</dict>
 		<dict>
 			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
+			<string>PSChildPaneSpecifier</string>
 			<key>Title</key>
-			<string>Title</string>
+			<string>contact_section_visibility</string>
 			<key>Key</key>
-			<string>Key</string>
-			<key>DefaultValue</key>
-			<true/>
+			<string>contactSectionVisibility</string>
+			<key>File</key>
+			<string>ContactSectionsVisibility.inApp</string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -232,8 +232,6 @@
 			<string>IASKCustomViewSpecifier</string>
 			<key>Key</key>
 			<string>localTemplate</string>
-			<key>DefaultValue</key>
-			<string>Sent from MARK5.</string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -274,16 +272,20 @@
 		<dict>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
-			<key>Title</key>
-			<string>advanced</string>
 		</dict>
 		<dict>
 			<key>Type</key>
 			<string>IASKButtonSpecifier</string>
 			<key>Title</key>
-			<string>create_system_report</string>
+			<string>logout</string>
 			<key>Key</key>
-			<string>createSystemReport</string>
+			<string>logout</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>advanced</string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -292,6 +294,14 @@
 			<string>send_feedback</string>
 			<key>Key</key>
 			<string>sendFeedback</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>IASKButtonSpecifier</string>
+			<key>Title</key>
+			<string>create_system_report</string>
+			<key>Key</key>
+			<string>createSystemReport</string>
 		</dict>
 		<dict>
 			<key>Type</key>
