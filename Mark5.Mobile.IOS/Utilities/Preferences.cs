@@ -29,9 +29,9 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string MainTabsOrderKey = "MainTabsOrder";
 
             public const string DocumentsToDownloadKey = "DocumentsToDownload";
-            public const string MarkAsReadDelaySecondsKey = "MarkAsReadDelaySeconds";
             public const string UnreadIndicatorMeKey = "UnreadIndicatorMe";
             public const string CompactDocumentsListKey = "CompactDocumentsList";
+            public const string MarkAsReadDelaySecondsKey = "MarkAsReadDelaySeconds";
             public const string LargeAttachmentWarningKey = "LargeAttachmentWarning";
             public const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
 
@@ -57,7 +57,10 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string CleanCacheIntervalDaysKey = "CleanCacheIntervalDays";
             public const string ClearCacheKey = "ClearCache";
             public const string EnableReportingKey = "EnableReporting";
+
             public const string PushNotificationTokenKey = "PushNotificationToken";
+
+            public const string ResetOnLaunchKey = "ResetOnLaunch";
         }
 
         readonly NSUserDefaults ud;
@@ -281,6 +284,11 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 return ud.StringForKey(Keys.LocalTemplateKey);
             }
+            set
+            {
+                ud.SetString(value, Keys.LocalTemplateKey);
+                ud.Synchronize();
+            }
         }
 
         #endregion
@@ -336,6 +344,19 @@ namespace Mark5.Mobile.IOS.Utilities
             set
             {
                 ud.SetString(value, Keys.PushNotificationTokenKey);
+                ud.Synchronize();
+            }
+        }
+
+        public bool ResetOnLaunch
+        {
+            get
+            {
+                return ud.BoolForKey(Keys.ResetOnLaunchKey);
+            }
+            set
+            {
+                ud.SetBool(value, Keys.ResetOnLaunchKey);
                 ud.Synchronize();
             }
         }

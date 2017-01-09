@@ -121,16 +121,16 @@
       <HintPath>..\Components\InAppSettingsKit-2.6.0.0\lib\ios-unified\InAppSettingsKit.dll</HintPath>
     </Reference>
     <Reference Include="SQLitePCLRaw.core">
-      <HintPath>..\packages\SQLitePCLRaw.core.1.1.2-pre20161207051304\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
+      <HintPath>..\packages\SQLitePCLRaw.core.1.1.2\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
     </Reference>
     <Reference Include="SQLitePCLRaw.provider.sqlite3">
-      <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.1\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
+      <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.2\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
     </Reference>
     <Reference Include="SQLitePCLRaw.batteries_green">
-      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.1\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.2\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
     </Reference>
     <Reference Include="SQLitePCLRaw.batteries_v2">
-      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.1\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.2\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -168,6 +168,7 @@
     <InterfaceDefinition Include="Ui\TableViewCells\WaitTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\EmptyTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\EditTextViewCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -235,6 +236,10 @@
     <Compile Include="Ui\Common\PopoverPresentationControllerDelegate.cs" />
     <Compile Include="Ui\ViewControllers\SimpleMainViewController.cs" />
     <Compile Include="Ui\ViewControllers\AbstractMainViewController.cs" />
+    <Compile Include="Ui\TableViewCells\EditTextViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\EditTextViewCell.designer.cs">
+      <DependentUpon>EditTextViewCell.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
@@ -386,6 +391,9 @@
     <BundleResource Include="Resources\icons\folderslist\spam%403x.png" />
     <BundleResource Include="Resources\icons\folderslist\worktray%402x.png" />
     <BundleResource Include="Resources\icons\folderslist\worktray%403x.png" />
+    <BundleResource Include="Resources\Settings.bundle\Root.inApp.plist" />
+    <BundleResource Include="Resources\Settings.bundle\ContactSectionsVisibility.inApp.plist" />
+    <BundleResource Include="Resources\Settings.bundle\en.lproj\ContactSectionsVisibility.strings" />
   </ItemGroup>
   <ItemGroup>
     <XamarinComponentReference Include="InAppSettingsKit">
