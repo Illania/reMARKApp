@@ -59,6 +59,8 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string EnableReportingKey = "EnableReporting";
 
             public const string PushNotificationTokenKey = "PushNotificationToken";
+
+            public const string ResetOnLaunchKey = "ResetOnLaunch";
         }
 
         readonly NSUserDefaults ud;
@@ -342,6 +344,19 @@ namespace Mark5.Mobile.IOS.Utilities
             set
             {
                 ud.SetString(value, Keys.PushNotificationTokenKey);
+                ud.Synchronize();
+            }
+        }
+
+        public bool ResetOnLaunch
+        {
+            get
+            {
+                return ud.BoolForKey(Keys.ResetOnLaunchKey);
+            }
+            set
+            {
+                ud.SetBool(value, Keys.ResetOnLaunchKey);
                 ud.Synchronize();
             }
         }

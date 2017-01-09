@@ -118,6 +118,11 @@ namespace Mark5.Mobile.IOS
             {
                 var mainFolder = FileSystem.Current.LocalStorage;
 
+                var preferences = new Preferences();
+
+                if (preferences.ResetOnLaunch)
+                    Integration.ClearData();
+
                 CommonConfig.PathSeparator = Path.DirectorySeparatorChar;
                 CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "data"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.OutgoingFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "out"), CreationCollisionOption.OpenIfExists);
@@ -140,7 +145,7 @@ namespace Mark5.Mobile.IOS
                 await DatabaseUtils.InitializeDatabases();
 
                 PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();
-                PlatformConfig.Preferences = new Preferences();
+                PlatformConfig.Preferences = preferences;
                 PlatformConfig.ReachabilityReceiver = new ReachabilityReceiver();
             }).Wait();
         }

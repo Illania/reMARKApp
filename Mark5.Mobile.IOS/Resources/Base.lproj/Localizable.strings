@@ -1,6 +1,12 @@
 ﻿"add_to_favorites" = "Add to\nfavorites";
 "back" = "Back";
 "cancel" = "Cancel";
+"clear_contacts_cache_summary" = "Do you want to remove cached contacts?";
+"clear_contacts_cache_title" = "Clear contacts cache";
+"clear_shortcodes_cache_summary" = "Do you want to remove cached shortcodes?";
+"clear_shortcodes_cache_title" = "Clear shortcodes cache";
+"clearing_contacts_cache___" = "Clearing cache...";
+"clearing_shortcodes_cache___" = "Clearing cache...";
 "contacts" = "Contacts";
 "continue" = "Continue";
 "creating_system_report___" = "Creating system report...";
@@ -27,6 +33,7 @@
 "hostname" = "Hostname";
 "local_folders" = "Local folders";
 "logging_in___" = "Logging in...";
+"logging_out___" = "Logging out...";
 "login" = "Login";
 "login_failed" = "Login failed";
 "login_failed_desc" = "Could not log in to MARK5. Please check your credentials and server address.";
@@ -37,6 +44,7 @@
 "notifications" = "Notifications";
 "ok" = "OK";
 "password" = "Password";
+"please_restart" = "Please restart MARK5 app";
 "please_wait___" = "Please wait...";
 "port" = "Port";
 "pull_to_refresh" = "Pull to refresh";
@@ -47,6 +55,7 @@
 "settings" = "Settings";
 "settings" = "Settings";
 "shortcodes" = "Shortcodes";
+"updating_config___" = "Updating configuration...";
 "username" = "Username";
 "warning" = "Warning";
 "warning_selfsigned_on" = "Self signed certificates will be accepted. Please be aware that this lowers security of communication between MARK5 server and your device.";

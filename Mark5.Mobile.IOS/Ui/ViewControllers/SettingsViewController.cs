@@ -9,6 +9,7 @@ using System;
 using CoreGraphics;
 using Foundation;
 using InAppSettingsKit;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -24,7 +25,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         const string Value1CellId = "Value1CellId";
 
+        const string SynchroniseContactsKey = "SynchroniseContacts";
+        const string SynchroniseShortcodesKey = "SynchroniseShortcodes";
         const string UsernameKey = "username";
+        const string UseTemplateKey = "UseTemplate";
         const string LocalTemplateKey = "localTemplate";
         const string ServerAddressKey = "serverAddress";
         const string SslEnabledKey = "sslEnabled";
@@ -48,7 +52,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
-            NSNotificationCenter.DefaultCenter.AddObserver(new NSString(InAppSettingsKit.SettingsStore.AppSettingChangedNotification), n => RefreshHiddenSettings());
+            NSNotificationCenter.DefaultCenter.AddObserver(new NSString(InAppSettingsKit.SettingsStore.AppSettingChangedNotification), SettingsChanged);
         }
 
         public override void ViewWillAppear(bool animated)
@@ -162,26 +166,77 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
         [Export("settingsViewController:buttonTappedForSpecifier:")]
-        public virtual void ButtonTappedForSpecifier(AppSettingsViewController sender, SettingsSpecifier specifier)
+        public virtual async void ButtonTappedForSpecifier(AppSettingsViewController sender, SettingsSpecifier specifier)
         {
             if (specifier.Key == LogoutKey)
             {
-                
+                var dismisAction = Dialogs.ShowInfiniteProgressDialog("logging_out___");
+
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
+                    {
+                        await Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
+                    }
+                }
+                catch
+                {
+                }
+
+                PlatformConfig.Preferences.ResetOnLaunch = true;
+
+                dismisAction();
+
+                Dialogs.ShowBlockingDialog(this, "please_restart");
+
+                return;
             }
 
             if (specifier.Key == SendFeedbackKey)
             {
-                
+                // TODO
+
+                return;
             }
 
             if (specifier.Key == CreateSystemReportKey)
             {
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog("creating_system_report___");
 
+                var report = await SystemReportCollector.CreateFullReportAsync();
+
+                dismissAction();
+
+                var src = SystemReportCollector.CreateShareReportController(report);
+                if (src.PopoverPresentationController != null) src.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(sender.TableView, sender.TableView.CellAt(sender.SettingsReader.GetIndexPath(specifier.Key)));
+                PresentViewController(src, true, null);
+
+                return;
             }
 
             if (specifier.Key == UpdateConfigKey)
             {
-                
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog("updating_config___");
+
+                try
+                {
+                    var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Remote);
+                    ServerConfig.SystemSettings = ss;
+
+                    await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Remote);
+
+                    dismissAction();
+                }
+                catch (Exception ex)
+                {
+                    dismissAction();
+
+                    CommonConfig.Logger.Error("Could not retrieve system settings!", ex);
+
+                    await Dialogs.ShowErrorDialogAsync(this, ex);
+                }
+
+                return;
             }
 
             if (specifier.Key == OpenSettingsAppKey)
@@ -195,9 +250,66 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             // Nothing to do
         }
 
-        void RefreshHiddenSettings()
+        async void SettingsChanged(NSNotification n)
         {
-            SetHiddenKeys(PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk ? null : new[] { LocalTemplateKey }, false);
+            var key = n.Object.ToString();
+
+            if (key == SynchroniseContactsKey && !PlatformConfig.Preferences.SynchroniseContacts)
+            {
+                var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("clear_contacts_cache_title"), Localization.GetString("clear_contacts_cache_summary"));
+                if (result)
+                {
+                    var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("clearing_contacts_cache___"));
+
+                    try
+                    {
+                        await Managers.CleanUpManager.ClearContactsCache();
+                        await Managers.CleanUpManager.CleanUp(new[] { ModuleType.Contacts });
+
+                        dismissAction();
+                    }
+                    catch (Exception ex)
+                    {
+                        dismissAction();
+
+                        CommonConfig.Logger.Error("Could not clear contacts cache!", ex);
+
+                        await Dialogs.ShowErrorDialogAsync(this, ex);
+                    }
+                }
+            }
+
+            if (key == SynchroniseShortcodesKey && !PlatformConfig.Preferences.SynchroniseShortcodes)
+            {
+                var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("clear_shortcodes_cache_title"), Localization.GetString("clear_shortcodes_cache_summary"));
+                if (result)
+                {
+                    var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("clearing_shortcodes_cache___"));
+
+                    try
+                    {
+                        await Managers.CleanUpManager.ClearShortcodeCache();
+                        await Managers.CleanUpManager.CleanUp(new[] { ModuleType.Shortcodes });
+
+                        dismissAction();
+                    }
+                    catch (Exception ex)
+                    {
+                        dismissAction();
+
+                        CommonConfig.Logger.Error("Could not clear shortcodes cache!", ex);
+
+                        await Dialogs.ShowErrorDialogAsync(this, ex);
+                    }
+                }
+            }
+
+            if (key == UseTemplateKey)
+            {
+                RefreshHiddenSettings();
+            }
         }
+
+        void RefreshHiddenSettings() => SetHiddenKeys(PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk ? null : new[] { LocalTemplateKey }, false);
     }
 }
