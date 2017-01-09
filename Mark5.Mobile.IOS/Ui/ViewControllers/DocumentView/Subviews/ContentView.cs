@@ -27,28 +27,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         void Initialize()
         {
-            //var source = new NSString("var meta = document.createElement('meta'); " +
-            //                          "meta.name = 'viewport'; " +
-            //                          "meta.content = 'width=device-width, maximum-scale=0.30'; " +
-            //                          "var head = document.getElementsByTagName('head')[0];" +
-            //                          "head.appendChild(meta);");
-            //var script = new WKUserScript(source, WKUserScriptInjectionTime.AtDocumentEnd, true);
-
-            //var userContentController = new WKUserContentController();
-            //userContentController.AddUserScript(script);
-
             var preferences = new WKPreferences();
             preferences.JavaScriptCanOpenWindowsAutomatically = false;
             preferences.JavaScriptEnabled = true;
 
             var configuration = new WKWebViewConfiguration();
             configuration.Preferences = preferences;
-            //configuration.UserContentController = userContentController; //TODO used for testing
 
             webView = new WKWebView(CoreGraphics.CGRect.Empty, configuration);
             webView.NavigationDelegate = this; //TODO talk with Bartosz about this (no difference between this and a weak delegate)
             webView.ScrollView.Delegate = this;
-            //webView.ScrollView.AddObserver("contentSize.height", NSKeyValueObservingOptions.Initial, HandleAction); //TODO
             webView.Opaque = false;
             webView.BackgroundColor = UIColor.White;
             webView.ScrollView.Bounces = false;
@@ -64,13 +52,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                     NSLayoutConstraint.Create(webView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1.0f, -VerticalMargin),
                     NSLayoutConstraint.Create(webView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin),
                 });
-
-
-        }
-
-        void HandleAction(NSObservedChange obj)
-        {
-            CommonConfig.Logger.Debug("-----------____ " + webView.ScrollView.ContentSize.Height);
         }
 
         #region IWKNavigationDelegate
@@ -84,10 +65,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 await webView.EvaluateJavaScriptAsync("");
                 heightConstraint.Constant = webView.ScrollView.ContentSize.Height;
                 SetNeedsLayout();
-
-                CommonConfig.Logger.Debug("ZOOM SCALE ::::::: - " + webView.ScrollView.ZoomScale);
-                CommonConfig.Logger.Debug("CONTENT SIZE ::::::: - " + webView.ScrollView.ContentSize.Height);
-
             });
         }
 
@@ -176,7 +153,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
             SetContent(ContentType.PlainText, string.Empty);
         }
-
 
         #endregion
 

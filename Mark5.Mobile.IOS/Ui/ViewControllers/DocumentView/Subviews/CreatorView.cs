@@ -19,7 +19,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         {
         }
 
-        public override void RefreshView() //TODO remember to check if the Task is necessary
+        public override void RefreshView()
         {
             if (DocumentPreview != null)
             {
@@ -29,7 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         public override void UpdateVisibility()
         {
-            if (DocumentPreview == null) //TODO No more subview visibility check?
+            if (DocumentPreview == null) //TODO No more subview visibility check (in settings)?
             {
                 Hidden = true;
                 return;
