@@ -252,6 +252,7 @@
     </Compile>
     <Compile Include="Utilities\DateTimeUtils.cs" />
     <Compile Include="Utilities\UI.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentsListViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

@@ -42,7 +42,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         #region Custom methods
 
-        public void Initialize(DocumentPreview documentPreview, bool local = false)
+        public void Initialize(DocumentPreview documentPreview)
         {
             DocumentPreview = documentPreview;
 

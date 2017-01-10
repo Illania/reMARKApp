@@ -29,6 +29,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected override void FolderSelected(Folder folder)
         {
             base.FolderSelected(folder);
+
+            var vc = new DocumentsListViewController { Folder = folder };
+            NavigationController.PushViewController(vc, true);
         }
 
         protected override void FolderExpand(Folder folder)
