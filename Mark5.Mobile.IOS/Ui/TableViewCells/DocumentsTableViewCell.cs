@@ -5,12 +5,14 @@
 //
 // Copyright (c) 2014 Nordic IT
 //
-
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Foundation;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
@@ -35,58 +37,56 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static DocumentsTableViewCell Create()
         {
-            var cell = (DocumentsTableViewCell)Nib.Instantiate(null, null)[0];
-
-            cell.SenderNameLabel.Font = Theme.DefaultBoldFont;
-            cell.DateReceivedLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
-            cell.MessagePreviewLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
-
-            return cell;
+            return (DocumentsTableViewCell)Nib.Instantiate(null, null)[0];
         }
 
         #region Custom methods
 
-        public void Initialize(DocumentPreview documentPreview, bool local = false)
+        public void Initialize(DocumentPreview documentPreview)
         {
             DocumentPreview = documentPreview;
 
-            UpdateCategoriesView();
+            if (documentPreview.Direction == DocumentDirection.Incoming)
+            {
+                var address = documentPreview.Addresses.FirstOrDefault(da => da.AddressType == DocumentAddressType.From);
+                SenderNameLabel.Text = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
+            }
+            else
+            {
+                var address = documentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType).FirstOrDefault();
+                SenderNameLabel.Text = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
+            }
 
-            SenderNameLabel.Text = !local ? documentPreview.From : documentPreview.To;
             SubjectLabel.Text = documentPreview.Subject;
             MessagePreviewLabel.Text = !string.IsNullOrWhiteSpace(documentPreview.Preview) ? documentPreview.Preview : "This message has no content.";
-            DateReceivedLabel.Text = documentPreview.DateReceived.ToCompactDateTimeString();
+            DateReceivedLabel.Text = documentPreview.DateReceivedTimestamp
+                         .ConvertTimestampMillisecondsToDateTime()
+                         .ConvertUtcToServerTime()
+                         .ConvertDateTimeToTimestampMilliseconds()
+                         .FormatServerTimestampAsCompactShortDateTimeString();
 
-            UIImage directionIcon = null;
-            if (local)
-            {
-                if (documentPreview.Failed)
-                {
-                    directionIcon = UIImage.FromBundle(Path.Combine("Icons", "failed.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-                }
-                else
-                {
-                    directionIcon = UIImage.FromBundle(Path.Combine("Icons", "pending.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-                }
-            }
-            else if (documentPreview.Direction == Direction.Incoming)
-            {
-                directionIcon = UIImage.FromBundle(Path.Combine("Icons", "incoming.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            }
-            else if (documentPreview.Direction == Direction.Outgoing)
-            {
-                directionIcon = UIImage.FromBundle(Path.Combine("Icons", "outgoing.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            }
-            if (documentPreview.Direction == Direction.Draft)
-            {
-                directionIcon = UIImage.FromBundle(Path.Combine("Icons", "pencil.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            }
+            UpdateCategoriesView();
 
-
-            UpdateReadStatus(local);
+            UIImage directionIcon;
+            switch (documentPreview.Direction)
+            {
+                case DocumentDirection.Incoming:
+                    directionIcon = UIImage.FromBundle(Path.Combine("icons", "incoming.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    break;
+                case DocumentDirection.Outgoing:
+                    directionIcon = UIImage.FromBundle(Path.Combine("icons", "outgoing.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    break;
+                case DocumentDirection.Draft:
+                    directionIcon = UIImage.FromBundle(Path.Combine("icons", "pencil.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    break;
+                default:
+                    directionIcon = null;
+                    break;
+            }
 
             IndicatorImageView1.Image = directionIcon;
-            IndicatorImageView3.Image = documentPreview.HasAttachments ? UIImage.FromBundle(Path.Combine("Icons", "attachment.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate) : null;
+            IndicatorImageView2.Image = (PlatformConfig.Preferences.UnreadIndicatorMe ? documentPreview.IsReadByCurrent : documentPreview.IsReadByAnyone) ? null : UIImage.FromBundle(Path.Combine("icons", "full-dot.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            IndicatorImageView3.Image = documentPreview.AttachmentsCount > 0 ? UIImage.FromBundle(Path.Combine("Iicons", "attachment.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate) : null;
         }
 
         #endregion
@@ -97,26 +97,17 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         {
             var colors = new Queue<UIColor>();
             foreach (var view in CategoriesView.Subviews)
-            {
                 colors.Enqueue(view.BackgroundColor);
-            }
 
             base.SetSelected(selected, animated);
 
             foreach (var view in CategoriesView.Subviews)
-            {
                 view.BackgroundColor = colors.Dequeue();
-            }
         }
 
         #endregion
 
         #region Helper methods
-
-        public void UpdateReadStatus(bool local = false)
-        {
-            IndicatorImageView2.Image = DocumentPreview.IsRead || local ? null : UIImage.FromBundle(Path.Combine("Icons", "full-dot.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-        }
 
         public void UpdateCategoriesView()
         {
@@ -130,22 +121,20 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             foreach (var category in DocumentPreview.Categories)
             {
                 var categoryView = new UIView();
-                categoryView.BackgroundColor = Ui.UiColorFromHexString(category.HexColor);
+                categoryView.BackgroundColor = UI.UIColorFromHexString(category.HexColor);
                 categoryView.TranslatesAutoresizingMaskIntoConstraints = false;
                 CategoriesView.AddSubview(categoryView);
+
                 if (previousView == null)
-                {
                     CategoriesView.AddConstraint(NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Top, 1.0f, 0.0f));
-                }
                 else
-                {
                     CategoriesView.AddConstraint(NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, previousView, NSLayoutAttribute.Bottom, 1.0f, 0.0f));
-                }
+
                 CategoriesView.AddConstraints(new[]
                     {
                         NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Left, 1.0f, 0.0f),
                         NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Right, 1.0f, 0.0f),
-                        NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, 1.0f),
+                        NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, 1.0f)
                     });
 
                 views.Add(categoryView);

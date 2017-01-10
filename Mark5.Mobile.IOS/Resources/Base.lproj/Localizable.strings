@@ -69,3 +69,5 @@
 "wrong_username_summary" = "You need to provide valid username.";
 "wrong_username_title" = "Wrong username";
 "yes" = "Yes";
+"today" = "Today";
+"yesterday" = "Yesterday";
