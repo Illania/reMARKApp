@@ -35,10 +35,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UITableView documentsTableView;
         UISearchController searchController;
         UITableViewController searchResultsController;
-        SearchDataSource searchResultsDataSource;
+        DataSource searchResultsDataSource;
 
         CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
+
+        AutoRefreshWorker autoRefreshWorker;
 
         public override void LoadView()
         {
@@ -65,7 +67,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"{nameof(DocumentsListViewController)} appeared");
 
-            await RefreshData();
+            var ds = (DataSource)documentsTableView.Source;
+            if (ds.Empty)
+                await RefreshData();
+
+            if (IsBeingDismissed) return;
+
+            CommonConfig.Logger.Info($"Starting automatic refresh...");
+
+            autoRefreshWorker?.Stop();
+            autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, () => { return ds?.Items?.FirstOrDefault(); }, AutoRefreshIntervalMs);
+            autoRefreshWorker.Start();
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -73,6 +85,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillDisappear(animated);
 
             DeinitializeHandlers();
+
+            autoRefreshWorker?.Stop();
+            autoRefreshWorker = null;
         }
 
         public override void DidReceiveMemoryWarning()
@@ -80,7 +95,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             CommonConfig.Logger.Warning($"{nameof(DocumentsListViewController)} received memory warning!");
 
             var ds = documentsTableView?.DataSource as DataSource;
-            ds?.Clear();
+            ds?.Reset();
 
             base.DidReceiveMemoryWarning();
         }
@@ -98,7 +113,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             documentsTableView = new UITableView();
             documentsTableView.ClipsToBounds = false;
-            documentsTableView.Source = new DataSource(documentsTableView);
+            documentsTableView.Source = new DataSource(documentsTableView, Localization.GetString("folder_empty"), PlatformConfig.Preferences.CompactDocumentsList);
+            documentsTableView.RowHeight = UITableView.AutomaticDimension;
+            documentsTableView.EstimatedRowHeight = 75f;
             documentsTableView.AllowsSelectionDuringEditing = false;
             documentsTableView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(documentsTableView);
@@ -121,7 +138,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DefinesPresentationContext = true;
 
             searchResultsController = new UITableViewController();
-            searchResultsDataSource = new SearchDataSource();
+            searchResultsDataSource = new DataSource(searchResultsController.TableView, Localization.GetString("no_matching_documents"), PlatformConfig.Preferences.CompactDocumentsList);
             searchResultsController.TableView.Source = searchResultsDataSource;
 
             searchController = new UISearchController(searchResultsController)
@@ -172,7 +189,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var ds = (DataSource)documentsTableView.Source;
 
                 if (forceClear)
-                    ds.Clear();
+                    ds.Reset();
 
                 var documentPreviews = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, startId, endId);
                 ds.EnableLoadMore = documentPreviews.Count >= PlatformConfig.Preferences.DocumentsToDownload;
@@ -189,24 +206,124 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             refreshControl.EndRefreshing();
-            refreshControl.ValueChanged -= RefreshControl_ValueChanged;
+            refreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
-        public void UpdateSearchResultsForSearchController(UISearchController searchController)
+        async Task AutoRefreshData(int endId)
         {
-            throw new NotImplementedException();
+            refreshControl.Enabled = false;
+
+            try
+            {
+                CommonConfig.Logger.Debug($"Attempting automatic refresh [endId={endId}, isBeingDismissed={IsBeingDismissed}]...");
+
+                if (IsBeingDismissed) return;
+
+                CommonConfig.Logger.Debug($"Automatic refresh running...");
+
+                var documents = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, endId: endId);
+
+                if (documents.Count > 0)
+                {
+                    CommonConfig.Logger.Info($"Received {documents?.Count} new documents");
+
+                    Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
+
+                    var ds = documentsTableView.Source as DataSource;
+                    ds?.PrependItems(documents);
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Automatic refresh failed [endId={endId}]", ex);
+            }
+            finally
+            {
+                CommonConfig.Logger.Debug($"Automatic refresh finished");
+            }
+
+            refreshControl.Enabled = true;
+        }
+
+        void IUISearchResultsUpdating.UpdateSearchResultsForSearchController(UISearchController searchController)
+        {
+            var searchText = searchController.SearchBar.Text;
+
+            if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
+            {
+                searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
+                searchCancellationTokenSourceList.Clear();
+                searchResultsDataSource.Reset();
+            }
+            else
+            {
+                if (searchCancellationTokenSource != null)
+                {
+                    searchCancellationTokenSource.Cancel();
+                    searchCancellationTokenSourceList.Remove(searchCancellationTokenSource);
+                    searchCancellationTokenSource = null;
+                }
+
+                searchCancellationTokenSource = new CancellationTokenSource();
+                searchCancellationTokenSourceList.Add(searchCancellationTokenSource);
+
+                DoSearchDocuments(searchText, searchCancellationTokenSource.Token);
+            }
+        }
+
+        async void DoSearchDocuments(string searchText, CancellationToken ct)
+        {
+            searchResultsDataSource.Reset();
+
+            await Task.Delay(500);
+
+            if (ct.IsCancellationRequested) return;
+
+            var ds = (DataSource)documentsTableView.Source;
+            var filteredDocuments = ds.Items.Where(dp => MatchesQuery(dp, searchText)).ToList();
+
+            if (ct.IsCancellationRequested) return;
+
+            searchResultsDataSource.AppendItems(filteredDocuments);
+        }
+
+        static bool MatchesQuery(DocumentPreview dp, string query)
+        {
+            if (dp.Subject.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+            {
+                return true;
+            }
+            if (dp.Preview.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+            {
+                return true;
+            }
+            if (dp.Addresses.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
+            {
+                return true;
+            }
+            if (dp.Addresses.Any(da => da.Address.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
+            {
+                return true;
+            }
+            if (dp.Categories.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         void ComposeDocumentItem_Clicked(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            // TODO
         }
 
         class DataSource : UITableViewSource, IDisposable
         {
 
             static readonly nfloat Height = 100f;
-            static readonly nfloat CompactHeight = 100f;
+            static readonly nfloat CompactHeight = 52f;
+            static readonly nfloat ExternalHeight = 52f;
 
             public bool Empty
             {
@@ -216,19 +333,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
+            public List<DocumentPreview> Items
+            {
+                get
+                {
+                    return documentPreviewsInView;
+                }
+            }
+
             public bool EnableLoadMore { get; set; }
 
             UITableView documentsTableView;
+            readonly string emptyText;
+            readonly bool compact;
 
-            bool loading;
-            List<DocumentPreview> documentPreviewsInView;
-            
-            public DataSource(UITableView documentsTableView)
+            bool loading = true;
+            List<DocumentPreview> documentPreviewsInView = new List<DocumentPreview>(1000);
+
+            public DataSource(UITableView documentsTableView, string emptyText, bool compact)
             {
+                this.emptyText = emptyText;
                 this.documentsTableView = documentsTableView;
-
-                loading = true;
-                documentPreviewsInView = new List<DocumentPreview>(1000);
+                this.compact = compact;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -241,15 +367,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (documentPreviewsInView.Count < 1)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                    emptyCell.Initialize(Localization.GetString("folder_empty"));
+                    emptyCell.Initialize(emptyText);
                     return emptyCell;
                 }
 
-                var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.Key) as DocumentsTableViewCell ?? DocumentsTableViewCell.Create();
                 var dp = documentPreviewsInView[indexPath.Row];
-                cell.Initialize(dp);
 
-                return cell;
+                if (dp.Direction == DocumentDirection.External)
+                {
+                    var cell = tableView.DequeueReusableCell(ExternalDocumentsTableViewCell.Key) as ExternalDocumentsTableViewCell ?? ExternalDocumentsTableViewCell.Create();
+                    cell.Initialize(dp);
+                    return cell;
+                }
+
+                if (compact)
+                {
+                    var cell = tableView.DequeueReusableCell(DocumentsCompactTableViewCell.Key) as DocumentsCompactTableViewCell ?? DocumentsCompactTableViewCell.Create();
+                    cell.Initialize(dp);
+                    return cell;
+                }
+                else
+                {
+                    var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.Key) as DocumentsTableViewCell ?? DocumentsTableViewCell.Create();
+                    cell.Initialize(dp);
+                    return cell;
+                }
             }
 
             public override nint RowsInSection(UITableView tableview, nint section) 
@@ -265,7 +407,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                return Height;
+                if (documentPreviewsInView.Count > 0 && documentPreviewsInView[indexPath.Row]?.Direction == DocumentDirection.External)
+                    return ExternalHeight;
+
+                return compact ? CompactHeight : Height;
             }
 
             public void PrependItems(List<DocumentPreview> documentPreviews)
@@ -285,9 +430,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
             }
 
-            public void Clear()
+            public void Reset()
             {
-                loading = false;
+                loading = true;
 
                 documentPreviewsInView.Clear();
                 documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
@@ -302,17 +447,52 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        class SearchDataSource : UITableViewSource, IDisposable
+        class AutoRefreshWorker
         {
-            
-            public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+            CancellationTokenSource cts;
+
+            readonly Func<int, Task> work;
+            readonly Func<DocumentPreview> firstOrDefaultItem;
+            readonly int intervalMs;
+
+            readonly object lockObj = new object();
+
+            public AutoRefreshWorker(Func<int, Task> work, Func<DocumentPreview> firstOrDefaultItem, int intervalMs)
             {
-                throw new NotImplementedException();
+                this.work = work;
+                this.firstOrDefaultItem = firstOrDefaultItem;
+                this.intervalMs = intervalMs;
             }
 
-            public override nint RowsInSection(UITableView tableview, nint section)
+            public void Start()
             {
-                throw new NotImplementedException();
+                lock (lockObj)
+                {
+                    cts?.Cancel();
+                    cts = new CancellationTokenSource();
+                    Task.Run(async () =>
+                    {
+                        while (true)
+                        {
+                            await Task.Delay(intervalMs);
+                            if (cts.IsCancellationRequested) break;
+
+                            var first = firstOrDefaultItem();
+                            if (first != null)
+                            {
+                                await work(first.Id);
+                            }
+                        }
+                    });
+                }
+            }
+
+            public void Stop()
+            {
+                lock (lockObj)
+                {
+                    cts?.Cancel();
+                }
             }
         }
     }

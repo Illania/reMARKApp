@@ -9,9 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
@@ -24,12 +26,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static readonly UINib Nib = UINib.FromName("DocumentsTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("DocumentsTableViewCell");
 
-        public DocumentPreview DocumentPreview
-        {
-            get;
-            private set;
-        }
-
         public DocumentsTableViewCell(IntPtr handle)
             : base(handle)
         {
@@ -37,15 +33,19 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static DocumentsTableViewCell Create()
         {
-            return (DocumentsTableViewCell)Nib.Instantiate(null, null)[0];
+            var cell = (DocumentsTableViewCell)Nib.Instantiate(null, null)[0];
+
+            cell.SenderNameLabel.Font = Theme.DefaultBoldFont;
+            cell.DateReceivedLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
+            cell.MessagePreviewLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
+
+            return cell;
         }
 
         #region Custom methods
 
         public void Initialize(DocumentPreview documentPreview)
         {
-            DocumentPreview = documentPreview;
-
             if (documentPreview.Direction == DocumentDirection.Incoming)
             {
                 var address = documentPreview.Addresses.FirstOrDefault(da => da.AddressType == DocumentAddressType.From);
@@ -58,14 +58,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             }
 
             SubjectLabel.Text = documentPreview.Subject;
-            MessagePreviewLabel.Text = !string.IsNullOrWhiteSpace(documentPreview.Preview) ? documentPreview.Preview : "This message has no content.";
+            MessagePreviewLabel.Text = !string.IsNullOrWhiteSpace(documentPreview.Preview) ? Regex.Replace(documentPreview.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline) : Localization.GetString("no_content");;
             DateReceivedLabel.Text = documentPreview.DateReceivedTimestamp
                          .ConvertTimestampMillisecondsToDateTime()
                          .ConvertUtcToServerTime()
                          .ConvertDateTimeToTimestampMilliseconds()
                          .FormatServerTimestampAsCompactShortDateTimeString();
 
-            UpdateCategoriesView();
+            UpdateCategoriesView(documentPreview);
 
             UIImage directionIcon;
             switch (documentPreview.Direction)
@@ -109,7 +109,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         #region Helper methods
 
-        public void UpdateCategoriesView()
+        public void UpdateCategoriesView(DocumentPreview documentPreview)
         {
             foreach (var subView in CategoriesView.Subviews)
             {
@@ -118,7 +118,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             var views = new List<UIView>();
             UIView previousView = null;
-            foreach (var category in DocumentPreview.Categories)
+            foreach (var category in documentPreview.Categories)
             {
                 var categoryView = new UIView();
                 categoryView.BackgroundColor = UI.UIColorFromHexString(category.HexColor);

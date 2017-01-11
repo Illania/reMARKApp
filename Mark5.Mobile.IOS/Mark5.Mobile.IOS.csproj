@@ -171,6 +171,7 @@
     <InterfaceDefinition Include="Ui\TableViewCells\EditTextViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\DocumentsCompactTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\DocumentsTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\ExternalDocumentsTableViewCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -253,6 +254,10 @@
     <Compile Include="Utilities\DateTimeUtils.cs" />
     <Compile Include="Utilities\UI.cs" />
     <Compile Include="Ui\ViewControllers\DocumentsListViewController.cs" />
+    <Compile Include="Ui\TableViewCells\ExternalDocumentsTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\ExternalDocumentsTableViewCell.designer.cs">
+      <DependentUpon>ExternalDocumentsTableViewCell.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

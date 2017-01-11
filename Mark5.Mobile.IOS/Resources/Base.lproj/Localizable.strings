@@ -42,6 +42,7 @@
 "no_folders_found" = "No folders found";
 "no_folders_in_favorites" = "No folders were added to favorites yet";
 "no_folders_in_section" = "There are no folders in this section";
+"no_matching_documents" = "There are no matching documents";
 "notifications" = "Notifications";
 "ok" = "OK";
 "password" = "Password";

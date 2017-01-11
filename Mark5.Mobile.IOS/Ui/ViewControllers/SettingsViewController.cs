@@ -25,6 +25,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         const string Value1CellId = "Value1CellId";
 
+        const string DocumentsToDownloadKey = "DocumentsToDownload";
+        const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
         const string SynchroniseContactsKey = "SynchroniseContacts";
         const string SynchroniseShortcodesKey = "SynchroniseShortcodes";
         const string UsernameKey = "username";
@@ -254,54 +256,92 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var key = n.Object.ToString();
 
-            if (key == SynchroniseContactsKey && !PlatformConfig.Preferences.SynchroniseContacts)
+            if (key == DocumentsToDownloadKey)
             {
-                var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("clear_contacts_cache_title"), Localization.GetString("clear_contacts_cache_summary"));
-                if (result)
-                {
-                    var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("clearing_contacts_cache___"));
+                Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
 
-                    try
-                    {
-                        await Managers.CleanUpManager.ClearContactsCache();
-                        await Managers.CleanUpManager.CleanUp(new[] { ModuleType.Contacts });
-
-                        dismissAction();
-                    }
-                    catch (Exception ex)
-                    {
-                        dismissAction();
-
-                        CommonConfig.Logger.Error("Could not clear contacts cache!", ex);
-
-                        await Dialogs.ShowErrorDialogAsync(this, ex);
-                    }
-                }
+                return;
             }
 
-            if (key == SynchroniseShortcodesKey && !PlatformConfig.Preferences.SynchroniseShortcodes)
+            if (key == DocumentBodyRequestTypeKey)
             {
-                var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("clear_shortcodes_cache_title"), Localization.GetString("clear_shortcodes_cache_summary"));
-                if (result)
+                Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+
+                return;
+            }
+
+            if (key == SynchroniseContactsKey)
+            {
+                if (PlatformConfig.Preferences.SynchroniseContacts)
                 {
-                    var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("clearing_shortcodes_cache___"));
+                    Managers.DownloadManager.DownloadPolicies[ObjectType.Contact] = new DownloadAllPolicy();
+                }
+                else
+                {
+                    Managers.DownloadManager.DownloadPolicies.Remove(ObjectType.Contact);
 
-                    try
+                    var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("clear_contacts_cache_title"), Localization.GetString("clear_contacts_cache_summary"));
+                    if (result)
                     {
-                        await Managers.CleanUpManager.ClearShortcodeCache();
-                        await Managers.CleanUpManager.CleanUp(new[] { ModuleType.Shortcodes });
+                        var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("clearing_contacts_cache___"));
 
-                        dismissAction();
-                    }
-                    catch (Exception ex)
-                    {
-                        dismissAction();
+                        try
+                        {
+                            await Managers.CleanUpManager.ClearContactsCache();
+                            await Managers.CleanUpManager.CleanUp(new[] { ModuleType.Contacts });
 
-                        CommonConfig.Logger.Error("Could not clear shortcodes cache!", ex);
+                            dismissAction();
+                        }
+                        catch (Exception ex)
+                        {
+                            dismissAction();
 
-                        await Dialogs.ShowErrorDialogAsync(this, ex);
+                            CommonConfig.Logger.Error("Could not clear contacts cache!", ex);
+
+                            await Dialogs.ShowErrorDialogAsync(this, ex);
+                        }
                     }
                 }
+
+                return;
+            }
+
+            if (key == SynchroniseShortcodesKey)
+            {
+                if (PlatformConfig.Preferences.SynchroniseShortcodes)
+                {
+                    Managers.DownloadManager.DownloadPolicies[ObjectType.Shortcode] = new DownloadAllPolicy();
+                }
+                else
+                {
+                    Managers.DownloadManager.DownloadPolicies.Remove(ObjectType.Shortcode);
+
+                    var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("clear_shortcodes_cache_title"), Localization.GetString("clear_shortcodes_cache_summary"));
+                    if (result)
+                    {
+                        var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("clearing_shortcodes_cache___"));
+
+                        try
+                        {
+                            await Managers.CleanUpManager.ClearShortcodeCache();
+                            await Managers.CleanUpManager.CleanUp(new[] { ModuleType.Shortcodes });
+
+                            dismissAction();
+                        }
+                        catch (Exception ex)
+                        {
+                            dismissAction();
+
+                            CommonConfig.Logger.Error("Could not clear shortcodes cache!", ex);
+
+                            await Dialogs.ShowErrorDialogAsync(this, ex);
+                        }
+                    }
+                }
+
+                return;
             }
 
             if (key == UseTemplateKey)

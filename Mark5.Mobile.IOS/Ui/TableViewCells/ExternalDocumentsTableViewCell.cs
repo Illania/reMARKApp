@@ -1,14 +1,13 @@
-//
-// Project: Mark5.Mobile.Common.iOS
-// File: DocumentsTableViewCell.cs
+﻿//
+// Project: Mark5.Mobile.IOS
+// File: ExternalDocumentsTableViewCell.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2017 Nordic IT
 //
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using System.Text.RegularExpressions;
 using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -18,23 +17,23 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-
-    public partial class DocumentsCompactTableViewCell : UITableViewCell
+    
+    public partial class ExternalDocumentsTableViewCell : UITableViewCell
     {
+        
+        public static readonly UINib Nib = UINib.FromName("ExternalDocumentsTableViewCell", NSBundle.MainBundle);
+        public static readonly NSString Key = new NSString("ExternalDocumentsTableViewCell");
 
-        public static readonly UINib Nib = UINib.FromName("DocumentsCompactTableViewCell", NSBundle.MainBundle);
-        public static readonly NSString Key = new NSString("DocumentsCompactTableViewCell");
-
-        public DocumentsCompactTableViewCell(IntPtr handle)
+        public ExternalDocumentsTableViewCell(IntPtr handle)
             : base(handle)
         {
         }
 
-        public static DocumentsCompactTableViewCell Create()
+        public static ExternalDocumentsTableViewCell Create()
         {
-            var cell = (DocumentsCompactTableViewCell)Nib.Instantiate(null, null)[0];
+            var cell = (ExternalDocumentsTableViewCell)Nib.Instantiate(null, null)[0];
 
-            cell.SenderNameLabel.Font = Theme.DefaultBoldFont;
+            cell.NameLabel.Font = Theme.DefaultBoldFont;
             cell.DateReceivedLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
 
             return cell;
@@ -44,18 +43,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public void Initialize(DocumentPreview documentPreview)
         {
-            if (documentPreview.Direction == DocumentDirection.Incoming)
-            {
-                var address = documentPreview.Addresses.FirstOrDefault(da => da.AddressType == DocumentAddressType.From);
-                SenderNameLabel.Text = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
-            }
-            else
-            {
-                var address = documentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType).FirstOrDefault();
-                SenderNameLabel.Text = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
-            }
-
-            SubjectLabel.Text = documentPreview.Subject;
+            NameLabel.Text = documentPreview.Subject;
+            PreviewLabel.Text = !string.IsNullOrWhiteSpace(documentPreview.Preview) ? Regex.Replace(documentPreview.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline) : Localization.GetString("no_content"); ;
             DateReceivedLabel.Text = documentPreview.DateReceivedTimestamp
                          .ConvertTimestampMillisecondsToDateTime()
                          .ConvertUtcToServerTime()
@@ -63,26 +52,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                          .FormatServerTimestampAsCompactShortDateTimeString();
 
             UpdateCategoriesView(documentPreview);
-
-            UIImage directionIcon;
-            switch (documentPreview.Direction)
-            {
-                case DocumentDirection.Incoming:
-                    directionIcon = UIImage.FromBundle(Path.Combine("icons", "incoming.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-                    break;
-                case DocumentDirection.Outgoing:
-                    directionIcon = UIImage.FromBundle(Path.Combine("icons", "outgoing.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-                    break;
-                case DocumentDirection.Draft:
-                    directionIcon = UIImage.FromBundle(Path.Combine("icons", "pencil.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-                    break;
-                default:
-                    directionIcon = null;
-                    break;
-            }
-
-            IndicatorImageView1.Image = directionIcon;
-            IndicatorImageView2.Image = (PlatformConfig.Preferences.UnreadIndicatorMe ? documentPreview.IsReadByCurrent : documentPreview.IsReadByAnyone) ? null : UIImage.FromBundle(Path.Combine("icons", "full-dot.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
         }
 
         #endregion
@@ -130,7 +99,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     {
                         NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Left, 1.0f, 0.0f),
                         NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Right, 1.0f, 0.0f),
-                        NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, 1.0f),
+                        NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, 1.0f)
                     });
 
                 views.Add(categoryView);
@@ -149,6 +118,5 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         }
 
         #endregion
-
     }
 }
