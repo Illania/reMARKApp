@@ -17,12 +17,13 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using ObjCRuntime;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     
-    public class DocumentsListViewController : UIViewController, IPrimaryViewController, IUISearchResultsUpdating
+    public class DocumentsListViewController : UIViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
     {
 
         const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
@@ -30,6 +31,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public Folder Folder { get; set; }
 
         UIBarButtonItem composeDocumentItem;
+        UIBarButtonItem exitEditItem;
+        UIBarButtonItem editItem;
 
         UIRefreshControl refreshControl;
         UITableView documentsTableView;
@@ -37,10 +40,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UITableViewController searchResultsController;
         DataSource searchResultsDataSource;
 
+        NSLayoutConstraint documentsTableViewBottomConstraint;
+
         CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
         AutoRefreshWorker autoRefreshWorker;
+
+        bool refreshing;
 
         public override void LoadView()
         {
@@ -105,6 +112,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             composeDocumentItem = new UIBarButtonItem();
             composeDocumentItem.Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"));
             NavigationItem.SetRightBarButtonItem(composeDocumentItem, false);
+
+            exitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+            editItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
         }
 
         void InitializeView()
@@ -113,10 +123,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             documentsTableView = new UITableView();
             documentsTableView.ClipsToBounds = false;
-            documentsTableView.Source = new DataSource(documentsTableView, Localization.GetString("folder_empty"), PlatformConfig.Preferences.CompactDocumentsList);
+            documentsTableView.Source = new DataSource(this, documentsTableView, async (startId) => await RefreshData(startId), Localization.GetString("folder_empty"), PlatformConfig.Preferences.CompactDocumentsList);
             documentsTableView.RowHeight = UITableView.AutomaticDimension;
             documentsTableView.EstimatedRowHeight = 75f;
             documentsTableView.AllowsSelectionDuringEditing = false;
+            documentsTableView.AllowsMultipleSelectionDuringEditing = true;
             documentsTableView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(documentsTableView);
             View.AddConstraints(new[]
@@ -124,8 +135,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(documentsTableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(documentsTableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(documentsTableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(documentsTableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
+                    documentsTableViewBottomConstraint = NSLayoutConstraint.Create(documentsTableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
                 });
+
+            var longPressRecognizer = new UILongPressGestureRecognizer(this, new Selector("longPressed:"))
+            {
+                MinimumPressDuration = 1f,
+                Delegate = this
+            };
+            documentsTableView.AddGestureRecognizer(longPressRecognizer);
 
             refreshControl = new UIRefreshControl();
             refreshControl.BackgroundColor = UIColor.White;
@@ -138,7 +156,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DefinesPresentationContext = true;
 
             searchResultsController = new UITableViewController();
-            searchResultsDataSource = new DataSource(searchResultsController.TableView, Localization.GetString("no_matching_documents"), PlatformConfig.Preferences.CompactDocumentsList);
+            searchResultsDataSource = new DataSource(this, searchResultsController.TableView, null, Localization.GetString("no_matching_documents"), PlatformConfig.Preferences.CompactDocumentsList);
             searchResultsController.TableView.Source = searchResultsDataSource;
 
             searchController = new UISearchController(searchResultsController)
@@ -163,7 +181,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (composeDocumentItem != null)
                 composeDocumentItem.Clicked += ComposeDocumentItem_Clicked;
 
-            refreshControl.ValueChanged += RefreshControl_ValueChanged;
+            if (exitEditItem != null)
+                exitEditItem.Clicked += ExitEditItem_Clicked;
+
+            if (editItem != null)
+                editItem.Clicked += EditItem_Clicked;
+            
+            if (refreshControl != null)
+                refreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
         void DeinitializeHandlers()
@@ -171,15 +196,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (composeDocumentItem != null)
                 composeDocumentItem.Clicked -= ComposeDocumentItem_Clicked;
 
-            refreshControl.ValueChanged -= RefreshControl_ValueChanged;
+            if (exitEditItem != null)
+                exitEditItem.Clicked -= ExitEditItem_Clicked;
+
+            if (editItem != null)
+                editItem.Clicked -= EditItem_Clicked;
+
+            if (refreshControl != null)
+                refreshControl.ValueChanged -= RefreshControl_ValueChanged;
+        }
+
+        public void DocumentSelected(DocumentPreview documentPreview)
+        {
+            // TODO
+        }
+
+        [Export("longPressed:")]
+        public void LongPressed(UILongPressGestureRecognizer recognizer)
+        {
+            if (documentsTableView.Editing) return;
+
+            documentsTableView.SetEditing(true, true);
+            NavigationItem.SetRightBarButtonItem(exitEditItem, true);
+            NavigationItem.SetLeftBarButtonItem(editItem, true);
+
+            var point = recognizer.LocationInView(documentsTableView);
+            var indexPath = documentsTableView.IndexPathForRowAtPoint(point);
+
+            documentsTableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
         }
 
         async void RefreshControl_ValueChanged(object sender, EventArgs e) => await RefreshData(forceClear: true);
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async Task RefreshData(int startId = -1, int endId = -1, bool forceClear = false)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
+            if (refreshing) return;
+
+            refreshing = true;
             refreshControl.ValueChanged -= RefreshControl_ValueChanged;
 
             CommonConfig.Logger.Info($"Refreshing documents list [folder={Folder?.Name}, startId={startId}, endId={endId}, forceClear={forceClear}]");
@@ -192,8 +245,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     ds.Reset();
 
                 var documentPreviews = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, startId, endId);
-                ds.EnableLoadMore = documentPreviews.Count >= PlatformConfig.Preferences.DocumentsToDownload;
-                CommonConfig.Logger.Info($"Enable load more documents set to {ds.EnableLoadMore}");
+                ds.LoadMoreEnabled = documentPreviews.Count >= PlatformConfig.Preferences.DocumentsToDownload;
+                CommonConfig.Logger.Info($"Enable load more documents set to {ds.LoadMoreEnabled}");
 
                 Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
                 ds.AppendItems(documentPreviews);
@@ -207,10 +260,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             refreshControl.EndRefreshing();
             refreshControl.ValueChanged += RefreshControl_ValueChanged;
+
+            refreshing = false;
         }
 
         async Task AutoRefreshData(int endId)
         {
+            if (refreshing) return;
+
+            refreshing = true;
+
             refreshControl.Enabled = false;
 
             try
@@ -243,6 +302,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             refreshControl.Enabled = true;
+            refreshing = false;
         }
 
         void IUISearchResultsUpdating.UpdateSearchResultsForSearchController(UISearchController searchController)
@@ -271,7 +331,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void DoSearchDocuments(string searchText, CancellationToken ct)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             searchResultsDataSource.Reset();
 
@@ -290,25 +352,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         static bool MatchesQuery(DocumentPreview dp, string query)
         {
             if (dp.Subject.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
                 return true;
-            }
+
             if (dp.Preview.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
                 return true;
-            }
+
             if (dp.Addresses.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
-            {
                 return true;
-            }
+
             if (dp.Addresses.Any(da => da.Address.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
-            {
                 return true;
-            }
+
             if (dp.Categories.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
-            {
                 return true;
-            }
 
             return false;
         }
@@ -316,6 +372,55 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void ComposeDocumentItem_Clicked(object sender, EventArgs e)
         {
             // TODO
+        }
+
+        void ExitEditItem_Clicked(object sender, EventArgs e)
+        {
+            documentsTableView.SetEditing(false, true);
+            NavigationItem.SetRightBarButtonItem(composeDocumentItem, true);
+            NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
+        }
+
+        void EditItem_Clicked(object sender, EventArgs e)
+        {
+            if (documentsTableView.IndexPathsForSelectedRows == null || documentsTableView.IndexPathsForSelectedRows.Length < 1) return;
+
+            var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+
+            var selectedDocuments = documentsTableView.IndexPathsForSelectedRows.Select(ip => ((DataSource)documentsTableView.Source).Items[ip.Row]);
+
+            if (selectedDocuments.Any(dp => !dp.IsReadByCurrent))
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("mark_as_read"), UIAlertActionStyle.Default, null));
+
+            if (selectedDocuments.Any(dp => dp.IsReadByCurrent))
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("mark_as_unread"), UIAlertActionStyle.Default, null));
+            
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, null));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, null));
+
+            if (Folder.InternalType == FolderInternalType.FilterView
+                || Folder.InternalType == FolderInternalType.Static
+                || Folder.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, null));
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, null));
+
+            if (Folder.InternalType == FolderInternalType.FilterView
+                || Folder.InternalType == FolderInternalType.Static
+                || Folder.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, null));
+
+            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
+                || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed
+                || selectedDocuments.All(dp => dp.Direction == DocumentDirection.Draft))
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, null));
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+
+            if (eas.PopoverPresentationController != null)
+                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+
+            PresentViewController(eas, true, null);
         }
 
         class DataSource : UITableViewSource, IDisposable
@@ -341,19 +446,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            public bool EnableLoadMore { get; set; }
+            public bool LoadMoreEnabled { get; set; }
 
+            DocumentsListViewController viewController;
             UITableView documentsTableView;
+            readonly Action<int> loadMoreAction;
             readonly string emptyText;
             readonly bool compact;
 
             bool loading = true;
             List<DocumentPreview> documentPreviewsInView = new List<DocumentPreview>(1000);
 
-            public DataSource(UITableView documentsTableView, string emptyText, bool compact)
+            public DataSource(DocumentsListViewController viewController, UITableView documentsTableView, Action<int> loadMoreAction, string emptyText, bool compact)
             {
-                this.emptyText = emptyText;
+                this.viewController = viewController;
                 this.documentsTableView = documentsTableView;
+                this.loadMoreAction = loadMoreAction;
+                this.emptyText = emptyText;
                 this.compact = compact;
             }
 
@@ -372,6 +481,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 var dp = documentPreviewsInView[indexPath.Row];
+
+
+                if (LoadMoreEnabled && loadMoreAction != null && dp.Id == documentPreviewsInView.Last().Id)
+                    loadMoreAction(dp.Id);
 
                 if (dp.Direction == DocumentDirection.External)
                 {
@@ -413,13 +526,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return compact ? CompactHeight : Height;
             }
 
+            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+            {
+                var dp = documentPreviewsInView[indexPath.Row];
+                viewController.DocumentSelected(dp);
+            }
+
             public void PrependItems(List<DocumentPreview> documentPreviews)
             {
                 loading = false;
 
                 documentPreviewsInView.InsertRange(0, documentPreviews);
                 var indexes = Enumerable.Range(0, documentPreviews.Count).Select(i => NSIndexPath.FromRowSection(i, 0)).ToArray();
-                documentsTableView.ReloadRows(indexes, UITableViewRowAnimation.Automatic);
+                documentsTableView.InsertRows(indexes, UITableViewRowAnimation.Automatic);
             }
 
             public void AppendItems(List<DocumentPreview> documentPreviews)
@@ -442,13 +561,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 base.Dispose(disposing);
 
-                documentPreviewsInView = null;
+                viewController = null;
                 documentsTableView = null;
+                documentPreviewsInView = null;
             }
         }
 
-        class AutoRefreshWorker
+        class AutoRefreshWorker : NSObject
         {
+            
             CancellationTokenSource cts;
 
             readonly Func<int, Task> work;
@@ -479,9 +600,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                             var first = firstOrDefaultItem();
                             if (first != null)
-                            {
-                                await work(first.Id);
-                            }
+                                InvokeOnMainThread(async () => await work(first.Id));
                         }
                     });
                 }
@@ -490,9 +609,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public void Stop()
             {
                 lock (lockObj)
-                {
                     cts?.Cancel();
-                }
             }
         }
     }

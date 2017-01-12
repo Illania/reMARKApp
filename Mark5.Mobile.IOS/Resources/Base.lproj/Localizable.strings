@@ -9,7 +9,11 @@
 "clearing_shortcodes_cache___" = "Clearing cache...";
 "contacts" = "Contacts";
 "continue" = "Continue";
+"copy_to_folder" = "Copy to folder";
+"copy_to_worktray" = "Copy to worktray";
 "creating_system_report___" = "Creating system report...";
+"delete" = "Delete";
+"delete_from_folder" = "Delete from folder";
 "disable_caching" = "Disable\ncaching";
 "disable_notifications" = "Don't\nnotify";
 "disabled" = "Disabled";
@@ -29,8 +33,8 @@
 "error_invalidsourcetypeexception_title" = "Unavailable offline";
 "favorites" = "Favorites";
 "filter" = "Filter";
-"folders" = "Folders";
 "folder_empty" = "Folder is empty";
+"folders" = "Folders";
 "hostname" = "Hostname";
 "local_folders" = "Local folders";
 "logging_in___" = "Logging in...";
@@ -38,6 +42,9 @@
 "login" = "Login";
 "login_failed" = "Login failed";
 "login_failed_desc" = "Could not log in to MARK5. Please check your credentials and server address.";
+"mark_as_read" = "Mark as read";
+"mark_as_unread" = "Mark as unread";
+"move_to_folder" = "Move to folder";
 "no" = "No";
 "no_folders_found" = "No folders found";
 "no_folders_in_favorites" = "No folders were added to favorites yet";
@@ -54,9 +61,11 @@
 "remove_from_favorites" = "Remove from\nfavorites";
 "report" = "Report";
 "search" = "Search";
+"set_priority" = "Set priority";
 "settings" = "Settings";
 "settings" = "Settings";
 "shortcodes" = "Shortcodes";
+"today" = "Today";
 "updating_config___" = "Updating configuration...";
 "username" = "Username";
 "warning" = "Warning";
@@ -71,5 +80,4 @@
 "wrong_username_summary" = "You need to provide valid username.";
 "wrong_username_title" = "Wrong username";
 "yes" = "Yes";
-"today" = "Today";
 "yesterday" = "Yesterday";
