@@ -12,7 +12,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using CoreGraphics;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -23,7 +22,7 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
 
-    public class DocumentViewController : StackViewController, ISecondaryViewController
+    public class DocumentViewController : UIViewController, ISecondaryViewController
     {
         public bool Empty { get { return true; } }
 
@@ -41,7 +40,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem nextDocumentButtonItem;
         UIBarButtonItem editDocumentButtonItem;
 
-        FromView from;
+        MyScrollView scrollView;
+        UIStackView stackViewBeforeContent;
+        UIStackView stackViewAfterContent;
+
+        FromView from; //TODO add view to the name?
         ToView to;
         CcView cc;
         BccView bcc;
@@ -65,6 +68,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIToolbar toolbar;
         NSLayoutConstraint toolbarBottomConstraint;
 
+        List<DocumentSubView> subViews;
+
         static UIBarButtonItem FlexibleSpace
         {
             get
@@ -80,6 +85,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.LoadView();
 
             InitNavigationBar();
+            InitStackViews();
             InitSubViews();
             InitToolbar();
         }
@@ -90,7 +96,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeHandlers();
             CorrectToolbar();
-
 
             RefreshData();
         }
@@ -140,54 +145,146 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationItem.SetRightBarButtonItems(rightButtons, false);
         }
 
+        void InitStackViews()
+        {
+            View.BackgroundColor = UIColor.White;
+
+            scrollView = new MyScrollView
+            {
+                BackgroundColor = UIColor.White,
+                ShowsVerticalScrollIndicator = true,
+                ShowsHorizontalScrollIndicator = true, //TODO find a good position or remove
+                ScrollEnabled = true,
+                ScrollsToTop = true,
+                UserInteractionEnabled = true,
+                ClipsToBounds = false,
+                TranslatesAutoresizingMaskIntoConstraints = false,
+            };
+            scrollView.layoutAction = HandleLayout;
+            View.AddSubview(scrollView);
+
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, View, NSLayoutAttribute.Width, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
+                });
+
+            stackViewBeforeContent = new UIStackView
+            {
+                BackgroundColor = UIColor.White,
+                Axis = UILayoutConstraintAxis.Vertical,
+                Alignment = UIStackViewAlignment.Fill,
+                Distribution = UIStackViewDistribution.Fill,
+                Spacing = 0.0f,
+                TranslatesAutoresizingMaskIntoConstraints = false,
+            };
+            scrollView.AddSubview(stackViewBeforeContent);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Top, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1.0f, 0.0f),
+                });
+
+            content = new ContentView(scrollView);
+            scrollView.AddSubview(content);
+            scrollView.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(content, NSLayoutAttribute.Top, NSLayoutRelation.Equal, stackViewBeforeContent, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
+                NSLayoutConstraint.Create(content, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                NSLayoutConstraint.Create(content, NSLayoutAttribute.Right, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Right, 1.0f, 0.0f),
+            });
+
+            stackViewAfterContent = new UIStackView
+            {
+                BackgroundColor = UIColor.White,
+                Axis = UILayoutConstraintAxis.Vertical,
+                Alignment = UIStackViewAlignment.Fill,
+                Distribution = UIStackViewDistribution.Fill,
+                Spacing = 0.0f,
+                TranslatesAutoresizingMaskIntoConstraints = false,
+            };
+            scrollView.AddSubview(stackViewAfterContent);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, content, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
+                });
+            scrollView.AddGestureRecognizer(new UIPinchGestureRecognizer(HandleAction1));
+        }
+
+        void HandleAction1(UIPinchGestureRecognizer gestureRecognizer) //TODO debug
+        {
+            CommonConfig.Logger.Info($"POINT: X={gestureRecognizer.LocationInView(scrollView).X}, Y={gestureRecognizer.LocationInView(scrollView).Y}");
+        }
+
+
         void InitSubViews()
         {
-            var views = new List<DocumentSubView>();
+            var viewsBeforeContent = new List<DocumentSubView>();
+            var viewsAfterContent = new List<DocumentSubView>();
 
             from = new FromView();
-            views.Add(from);
+            viewsBeforeContent.Add(from);
 
             to = new ToView();
-            views.Add(to);
+            viewsBeforeContent.Add(to);
 
             cc = new CcView();
-            views.Add(cc);
+            viewsBeforeContent.Add(cc);
 
             bcc = new BccView();
-            views.Add(bcc);
+            viewsBeforeContent.Add(bcc);
 
             subject = new SubjectView();
-            views.Add(subject);
+            viewsBeforeContent.Add(subject);
 
             dateReceived = new DateReceivedView();
-            views.Add(dateReceived);
+            viewsBeforeContent.Add(dateReceived);
 
             priority = new PriorityView();
-            views.Add(priority);
-
-            content = new ContentView();
-            views.Add(content);
+            viewsBeforeContent.Add(priority);
 
             attachmentsList = new AttachmentsView();
-            views.Add(attachmentsList);
+            viewsAfterContent.Add(attachmentsList);
 
             referenceNumber = new ReferenceNumberView();
-            views.Add(referenceNumber);
+            viewsAfterContent.Add(referenceNumber);
 
             readBy = new ReadByView();
-            views.Add(readBy);
+            viewsAfterContent.Add(readBy);
 
             creator = new CreatorView();
-            views.Add(creator);
+            viewsAfterContent.Add(creator);
 
             originator = new OriginatorView();
-            views.Add(originator);
+            viewsAfterContent.Add(originator);
 
-            AddArrangedViewsWithSeparators(views);
+            viewsBeforeContent.ForEach(stackViewBeforeContent.AddArrangedSubview);
+            viewsAfterContent.ForEach(stackViewAfterContent.AddArrangedSubview);
 
-            StackView.ArrangedSubviews.OfType<DocumentSubView>().ForEach(v => v.UpdateVisibility());
+            subViews = viewsBeforeContent.Append(content).Concat(viewsAfterContent).ToList();
 
-            StackView.Alpha = 0.0f;
+            subViews.ForEach(v => v.UpdateVisibility());
+        }
+
+        void HandleLayout(UIScrollView obj) //TODO better name and better place
+        {
+            var minimumVisibleX = obj.ContentOffset.X;
+
+            var views = new UIView[] { from, to, cc, bcc, subject, dateReceived, priority,
+                attachmentsList, referenceNumber, readBy, creator, originator };
+
+            foreach (var item in views)
+            {
+                var actualFrame = item.Frame;
+                actualFrame.X = minimumVisibleX;
+                item.Frame = actualFrame;
+            }
         }
 
         void InitToolbar()
@@ -253,13 +350,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CorrectScrollViewInsets()
         {
-            ScrollView.ContentInset = new UIEdgeInsets(ScrollView.ContentInset.Top, 0.0f, ScrollView.ContentInset.Bottom + toolbar.Frame.Height, 0.0f);
-            ScrollView.ScrollIndicatorInsets = new UIEdgeInsets(ScrollView.ScrollIndicatorInsets.Top, 0.0f, ScrollView.ScrollIndicatorInsets.Bottom + toolbar.Frame.Height, 0.0f);
+            scrollView.ContentInset = new UIEdgeInsets(scrollView.ContentInset.Top, 0.0f, scrollView.ContentInset.Bottom + toolbar.Frame.Height, 0.0f);
+            scrollView.ScrollIndicatorInsets = new UIEdgeInsets(scrollView.ScrollIndicatorInsets.Top, 0.0f, scrollView.ScrollIndicatorInsets.Bottom + toolbar.Frame.Height, 0.0f);
         }
 
         void InitializeHandlers()
         {
-            from.RecipentTapped += HandleRecipentTapped;
+            from.RecipentTapped += HandleRecipentTapped; //TODO uniform naming
             to.RecipentTapped += HandleRecipentTapped;
             cc.RecipentTapped += HandleRecipentTapped;
             bcc.RecipentTapped += HandleRecipentTapped;
@@ -269,6 +366,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             replyActions.Clicked += ReplyActions_Clicked;
             userActions.Clicked += DoShowUserActions;
             commentsButton.TouchUpInside += DoShowComments;
+            attachmentsList.AttachmentTapped += AttachmentsList_AttachmentTapped;
         }
 
         void DeInitializeHandlers()
@@ -280,9 +378,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             flag.Clicked -= Flag_Clicked;
             fileTo.Clicked -= FileTo_Clicked;
-            replyActions.Clicked -= ReplyActions_Clicked; //TODO uniform naming
+            replyActions.Clicked -= ReplyActions_Clicked;
             userActions.Clicked -= DoShowUserActions;
             commentsButton.TouchUpInside -= DoShowComments;
+            attachmentsList.AttachmentTapped -= AttachmentsList_AttachmentTapped;
         }
 
         #endregion
@@ -331,23 +430,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             Title = DocumentPreview.Subject;
 
-            StackView.ArrangedSubviews.OfType<DocumentSubView>().ForEach(v =>
+            subViews.ForEach(v =>
             {
                 v.Document = Document;
                 v.DocumentPreview = DocumentPreview;
                 v.RefreshView();
             });
 
-            StackView.ArrangedSubviews.OfType<DocumentSubView>().ForEach(v => v.UpdateVisibility());
-            CorrectSeparators();
+            subViews.ForEach(v => v.UpdateVisibility());
 
-            UIView.Animate(0.075d, StackView.LayoutIfNeeded);
-            UIView.Animate(0.1d, () => StackView.Alpha = 1.0f);
+            UIView.Animate(0.075d, stackViewBeforeContent.LayoutIfNeeded);
+            UIView.Animate(0.1d, () => stackViewBeforeContent.Alpha = 1.0f);
+            UIView.Animate(0.075d, stackViewAfterContent.LayoutIfNeeded);
+            UIView.Animate(0.1d, () => stackViewAfterContent.Alpha = 1.0f);
         }
 
         #endregion
 
         #region Actions
+
+        void AttachmentsList_AttachmentTapped(object sender, AttachmentButtonTappedEventArgs e)
+        {
+            //TODO
+        }
 
         void HandleRecipentTapped(object sender, RecipentTappedEventArgs e)
         {
@@ -463,5 +568,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
         #endregion
+    }
+
+    public class MyScrollView : UIScrollView //TODO find better name and maybe place
+    {
+        public Action<UIScrollView> layoutAction
+        {
+            get;
+            set;
+        }
+
+        public override void LayoutSubviews()
+        {
+            base.LayoutSubviews();
+            if (layoutAction != null)
+            {
+                layoutAction(this);
+            }
+        }
     }
 }

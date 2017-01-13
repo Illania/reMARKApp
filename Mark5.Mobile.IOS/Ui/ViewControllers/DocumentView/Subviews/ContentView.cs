@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+using System;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
@@ -13,15 +14,28 @@ using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 {
-    public class ContentView : DocumentSubView, IWKNavigationDelegate, IUIScrollViewDelegate
+    public class ContentView : DocumentSubView, IWKNavigationDelegate, IUIScrollViewDelegate, IUIGestureRecognizerDelegate
     {
         float defaultHeight = 1.0f;
+        float defaultWidth = 1.0f;
 
         WKWebView webView;
         NSLayoutConstraint heightConstraint;
+        NSLayoutConstraint widthConstraint;
 
-        public ContentView()
+        nfloat initialHeight;
+        nfloat initialWidth;
+        nfloat initialZoom;
+
+        nfloat centerGestureStartX;
+        nfloat centerGestureStartY; //TODO find better names
+        nfloat actualZoomScaleBeforeZooming;
+
+        UIScrollView mainScrollView;
+
+        public ContentView(UIScrollView mainScroll)
         {
+            mainScrollView = mainScroll;
             Initialize();
         }
 
@@ -31,26 +45,37 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             preferences.JavaScriptCanOpenWindowsAutomatically = false;
             preferences.JavaScriptEnabled = true;
 
+            //TODO disable link clicking (or open external browser)
             var configuration = new WKWebViewConfiguration();
             configuration.Preferences = preferences;
 
             webView = new WKWebView(CoreGraphics.CGRect.Empty, configuration);
-            webView.NavigationDelegate = this; //TODO talk with Bartosz about this (no difference between this and a weak delegate)
+            webView.NavigationDelegate = this;
             webView.ScrollView.Delegate = this;
             webView.Opaque = false;
             webView.BackgroundColor = UIColor.White;
             webView.ScrollView.Bounces = false;
             webView.ScrollView.ScrollsToTop = false;
+            webView.ScrollView.ScrollEnabled = false;
             webView.TranslatesAutoresizingMaskIntoConstraints = false;
-            AddSubview(webView);
+            webView.ScrollView.UserInteractionEnabled = true;
+            var pinchRecognizer = new UIPinchGestureRecognizer(HandlePinch);
+            pinchRecognizer.Delegate = this;
+            var tapRecognizer = new UITapGestureRecognizer(HandleTap);
+            tapRecognizer.Delegate = this;
+            webView.ScrollView.AddGestureRecognizer(pinchRecognizer);
+            webView.ScrollView.AddGestureRecognizer(tapRecognizer);
+            ContainerView.AddSubview(webView);
             heightConstraint = NSLayoutConstraint.Create(webView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, defaultHeight);
-            AddConstraints(new[]
+            widthConstraint = NSLayoutConstraint.Create(webView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, defaultWidth);
+            ContainerView.AddConstraints(new[]
                 {
                     heightConstraint,
-                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1.0f, VerticalMargin),
-                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1.0f, HorizontalMargin),
-                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1.0f, -VerticalMargin),
-                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin),
+                    widthConstraint,
+                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1.0f, VerticalMargin),
+                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1.0f, HorizontalMargin),
+                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1.0f, -VerticalMargin),
+                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin),
                 });
         }
 
@@ -63,7 +88,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             {
                 //TODO No idea about why the following line is necessary (withouth it works strangely)
                 await webView.EvaluateJavaScriptAsync("");
-                heightConstraint.Constant = webView.ScrollView.ContentSize.Height;
+
+                initialHeight = webView.ScrollView.ContentSize.Height;
+                initialZoom = webView.ScrollView.ZoomScale;
+                initialWidth = webView.ScrollView.ContentSize.Width;
+
+                heightConstraint.Constant = initialHeight;
+                widthConstraint.Constant = initialWidth;
+
                 SetNeedsLayout();
             });
         }
@@ -75,22 +107,57 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         [Export("scrollViewWillBeginZooming:withView:")]
         public void ZoomingStarted(UIScrollView scrollView, UIView view)
         {
-            CommonConfig.Logger.Debug("START ::::::: - ");
+            // webView.RemoveConstraint(widthConstraint);
+            actualZoomScaleBeforeZooming = scrollView.ZoomScale;
         }
 
         [Export("scrollViewDidEndZooming:withView:atScale:")]
-        public void ZoomingEnded(UIScrollView scrollView, UIView withView, System.nfloat atScale)
+        public void ZoomingEnded(UIScrollView scrollView, UIView withView, nfloat atScale)
         {
-            CommonConfig.Logger.Debug("SCALE ZOOMING ENDED ::::::: - " + atScale);
-            CommonConfig.Logger.Debug("CONTENT SIZE ZOOMING ENDED ::::::: - " + webView.ScrollView.ContentSize.Height);
-            BeginInvokeOnMainThread(async () =>
-            {
-                //TODO No idea about why the following line is necessary (withouth it works strangely)
-                await webView.EvaluateJavaScriptAsync("");
-                heightConstraint.Constant = webView.ScrollView.ContentSize.Height;
-                SetNeedsLayout(); //TODO still not good
-            });
+            BeginInvokeOnMainThread(() =>
+           {
+               var zoomScaleRatio = scrollView.ZoomScale / actualZoomScaleBeforeZooming;
 
+               heightConstraint.Constant = (initialHeight / initialZoom) * scrollView.ZoomScale;
+               widthConstraint.Constant = (initialWidth / initialZoom) * scrollView.ZoomScale;
+
+               var scrollViewOffset = mainScrollView.ContentOffset;
+               scrollViewOffset.X += centerGestureStartX * (zoomScaleRatio - 1);
+               scrollViewOffset.Y += centerGestureStartY * (zoomScaleRatio - 1);
+
+               mainScrollView.ContentOffset = scrollViewOffset;
+
+               //  webView.AddConstraint(widthConstraint);
+           });
+        }
+
+        #endregion
+
+        #region IUIGestureRecognizerDelegate
+
+        [Export("gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:")]
+        public bool ShouldRecognizeSimultaneously(UIGestureRecognizer gestureRecognizer, UIGestureRecognizer otherGestureRecognizer)
+        {
+            return true;
+        }
+
+        #endregion
+
+        #region Gesture Recognizer handlers
+
+        void HandlePinch(UIPinchGestureRecognizer gestureRecognizer) //TODO can be improved
+        {
+            if (gestureRecognizer.State == UIGestureRecognizerState.Began)
+            {
+                centerGestureStartX = gestureRecognizer.LocationInView(webView.ScrollView).X;
+                centerGestureStartY = gestureRecognizer.LocationInView(webView.ScrollView).Y;
+            }
+        }
+
+        void HandleTap(UITapGestureRecognizer gestureRecognizer)
+        {
+            centerGestureStartX = gestureRecognizer.LocationInView(webView.ScrollView).X; //TODO works worse than the pinch
+            centerGestureStartY = gestureRecognizer.LocationInView(webView.ScrollView).Y;
         }
 
         #endregion

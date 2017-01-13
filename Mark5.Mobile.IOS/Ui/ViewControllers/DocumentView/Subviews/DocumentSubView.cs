@@ -13,10 +13,16 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 {
-    public abstract class DocumentSubView : StackSubView
+    public abstract class DocumentSubView : UIStackView
     {
         public DocumentPreview DocumentPreview { get; set; }
         public Document Document { get; set; }
+
+        protected UIView ContainerView;
+
+        protected float HorizontalMargin = 15.0f;
+        protected float VerticalMargin = 12.0f;
+        protected float InnerMargin = 5.0f;
 
         protected DocumentSubView()
         {
@@ -25,9 +31,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         void Initialize()
         {
+            BackgroundColor = UIColor.White;
             Opaque = false;
+            Axis = UILayoutConstraintAxis.Vertical;
+            Alignment = UIStackViewAlignment.Fill;
+            Distribution = UIStackViewDistribution.Fill;
+            Spacing = 0.0f;
             TranslatesAutoresizingMaskIntoConstraints = false;
-            SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+
+            ContainerView = new UIView();
+            AddArrangedSubview(ContainerView);
+
+            AddArrangedSubview(new SeparatorSubView());
         }
 
         public abstract void RefreshView();
