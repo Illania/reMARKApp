@@ -224,9 +224,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (documentsTableView.Editing) return;
 
-            documentsTableView.SetEditing(true, true);
-            NavigationItem.SetRightBarButtonItem(exitEditItem, true);
-            NavigationItem.SetLeftBarButtonItem(editItem, true);
+            StartEditing();
 
             var point = recognizer.LocationInView(documentsTableView);
             var indexPath = documentsTableView.IndexPathForRowAtPoint(point);
@@ -234,12 +232,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             documentsTableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
         }
 
+        void StartEditing()
+        {
+            documentsTableView.SetEditing(true, true);
+            NavigationItem.SetRightBarButtonItem(exitEditItem, true);
+            NavigationItem.SetLeftBarButtonItem(editItem, true);
+        }
+
         void ComposeDocumentItem_Clicked(object sender, EventArgs e)
         {
             // TODO
         }
 
-        void ExitEditItem_Clicked(object sender, EventArgs e)
+        void ExitEditItem_Clicked(object sender, EventArgs e) => EndEditing();
+
+        void EndEditing()
         {
             documentsTableView.SetEditing(false, true);
             NavigationItem.SetRightBarButtonItem(composeDocumentItem, true);
@@ -252,33 +259,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
-            var selectedDocuments = documentsTableView.IndexPathsForSelectedRows.Select(ip => ((DataSource)documentsTableView.Source).Items[ip.Row]);
+            var rows = documentsTableView.IndexPathsForSelectedRows.ToArray();
+            var selectedDocuments = rows.Select(ip => ((DataSource)documentsTableView.Source).Items[ip.Row]).ToList();
 
             if (selectedDocuments.Any(dp => !dp.IsReadByCurrent))
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("mark_as_read"), UIAlertActionStyle.Default, null));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("mark_as_read"), UIAlertActionStyle.Default, a => { MarkAsRead(selectedDocuments, rows); EndEditing(); }));
 
             if (selectedDocuments.Any(dp => dp.IsReadByCurrent))
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("mark_as_unread"), UIAlertActionStyle.Default, null));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("mark_as_unread"), UIAlertActionStyle.Default, a => { MarkAsUnread(selectedDocuments, rows); EndEditing(); }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, null));
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, null));
-
-            if (Folder.InternalType == FolderInternalType.FilterView
-                || Folder.InternalType == FolderInternalType.Static
-                || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, null));
-
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, null));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, null)); // TODO
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, null)); // TODO
 
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static
                 || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, null));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, null)); // TODO
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, null)); // TODO
+
+            if (Folder.InternalType == FolderInternalType.FilterView
+                || Folder.InternalType == FolderInternalType.Static
+                || Folder.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, null)); // TODO
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
                 || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed
                 || selectedDocuments.All(dp => dp.Direction == DocumentDirection.Draft))
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, null));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, null)); // TODO
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
@@ -286,6 +294,44 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
             PresentViewController(eas, true, null);
+        }
+
+        void MarkAsRead(DocumentPreview documentPreview, NSIndexPath row) => MarkAsRead(new List<DocumentPreview> { documentPreview }, new[] { row });
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void        async void MarkAsRead(List<DocumentPreview> documentPreviews, NSIndexPath[] rows)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void        {
+            CommonConfig.Logger.Info($"Attempting to mark as read [documentPreviews={documentPreviews.Count}]...");
+
+            try
+            {
+                await Managers.DocumentsManager.SetDocumentsReadStatusAsync(documentPreviews, true);
+                documentsTableView.ReloadRows(rows, UITableViewRowAnimation.Automatic);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Marking as read failed [documentPreviews.Count={documentPreviews.Count}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+        }
+
+        void MarkAsUnread(DocumentPreview documentPreview, NSIndexPath row) => MarkAsUnread(new List<DocumentPreview> { documentPreview }, new[] { row });
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void        async void MarkAsUnread(List<DocumentPreview> documentPreviews, NSIndexPath[] rows)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void        {
+            CommonConfig.Logger.Info($"Attempting to mark as unread [documentPreviews={documentPreviews.Count}]...");
+
+            try
+            {
+                await Managers.DocumentsManager.SetDocumentsReadStatusAsync(documentPreviews, false);
+                documentsTableView.ReloadRows(rows, UITableViewRowAnimation.Automatic);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Marking as unread failed [documentPreviews.Count={documentPreviews.Count}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
         }
 
         #endregion
@@ -542,6 +588,41 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return ExternalHeight;
 
                 return compact ? CompactHeight : Height;
+            }
+
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                return true;
+            }
+
+            public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                var actions = new List<UITableViewRowAction>();
+
+                var documentPreview = documentPreviewsInView[indexPath.Row];
+
+                var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("more"), (a, ip) => { viewController.EndEditing(); }); // TODO
+                moreAction.BackgroundColor = Theme.Blue;
+                actions.Add(moreAction);
+
+                var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("copy_to_worktray"), (a, ip) => { viewController.EndEditing(); }); // TODO
+                copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
+                actions.Add(copyToWorktrayAction);
+
+                if (documentPreview.IsReadByCurrent)
+                {
+                    var markAsUnreadAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("mark_as_unread"), (a, ip) => { viewController.MarkAsUnread(documentPreview, indexPath); viewController.EndEditing(); });
+                    markAsUnreadAction.BackgroundColor = Theme.Brown;
+                    actions.Add(markAsUnreadAction);
+                }
+                else
+                {
+                    var markAsReadAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("mark_as_read"), (a, ip) => { viewController.MarkAsRead(documentPreview, indexPath); viewController.EndEditing(); });
+                    markAsReadAction.BackgroundColor = Theme.Brown;
+                    actions.Add(markAsReadAction);
+                }
+
+                return actions.ToArray();
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
