@@ -579,15 +579,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async Task DoChangeReadStatus()
         {
-            var isRead = DocumentPreview.IsReadByCurrent;
+            var isReadByCurrent = DocumentPreview.IsReadByCurrent;
 
-            CommonConfig.Logger.Info($"Attempting to mark as {(isRead ? "unread" : "read")} [documentPreview={DocumentPreview}]...");
+            CommonConfig.Logger.Info($"Attempting to mark as {(isReadByCurrent ? "unread" : "read")} [documentPreview={DocumentPreview}]...");
 
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString(isRead ? "mark_document_as_unread___" : "mark_document_as_read___"));
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString(isReadByCurrent ? "marking_document_as_unread___" : "marking_document_as_read___"));
 
             try
             {
-                await Managers.DocumentsManager.SetDocumentReadStatusAsync(DocumentPreview, Document, true, ServerConfig.SystemSettings.UserInfo.User);
+                await Managers.DocumentsManager.SetDocumentReadStatusAsync(DocumentPreview, Document, !isReadByCurrent, ServerConfig.SystemSettings.UserInfo.User);
 
                 readByView.RefreshView();
 
@@ -597,7 +597,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Marking as {(isRead ? "unread" : "read")}  failed [documentPreview={DocumentPreview}]", ex);
+                CommonConfig.Logger.Error($"Marking as {(isReadByCurrent ? "unread" : "read")}  failed [documentPreview={DocumentPreview}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
