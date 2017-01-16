@@ -51,9 +51,44 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return tcs.Task;
         }
 
-        public static Task<int> ShowListDialogAsync(UIViewController vc, string message, string[] listStrings)
+        public static Task<int> ShowListDialogAsync(UIViewController vc, string message, string[] listStrings, UIView anchorView)
         {
             var tcs = new TaskCompletionSource<int>();
+            var actionSheet = PrepareLisDialogActionSheet(tcs, message, listStrings);
+            if (actionSheet.PopoverPresentationController != null)
+            {
+                actionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(anchorView);
+            }
+            vc.PresentViewController(actionSheet, true, null);
+            return tcs.Task;
+        }
+
+        public static Task<int> ShowListDialogAsync(UIViewController vc, string message, string[] listStrings, UIBarButtonItem anchorBarButtonItem)
+        {
+            var tcs = new TaskCompletionSource<int>();
+            var actionSheet = PrepareLisDialogActionSheet(tcs, message, listStrings);
+            if (actionSheet.PopoverPresentationController != null)
+            {
+                actionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(anchorBarButtonItem);
+            }
+            vc.PresentViewController(actionSheet, true, null);
+            return tcs.Task;
+        }
+
+        public static Task<int> ShowListDialogAsync(UIViewController vc, string message, string[] listStrings, UITableView tableView, UITableViewCell anchorCell)
+        {
+            var tcs = new TaskCompletionSource<int>();
+            var actionSheet = PrepareLisDialogActionSheet(tcs, message, listStrings);
+            if (actionSheet.PopoverPresentationController != null)
+            {
+                actionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(tableView, anchorCell);
+            }
+            vc.PresentViewController(actionSheet, true, null);
+            return tcs.Task;
+        }
+
+        static UIAlertController PrepareLisDialogActionSheet(TaskCompletionSource<int> tcs, string message, string[] listStrings)
+        {
             var actionSheet = UIAlertController.Create(null, message, UIAlertControllerStyle.ActionSheet);
 
             for (int i = 0; i < listStrings.Length; i++)
@@ -63,8 +98,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             }
 
             actionSheet.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
-            vc.PresentViewController(actionSheet, true, null);
-            return tcs.Task;
+            return actionSheet;
         }
 
         public static void ShowBlockingDialog(UIViewController vc, string content)
