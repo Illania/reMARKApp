@@ -11,12 +11,14 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CoreGraphics;
+using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.Common.StackView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews;
+using Mark5.Mobile.IOS.Utilities.UserInterface;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -33,7 +35,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public Document Document { get; set; }
         public Guid NotificationGuid { get; set; }
 
-        const long MaxAttachmentSize = 25 * 1024 * 1024;
+        const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
         UIBarButtonItem doneButtonItem;
         UIBarButtonItem previousDocumentButtonItem;
@@ -69,6 +71,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         NSLayoutConstraint toolbarBottomConstraint;
 
         List<DocumentSubView> subViews;
+
+        UIDocumentInteractionController attachmentInteractionController;
 
         static UIBarButtonItem FlexibleSpace
         {
@@ -471,9 +475,63 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Subviews event handlers
 
-        void AttachmentsList_AttachmentTapped(object sender, AttachmentButtonTappedEventArgs e)
+        async void AttachmentsList_AttachmentTapped(object sender, AttachmentButtonTappedEventArgs e)
         {
-            //TODO
+            var attachmentDescription = e.Attachment;
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
+
+            try
+            {
+                var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, false, SourceType.Local);
+
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    if (attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes
+                        && PlatformConfig.Preferences.LargeAttachmentWarning
+                        && !await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("big_attachment_title"),
+                                                               string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(e.Attachment.SizeInBytes))))
+                    {
+                        dismissAction();
+                        return;
+                    }
+
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, false, SourceType.Remote);
+                }
+
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    throw new Exception("Unable to get attachment path.");
+                }
+
+                attachmentInteractionController = UIDocumentInteractionController.FromUrl(NSUrl.FromFilename(path));
+                attachmentInteractionController.Delegate = new AttachmentInteractionControllerDelegate(this, attachmentDescription);
+
+                var previewSuccessful = attachmentInteractionController.PresentPreview(true);
+
+                if (!previewSuccessful)
+                {
+
+                    CommonConfig.Logger.Info(string.Format("Failed to present preview for attachment. Presenting open with instead. [documentId={0}, attachment={1}]", Document.Id, attachmentDescription));
+                }
+                var openInSuccessful = attachmentInteractionController.PresentOpenInMenu(View.Frame, View, true);
+                if (!openInSuccessful)
+                {
+                    CommonConfig.Logger.Warning(string.Format("Failed to present open in view - there is no app that can open this type of attachment installed. [documentId={0}, attachment={1}]", Document.Id, attachmentDescription));
+
+                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to view attachment [document.Id={Document.Id}, attachment.Id={attachmentDescription?.Id}, attachment.Name={attachmentDescription?.Name}", ex);
+
+                dismissAction();
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+            finally
+            {
+                dismissAction();
+            }
         }
 
         void HandleRecipentTapped(object sender, RecipentTappedEventArgs e)
@@ -685,5 +743,48 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 LayoutSubviewsAction(this);
             }
         }
+    }
+
+    class AttachmentInteractionControllerDelegate : UIDocumentInteractionControllerDelegate
+    {
+
+        readonly UIViewController parentController;
+        readonly AttachmentDescription attachmentDescription;
+
+        public AttachmentInteractionControllerDelegate(UIViewController parentController, AttachmentDescription attachmentDescription)
+        {
+            this.attachmentDescription = attachmentDescription;
+            this.parentController = parentController;
+        }
+
+        #region UIDocumentInteractionControllerDelegate overrides
+
+        public override UIViewController ViewControllerForPreview(UIDocumentInteractionController controller)
+        {
+            return parentController;
+        }
+
+        public override UIView ViewForPreview(UIDocumentInteractionController controller)
+        {
+            return parentController.View;
+        }
+
+        public override CGRect RectangleForPreview(UIDocumentInteractionController controller)
+        {
+            return parentController.View.Frame;
+        }
+
+        public override void WillBeginSendingToApplication(UIDocumentInteractionController controller, string application)
+        {
+            CommonConfig.Logger.Info(string.Format("Sending atttachment to {0} app. [attachment={1}", attachmentDescription, application));
+        }
+
+        public override void DidEndSendingToApplication(UIDocumentInteractionController controller, string application)
+        {
+            CommonConfig.Logger.Info(string.Format("Sent atttachment to {0} app. [attachment={1}", attachmentDescription, application));
+        }
+
+        #endregion
+
     }
 }
