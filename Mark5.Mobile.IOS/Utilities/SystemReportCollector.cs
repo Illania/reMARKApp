@@ -8,6 +8,7 @@
 
 using System;
 using System.Text;
+using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
@@ -48,6 +49,14 @@ namespace Mark5.Mobile.IOS.Utilities
             sb.Append(CreateLogReport());
 
             return sb.ToString();
+        }
+
+        public static Task<string> CreateFullReportAsync()
+        {
+            return Task.Run(() =>
+            {
+                return CreateFullReport();
+            });
         }
 
         public static string CreateSystemInfoReport()

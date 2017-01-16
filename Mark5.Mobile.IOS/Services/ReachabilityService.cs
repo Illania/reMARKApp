@@ -38,7 +38,7 @@ namespace Mark5.Mobile.IOS.Services
             IsReachable = CheckNetworkAvailability();
         }
 
-        public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.ServiceConnection, bool testOnly = false)
+        public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.Service, bool testOnly = false)
         {
             if (!testOnly)
             {
@@ -120,9 +120,10 @@ namespace Mark5.Mobile.IOS.Services
                 })
                 using (var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
                 {
-                    var result = response.StatusCode == HttpStatusCode.OK;
+                    var result = response.StatusCode == HttpStatusCode.OK ||
+                                         response.StatusCode == HttpStatusCode.BadRequest;
 
-                    CommonConfig.Logger.Info($"Service connection availability: {result}");
+                    CommonConfig.Logger.Info($"Service connection availability: {result}. [status={response.StatusCode}]");
 
                     return result;
                 }

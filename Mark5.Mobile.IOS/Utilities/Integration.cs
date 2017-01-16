@@ -9,6 +9,8 @@ using System;
 using System.Linq;
 using CoreGraphics;
 using Foundation;
+using Mark5.Mobile.Common;
+using PCLStorage;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Utilities
@@ -60,7 +62,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         #endregion
 
-        #region Disk space
+        #region Disk
 
         public static long GetFreeDiskSpace()
         {
@@ -74,6 +76,21 @@ namespace Mark5.Mobile.IOS.Utilities
             var paths = NSSearchPath.GetDirectories(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomain.User, true);
             var dict = NSFileManager.DefaultManager.GetFileSystemAttributes(paths.Last());
             return ((NSNumber)dict.Size).LongValue;
+        }
+
+        public static void ClearData()
+        {
+            NSError _error;
+
+            var localStorage = FileSystem.Current.LocalStorage;
+            var dataFolder = PortablePath.Combine(localStorage.Path, "v2");
+            var cacheFolder = PortablePath.Combine(localStorage.Path, "Caches", "v2");
+
+            NSFileManager.DefaultManager.Remove(dataFolder, out _error);
+            NSFileManager.DefaultManager.Remove(cacheFolder, out _error);
+
+            var domain = NSBundle.MainBundle.BundleIdentifier;
+            NSUserDefaults.StandardUserDefaults.RemovePersistentDomain(domain);
         }
 
         #endregion

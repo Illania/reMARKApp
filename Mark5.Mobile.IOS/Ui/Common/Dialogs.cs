@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: Dialogs.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -67,6 +67,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return tcs.Task;
         }
 
+        public static void ShowBlockingDialog(UIViewController vc, string content)
+        {
+            var alert = UIAlertController.Create(null, content, UIAlertControllerStyle.Alert);
+            vc.PresentViewController(alert, true, null);
+        }
+
         #endregion
 
         #region Non-awaitable dialogs
@@ -76,7 +82,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             // TODO
             //SVProgressHUD.ShowWithStatus(Localization.GetString(content));
             //return SVProgressHUD.Dismiss;
-            return null;
+            return () => { };
         }
 
         #endregion
