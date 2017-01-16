@@ -198,6 +198,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         {
             webView.StopLoading();
             heightConstraint.Constant = defaultHeight;
+            widthConstraint.Constant = defaultWidth;
 
             switch (contentType)
             {
@@ -217,6 +218,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         {
             webView.StopLoading();
             heightConstraint.Constant = defaultHeight;
+            widthConstraint.Constant = defaultWidth;
 
             SetContent(ContentType.PlainText, string.Empty);
         }
