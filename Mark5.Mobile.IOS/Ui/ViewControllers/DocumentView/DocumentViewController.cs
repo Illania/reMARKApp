@@ -172,7 +172,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             mainScrollView.LayoutSubviewsAction = HandleScrollViewLayoutSubviewsAction;
             View.AddSubview(mainScrollView);
-
             View.AddConstraints(new[]
                 {
                     NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
@@ -611,7 +610,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         #endregion
 
 
-        void HandleScrollViewLayoutSubviewsAction(UIScrollView scrollView) //TODO better place
+        void HandleScrollViewLayoutSubviewsAction(UIScrollView scrollView)
         {
             //Used to keep the views before and after the content anchored to the scrollView
             var minimumVisibleX = scrollView.ContentOffset.X;
