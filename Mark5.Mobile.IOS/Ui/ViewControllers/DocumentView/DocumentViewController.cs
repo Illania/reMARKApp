@@ -459,50 +459,69 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             //TODO
         }
 
-        void Flag_Clicked(object sender, EventArgs e) //TODO use dialogs? what about the popover
+        async void Flag_Clicked(object sender, EventArgs e) //TODO decide on naming
         {
             var isRead = DocumentPreview.IsReadByCurrent;
+            var flagListStrings = new string[] { Localization.GetString(isRead ? "mark_as_unread" : "mark_as_read"),
+                    Localization.GetString("categories") };
 
-            var actions = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
-            actions.AddAction(UIAlertAction.Create(string.Format("Mark as {0}", isRead ? "unread" : "read"), UIAlertActionStyle.Default, a => DoChangeReadStatus()));
-            actions.AddAction(UIAlertAction.Create("Categories", UIAlertActionStyle.Default, a => DoAssignCategory()));
-            actions.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
-            if (actions.PopoverPresentationController != null)
+            var result = await Dialogs.ShowListDialogAsync(this, null, flagListStrings, flag);
+            switch (result)
             {
-                actions.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(flag);
+                case 0:
+                    DoChangeReadStatus();
+                    break;
+                case 1:
+                    DoAssignCategory();
+                    break;
             }
-            PresentViewController(actions, true, null);
         }
 
-        void ReplyActions_Clicked(object sender, EventArgs e)
+        async void ReplyActions_Clicked(object sender, EventArgs e)
         {
-            var replyActionSheet = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
-            replyActionSheet.AddAction(UIAlertAction.Create("Reply", UIAlertActionStyle.Default, a => DoReply(DocumentCreationModeFlag.Reply)));
-            replyActionSheet.AddAction(UIAlertAction.Create("Reply all", UIAlertActionStyle.Default, a => DoReply(DocumentCreationModeFlag.ReplyAll)));
-            replyActionSheet.AddAction(UIAlertAction.Create("Forward", UIAlertActionStyle.Default, a => DoReply(DocumentCreationModeFlag.Forward)));
-            replyActionSheet.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
-            if (replyActionSheet.PopoverPresentationController != null)
+            var replyListStrings = new string[] { "reply",
+                "reply_all",
+                "forward" };
+
+            var result = await Dialogs.ShowListDialogAsync(this, null, replyListStrings, replyActions);
+            switch (result)
             {
-                replyActionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(replyActions);
+                case 0:
+                    DoReply(DocumentCreationModeFlag.Reply);
+                    break;
+                case 1:
+                    DoReply(DocumentCreationModeFlag.ReplyAll);
+                    break;
+                case 2:
+                    DoReply(DocumentCreationModeFlag.Forward);
+                    break;
             }
-            PresentViewController(replyActionSheet, true, null);
         }
 
-        void FileTo_Clicked(object sender, EventArgs e)
+        async void FileTo_Clicked(object sender, EventArgs e)
         {
-            var fileToActionSheet = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
-            fileToActionSheet.AddAction(UIAlertAction.Create("Copy to worktray", UIAlertActionStyle.Default, a => DoFileToWorktray()));
-            fileToActionSheet.AddAction(UIAlertAction.Create("Copy to folder", UIAlertActionStyle.Default, a => DoFileToFolder(false)));
-            //fileToActionSheet.AddAction(UIAlertAction.Create("Move to folder", UIAlertActionStyle.Default, a => DoFileToFolder(true)));
-            fileToActionSheet.AddAction(UIAlertAction.Create("Delete from folder", UIAlertActionStyle.Destructive, a => DoDeleteFromFolder()));
-            fileToActionSheet.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
-            if (fileToActionSheet.PopoverPresentationController != null)
-            {
-                fileToActionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(fileTo);
-            }
-            PresentViewController(fileToActionSheet, true, null);
-        }
+            var fileToListStrings = new string[] { "copy_to_worktray",
+                "copy_to_folder",
+                "move_to_folder",
+                "delete_from_folder" };
 
+            var result = await Dialogs.ShowListDialogAsync(this, null, fileToListStrings, fileTo);
+            switch (result)
+            {
+                case 0:
+                    DoFileToWorktray();
+                    break;
+                case 1:
+                    DoFileToFolder(false);
+                    break;
+                case 2:
+                    DoFileToFolder(true);
+                    break;
+                case 3:
+                    DoDeleteFromFolder();
+                    break;
+            }
+        }
 
         void DoChangeReadStatus()
         {

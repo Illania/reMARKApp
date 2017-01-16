@@ -305,7 +305,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var templateListStrings = new string[] { Localization.GetString("template_selection_default"),
                     Localization.GetString("template_selection_local"),
                     Localization.GetString("template_selection_another") };
-                var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("template_selection_title"), templateListStrings);
+                var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("template_selection_title"), templateListStrings, contentView);
                 switch (result)
                 {
                     case 0:
@@ -351,7 +351,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var templateNames = templatesForCreationMode.Select(t => (t.Private ? "[Private] " : "[Public] ") + t.Name).ToArray();
 
-                    var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("template_question"), templateNames);
+                    var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("template_question"), templateNames, contentView);
                     var selectedPreview = templatesPreviews[result];
                     await GetTemplate(selectedPreview);
                 }
