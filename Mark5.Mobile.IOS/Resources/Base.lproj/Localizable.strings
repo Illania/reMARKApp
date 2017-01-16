@@ -121,4 +121,6 @@
 "move_to_folder" = "Move to folder";
 "delete_from_folder" = "Delete from folder";
 "attachments" = "Attachments";
+"marking_document_as_read___" = "Marking document as read...";
+"marking_document_as_unread___" = "Marking document as unread...";
 

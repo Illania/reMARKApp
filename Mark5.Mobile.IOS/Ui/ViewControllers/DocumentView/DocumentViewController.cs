@@ -343,21 +343,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeHandlers()
         {
+            //Subviews
             fromView.RecipentTapped += HandleRecipentTapped; //TODO uniform naming
             toView.RecipentTapped += HandleRecipentTapped;
             ccView.RecipentTapped += HandleRecipentTapped;
             bccView.RecipentTapped += HandleRecipentTapped;
+            attachmentsListView.AttachmentTapped += AttachmentsList_AttachmentTapped;
 
+            //Toolbar
             flag.Clicked += Flag_Clicked;
             fileTo.Clicked += FileTo_Clicked;
             replyActions.Clicked += ReplyActions_Clicked;
             userActions.Clicked += DoShowUserActions;
             commentsButton.TouchUpInside += DoShowComments;
-            attachmentsListView.AttachmentTapped += AttachmentsList_AttachmentTapped;
 
+            //NavigationBar
             if (Modal)
             {
-                doneButtonItem.Clicked += DoneButtonItem_Clicked; ;
+                doneButtonItem.Clicked += DoneButtonItem_Clicked;
             }
             else
             {
@@ -369,21 +372,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DeInitializeHandlers()
         {
+            //Subviews
             fromView.RecipentTapped -= HandleRecipentTapped;
             toView.RecipentTapped -= HandleRecipentTapped;
             ccView.RecipentTapped -= HandleRecipentTapped;
             bccView.RecipentTapped -= HandleRecipentTapped;
+            attachmentsListView.AttachmentTapped -= AttachmentsList_AttachmentTapped;
 
+            //Toolbar
             flag.Clicked -= Flag_Clicked;
             fileTo.Clicked -= FileTo_Clicked;
             replyActions.Clicked -= ReplyActions_Clicked;
             userActions.Clicked -= DoShowUserActions;
             commentsButton.TouchUpInside -= DoShowComments;
-            attachmentsListView.AttachmentTapped -= AttachmentsList_AttachmentTapped;
 
+            //NavigationBar
             if (Modal)
             {
-                doneButtonItem.Clicked -= DoneButtonItem_Clicked; ;
+                doneButtonItem.Clicked -= DoneButtonItem_Clicked;
             }
             else
             {
@@ -463,7 +469,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
-        #region Actions
+        #region Subviews event handlers
 
         void AttachmentsList_AttachmentTapped(object sender, AttachmentButtonTappedEventArgs e)
         {
@@ -475,7 +481,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             //TODO
         }
 
-        async void Flag_Clicked(object sender, EventArgs e) //TODO decide on naming
+        #endregion
+
+        #region Toolbar event handlers
+
+        async void Flag_Clicked(object sender, EventArgs e)
         {
             var isRead = DocumentPreview.IsReadByCurrent;
             var flagListStrings = new string[] { Localization.GetString(isRead ? "mark_as_unread" : "mark_as_read"),
@@ -485,7 +495,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             switch (result)
             {
                 case 0:
-                    DoChangeReadStatus();
+                    await DoChangeReadStatus();
                     break;
                 case 1:
                     DoAssignCategory();
@@ -539,9 +549,58 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void DoChangeReadStatus()
+        #endregion
+
+        #region NavigationBar event handlers
+
+        void GoToNextDocument(object sender, EventArgs args)
         {
             //TODO
+        }
+
+        void GoToPreviousDocument(object sender, EventArgs args)
+        {
+            //TODO
+        }
+
+        void EditDocument(object sender, EventArgs args)
+        {
+            //TODO
+        }
+
+        void DoneButtonItem_Clicked(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
+        }
+
+        #endregion
+
+        #region Actions
+
+        async Task DoChangeReadStatus()
+        {
+            var isRead = DocumentPreview.IsReadByCurrent;
+
+            CommonConfig.Logger.Info($"Attempting to mark as {(isRead ? "unread" : "read")} [documentPreview={DocumentPreview}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString(isRead ? "mark_document_as_unread___" : "mark_document_as_read___"));
+
+            try
+            {
+                await Managers.DocumentsManager.SetDocumentReadStatusAsync(DocumentPreview, Document, true, ServerConfig.SystemSettings.UserInfo.User);
+
+                readByView.RefreshView();
+
+                dismissAction();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Marking as {(isRead ? "unread" : "read")}  failed [documentPreview={DocumentPreview}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
         }
 
         void DoAssignCategory()
@@ -587,28 +646,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(composeDocumentNavigationController, true, null);
         }
 
-        void GoToNextDocument(object sender, EventArgs args)
-        {
-            //TODO
-        }
-
-        void GoToPreviousDocument(object sender, EventArgs args)
-        {
-            //TODO
-        }
-
-        void EditDocument(object sender, EventArgs args)
-        {
-            //TODO
-        }
-
-        void DoneButtonItem_Clicked(object sender, EventArgs e)
-        {
-            DismissViewController(true, null);
-        }
-
         #endregion
 
+        #region ScrollView LayoutSubViews Action
 
         void HandleScrollViewLayoutSubviewsAction(UIScrollView scrollView)
         {
@@ -624,6 +664,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 item.Frame = actualFrame;
             }
         }
+
+        #endregion
 
     }
 
