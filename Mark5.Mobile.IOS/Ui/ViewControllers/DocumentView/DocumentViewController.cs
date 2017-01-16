@@ -44,19 +44,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIStackView stackViewBeforeContent;
         UIStackView stackViewAfterContent;
 
-        FromView from; //TODO add view to the name?
-        ToView to;
-        CcView cc;
-        BccView bcc;
-        OriginatorView originator;
-        SubjectView subject;
-        DateReceivedView dateReceived;
-        PriorityView priority;
-        ContentView content;
-        AttachmentsView attachmentsList;
-        CreatorView creator;
-        ReadByView readBy;
-        ReferenceNumberView referenceNumber;
+        FromView fromView; //TODO add view to the name?
+        ToView toView;
+        CcView ccView;
+        BccView bccView;
+        OriginatorView originatorView;
+        SubjectView subjectView;
+        DateReceivedView dateReceivedView;
+        PriorityView priorityView;
+        ContentView contentView;
+        AttachmentsView attachmentsListView;
+        CreatorView creatorView;
+        ReadByView readByView;
+        ReferenceNumberView referenceNumberView;
 
         UIBarButtonItem flag;
         UIBarButtonItem fileTo;
@@ -188,13 +188,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1.0f, 0.0f),
                 });
 
-            content = new ContentView(scrollView);
-            scrollView.AddSubview(content);
+            contentView = new ContentView(scrollView);
+            scrollView.AddSubview(contentView);
             scrollView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(content, NSLayoutAttribute.Top, NSLayoutRelation.Equal, stackViewBeforeContent, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
-                NSLayoutConstraint.Create(content, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                NSLayoutConstraint.Create(content, NSLayoutAttribute.Right, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Right, 1.0f, 0.0f),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, stackViewBeforeContent, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Right, 1.0f, 0.0f),
             });
 
             stackViewAfterContent = new UIStackView
@@ -209,7 +209,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             scrollView.AddSubview(stackViewAfterContent);
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, content, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, contentView, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
@@ -228,46 +228,46 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var viewsBeforeContent = new List<DocumentSubView>();
             var viewsAfterContent = new List<DocumentSubView>();
 
-            from = new FromView();
-            viewsBeforeContent.Add(from);
+            fromView = new FromView();
+            viewsBeforeContent.Add(fromView);
 
-            to = new ToView();
-            viewsBeforeContent.Add(to);
+            toView = new ToView();
+            viewsBeforeContent.Add(toView);
 
-            cc = new CcView();
-            viewsBeforeContent.Add(cc);
+            ccView = new CcView();
+            viewsBeforeContent.Add(ccView);
 
-            bcc = new BccView();
-            viewsBeforeContent.Add(bcc);
+            bccView = new BccView();
+            viewsBeforeContent.Add(bccView);
 
-            subject = new SubjectView();
-            viewsBeforeContent.Add(subject);
+            subjectView = new SubjectView();
+            viewsBeforeContent.Add(subjectView);
 
-            dateReceived = new DateReceivedView();
-            viewsBeforeContent.Add(dateReceived);
+            dateReceivedView = new DateReceivedView();
+            viewsBeforeContent.Add(dateReceivedView);
 
-            priority = new PriorityView();
-            viewsBeforeContent.Add(priority);
+            priorityView = new PriorityView();
+            viewsBeforeContent.Add(priorityView);
 
-            attachmentsList = new AttachmentsView();
-            viewsAfterContent.Add(attachmentsList);
+            attachmentsListView = new AttachmentsView();
+            viewsAfterContent.Add(attachmentsListView);
 
-            referenceNumber = new ReferenceNumberView();
-            viewsAfterContent.Add(referenceNumber);
+            referenceNumberView = new ReferenceNumberView();
+            viewsAfterContent.Add(referenceNumberView);
 
-            readBy = new ReadByView();
-            viewsAfterContent.Add(readBy);
+            readByView = new ReadByView();
+            viewsAfterContent.Add(readByView);
 
-            creator = new CreatorView();
-            viewsAfterContent.Add(creator);
+            creatorView = new CreatorView();
+            viewsAfterContent.Add(creatorView);
 
-            originator = new OriginatorView();
-            viewsAfterContent.Add(originator);
+            originatorView = new OriginatorView();
+            viewsAfterContent.Add(originatorView);
 
             viewsBeforeContent.ForEach(stackViewBeforeContent.AddArrangedSubview);
             viewsAfterContent.ForEach(stackViewAfterContent.AddArrangedSubview);
 
-            subViews = viewsBeforeContent.Append(content).Concat(viewsAfterContent).ToList();
+            subViews = viewsBeforeContent.Append(contentView).Concat(viewsAfterContent).ToList();
 
             subViews.ForEach(v => v.UpdateVisibility());
         }
@@ -276,8 +276,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var minimumVisibleX = obj.ContentOffset.X;
 
-            var views = new UIView[] { from, to, cc, bcc, subject, dateReceived, priority,
-                attachmentsList, referenceNumber, readBy, creator, originator };
+            var views = new UIView[] { fromView, toView, ccView, bccView, subjectView, dateReceivedView, priorityView,
+                attachmentsListView, referenceNumberView, readByView, creatorView, originatorView };
 
             foreach (var item in views)
             {
@@ -356,32 +356,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeHandlers()
         {
-            from.RecipentTapped += HandleRecipentTapped; //TODO uniform naming
-            to.RecipentTapped += HandleRecipentTapped;
-            cc.RecipentTapped += HandleRecipentTapped;
-            bcc.RecipentTapped += HandleRecipentTapped;
+            fromView.RecipentTapped += HandleRecipentTapped; //TODO uniform naming
+            toView.RecipentTapped += HandleRecipentTapped;
+            ccView.RecipentTapped += HandleRecipentTapped;
+            bccView.RecipentTapped += HandleRecipentTapped;
 
             flag.Clicked += Flag_Clicked;
             fileTo.Clicked += FileTo_Clicked;
             replyActions.Clicked += ReplyActions_Clicked;
             userActions.Clicked += DoShowUserActions;
             commentsButton.TouchUpInside += DoShowComments;
-            attachmentsList.AttachmentTapped += AttachmentsList_AttachmentTapped;
+            attachmentsListView.AttachmentTapped += AttachmentsList_AttachmentTapped;
         }
 
         void DeInitializeHandlers()
         {
-            from.RecipentTapped -= HandleRecipentTapped;
-            to.RecipentTapped -= HandleRecipentTapped;
-            cc.RecipentTapped -= HandleRecipentTapped;
-            bcc.RecipentTapped -= HandleRecipentTapped;
+            fromView.RecipentTapped -= HandleRecipentTapped;
+            toView.RecipentTapped -= HandleRecipentTapped;
+            ccView.RecipentTapped -= HandleRecipentTapped;
+            bccView.RecipentTapped -= HandleRecipentTapped;
 
             flag.Clicked -= Flag_Clicked;
             fileTo.Clicked -= FileTo_Clicked;
             replyActions.Clicked -= ReplyActions_Clicked;
             userActions.Clicked -= DoShowUserActions;
             commentsButton.TouchUpInside -= DoShowComments;
-            attachmentsList.AttachmentTapped -= AttachmentsList_AttachmentTapped;
+            attachmentsListView.AttachmentTapped -= AttachmentsList_AttachmentTapped;
         }
 
         #endregion
