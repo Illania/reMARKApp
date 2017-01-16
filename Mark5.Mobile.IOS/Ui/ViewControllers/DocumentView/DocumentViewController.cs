@@ -40,7 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem nextDocumentButtonItem;
         UIBarButtonItem editDocumentButtonItem;
 
-        MyScrollView scrollView;
+        ActionableLayoutScrollView mainScrollView;
         UIStackView stackViewBeforeContent;
         UIStackView stackViewAfterContent;
 
@@ -76,6 +76,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 return new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace);
             }
+        }
+
+        public bool Modal
+        {
+            get;
+            set;
         }
 
         #region UIViewController overrides
@@ -120,55 +126,59 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitNavigationBar()
         {
-            nextDocumentButtonItem = null;
-            previousDocumentButtonItem = null;
+            if (Modal)
+            {
+                doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+                NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
+            }
+            else
+            {
+                nextDocumentButtonItem = null;
+                previousDocumentButtonItem = null;
 
-            var rightButtons = new UIBarButtonItem[2];
+                var rightButtons = new UIBarButtonItem[2];
 
-            nextDocumentButtonItem = new UIBarButtonItem();
-            nextDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("Icons", "arrow-down.png"));
-            nextDocumentButtonItem.Clicked += (sender, e) => GoToNextDocument();
-            nextDocumentButtonItem.Enabled = false;
-            rightButtons[0] = nextDocumentButtonItem;
+                nextDocumentButtonItem = new UIBarButtonItem();
+                nextDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("Icons", "arrow-down.png"));
+                nextDocumentButtonItem.Enabled = false;
+                rightButtons[0] = nextDocumentButtonItem;
 
-            previousDocumentButtonItem = new UIBarButtonItem();
-            previousDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("Icons", "arrow-up.png"));
-            previousDocumentButtonItem.Clicked += (sender, e) => GoToPreviousDocument();
-            previousDocumentButtonItem.Enabled = false;
-            rightButtons[1] = previousDocumentButtonItem;
+                previousDocumentButtonItem = new UIBarButtonItem();
+                previousDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("Icons", "arrow-up.png"));
+                previousDocumentButtonItem.Enabled = false;
+                rightButtons[1] = previousDocumentButtonItem;
 
-            editDocumentButtonItem = new UIBarButtonItem();
-            editDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("Icons", "pencil.png"));
-            editDocumentButtonItem.Clicked += (sender, e) => EditDocument();
-            editDocumentButtonItem.Enabled = true;
+                editDocumentButtonItem = new UIBarButtonItem();
+                editDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("Icons", "pencil.png"));
+                editDocumentButtonItem.Enabled = true;
 
-            NavigationItem.SetRightBarButtonItems(rightButtons, false);
+                NavigationItem.SetRightBarButtonItems(rightButtons, false);
+            }
         }
 
         void InitStackViews()
         {
             View.BackgroundColor = UIColor.White;
 
-            scrollView = new MyScrollView
+            mainScrollView = new ActionableLayoutScrollView
             {
                 BackgroundColor = UIColor.White,
                 ShowsVerticalScrollIndicator = true,
-                ShowsHorizontalScrollIndicator = true, //TODO find a good position or remove
                 ScrollEnabled = true,
                 ScrollsToTop = true,
                 UserInteractionEnabled = true,
                 ClipsToBounds = false,
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };
-            scrollView.layoutAction = HandleLayout;
-            View.AddSubview(scrollView);
+            mainScrollView.LayoutSubviewsAction = HandleScrollViewLayoutSubviewsAction;
+            View.AddSubview(mainScrollView);
 
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, View, NSLayoutAttribute.Width, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, View, NSLayoutAttribute.Width, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
                 });
 
             stackViewBeforeContent = new UIStackView
@@ -180,21 +190,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Spacing = 0.0f,
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };
-            scrollView.AddSubview(stackViewBeforeContent);
+            mainScrollView.AddSubview(stackViewBeforeContent);
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Top, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Top, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1.0f, 0.0f),
                 });
 
-            contentView = new ContentView(scrollView);
-            scrollView.AddSubview(contentView);
-            scrollView.AddConstraints(new[]
+            contentView = new ContentView(mainScrollView);
+            mainScrollView.AddSubview(contentView);
+            mainScrollView.AddConstraints(new[]
             {
                 NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, stackViewBeforeContent, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Right, 1.0f, 0.0f),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Right, 1.0f, 0.0f),
             });
 
             stackViewAfterContent = new UIStackView
@@ -206,22 +216,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Spacing = 0.0f,
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };
-            scrollView.AddSubview(stackViewAfterContent);
+            mainScrollView.AddSubview(stackViewAfterContent);
             View.AddConstraints(new[]
                 {
                     NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, contentView, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
                 });
-            scrollView.AddGestureRecognizer(new UIPinchGestureRecognizer(HandleAction1));
         }
-
-        void HandleAction1(UIPinchGestureRecognizer gestureRecognizer) //TODO debug
-        {
-            CommonConfig.Logger.Info($"POINT: X={gestureRecognizer.LocationInView(scrollView).X}, Y={gestureRecognizer.LocationInView(scrollView).Y}");
-        }
-
 
         void InitSubViews()
         {
@@ -270,21 +273,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             subViews = viewsBeforeContent.Append(contentView).Concat(viewsAfterContent).ToList();
 
             subViews.ForEach(v => v.UpdateVisibility());
-        }
-
-        void HandleLayout(UIScrollView obj) //TODO better name and better place
-        {
-            var minimumVisibleX = obj.ContentOffset.X;
-
-            var views = new UIView[] { fromView, toView, ccView, bccView, subjectView, dateReceivedView, priorityView,
-                attachmentsListView, referenceNumberView, readByView, creatorView, originatorView };
-
-            foreach (var item in views)
-            {
-                var actualFrame = item.Frame;
-                actualFrame.X = minimumVisibleX;
-                item.Frame = actualFrame;
-            }
         }
 
         void InitToolbar()
@@ -350,8 +338,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CorrectScrollViewInsets()
         {
-            scrollView.ContentInset = new UIEdgeInsets(scrollView.ContentInset.Top, 0.0f, scrollView.ContentInset.Bottom + toolbar.Frame.Height, 0.0f);
-            scrollView.ScrollIndicatorInsets = new UIEdgeInsets(scrollView.ScrollIndicatorInsets.Top, 0.0f, scrollView.ScrollIndicatorInsets.Bottom + toolbar.Frame.Height, 0.0f);
+            mainScrollView.ContentInset = new UIEdgeInsets(mainScrollView.ContentInset.Top, 0.0f, mainScrollView.ContentInset.Bottom + toolbar.Frame.Height, 0.0f);
+            mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(mainScrollView.ScrollIndicatorInsets.Top, 0.0f, mainScrollView.ScrollIndicatorInsets.Bottom + toolbar.Frame.Height, 0.0f);
         }
 
         void InitializeHandlers()
@@ -367,6 +355,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             userActions.Clicked += DoShowUserActions;
             commentsButton.TouchUpInside += DoShowComments;
             attachmentsListView.AttachmentTapped += AttachmentsList_AttachmentTapped;
+
+            if (Modal)
+            {
+                doneButtonItem.Clicked += DoneButtonItem_Clicked; ;
+            }
+            else
+            {
+                nextDocumentButtonItem.Clicked += GoToNextDocument;
+                previousDocumentButtonItem.Clicked += GoToPreviousDocument;
+                editDocumentButtonItem.Clicked += EditDocument;
+            }
         }
 
         void DeInitializeHandlers()
@@ -382,6 +381,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             userActions.Clicked -= DoShowUserActions;
             commentsButton.TouchUpInside -= DoShowComments;
             attachmentsListView.AttachmentTapped -= AttachmentsList_AttachmentTapped;
+
+            if (Modal)
+            {
+                doneButtonItem.Clicked -= DoneButtonItem_Clicked; ;
+            }
+            else
+            {
+                nextDocumentButtonItem.Clicked -= GoToNextDocument;
+                previousDocumentButtonItem.Clicked -= GoToPreviousDocument;
+                editDocumentButtonItem.Clicked -= EditDocument;
+            }
         }
 
         #endregion
@@ -417,7 +427,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
 
-                //TODO need to close the view controller eventually
+                if (Modal)
+                {
+                    DismissViewController(true, null);
+                }
+                else
+                {
+                    NavigationController.PopViewController(true);
+                }
             }
         }
 
@@ -571,27 +588,49 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(composeDocumentNavigationController, true, null);
         }
 
-        void GoToNextDocument()
+        void GoToNextDocument(object sender, EventArgs args)
         {
             //TODO
         }
 
-        void GoToPreviousDocument()
+        void GoToPreviousDocument(object sender, EventArgs args)
         {
             //TODO
         }
 
-        void EditDocument()
+        void EditDocument(object sender, EventArgs args)
         {
             //TODO
+        }
+
+        void DoneButtonItem_Clicked(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
         }
 
         #endregion
+
+
+        void HandleScrollViewLayoutSubviewsAction(UIScrollView scrollView) //TODO better place
+        {
+            //Used to keep the views before and after the content anchored to the scrollView
+            var minimumVisibleX = scrollView.ContentOffset.X;
+
+            var views = new UIView[] { stackViewBeforeContent, stackViewAfterContent };
+
+            foreach (var item in views)
+            {
+                var actualFrame = item.Frame;
+                actualFrame.X = minimumVisibleX;
+                item.Frame = actualFrame;
+            }
+        }
+
     }
 
-    public class MyScrollView : UIScrollView //TODO find better name and maybe place
+    public class ActionableLayoutScrollView : UIScrollView //TODO better name?
     {
-        public Action<UIScrollView> layoutAction
+        public Action<UIScrollView> LayoutSubviewsAction
         {
             get;
             set;
@@ -600,9 +639,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void LayoutSubviews()
         {
             base.LayoutSubviews();
-            if (layoutAction != null)
+            if (LayoutSubviewsAction != null)
             {
-                layoutAction(this);
+                LayoutSubviewsAction(this);
             }
         }
     }
