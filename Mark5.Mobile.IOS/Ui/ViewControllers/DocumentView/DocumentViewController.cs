@@ -39,13 +39,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             set;
         }
 
-        public GetPreviousDocumentIdDelegate GetPreviousDocumentId
+        public GetPreviousDocumentPreviewDelegate GetPreviousDocumentId
         {
             get;
             set;
         }
 
-        public GetNextDocumentIdDelegate GetNextDocumentId
+        public GetNextDocumentPreviewDelegate GetNextDocumentId
         {
             get;
             set;
@@ -99,10 +99,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UIDocumentInteractionController attachmentInteractionController;
 
-
-
-        public delegate int? GetPreviousDocumentIdDelegate(DocumentPreview documentPreview, out bool nextDocumentAvailable, out bool previousDocumentAvailable, bool scrollAndSelect = false);
-        public delegate int? GetNextDocumentIdDelegate(DocumentPreview documentPreview, out bool nextDocumentAvailable, out bool previousDocumentAvailable, bool scrollAndSelect = false);
+        public delegate DocumentPreview GetPreviousDocumentPreviewDelegate(DocumentPreview documentPreview, out bool nextDocumentAvailable, out bool previousDocumentAvailable, bool scrollAndSelect = false);
+        public delegate DocumentPreview GetNextDocumentPreviewDelegate(DocumentPreview documentPreview, out bool nextDocumentAvailable, out bool previousDocumentAvailable, bool scrollAndSelect = false);
 
         #region UIViewController overrides
 
@@ -122,13 +120,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeHandlers();
             CorrectToolbar();
-
-            RefreshData();
         }
 
-        public override void ViewDidAppear(bool animated)
+        public override async void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
+
+            await RefreshData();
 
             CorrectScrollViewInsets();
         }
@@ -425,45 +423,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public async void Reload()
         {
-
             Reset();
-
             await RefreshData();
         }
 
-        //void Reset() //TODO start from here tomorrow
-        //{
-        //    loadDocumentCancellationTokenSource?.Cancel();
-        //    loadDocumentCancellationTokenSource = null;
-        //    loadAttachmentCancellationTokenSource?.Cancel();
-        //    loadAttachmentCancellationTokenSource = null;
-        //    changeReadStatusCancellationTokenSource?.Cancel();
-        //    changeReadStatusCancellationTokenSource = null;
+        void Reset()
+        {
+            //TODO what about cancellation tokens
 
-        //    loadDocumentCancellationTokenSource = new CancellationTokenSource();
-        //    loadAttachmentCancellationTokenSource = new CancellationTokenSource();
-        //    changeReadStatusCancellationTokenSource = new CancellationTokenSource();
+            NavigationController.SetNavigationBarHidden(false, true);
+            mainScrollView.SetContentOffset(new CGPoint(0, -mainScrollView.ContentInset.Top), false);
 
-        //    NavigationController.SetNavigationBarHidden(false, true);
-        //    ScrollView.SetContentOffset(new CGPoint(0, -ScrollView.ContentInset.Top), false);
+            nextDocumentButtonItem.Enabled = false;
+            previousDocumentButtonItem.Enabled = false;
 
-        //    nextDocumentButtonItem.Enabled = false;
-        //    previousDocumentButtonItem.Enabled = false;
+            var rightButtons = new UIBarButtonItem[2];
+            rightButtons[0] = nextDocumentButtonItem;
+            rightButtons[1] = previousDocumentButtonItem;
+            NavigationItem.SetRightBarButtonItems(rightButtons, true);
 
-        //    var rightButtons = new UIBarButtonItem[2];
-        //    rightButtons[0] = nextDocumentButtonItem;
-        //    rightButtons[1] = previousDocumentButtonItem;
-        //    NavigationItem.SetRightBarButtonItems(rightButtons, true);
-
-        //    flag.Enabled = false;
-        //    fileTo.Enabled = false;
-        //    replyActions.Enabled = false;
-        //    comments.SetBadgeValue("0", false);
-        //    comments.Enabled = false;
-        //    commentsButton.Enabled = false;
-        //    userActions.Enabled = false;
-        //}
-
+            flag.Enabled = false;
+            fileTo.Enabled = false;
+            replyActions.Enabled = false;
+            comments.SetBadgeValue("0", false);
+            comments.Enabled = false;
+            commentsButton.Enabled = false;
+            userActions.Enabled = false;
+        }
 
         async Task RefreshData()
         {
@@ -523,6 +509,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             subViews.ForEach(v => v.UpdateVisibility());
 
+            flag.Enabled = true;
+            fileTo.Enabled = true;
+            replyActions.Enabled = true;
+            comments.BadgeValue = DocumentPreview.CommentsCount.ToString();
+            comments.Enabled = true;
+            commentsButton.Enabled = true;
+            userActions.Enabled = true;
+
             UIView.Animate(0.075d, stackViewBeforeContent.LayoutIfNeeded);
             UIView.Animate(0.1d, () => stackViewBeforeContent.Alpha = 1.0f);
             UIView.Animate(0.075d, stackViewAfterContent.LayoutIfNeeded);
@@ -568,14 +562,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (!previewSuccessful)
                 {
-
                     CommonConfig.Logger.Info(string.Format("Failed to present preview for attachment. Presenting open with instead. [documentId={0}, attachment={1}]", Document.Id, attachmentDescription));
                 }
                 var openInSuccessful = attachmentInteractionController.PresentOpenInMenu(View.Frame, View, true);
                 if (!openInSuccessful)
                 {
                     CommonConfig.Logger.Warning(string.Format("Failed to present open in view - there is no app that can open this type of attachment installed. [documentId={0}, attachment={1}]", Document.Id, attachmentDescription));
-
                     await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
                 }
             }
@@ -673,12 +665,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             DocumentPreview = null;
             Document = null;
-            Folder = null;
-            FolderId = null;
-            DocumentId = null; //TODO can this be put in a common function?
+            DocumentId = null;
 
             bool previousAvailable, nextAvailable;
-            DocumentId = GetNextDocumentId(DocumentPreview, out previousAvailable, out nextAvailable, true);
+            DocumentPreview = GetNextDocumentId(DocumentPreview, out previousAvailable, out nextAvailable, true);
 
             if (DocumentPreview == null)
             {
