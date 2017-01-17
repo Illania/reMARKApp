@@ -43,6 +43,11 @@ namespace Mark5.Mobile.IOS
         {
             try
             {
+
+
+
+
+
                 var startupTime = new Stopwatch();
                 startupTime.Start();
 
@@ -93,6 +98,11 @@ namespace Mark5.Mobile.IOS
             CommonConfig.Logger.Info($"Received APNS token: {deviceToken}");
 
             var newToken = deviceToken.ToString();
+
+
+
+
+
             var oldToken = PlatformConfig.Preferences.PushNotificationToken;
             PlatformConfig.Preferences.PushNotificationToken = newToken;
 
