@@ -107,7 +107,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         [Export("scrollViewWillBeginZooming:withView:")]
         public void ZoomingStarted(UIScrollView scrollView, UIView view)
         {
-            // webView.RemoveConstraint(widthConstraint);
+            webView.RemoveConstraint(widthConstraint);
             actualZoomScaleBeforeZooming = scrollView.ZoomScale;
         }
 
@@ -127,9 +127,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
                mainScrollView.ContentOffset = scrollViewOffset;
 
-               //  webView.AddConstraint(widthConstraint);
+               webView.AddConstraint(widthConstraint);
            });
         }
+
+        //TODO v1: content offset working, no zoom out: right constraint on content view, 
+        //TODO v2: zoom out working, no right content offset: width constraint on content view, remove/add width constraint on webviews
 
         #endregion
 
