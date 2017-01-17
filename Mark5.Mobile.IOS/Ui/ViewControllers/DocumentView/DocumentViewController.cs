@@ -65,7 +65,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem doneButtonItem;
         UIBarButtonItem previousDocumentButtonItem;
         UIBarButtonItem nextDocumentButtonItem;
-        UIBarButtonItem editDocumentButtonItem;
 
         ActionableLayoutScrollView mainScrollView;
         UIStackView stackViewBeforeContent;
@@ -166,9 +165,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 previousDocumentButtonItem.Enabled = false;
                 rightButtons[1] = previousDocumentButtonItem;
 
-                editDocumentButtonItem = new UIBarButtonItem();
-                editDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("Icons", "pencil.png"));
-                editDocumentButtonItem.Enabled = true;
+                //TODO I removed the edit button, because I think we should do it as in Android. So if we tap on a local document, we get the compose view directly
 
                 NavigationItem.SetRightBarButtonItems(rightButtons, false);
             }
@@ -384,7 +381,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 nextDocumentButtonItem.Clicked += GoToNextDocument;
                 previousDocumentButtonItem.Clicked += GoToPreviousDocument;
-                editDocumentButtonItem.Clicked += EditDocument;
             }
         }
 
@@ -413,7 +409,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 nextDocumentButtonItem.Clicked -= GoToNextDocument;
                 previousDocumentButtonItem.Clicked -= GoToPreviousDocument;
-                editDocumentButtonItem.Clicked -= EditDocument;
             }
         }
 
