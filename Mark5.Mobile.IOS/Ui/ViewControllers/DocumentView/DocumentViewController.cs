@@ -16,7 +16,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Ui.ViewControllers.Common.StackView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews;
 using Mark5.Mobile.IOS.Utilities.UserInterface;
 using UIKit;
@@ -26,6 +25,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
     public class DocumentViewController : UIViewController, ISecondaryViewController
     {
+        static UIBarButtonItem FlexibleSpace
+        {
+            get
+            {
+                return new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace);
+            }
+        }
+
+        public bool Modal
+        {
+            get;
+            set;
+        }
+
+        public GetPreviousDocumentIdDelegate GetPreviousDocumentId
+        {
+            get;
+            set;
+        }
+
+        public GetNextDocumentIdDelegate GetNextDocumentId
+        {
+            get;
+            set;
+        }
+
         public bool Empty { get { return true; } }
 
         public int? FolderId { get; set; }
@@ -46,7 +71,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIStackView stackViewBeforeContent;
         UIStackView stackViewAfterContent;
 
-        FromView fromView; //TODO add view to the name?
+        FromView fromView;
         ToView toView;
         CcView ccView;
         BccView bccView;
@@ -74,19 +99,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UIDocumentInteractionController attachmentInteractionController;
 
-        static UIBarButtonItem FlexibleSpace
-        {
-            get
-            {
-                return new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace);
-            }
-        }
 
-        public bool Modal
-        {
-            get;
-            set;
-        }
+
+        public delegate int? GetPreviousDocumentIdDelegate(DocumentPreview documentPreview, out bool nextDocumentAvailable, out bool previousDocumentAvailable, bool scrollAndSelect = false);
+        public delegate int? GetNextDocumentIdDelegate(DocumentPreview documentPreview, out bool nextDocumentAvailable, out bool previousDocumentAvailable, bool scrollAndSelect = false);
 
         #region UIViewController overrides
 
@@ -407,6 +423,48 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Refresh methods
 
+        public async void Reload()
+        {
+
+            Reset();
+
+            await RefreshData();
+        }
+
+        //void Reset() //TODO start from here tomorrow
+        //{
+        //    loadDocumentCancellationTokenSource?.Cancel();
+        //    loadDocumentCancellationTokenSource = null;
+        //    loadAttachmentCancellationTokenSource?.Cancel();
+        //    loadAttachmentCancellationTokenSource = null;
+        //    changeReadStatusCancellationTokenSource?.Cancel();
+        //    changeReadStatusCancellationTokenSource = null;
+
+        //    loadDocumentCancellationTokenSource = new CancellationTokenSource();
+        //    loadAttachmentCancellationTokenSource = new CancellationTokenSource();
+        //    changeReadStatusCancellationTokenSource = new CancellationTokenSource();
+
+        //    NavigationController.SetNavigationBarHidden(false, true);
+        //    ScrollView.SetContentOffset(new CGPoint(0, -ScrollView.ContentInset.Top), false);
+
+        //    nextDocumentButtonItem.Enabled = false;
+        //    previousDocumentButtonItem.Enabled = false;
+
+        //    var rightButtons = new UIBarButtonItem[2];
+        //    rightButtons[0] = nextDocumentButtonItem;
+        //    rightButtons[1] = previousDocumentButtonItem;
+        //    NavigationItem.SetRightBarButtonItems(rightButtons, true);
+
+        //    flag.Enabled = false;
+        //    fileTo.Enabled = false;
+        //    replyActions.Enabled = false;
+        //    comments.SetBadgeValue("0", false);
+        //    comments.Enabled = false;
+        //    commentsButton.Enabled = false;
+        //    userActions.Enabled = false;
+        //}
+
+
         async Task RefreshData()
         {
             try
@@ -613,7 +671,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void GoToNextDocument(object sender, EventArgs args)
         {
-            //TODO
+            DocumentPreview = null;
+            Document = null;
+            Folder = null;
+            FolderId = null;
+            DocumentId = null; //TODO can this be put in a common function?
+
+            bool previousAvailable, nextAvailable;
+            DocumentId = GetNextDocumentId(DocumentPreview, out previousAvailable, out nextAvailable, true);
+
+            if (DocumentPreview == null)
+            {
+                nextDocumentButtonItem.Enabled = false;
+                previousDocumentButtonItem.Enabled = false;
+                return;
+            }
+
+            Reload();
         }
 
         void GoToPreviousDocument(object sender, EventArgs args)
@@ -727,7 +801,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
     }
 
-    public class ActionableLayoutScrollView : UIScrollView //TODO better name?
+    public class ActionableLayoutScrollView : UIScrollView
     {
         public Action<UIScrollView> LayoutSubviewsAction
         {

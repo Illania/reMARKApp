@@ -123,4 +123,9 @@
 "attachments" = "Attachments";
 "marking_document_as_read___" = "Marking document as read...";
 "marking_document_as_unread___" = "Marking document as unread...";
-
+"downloading_attachment___" = "Downloading attachment...";
+"opening_attachment___" = "Opening attachment...";
+"big_attachment_title" = "Big attachment";
+"big_attachment_warning" = "This attachment is {0} large. Do you still want to download this file?"
+"cannot_open_attachment_title" = "Cannot open attachment";
+"cannot_open_attachment_content" = "There is no app installed that can open this file.";
