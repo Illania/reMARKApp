@@ -39,13 +39,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             set;
         }
 
-        public GetPreviousDocumentPreviewDelegate GetPreviousDocumentId
+        public GetPreviousDocumentPreviewDelegate GetPreviousDocumentPreview
         {
             get;
             set;
         }
 
-        public GetNextDocumentPreviewDelegate GetNextDocumentId
+        public GetNextDocumentPreviewDelegate GetNextDocumentPreview
         {
             get;
             set;
@@ -416,7 +416,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Refresh methods
 
-        public async void Reload()
+        public async Task Reload()
         {
             Reset();
             await RefreshData();
@@ -656,14 +656,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region NavigationBar event handlers
 
-        void GoToNextDocument(object sender, EventArgs args)
+        async void GoToNextDocument(object sender, EventArgs args)
         {
             DocumentPreview = null;
             Document = null;
             DocumentId = null;
 
             bool previousAvailable, nextAvailable;
-            DocumentPreview = GetNextDocumentId(DocumentPreview, out previousAvailable, out nextAvailable, true);
+            DocumentPreview = GetNextDocumentPreview(DocumentPreview, out previousAvailable, out nextAvailable, true);
 
             if (DocumentPreview == null)
             {
@@ -672,17 +672,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
             }
 
-            Reload();
+            await Reload();
         }
 
-        void GoToPreviousDocument(object sender, EventArgs args)
+        async void GoToPreviousDocument(object sender, EventArgs args)
         {
-            //TODO
-        }
+            DocumentPreview = null;
+            Document = null;
+            DocumentId = null;
 
-        void EditDocument(object sender, EventArgs args)
-        {
-            //TODO
+            bool previousAvailable, nextAvailable;
+            DocumentPreview = GetPreviousDocumentPreview(DocumentPreview, out previousAvailable, out nextAvailable, true);
+
+            if (DocumentPreview == null)
+            {
+                nextDocumentButtonItem.Enabled = false;
+                previousDocumentButtonItem.Enabled = false;
+                return;
+            }
+
+            await Reload();
         }
 
         void DoneButtonItem_Clicked(object sender, EventArgs e)
