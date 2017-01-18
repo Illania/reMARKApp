@@ -264,6 +264,7 @@
     <Compile Include="Ui\TableViewCells\ContactsTableViewCell.designer.cs">
       <DependentUpon>ContactsTableViewCell.cs</DependentUpon>
     </Compile>
+    <Compile Include="Ui\ViewControllers\ShortcodesListViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
