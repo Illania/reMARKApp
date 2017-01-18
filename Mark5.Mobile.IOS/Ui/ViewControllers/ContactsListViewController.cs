@@ -65,9 +65,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeHandlers();
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        public override async void ViewDidAppear(bool animated)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        public override void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
@@ -75,7 +73,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var ds = (DataSource)contactsTableView.Source;
             if (ds.Empty)
-                await RefreshData();
+                RefreshData();
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -114,7 +112,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             contactsTableView = new UITableView();
             contactsTableView.ClipsToBounds = false;
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-            contactsTableView.Source = new DataSource(this, contactsTableView, async (startId) => await RefreshData(startId), Localization.GetString("folder_empty"));
+            contactsTableView.Source = new DataSource(this, contactsTableView, (startId) => RefreshData(startId), Localization.GetString("folder_empty"));
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
             contactsTableView.RowHeight = UITableView.AutomaticDimension;
             contactsTableView.EstimatedRowHeight = 75f;
@@ -247,8 +245,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 || Folder.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, null)); // TODO
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, null)); // TODO
-
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static
                 || Folder.InternalType == FolderInternalType.Worktray)
@@ -270,9 +266,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Refreshing
 
-        async void RefreshControl_ValueChanged(object sender, EventArgs e) => await RefreshData(forceClear: true);
+        void RefreshControl_ValueChanged(object sender, EventArgs e) => RefreshData(forceClear: true);
 
-        async Task RefreshData(int startRowId = -1, bool forceClear = false)
+        void RefreshData(int startRowId = -1, bool forceClear = false)
         {
             if (refreshing) return;
 
@@ -398,7 +394,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         class DataSource : UITableViewSource, IDisposable
         {
 
-            static readonly nfloat Height = 44f;
+            static readonly nfloat Height = 65f;
 
             public bool Empty
             {
@@ -449,12 +445,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var cp = contactPreviewsInView[indexPath.Row];
 
-                // TODO
-                //var cell = tableView.DequeueReusableCell(ContactsTableViewCell.Key) as ContactsTableViewCell ?? ContactsTableViewCell.Create();
-                //cell.Initialize(cp);
-
-                var cell = tableView.DequeueReusableCell("key") as UITableViewCell ?? new UITableViewCell(UITableViewCellStyle.Default, "key");
-                cell.TextLabel.Text = cp.Name;
+                var cell = tableView.DequeueReusableCell(ContactsTableViewCell.Key) as ContactsTableViewCell ?? ContactsTableViewCell.Create();
+                cell.Initialize(cp);
 
                 return cell;
             }

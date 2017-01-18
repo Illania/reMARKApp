@@ -34,11 +34,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static DocumentsTableViewCell Create()
         {
             var cell = (DocumentsTableViewCell)Nib.Instantiate(null, null)[0];
-
             cell.SenderNameLabel.Font = Theme.DefaultBoldFont;
             cell.DateReceivedLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
             cell.MessagePreviewLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
-
             return cell;
         }
 
