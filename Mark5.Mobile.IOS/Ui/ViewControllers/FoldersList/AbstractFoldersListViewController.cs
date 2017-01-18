@@ -729,7 +729,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (foldersInView.Count < 1)
                 {
-                    var emptyCell = tableView.DequeueReusableCell(WaitTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
                     emptyCell.Initialize(Localization.GetString("no_folders_in_section"));
                     return emptyCell;
                 }
@@ -745,7 +745,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var folderIsCached = false;
                 CachingStatus.TryGetValue(f.Id, out folderIsCached);
 
-                cell.Initialize(f, false, folderIsCached);
+                cell.Initialize(f, folderIsCached);
 
                 return cell;
             }
@@ -984,11 +984,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 }
 
                 var f = foldersInView[indexPath.LongSection][indexPath.Row];
-                var sectionIsFavorites = Section.Favorites == indexPath.LongSection;
                 var folderIsCached = false;
                 CachingStatus.TryGetValue(f.Id, out folderIsCached);
 
-                cell.Initialize(f, sectionIsFavorites, folderIsCached);
+                cell.Initialize(f, folderIsCached);
 
                 return cell;
             }

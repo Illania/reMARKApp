@@ -41,7 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         {
         }
 
-        public void Initialize(Folder folder, bool sectionIsFavorites, bool folderIsOffline)
+        public void Initialize(Folder folder, bool folderIsOffline)
         {
             this.folder = folder;
 
