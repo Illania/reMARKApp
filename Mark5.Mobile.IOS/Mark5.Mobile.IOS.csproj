@@ -161,6 +161,7 @@
     <Folder Include="Model\" />
     <Folder Include="Ui\ViewControllers\FoldersList\" />
     <Folder Include="Ui\TableViewCells\" />
+    <Folder Include="Ui\Common\HubMessages\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -270,6 +271,8 @@
     <Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.designer.cs">
       <DependentUpon>ShortcodesTableViewCell.cs</DependentUpon>
     </Compile>
+    <Compile Include="Ui\ViewControllers\FoldersList\CopyMoveToFolderListViewController.cs" />
+    <Compile Include="Ui\Common\HubMessages\EntityMovedFromFolderMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
@@ -279,6 +282,10 @@
     <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
       <Project>{8161E607-C6EA-4BB8-B801-EE9D128240CB}</Project>
       <Name>Mark5.Mobile.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TinyMessenger\TinyMessenger.csproj">
+      <Project>{26873336-60F0-4734-8286-A1ECC902AB95}</Project>
+      <Name>TinyMessenger</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -424,6 +431,7 @@
     <BundleResource Include="Resources\Settings.bundle\Root.inApp.plist" />
     <BundleResource Include="Resources\Settings.bundle\ContactSectionsVisibility.inApp.plist" />
     <BundleResource Include="Resources\Settings.bundle\en.lproj\ContactSectionsVisibility.strings" />
+    <BundleResource Include="Resources\Base.lproj\Localizable.stringsdict" />
   </ItemGroup>
   <ItemGroup>
     <XamarinComponentReference Include="InAppSettingsKit">

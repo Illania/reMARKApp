@@ -34,8 +34,8 @@
 	<string name="confirm_change_draft">Do you want save the changes?</string>
 	<string name="confirm_comment_deletion_content">Are you sure you want to delete the comment?</string>
 	<string name="confirm_comment_deletion_title">Delete comment</string>
-	<string name="confirm_copy_to_folder">Confirm copy to folder</string>
-	<string name="confirm_move_to_folder">Confirm move to folder</string>
+	<string name="confirm_copy_to_folder">Copy</string>
+	<string name="confirm_move_to_folder">Move</string>
 	<string name="confirm_save_as_draft">Do you want to save the document as draft?</string>
 	<string name="confirm_save_modified_document">Do you want to save the modified document?</string>
 	<string name="connection_status">Connection status</string>

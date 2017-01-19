@@ -7,8 +7,11 @@
 "clear_shortcodes_cache_title" = "Clear shortcodes cache";
 "clearing_contacts_cache___" = "Clearing cache...";
 "clearing_shortcodes_cache___" = "Clearing cache...";
+"confirm_copy_to_folder" = "Copy";
+"confirm_move_to_folder" = "Move";
 "contacts" = "Contacts";
 "continue" = "Continue";
+"copying___" = "Copying...";
 "copy_to_folder" = "Copy to folder";
 "copy_to_worktray" = "Copy to worktray";
 "creating_system_report___" = "Creating system report...";
@@ -45,6 +48,7 @@
 "mark_as_read" = "Mark as read";
 "mark_as_unread" = "Mark as unread";
 "more" = "More";
+"moving___" = "Moving...";
 "move_to_folder" = "Move to folder";
 "no" = "No";
 "no_folders_found" = "No folders found";

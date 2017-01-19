@@ -158,7 +158,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-        void InitializeNavigationBar()
+        protected virtual void InitializeNavigationBar()
         {
             if (DisableNavigationBarActions) return;
 

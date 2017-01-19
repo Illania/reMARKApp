@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+	    <key>confirm_copy_to_folder_documents</key>
+	    <dict>
+	        <key>NSStringLocalizedFormatKey</key>
+	        <string>%#@value@</string>
+	        <key>value</key>
+	        <dict>
+	            <key>NSStringFormatSpecTypeKey</key>
+	            <string>NSStringPluralRuleType</string>
+	            <key>NSStringFormatValueTypeKey</key>
+	            <string>d</string>
+	            <key>one</key>
+	            <string>Do you want to copy one document?</string>
+	            <key>other</key>
+	            <string>Do you want to copy %d documents?</string>
+	        </dict>
+	    </dict>
+	</dict>
+	<dict>
+	    <key>confirm_copy_to_folder_contacts</key>
+	    <dict>
+	        <key>NSStringLocalizedFormatKey</key>
+	        <string>%#@value@</string>
+	        <key>value</key>
+	        <dict>
+	            <key>NSStringFormatSpecTypeKey</key>
+	            <string>NSStringPluralRuleType</string>
+	            <key>NSStringFormatValueTypeKey</key>
+	            <string>d</string>
+	            <key>one</key>
+	            <string>Do you want to copy one contact?</string>
+	            <key>other</key>
+	            <string>Do you want to copy %d contacts?</string>
+	        </dict>
+	    </dict>
+	</dict>
+	<dict>
+	    <key>confirm_copy_to_folder_shortcodes</key>
+	    <dict>
+	        <key>NSStringLocalizedFormatKey</key>
+	        <string>%#@value@</string>
+	        <key>value</key>
+	        <dict>
+	            <key>NSStringFormatSpecTypeKey</key>
+	            <string>NSStringPluralRuleType</string>
+	            <key>NSStringFormatValueTypeKey</key>
+	            <string>d</string>
+	            <key>one</key>
+	            <string>Do you want to copy one shortcode?</string>
+	            <key>other</key>
+	            <string>Do you want to copy %d shortcodes?</string>
+	        </dict>
+	    </dict>
+	</dict>
+</plist>
