@@ -179,6 +179,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 BackgroundColor = UIColor.White,
                 ShowsVerticalScrollIndicator = true,
+                ShowsHorizontalScrollIndicator = false,
                 ScrollEnabled = true,
                 ScrollsToTop = true,
                 UserInteractionEnabled = true,
@@ -191,7 +192,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, View, NSLayoutAttribute.Width, 1.0f, 0.0f),
+                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
                 });
 
@@ -213,13 +214,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 });
 
             contentView = new ContentView(mainScrollView);
+            var rightConstraint = NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Right, 1.0f, 0.0f);
+            var widthConstraintInitial = NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, mainScrollView, NSLayoutAttribute.Width, 1.0f, 0.0f);
+            var widthConstraint = NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, 1.0f);
+
+            contentView.ExternalInitialWidthConstraint = widthConstraintInitial;
+            contentView.ExternalRightConstraint = rightConstraint;
+            contentView.ExternalWidthConstraint = widthConstraint;
             mainScrollView.AddSubview(contentView);
             mainScrollView.AddConstraints(new[]
             {
                 NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, stackViewBeforeContent, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
                 NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Right, 1.0f, 0.0f),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, mainScrollView, NSLayoutAttribute.Width, 1.0f, 0.0f),
+                rightConstraint,
+                widthConstraintInitial,
+                widthConstraint,
             });
 
             stackViewAfterContent = new UIStackView
@@ -583,6 +592,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void HandleRecipentTapped(object sender, RecipentTappedEventArgs e)
         {
             //TODO
+            contentView.SetMinimumScale();
         }
 
         #endregion
