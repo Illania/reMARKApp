@@ -41,6 +41,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var vc = new ContactsListViewController { Folder = folder };
                 NavigationController.PushViewController(vc, true);
             }
+
+            if (folder.Module == ModuleType.Shortcodes)
+            {
+                var vc = new ShortcodesListViewController { Folder = folder };
+                NavigationController.PushViewController(vc, true);
+            }
         }
 
         protected override void FolderExpand(Folder folder)
