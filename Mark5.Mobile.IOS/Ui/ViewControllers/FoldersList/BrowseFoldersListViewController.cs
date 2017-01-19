@@ -29,6 +29,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected override void FolderSelected(Folder folder)
         {
             base.FolderSelected(folder);
+
+            if (folder.Module == ModuleType.Documents)
+            {
+                var vc = new DocumentsListViewController { Folder = folder };
+                NavigationController.PushViewController(vc, true);
+            }
+
+            if (folder.Module == ModuleType.Contacts)
+            {
+                var vc = new ContactsListViewController { Folder = folder };
+                NavigationController.PushViewController(vc, true);
+            }
+
+            if (folder.Module == ModuleType.Shortcodes)
+            {
+                var vc = new ShortcodesListViewController { Folder = folder };
+                NavigationController.PushViewController(vc, true);
+            }
         }
 
         protected override void FolderExpand(Folder folder)
