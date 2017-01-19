@@ -133,24 +133,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             mainScrollView.ContentOffset = scrollViewOffset;
 
             actualZoomScaleBeforeZooming = scrollView.ZoomScale;
-        }
 
-        [Export("scrollViewDidEndZooming:withView:atScale:")]
-        public void ZoomingEnded(UIScrollView scrollView, UIView withView, nfloat atScale)
-        {
-            BeginInvokeOnMainThread(() =>
-           {
-               //var zoomScaleRatio = scrollView.ZoomScale / actualZoomScaleBeforeZooming;
-
-               //heightConstraint.Constant = (initialHeight / initialZoom) * scrollView.ZoomScale;
-               //widthConstraint.Constant = (initialWidth / initialZoom) * scrollView.ZoomScale;
-
-               //var scrollViewOffset = mainScrollView.ContentOffset;
-               //scrollViewOffset.X += centerGestureStartX * (zoomScaleRatio - 1);
-               //scrollViewOffset.Y += centerGestureStartY * (zoomScaleRatio - 1);
-
-               //mainScrollView.ContentOffset = scrollViewOffset;
-           });
+            var of = scrollView.ContentOffset;
+            of.X = 0;
+            of.Y = 0;
+            scrollView.ContentOffset = of;
         }
 
         #endregion
@@ -167,7 +154,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         #region Gesture Recognizer handlers
 
-        void HandlePinch(UIPinchGestureRecognizer gestureRecognizer) //TODO can be improved
+        void HandlePinch(UIPinchGestureRecognizer gestureRecognizer)
         {
             if (gestureRecognizer.State == UIGestureRecognizerState.Began)
             {
@@ -178,7 +165,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         void HandleTap(UITapGestureRecognizer gestureRecognizer)
         {
-            centerGestureStartX = gestureRecognizer.LocationInView(webView.ScrollView).X; //TODO works worse than the pinch
+            centerGestureStartX = gestureRecognizer.LocationInView(webView.ScrollView).X;
             centerGestureStartY = gestureRecognizer.LocationInView(webView.ScrollView).Y;
         }
 
