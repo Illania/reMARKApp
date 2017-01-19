@@ -22,7 +22,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    
+
     public class DocumentsListViewController : UIViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
     {
 
@@ -127,8 +127,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             documentsTableView = new UITableView();
             documentsTableView.ClipsToBounds = false;
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void            documentsTableView.Source = new DataSource(this, documentsTableView, async (startId) => await RefreshData(startId), Localization.GetString("folder_empty"), PlatformConfig.Preferences.CompactDocumentsList);
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void            documentsTableView.RowHeight = UITableView.AutomaticDimension;
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+            documentsTableView.Source = new DataSource(this, documentsTableView, async (startId) => await RefreshData(startId), Localization.GetString("folder_empty"), PlatformConfig.Preferences.CompactDocumentsList);
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+
+            documentsTableView.RowHeight = UITableView.AutomaticDimension;
             documentsTableView.EstimatedRowHeight = 75f;
             documentsTableView.AllowsSelectionDuringEditing = false;
             documentsTableView.AllowsMultipleSelectionDuringEditing = true;
@@ -190,7 +194,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (editItem != null)
                 editItem.Clicked += EditItem_Clicked;
-            
+
             if (refreshControl != null)
                 refreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
@@ -216,7 +220,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void DocumentSelected(DocumentPreview documentPreview)
         {
-            // TODO
+            var documentViewController = new DocumentViewController
+            {
+                DocumentPreview = documentPreview,
+                Folder = Folder
+            };
+            NavigationController.PushViewController(documentViewController, true);
         }
 
         [Export("longPressed:")]
@@ -298,8 +307,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void MarkAsRead(DocumentPreview documentPreview, NSIndexPath row) => MarkAsRead(new List<DocumentPreview> { documentPreview }, new[] { row });
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void        async void MarkAsRead(List<DocumentPreview> documentPreviews, NSIndexPath[] rows)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void        {
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void MarkAsRead(List<DocumentPreview> documentPreviews, NSIndexPath[] rows)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
             CommonConfig.Logger.Info($"Attempting to mark as read [documentPreviews={documentPreviews.Count}]...");
 
             try
@@ -317,8 +328,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void MarkAsUnread(DocumentPreview documentPreview, NSIndexPath row) => MarkAsUnread(new List<DocumentPreview> { documentPreview }, new[] { row });
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void        async void MarkAsUnread(List<DocumentPreview> documentPreviews, NSIndexPath[] rows)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void        {
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void MarkAsUnread(List<DocumentPreview> documentPreviews, NSIndexPath[] rows)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
             CommonConfig.Logger.Info($"Attempting to mark as unread [documentPreviews={documentPreviews.Count}]...");
 
             try
@@ -571,7 +584,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            public override nint RowsInSection(UITableView tableview, nint section) 
+            public override nint RowsInSection(UITableView tableview, nint section)
             {
                 if (loading)
                     return 1;
@@ -668,7 +681,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class AutoRefreshWorker : NSObject
         {
-            
             CancellationTokenSource cts;
 
             readonly Func<int, Task> work;
@@ -699,7 +711,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                             var first = firstOrDefaultItem();
                             if (first != null)
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void                                InvokeOnMainThread(async () => await work(first.Id));
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+                                InvokeOnMainThread(async () => await work(first.Id));
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
                         }
                     });
