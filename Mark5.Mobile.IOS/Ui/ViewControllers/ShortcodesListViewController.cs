@@ -25,8 +25,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class ShortcodesListViewController : UIViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
     {
 
-        const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
-
         public Folder Folder { get; set; }
 
         UIBarButtonItem exitEditItem;
@@ -425,12 +423,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var sp = shortcodePreviewsInView[indexPath.Row];
 
-                //var cell = tableView.DequeueReusableCell(ShortcodesTableViewCell.Key) as ShortcodesTableViewCell ?? ShortcodesTableViewCell.Create();
-                //cell.Initialize(sp);
-
-                var cell = tableView.DequeueReusableCell("key") as UITableViewCell ?? new UITableViewCell(UITableViewCellStyle.Default, "key");
-                cell.TextLabel.Text = sp.Name;
-
+                var cell = tableView.DequeueReusableCell(ShortcodesTableViewCell.Key) as ShortcodesTableViewCell ?? ShortcodesTableViewCell.Create();
+                cell.Initialize(sp);
                 return cell;
             }
 

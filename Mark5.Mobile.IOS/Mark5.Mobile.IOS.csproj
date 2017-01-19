@@ -173,6 +173,7 @@
     <InterfaceDefinition Include="Ui\TableViewCells\DocumentsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\ExternalDocumentsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\ContactsTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\ShortcodesTableViewCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -265,6 +266,10 @@
       <DependentUpon>ContactsTableViewCell.cs</DependentUpon>
     </Compile>
     <Compile Include="Ui\ViewControllers\ShortcodesListViewController.cs" />
+    <Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.designer.cs">
+      <DependentUpon>ShortcodesTableViewCell.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
