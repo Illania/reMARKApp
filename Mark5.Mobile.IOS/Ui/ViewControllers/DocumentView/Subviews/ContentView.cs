@@ -33,7 +33,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         UIScrollView mainScrollView;
         public NSLayoutConstraint ExternalInitialWidthConstraint;
-        public NSLayoutConstraint ExternalWidthConstraint;
         public NSLayoutConstraint ExternalRightConstraint;
 
         public ContentView(UIScrollView mainScroll)
@@ -74,7 +73,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             ContainerView.AddConstraints(new[]
                 {
                     heightConstraint,
-                    //widthConstraint,
+                    widthConstraint,
                     NSLayoutConstraint.Create(webView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1.0f, VerticalMargin),
                     NSLayoutConstraint.Create(webView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1.0f, HorizontalMargin),
                     NSLayoutConstraint.Create(webView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1.0f, -VerticalMargin),
@@ -108,29 +107,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         [Export("scrollViewWillBeginZooming:withView:")]
         public void ZoomingStarted(UIScrollView scrollView, UIView view)
         {
-            webView.RemoveConstraint(widthConstraint);
-            //mainScrollView.RemoveConstraint(ExternalWidthConstraint);
-            //mainScrollView.RemoveConstraint(ExternalRightConstraint);
             actualZoomScaleBeforeZooming = scrollView.ZoomScale;
-
-            zomingStarted = true;
+            zoomed = true;
         }
 
-        bool zomingStarted;
+        bool zoomed;
 
         [Export("scrollViewDidZoom:")]
         public void DidZoom(UIScrollView scrollView)
         {
-            if (!zomingStarted)
+            if (!zoomed) //Zoom happened
             {
                 return;
             }
 
-            widthConstraint.Constant = (initialWidth / initialZoom) * scrollView.ZoomScale;
-            ExternalWidthConstraint.Constant = widthConstraint.Constant;
-
             var zoomScaleRatio = scrollView.ZoomScale / actualZoomScaleBeforeZooming;
 
+            heightConstraint.Constant = (initialHeight / initialZoom) * scrollView.ZoomScale;
+            widthConstraint.Constant = (initialWidth / initialZoom) * scrollView.ZoomScale;
 
             var scrollViewOffset = mainScrollView.ContentOffset;
             scrollViewOffset.X += centerGestureStartX * (zoomScaleRatio - 1);
@@ -146,30 +140,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         {
             BeginInvokeOnMainThread(() =>
            {
-               var zoomScaleRatio = scrollView.ZoomScale / actualZoomScaleBeforeZooming;
+               //var zoomScaleRatio = scrollView.ZoomScale / actualZoomScaleBeforeZooming;
 
-               heightConstraint.Constant = (initialHeight / initialZoom) * scrollView.ZoomScale;
-               widthConstraint.Constant = (initialWidth / initialZoom) * scrollView.ZoomScale;
-               ExternalWidthConstraint.Constant = widthConstraint.Constant;
+               //heightConstraint.Constant = (initialHeight / initialZoom) * scrollView.ZoomScale;
+               //widthConstraint.Constant = (initialWidth / initialZoom) * scrollView.ZoomScale;
 
-               var scrollViewOffset = mainScrollView.ContentOffset;
-               scrollViewOffset.X += centerGestureStartX * (zoomScaleRatio - 1);
-               scrollViewOffset.Y += centerGestureStartY * (zoomScaleRatio - 1);
+               //var scrollViewOffset = mainScrollView.ContentOffset;
+               //scrollViewOffset.X += centerGestureStartX * (zoomScaleRatio - 1);
+               //scrollViewOffset.Y += centerGestureStartY * (zoomScaleRatio - 1);
 
-               mainScrollView.ContentOffset = scrollViewOffset;
-
-               //webView.AddConstraint(widthConstraint);
-               //mainScrollView.AddConstraint(ExternalWidthConstraint);
-               //mainScrollView.AddConstraint(ExternalRightConstraint);
+               //mainScrollView.ContentOffset = scrollViewOffset;
            });
         }
 
         #endregion
-
-        public void SetMinimumScale()
-        {
-            //webView.ScrollView.MinimumZoomScale = initialZoom;
-        }
 
         #region IUIGestureRecognizerDelegate
 
