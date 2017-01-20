@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
@@ -100,6 +101,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public delegate DocumentPreview GetPreviousDocumentPreviewDelegate(DocumentPreview documentPreview, out bool nextDocumentAvailable, out bool previousDocumentAvailable, bool scrollAndSelect = false);
         public delegate DocumentPreview GetNextDocumentPreviewDelegate(DocumentPreview documentPreview, out bool nextDocumentAvailable, out bool previousDocumentAvailable, bool scrollAndSelect = false);
 
+        public event EventHandler<ReadStatusUpdatedEventArgs> ReadStatusUpdated;
+
+        CancellationTokenSource setReadStatusCancellationTokenSource;
+
         #region UIViewController overrides
 
         public override void LoadView()
@@ -132,6 +137,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void ViewWillDisappear(bool animated)
         {
             base.ViewWillDisappear(animated);
+
+            setReadStatusCancellationTokenSource?.Cancel();
 
             DeInitializeHandlers();
         }
@@ -474,6 +481,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 RefreshView();
+                MarkAsReadIfNecessary();
             }
             catch (Exception ex)
             {
@@ -490,6 +498,51 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NavigationController.PopViewController(true);
                 }
             }
+        }
+
+        void MarkAsReadIfNecessary()
+        {
+            setReadStatusCancellationTokenSource?.Cancel();
+            setReadStatusCancellationTokenSource = new CancellationTokenSource();
+
+            Task.Run(async () =>
+            {
+                var f = Folder;
+                var d = Document;
+                var dp = DocumentPreview;
+                var token = setReadStatusCancellationTokenSource.Token;
+
+                try
+                {
+                    if (dp.IsReadByCurrent)
+                    {
+                        return;
+                    }
+
+                    var delaySeconds = PlatformConfig.Preferences.MarkAsReadDelaySeconds;
+                    if (delaySeconds < 0) return;
+
+                    await Task.Delay(delaySeconds * 1000);
+
+                    if (token.IsCancellationRequested) return;
+                    await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true, ServerConfig.SystemSettings.UserInfo.User);
+
+                    BeginInvokeOnMainThread(() =>
+                    {
+                        if (token.IsCancellationRequested) return;
+                        if (dp == null) return;
+
+                        readByView.RefreshView();
+                        readByView.UpdateVisibility();
+
+                        ReadStatusUpdated(this, new ReadStatusUpdatedEventArgs(dp));
+                    });
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error($"Marking document as read failed [folder.name={f?.Name}, folder.id={f?.Id}, documentPreviewId={dp?.Id}]", ex);
+                }
+            });
         }
 
         void RefreshView()
@@ -753,6 +806,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 readByView.RefreshView();
 
+                ReadStatusUpdated(this, new ReadStatusUpdatedEventArgs(DocumentPreview));
+
                 dismissAction();
             }
             catch (Exception ex)
@@ -890,5 +945,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
+    }
+
+    public class ReadStatusUpdatedEventArgs : EventArgs
+    {
+        public DocumentPreview DocumentPreview
+        {
+            get;
+            private set;
+        }
+
+        public ReadStatusUpdatedEventArgs(DocumentPreview documentPreview)
+        {
+            DocumentPreview = documentPreview;
+        }
     }
 }

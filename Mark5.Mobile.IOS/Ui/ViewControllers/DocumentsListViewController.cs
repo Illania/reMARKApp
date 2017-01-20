@@ -27,7 +27,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class DocumentsListViewController : UIViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
     {
 
-        const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
+        const int AutoRefreshIntervalMs = 5 * 1000;
+
+        // 5 seconds
 
         public Folder Folder { get; set; }
 
@@ -224,14 +226,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var ds = (DataSource)documentsTableView.Source;
 
-            var documentViewController = new DocumentViewController
+            var documentViewController = new DocumentViewController();
+            documentViewController.DocumentPreview = documentPreview;
+            documentViewController.Folder = Folder;
+            documentViewController.HidesBottomBarWhenPushed = true;
+            if (!searchController.Active)
             {
-                DocumentPreview = documentPreview,
-                Folder = Folder,
-                GetNextDocumentPreview = ds.GetNextDocumentPreview,
-                GetPreviousDocumentPreview = ds.GetPreviousDocumentPreview,
-            };
+                documentViewController.GetNextDocumentPreview = ds.GetNextDocumentPreview;
+                documentViewController.GetPreviousDocumentPreview = ds.GetPreviousDocumentPreview;
+            }
 
+            documentViewController.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
             newDocumentsAvailableAction = documentViewController.RefreshNavigationBar;
             NavigationController.PushViewController(documentViewController, true);
         }
@@ -442,6 +447,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             refreshControl.Enabled = true;
             refreshing = false;
+        }
+
+        #endregion
+
+        #region DocumentViewController Events
+
+        void DocumentViewController_ReadStatusUpdated(object sender, ReadStatusUpdatedEventArgs e)
+        {
+            if (searchController.Active)
+            {
+
+            }
+
+            var selectedRow = documentsTableView.IndexPathForSelectedRow;
+
+            (documentsTableView.Source as DataSource).UpdateDocumentPreview(e.DocumentPreview);
+
+
+            documentsTableView.ReloadData();
+
+            if (selectedRow != null)
+            {
+                documentsTableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+            }
         }
 
         #endregion
@@ -758,6 +787,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 documentsTableView = null;
                 documentPreviewsInView = null;
             }
+
+
+            public void UpdateDocumentPreview(DocumentPreview documentPreview)
+            {
+                var documentRow = documentPreviewsInView.IndexOf(d => d.Id == documentPreview.Id);
+                if (documentRow < 0)
+                    return;
+
+                documentsTableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(documentRow, 0) }, UITableViewRowAnimation.Automatic);
+            }
+
         }
 
         class AutoRefreshWorker : NSObject
