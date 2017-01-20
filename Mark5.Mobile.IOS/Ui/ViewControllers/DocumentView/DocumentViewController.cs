@@ -510,6 +510,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             subViews.ForEach(v => v.UpdateVisibility());
 
+            RefreshNavigationBar();
+
             flag.Enabled = true;
             fileTo.Enabled = true;
             replyActions.Enabled = true;
@@ -522,6 +524,36 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             UIView.Animate(0.1d, () => stackViewBeforeContent.Alpha = 1.0f);
             UIView.Animate(0.075d, stackViewAfterContent.LayoutIfNeeded);
             UIView.Animate(0.1d, () => stackViewAfterContent.Alpha = 1.0f);
+        }
+
+
+        public void RefreshNavigationBar()
+        {
+            if (Modal)
+            {
+                return;
+            }
+
+            bool _na;
+            bool _pa;
+
+            if (GetNextDocumentPreview != null)
+            {
+                nextDocumentButtonItem.Enabled = GetNextDocumentPreview(DocumentPreview, out _na, out _pa) != null;
+            }
+            else
+            {
+                nextDocumentButtonItem.Enabled = false;
+            }
+
+            if (GetPreviousDocumentPreview != null)
+            {
+                previousDocumentButtonItem.Enabled = GetPreviousDocumentPreview(DocumentPreview, out _na, out _pa) != null;
+            }
+            else
+            {
+                previousDocumentButtonItem.Enabled = false;
+            }
         }
 
         #endregion
@@ -664,7 +696,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void GoToNextDocument(object sender, EventArgs args)
         {
-            DocumentPreview = null;
             Document = null;
             DocumentId = null;
 

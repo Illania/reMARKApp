@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -220,10 +221,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void DocumentSelected(DocumentPreview documentPreview)
         {
+            var ds = (DataSource)documentsTableView.Source;
+
             var documentViewController = new DocumentViewController
             {
                 DocumentPreview = documentPreview,
-                Folder = Folder
+                Folder = Folder,
+                GetNextDocumentPreview = ds.GetNextDocumentPreview,
+                GetPreviousDocumentPreview = ds.GetPreviousDocumentPreview,
             };
             NavigationController.PushViewController(documentViewController, true);
         }
@@ -659,6 +664,73 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 documentPreviewsInView.AddRange(documentPreviews);
                 documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+            }
+
+            public DocumentPreview GetNextDocumentPreview(DocumentPreview documentPreview,
+                                              out bool previousDocumentAvailable,
+                                              out bool nextDocumentAvailable,
+                                                          bool scrollToDocument = false)
+            {
+                var currentDocumentRow = documentPreviewsInView.IndexOf(d => d.Id == documentPreview.Id);
+                if (currentDocumentRow < 0)
+                {
+                    previousDocumentAvailable = false;
+                    nextDocumentAvailable = false;
+                    return null;
+                }
+
+                var nextDocumentRow = currentDocumentRow + 1;
+                previousDocumentAvailable = true;
+                nextDocumentAvailable = nextDocumentRow < documentPreviewsInView.Count - 1;
+
+                if (!nextDocumentAvailable && LoadMoreEnabled && loadMoreAction != null)
+                    loadMoreAction(documentPreviewsInView.Last().Id);
+
+                if (scrollToDocument)
+                {
+                    ScrollAndSelect(nextDocumentRow);
+                }
+
+                return documentPreviewsInView.ElementAtOrDefault(nextDocumentRow);
+            }
+
+            public DocumentPreview GetPreviousDocumentPreview(DocumentPreview documentPreview,
+                                  out bool previousDocumentAvailable,
+                                  out bool nextDocumentAvailable,
+                                              bool scrollToDocument = false)
+            {
+                var currentDocumentRow = documentPreviewsInView.IndexOf(d => d.Id == documentPreview.Id);
+                if (currentDocumentRow < 0)
+                {
+                    previousDocumentAvailable = false;
+                    nextDocumentAvailable = false;
+                    return null;
+                }
+
+                var previousDocumentRow = currentDocumentRow - 1;
+                previousDocumentAvailable = previousDocumentRow > 0;
+                nextDocumentAvailable = previousDocumentRow < documentPreviewsInView.Count - 1;
+
+                if (scrollToDocument)
+                {
+                    ScrollAndSelect(previousDocumentRow);
+                }
+
+                return documentPreviewsInView.ElementAtOrDefault(previousDocumentRow);
+            }
+
+            void ScrollAndSelect(int row)
+            {
+                var selectedIndexPaths = documentsTableView.IndexPathsForSelectedRows;
+                if (selectedIndexPaths != null)
+                {
+                    foreach (var indexPath in selectedIndexPaths)
+                    {
+                        documentsTableView.DeselectRow(indexPath, true);
+                    }
+                }
+
+                documentsTableView.SelectRow(NSIndexPath.FromRowSection(row, 0), true, UITableViewScrollPosition.Middle);
             }
 
             public void Reset()
