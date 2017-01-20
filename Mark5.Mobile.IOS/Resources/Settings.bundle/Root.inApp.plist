@@ -237,15 +237,15 @@
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
-			<string>Cache</string>
+			<string>cache</string>
 			<key>FooterText</key>
-			<string>Here you can configure behavior of cache. You can maintain several days of cache or clear it completely on demand. Changes are applied when the app starts.</string>
+			<string>cache_settings</string>
 		</dict>
 		<dict>
 			<key>Type</key>
 			<string>PSMultiValueSpecifier</string>
 			<key>Title</key>
-			<string>Limit cache</string>
+			<string>limit_cache</string>
 			<key>Key</key>
 			<string>limitCache</string>
 			<key>Titles</key>
@@ -273,7 +273,7 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
-			<string>Clear all cache</string>
+			<string>clear_all_cache</string>
 			<key>Key</key>
 			<string>clearCacheRequested</string>
 			<key>DefaultValue</key>
