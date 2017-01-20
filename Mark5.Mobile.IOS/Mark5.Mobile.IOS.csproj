@@ -431,7 +431,6 @@
     <BundleResource Include="Resources\Settings.bundle\Root.inApp.plist" />
     <BundleResource Include="Resources\Settings.bundle\ContactSectionsVisibility.inApp.plist" />
     <BundleResource Include="Resources\Settings.bundle\en.lproj\ContactSectionsVisibility.strings" />
-    <BundleResource Include="Resources\Base.lproj\Localizable.stringsdict" />
   </ItemGroup>
   <ItemGroup>
     <XamarinComponentReference Include="InAppSettingsKit">

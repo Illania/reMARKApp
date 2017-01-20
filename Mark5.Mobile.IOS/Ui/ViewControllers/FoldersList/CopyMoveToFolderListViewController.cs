@@ -40,13 +40,61 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             this.fromFolder = fromFolder;
         }
 
+        protected override void InitializeNavigationBarTitle()
+        {
+            Func<string> getTitle = () =>
+            {
+                switch (ParentFolder.Module)
+                {
+                    case ModuleType.Documents:
+                        return Localization.GetString("documents");
+                    case ModuleType.Contacts:
+                        return Localization.GetString("contacts");
+                    case ModuleType.Shortcodes:
+                        return Localization.GetString("shortcodes");
+                    case ModuleType.Calendar:
+                        return Localization.GetString("contacts");
+                    default:
+                        return string.Empty;
+                }
+            };
+
+            if (IsRootOfFoldersList)
+            {
+                NavigationItem.Title = fromFolder == null ? Localization.GetString("copy_to_folder") : Localization.GetString("move_to_folder");
+                NavigationItem.Prompt = getTitle();
+            }
+            else
+            {
+                NavigationItem.Title = ParentFolder.Name;
+                NavigationItem.Prompt = getTitle();
+            }
+        }
+
         protected override void InitializeNavigationBar()
         {
-            base.InitializeNavigationBar();
+            if (IsRootOfFoldersList)
+            {
+                cancelModeItem = new UIBarButtonItem();
+                cancelModeItem.Title = Localization.GetString("cancel");
+                NavigationItem.SetLeftBarButtonItem(cancelModeItem, false);
+            }
+        }
 
-            cancelModeItem = new UIBarButtonItem();
-            cancelModeItem.Title = Localization.GetString("cancel");
-            NavigationItem.SetLeftBarButtonItem(cancelModeItem, false);
+        protected override void InitializeHandlers()
+        {
+            base.InitializeHandlers();
+
+            if (cancelModeItem != null)
+                cancelModeItem.Clicked += CancelModeItem_Clicked;
+        }
+
+        protected override void DeinitializeHandlers()
+        {
+            base.DeinitializeHandlers();
+
+            if (cancelModeItem != null)
+                cancelModeItem.Clicked -= CancelModeItem_Clicked;
         }
 
         protected override void FolderSelected(Folder folder)
@@ -80,6 +128,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             return false;
         }
 
+        void CancelModeItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
+
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void CopyBusinessEntityToFolder(Folder folder)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
@@ -100,7 +150,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     throw new ArgumentException("Object type not supported!");
             }
 
-            var confirmed = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("confirm_copy_to_folder"), Localization.GetString(key, businessEntities.Count));
+            var confirmed = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("confirm_copy_to_folder"), Localization.GetString(key));
             if (!confirmed) return;
 
             CommonConfig.Logger.Info($"Copying business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]");
@@ -144,7 +194,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     throw new ArgumentException("Object type not supported!");
             }
 
-            var confirmed = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("confirm_move_to_folder"), Localization.GetString(key, businessEntities.Count));
+            var confirmed = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("confirm_move_to_folder"), Localization.GetString(key));
             if (!confirmed) return;
 
             CommonConfig.Logger.Info($"Moving business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]");

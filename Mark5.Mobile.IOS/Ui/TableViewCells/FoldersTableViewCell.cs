@@ -89,10 +89,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             FolderNameLabel.TextColor = Theme.Gray;
             FolderIconImage.TintColor = Theme.Gray;
             FolderCheckedIndicatorImage.TintColor = Theme.Gray;
-            ExpandButton.TintColor = Theme.Gray;
 
             SelectionStyle = UITableViewCellSelectionStyle.None;
-            UserInteractionEnabled = false;
         }
 
         partial void ExpandButtonTouchUpInside(NSObject sender)
