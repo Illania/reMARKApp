@@ -67,6 +67,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             NavigationController.PushViewController(vc, true);
         }
 
+        protected override bool ShouldDisableFolder(Folder folder)
+        {
+            if (folder.Local)
+                return true;
+
+            if (folder.InternalType != FolderInternalType.FilterView
+                && folder.InternalType != FolderInternalType.Static
+                && folder.InternalType != FolderInternalType.Worktray)
+                return true;
+
+            return false;
+        }
+
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void CopyBusinessEntityToFolder(Folder folder)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
@@ -96,11 +109,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             try
             {
                 await Managers.CommonActionsManager.CopyToFolder(businessEntities, folder);
+                dismissAction();
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while copying business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]", ex);
 
+                dismissAction();
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
             finally
@@ -139,11 +154,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 await Managers.CommonActionsManager.MoveToFolder(businessEntities, fromFolder, folder);
                 PlatformConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, businessEntities.First().ObjectType, fromFolder.Id, businessEntities.Select(b => b.Id).ToList()));
+                dismissAction();
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while moving business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]", ex);
 
+                dismissAction();
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
             finally

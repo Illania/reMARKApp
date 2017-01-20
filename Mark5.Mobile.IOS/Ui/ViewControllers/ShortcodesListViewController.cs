@@ -16,6 +16,7 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using ObjCRuntime;
 using UIKit;
 
@@ -235,12 +236,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var selectedShortcodes = rows.Select(ip => ((DataSource)shortcodesTableView.Source).Items[ip.Row]).ToList();
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, null)); // TODO
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, null)); // TODO
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
+            {
+                var vc = new CopyMoveToFolderListViewController(selectedShortcodes.Cast<IBusinessEntity>().ToList());
+                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            }));
 
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static
                 || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, null)); // TODO
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
+            {
+                var vc = new CopyMoveToFolderListViewController(selectedShortcodes.Cast<IBusinessEntity>().ToList(), Folder);
+                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            }));
 
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static

@@ -412,6 +412,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
         }
 
+        protected virtual bool ShouldDisableFolder(Folder folder)
+        {
+            return false;
+        }
+
         #endregion
 
         #region Row actions handlers
@@ -746,6 +751,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 CachingStatus.TryGetValue(f.Id, out folderIsCached);
 
                 cell.Initialize(f, folderIsCached);
+                if (viewController.ShouldDisableFolder(f)) cell.Disable();
 
                 return cell;
             }
@@ -965,13 +971,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     var emptyCell = tableView.DequeueReusableCell(WaitTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
 
                     if (indexPath.LongSection == Section.Favorites)
-                    {
                         emptyCell.Initialize(Localization.GetString("no_folders_in_favorites"));
-                    }
                     else
-                    {
                         emptyCell.Initialize(Localization.GetString("no_folders_in_section"));
-                    }
 
                     return emptyCell;
                 }
@@ -988,6 +990,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 CachingStatus.TryGetValue(f.Id, out folderIsCached);
 
                 cell.Initialize(f, folderIsCached);
+                if (viewController.ShouldDisableFolder(f)) cell.Disable();
 
                 return cell;
             }
@@ -1257,7 +1260,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 var cell = tableView.DequeueReusableCell(FoldersSearchResultsTableViewCell.Key) as FoldersSearchResultsTableViewCell ?? FoldersSearchResultsTableViewCell.Create();
 
-                cell.Initialize(foldersInView[indexPath.Row]);
+                var f = foldersInView[indexPath.Row];
+                cell.Initialize(f);
+                if (viewController.ShouldDisableFolder(f)) cell.Disable();
 
                 return cell;
             }
