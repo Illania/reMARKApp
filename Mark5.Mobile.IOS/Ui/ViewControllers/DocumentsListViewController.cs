@@ -45,6 +45,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
         AutoRefreshWorker autoRefreshWorker;
+        Action newDocumentsAvailableAction;
 
         bool refreshing;
 
@@ -230,6 +231,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 GetNextDocumentPreview = ds.GetNextDocumentPreview,
                 GetPreviousDocumentPreview = ds.GetPreviousDocumentPreview,
             };
+
+            newDocumentsAvailableAction = documentViewController.RefreshNavigationBar;
             NavigationController.PushViewController(documentViewController, true);
         }
 
@@ -380,6 +383,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
                 ds.AppendItems(documentPreviews);
+
+                if (documentPreviews.Any() && newDocumentsAvailableAction != null)
+                    newDocumentsAvailableAction();
             }
             catch (Exception ex)
             {
@@ -420,6 +426,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     var ds = documentsTableView.Source as DataSource;
                     ds?.PrependItems(documents);
+
+                    if (newDocumentsAvailableAction != null)
+                        newDocumentsAvailableAction();
                 }
             }
             catch (Exception ex)
