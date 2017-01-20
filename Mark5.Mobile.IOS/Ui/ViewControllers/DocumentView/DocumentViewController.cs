@@ -714,7 +714,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void GoToPreviousDocument(object sender, EventArgs args)
         {
-            DocumentPreview = null;
             Document = null;
             DocumentId = null;
 
