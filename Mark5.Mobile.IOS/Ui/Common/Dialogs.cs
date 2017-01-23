@@ -162,23 +162,23 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             if (ex is AppServiceException)
             {
-                return Localization.GetString("error_String.appserviceexception_title");
+                return Localization.GetString("error_appserviceexception_title");
             }
             if (ex is FileTransferServiceException)
             {
-                return Localization.GetString("error_String.filetransferserviceexception_title");
+                return Localization.GetString("error_filetransferserviceexception_title");
             }
             if (ex is DataNotFoundException)
             {
-                return Localization.GetString("error_String.datanotfoundexception_title");
+                return Localization.GetString("error_datanotfoundexception_title");
             }
             if (ex is DataAccessException)
             {
-                return Localization.GetString("error_String.dataaccessexception_title");
+                return Localization.GetString("error_dataaccessexception_title");
             }
             if (ex is InvalidSourceTypeException)
             {
-                return Localization.GetString("error_String.invalidsourcetypeexception_title");
+                return Localization.GetString("error_invalidsourcetypeexception_title");
             }
 
             return Localization.GetString("error_generalexception_title");
@@ -196,7 +196,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             }
             if (ex is DataNotFoundException)
             {
-                return Localization.GetString("error_String.datanotfoundexception_message");
+                return Localization.GetString("error_datanotfoundexception_message");
             }
             if (ex is DataAccessException)
             {
@@ -204,7 +204,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             }
             if (ex is InvalidSourceTypeException)
             {
-                return Localization.GetString("error_String.invalidsourcetypeexception_message");
+                return Localization.GetString("error_invalidsourcetypeexception_message");
             }
 
             return ex.Message;
