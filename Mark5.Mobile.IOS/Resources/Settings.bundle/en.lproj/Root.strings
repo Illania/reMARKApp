@@ -1,10 +1,18 @@
-﻿"about" = "About MARK5";
+﻿"3_days" = "3 days";
+"1_week" = "1 week";
+"2_weeks" = "2 weeks";
+"3_weeks" = "3 weeks";
+"1_month" = "1 month";
+"about" = "About MARK5";
 "accept_selfsigned" = "Accept self-signed certificates";
 "advanced" = "Advanced";
 "advanced" = "Advanced";
 "always_ask" = "Always ask";
 "always_ask_short" = "Ask";
 "anyone" = "Anyone";
+"cache_settings" = "Here you can configure behavior of cache. You can maintain several days of cache or clear it completely on demand. Changes are applied when the app starts.";
+"cache" = "Cache";
+"clear_all_cache" = "Clear all cache";
 "compact_documents_list" = "Compact documents list";
 "compose_options" = "Compose view options";
 "compose_priority_enabled" = "Show priority field";
@@ -17,6 +25,7 @@
 "document_body_request_type" = "Viewing format";
 "documents" = "Documents";
 "documents_to_download" = "Documents to download";
+"do_not_limit" = "Do not limit";
 "dont_use" = "Don't use";
 "dont_use_short" = "Don't use";
 "enable_reporting" = "Share diagnostic information";
@@ -24,6 +33,7 @@
 "html" = "HTML";
 "large_attachment_warning" = "Large attachment warning";
 "large_attachment_warning_desc" = "Show warning when trying to download large attachment over cellular connection.";
+"limit_cache" = "Limit cache";
 "local_template" = "Local template";
 "local_template_short" = "Local";
 "logout" = "Log out";
