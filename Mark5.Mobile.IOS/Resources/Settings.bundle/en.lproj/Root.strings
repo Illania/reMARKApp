@@ -1,4 +1,9 @@
-﻿"about" = "About MARK5";
+﻿"3_days" = "3 days";
+"1_week" = "1 week";
+"2_weeks" = "2 weeks";
+"3_weeks" = "3 weeks";
+"1_month" = "1 month";
+"about" = "About MARK5";
 "accept_selfsigned" = "Accept self-signed certificates";
 "advanced" = "Advanced";
 "advanced" = "Advanced";
@@ -20,6 +25,7 @@
 "document_body_request_type" = "Viewing format";
 "documents" = "Documents";
 "documents_to_download" = "Documents to download";
+"do_not_limit" = "Do not limit";
 "dont_use" = "Don't use";
 "dont_use_short" = "Don't use";
 "enable_reporting" = "Share diagnostic information";

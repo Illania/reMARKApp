@@ -250,12 +250,12 @@
 			<string>limitCache</string>
 			<key>Titles</key>
 			<array>
-				<string>Do not limit</string>
-				<string>3 days</string>
-				<string>1 week</string>
-				<string>2 weeks</string>
-				<string>3 weeks</string>
-				<string>1 month</string>
+				<string>do_not_limit</string>
+				<string>3_days</string>
+				<string>1_week</string>
+				<string>2_weeks</string>
+				<string>3_weeks</string>
+				<string>1_month</string>
 			</array>
 			<key>Values</key>
 			<array>
