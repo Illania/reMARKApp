@@ -65,6 +65,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem doneButtonItem;
         UIBarButtonItem previousDocumentButtonItem;
         UIBarButtonItem nextDocumentButtonItem;
+        UIBarButtonItem editDocumentButtonItem;
 
         ActionableLayoutScrollView mainScrollView;
         UIStackView stackViewBeforeContent;
@@ -125,7 +126,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             CorrectToolbar();
         }
 
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public override async void ViewDidAppear(bool animated)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void 
         {
             base.ViewDidAppear(animated);
 
@@ -139,6 +142,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillDisappear(animated);
 
             setReadStatusCancellationTokenSource?.Cancel();
+            setReadStatusCancellationTokenSource = null;
 
             DeInitializeHandlers();
         }
@@ -171,7 +175,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 previousDocumentButtonItem.Enabled = false;
                 rightButtons[1] = previousDocumentButtonItem;
 
-                //TODO I removed the edit button, because I think we should do it as in Android. So if we tap on a local document, we get the compose view directly
+                editDocumentButtonItem = new UIBarButtonItem();
+                editDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("Icons", "pencil.png"));
+                editDocumentButtonItem.Enabled = true;
 
                 NavigationItem.SetRightBarButtonItems(rightButtons, false);
             }
@@ -372,18 +378,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitializeHandlers()
         {
             //Subviews
-            fromView.RecipentTapped += HandleRecipentTapped; //TODO uniform naming
-            toView.RecipentTapped += HandleRecipentTapped;
-            ccView.RecipentTapped += HandleRecipentTapped;
-            bccView.RecipentTapped += HandleRecipentTapped;
+            fromView.RecipentTapped += RecipeintsView_RecipientTapped; //TODO uniform naming
+            toView.RecipentTapped += RecipeintsView_RecipientTapped;
+            ccView.RecipentTapped += RecipeintsView_RecipientTapped;
+            bccView.RecipentTapped += RecipeintsView_RecipientTapped;
             attachmentsListView.AttachmentTapped += AttachmentsList_AttachmentTapped;
 
             //Toolbar
             flag.Clicked += Flag_Clicked;
             fileTo.Clicked += FileTo_Clicked;
             replyActions.Clicked += ReplyActions_Clicked;
-            userActions.Clicked += DoShowUserActions;
-            commentsButton.TouchUpInside += DoShowComments;
+            userActions.Clicked += UserActions_Clicked;
+            commentsButton.TouchUpInside += CommentsButton_TouchUpInside;
 
             //NavigationBar
             if (Modal)
@@ -392,26 +398,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             else
             {
-                nextDocumentButtonItem.Clicked += GoToNextDocument;
-                previousDocumentButtonItem.Clicked += GoToPreviousDocument;
+                nextDocumentButtonItem.Clicked += NextDocumentButton_Clicked;
+                previousDocumentButtonItem.Clicked += PreviousDocumentButton_Clicked;
+                editDocumentButtonItem.Clicked += EditDocumentButtonItem_Clicked;
             }
         }
 
         void DeInitializeHandlers()
         {
             //Subviews
-            fromView.RecipentTapped -= HandleRecipentTapped;
-            toView.RecipentTapped -= HandleRecipentTapped;
-            ccView.RecipentTapped -= HandleRecipentTapped;
-            bccView.RecipentTapped -= HandleRecipentTapped;
+            fromView.RecipentTapped -= RecipeintsView_RecipientTapped;
+            toView.RecipentTapped -= RecipeintsView_RecipientTapped;
+            ccView.RecipentTapped -= RecipeintsView_RecipientTapped;
+            bccView.RecipentTapped -= RecipeintsView_RecipientTapped;
             attachmentsListView.AttachmentTapped -= AttachmentsList_AttachmentTapped;
 
             //Toolbar
             flag.Clicked -= Flag_Clicked;
             fileTo.Clicked -= FileTo_Clicked;
             replyActions.Clicked -= ReplyActions_Clicked;
-            userActions.Clicked -= DoShowUserActions;
-            commentsButton.TouchUpInside -= DoShowComments;
+            userActions.Clicked -= UserActions_Clicked;
+            commentsButton.TouchUpInside -= CommentsButton_TouchUpInside;
 
             //NavigationBar
             if (Modal)
@@ -420,8 +427,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             else
             {
-                nextDocumentButtonItem.Clicked -= GoToNextDocument;
-                previousDocumentButtonItem.Clicked -= GoToPreviousDocument;
+                nextDocumentButtonItem.Clicked -= NextDocumentButton_Clicked;
+                previousDocumentButtonItem.Clicked -= PreviousDocumentButton_Clicked;
             }
         }
 
@@ -437,7 +444,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void Reset()
         {
-            //TODO what about cancellation tokens
 
             NavigationController.SetNavigationBarHidden(false, true);
             mainScrollView.SetContentOffset(new CGPoint(0, -mainScrollView.ContentInset.Top), false);
@@ -579,7 +585,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             UIView.Animate(0.1d, () => stackViewAfterContent.Alpha = 1.0f);
         }
 
-
         public void RefreshNavigationBar()
         {
             if (Modal)
@@ -606,6 +611,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             else
             {
                 previousDocumentButtonItem.Enabled = false;
+            }
+
+            if (Document == null || (DocumentPreview.Direction != DocumentDirection.Draft))
+            {
+                var rightButtons = new UIBarButtonItem[2];
+                rightButtons[0] = nextDocumentButtonItem;
+                rightButtons[1] = previousDocumentButtonItem;
+                NavigationItem.SetRightBarButtonItems(rightButtons, true);
+            }
+            else
+            {
+                var rightButtons = new UIBarButtonItem[3];
+                rightButtons[0] = nextDocumentButtonItem;
+                rightButtons[1] = previousDocumentButtonItem;
+                rightButtons[2] = editDocumentButtonItem;
+                NavigationItem.SetRightBarButtonItems(rightButtons, true);
             }
         }
 
@@ -670,7 +691,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void HandleRecipentTapped(object sender, RecipentTappedEventArgs e)
+        void RecipeintsView_RecipientTapped(object sender, RecipentTappedEventArgs e)
         {
             //TODO
         }
@@ -747,7 +768,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region NavigationBar event handlers
 
-        async void GoToNextDocument(object sender, EventArgs args)
+        async void NextDocumentButton_Clicked(object sender, EventArgs args)
         {
             Document = null;
             DocumentId = null;
@@ -765,7 +786,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             await Reload();
         }
 
-        async void GoToPreviousDocument(object sender, EventArgs args)
+        async void PreviousDocumentButton_Clicked(object sender, EventArgs args)
         {
             Document = null;
             DocumentId = null;
@@ -781,6 +802,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             await Reload();
+        }
+
+        void EditDocumentButtonItem_Clicked(object sender, EventArgs e)
+        {
+
         }
 
         void DoneButtonItem_Clicked(object sender, EventArgs e)
@@ -825,7 +851,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             //TODO
         }
 
-        void DoShowUserActions(object sender, EventArgs e)
+        void UserActions_Clicked(object sender, EventArgs e)
         {
             //TODO
         }
@@ -835,7 +861,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             //TODO
         }
 
-        void DoShowComments(object sender, EventArgs e)
+        void CommentsButton_TouchUpInside(object sender, EventArgs e)
         {
             //TODO
         }
