@@ -14,10 +14,10 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    
+
     public partial class FoldersTableViewCell : UITableViewCell
     {
-    
+
         public static readonly UINib Nib = UINib.FromName("FoldersTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("FoldersTableViewCell");
 
@@ -28,9 +28,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static FoldersTableViewCell Create()
         {
             var cell = (FoldersTableViewCell)Nib.Instantiate(null, null)[0];
-            cell.FolderCheckedIndicatorImage.Image = UIImage.FromBundle(Path.Combine("Icons", "checkmark.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            cell.FolderCheckedIndicatorImage.Image = UIImage.FromBundle(Path.Combine("icons", "checkmark.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             cell.FolderCheckedIndicatorImage.TintColor = Theme.Brown;
-            cell.OfflineIndicatorImage.Image = UIImage.FromBundle(Path.Combine("Icons", "offline.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            cell.OfflineIndicatorImage.Image = UIImage.FromBundle(Path.Combine("icons", "offline.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             cell.OfflineIndicatorImage.TintColor = Theme.DarkBlue;
             cell.ExpandButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "expand.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             return cell;
