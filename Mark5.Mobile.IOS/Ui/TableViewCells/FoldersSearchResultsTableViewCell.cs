@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using Foundation;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
@@ -35,6 +36,16 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             FolderNameLabel.Text = folder.Name;
             FolderPathLabel.Text = folder.Path;
             FolderIconImage.Image = GetIcon(folder);
+        }
+
+        public void Disable()
+        {
+            FolderNameLabel.TextColor = Theme.Gray;
+            FolderPathLabel.TextColor = Theme.Gray;
+            FolderIconImage.TintColor = Theme.Gray;
+
+            SelectionStyle = UITableViewCellSelectionStyle.None;
+            UserInteractionEnabled = false;
         }
 
         static UIImage GetIcon(Folder folder)

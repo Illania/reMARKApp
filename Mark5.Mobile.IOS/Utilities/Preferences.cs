@@ -68,6 +68,42 @@ namespace Mark5.Mobile.IOS.Utilities
         public Preferences()
         {
             ud = NSUserDefaults.StandardUserDefaults;
+            RegisterDefaults();
+        }
+
+        void RegisterDefaults()
+        {
+            var defaultsDictionary = new NSMutableDictionary();
+
+            defaultsDictionary.Add(new NSString(Keys.DocumentsToDownloadKey), NSNumber.FromInt16(250));
+            defaultsDictionary.Add(new NSString(Keys.UnreadIndicatorMeKey), NSNumber.FromBoolean(true));
+            defaultsDictionary.Add(new NSString(Keys.MarkAsReadDelaySecondsKey), NSNumber.FromInt16(2));
+            defaultsDictionary.Add(new NSString(Keys.CompactDocumentsListKey), NSNumber.FromBoolean(false));
+            defaultsDictionary.Add(new NSString(Keys.LargeAttachmentWarningKey), NSNumber.FromBoolean(true));
+            defaultsDictionary.Add(new NSString(Keys.DocumentBodyRequestTypeKey), NSNumber.FromBoolean(false));
+
+            defaultsDictionary.Add(new NSString(Keys.ContactCommunicationFaxNumbersEnabledKey), NSNumber.FromBoolean(true));
+            defaultsDictionary.Add(new NSString(Keys.ContactCommunicationTelexNumbersEnabledKey), NSNumber.FromBoolean(true));
+            defaultsDictionary.Add(new NSString(Keys.ContactCommunicationImEnabledKey), NSNumber.FromBoolean(true));
+            defaultsDictionary.Add(new NSString(Keys.ContactCommunicationInternalEnabledKey), NSNumber.FromBoolean(true));
+            defaultsDictionary.Add(new NSString(Keys.ContactCommunicationOtherEnabledKey), NSNumber.FromBoolean(true));
+            defaultsDictionary.Add(new NSString(Keys.ContactAddressesEnabledKey), NSNumber.FromBoolean(true));
+            defaultsDictionary.Add(new NSString(Keys.ContactBirthdateEnabledKey), NSNumber.FromBoolean(true));
+            defaultsDictionary.Add(new NSString(Keys.ContactAccountEnabledKey), NSNumber.FromBoolean(true));
+            defaultsDictionary.Add(new NSString(Keys.ContactVatEnabledKey), NSNumber.FromBoolean(true));
+            defaultsDictionary.Add(new NSString(Keys.SynchroniseContactsKey), NSNumber.FromBoolean(true));
+
+            defaultsDictionary.Add(new NSString(Keys.SynchroniseShortcodesKey), NSNumber.FromBoolean(false));
+
+            defaultsDictionary.Add(new NSString(Keys.ComposePriorityEnabledKey), NSNumber.FromBoolean(false));
+            defaultsDictionary.Add(new NSString(Keys.RemoveLineKey), NSNumber.FromBoolean(true));
+            defaultsDictionary.Add(new NSString(Keys.UseTemplateKey), NSNumber.FromInt16(1));
+
+            defaultsDictionary.Add(new NSString(Keys.CleanCacheIntervalDaysKey), NSNumber.FromInt16(7));
+            defaultsDictionary.Add(new NSString(Keys.ClearCacheKey), NSNumber.FromBoolean(false));
+            defaultsDictionary.Add(new NSString(Keys.EnableReportingKey), NSNumber.FromBoolean(true));
+
+            ud.RegisterDefaults(defaultsDictionary);
         }
 
         public IDictionary<string, object> All
@@ -255,7 +291,7 @@ namespace Mark5.Mobile.IOS.Utilities
         #region Composing Documents
 
         public bool ComposePriorityEnabled
-        { 
+        {
             get
             {
                 return ud.BoolForKey(Keys.ComposePriorityEnabledKey);

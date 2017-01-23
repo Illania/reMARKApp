@@ -18,9 +18,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
         }
 
-        /// <summary>
-        /// This constructor MUST NOT be public!
-        /// </summary>
         protected BrowseFoldersListViewController(Folder folder)
             : base(folder, false, false, false)
         {

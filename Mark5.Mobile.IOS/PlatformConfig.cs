@@ -9,6 +9,7 @@
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.IOS.Services;
 using Mark5.Mobile.IOS.Utilities;
+using TinyMessenger;
 
 namespace Mark5.Mobile.IOS
 {
@@ -23,6 +24,8 @@ namespace Mark5.Mobile.IOS
         public static Preferences Preferences { get; set; }
 
         public static ReachabilityReceiver ReachabilityReceiver { get; set; }
+
+        public static ITinyMessengerHub MessengerHub { get; set; }
     }
 }
 

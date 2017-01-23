@@ -24,6 +24,7 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
 using Mark5.Mobile.IOS.Utilities;
 using PCLStorage;
+using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS
@@ -147,6 +148,7 @@ namespace Mark5.Mobile.IOS
                 PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();
                 PlatformConfig.Preferences = preferences;
                 PlatformConfig.ReachabilityReceiver = new ReachabilityReceiver();
+                PlatformConfig.MessengerHub = new TinyMessengerHub();
             }).Wait();
         }
 

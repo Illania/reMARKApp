@@ -7,10 +7,19 @@
 "clear_shortcodes_cache_title" = "Clear shortcodes cache";
 "clearing_contacts_cache___" = "Clearing cache...";
 "clearing_shortcodes_cache___" = "Clearing cache...";
+"confirm_copy_to_folder" = "Copy";
+"confirm_copy_to_folder_contacts" = "Do you want to copy selected contacts?";
+"confirm_copy_to_folder_documents" = "Do you want to copy selected documents?";
+"confirm_copy_to_folder_shortcodes" = "Do you want to copy selected shortcodes?";
+"confirm_move_to_folder" = "Move";
+"confirm_move_to_folder_contacts" = "Do you want to move selected contacts?";
+"confirm_move_to_folder_documents" = "Do you want to move selected documents?";
+"confirm_move_to_folder_shortcodes" = "Do you want to move selected shortcodes?";
 "contacts" = "Contacts";
 "continue" = "Continue";
 "copy_to_folder" = "Copy to folder";
 "copy_to_worktray" = "Copy to worktray";
+"copying___" = "Copying...";
 "creating_system_report___" = "Creating system report...";
 "delete" = "Delete";
 "delete_from_folder" = "Delete from folder";
@@ -46,6 +55,7 @@
 "mark_as_unread" = "Mark as unread";
 "more" = "More";
 "move_to_folder" = "Move to folder";
+"moving___" = "Moving...";
 "no" = "No";
 "no_folders_found" = "No folders found";
 "no_folders_in_favorites" = "No folders were added to favorites yet";

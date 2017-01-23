@@ -120,7 +120,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         #region Initialize/deinitialize
 
-        void InitializeNavigationBarTitle()
+        protected virtual void InitializeNavigationBarTitle()
         {
             Func<string> getTitle = () =>
             {
@@ -150,7 +150,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-        void ClearNavigationBarTitle()
+        protected virtual void ClearNavigationBarTitle()
         {
             if (IsRootOfFoldersList)
             {
@@ -158,7 +158,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-        void InitializeNavigationBar()
+        protected virtual void InitializeNavigationBar()
         {
             if (DisableNavigationBarActions) return;
 
@@ -187,7 +187,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-        void InitializeView()
+        protected virtual void InitializeView()
         {
             AutomaticallyAdjustsScrollViewInsets = true;
 
@@ -214,7 +214,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             FoldersTableView.AddSubview(RefreshControl);
         }
 
-        void InitializeSearchBar()
+        protected virtual void InitializeSearchBar()
         {
             DefinesPresentationContext = true;
 
@@ -234,7 +234,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             FoldersTableView.TableHeaderView = SearchController.SearchBar;
         }
 
-        void InitializeHandlers()
+        protected virtual void InitializeHandlers()
         {
             if (ComposeDocumentItem != null)
                 ComposeDocumentItem.Clicked += ComposeDocumentItem_Clicked;
@@ -245,7 +245,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             RefreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
-        void DeinitializeHandlers()
+        protected virtual void DeinitializeHandlers()
         {
             if (ComposeDocumentItem != null)
                 ComposeDocumentItem.Clicked -= ComposeDocumentItem_Clicked;
@@ -410,6 +410,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         protected virtual void FolderExpand(Folder folder)
         {
+        }
+
+        protected virtual bool ShouldDisableFolder(Folder folder)
+        {
+            return false;
         }
 
         #endregion
@@ -746,6 +751,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 CachingStatus.TryGetValue(f.Id, out folderIsCached);
 
                 cell.Initialize(f, folderIsCached);
+                if (viewController.ShouldDisableFolder(f)) cell.Disable();
 
                 return cell;
             }
@@ -769,6 +775,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var f = foldersInView[indexPath.Row];
+
+                if (viewController.ShouldDisableFolder(f)) return;
+
                 viewController.FolderSelected(f);
             }
 
@@ -965,13 +974,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     var emptyCell = tableView.DequeueReusableCell(WaitTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
 
                     if (indexPath.LongSection == Section.Favorites)
-                    {
                         emptyCell.Initialize(Localization.GetString("no_folders_in_favorites"));
-                    }
                     else
-                    {
                         emptyCell.Initialize(Localization.GetString("no_folders_in_section"));
-                    }
 
                     return emptyCell;
                 }
@@ -988,6 +993,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 CachingStatus.TryGetValue(f.Id, out folderIsCached);
 
                 cell.Initialize(f, folderIsCached);
+                if (viewController.ShouldDisableFolder(f)) cell.Disable();
 
                 return cell;
             }
@@ -1020,6 +1026,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var f = foldersInView[indexPath.LongSection][indexPath.Row];
+
+                if (viewController.ShouldDisableFolder(f)) return;
+
                 viewController.FolderSelected(f);
             }
 
@@ -1257,7 +1266,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 var cell = tableView.DequeueReusableCell(FoldersSearchResultsTableViewCell.Key) as FoldersSearchResultsTableViewCell ?? FoldersSearchResultsTableViewCell.Create();
 
-                cell.Initialize(foldersInView[indexPath.Row]);
+                var f = foldersInView[indexPath.Row];
+                cell.Initialize(f);
+                if (viewController.ShouldDisableFolder(f)) cell.Disable();
 
                 return cell;
             }
@@ -1285,6 +1296,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var f = foldersInView[indexPath.Row];
+
+                if (viewController.ShouldDisableFolder(f)) return;
+
                 viewController.FolderSelected(f);
             }
 
