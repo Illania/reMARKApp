@@ -18,8 +18,9 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews;
-using Mark5.Mobile.IOS.Utilities.UserInterface;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
+using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -196,7 +197,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ScrollsToTop = true,
                 UserInteractionEnabled = true,
                 ClipsToBounds = false,
-                TranslatesAutoresizingMaskIntoConstraints = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
             };
             mainScrollView.LayoutSubviewsAction = HandleScrollViewLayoutSubviewsAction;
             View.AddSubview(mainScrollView);
@@ -205,7 +206,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
                 NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
                 });
 
             stackViewBeforeContent = new UIStackView
@@ -215,29 +216,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Alignment = UIStackViewAlignment.Fill,
                 Distribution = UIStackViewDistribution.Fill,
                 Spacing = 0.0f,
-                TranslatesAutoresizingMaskIntoConstraints = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
             };
             mainScrollView.AddSubview(stackViewBeforeContent);
             View.AddConstraints(new[]
                 {
                     NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Top, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1.0f, 0.0f)
                 });
 
-            contentView = new ContentView(mainScrollView);
-            var rightConstraint = NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Right, 1.0f, 0.0f);
-            var widthConstraintInitial = NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, mainScrollView, NSLayoutAttribute.Width, 1.0f, 0.0f);
-
-            contentView.ExternalInitialWidthConstraint = widthConstraintInitial;
-            contentView.ExternalRightConstraint = rightConstraint;
+            contentView = new ContentView(mainScrollView, DecidePolicyForNavigationAction);
             mainScrollView.AddSubview(contentView);
             mainScrollView.AddConstraints(new[]
             {
                 NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, stackViewBeforeContent, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
                 NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                rightConstraint,
-                widthConstraintInitial,
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Right, 1.0f, 0.0f),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, mainScrollView, NSLayoutAttribute.Width, 1.0f, 0.0f)
             });
 
             stackViewAfterContent = new UIStackView
@@ -247,7 +243,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Alignment = UIStackViewAlignment.Fill,
                 Distribution = UIStackViewDistribution.Fill,
                 Spacing = 0.0f,
-                TranslatesAutoresizingMaskIntoConstraints = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
             };
             mainScrollView.AddSubview(stackViewAfterContent);
             View.AddConstraints(new[]
@@ -255,7 +251,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, contentView, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
                 });
         }
 
@@ -323,10 +319,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             commentsButton.SetImage(UIImage.FromBundle(Path.Combine("Icons", "comments.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             commentsButton.Enabled = false;
 
-            comments = new BadgeBarButtonItem(commentsButton)
-            {
-                BadgeBackgroundColor = Theme.Brown,
-            };
+            comments = new BadgeBarButtonItem(commentsButton);
+            comments.BadgeBackgroundColor = Theme.Brown;
             comments.Enabled = false;
 
             replyActions = new UIBarButtonItem();
@@ -349,7 +343,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 FlexibleSpace,
                 comments,
                 FlexibleSpace,
-                userActions,
+                userActions
             };
             toolbar.TranslatesAutoresizingMaskIntoConstraints = false;
             toolbar.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
@@ -360,7 +354,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
-                    toolbarBottomConstraint,
+                    toolbarBottomConstraint
                 });
         }
 
@@ -378,7 +372,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitializeHandlers()
         {
             //Subviews
-            fromView.RecipentTapped += RecipeintsView_RecipientTapped; //TODO uniform naming
+            fromView.RecipentTapped += RecipeintsView_RecipientTapped;
             toView.RecipentTapped += RecipeintsView_RecipientTapped;
             ccView.RecipentTapped += RecipeintsView_RecipientTapped;
             bccView.RecipentTapped += RecipeintsView_RecipientTapped;
@@ -694,6 +688,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void RecipeintsView_RecipientTapped(object sender, RecipentTappedEventArgs e)
         {
             //TODO
+        }
+
+        WKNavigationActionPolicy DecidePolicyForNavigationAction(WKNavigationAction navigationAction)
+        {
+            if (navigationAction.NavigationType == WKNavigationType.LinkActivated
+            || navigationAction.NavigationType == WKNavigationType.BackForward
+            || navigationAction.NavigationType == WKNavigationType.FormSubmitted
+            || navigationAction.NavigationType == WKNavigationType.FormResubmitted)
+            {
+                if (navigationAction.Request.Url.Scheme == "mailto")
+                {
+                    var address = navigationAction.Request.Url.ResourceSpecifier; //TODO open compose view controller with address
+                }
+                else
+                {
+                    Integration.OpenLink(navigationAction.Request.Url,
+                                                      async () => await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("unable_open_link_title"), Localization.GetString("unable_open_link_content") + navigationAction.Request.Url.Scheme));
+                }
+
+                return WKNavigationActionPolicy.Cancel;
+            }
+
+            if (navigationAction.NavigationType == WKNavigationType.Reload)
+            {
+                return WKNavigationActionPolicy.Cancel;
+            }
+
+            return WKNavigationActionPolicy.Allow;
         }
 
         #endregion

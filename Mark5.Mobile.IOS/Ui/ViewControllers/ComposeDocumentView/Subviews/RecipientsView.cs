@@ -42,10 +42,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         protected CustomUITextView TextView;
         UITapGestureRecognizer textViewTapGestureRecognizer;
 
-        NSLayoutConstraint heightConstraint;
-
-        Dictionary<UIView, NSLayoutConstraint[]> constraintsStash;
-
         public event EventHandler Edited = delegate { };
         public event EventHandler<AddButtonTappedEventArgs> AddButtonTapped = delegate { };
         public event EventHandler<RecipentTappedEventArgs> RecipentTapped = delegate { };
@@ -61,7 +57,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public RecipientsView(DocumentAddressType type)
         {
-            constraintsStash = new Dictionary<UIView, NSLayoutConstraint[]>();
             AddressType = type;
             Initialize();
         }
@@ -144,8 +139,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             textViewTapGestureRecognizer = new UITapGestureRecognizer();
             textViewTapGestureRecognizer.AddTarget(HandleTextTapped);
             textViewTapGestureRecognizer.NumberOfTapsRequired = 1;
-
-            heightConstraint = NSLayoutConstraint.Create(this, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, 0.0f);
         }
 
         string GetTitleFromAddressType()

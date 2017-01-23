@@ -11,10 +11,24 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-    
     public static class UI
     {
-        
+        #region Pretty printing
+
+        static readonly string[] SizeSuffixes = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+
+        public static string PrettyFileSize(long bytes)
+        {
+            var mag = (int)Math.Log(bytes, 1024);
+            decimal adjustedSize = (decimal)bytes / (1L << (mag * 10));
+
+            return string.Format("{0:n1} {1}", adjustedSize, SizeSuffixes[mag]);
+        }
+
+        #endregion
+
+        #region Color
+
         public static UIColor UIColorFromHexString(string hexString)
         {
             try
@@ -58,6 +72,9 @@ namespace Mark5.Mobile.IOS.Utilities
 
                 return UIColor.Clear;
             }
+
+            #endregion
+
         }
     }
 }

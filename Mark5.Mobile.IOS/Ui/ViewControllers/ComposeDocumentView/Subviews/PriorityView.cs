@@ -28,11 +28,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         UILabel label;
         UILabel selectedPriorityLabel;
 
-        NSLayoutConstraint heightConstraint;
-
-        Dictionary<UIView, NSLayoutConstraint[]> constraintsStash;
-        bool ignoreSelectPriorityLabelTap;
-
         public PriorityView(UIViewController viewController)
         {
             this.viewController = viewController;
@@ -74,8 +69,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     NSLayoutConstraint.Create(selectedPriorityLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin),
                     NSLayoutConstraint.Create(selectedPriorityLabel, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1.0f, -VerticalMargin),
                 });
-
-            heightConstraint = NSLayoutConstraint.Create(this, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, 0.0f);
         }
 
         #region Overrides
@@ -103,11 +96,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         [Export("PriorityLabelTapped")]
         void PriorityLabelTapped()
         {
-            if (ignoreSelectPriorityLabelTap)
-            {
-                return;
-            }
-
             selectedPriorityLabel.TextColor = Theme.TintColor;
 
             HandleScrollToView(this, EventArgs.Empty);

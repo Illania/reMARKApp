@@ -97,9 +97,16 @@ namespace Mark5.Mobile.IOS.Utilities
 
         #region Apple apps
 
-        public static void OpenLink(NSUrl url)
+        public static void OpenLink(NSUrl url, Action failureCompletionHandler)
         {
-            UIApplication.SharedApplication.OpenUrl(url); //TODO deprecated
+            var options = new UIApplicationOpenUrlOptions();
+            UIApplication.SharedApplication.OpenUrl(url, options, (result) =>
+            {
+                if (!result)
+                {
+                    failureCompletionHandler();
+                }
+            });
         }
 
         #endregion

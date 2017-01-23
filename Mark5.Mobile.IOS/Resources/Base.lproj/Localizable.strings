@@ -154,3 +154,5 @@
 "cannot_open_attachment_content" = "There is no app installed that can open this file.";
 "yes" = "Yes";
 "yesterday" = "Yesterday";
+"unable_open_link_title" = "Unable to open link";
+"unable_open_link_content" = "There are no applications that can open link type ";

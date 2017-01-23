@@ -7,8 +7,8 @@
 //
 using System;
 using Foundation;
-using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 using WebKit;
 
@@ -32,12 +32,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         nfloat actualZoomScaleBeforeZooming;
 
         UIScrollView mainScrollView;
-        public NSLayoutConstraint ExternalInitialWidthConstraint;
-        public NSLayoutConstraint ExternalRightConstraint;
 
-        public ContentView(UIScrollView mainScroll)
+        Func<WKNavigationAction, WKNavigationActionPolicy> navigationActionDelegate;
+
+        public ContentView(UIScrollView mainScrollView, Func<WKNavigationAction, WKNavigationActionPolicy> navigationActionDelegate)
         {
-            mainScrollView = mainScroll;
+            this.mainScrollView = mainScrollView;
+            this.navigationActionDelegate = navigationActionDelegate;
             Initialize();
         }
 
@@ -82,6 +83,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         }
 
         #region IWKNavigationDelegate
+
+        [Export("webView:decidePolicyForNavigationAction:decisionHandler:")]
+        void DecidePolicy(WKWebView wkWebView, WKNavigationAction navigationAction, Action<WKNavigationActionPolicy> decisionHandler)
+        {
+            decisionHandler(navigationActionDelegate(navigationAction));
+        }
 
         [Export("webView:didFinishNavigation:")]
         void DidFinishNavigation(WKWebView wkWebView, WKNavigation navigation)

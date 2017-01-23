@@ -174,7 +174,6 @@
     <Folder Include="Ui\TableViewCells\" />
     <Folder Include="Ui\ViewControllers\DocumentView\" />
     <Folder Include="Ui\ViewControllers\DocumentView\Subviews\" />
-    <Folder Include="Utilities\UserInterface\" />
     <Folder Include="Ui\Common\HubMessages\" />
   </ItemGroup>
   <ItemGroup>
@@ -297,7 +296,6 @@
     <Compile Include="Ui\ViewControllers\DocumentView\Subviews\ReadByView.cs" />
     <Compile Include="Ui\ViewControllers\DocumentView\Subviews\TextSubView.cs" />
     <Compile Include="Ui\Common\BadgeBarButtonItem.cs" />
-    <Compile Include="Utilities\UserInterface\UI.cs" />
     <Compile Include="Ui\TableViewCells\DocumentsCompactTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\DocumentsCompactTableViewCell.designer.cs">
       <DependentUpon>DocumentsCompactTableViewCell.cs</DependentUpon>
