@@ -699,7 +699,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 if (navigationAction.Request.Url.Scheme == "mailto")
                 {
-                    var address = navigationAction.Request.Url.ResourceSpecifier; //TODO open compose view controller with address
+                    var address = navigationAction.Request.Url.ResourceSpecifier;
+                    //TODO open compose view controller with address
                 }
                 else
                 {
