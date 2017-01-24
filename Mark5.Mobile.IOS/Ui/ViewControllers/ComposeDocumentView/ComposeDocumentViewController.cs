@@ -33,8 +33,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public int? PreviousDocumentId { get; set; }
         public string[] PreconfiguredEmailAddresses { get; set; }
 
-        Document PreviousDocument { get; set; }
-        DocumentPreview PreviousDocumentPreview { get; set; }
+        public Document PreviousDocument { get; set; }
+        public DocumentPreview PreviousDocumentPreview { get; set; }
 
         Document Document { get; set; } = new Document();
         DocumentPreview DocumentPreview { get; set; } = new DocumentPreview();
@@ -190,10 +190,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 else
                 {
                     var sourceType = SourceType.Auto;
-                    //TODO eventually this could be improved by first checking the cache
-                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, sourceType);
-                    PreviousDocument = container.Document;
-                    PreviousDocumentPreview = container.DocumentPreview;
+                    PreviousDocument = await Managers.DocumentsManager.GetDocumentAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, sourceType);
                     if (CreationModeFlag == DocumentCreationModeFlag.Edit && PreviousDocumentPreview.Direction == DocumentDirection.Draft)
                     {
                         Document.Id = DocumentPreview.Id = PreviousDocument.Id;
@@ -264,7 +261,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CancelButtonItem_Clicked(object sender, EventArgs e)
         {
-            //TODO
+            //TODO complete
+            PopOrDismissViewController();
+        }
+
+        void PopOrDismissViewController()
+        {
+            if (PresentingViewController != null)
+            {
+                DismissViewController(true, null);
+            }
+            else
+            {
+                NavigationController.PopViewController(true);
+            }
         }
 
         #endregion
@@ -284,8 +294,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
             }
 
-            //var useTemplate = PlatformConfig.Preferences.UseTemplate;
-            var useTemplate = Preferences.TemplateUsageMode.AlwaysAsk;
+            var useTemplate = PlatformConfig.Preferences.UseTemplate;
 
             if (useTemplate == Preferences.TemplateUsageMode.DontUse)
             {
