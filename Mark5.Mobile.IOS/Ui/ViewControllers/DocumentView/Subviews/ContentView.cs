@@ -121,7 +121,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         [Export("scrollViewDidZoom:")]
         public void DidZoom(UIScrollView scrollView)
         {
-            if (!zoomingStarted) //Zoom happened
+            if (!zoomingStarted)
             {
                 return;
             }
