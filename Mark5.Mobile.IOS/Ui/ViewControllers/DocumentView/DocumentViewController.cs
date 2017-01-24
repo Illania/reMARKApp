@@ -656,21 +656,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     throw new Exception("Unable to get attachment path.");
                 }
 
-                attachmentInteractionController = UIDocumentInteractionController.FromUrl(NSUrl.FromFilename(path));
+
+                var url = NSUrl.FromFilename(path);
+                attachmentInteractionController = UIDocumentInteractionController.FromUrl(url);
                 attachmentInteractionController.Delegate = new AttachmentInteractionControllerDelegate(this, attachmentDescription);
 
-                var previewSuccessful = attachmentInteractionController.PresentPreview(true);
+                var previewSuccessful = attachmentInteractionController.PresentPreview(true); //TODO check on the phone if it works, because it does not on the simulator
 
                 if (!previewSuccessful)
                 {
                     CommonConfig.Logger.Info(string.Format("Failed to present preview for attachment. Presenting open with instead. [documentId={0}, attachment={1}]", Document.Id, attachmentDescription));
+                    var openInSuccessful = attachmentInteractionController.PresentOptionsMenu(View.Frame, View, true);
+                    if (!openInSuccessful)
+                    {
+                        CommonConfig.Logger.Warning(string.Format("Failed to present open in view - there is no app that can open this type of attachment installed. [documentId={0}, attachment={1}]", Document.Id, attachmentDescription));
+                        await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
+                    }
                 }
-                var openInSuccessful = attachmentInteractionController.PresentOpenInMenu(View.Frame, View, true);
-                if (!openInSuccessful)
-                {
-                    CommonConfig.Logger.Warning(string.Format("Failed to present open in view - there is no app that can open this type of attachment installed. [documentId={0}, attachment={1}]", Document.Id, attachmentDescription));
-                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
-                }
+
             }
             catch (Exception ex)
             {
