@@ -34,23 +34,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        public bool Modal
-        {
-            get;
-            set;
-        }
+        public bool Modal { get; set; }
 
-        public GetPreviousDocumentPreviewDelegate GetPreviousDocumentPreview
-        {
-            get;
-            set;
-        }
-
-        public GetNextDocumentPreviewDelegate GetNextDocumentPreview
-        {
-            get;
-            set;
-        }
+        public GetPreviousDocumentPreviewDelegate GetPreviousDocumentPreview { get; set; }
+        public GetNextDocumentPreviewDelegate GetNextDocumentPreview { get; set; }
 
         public bool Empty { get { return true; } }
 
@@ -438,7 +425,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void Reset()
         {
-
             NavigationController.SetNavigationBarHidden(false, true);
             mainScrollView.SetContentOffset(new CGPoint(0, -mainScrollView.ContentInset.Top), false);
 
@@ -746,9 +732,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void ReplyActions_Clicked(object sender, EventArgs e)
         {
-            var replyListStrings = new string[] { "reply",
-                "reply_all",
-                "forward" };
+            var replyListStrings = new string[] { Localization.GetString("reply"),
+                Localization.GetString("reply_all"),
+                Localization.GetString("forward")};
 
             var result = await Dialogs.ShowListDialogAsync(this, null, replyListStrings, replyActions);
             switch (result)
@@ -909,6 +895,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             composeDocumentViewController.CreationModeFlag = creationModeFlag;
             composeDocumentViewController.PreviousDocumentFolderId = FolderId ?? Folder?.Id;
             composeDocumentViewController.PreviousDocumentDirection = DocumentPreview.Direction;
+            composeDocumentViewController.PreviousDocument = Document;
+            composeDocumentViewController.PreviousDocumentPreview = DocumentPreview;
 
             var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
             composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
