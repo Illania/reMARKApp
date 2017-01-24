@@ -753,10 +753,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void FileTo_Clicked(object sender, EventArgs e)
         {
-            var fileToListStrings = new string[] { "copy_to_worktray",
-                "copy_to_folder",
-                "move_to_folder",
-                "delete_from_folder" };
+            var fileToListStrings = new string[] { Localization.GetString("copy_to_worktray"),
+                Localization.GetString("copy_to_folder"),
+                Localization.GetString("move_to_folder"),
+                Localization.GetString("delete_from_folder")};
 
             var result = await Dialogs.ShowListDialogAsync(this, null, fileToListStrings, fileTo);
             switch (result)
