@@ -29,13 +29,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
     public class ContentView : ComposeDocumentView, IWKNavigationDelegate
     {
-
         UIButton expandButton;
 
         WKWebView newContentWebView;
         WKWebView oldContentWebView;
 
-        bool previousDocumentContentLoaded;
         string oldContent;
         bool oldContentLoaded;
 
@@ -120,7 +118,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var preferences = new WKPreferences();
             preferences.JavaScriptCanOpenWindowsAutomatically = false;
-            preferences.JavaScriptEnabled = false;
+            preferences.JavaScriptEnabled = true;
 
             var configuration = new WKWebViewConfiguration();
             configuration.Preferences = preferences;
@@ -128,9 +126,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             configuration.AllowsInlineMediaPlayback = false;
 
             oldContentWebView = new WKWebView(CGRect.Empty, configuration);
-            oldContentWebView.Hidden = true;
             oldContentWebView.TranslatesAutoresizingMaskIntoConstraints = false;
+            oldContentWebView.Hidden = true;
             oldContentWebView.Opaque = false;
+            var oldContentWebViewNavigationDelegate = new OldContentWebViewNavigationDelegate();
+            oldContentWebViewNavigationDelegate.HeightChangedAction = HandleAction;
+            oldContentWebView.NavigationDelegate = oldContentWebViewNavigationDelegate;
 
             oldContentWebView.ScrollView.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
             oldContentWebView.ScrollView.ScrollEnabled = false;
@@ -147,6 +148,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1.0f, -VerticalMargin),
                 zeroHeightConstraint
             });
+        }
+
+        void HandleAction(nfloat height) //TODO put better name
+        {
+            minimumHeightConstraint.Constant = height;
         }
 
         #region Public methods
@@ -432,5 +438,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #endregion
 
+        class OldContentWebViewNavigationDelegate : WKNavigationDelegate
+        {
+            public Action<nfloat> HeightChangedAction
+            {
+                get;
+                set;
+            }
+
+            public override void DidFinishNavigation(WKWebView webView, WKNavigation navigation)
+            {
+                BeginInvokeOnMainThread(async () =>
+                {
+                    //Not sure why it does not work withouth the following line
+                    await webView.EvaluateJavaScriptAsync("");
+
+                    if (HeightChangedAction != null)
+                    {
+                        HeightChangedAction(webView.ScrollView.ContentSize.Height);
+                    }
+                });
+            }
+        }
     }
 }
