@@ -5,9 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
-using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Mark5.Mobile.IOS.Ui.Common;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
