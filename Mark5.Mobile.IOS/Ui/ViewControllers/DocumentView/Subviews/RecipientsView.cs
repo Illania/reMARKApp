@@ -43,7 +43,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         void Initialize()
         {
             titleLabel = new UILabel();
-            titleLabel.Text = GetTitle();
+            titleLabel.Text = GetTitle() + ":";
             titleLabel.Font = Theme.DefaultFont;
             titleLabel.TextColor = UIColor.LightGray;
             titleLabel.Opaque = false;
@@ -55,7 +55,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             ContainerView.AddConstraints(new[]
                 {
                     NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1.0f, VerticalMargin),
-                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1.0f, HorizontalMargin),
+                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1.0f, HorizontalMargin)
                 });
 
             var textStorage = new NSTextStorage();
@@ -81,7 +81,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                     NSLayoutConstraint.Create(textView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1.0f, VerticalMargin),
                     NSLayoutConstraint.Create(textView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Right, 1.0f, InnerMargin),
                     NSLayoutConstraint.Create(textView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1.0f, -VerticalMargin),
-                    NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin),
+                    NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin)
                 });
 
             textViewTapGestureRecognizer = new UITapGestureRecognizer();
@@ -127,7 +127,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         public override void UpdateVisibility()
         {
-            if (DocumentPreview == null || !VisibilityEnabled())
+            if (DocumentPreview == null)
             {
                 Hidden = true;
                 return;
@@ -170,21 +170,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             switch (addressType)
             {
                 case DocumentAddressType.To:
-                    return "To:";
+                    return Localization.GetString("to");
                 case DocumentAddressType.Cc:
-                    return "Cc:";
+                    return Localization.GetString("cc");
                 case DocumentAddressType.Bcc:
-                    return "Bcc:";
+                    return Localization.GetString("bcc");
                 case DocumentAddressType.From:
-                    return "From:"; //TODO
+                    return Localization.GetString("from");
                 default:
                     throw new ArgumentException(string.Format("Unknown type. [addressType={0}]", addressType));
             }
-        }
-
-        bool VisibilityEnabled()
-        {
-            return true; //TODO check later
         }
 
         void CorrectMarkup()
@@ -221,7 +216,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             textView.TextStorage.DeleteRange(new NSRange(0, 1));
             textView.TextStorage.EndEditing();
 
-            UIView.Animate(0.2d, () =>
+            Animate(0.2d, () =>
                 {
                     textView.TextContainer.MaximumNumberOfLines = 0;
                     textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;

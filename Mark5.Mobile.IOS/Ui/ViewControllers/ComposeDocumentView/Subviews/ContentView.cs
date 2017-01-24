@@ -108,7 +108,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             expandButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Center;
             expandButton.Opaque = false;
             expandButton.Hidden = true;
-            expandButton.TouchUpInside += HandleExpandButtonTapped;
+            expandButton.TouchUpInside += ExpandButton_Tapped;
 
             AddSubview(expandButton);
             AddConstraints(new[]
@@ -119,7 +119,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             });
 
             var preferences = new WKPreferences();
-            preferences.JavaScriptCanOpenWindowsAutomatically = false; //TODO check all the parameters
+            preferences.JavaScriptCanOpenWindowsAutomatically = false;
             preferences.JavaScriptEnabled = false;
 
             var configuration = new WKWebViewConfiguration();
@@ -398,7 +398,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #region Event handlers
 
-        async void HandleExpandButtonTapped(object sender, EventArgs e)
+        async void ExpandButton_Tapped(object sender, EventArgs e)
         {
             if (oldContentWebView.Hidden)
             {

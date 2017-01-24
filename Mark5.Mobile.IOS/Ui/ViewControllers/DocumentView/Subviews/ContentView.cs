@@ -8,7 +8,6 @@
 using System;
 using Foundation;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 using WebKit;
 
@@ -35,6 +34,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         Func<WKNavigationAction, WKNavigationActionPolicy> navigationActionDelegate;
 
+        bool zoomingStarted;
+
         public ContentView(UIScrollView mainScrollView, Func<WKNavigationAction, WKNavigationActionPolicy> navigationActionDelegate)
         {
             this.mainScrollView = mainScrollView;
@@ -48,7 +49,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             preferences.JavaScriptCanOpenWindowsAutomatically = false;
             preferences.JavaScriptEnabled = true;
 
-            //TODO disable link clicking (or open external browser)
             var configuration = new WKWebViewConfiguration();
             configuration.Preferences = preferences;
 
@@ -78,7 +78,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                     NSLayoutConstraint.Create(webView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1.0f, VerticalMargin),
                     NSLayoutConstraint.Create(webView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1.0f, HorizontalMargin),
                     NSLayoutConstraint.Create(webView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1.0f, -VerticalMargin),
-                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin),
+                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin)
                 });
         }
 
@@ -115,15 +115,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         public void ZoomingStarted(UIScrollView scrollView, UIView view)
         {
             actualZoomScaleBeforeZooming = scrollView.ZoomScale;
-            zoomed = true;
+            zoomingStarted = true;
         }
-
-        bool zoomed;
 
         [Export("scrollViewDidZoom:")]
         public void DidZoom(UIScrollView scrollView)
         {
-            if (!zoomed) //Zoom happened
+            if (!zoomingStarted) //Zoom happened
             {
                 return;
             }
@@ -141,10 +139,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
             actualZoomScaleBeforeZooming = scrollView.ZoomScale;
 
-            var of = scrollView.ContentOffset;
-            of.X = 0;
-            of.Y = 0;
-            scrollView.ContentOffset = of;
+            var webViewScrollViewOffset = scrollView.ContentOffset;
+            webViewScrollViewOffset.X = 0;
+            webViewScrollViewOffset.Y = 0;
+            scrollView.ContentOffset = webViewScrollViewOffset;
         }
 
         #endregion
@@ -203,7 +201,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         public override void UpdateVisibility()
         {
-            Hidden = false; //TODO should be from preferences
+            Hidden = false;
         }
 
         #endregion

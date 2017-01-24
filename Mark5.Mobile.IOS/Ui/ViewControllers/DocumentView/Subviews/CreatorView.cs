@@ -5,8 +5,6 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
-using System;
-using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 
@@ -29,7 +27,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         public override void UpdateVisibility()
         {
-            if (DocumentPreview == null) //TODO No more subview visibility check (in settings)?
+            if (DocumentPreview == null)
             {
                 Hidden = true;
                 return;
