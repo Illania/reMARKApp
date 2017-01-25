@@ -130,7 +130,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             oldContentWebView.Hidden = true;
             oldContentWebView.Opaque = false;
             var oldContentWebViewNavigationDelegate = new OldContentWebViewNavigationDelegate();
-            oldContentWebViewNavigationDelegate.HeightChangedAction = HandleAction;
+            oldContentWebViewNavigationDelegate.HeightChangedAction = HandleHeightChanged;
             oldContentWebView.NavigationDelegate = oldContentWebViewNavigationDelegate;
 
             oldContentWebView.ScrollView.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
@@ -150,7 +150,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             });
         }
 
-        void HandleAction(nfloat height) //TODO put better name
+        void HandleHeightChanged(nfloat height)
         {
             minimumHeightConstraint.Constant = height;
         }
@@ -195,7 +195,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #endregion
 
-        #region
+        #region Private methods
 
         async Task LoadOldContent()
         {
@@ -420,7 +420,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 constraintsStash.Clear();
 
-                Animate(0.15d, LayoutIfNeeded);
+                LayoutIfNeeded();
             }
             else
             {
@@ -432,7 +432,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 RemoveConstraint(minimumHeightConstraint);
                 AddConstraint(zeroHeightConstraint);
 
-                Animate(0.15d, LayoutIfNeeded);
+                LayoutIfNeeded();
             }
         }
 
