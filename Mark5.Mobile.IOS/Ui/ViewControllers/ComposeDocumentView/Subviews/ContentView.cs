@@ -27,7 +27,7 @@ using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-    public class ContentView : ComposeDocumentView, IWKNavigationDelegate
+    public class ContentView : ComposeDocumentView, IWKNavigationDelegate, IUIGestureRecognizerDelegate, IWKScriptMessageHandler
     {
         UIButton expandButton;
 
@@ -50,8 +50,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                                                     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0 "">
                                                 </head>
                                                 <body>
-                                                    <div class=""" + EditableContentClass + @""" contenteditable=""true"" style=""width: 100%""><br></div>
+                                                    <div class=""" + EditableContentClass + @""" contenteditable=""true"" style=""width: 100%"" onfocus=""editableContentFocused()""><br></div>
                                                     <div class=""" + TemplateElementClass + @""" style=""outline: 0px solid transparent""></div>
+                                                    <script>
+                                                    function editableContentFocused() {
+                                                        webkit.messageHandlers.editableContentFocusedHandler.postMessage("""");
+                                                    }
+                                                    </script>
                                                 </body>
                                             </html>";
 
@@ -73,8 +78,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             preferences.JavaScriptCanOpenWindowsAutomatically = false;
             preferences.JavaScriptEnabled = true;
 
+            var contentController = new WKUserContentController();
+            contentController.AddScriptMessageHandler(this, "editableContentFocusedHandler");
+
             var configuration = new WKWebViewConfiguration();
             configuration.Preferences = preferences;
+            configuration.UserContentController = contentController;
             configuration.SuppressesIncrementalRendering = false;
             configuration.AllowsInlineMediaPlayback = false;
 
@@ -436,6 +445,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
         }
 
+        public void DidReceiveScriptMessage(WKUserContentController userContentController, WKScriptMessage message)
+        {
+            if (message.Name == "editableContentFocusedHandler")
+            {
+                HandleScrollToView(this, EventArgs.Empty);
+            }
+        }
+
         #endregion
 
         class OldContentWebViewNavigationDelegate : WKNavigationDelegate
@@ -460,5 +477,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 });
             }
         }
+
     }
 }

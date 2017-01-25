@@ -6,6 +6,7 @@
 // Copyright (c) 2017 Nordic IT
 //
 using System;
+using Foundation;
 using Mark5.Mobile.Common;
 using UIKit;
 
@@ -72,9 +73,18 @@ namespace Mark5.Mobile.IOS.Utilities
 
                 return UIColor.Clear;
             }
-
-            #endregion
-
         }
+
+        #endregion
+
+        #region Notifications
+
+        public static float KeyboardHeightFromNotification(NSNotification notification)
+        {
+            var keyboardFrame = ((NSValue)notification.UserInfo[UIKeyboard.FrameEndUserInfoKey]).CGRectValue;
+            return (float)Math.Min(keyboardFrame.Width, keyboardFrame.Height); // Resolving correct dimension, to work around device bug http://stackoverflow.com/questions/9746417/keyboard-willshow-and-willhide-vs-rotation
+        }
+        #endregion
+
     }
 }

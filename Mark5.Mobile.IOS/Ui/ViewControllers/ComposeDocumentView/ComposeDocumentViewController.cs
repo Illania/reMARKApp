@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
@@ -53,6 +54,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem cancelButtonItem;
         UIBarButtonItem sendButtonItem;
 
+        // This value will be later updated from notification.
+        float keyboardHeight = 216.0f;
+
         public ComposeDocumentViewController()
         {
             Title = Localization.GetString("new_document");
@@ -74,10 +78,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeHandlers();
 
-            //TODO subscription to keyboard notifications
+            NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.DidShowNotification, OnKeyboardDidShowNotification);
+            NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillChangeFrameNotification, OnKeyboardDidShowNotification);
+            NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
         }
 
-        public override void ViewDidAppear(bool animated)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        public override async void ViewDidAppear(bool animated)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             base.ViewDidAppear(animated);
 
@@ -91,13 +99,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PreviousDocumentDirection = DocumentDirection.None;
             CreationModeFlag = DocumentCreationModeFlag.New;
 
-            LoadDocument();
+            await LoadDocument();
         }
 
         public override void ViewWillDisappear(bool animated)
         {
             base.ViewWillDisappear(animated);
             DeInitializeHandlers();
+
+            NSNotificationCenter.DefaultCenter.RemoveObservers(new[]
+            {
+                    UIKeyboard.DidShowNotification,
+                    UIKeyboard.WillChangeFrameNotification,
+                    UIKeyboard.WillHideNotification
+                });
         }
 
         #endregion
@@ -248,6 +263,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             return !lineView.LineSelectedIsAmbiguous;
+        }
+
+        #endregion
+
+        #region Keyboard Notifications
+
+        void OnKeyboardDidShowNotification(NSNotification notification)
+        {
+            keyboardHeight = UI.KeyboardHeightFromNotification(notification);
+
+            var insets = ScrollView.ContentInset;
+            insets.Bottom = keyboardHeight;
+            ScrollView.ContentInset = insets;
+        }
+
+        void OnKeyboardWillHideNotification(NSNotification notification)
+        {
+            var insets = ScrollView.ContentInset;
+            insets.Bottom = 0.0f;
+            ScrollView.ContentInset = insets;
         }
 
         #endregion
