@@ -39,19 +39,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         protected void HandleScrollToView(object sender, EventArgs e)
         {
-            //TODO this was for the form view, need to do the same for the stack view
-            //var parentScrollView = Superview as UIScrollView;
-            //if (parentScrollView != null)
-            //{
-            //    var frame = Frame;
-            //    frame.Height += HorizontalMargin;
-            //    if (frame.Height > parentScrollView.Frame.Height + parentScrollView.ContentOffset.Y)
-            //    {
-            //        frame.Height = parentScrollView.Frame.Height + parentScrollView.ContentOffset.Y;
-            //    }
+            var parentScrollView = Superview.Superview as UIScrollView;
+            if (parentScrollView != null)
+            {
+                var frame = Frame;
+                frame.Height += HorizontalMargin;
+                if (frame.Height > parentScrollView.Frame.Height + parentScrollView.ContentOffset.Y)
+                {
+                    frame.Height = parentScrollView.Frame.Height + parentScrollView.ContentOffset.Y;
+                }
 
-            //    parentScrollView.ScrollRectToVisible(frame, true);
-            //}
+                parentScrollView.ScrollRectToVisible(frame, true);
+            }
         }
 
         #endregion
