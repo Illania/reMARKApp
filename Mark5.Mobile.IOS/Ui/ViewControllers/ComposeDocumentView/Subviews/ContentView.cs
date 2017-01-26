@@ -489,8 +489,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             {
                 BeginInvokeOnMainThread(async () =>
                 {
-                    CommonConfig.Logger.Error("FINISHED NAVIGATION");
-
                     //Not sure why it does not work withouth the following line
                     await webView.EvaluateJavaScriptAsync("");
 
