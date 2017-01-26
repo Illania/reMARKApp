@@ -62,6 +62,7 @@
 "no_folders_in_section" = "There are no folders in this section";
 "no_matching_contacts" = "There are no matching contacts";
 "no_matching_documents" = "There are no matching documents";
+"no_matching_users" = "There are no matching users";
 "notifications" = "Notifications";
 "ok" = "OK";
 "own_worktray" = "My worktray";
