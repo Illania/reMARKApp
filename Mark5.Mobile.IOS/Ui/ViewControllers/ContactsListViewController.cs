@@ -23,7 +23,7 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
 
-    public class ContactsListViewController : UIViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
+    public class ContactsListViewController : AbstractViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
     {
 
         public Folder Folder { get; set; }
@@ -109,11 +109,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             contactsTableView = new UITableView();
             contactsTableView.ClipsToBounds = false;
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-            contactsTableView.Source = new DataSource(this, contactsTableView, (startId) => RefreshData(startId), Localization.GetString("folder_empty"));
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
-            contactsTableView.RowHeight = UITableView.AutomaticDimension;
-            contactsTableView.EstimatedRowHeight = 75f;
+            contactsTableView.Source = new DataSource(this, contactsTableView, Localization.GetString("folder_empty"));
             contactsTableView.AllowsSelectionDuringEditing = false;
             contactsTableView.AllowsMultipleSelectionDuringEditing = true;
             contactsTableView.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -144,7 +140,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DefinesPresentationContext = true;
 
             searchResultsController = new UITableViewController();
-            searchResultsDataSource = new DataSource(this, searchResultsController.TableView, null, Localization.GetString("no_matching_contacts"));
+            searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_contacts"));
             searchResultsController.TableView.Source = searchResultsDataSource;
 
             searchController = new UISearchController(searchResultsController)
@@ -420,18 +416,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             ContactsListViewController viewController;
             UITableView contactsTableView;
-            readonly Action<int> loadMoreAction;
             readonly string emptyText;
-            readonly bool compact;
 
             bool loading = true;
             List<ContactPreview> contactPreviewsInView = new List<ContactPreview>(1000);
 
-            public DataSource(ContactsListViewController viewController, UITableView contactsTableView, Action<int> loadMoreAction, string emptyText)
+            public DataSource(ContactsListViewController viewController, UITableView contactsTableView, string emptyText)
             {
                 this.viewController = viewController;
                 this.contactsTableView = contactsTableView;
-                this.loadMoreAction = loadMoreAction;
                 this.emptyText = emptyText;
             }
 

@@ -11,7 +11,7 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
 
-    public class DocumentViewController : UIViewController, ISecondaryViewController
+    public class DocumentViewController : AbstractViewController, ISecondaryViewController
     {
         
         public bool Empty { get { return true; } }
