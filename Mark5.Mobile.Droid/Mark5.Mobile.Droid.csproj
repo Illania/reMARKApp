@@ -307,7 +307,6 @@
     <Compile Include="Utilities\DeviceInfoProvider.cs" />
     <Compile Include="Utilities\InsecureAndroidClientHandler.cs" />
     <Compile Include="Utilities\Integration.cs" />
-    <Compile Include="Utilities\LambdaEqualityComparer.cs" />
     <Compile Include="Utilities\PortableConcurrentQueue.cs" />
     <Compile Include="Utilities\Preferences.cs" />
     <Compile Include="Utilities\PushNotificationsConverter.cs" />

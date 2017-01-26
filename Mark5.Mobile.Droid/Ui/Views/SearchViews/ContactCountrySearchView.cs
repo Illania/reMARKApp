@@ -8,6 +8,7 @@
 using System.Linq;
 using Android.Content;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews

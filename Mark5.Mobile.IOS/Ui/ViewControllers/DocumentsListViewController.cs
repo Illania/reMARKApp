@@ -24,7 +24,7 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     
-    public class DocumentsListViewController : UIViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
+    public class DocumentsListViewController : AbstractViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
     {
 
         const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
@@ -269,7 +269,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (selectedDocuments.Any(dp => dp.IsReadByCurrent))
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("mark_as_unread"), UIAlertActionStyle.Default, a => { MarkAsUnread(selectedDocuments, rows); EndEditing(); }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, null)); // TODO
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a => { CopyToWorktray(selectedDocuments); EndEditing(); }));
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyMoveToFolderListViewController(selectedDocuments.Cast<IBusinessEntity>().ToList());
@@ -303,6 +303,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
             PresentViewController(eas, true, null);
+        }
+
+        void CopyToWorktray(DocumentPreview documentPreview) => CopyToWorktray(new List<DocumentPreview> { documentPreview });
+
+        void CopyToWorktray(List<DocumentPreview> documentPreviews)
+        {
+            var vc = new CopyToWorktrayViewController { BusinessEntities = documentPreviews.Cast<IBusinessEntity>().ToList() };
+            NavigationController.PresentViewController(new NavigationController(vc), true, null);
         }
 
         void MarkAsRead(DocumentPreview documentPreview, NSIndexPath row) => MarkAsRead(new List<DocumentPreview> { documentPreview }, new[] { row });
@@ -614,7 +622,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 moreAction.BackgroundColor = Theme.Blue;
                 actions.Add(moreAction);
 
-                var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("copy_to_worktray"), (a, ip) => { viewController.EndEditing(); }); // TODO
+                var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("copy_to_worktray"), (a, ip) => { viewController.CopyToWorktray(documentPreview); viewController.EndEditing(); });
                 copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
                 actions.Add(copyToWorktrayAction);
 

@@ -273,6 +273,7 @@
     </Compile>
     <Compile Include="Ui\ViewControllers\FoldersList\CopyMoveToFolderListViewController.cs" />
     <Compile Include="Ui\Common\HubMessages\EntityMovedFromFolderMessage.cs" />
+    <Compile Include="Ui\ViewControllers\CopyToWorktrayViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
