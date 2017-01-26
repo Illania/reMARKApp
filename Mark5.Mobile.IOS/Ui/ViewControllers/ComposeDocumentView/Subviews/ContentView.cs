@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
 using AngleSharp.Html;
@@ -34,8 +35,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         WKWebView newContentWebView;
         WKWebView oldContentWebView;
 
-        nfloat initialHeight = 200.0f;
-
         string oldContent;
         bool oldContentLoaded;
 
@@ -44,7 +43,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         NSLayoutConstraint newContentHeightConstraint;
 
         NSLayoutConstraint oldContentZeroHeightConstraint;
-        NSLayoutConstraint oldContentHeightConstraint; //TODO every now and then "could not find div with id...."
+        NSLayoutConstraint oldContentHeightConstraint;
+
+        SemaphoreSlim newContentLoadingSemaphore;
 
         const string EditableContentClass = "content_c176f8ef-2579-4f1f-86c1-f289beaba2ae";
         const string TemplateElementClass = "template_75bb41fd-4984-43f5-b61d-3dbbe87bca21";
@@ -74,7 +75,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public ContentView()
         {
             constraintsStash = new Dictionary<UIView, NSLayoutConstraint[]>();
-
+            newContentLoadingSemaphore = new SemaphoreSlim(0);
             InitializeNewContentControls();
             InitializePreviousContentControls();
         }
@@ -102,10 +103,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             newContentWebView.ScrollView.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
             newContentWebView.ScrollView.ScrollEnabled = false;
             var navigationDelegate = new WebViewNavigationDelegate();
-            navigationDelegate.HeightChangedAction = () => UpdateWebViewHeight(newContentWebView, newContentHeightConstraint);
+            navigationDelegate.DidFinishNavigationAction = () =>
+            {
+                UpdateWebViewHeight(newContentWebView, newContentHeightConstraint);
+                newContentLoadingSemaphore.Release();
+            };
             newContentWebView.NavigationDelegate = navigationDelegate;
 
-            newContentHeightConstraint = NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, 50);
+            newContentHeightConstraint = NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, 200);
             AddSubview(newContentWebView);
             AddConstraints(new[]
                 {
@@ -151,7 +156,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             oldContentWebView.Hidden = true;
             oldContentWebView.Opaque = false;
             var oldContentWebViewNavigationDelegate = new WebViewNavigationDelegate();
-            oldContentWebViewNavigationDelegate.HeightChangedAction = () => UpdateWebViewHeight(oldContentWebView, oldContentHeightConstraint);
+            oldContentWebViewNavigationDelegate.DidFinishNavigationAction = () => UpdateWebViewHeight(oldContentWebView, oldContentHeightConstraint);
             oldContentWebView.NavigationDelegate = oldContentWebViewNavigationDelegate;
 
             oldContentWebView.ScrollView.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
@@ -352,6 +357,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         async Task SetWebContentPart(string parentElementClass, ContentType contentType, string content)
         {
+            await newContentLoadingSemaphore.WaitAsync();
+
             var currentContent = (await newContentWebView.EvaluateJavaScriptAsync(GetWebContentJs) as NSString);
 
             var htmlParser = new HtmlParser();
@@ -476,19 +483,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         class WebViewNavigationDelegate : WKNavigationDelegate
         {
-            public Action HeightChangedAction { get; set; }
+            public Action DidFinishNavigationAction { get; set; }
 
             public override void DidFinishNavigation(WKWebView webView, WKNavigation navigation)
             {
                 BeginInvokeOnMainThread(async () =>
                 {
+                    CommonConfig.Logger.Error("FINISHED NAVIGATION");
+
                     //Not sure why it does not work withouth the following line
                     await webView.EvaluateJavaScriptAsync("");
 
-                    if (HeightChangedAction != null)
+                    if (DidFinishNavigationAction != null)
                     {
-                        HeightChangedAction();
+                        DidFinishNavigationAction();
                     }
+
+
                 });
             }
         }
