@@ -43,7 +43,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (parentScrollView != null)
             {
                 var frame = Frame;
-                frame.Height += HorizontalMargin;
+                frame.Height -= 2 * VerticalMargin;
                 if (frame.Height > parentScrollView.Frame.Height + parentScrollView.ContentOffset.Y)
                 {
                     frame.Height = parentScrollView.Frame.Height + parentScrollView.ContentOffset.Y;

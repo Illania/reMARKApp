@@ -149,7 +149,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public void SetLineFromGuid(Guid lineGuid)
         {
-            var line = availableOutgoingLines.First(l => l.Guid == lineGuid);
+            var line = availableOutgoingLines.FirstOrDefault(l => l.Guid == lineGuid);
             if (line != null)
             {
                 SetLine(line);
