@@ -1,5 +1,5 @@
 ﻿//
-// Project: ${Project}
+// Project: Mark5.Mobile.IOS
 // File: CopyToWorktrayViewController.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
@@ -8,14 +8,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using UIKit;
@@ -23,7 +21,7 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
 
-    public class CopyToWorktrayViewController : AbstractViewController, IUISearchResultsUpdating
+    public class CopyToWorktrayViewController : AbstractViewController
     {
 
         public List<IBusinessEntity> BusinessEntities { get; set; }
@@ -32,12 +30,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem doneItem;
 
         UITableView tableView;
-        UISearchController searchController;
-        UITableViewController searchResultsController;
-        SearchDataSource searchResultsDataSource;
-
-        CancellationTokenSource searchCancellationTokenSource;
-        readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
         public override void LoadView()
         {
@@ -45,7 +37,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeNavigationBar();
             InitializeView();
-            InitializeSearchBar();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -114,28 +105,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
                 });
-        }
-
-        void InitializeSearchBar()
-        {
-            DefinesPresentationContext = true;
-
-            searchResultsController = new UITableViewController();
-            searchResultsDataSource = new SearchDataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_users"));
-            searchResultsController.TableView.Source = searchResultsDataSource;
-            searchResultsController.TableView.AllowsSelection = true;
-            searchResultsController.TableView.AllowsMultipleSelection = true;
-
-            searchController = new UISearchController(searchResultsController)
-            {
-                HidesNavigationBarDuringPresentation = true,
-                DimsBackgroundDuringPresentation = true,
-                ObscuresBackgroundDuringPresentation = true,
-                SearchResultsUpdater = this
-            };
-            searchController.SearchBar.Placeholder = Localization.GetString("filter");
-
-            tableView.TableHeaderView = searchController.SearchBar;
         }
 
         void InitializeNavigationBarTitle()
@@ -232,95 +201,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DisableDoneButton() => doneItem.Enabled = false;
 
-        public bool IsUserSelected(SystemUser systemUser)
-        {
-            var ds = (DataSource)tableView.Source;
-            return ds.SelectedItems.Contains(systemUser, LambdaEqualityComparer<SystemUser>.Create(su => su.Id));
-        }
-
-        public void SelectUser(SystemUser systemUser)
-        {
-            var ds = (DataSource)tableView.Source;
-            var ip = ds.IndexPathForItem(systemUser);
-
-            if (ip != null)
-            {
-                tableView.SelectRow(ip, false, UITableViewScrollPosition.None);
-            }
-        }
-
-        public void DeselectUser(SystemUser systemUser)
-        {
-            var ds = (DataSource)tableView.Source;
-            var ip = ds.IndexPathForItem(systemUser);
-
-            if (ip != null)
-            {
-                tableView.DeselectRow(ip, false);
-            }
-        }
-
-        void IUISearchResultsUpdating.UpdateSearchResultsForSearchController(UISearchController searchController)
-        {
-            var searchText = searchController.SearchBar.Text;
-
-            if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
-            {
-                searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
-                searchCancellationTokenSourceList.Clear();
-                searchResultsDataSource.Reset();
-            }
-            else
-            {
-                if (searchCancellationTokenSource != null)
-                {
-                    searchCancellationTokenSource.Cancel();
-                    searchCancellationTokenSourceList.Remove(searchCancellationTokenSource);
-                    searchCancellationTokenSource = null;
-                }
-
-                searchCancellationTokenSource = new CancellationTokenSource();
-                searchCancellationTokenSourceList.Add(searchCancellationTokenSource);
-
-                DoSearchUsers(searchText, searchCancellationTokenSource.Token);
-            }
-        }
-
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        async void DoSearchUsers(string searchText, CancellationToken ct)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
-        {
-            searchResultsDataSource.Reset();
-
-            await Task.Delay(500);
-
-            if (ct.IsCancellationRequested) return;
-
-            var ds = (DataSource)tableView.Source;
-            var filteredDocuments = ds.Items.Where(dp => MatchesQuery(dp, searchText)).ToList();
-
-            if (ct.IsCancellationRequested) return;
-
-            searchResultsDataSource.SetItems(filteredDocuments);
-        }
-
-        static bool MatchesQuery(SystemUser su, string query)
-        {
-            if (su.Username.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-
-            if (su.FirstName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-
-            if (su.LastName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-
-            if (su.PatronymicName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-
-            return false;
-        }
-
         class DataSource : UITableViewSource, IDisposable
         {
 
@@ -349,14 +229,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     var rows = tableView.IndexPathsForSelectedRows.ToArray();
                     return rows.Select(ip => systemUsersInView[ip.Row]).ToList();
-                }
-            }
-
-            public List<SystemUser> Items
-            {
-                get
-                {
-                    return systemUsersInView;
                 }
             }
 
@@ -473,134 +345,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 systemUsersInView.Clear();
                 tableView.ReloadSections(NSIndexSet.FromIndex(1), UITableViewRowAnimation.Automatic);
-            }
-
-            public NSIndexPath IndexPathForItem(SystemUser systemUser)
-            {
-                for (var i = 0; i < systemUsersInView.Count; i++)
-                    if (systemUsersInView[i].Id == systemUser.Id)
-                        return NSIndexPath.FromRowSection(i, 0);
-
-                return null;
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                base.Dispose(disposing);
-
-                viewController = null;
-                tableView = null;
-                systemUsersInView = null;
-            }
-        }
-
-        class SearchDataSource : UITableViewSource, IDisposable
-        {
-
-            CopyToWorktrayViewController viewController;
-            UITableView tableView;
-            string emptyText;
-
-            List<SystemUser> systemUsersInView = new List<SystemUser>();
-
-            bool loading = true;
-
-            public SearchDataSource(CopyToWorktrayViewController viewController, UITableView tableView, string emptyText)
-            {
-                this.viewController = viewController;
-                this.tableView = tableView;
-                this.emptyText = emptyText;
-            }
-
-            public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
-            {
-                if (loading)
-                {
-                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
-                }
-
-                if (systemUsersInView.Count < 1)
-                {
-                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                    emptyCell.Initialize(emptyText);
-                    return emptyCell;
-                }
-
-                var su = systemUsersInView[indexPath.Row];
-
-                var cell = tableView.DequeueReusableCell("subtitle") ?? new UITableViewCell(UITableViewCellStyle.Subtitle, "subtitle");
-                cell.TextLabel.Text = $"{su.FirstName} {su.LastName}";
-                cell.DetailTextLabel.Text = su.Username;
-                cell.SelectionStyle = UITableViewCellSelectionStyle.None;
-
-                cell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath) ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
-
-                return cell;
-            }
-
-            public override nint RowsInSection(UITableView tableview, nint section)
-            {
-                if (loading)
-                    return 1;
-
-                if (systemUsersInView.Count < 1)
-                    return 1;
-
-                return systemUsersInView.Count;
-            }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return 44f;
-            }
-
-            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
-            {
-                var cell = tableView.CellAt(indexPath);
-                cell.Accessory = UITableViewCellAccessory.Checkmark;
-
-                viewController.SelectUser(systemUsersInView[indexPath.Row]);
-            }
-
-            public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
-            {
-                var cell = tableView.CellAt(indexPath);
-                cell.Accessory = UITableViewCellAccessory.None;
-
-                viewController.DeselectUser(systemUsersInView[indexPath.Row]);
-            }
-
-            public void SetItems(List<SystemUser> systemUsers)
-            {
-                loading = false;
-
-                systemUsersInView.Clear();
-                systemUsersInView.AddRange(systemUsers);
-
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
-
-                for (var i = 0; i < systemUsersInView.Count; i++)
-                {
-                    if (viewController.IsUserSelected(systemUsersInView[i]))
-                    {
-                        var cell = tableView.CellAt(NSIndexPath.FromRowSection(i, 0));
-                        if (cell != null) cell.Accessory = UITableViewCellAccessory.Checkmark;
-                        tableView.SelectRow(NSIndexPath.FromRowSection(i, 0), false, UITableViewScrollPosition.None);
-                    }
-                    else
-                    {
-                        var cell = tableView.CellAt(NSIndexPath.FromRowSection(i, 0));
-                        if (cell != null) cell.Accessory = UITableViewCellAccessory.None;
-                    }
-                }
-            }
-
-            public void Reset()
-            {
-                loading = true;
-
-                systemUsersInView.Clear();
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
             }
 
             protected override void Dispose(bool disposing)
