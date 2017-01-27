@@ -23,8 +23,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     
     public class NotificationsListViewController : AbstractViewController
     {
-        
+
+        UIRefreshControl refreshControl;
         UITableView tableView;
+
+        bool refreshing;
 
         public override void LoadView()
         {
@@ -48,7 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(CopyToWorktrayViewController)} appeared");
+            CommonConfig.Logger.Info($"{nameof(NotificationsListViewController)} appeared");
 
             var ds = (DataSource)tableView.Source;
             if (ds.Empty)
@@ -64,7 +67,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(CopyToWorktrayViewController)} received memory warning!");
+            CommonConfig.Logger.Warning($"{nameof(NotificationsListViewController)} received memory warning!");
 
             var ds = tableView?.DataSource as DataSource;
             ds?.Reset();
@@ -93,6 +96,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
                 });
+
+            refreshControl = new UIRefreshControl();
+            refreshControl.BackgroundColor = UIColor.White;
+            refreshControl.AttributedTitle = Localization.GetNSAttributedString("pull_to_refresh");
+            tableView.AddSubview(refreshControl);
         }
 
         void InitializeNavigationBarTitle()
@@ -102,14 +110,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeHandlers()
         {
+            if (refreshControl != null)
+                refreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
         void DeinitializeHandlers()
         {
+            if (refreshControl != null)
+                refreshControl.ValueChanged -= RefreshControl_ValueChanged;
         }
+
+        async void RefreshControl_ValueChanged(object sender, EventArgs e) => await RefreshData();
 
         async Task RefreshData()
         {
+            if (refreshing) return;
+
+            refreshing = true;
+            refreshControl.ValueChanged -= RefreshControl_ValueChanged;
+
             CommonConfig.Logger.Info($"Refreshing list of notifications");
 
             try
@@ -124,6 +143,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
+
+            refreshControl.EndRefreshing();
+            refreshControl.ValueChanged += RefreshControl_ValueChanged;
+
+            refreshing = false;
         }
 
         public void NotificationSelected(Notification n)
