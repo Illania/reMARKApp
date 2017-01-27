@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
@@ -23,6 +22,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     
     public class NotificationsListViewController : AbstractViewController
     {
+
+        UIBarButtonItem markAsReadItem;
 
         UIRefreshControl refreshControl;
         UITableView tableView;
@@ -77,6 +78,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
+            markAsReadItem = new UIBarButtonItem();
+            markAsReadItem.Title = Localization.GetString("mark_as_read");
+            markAsReadItem.Enabled = false;
+            NavigationItem.SetRightBarButtonItem(markAsReadItem, false);
         }
 
         void InitializeView()
@@ -110,14 +115,38 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeHandlers()
         {
+            if (markAsReadItem != null)
+                markAsReadItem.Clicked += MarkAsReadItem_Clicked;
+
             if (refreshControl != null)
                 refreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
         void DeinitializeHandlers()
         {
+            if (markAsReadItem != null)
+                markAsReadItem.Clicked -= MarkAsReadItem_Clicked;
+            
             if (refreshControl != null)
                 refreshControl.ValueChanged -= RefreshControl_ValueChanged;
+        }
+
+        async void MarkAsReadItem_Clicked(object sender, EventArgs e)
+        {
+            try
+            {
+                var ds = (DataSource)tableView.Source;
+                await Managers.NotificationsManager.MarkAsRead(ds.Items);
+                ds.Reload();
+
+                markAsReadItem.Enabled = false;
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Marking notifications as read failed", ex);
+
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
         }
 
         async void RefreshControl_ValueChanged(object sender, EventArgs e) => await RefreshData();
@@ -136,6 +165,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
                 var ds = (DataSource)tableView.Source;
                 ds.SetItems(notifications);
+
+                markAsReadItem.Enabled = notifications.Any(n => !n.IsRead);
             }
             catch (Exception ex)
             {
@@ -152,6 +183,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void NotificationSelected(Notification n)
         {
+            // TODO
         }
 
         class DataSource : UITableViewSource, IDisposable
@@ -162,6 +194,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 get
                 {
                     return notificationsInView.Count < 1;
+                }
+            }
+
+            public List<Notification> Items
+            {
+                get
+                {
+                    return notificationsInView;
                 }
             }
 
@@ -232,6 +272,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 notificationsInView.Clear();
                 notificationsInView.AddRange(systemUsers);
 
+                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+            }
+
+            public void Reload()
+            {
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
             }
 
