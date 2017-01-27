@@ -352,6 +352,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("template_selection_title"), templateListStrings, contentView);
                 switch (result)
                 {
+                    case -1:
+                        break;
                     case 0:
                         await GetDefaultTemplate(true);
                         break;

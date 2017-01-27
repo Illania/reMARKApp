@@ -719,6 +719,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Localization.GetString("categories") };
 
             var result = await Dialogs.ShowListDialogAsync(this, null, flagListStrings, flag);
+
+            if (result < 0)
+                return;
+
             switch (result)
             {
                 case 0:
@@ -737,6 +741,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("forward")};
 
             var result = await Dialogs.ShowListDialogAsync(this, null, replyListStrings, replyActions);
+
+            if (result < 0)
+                return;
+
             switch (result)
             {
                 case 0:
@@ -759,6 +767,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("delete_from_folder")};
 
             var result = await Dialogs.ShowListDialogAsync(this, null, fileToListStrings, fileTo);
+
+            if (result < 0)
+                return;
+
             switch (result)
             {
                 case 0:

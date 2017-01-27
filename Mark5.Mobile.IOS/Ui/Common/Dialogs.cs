@@ -93,11 +93,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             for (int i = 0; i < listStrings.Length; i++)
             {
-                var ab = i; //TODO make it elegant (can't use i, because it's the variable, not the value, that's captured in the lambda)
+                var ab = i; //Can't use i, because it's the variable, not the value, that's captured in the lambda)
                 actionSheet.AddAction(UIAlertAction.Create(listStrings[i], UIAlertActionStyle.Default, a => tcs.SetResult(ab)));
             }
 
-            actionSheet.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+            actionSheet.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => tcs.SetResult(-1)));
             return actionSheet;
         }
 

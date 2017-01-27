@@ -183,24 +183,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         #region Event handlers
 
         [Export("LineLabelTapped")]
-        void LineLabelTapped()
+        async void LineLabelTapped()
         {
             selectedLineLabel.TextColor = Theme.TintColor;
 
             HandleScrollToView(this, EventArgs.Empty);
             ActionSheetWillAppear(this, EventArgs.Empty);
 
-            var linesActionSheet = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
-            foreach (var line in availableOutgoingLines)
+            var lineNames = availableOutgoingLines.Select(l => l.Name).ToArray();
+            var result = await Dialogs.ShowListDialogAsync(viewController, null, lineNames, selectedLineLabel);
+
+            if (result >= 0)
             {
-                linesActionSheet.AddAction(UIAlertAction.Create(line.Name, UIAlertActionStyle.Default, a => SetLine(line)));
+                SetLine(availableOutgoingLines[result]);
             }
-            linesActionSheet.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, a => selectedLineLabel.TextColor = UIColor.DarkTextColor));
-            if (linesActionSheet.PopoverPresentationController != null)
-            {
-                //linesActionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(selectedLineLabel); //TODO
-            }
-            viewController.PresentViewController(linesActionSheet, true, null);
         }
 
         #endregion
