@@ -45,6 +45,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         NSLayoutConstraint oldContentZeroHeightConstraint;
         NSLayoutConstraint oldContentHeightConstraint;
 
+        nfloat centerGestureStartY;
+
         SemaphoreSlim newContentLoadingSemaphore;
 
         const string EditableContentClass = "content_c176f8ef-2579-4f1f-86c1-f289beaba2ae";
@@ -102,6 +104,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             newContentWebView.ScrollView.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
             newContentWebView.ScrollView.ScrollEnabled = false;
+            var tapRecognizer = new UITapGestureRecognizer(HandleTap);
+            tapRecognizer.Delegate = this;
+            newContentWebView.ScrollView.AddGestureRecognizer(tapRecognizer);
             var navigationDelegate = new WebViewNavigationDelegate();
             navigationDelegate.DidFinishNavigationAction = () =>
             {
@@ -110,7 +115,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             };
             newContentWebView.NavigationDelegate = navigationDelegate;
 
-            newContentHeightConstraint = NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, 200);
+            newContentHeightConstraint = NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, 200);
             AddSubview(newContentWebView);
             AddConstraints(new[]
                 {
@@ -163,7 +168,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             oldContentWebView.ScrollView.ScrollEnabled = false;
             AddSubview(oldContentWebView);
 
-            oldContentHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, 0.5f);
+            oldContentHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, 0.5f);
             oldContentZeroHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, 0.0f);
 
             AddConstraints(new[]
@@ -175,6 +180,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 oldContentZeroHeightConstraint
             });
         }
+
+        #region IUIGestureRecognizerDelegate
+
+        [Export("gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:")]
+        public bool ShouldRecognizeSimultaneously(UIGestureRecognizer gestureRecognizer, UIGestureRecognizer otherGestureRecognizer)
+        {
+            return true;
+        }
+
+        #endregion
+
+        #region Gesture Recognizer handlers
+
+        void HandleTap(UITapGestureRecognizer gestureRecognizer)
+        {
+            centerGestureStartY = gestureRecognizer.LocationInView(Superview.Superview).Y;
+        }
+
+        #endregion
 
         #region Public methods
 
@@ -466,7 +490,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             if (message.Name == "editableContentFocusedHandler")
             {
-                HandleScrollToView(this, EventArgs.Empty);
+                var scrollView = Superview.Superview as UIScrollView;
+                scrollView.SetContentOffset(new CGPoint(0, centerGestureStartY - scrollView.ContentInset.Top - 20), true);
+                newContentWebView.ScrollView.SetContentOffset(new CGPoint(0, 0), true);
             }
             else if (message.Name == "editableContentInputHandler")
             {
@@ -476,7 +502,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void UpdateWebViewHeight(WKWebView webView, NSLayoutConstraint heightConstraint)
         {
-            heightConstraint.Constant = webView.ScrollView.ContentSize.Height;
+            var newHeight = webView.ScrollView.ContentSize.Height;
+
+            if (newHeight != heightConstraint.Constant)
+            {
+                heightConstraint.Constant = newHeight;
+                CommonConfig.Logger.Debug($"NEW HEIGHT = {newHeight}");
+            }
+
         }
 
         #endregion
