@@ -235,8 +235,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var n = notificationsInView[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell("default") ?? new UITableViewCell(UITableViewCellStyle.Default, "default");
-                cell.TextLabel.Text = n.Message;
+                var cell = tableView.DequeueReusableCell(NotificationsTableViewCell.Key) as NotificationsTableViewCell ?? NotificationsTableViewCell.Create();
+                cell.Initialize(n);
 
                 cell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath) ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
 
@@ -256,7 +256,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                return 44f;
+                return 60f;
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)

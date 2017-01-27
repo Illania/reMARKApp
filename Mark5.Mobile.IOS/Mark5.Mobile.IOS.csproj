@@ -175,6 +175,7 @@
     <InterfaceDefinition Include="Ui\TableViewCells\ExternalDocumentsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\ContactsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\ShortcodesTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\NotificationsTableViewCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -274,6 +275,10 @@
     <Compile Include="Ui\ViewControllers\FoldersList\CopyMoveToFolderListViewController.cs" />
     <Compile Include="Ui\Common\HubMessages\EntityMovedFromFolderMessage.cs" />
     <Compile Include="Ui\ViewControllers\CopyToWorktrayViewController.cs" />
+    <Compile Include="Ui\TableViewCells\NotificationsTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\NotificationsTableViewCell.designer.cs">
+      <DependentUpon>NotificationsTableViewCell.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
