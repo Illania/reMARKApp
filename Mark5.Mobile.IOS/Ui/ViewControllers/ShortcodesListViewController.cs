@@ -23,7 +23,7 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
 
-    public class ShortcodesListViewController : UIViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
+    public class ShortcodesListViewController : AbstractViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
     {
 
         public Folder Folder { get; set; }
@@ -109,11 +109,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             shortcodesTableView = new UITableView();
             shortcodesTableView.ClipsToBounds = false;
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-            shortcodesTableView.Source = new DataSource(this, shortcodesTableView, (startId) => RefreshData(startId), Localization.GetString("folder_empty"));
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
-            shortcodesTableView.RowHeight = UITableView.AutomaticDimension;
-            shortcodesTableView.EstimatedRowHeight = 75f;
+            shortcodesTableView.Source = new DataSource(this, shortcodesTableView, Localization.GetString("folder_empty"));
             shortcodesTableView.AllowsSelectionDuringEditing = false;
             shortcodesTableView.AllowsMultipleSelectionDuringEditing = true;
             shortcodesTableView.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -144,7 +140,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DefinesPresentationContext = true;
 
             searchResultsController = new UITableViewController();
-            searchResultsDataSource = new DataSource(this, searchResultsController.TableView, null, Localization.GetString("no_matching_shortcodes"));
+            searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_shortcodes"));
             searchResultsController.TableView.Source = searchResultsDataSource;
 
             searchController = new UISearchController(searchResultsController)
@@ -401,18 +397,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             ShortcodesListViewController viewController;
             UITableView shortcodesTableView;
-            readonly Action<int> loadMoreAction;
             readonly string emptyText;
-            readonly bool compact;
 
             bool loading = true;
             List<ShortcodePreview> shortcodePreviewsInView = new List<ShortcodePreview>(1000);
 
-            public DataSource(ShortcodesListViewController viewController, UITableView shortcodesTableView, Action<int> loadMoreAction, string emptyText)
+            public DataSource(ShortcodesListViewController viewController, UITableView shortcodesTableView, string emptyText)
             {
                 this.viewController = viewController;
                 this.shortcodesTableView = shortcodesTableView;
-                this.loadMoreAction = loadMoreAction;
                 this.emptyText = emptyText;
             }
 

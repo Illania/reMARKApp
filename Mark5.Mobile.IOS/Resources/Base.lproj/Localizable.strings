@@ -97,11 +97,13 @@
 "no_templates_title" = "No templates";
 "no" = "No";
 "normal" = "Normal";
+"no_matching_users" = "There are no matching users";
 "notifications" = "Notifications";
 "notifications" = "Notifications";
 "ok" = "OK";
 "opening_attachment___" = "Opening attachment...";
 "originator" = "Originator";
+"own_worktray" = "My worktray";
 "password" = "Password";
 "please_restart" = "Please restart MARK5 app";
 "please_wait___" = "Please wait...";
