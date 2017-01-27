@@ -432,7 +432,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_change_draft, () => SendDocument(true), SaveAndCloseComposeActivity);
             }
-            else
+            else //TODO what is this 3rd condition for...?
             {
                 Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft, () => SendDocument(true), SaveAndCloseComposeActivity);
             }

@@ -289,15 +289,65 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        void SendButtonItem_Clicked(object sender, EventArgs e)
+        async void SendButtonItem_Clicked(object sender, EventArgs e)
         {
-            //TODO
+            await SendDocument(false);
         }
 
-        void CancelButtonItem_Clicked(object sender, EventArgs e)
+        async void CancelButtonItem_Clicked(object sender, EventArgs e)
         {
-            //TODO complete
-            PopOrDismissViewController();
+
+            if (LocalDocument)
+            {
+                //TODO    
+            }
+            else
+            {
+                var confirm = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("save_draft"), Localization.GetString("confirm_save_as_draft"));
+                if (confirm)
+                {
+                    await SendDocument(true);
+                }
+                else
+                {
+                    PopOrDismissViewController(); //TODO check if we need to do else
+                }
+            }
+
+        }
+
+        async Task SendDocument(bool draft)
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(draft ? Localization.GetString("saving_draft___") : Localization.GetString("sending_document___"));
+
+            try
+            {
+                foreach (var subView in subViews)
+                {
+                    await subView.UpdateDocument();
+                }
+
+                DocumentPreview.Direction = draft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
+
+                if (LocalDocument)
+                {
+                    //TODO
+                }
+
+                await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,
+                                                            PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1,
+                                                           0, false, false);
+                dismissAction();
+
+                PopOrDismissViewController();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Failed to insert document in outgoing [isDraft={draft}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
         }
 
         void PopOrDismissViewController()
@@ -344,7 +394,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 await GetDefaultTemplate();
             }
-            else if (useTemplate == Preferences.TemplateUsageMode.AlwaysAsk) //TODO popover delegate not set
+            else if (useTemplate == Preferences.TemplateUsageMode.AlwaysAsk)
             {
                 var templateListStrings = new string[] { Localization.GetString("template_selection_default"),
                     Localization.GetString("template_selection_local"),

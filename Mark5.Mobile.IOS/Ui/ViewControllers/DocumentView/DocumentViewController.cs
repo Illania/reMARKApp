@@ -830,7 +830,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void EditDocumentButtonItem_Clicked(object sender, EventArgs e)
         {
+            var composeDocumentViewController = new ComposeDocumentViewController()
+            {
+                PreviousDocumentPreview = DocumentPreview,
+                PreviousDocument = Document,
+                CreationModeFlag = DocumentCreationModeFlag.Edit,
+                PreviousDocumentDirection = DocumentPreview.Direction,
+                PreviousDocumentFolderId = Folder.Id
+            };
 
+            var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
+            composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
+            PresentViewController(composeDocumentNavigationController, true, null);
         }
 
         void DoneButtonItem_Clicked(object sender, EventArgs e)
@@ -902,13 +913,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DoReply(DocumentCreationModeFlag creationModeFlag)
         {
-            var composeDocumentViewController = new ComposeDocumentViewController();
-            composeDocumentViewController.PreviousDocumentId = DocumentPreview.Id;
-            composeDocumentViewController.CreationModeFlag = creationModeFlag;
-            composeDocumentViewController.PreviousDocumentFolderId = FolderId ?? Folder?.Id;
-            composeDocumentViewController.PreviousDocumentDirection = DocumentPreview.Direction;
-            composeDocumentViewController.PreviousDocument = Document;
-            composeDocumentViewController.PreviousDocumentPreview = DocumentPreview;
+            var composeDocumentViewController = new ComposeDocumentViewController()
+            {
+                PreviousDocumentId = DocumentPreview.Id,
+                CreationModeFlag = creationModeFlag,
+                PreviousDocumentFolderId = FolderId ?? Folder?.Id,
+                PreviousDocumentDirection = DocumentPreview.Direction,
+                PreviousDocument = Document,
+                PreviousDocumentPreview = DocumentPreview
+            };
 
             var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
             composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
