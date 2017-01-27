@@ -78,11 +78,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeView()
         {
+            AutomaticallyAdjustsScrollViewInsets = true;
+
+            tableView = new UITableView();
+            tableView.ClipsToBounds = false;
+            tableView.Source = new DataSource(this, tableView, Localization.GetString("no_notifications"));
+            tableView.AllowsSelection = true;
+            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
+            View.AddSubview(tableView);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
+                });
         }
 
         void InitializeNavigationBarTitle()
         {
-            NavigationItem.Title = Localization.GetString("notfications");
+            NavigationItem.Title = Localization.GetString("notifications");
         }
 
         void InitializeHandlers()
@@ -93,9 +108,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
         }
 
-        Task RefreshData()
+        async Task RefreshData()
         {
-            throw new NotImplementedException();
+            CommonConfig.Logger.Info($"Refreshing list of notifications");
+
+            try
+            {
+                var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
+                var ds = (DataSource)tableView.Source;
+                ds.SetItems(notifications);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Could not refresh list of notifications", ex);
+
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+        }
+
+        public void NotificationSelected(Notification n)
+        {
         }
 
         class DataSource : UITableViewSource, IDisposable
@@ -161,6 +193,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
             {
                 return 44f;
+            }
+
+            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+            {
+                var n = notificationsInView[indexPath.Row];
+                viewController.NotificationSelected(n);
             }
 
             public void SetItems(List<Notification> systemUsers)
