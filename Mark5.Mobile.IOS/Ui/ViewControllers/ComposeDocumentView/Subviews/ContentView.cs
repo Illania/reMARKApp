@@ -181,25 +181,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             });
         }
 
-        #region IUIGestureRecognizerDelegate
-
-        [Export("gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:")]
-        public bool ShouldRecognizeSimultaneously(UIGestureRecognizer gestureRecognizer, UIGestureRecognizer otherGestureRecognizer)
-        {
-            return true;
-        }
-
-        #endregion
-
-        #region Gesture Recognizer handlers
-
-        void HandleTap(UITapGestureRecognizer gestureRecognizer)
-        {
-            centerGestureStartY = gestureRecognizer.LocationInView(Superview.Superview).Y;
-        }
-
-        #endregion
-
         #region Public methods
 
         public override async Task RefreshView()
@@ -452,6 +433,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #endregion
 
+        #region IUIGestureRecognizerDelegate
+
+        [Export("gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:")]
+        public bool ShouldRecognizeSimultaneously(UIGestureRecognizer gestureRecognizer, UIGestureRecognizer otherGestureRecognizer)
+        {
+            return true;
+        }
+
+        #endregion
+
+        #region Gesture Recognizer handlers
+
+        void HandleTap(UITapGestureRecognizer gestureRecognizer)
+        {
+            centerGestureStartY = gestureRecognizer.LocationInView(Superview.Superview).Y;
+        }
+
+        #endregion
+
         #region Event handlers
 
         async void ExpandButton_Tapped(object sender, EventArgs e)
@@ -502,14 +502,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void UpdateWebViewHeight(WKWebView webView, NSLayoutConstraint heightConstraint)
         {
-            var newHeight = webView.ScrollView.ContentSize.Height;
-
-            if (newHeight != heightConstraint.Constant)
-            {
-                heightConstraint.Constant = newHeight;
-                CommonConfig.Logger.Debug($"NEW HEIGHT = {newHeight}");
-            }
-
+            heightConstraint.Constant = webView.ScrollView.ContentSize.Height;
         }
 
         #endregion
@@ -529,8 +522,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     {
                         DidFinishNavigationAction();
                     }
-
-
                 });
             }
         }
