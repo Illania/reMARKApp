@@ -175,6 +175,7 @@
     <Folder Include="Ui\ViewControllers\DocumentView\" />
     <Folder Include="Ui\ViewControllers\DocumentView\Subviews\" />
     <Folder Include="Ui\Common\HubMessages\" />
+    <Folder Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsView\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -188,6 +189,7 @@
     <InterfaceDefinition Include="Ui\TableViewCells\ExternalDocumentsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\ContactsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\ShortcodesTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\SuggestionListViewCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -324,6 +326,9 @@
     <Compile Include="Ui\ViewControllers\FoldersList\CopyMoveToFolderListViewController.cs" />
     <Compile Include="Ui\Common\HubMessages\EntityMovedFromFolderMessage.cs" />
     <Compile Include="Ui\ViewControllers\CopyToWorktrayViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsView\SuggestionsListView.cs" />
+    <Compile Include="Ui\TableViewCells\SuggestionListViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\SuggestionListViewCell.designer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

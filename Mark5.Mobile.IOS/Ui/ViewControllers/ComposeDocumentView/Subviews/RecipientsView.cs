@@ -35,7 +35,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         string savedRecipient;
 
-        readonly DocumentAddressType AddressType;
+        public DocumentAddressType AddressType { get; protected set; }
 
         protected UILabel Label;
         protected UIButton AddButton;
@@ -141,7 +141,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             textViewTapGestureRecognizer.NumberOfTapsRequired = 1;
         }
 
-        string GetTitleFromAddressType()
+        protected string GetTitleFromAddressType()
         {
             switch (AddressType)
             {
@@ -152,7 +152,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 case DocumentAddressType.Bcc:
                     return Localization.GetString("bcc");
                 default:
-                    throw new ArgumentException("The address type is not supported!");
+                    return string.Empty;
             }
         }
 

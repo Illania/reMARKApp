@@ -15,6 +15,7 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.Common.StackView;
+using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -33,8 +34,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
         public string[] PreconfiguredEmailAddresses { get; set; }
-
         public Document PreviousDocument { get; set; }
+
         public DocumentPreview PreviousDocumentPreview { get; set; }
 
         Document Document { get; set; } = new Document();
@@ -48,6 +49,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         SubjectView subjectView;
         ContentView contentView;
         readonly List<ComposeDocumentSubView> subViews = new List<ComposeDocumentSubView>();
+
+        SuggestionsListView suggestionsListView;
 
         bool templateLoaded;
 
@@ -70,6 +73,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitNavigationBar();
             InitSubViews();
+            InitSuggestionView();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -158,16 +162,40 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             AddArrangedViewsWithSeparators(subViews);
         }
 
-        void InitializeHandlers()
+        void InitSuggestionView()
+        {
+            suggestionsListView = new SuggestionsListView(this);
+
+            View.AddSubview(suggestionsListView);
+            View.AddConstraints(new[]
+                {
+                        NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
+                        NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                        NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
+                        NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
+                    });
+        }
+
+        void InitializeHandlers() //TODO add handlers for views
         {
             cancelButtonItem.Clicked += CancelButtonItem_Clicked;
             sendButtonItem.Clicked += SendButtonItem_Clicked;
+
+            toView.SearchRequested += RecipientView_SearchRequested;
+            ccView.SearchRequested += RecipientView_SearchRequested;
+            bccView.SearchRequested += RecipientView_SearchRequested;
+
+            suggestionsListView.ShouldDisappear += SuggestionsListView_ShouldDisappear;
         }
 
         void DeInitializeHandlers()
         {
             cancelButtonItem.Clicked -= CancelButtonItem_Clicked;
             sendButtonItem.Clicked -= SendButtonItem_Clicked;
+
+            toView.SearchRequested -= RecipientView_SearchRequested;
+            ccView.SearchRequested -= RecipientView_SearchRequested;
+            bccView.SearchRequested -= RecipientView_SearchRequested;
         }
 
         #endregion
@@ -242,8 +270,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             await AskIfShouldUseTemplates();
         }
 
-        #region Navigation Bar items related
-
         bool IsFormValid()
         {
             if (subjectView.Empty)
@@ -264,8 +290,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             return !lineView.LineSelectedIsAmbiguous;
         }
-
-        #endregion
 
         #region Keyboard Notifications
 
@@ -288,33 +312,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         #endregion
 
         #region Actions
-
-        async void SendButtonItem_Clicked(object sender, EventArgs e)
-        {
-            await SendDocument(false);
-        }
-
-        async void CancelButtonItem_Clicked(object sender, EventArgs e)
-        {
-
-            if (LocalDocument)
-            {
-                //TODO    
-            }
-            else
-            {
-                var confirm = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("save_draft"), Localization.GetString("confirm_save_as_draft"));
-                if (confirm)
-                {
-                    await SendDocument(true);
-                }
-                else
-                {
-                    PopOrDismissViewController(); //TODO check if we need to do else
-                }
-            }
-
-        }
 
         async Task SendDocument(bool draft)
         {
@@ -360,6 +357,55 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 NavigationController.PopViewController(true);
             }
+        }
+
+        #endregion
+
+        #region Event Handlers
+
+        async void SendButtonItem_Clicked(object sender, EventArgs e)
+        {
+            await SendDocument(false);
+        }
+
+        async void CancelButtonItem_Clicked(object sender, EventArgs e)
+        {
+            if (LocalDocument)
+            {
+                //TODO    
+            }
+            else
+            {
+                var confirm = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("save_draft"), Localization.GetString("confirm_save_as_draft"));
+                if (confirm)
+                {
+                    await SendDocument(true);
+                }
+                else
+                {
+                    PopOrDismissViewController(); //TODO check if we need to do else
+                }
+            }
+
+        }
+
+        void RecipientView_SearchRequested(object sender, string initialSearchString)
+        {
+            if (string.IsNullOrEmpty(initialSearchString))
+            {
+                return;
+            }
+
+            var recipientView = (RecipientsView)sender;
+            suggestionsListView.Initialize(recipientView, initialSearchString);
+
+            View.BringSubviewToFront(suggestionsListView);
+        }
+
+
+        void SuggestionsListView_ShouldDisappear(object sender, EventArgs e)
+        {
+            View.SendSubviewToBack(suggestionsListView);
         }
 
         #endregion
