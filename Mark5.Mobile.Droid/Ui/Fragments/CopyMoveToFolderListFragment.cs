@@ -55,6 +55,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 BusinessEntities = BusinessEntities,
                 FromFolder = FromFolder,
                 RemoteFolder = folder,
+                Type = Type
             };
         }
 
