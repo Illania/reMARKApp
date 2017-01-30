@@ -28,7 +28,7 @@ using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-    public class ContentView : ComposeDocumentView, IWKNavigationDelegate, IUIGestureRecognizerDelegate, IWKScriptMessageHandler
+    public class ContentView : ComposeDocumentSubView, IWKNavigationDelegate, IUIGestureRecognizerDelegate, IWKScriptMessageHandler
     {
         UIButton expandButton;
 

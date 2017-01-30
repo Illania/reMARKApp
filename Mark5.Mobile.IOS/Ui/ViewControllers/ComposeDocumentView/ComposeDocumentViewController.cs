@@ -47,7 +47,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         PriorityView priorityView;
         SubjectView subjectView;
         ContentView contentView;
-        readonly List<ComposeDocumentView> subViews = new List<ComposeDocumentView>();
+        readonly List<ComposeDocumentSubView> subViews = new List<ComposeDocumentSubView>();
 
         bool templateLoaded;
 

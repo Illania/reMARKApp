@@ -13,7 +13,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-    public class SubjectView : ComposeDocumentView
+    public class SubjectView : ComposeDocumentSubView
     {
         public event EventHandler Edited = delegate { };
 
