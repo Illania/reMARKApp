@@ -92,6 +92,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.ClipsToBounds = false;
             tableView.Source = new DataSource(this, tableView, Localization.GetString("no_notifications"));
             tableView.AllowsSelection = true;
+            tableView.RowHeight = UITableView.AutomaticDimension;
+            tableView.EstimatedRowHeight = 60f;
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(tableView);
             View.AddConstraints(new[]
@@ -238,8 +240,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var cell = tableView.DequeueReusableCell(NotificationsTableViewCell.Key) as NotificationsTableViewCell ?? NotificationsTableViewCell.Create();
                 cell.Initialize(n);
 
-                cell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath) ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
-
                 return cell;
             }
 
@@ -252,11 +252,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return 1;
 
                 return notificationsInView.Count;
-            }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return 60f;
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)

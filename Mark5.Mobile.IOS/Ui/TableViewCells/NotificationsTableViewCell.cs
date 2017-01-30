@@ -38,7 +38,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         {
             var cell = (NotificationsTableViewCell)Nib.Instantiate(null, null)[0];
 
-            cell.DateLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
+            cell.TitleLabel.Font = Theme.DefaultBoldFont;
+            cell.DateReceivedLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
 
             return cell;
         }
@@ -50,7 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             Notification = notification;
 
             BackgroundColor = notification.IsRead ? UIColor.White : Theme.LightGray;
-            MessageLabel.Font = notification.IsRead ? Theme.DefaultFont : Theme.DefaultBoldFont;
+            ContentLabel.Font = notification.IsRead ? Theme.DefaultFont : Theme.DefaultBoldFont;
 
             UIImage icon;
             switch (notification.ObjectType)
@@ -62,10 +63,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     icon = UIImage.FromBundle(Path.Combine("icons", "notifications-small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
             }
-            IconView.Image = icon;
+            IconImageView.Image = icon;
 
-            MessageLabel.Text = notification.Message;
-            DateLabel.Text = notification.DateTimeTimestamp
+            TitleLabel.Text = notification.Title;
+            ContentLabel.Text = notification.Message;
+            DateReceivedLabel.Text = notification.DateTimeTimestamp
                     .ConvertTimestampMillisecondsToDateTime()
                     .ConvertUtcToServerTime()
                     .ConvertDateTimeToTimestampMilliseconds()
