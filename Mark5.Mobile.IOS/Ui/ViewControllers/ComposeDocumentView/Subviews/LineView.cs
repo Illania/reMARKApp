@@ -156,6 +156,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
         }
 
+        public Line GetLine()
+        {
+            return selectedLine;
+        }
+
         #endregion
 
         #region Helper methods

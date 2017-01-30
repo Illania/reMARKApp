@@ -247,7 +247,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsVie
             base.LayoutSubviews();
 
             nfloat offset = 0.0f;
-            if (viewController != null && viewController.NavigationController != null && viewController.NavigationController.NavigationBar != null && viewController.NavigationController.NavigationBar.Frame != CGRect.Empty)
+            if (viewController != null && viewController.NavigationController != null && viewController.NavigationController.NavigationBar != null
+                && viewController.NavigationController.NavigationBar.Frame != CGRect.Empty)
             {
                 offset = viewController.NavigationController.NavigationBar.Frame.Bottom;
             }
@@ -302,7 +303,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsVie
         public SuggestionsListViewSource(SuggestionsListView emailCompositionView, UITableView suggestionsTableView)
         {
             tableView = suggestionsTableView;
-            this.suggestionsListView = emailCompositionView;
+            suggestionsListView = emailCompositionView;
         }
 
         #region UITableViewDataSource implementation
@@ -317,7 +318,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsVie
             if (Empty)
             {
                 var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                emptyCell.Initialize(Localization.GetString("no_suggestions_available")); //TODO Add string
+                emptyCell.Initialize(Localization.GetString("no_suggestions_available"));
                 return emptyCell;
             }
 
@@ -443,7 +444,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsVie
         }
 
         #endregion
-
 
     }
 }

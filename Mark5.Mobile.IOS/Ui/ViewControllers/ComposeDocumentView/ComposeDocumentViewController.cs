@@ -24,6 +24,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class ComposeDocumentViewController : StackViewController
     {
+        string DefaultTitle = Localization.GetString("new_document");
+
         public DocumentDirection PreviousDocumentDirection { get; set; }
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
         public DocumentCreationModeFlag OutgoingDocumentOriginalCreationModeFlag { get; set; }
@@ -62,7 +64,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public ComposeDocumentViewController()
         {
-            Title = Localization.GetString("new_document");
+            Title = DefaultTitle;
         }
 
         #region UIViewController overrides
@@ -167,8 +169,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             sendButtonItem.Clicked += SendButtonItem_Clicked;
 
             toView.SearchRequested += RecipientView_SearchRequested;
+            toView.Edited += Subview_Edited;
+
             ccView.SearchRequested += RecipientView_SearchRequested;
+            ccView.Edited += Subview_Edited;
+
             bccView.SearchRequested += RecipientView_SearchRequested;
+            bccView.Edited += Subview_Edited;
+
+            lineView.Edited += Subview_Edited;
+
+            subjectView.Edited += Subview_Edited;
         }
 
         void DeInitializeHandlers()
@@ -177,12 +188,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             sendButtonItem.Clicked -= SendButtonItem_Clicked;
 
             toView.SearchRequested -= RecipientView_SearchRequested;
+            toView.Edited -= Subview_Edited;
+
             ccView.SearchRequested -= RecipientView_SearchRequested;
+            ccView.Edited -= Subview_Edited;
+
             bccView.SearchRequested -= RecipientView_SearchRequested;
+            bccView.Edited -= Subview_Edited;
+
+            lineView.Edited -= Subview_Edited;
+
+            subjectView.Edited -= Subview_Edited;
 
             if (suggestionsListView != null)
             {
-                suggestionsListView.ShouldDisappear += SuggestionsListView_ShouldDisappear;
+                suggestionsListView.ShouldDisappear -= SuggestionsListView_ShouldDisappear;
             }
         }
 
@@ -351,6 +371,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Event Handlers
 
+        void Subview_Edited(object sender, EventArgs e)
+        {
+            Title = !subjectView.Empty ? subjectView.Subject : DefaultTitle;
+            sendButtonItem.Enabled = IsFormValid();
+
+            if (sender is LineView && PlatformConfig.Preferences.RemoveLine && CreationModeFlag == DocumentCreationModeFlag.ReplyAll
+                && PreviousDocumentPreview != null && PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
+            {
+                if (!lineView.LineSelectedIsAmbiguous && !string.IsNullOrEmpty(lineView.GetLine().FromAddress))
+                {
+                    toView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
+                    ccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
+                    bccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
+                }
+            }
+        }
+
         async void SendButtonItem_Clicked(object sender, EventArgs e)
         {
             await SendDocument(false);
@@ -406,7 +443,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             View.BringSubviewToFront(suggestionsListView);
         }
-
 
         void SuggestionsListView_ShouldDisappear(object sender, EventArgs e)
         {

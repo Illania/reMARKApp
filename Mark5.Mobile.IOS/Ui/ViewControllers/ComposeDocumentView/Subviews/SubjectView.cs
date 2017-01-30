@@ -20,6 +20,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         UILabel label;
         UITextView textView;
 
+        public string Subject
+        {
+            get { return textView.Text; }
+            set { textView.Text = value; }
+        }
+
         public bool Empty
         {
             get { return string.IsNullOrEmpty(textView?.Text); }
@@ -104,11 +110,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             DocumentPreview.Subject = textView.Text;
             return Task.CompletedTask;
-        }
-
-        public void SetSubject(string subject)
-        {
-            textView.Text = subject;
         }
 
         #endregion
