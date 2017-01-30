@@ -73,7 +73,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitNavigationBar();
             InitSubViews();
-            InitSuggestionView();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -162,20 +161,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             AddArrangedViewsWithSeparators(subViews);
         }
 
-        void InitSuggestionView()
-        {
-            suggestionsListView = new SuggestionsListView(this);
-
-            View.AddSubview(suggestionsListView);
-            View.AddConstraints(new[]
-                {
-                        NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
-                        NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                        NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
-                        NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
-                    });
-        }
-
         void InitializeHandlers() //TODO add handlers for views
         {
             cancelButtonItem.Clicked += CancelButtonItem_Clicked;
@@ -184,8 +169,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             toView.SearchRequested += RecipientView_SearchRequested;
             ccView.SearchRequested += RecipientView_SearchRequested;
             bccView.SearchRequested += RecipientView_SearchRequested;
-
-            suggestionsListView.ShouldDisappear += SuggestionsListView_ShouldDisappear;
         }
 
         void DeInitializeHandlers()
@@ -196,6 +179,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             toView.SearchRequested -= RecipientView_SearchRequested;
             ccView.SearchRequested -= RecipientView_SearchRequested;
             bccView.SearchRequested -= RecipientView_SearchRequested;
+
+            if (suggestionsListView != null)
+            {
+                suggestionsListView.ShouldDisappear += SuggestionsListView_ShouldDisappear;
+            }
         }
 
         #endregion
@@ -394,6 +382,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (string.IsNullOrEmpty(initialSearchString))
             {
                 return;
+            }
+
+            if (suggestionsListView == null)
+            {
+                suggestionsListView = new SuggestionsListView(this);
+                suggestionsListView.ShouldDisappear += SuggestionsListView_ShouldDisappear;
+
+                View.AddSubview(suggestionsListView);
+                View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
+                });
+
+                View.SendSubviewToBack(suggestionsListView);
             }
 
             var recipientView = (RecipientsView)sender;

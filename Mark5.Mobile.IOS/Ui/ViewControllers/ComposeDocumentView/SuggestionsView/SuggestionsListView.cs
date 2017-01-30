@@ -71,25 +71,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsVie
             spaceView.Opaque = false;
             spaceView.BackgroundColor = UIColor.Clear;
             spaceView.TranslatesAutoresizingMaskIntoConstraints = false;
-            Add(spaceView);
+            spaceHeightConstraint = NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, 1.0f);
+            AddSubview(spaceView);
             AddConstraints(new[]
                 {
                     NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1.0f, 0.0f)
+                    NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1.0f, 0.0f),
+                    spaceHeightConstraint
                 });
 
-            spaceHeightConstraint = NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 0.0f, 0.0f);
-            AddConstraint(spaceHeightConstraint);
-
             suggestionsTextView = new SuggestionsTextView();
+            suggestionsTextView.TranslatesAutoresizingMaskIntoConstraints = false;
             AddSubview(suggestionsTextView);
             AddConstraints(new[]
                 {
                     NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, spaceView, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, this, NSLayoutAttribute.Width, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, 50.0f)
+                    NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, 20.0f)
                 });
 
             suggestionsTextView.SearchRequested += (sender, e) => DoSearch(e);
@@ -98,6 +98,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsVie
             suggestionsTextView.ReachedOriginalState += (sender, e) => Dismiss();
 
             separator = new SeparatorSubView();
+            separator.TranslatesAutoresizingMaskIntoConstraints = false;
             AddSubview(separator);
             AddConstraints(new[]
                 {
@@ -179,59 +180,57 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsVie
 
         void DoSearch(string searchText)
         {
-            //if (searchCancellationTokenSource != null)
-            //{
-            //    searchCancellationTokenSource.Cancel();
-            //    searchCancellationTokenSource = null;
-            //}
+            if (searchCancellationTokenSource != null)
+            {
+                searchCancellationTokenSource.Cancel();
+                searchCancellationTokenSource = null;
+            }
 
-            //BeginInvokeOnMainThread(() =>
-            //    {
-            //        suggestionsListViewSource.Clean();
-            //        suggestionsListViewSource.ReloadData();
-            //    });
+            BeginInvokeOnMainThread(() =>
+                {
+                    suggestionsListViewSource.Clean();
+                    suggestionsListViewSource.ReloadData();
+                });
 
-            //if (!string.IsNullOrEmpty(searchText))
-            //{
-            //    suggestionsListViewSource.Searching = true;
-            //    searchCancellationTokenSource = new CancellationTokenSource();
-            //    searchCancellationTokenSources.Add(searchCancellationTokenSource);
-            //    suggestionService.GetSuggestions(searchText, searchCancellationTokenSource.Token); //Need to pass the suggestion handler
-            //}
-            //else
-            //{
-            //    suggestionsListViewSource.Searching = false;
-            //    searchCancellationTokenSources.Clear();
-            //}
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                suggestionsListViewSource.Searching = true;
+                searchCancellationTokenSource = new CancellationTokenSource();
+                searchCancellationTokenSources.Add(searchCancellationTokenSource);
+                suggestionService.GetSuggestions(searchText, searchCancellationTokenSource.Token, HandleSugguestions);
+            }
+            else
+            {
+                suggestionsListViewSource.Searching = false;
+                searchCancellationTokenSources.Clear();
+            }
         }
-
 
         void HandleSugguestions(List<PrintableSuggestion> newSuggestions, CancellationToken token)
         {
-            //if (e.CancellationToken.IsCancellationRequested)
-            //{
-            //    return;
-            //}
+            if (token.IsCancellationRequested)
+            {
+                return;
+            }
 
-            //BeginInvokeOnMainThread(() =>
-            //    {
-            //        suggestionsListViewSource.RefreshData(e.Suggestions);
-            //        suggestionsListViewSource.ReloadData();
-            //    });
+            BeginInvokeOnMainThread(() =>
+                {
+                    suggestionsListViewSource.RefreshData(newSuggestions);
+                    suggestionsListViewSource.ReloadData();
+                });
         }
 
         public void SuggestionSelected(PrintableSuggestion printableSuggestion)
         {
-            //suggestionLabelledEmailTextSubView.AddSuggestion(printableSuggestion);
-            //Dismiss();
+            suggestionsTextView.AddSuggestion(printableSuggestion);
+            Dismiss();
 
-            //BeginInvokeOnMainThread(() =>
-            //    {
-            //        suggestionsListViewSource.Searching = false;
-            //        suggestionsListViewSource.Clean();
-            //        suggestionsListViewSource.ReloadData();
-            //    });
-
+            BeginInvokeOnMainThread(() =>
+                {
+                    suggestionsListViewSource.Searching = false;
+                    suggestionsListViewSource.Clean();
+                    suggestionsListViewSource.ReloadData();
+                });
         }
 
         #endregion
@@ -398,7 +397,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsVie
             : base(DocumentAddressType.None)
         {
             CollapseExpandAnimationEnabled = false;
-            var okayButtonIcon = UIImage.FromBundle(Path.Combine("Icons", "okay.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            var okayButtonIcon = UIImage.FromBundle(Path.Combine("icons", "okay.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             AddButton.SetImage(okayButtonIcon, UIControlState.Normal);
         }
 

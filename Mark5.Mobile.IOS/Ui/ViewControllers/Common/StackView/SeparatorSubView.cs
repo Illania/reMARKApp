@@ -38,6 +38,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.Common.StackView
                 constraint.Priority = 500;
             }
             AddConstraints(constraints);
+
         }
     }
 }

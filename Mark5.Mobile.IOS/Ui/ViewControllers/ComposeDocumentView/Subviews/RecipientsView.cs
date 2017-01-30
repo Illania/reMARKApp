@@ -23,7 +23,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-    public class RecipientsView : ComposeDocumentView
+    public class RecipientsView : ComposeDocumentSubView
     {
         protected const string EmailSeparator = ", ";
         protected const string RecipentRegex = @".*<.*@.*>";
@@ -81,7 +81,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             if (!hideAdd)
             {
-                var addButtonIcon = UIImage.FromBundle(Path.Combine("Icons", "add.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                var addButtonIcon = UIImage.FromBundle(Path.Combine("icons", "add.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                 AddButton = new UIButton();
                 AddButton.SetImage(addButtonIcon, UIControlState.Normal);
                 AddButton.BackgroundColor = UIColor.Clear;

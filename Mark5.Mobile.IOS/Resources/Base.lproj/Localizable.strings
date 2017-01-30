@@ -94,6 +94,7 @@
 "no_folders_in_section" = "There are no folders in this section";
 "no_matching_contacts" = "There are no matching contacts";
 "no_matching_documents" = "There are no matching documents";
+"no_suggestions_available" = "No suggestions available";
 "no_templates_content" = "There are no templates defined for this creation mode.";
 "no_templates_title" = "No templates";
 "no" = "No";

@@ -13,7 +13,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-    public abstract class ComposeDocumentView : StackSubView
+    public abstract class ComposeDocumentSubView : StackSubView
     {
         public DocumentPreview DocumentPreview { get; set; }
         public Document Document { get; set; }
@@ -23,7 +23,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         protected float MinimumHeight = 21.0f;
 
-        protected ComposeDocumentView()
+        protected ComposeDocumentSubView()
         {
             Initialize();
         }
