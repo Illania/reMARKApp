@@ -50,7 +50,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         SemaphoreSlim newContentLoadingSemaphore;
 
         const string EditableContentClass = "content_c176f8ef-2579-4f1f-86c1-f289beaba2ae";
-        const string TemplateElementClass = "template_75bb41fd-4984-43f5-b61d-3dbbe87bca21";
 
         const string DefaultEditContent = @"<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.01 Transitional//EN"" ""http://www.w3.org/TR/html4/loose.dtd"">
                                             <html>
@@ -59,7 +58,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                                                 </head>
                                                 <body>
                                                     <div id=""editable-one"" class=""" + EditableContentClass + @""" contenteditable=""true"" style=""width: 100%"" onfocus=""editableContentFocused()""><br></div>
-                                                    <div class=""" + TemplateElementClass + @""" style=""outline: 0px solid transparent""></div>
                                                     <script>
                                                     function editableContentFocused() {
                                                         webkit.messageHandlers.editableContentFocusedHandler.postMessage("""");
@@ -211,12 +209,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public async Task InsertTemplate(Template template)
         {
-            await SetWebContentPart(TemplateElementClass, template.ContentType, template.Content);
+            await SetWebContentPart(EditableContentClass, template.ContentType, GetContentWithSpace(template.ContentType, template.Content));
         }
 
         public async Task InsertLocalTemplate(string localTemplate)
         {
-            await SetWebContentPart(TemplateElementClass, ContentType.PlainText, localTemplate);
+            await SetWebContentPart(EditableContentClass, ContentType.PlainText, GetContentWithSpace(ContentType.PlainText, localTemplate));
+        }
+
+        string GetContentWithSpace(ContentType contentType, string content)
+        {
+            if (contentType == ContentType.Html)
+            {
+                return "<br><br><br>" + content;
+            }
+            if (contentType == ContentType.PlainText)
+            {
+                return "\n\n\n" + content;
+            }
+
+            throw new ArgumentException("Invalid content type");
         }
 
         #endregion
@@ -332,14 +344,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         async Task<string> RetrieveCombinedText()
         {
-            var newContentString = (await newContentWebView.EvaluateJavaScriptAsync(GetWebContentJs) as NSString);
+            var newContentString = (await newContentWebView.EvaluateJavaScriptAsync(GetWebContentJs) as NSString).ToString();
+            var newContentProcessedString = await ProcessRetrievedContent(new HtmlParser(), newContentString);
 
             await LoadOldContent();
 
             if (!string.IsNullOrEmpty(oldContent))
             {
                 var htmlParser = new HtmlParser();
-                var newContentParsed = await htmlParser.ParseAsync(newContentString);
+                var newContentParsed = await htmlParser.ParseAsync(newContentProcessedString);
                 var oldContentParsed = await htmlParser.ParseAsync(oldContent);
                 var oldContentInDiv = newContentParsed.CreateElement("div");
                 oldContentInDiv.InnerHtml = oldContentParsed.Body.InnerHtml;
@@ -349,7 +362,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 return textWriter.ToString();
             }
 
-            return newContentString;
+            return newContentProcessedString;
         }
 
         static async Task<string> GetPreview(string htmlText)
@@ -415,6 +428,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
 
             throw new ArgumentException(string.Format("Unsupported contentType. [contentType={0}]", contentToInsertType));
+        }
+
+        static async Task<string> ProcessRetrievedContent(HtmlParser htmlParser, string content)
+        {
+            var currentHtmlDocument = await htmlParser.ParseAsync(content);
+
+            var elementClasses = new[]
+            {
+                EditableContentClass,
+            };
+
+            foreach (var elementClass in elementClasses)
+            {
+                var matchingElements = currentHtmlDocument.QuerySelectorAll("div." + elementClass);
+                foreach (var matchingElement in matchingElements)
+                {
+                    matchingElement.Attributes.RemoveNamedItem("contenteditable");
+                }
+            }
+
+            var processedWebContent = currentHtmlDocument.DocumentElement.OuterHtml;
+
+            return await InlineStyles(processedWebContent);
         }
 
         static Task<string> InlineStyles(string content)

@@ -52,7 +52,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public bool Empty
         {
-            get { return string.IsNullOrEmpty(TextView.Text); }
+            get
+            {
+                return !Validator.ContainsValidEmail(TextView.Text);
+            }
         }
 
         public RecipientsView(DocumentAddressType type)
@@ -489,11 +492,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public bool ContainsInvalidEmail()
         {
             return TextView.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries).Any(a => !Validator.ContainsValidEmails(a));
-        }
-
-        public bool ContainsValidEmail()
-        {
-            return Validator.ContainsValidEmail(TextView.Text);
         }
 
         public IEnumerable<string> GetEmails()

@@ -288,7 +288,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var recipientAdded = false;
             foreach (var recipientView in new List<RecipientsView> { toView, ccView, bccView })
             {
-                recipientAdded |= recipientView.ContainsValidEmail();
+                recipientAdded |= !recipientView.Empty;
             }
 
             if (!recipientAdded)
