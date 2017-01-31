@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -83,11 +84,14 @@ namespace Mark5.ServiceReference.FileTransferService
             {
                 using (var client = new HttpClient(httpClientHandler()))
                 {
-                    var uri = (new Uri(endpointUrl)).AppendPathSegments(Segments.Attachment, req.Id)
-                                    .SetQueryParam("documentId", req.DocumentId);
-                    var request = new HttpRequestMessage(HttpMethod.Get, uri);
+                    var path = $"{endpointUrl}/{Segments.Attachment}/{req.Id}&documentId={req.DocumentId}";
+
+                    var request = new HttpRequestMessage(HttpMethod.Get, path);
+
                     request.Headers.Add(Headers.Token, req.Token);
                     var res = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
+
+                    if (res.StatusCode != HttpStatusCode.OK) return null;
 
                     var result = new GetAttachmentResponse();
 
