@@ -225,7 +225,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
             if (contentType == ContentType.PlainText)
             {
-                return "\n\n\n" + content;
+                return "\n\n\n\n" + content;
             }
 
             throw new ArgumentException("Invalid content type");
