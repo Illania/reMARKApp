@@ -355,39 +355,58 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Actions
 
+        // It would be a good idea to refactor this method to use async/await
         void SendDocument(bool draft = false)
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, draft ? Resource.String.saving_draft : Resource.String.sending_document, Resource.String.please_wait);
-
-            Task.Run(async () =>
+            Action sendAction = () =>
             {
-                foreach (var subView in subViews)
-                {
-                    await subView.UpdateDocument();
-                }
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, draft ? Resource.String.saving_draft : Resource.String.sending_document, Resource.String.please_wait);
 
-                DocumentPreview.Direction = draft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
-                if (LocalDocument)
+                Task.Run(async () =>
                 {
-                    await SynchOutgoingAttachments(false);
-                }
-                await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,
-                                                                        PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1,
-                                                                       0, false, false);
-            }).ContinueWith(async t =>
-           {
-               dismissAction();
+                    foreach (var subView in subViews)
+                    {
+                        await subView.UpdateDocument();
+                    }
 
-               if (t.IsFaulted)
+                    DocumentPreview.Direction = draft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
+                    if (LocalDocument)
+                    {
+                        await SynchOutgoingAttachments(false);
+                    }
+                    await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid,
+                                                                                  Document,
+                                                                                  DocumentPreview,
+                                                                                  LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,
+                                                                                  PreviousDocumentId ?? -1,
+                                                                                  PreviousDocumentFolderId ?? -1,
+                                                                                  0,
+                                                                                  false,
+                                                                                  false);
+                }).ContinueWith(async t =>
                {
-                   CommonConfig.Logger.Error($"Failed to insert document in outgoing [isDraft={draft}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", t.Exception.InnerException);
-                   await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
-               }
-               else
-               {
-                   Activity.Finish();
-               }
-           }, TaskScheduler.FromCurrentSynchronizationContext());
+                   dismissAction();
+
+                   if (t.IsFaulted)
+                   {
+                       CommonConfig.Logger.Error($"Failed to insert document in outgoing [isDraft={draft}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", t.Exception.InnerException);
+                       await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
+                   }
+                   else
+                   {
+                       Activity.Finish();
+                   }
+               }, TaskScheduler.FromCurrentSynchronizationContext());
+            };
+
+            if (new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllEmailsValid))
+            {
+                sendAction();
+            }
+            else
+            {
+                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_title, Resource.String.invalid_emails_content, sendAction, null);
+            }
         }
 
         void SaveModifiedOutgoingDocument()
@@ -626,11 +645,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool IsFormValid()
         {
-            if (subjectView.Empty)
-            {
-                return false;
-            }
-
             var recipientAdded = false;
             foreach (var recipientView in new List<RecipientsView> { toView, ccView, bccView })
             {
@@ -638,6 +652,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (!recipientAdded)
+            {
+                return false;
+            }
+
+            if (subjectView.Empty)
             {
                 return false;
             }
@@ -737,6 +756,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         async Task GetLocalTemplate()
         {
             var localTemplate = PlatformConfig.Preferences.LocalTemplate;
+            localTemplate = "\n\n\n" + localTemplate;
             await contentView.InsertLocalTemplate(localTemplate);
         }
 
