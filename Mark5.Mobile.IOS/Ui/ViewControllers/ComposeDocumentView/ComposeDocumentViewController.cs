@@ -163,7 +163,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             AddArrangedViewsWithSeparators(subViews);
         }
 
-        void InitializeHandlers() //TODO add handlers for views
+        void InitializeHandlers()
         {
             cancelButtonItem.Clicked += CancelButtonItem_Clicked;
             sendButtonItem.Clicked += SendButtonItem_Clicked;
@@ -288,7 +288,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var recipientAdded = false;
             foreach (var recipientView in new List<RecipientsView> { toView, ccView, bccView })
             {
-                recipientAdded |= !recipientView.Empty;
+                recipientAdded |= recipientView.ContainsValidEmail();
             }
 
             if (!recipientAdded)
@@ -323,6 +323,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async Task SendDocument(bool draft)
         {
+            var containtsIncompleteEmail = false;
+            foreach (var recipientView in new List<RecipientsView> { toView, ccView, bccView })
+            {
+                containtsIncompleteEmail |= recipientView.ContainsInvalidEmail();
+            }
+
+            if (containtsIncompleteEmail)
+            {
+                var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("warining"), Localization.GetString("incorrect_email_addresses"));
+                if (!result)
+                {
+                    return;
+                }
+            }
+
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(draft ? Localization.GetString("saving_draft___") : Localization.GetString("sending_document___"));
 
             try
@@ -613,7 +628,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (!string.IsNullOrEmpty(template.Subject))
             {
-                subjectView.SetSubject(template.Subject);
+                subjectView.Subject = template.Subject;
             }
 
             lineView.SetLineFromGuid(template.LineGuid);

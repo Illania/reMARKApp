@@ -66,6 +66,7 @@
 "from" = "From";
 "hide_original_message" = "Hide original message";
 "hostname" = "Hostname";
+"incorrect_email_addresses" = "There are email addresses who do not appear to be correct. Do you want to send anyway?";
 "line" = "Line";
 "line" = "Line";
 "loading_document___" = "Loading document...";
@@ -79,13 +80,10 @@
 "login" = "Login";
 "low" = "Low";
 "mark_as_read" = "Mark as read";
-"mark_as_read" = "Mark as read";
-"mark_as_unread" = "Mark as unread";
 "mark_as_unread" = "Mark as unread";
 "marking_document_as_read___" = "Marking document as read...";
 "marking_document_as_unread___" = "Marking document as unread...";
 "more" = "More";
-"move_to_folder" = "Move to folder";
 "move_to_folder" = "Move to folder";
 "moving___" = "Moving...";
 "new_document" = "New Document";
