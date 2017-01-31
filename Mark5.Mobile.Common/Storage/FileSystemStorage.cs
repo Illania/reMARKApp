@@ -214,69 +214,78 @@ namespace Mark5.Mobile.Common.Storage
                 return null;
             }
 
-            var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
-
-            var documentPreviewFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingDocumentPreview);
-            var documentPreview = await SerializationUtils.DeserializeAsync<DocumentPreview>(await documentPreviewFile.ReadAllTextAsync());
-
-            var infoFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingInfo);
-            var info = await SerializationUtils.DeserializeAsync<OutgoingDocumentInfo>(await infoFile.ReadAllTextAsync());
-            var isFailed = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed)) == ExistenceCheckResult.FileExists;
-
-            if (isFailed)
+            try
             {
-                info.State = OutgoingDocumentState.Failed;
-            }
-            else
-            {
-                info.State = OutgoingDocumentState.Waiting;
-            }
+                var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
 
-            if (lockDocument)
-            {
-                await LockOutgoingDocumentAsync(id);
-                info.Locked = true;
-            }
-            else
-            {
-                var isLocked = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingLock)) == ExistenceCheckResult.FileExists;
+                var documentPreviewFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingDocumentPreview);
+                var documentPreview = await SerializationUtils.DeserializeAsync<DocumentPreview>(await documentPreviewFile.ReadAllTextAsync());
 
-                if (isLocked)
+                var infoFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingInfo);
+                var info = await SerializationUtils.DeserializeAsync<OutgoingDocumentInfo>(await infoFile.ReadAllTextAsync());
+                var isFailed = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed)) == ExistenceCheckResult.FileExists;
+
+                if (isFailed)
                 {
+                    info.State = OutgoingDocumentState.Failed;
+                }
+                else
+                {
+                    info.State = OutgoingDocumentState.Waiting;
+                }
+
+                if (lockDocument)
+                {
+                    await LockOutgoingDocumentAsync(id);
                     info.Locked = true;
                 }
-            }
-
-            Document document = null;
-            List<OutgoingDocumentAttachmentDescription> attachments = null;
-
-            if (loadMode == LoadMode.Complete)
-            {
-                var documentFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingDocument);
-                document = await SerializationUtils.DeserializeAsync<Document>(await documentFile.ReadAllTextAsync());
-
-                var attachmentsFolder = await GetOutgoingAttachmentsFolderAsync(id);
-                attachments = new List<OutgoingDocumentAttachmentDescription>();
-                foreach (var item in await attachmentsFolder.GetFilesAsync())
+                else
                 {
-                    var attachment = new OutgoingDocumentAttachmentDescription();
-                    var stream = await item.OpenAsync(PCLStorage.FileAccess.Read);
-                    attachment.SizeInBytes = (int)stream.Length;
-                    stream.Dispose();
-                    attachment.Path = item.Path;
-                    attachment.Name = item.Name;
-                    attachments.Add(attachment);
-                }
-            }
+                    var isLocked = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingLock)) == ExistenceCheckResult.FileExists;
 
-            return new OutgoingDocumentContainer
+                    if (isLocked)
+                    {
+                        info.Locked = true;
+                    }
+                }
+
+                Document document = null;
+                List<OutgoingDocumentAttachmentDescription> attachments = null;
+
+                if (loadMode == LoadMode.Complete)
+                {
+                    var documentFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingDocument);
+                    document = await SerializationUtils.DeserializeAsync<Document>(await documentFile.ReadAllTextAsync());
+
+                    var attachmentsFolder = await GetOutgoingAttachmentsFolderAsync(id);
+                    attachments = new List<OutgoingDocumentAttachmentDescription>();
+                    foreach (var item in await attachmentsFolder.GetFilesAsync())
+                    {
+                        var attachment = new OutgoingDocumentAttachmentDescription();
+                        var stream = await item.OpenAsync(PCLStorage.FileAccess.Read);
+                        attachment.SizeInBytes = (int)stream.Length;
+                        stream.Dispose();
+                        attachment.Path = item.Path;
+                        attachment.Name = item.Name;
+                        attachments.Add(attachment);
+                    }
+                }
+
+                return new OutgoingDocumentContainer
+                {
+                    Document = document,
+                    DocumentPreview = documentPreview,
+                    Info = info,
+                    LocalAttachments = attachments,
+                    LoadMode = loadMode,
+                };
+            }
+            catch (Exception ex)
             {
-                Document = document,
-                DocumentPreview = documentPreview,
-                Info = info,
-                LocalAttachments = attachments,
-                LoadMode = loadMode,
-            };
+                CommonConfig.Logger.Error("Failed to retrieve outgoing document container.", ex);
+
+                return null;
+            }
         }
 
         public static async Task<List<OutgoingDocumentContainer>> GetOutgoingDocumentContainersAsync()
