@@ -417,7 +417,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 try
                 {
-                    await Managers.CommonActionsManager.CopyToWorktray(adapter.SelectedItems.OfType<IBusinessEntity>().ToList());
+                    await Managers.CommonActionsManager.CopyToWorktray(CurrentAdapter.SelectedItems.OfType<IBusinessEntity>().ToList());
 
                     dismissAction();
                     actionMode?.Finish();
@@ -556,11 +556,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         static bool MatchesQuery(ShortcodePreview cp, string query)
         {
-            if (cp.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
+            if (cp.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
             {
                 return true;
             }
-            if (cp.Description.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
+            if (cp.Description.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
             {
                 return true;
             }

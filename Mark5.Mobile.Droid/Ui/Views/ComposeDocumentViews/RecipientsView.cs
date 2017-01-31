@@ -56,6 +56,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
+        public bool AllEmailsValid
+        {
+            get
+            {
+                return Validator.ExtractValidEmails(emailEditor.Text).Count == emailEditor.Text.Split(',').Length;
+            }
+        }
+
         public RecipientsView(Context context, DocumentAddressType type)
             : base(context)
         {

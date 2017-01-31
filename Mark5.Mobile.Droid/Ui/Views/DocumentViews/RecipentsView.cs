@@ -92,7 +92,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                 Orientation = Horizontal
             };
-            compactLayout.SetGravity((int)GravityFlags.CenterVertical);
+            compactLayout.Gravity = (int)GravityFlags.CenterVertical;
             AddView(compactLayout);
 
             var size = ConversionUtils.ConvertDpToPixels(40.0f);
