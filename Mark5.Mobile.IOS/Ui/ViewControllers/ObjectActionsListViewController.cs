@@ -148,6 +148,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Error($"Could not refresh list of users", ex);
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
+
+                NavigationController.DismissViewController(true, null);
             }
         }
 
@@ -194,9 +196,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var section = objectActionsSections[indexPath.Section];
                 var oa = objectActionsInView[section][indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell("subtitle") ?? new UITableViewCell(UITableViewCellStyle.Subtitle, "subtitle");
-                cell.TextLabel.Text = oa.Description;
-                cell.DetailTextLabel.Text = oa.Username;
+                var cell = tableView.DequeueReusableCell(ObjectActionsTableViewCell.Key) as ObjectActionsTableViewCell ?? ObjectActionsTableViewCell.Create();
+                cell.Initialize(oa);
 
                 return cell;
             }
@@ -237,7 +238,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                return 44f;
+                return 72f;
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
