@@ -7,6 +7,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
@@ -82,7 +83,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitializeNavigationBar()
         {
             doneItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
-            doneItem.Enabled = false;
             NavigationItem.SetRightBarButtonItem(doneItem, false);
         }
 
@@ -94,7 +94,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.ClipsToBounds = false;
             tableView.Source = new DataSource(this, tableView, Localization.GetString("no_object_actions"));
             tableView.AllowsSelection = true;
-            tableView.AllowsMultipleSelection = true;
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(tableView);
             View.AddConstraints(new[]
@@ -140,8 +139,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 var objectActions = await Managers.CommonActionsManager.GetObjectActionsAsync(businessEntity);
+                var grouppedObjectActions = objectActions.OrderBy(oa => oa.ActionType).ThenBy(oa => oa.ActionTimeTimestamp).GroupBy(oa => oa.ActionType).ToDictionary(v => v.Key, v=>v.ToArray());
                 var ds = (DataSource)tableView.Source;
-                ds.SetItems(objectActions);
+                ds.SetItems(grouppedObjectActions);
             }
             catch (Exception ex)
             {
@@ -167,7 +167,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             string emptyText;
 
             bool loading = true;
-            List<ObjectAction> objectActionsInView = new List<ObjectAction>();
+            string[] objectActionsSections = new string[0];
+            Dictionary<string, ObjectAction[]> objectActionsInView = new Dictionary<string, ObjectAction[]>();
 
             public DataSource(ObjectActionsListViewController viewController, UITableView tableView, string emptyText)
             {
@@ -190,7 +191,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return emptyCell;
                 }
 
-                var oa = objectActionsInView[indexPath.Row];
+                var section = objectActionsSections[indexPath.Section];
+                var oa = objectActionsInView[section][indexPath.Row];
 
                 var cell = tableView.DequeueReusableCell("subtitle") ?? new UITableViewCell(UITableViewCellStyle.Subtitle, "subtitle");
                 cell.TextLabel.Text = oa.Description;
@@ -207,12 +209,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (objectActionsInView.Count < 1)
                     return 1;
 
-                return objectActionsInView.Count;
+                var sectionName = objectActionsSections[section];
+                return objectActionsInView[sectionName].Length;
             }
 
             public override nint NumberOfSections(UITableView tableView)
             {
-                return 1;
+                if (loading)
+                    return 1;
+
+                if (objectActionsInView.Count < 1)
+                    return 1;
+
+                return objectActionsSections.Length;
+            }
+
+            public override string TitleForHeader(UITableView tableView, nint section)
+            {
+                if (loading)
+                    return string.Empty;
+
+                if (objectActionsInView.Count < 1)
+                    return string.Empty;
+
+                return objectActionsSections[section];
             }
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
@@ -222,26 +242,37 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var su = objectActionsInView[indexPath.Row];
-                viewController.ObjectActionSelected(su);
+                var sectionName = objectActionsSections[indexPath.Section];
+                var oa = objectActionsInView[sectionName][indexPath.Row];
+                viewController.ObjectActionSelected(oa);
             }
 
-            public void SetItems(List<ObjectAction> objectActions)
+            public void SetItems(Dictionary<string, ObjectAction[]> objectActions)
             {
                 loading = false;
 
-                objectActionsInView.Clear();
-                objectActionsInView.AddRange(objectActions);
+                objectActionsSections = objectActions.Keys.ToArray();
+                objectActionsInView = new Dictionary<string, ObjectAction[]>(objectActions);
 
+                tableView.BeginUpdates();
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+                tableView.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, objectActionsSections.Length - 1)), UITableViewRowAnimation.Automatic);
+                tableView.EndUpdates();
             }
 
             public void Reset()
             {
                 loading = true;
 
+                var sectionsCount = objectActionsSections.Length;
+
+                objectActionsSections = new string[0];
                 objectActionsInView.Clear();
+
+                tableView.BeginUpdates();
+                tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, sectionsCount - 1)), UITableViewRowAnimation.Automatic);
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+                tableView.EndUpdates();
             }
 
             protected override void Dispose(bool disposing)
@@ -250,6 +281,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 viewController = null;
                 tableView = null;
+                objectActionsSections = new string[0];
                 objectActionsInView = null;
             }
         }
