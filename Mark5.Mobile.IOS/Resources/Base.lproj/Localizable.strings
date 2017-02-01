@@ -1,4 +1,5 @@
-﻿"add_to_favorites" = "Add to\nfavorites";
+﻿"actions" = "Actions";
+"add_to_favorites" = "Add to\nfavorites";
 "back" = "Back";
 "cancel" = "Cancel";
 "clear_contacts_cache_summary" = "Do you want to remove cached contacts?";
@@ -64,6 +65,7 @@
 "no_matching_documents" = "There are no matching documents";
 "no_matching_users" = "There are no matching users";
 "no_notifications" = "There are no notifications";
+"no_object_actions" = "There are no actions";
 "notifications" = "Notifications";
 "ok" = "OK";
 "own_worktray" = "My worktray";
