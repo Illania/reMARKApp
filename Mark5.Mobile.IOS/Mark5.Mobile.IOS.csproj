@@ -177,6 +177,7 @@
     <InterfaceDefinition Include="Ui\TableViewCells\ContactsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\ShortcodesTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\NotificationsTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\ObjectActionsTableViewCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -279,6 +280,11 @@
     <Compile Include="Ui\TableViewCells\NotificationsTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\NotificationsTableViewCell.designer.cs">
       <DependentUpon>NotificationsTableViewCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\ViewControllers\ObjectActionsListViewController.cs" />
+    <Compile Include="Ui\TableViewCells\ObjectActionsTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\ObjectActionsTableViewCell.designer.cs">
+      <DependentUpon>ObjectActionsTableViewCell.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
