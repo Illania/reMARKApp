@@ -78,8 +78,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 });
         }
 
-        //TODO remember about all the unsubscription from view
-
         #region Public methods
 
         public override Task RefreshView()

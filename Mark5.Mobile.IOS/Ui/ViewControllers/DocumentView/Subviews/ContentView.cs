@@ -201,6 +201,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         public override void UpdateVisibility()
         {
+            if (Document == null)
+            {
+                Hidden = true;
+                return;
+            }
+
             Hidden = false;
         }
 

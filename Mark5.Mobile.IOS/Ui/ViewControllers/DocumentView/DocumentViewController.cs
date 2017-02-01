@@ -676,16 +676,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void RecipeintsView_RecipientTapped(object sender, RecipentTappedEventArgs e)
         {
-            var composeDocumentViewController = new ComposeDocumentViewController
-            {
-                CreationModeFlag = DocumentCreationModeFlag.New,
-                PreviousDocumentDirection = DocumentDirection.None,
-                PreconfiguredEmailAddresses = new string[] { e.Recipent }
-            };
-
-            var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
-            composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
-            PresentViewController(composeDocumentNavigationController, true, null);
+            PresentComposeViewWithPreconfiguredAddresses(new string[] { e.Recipent });
         }
 
         WKNavigationActionPolicy DecidePolicyForNavigationAction(WKNavigationAction navigationAction)
@@ -698,12 +689,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (navigationAction.Request.Url.Scheme == "mailto")
                 {
                     var address = navigationAction.Request.Url.ResourceSpecifier;
-                    //TODO open compose view controller with address
+                    PresentComposeViewWithPreconfiguredAddresses(new string[] { address });
                 }
                 else
                 {
                     Integration.OpenLink(navigationAction.Request.Url,
-                                                      async () => await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("unable_open_link_title"), Localization.GetString("unable_open_link_content") + navigationAction.Request.Url.Scheme));
+                                                      async () => await Dialogs.ShowConfirmDialogAsync(this,
+                                                                                                       Localization.GetString("unable_open_link_title"),
+                                                                                                       Localization.GetString("unable_open_link_content") + navigationAction.Request.Url.Scheme));
                 }
 
                 return WKNavigationActionPolicy.Cancel;
@@ -715,6 +708,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             return WKNavigationActionPolicy.Allow;
+        }
+
+        void PresentComposeViewWithPreconfiguredAddresses(string[] preconfiguredEmailAddresses)
+        {
+            var composeDocumentViewController = new ComposeDocumentViewController
+            {
+                CreationModeFlag = DocumentCreationModeFlag.New,
+                PreviousDocumentDirection = DocumentDirection.None,
+                PreconfiguredEmailAddresses = preconfiguredEmailAddresses
+            };
+
+            var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
+            composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
+            PresentViewController(composeDocumentNavigationController, true, null);
         }
 
         #endregion

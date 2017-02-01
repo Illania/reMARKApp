@@ -94,23 +94,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         #region Event handlers
 
         [Export("PriorityLabelTapped")]
-        void PriorityLabelTapped()
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void PriorityLabelTapped()
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             selectedPriorityLabel.TextColor = Theme.TintColor;
 
             HandleScrollToView(this, EventArgs.Empty);
             ActionSheetWillAppear(this, EventArgs.Empty);
 
-            var selectPriorityActionSheet = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
-            selectPriorityActionSheet.AddAction(UIAlertAction.Create(GetPriorityText(Priority.Urgent), UIAlertActionStyle.Default, a => SelectPriority(Priority.Urgent)));
-            selectPriorityActionSheet.AddAction(UIAlertAction.Create(GetPriorityText(Priority.Normal), UIAlertActionStyle.Default, a => SelectPriority(Priority.Normal)));
-            selectPriorityActionSheet.AddAction(UIAlertAction.Create(GetPriorityText(Priority.Low), UIAlertActionStyle.Default, a => SelectPriority(Priority.Low)));
-            selectPriorityActionSheet.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => selectedPriorityLabel.TextColor = UIColor.DarkTextColor));
-            if (selectPriorityActionSheet.PopoverPresentationController != null)
+            var templateListStrings = new string[] { GetPriorityText(Priority.Urgent), GetPriorityText(Priority.Normal), GetPriorityText(Priority.Low) };
+
+            var result = await Dialogs.ShowListDialogAsync(viewController, null, templateListStrings, selectedPriorityLabel);
+            switch (result)
             {
-                //selectPriorityActionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(selectedPriorityLabel); //TODO
+                case -1:
+                    break;
+                case 0:
+                    SelectPriority(Priority.Urgent);
+                    break;
+                case 1:
+                    SelectPriority(Priority.Normal);
+                    break;
+                case 2:
+                    SelectPriority(Priority.Low);
+                    break;
             }
-            viewController.PresentViewController(selectPriorityActionSheet, true, null);
         }
 
         #endregion
