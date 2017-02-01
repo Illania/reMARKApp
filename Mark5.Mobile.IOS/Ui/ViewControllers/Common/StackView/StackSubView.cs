@@ -5,7 +5,6 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.Common.StackView
@@ -28,21 +27,5 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.Common.StackView
             TranslatesAutoresizingMaskIntoConstraints = false;
         }
 
-        public override void AddConstraint(NSLayoutConstraint constraint)
-        {
-            constraint.Priority = 999;
-
-            base.AddConstraint(constraint);
-        }
-
-        public override void AddConstraints(NSLayoutConstraint[] constraints)
-        {
-            foreach (var constraint in constraints)
-            {
-                constraint.Priority = 999;
-            }
-
-            base.AddConstraints(constraints);
-        }
     }
 }
