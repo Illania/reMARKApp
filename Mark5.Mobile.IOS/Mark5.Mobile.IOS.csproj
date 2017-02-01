@@ -242,12 +242,10 @@
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\LineView.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ContentView.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\AttachmentsView.cs" />
-    <Compile Include="Utilities\Extensions\ContentTypeExtensions.cs" />
     <Compile Include="Utilities\Extensions\ObjectExtensions.cs" />
     <Compile Include="Utilities\Extensions\UiViewExtension.cs" />
     <Compile Include="Utilities\Extensions\UiTextViewExtensions.cs" />
     <Compile Include="Utilities\Extensions\StringExtensions.cs" />
-    <Compile Include="Utilities\Extensions\NSAttributedStringExtensions.cs" />
     <Compile Include="Ui\ViewControllers\Common\StackView\StackViewController.cs" />
     <Compile Include="Ui\ViewControllers\Common\StackView\SeparatorSubView.cs" />
     <Compile Include="Ui\ViewControllers\Common\StackView\StackSubView.cs" />
