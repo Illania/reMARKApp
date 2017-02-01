@@ -423,10 +423,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
                 else
                 {
-                    PopOrDismissViewController(); //TODO check if we need to do else
+                    PopOrDismissViewController();
                 }
             }
-
         }
 
         void RecipientView_SearchRequested(object sender, string initialSearchString)

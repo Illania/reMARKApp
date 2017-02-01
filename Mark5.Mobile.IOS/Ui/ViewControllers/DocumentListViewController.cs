@@ -223,23 +223,68 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        public void DocumentSelected(DocumentPreview documentPreview)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        public async void DocumentSelected(DocumentPreview documentPreview)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            var ds = (DataSource)documentsTableView.Source;
-
-            var documentViewController = new DocumentViewController();
-            documentViewController.DocumentPreview = documentPreview;
-            documentViewController.Folder = Folder;
-            documentViewController.HidesBottomBarWhenPushed = true;
-            if (!searchController.Active)
+            if (SplitViewController == null || SplitViewController.Collapsed)
             {
-                documentViewController.GetNextDocumentPreview = ds.GetNextDocumentPreview;
-                documentViewController.GetPreviousDocumentPreview = ds.GetPreviousDocumentPreview;
-            }
+                var ds = (DataSource)documentsTableView.Source;
 
-            documentViewController.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
-            newDocumentsAvailableAction = documentViewController.RefreshNavigationBar;
-            NavigationController.PushViewController(documentViewController, true);
+                var documentViewController = new DocumentViewController();
+                documentViewController.DocumentPreview = documentPreview;
+                documentViewController.Folder = Folder;
+                documentViewController.HidesBottomBarWhenPushed = true;
+                if (!searchController.Active)
+                {
+                    documentViewController.GetNextDocumentPreview = ds.GetNextDocumentPreview;
+                    documentViewController.GetPreviousDocumentPreview = ds.GetPreviousDocumentPreview;
+                }
+
+                documentViewController.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
+                newDocumentsAvailableAction = documentViewController.RefreshNavigationBar;
+                NavigationController.PushViewController(documentViewController, true);
+            }
+            else
+            {
+                var ds = (DataSource)documentsTableView.Source;
+
+                var documentNavigationController = ((UINavigationController)SplitViewController.ViewControllers[1]);
+                documentNavigationController.PopToViewController(documentNavigationController.ViewControllers[0], false);
+
+                var documentViewController = (DocumentViewController)documentNavigationController.ViewControllers[0];
+
+                if (documentViewController.Folder != Folder || documentViewController.DocumentPreview != documentPreview)
+                {
+                    if (searchController.Active)
+                    {
+                        documentViewController.GetNextDocumentPreview = null;
+                        documentViewController.GetPreviousDocumentPreview = null;
+
+                        newDocumentsAvailableAction = null;
+                    }
+                    else
+                    {
+                        documentViewController.GetNextDocumentPreview = ds.GetNextDocumentPreview;
+                        documentViewController.GetPreviousDocumentPreview = ds.GetPreviousDocumentPreview;
+
+                        newDocumentsAvailableAction = documentViewController.RefreshNavigationBar;
+                    }
+
+                    documentViewController.FolderId = null;
+                    documentViewController.DocumentId = null;
+                    documentViewController.Document = null;
+
+                    documentViewController.Folder = Folder;
+                    documentViewController.DocumentPreview = documentPreview;
+                    documentViewController.HidesBottomBarWhenPushed = false;
+
+                    documentViewController.ReadStatusUpdated -= DocumentViewController_ReadStatusUpdated;
+                    documentViewController.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
+
+                    await documentViewController.Reload();
+                }
+            }
         }
 
         [Export("longPressed:")]
