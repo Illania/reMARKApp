@@ -28,9 +28,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class DocumentsListViewController : AbstractViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
     {
 
-        const int AutoRefreshIntervalMs = 5 * 1000;
-
-        // 5 seconds
+        const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
 
         public Folder Folder { get; set; }
 

@@ -39,7 +39,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public GetPreviousDocumentPreviewDelegate GetPreviousDocumentPreview { get; set; }
         public GetNextDocumentPreviewDelegate GetNextDocumentPreview { get; set; }
 
-        public bool Empty { get { return true; } }
+        public bool Empty { get { return Document == null; } }
 
         public int? FolderId { get; set; }
         public Folder Folder { get; set; }
@@ -676,7 +676,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void RecipeintsView_RecipientTapped(object sender, RecipentTappedEventArgs e)
         {
-            //TODO
+            var composeDocumentViewController = new ComposeDocumentViewController
+            {
+                CreationModeFlag = DocumentCreationModeFlag.New,
+                PreviousDocumentDirection = DocumentDirection.None,
+                PreconfiguredEmailAddresses = new string[] { e.Recipent }
+            };
+
+            var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
+            composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
+            PresentViewController(composeDocumentNavigationController, true, null);
         }
 
         WKNavigationActionPolicy DecidePolicyForNavigationAction(WKNavigationAction navigationAction)
