@@ -92,8 +92,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
             tableView.ClipsToBounds = false;
-            tableView.Source = new DataSource(this, tableView, Localization.GetString("no_object_actions"));
-            tableView.AllowsSelection = true;
+            tableView.Source = new DataSource(tableView, Localization.GetString("no_object_actions"));
+            tableView.AllowsSelection = false;
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(tableView);
             View.AddConstraints(new[]
@@ -120,11 +120,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (doneItem != null)
                 doneItem.Clicked -= DoneItem_Clicked;
-        }
-
-        public void ObjectActionSelected(ObjectAction oa)
-        {
-            // TODO
         }
 
         void DoneItem_Clicked(object sender, EventArgs e)
@@ -164,7 +159,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            ObjectActionsListViewController viewController;
             UITableView tableView;
             string emptyText;
 
@@ -172,9 +166,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             string[] objectActionsSections = new string[0];
             Dictionary<string, ObjectAction[]> objectActionsInView = new Dictionary<string, ObjectAction[]>();
 
-            public DataSource(ObjectActionsListViewController viewController, UITableView tableView, string emptyText)
+            public DataSource(UITableView tableView, string emptyText)
             {
-                this.viewController = viewController;
                 this.tableView = tableView;
                 this.emptyText = emptyText;
             }
@@ -241,13 +234,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return 72f;
             }
 
-            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
-            {
-                var sectionName = objectActionsSections[indexPath.Section];
-                var oa = objectActionsInView[sectionName][indexPath.Row];
-                viewController.ObjectActionSelected(oa);
-            }
-
             public void SetItems(Dictionary<string, ObjectAction[]> objectActions)
             {
                 loading = false;
@@ -280,7 +266,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 base.Dispose(disposing);
 
-                viewController = null;
                 tableView = null;
                 objectActionsSections = new string[0];
                 objectActionsInView = null;
