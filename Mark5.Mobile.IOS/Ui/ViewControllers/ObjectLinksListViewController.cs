@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.IOS
-// File: ObjectActionsListViewController.cs
+// File: ObjectLinksListViewController.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2017 Nordic IT
@@ -20,8 +20,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    
-    public class ObjectActionsListViewController : AbstractViewController
+
+    public class ObjectLinksListViewController : AbstractViewController
     {
 
         readonly IBusinessEntity businessEntity;
@@ -29,7 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem doneItem;
         UITableView tableView;
 
-        public ObjectActionsListViewController(IBusinessEntity businessEntity)
+        public ObjectLinksListViewController(IBusinessEntity businessEntity)
         {
             this.businessEntity = businessEntity;
         }
@@ -56,7 +56,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(ObjectActionsListViewController)} appeared");
+            CommonConfig.Logger.Info($"{nameof(ObjectLinksListViewController)} appeared");
 
             var ds = (DataSource)tableView.Source;
             if (ds.Empty)
@@ -72,7 +72,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(ObjectActionsListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning($"{nameof(ObjectLinksListViewController)} received memory warning!");
 
             var ds = tableView?.DataSource as DataSource;
             ds?.Reset();
@@ -92,8 +92,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
             tableView.ClipsToBounds = false;
-            tableView.Source = new DataSource(tableView, Localization.GetString("no_object_actions"));
-            tableView.AllowsSelection = false;
+            tableView.Source = new DataSource(this, tableView, Localization.GetString("no_object_links"));
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(tableView);
             View.AddConstraints(new[]
@@ -107,7 +106,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBarTitle()
         {
-            NavigationItem.Title = Localization.GetString("actions");
+            NavigationItem.Title = Localization.GetString("links");
         }
 
         void InitializeHandlers()
@@ -127,25 +126,56 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationController.DismissViewController(true, null);
         }
 
+        public void ObjectLinkSelected(ObjectLink link)
+        {
+            // TODO
+        }
+
         async Task RefreshData()
         {
-            CommonConfig.Logger.Info($"Refreshing list of actions");
+            CommonConfig.Logger.Info($"Refreshing list of links");
 
             try
             {
-                var objectActions = await Managers.CommonActionsManager.GetObjectActionsAsync(businessEntity);
-                var grouppedObjectActions = objectActions.OrderBy(oa => oa.ActionType).ThenBy(oa => oa.ActionTimeTimestamp).GroupBy(oa => oa.ActionType).ToDictionary(v => v.Key, v=>v.ToArray());
+                var objectLinks = await Managers.CommonActionsManager.GetObjectLinksAsync(businessEntity);
+
+                ProcessObjectLinks(objectLinks);
+
+                var grouppedObjectLinks = objectLinks.OrderBy(ol => ol.TypeInfo.DescriptionSimple).GroupBy(ol => ol.IsReverse ? ol.TypeInfo.DescriptionComplexReverse : ol.TypeInfo.DescriptionComplex).ToDictionary(kv => kv.Key, kv => kv.ToArray());
                 var ds = (DataSource)tableView.Source;
-                ds.SetItems(grouppedObjectActions);
+                ds.SetItems(grouppedObjectLinks);
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Could not refresh list of actions", ex);
+                CommonConfig.Logger.Error($"Could not refresh list of links", ex);
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
 
                 NavigationController.DismissViewController(true, null);
             }
+        }
+
+        void ProcessObjectLinks(List<ObjectLink> ols)
+        {
+            foreach (var ol in ols)
+            {
+                ol.TypeInfo.DescriptionAction = ProcessString(ol.TypeInfo.DescriptionAction, ol.FromObjectType, ol.ToObjectType);
+                ol.TypeInfo.DescriptionActionReverse = ProcessString(ol.TypeInfo.DescriptionActionReverse, ol.FromObjectType, ol.ToObjectType);
+                ol.TypeInfo.DescriptionComplex = ProcessString(ol.TypeInfo.DescriptionComplex, ol.FromObjectType, ol.ToObjectType);
+                ol.TypeInfo.DescriptionComplexReverse = ProcessString(ol.TypeInfo.DescriptionComplexReverse, ol.FromObjectType, ol.ToObjectType);
+                ol.TypeInfo.DescriptionSimple = ProcessString(ol.TypeInfo.DescriptionSimple, ol.FromObjectType, ol.ToObjectType);
+            }
+        }
+
+        string ProcessString(string str, ObjectType from, ObjectType to)
+        {
+            if (str.Contains("%"))
+            {
+                str = str.Replace("%ObjFromName%", from.ToString());
+                str = str.Replace("%ObjToName%", to.ToString());
+            }
+
+            return str;
         }
 
         class DataSource : UITableViewSource, IDisposable
@@ -155,19 +185,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 get
                 {
-                    return objectActionsInView.Count < 1;
+                    return objectLInksInView.Count < 1;
                 }
             }
 
+            ObjectLinksListViewController viewController;
             UITableView tableView;
             string emptyText;
 
             bool loading = true;
-            string[] objectActionsSections = new string[0];
-            Dictionary<string, ObjectAction[]> objectActionsInView = new Dictionary<string, ObjectAction[]>();
+            string[] objectLinksSections = new string[0];
+            Dictionary<string, ObjectLink[]> objectLInksInView = new Dictionary<string, ObjectLink[]>();
 
-            public DataSource(UITableView tableView, string emptyText)
+            public DataSource(ObjectLinksListViewController viewController, UITableView tableView, string emptyText)
             {
+                this.viewController = viewController;
                 this.tableView = tableView;
                 this.emptyText = emptyText;
             }
@@ -179,18 +211,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
                 }
 
-                if (objectActionsInView.Count < 1)
+                if (objectLInksInView.Count < 1)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
                     emptyCell.Initialize(emptyText);
                     return emptyCell;
                 }
 
-                var section = objectActionsSections[indexPath.Section];
-                var oa = objectActionsInView[section][indexPath.Row];
+                var section = objectLinksSections[indexPath.Section];
+                var ol = objectLInksInView[section][indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(ObjectActionsTableViewCell.Key) as ObjectActionsTableViewCell ?? ObjectActionsTableViewCell.Create();
-                cell.Initialize(oa);
+                var cell = tableView.DequeueReusableCell(ObjectLinksTableViewCell.Key) as ObjectLinksTableViewCell ?? ObjectLinksTableViewCell.Create();
+                cell.Initialize(ol);
 
                 return cell;
             }
@@ -200,11 +232,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return 1;
 
-                if (objectActionsInView.Count < 1)
+                if (objectLInksInView.Count < 1)
                     return 1;
 
-                var sectionName = objectActionsSections[section];
-                return objectActionsInView[sectionName].Length;
+                var sectionName = objectLinksSections[section];
+                return objectLInksInView[sectionName].Length;
             }
 
             public override nint NumberOfSections(UITableView tableView)
@@ -212,10 +244,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return 1;
 
-                if (objectActionsInView.Count < 1)
+                if (objectLInksInView.Count < 1)
                     return 1;
 
-                return objectActionsSections.Length;
+                return objectLinksSections.Length;
             }
 
             public override string TitleForHeader(UITableView tableView, nint section)
@@ -223,10 +255,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return string.Empty;
 
-                if (objectActionsInView.Count < 1)
+                if (objectLInksInView.Count < 1)
                     return string.Empty;
 
-                return objectActionsSections[section];
+                return objectLinksSections[section];
             }
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
@@ -234,16 +266,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return 72f;
             }
 
-            public void SetItems(Dictionary<string, ObjectAction[]> objectActions)
+            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (tableView.CellAt(indexPath).SelectionStyle == UITableViewCellSelectionStyle.None) return;
+
+                var section = objectLinksSections[indexPath.Section];
+                var ol = objectLInksInView[section][indexPath.Row];
+
+                viewController.ObjectLinkSelected(ol);
+            }
+
+            public void SetItems(Dictionary<string, ObjectLink[]> objectLinks)
             {
                 loading = false;
 
-                objectActionsSections = objectActions.Keys.ToArray();
-                objectActionsInView = new Dictionary<string, ObjectAction[]>(objectActions);
+                objectLinksSections = objectLinks.Keys.ToArray();
+                objectLInksInView = new Dictionary<string, ObjectLink[]>(objectLinks);
 
                 tableView.BeginUpdates();
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
-                tableView.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, objectActionsSections.Length - 1)), UITableViewRowAnimation.Automatic);
+                tableView.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, objectLinksSections.Length - 1)), UITableViewRowAnimation.Automatic);
                 tableView.EndUpdates();
             }
 
@@ -251,10 +293,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = true;
 
-                var sectionsCount = objectActionsSections.Length;
+                var sectionsCount = objectLinksSections.Length;
 
-                objectActionsSections = new string[0];
-                objectActionsInView.Clear();
+                objectLinksSections = new string[0];
+                objectLInksInView.Clear();
 
                 tableView.BeginUpdates();
                 tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, sectionsCount - 1)), UITableViewRowAnimation.Automatic);
@@ -266,9 +308,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 base.Dispose(disposing);
 
+                viewController = null;
                 tableView = null;
-                objectActionsSections = new string[0];
-                objectActionsInView = null;
+                objectLinksSections = new string[0];
+                objectLInksInView = null;
             }
         }
     }
