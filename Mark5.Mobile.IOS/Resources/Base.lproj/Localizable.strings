@@ -46,6 +46,7 @@
 "folder_empty" = "Folder is empty";
 "folders" = "Folders";
 "hostname" = "Hostname";
+"links" = "Links";
 "local_folders" = "Local folders";
 "logging_in___" = "Logging in...";
 "logging_out___" = "Logging out...";
@@ -66,6 +67,7 @@
 "no_matching_users" = "There are no matching users";
 "no_notifications" = "There are no notifications";
 "no_object_actions" = "There are no actions";
+"no_object_links" = "There are no links";
 "notifications" = "Notifications";
 "ok" = "OK";
 "own_worktray" = "My worktray";
