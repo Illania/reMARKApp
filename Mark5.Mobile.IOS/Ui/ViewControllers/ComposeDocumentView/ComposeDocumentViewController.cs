@@ -7,6 +7,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
@@ -58,6 +59,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UIBarButtonItem cancelButtonItem;
         UIBarButtonItem sendButtonItem;
+        UIBarButtonItem attachmentButtonItem;
 
         // This value will be later updated from notification.
         float keyboardHeight = 216.0f;
@@ -133,7 +135,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             sendButtonItem = new UIBarButtonItem();
             sendButtonItem.Title = Localization.GetString("send");
             sendButtonItem.Enabled = false;
-            NavigationItem.SetRightBarButtonItem(sendButtonItem, false);
+
+            attachmentButtonItem = new UIBarButtonItem();
+            attachmentButtonItem.Title = "ATT";
+            attachmentButtonItem.Enabled = true;
+            NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { attachmentButtonItem, sendButtonItem }, false);
         }
 
         void InitSubViews()
@@ -165,9 +171,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeHandlers()
         {
+            //Navigation Bar
             cancelButtonItem.Clicked += CancelButtonItem_Clicked;
             sendButtonItem.Clicked += SendButtonItem_Clicked;
+            attachmentButtonItem.Clicked += AttachmentButtonItem_Clicked;
 
+            //Subviews
             toView.SearchRequested += RecipientView_SearchRequested;
             toView.Edited += Subview_Edited;
 
@@ -184,9 +193,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DeInitializeHandlers()
         {
+            //Navigation Bar
             cancelButtonItem.Clicked -= CancelButtonItem_Clicked;
             sendButtonItem.Clicked -= SendButtonItem_Clicked;
+            attachmentButtonItem.Clicked -= AttachmentButtonItem_Clicked;
 
+            //Subviews
             toView.SearchRequested -= RecipientView_SearchRequested;
             toView.Edited -= Subview_Edited;
 
@@ -384,23 +396,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
-        #region Event Handlers
+        #region Navigation Bar Event Handlers
 
-        void Subview_Edited(object sender, EventArgs e)
+        void AttachmentButtonItem_Clicked(object sender, EventArgs e)
         {
-            Title = !subjectView.Empty ? subjectView.Subject : DefaultTitle;
-            sendButtonItem.Enabled = IsFormValid();
+            var c = new UIDocumentMenuViewController(new string[] { "public.content" }, UIDocumentPickerMode.Import);
+            c.Delegate = new MyDelegate(this, HandleAction);
+            PresentViewController(c, true, null);
+        }
 
-            if (sender is LineView && PlatformConfig.Preferences.RemoveLine && CreationModeFlag == DocumentCreationModeFlag.ReplyAll
-                && PreviousDocumentPreview != null && PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
-            {
-                if (!lineView.LineSelectedIsAmbiguous && !string.IsNullOrEmpty(lineView.GetLine().FromAddress))
-                {
-                    toView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
-                    ccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
-                    bccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
-                }
-            }
+        async void HandleAction(NSUrl url) //TODO put in right place
+        {
+            var filename = url.LastPathComponent;
+            var stream = new FileStream(url.Path, FileMode.Open, FileAccess.Read);
+
+            var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
+            CommonConfig.Logger.Debug($"PATH = {path}");
         }
 
         async void SendButtonItem_Clicked(object sender, EventArgs e)
@@ -424,6 +435,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 else
                 {
                     PopOrDismissViewController();
+                }
+            }
+        }
+
+        #endregion
+
+        #region Subviews Event Handlers
+
+        void Subview_Edited(object sender, EventArgs e)
+        {
+            Title = !subjectView.Empty ? subjectView.Subject : DefaultTitle;
+            sendButtonItem.Enabled = IsFormValid();
+
+            if (sender is LineView && PlatformConfig.Preferences.RemoveLine && CreationModeFlag == DocumentCreationModeFlag.ReplyAll
+                && PreviousDocumentPreview != null && PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
+            {
+                if (!lineView.LineSelectedIsAmbiguous && !string.IsNullOrEmpty(lineView.GetLine().FromAddress))
+                {
+                    toView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
+                    ccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
+                    bccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
                 }
             }
         }
@@ -679,6 +711,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
         #endregion
+
+        class MyDelegate : UIDocumentMenuDelegate, IUIDocumentPickerDelegate
+        {
+            ComposeDocumentViewController viewController;
+            Action<NSUrl> urlHanlder;
+
+            public MyDelegate(ComposeDocumentViewController vc, Action<NSUrl> handler)
+            {
+                viewController = vc;
+                urlHanlder = handler;
+            }
+
+            public void DidPickDocument(UIDocumentPickerViewController controller, NSUrl url)
+            {
+                urlHanlder(url);
+            }
+
+            public override void DidPickDocumentPicker(UIDocumentMenuViewController documentMenu, UIDocumentPickerViewController documentPicker)
+            {
+                documentPicker.Delegate = this;
+                documentPicker.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+                viewController.PresentViewController(documentPicker, true, null);
+            }
+
+            public override void WasCancelled(UIDocumentMenuViewController documentMenu)
+            {
+            }
+        }
 
     }
 }
