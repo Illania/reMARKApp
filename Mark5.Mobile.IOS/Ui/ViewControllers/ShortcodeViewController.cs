@@ -160,7 +160,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         class DataSource : UITableViewSource, IDisposable
         {
 
-            ShortcodeViewController shortcodeViewController;
+            ShortcodeViewController viewController;
             UITableView tableView;
 
             bool empty = true;
@@ -171,9 +171,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DocumentAddress[] ccAddresses = new DocumentAddress[0];
             DocumentAddress[] bccAddresses = new DocumentAddress[0];
 
-            public DataSource(ShortcodeViewController shortcodeViewController, UITableView tableView)
+            public DataSource(ShortcodeViewController viewController, UITableView tableView)
             {
-                this.shortcodeViewController = shortcodeViewController;
+                this.viewController = viewController;
                 this.tableView = tableView;
             }
 
@@ -298,6 +298,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             protected override void Dispose(bool disposing)
             {
                 base.Dispose(disposing);
+
+                tableView = null;
+                viewController = null;
 
                 description = null;
                 toAddresses = null;
