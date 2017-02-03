@@ -409,6 +409,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var filename = url.LastPathComponent;
             var stream = new FileStream(url.Path, FileMode.Open, FileAccess.Read);
+            NSError _error;
+            NSObject sizeObject;
+            var size = url.TryGetResource(NSUrl.FileSizeKey, out sizeObject, out _error);
 
             var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
             CommonConfig.Logger.Debug($"PATH = {path}");
