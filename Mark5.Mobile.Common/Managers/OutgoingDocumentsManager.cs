@@ -224,7 +224,7 @@ namespace Mark5.Mobile.Common.Managers
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Error in send action", ex);
+                CommonConfig.Logger.Error("Error in send action ", ex);
 
                 throw ex;
             }
