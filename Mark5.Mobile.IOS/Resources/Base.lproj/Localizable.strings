@@ -1,6 +1,7 @@
 "actions" = "Actions";
 "add_to_favorites" = "Add to\nfavorites";
 "attachments" = "Attachments";
+"attachment_too_big" = "The attachment is bigger than the maximum allowed size on the server";
 "back" = "Back";
 "bcc" = "Bcc";
 "big_attachment_title" = "Big attachment";
@@ -54,6 +55,7 @@
 "error_invalidsourcetypeexception_message" = "This action cannot be performed offline";
 "error_invalidsourcetypeexception_title" = "Unavailable offline";
 "error_while_sending_document" = "Error while sending document.";
+"error_saving_local_attachment" = "Error while saving local attachment";
 "favorites" = "Favorites";
 "filter" = "Filter";
 "folder_empty" = "Folder is empty";

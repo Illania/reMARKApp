@@ -647,7 +647,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 attachmentInteractionController = UIDocumentInteractionController.FromUrl(url);
                 attachmentInteractionController.Delegate = new AttachmentInteractionControllerDelegate(this, attachmentDescription);
 
-                var previewSuccessful = attachmentInteractionController.PresentPreview(true); //TODO check on the phone if it works, because it does not on the simulator
+                var previewSuccessful = attachmentInteractionController.PresentPreview(true);
 
                 if (!previewSuccessful)
                 {

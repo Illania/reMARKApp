@@ -25,6 +25,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class ComposeDocumentViewController : StackViewController
     {
+        const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
+
         string DefaultTitle = Localization.GetString("new_document");
 
         public DocumentDirection PreviousDocumentDirection { get; set; }
@@ -50,6 +52,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         LineView lineView;
         PriorityView priorityView;
         SubjectView subjectView;
+        AttachmentsView attachmentsView;
         ContentView contentView;
         readonly List<ComposeDocumentSubView> subViews = new List<ComposeDocumentSubView>();
 
@@ -163,6 +166,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             subjectView = new SubjectView();
             subViews.Add(subjectView);
 
+            attachmentsView = new AttachmentsView();
+            subViews.Add(attachmentsView);
+
             contentView = new ContentView();
             subViews.Add(contentView);
 
@@ -189,6 +195,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             lineView.Edited += Subview_Edited;
 
             subjectView.Edited += Subview_Edited;
+
+            attachmentsView.AttachmentClicked += AttachmentsView_AttachmentClicked;
         }
 
         void DeInitializeHandlers()
@@ -211,6 +219,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             lineView.Edited -= Subview_Edited;
 
             subjectView.Edited -= Subview_Edited;
+
+            attachmentsView.AttachmentClicked -= AttachmentsView_AttachmentClicked;
 
             if (suggestionsListView != null)
             {
@@ -407,14 +417,55 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void HandleAction(NSUrl url) //TODO put in right place
         {
-            var filename = url.LastPathComponent;
-            var stream = new FileStream(url.Path, FileMode.Open, FileAccess.Read);
-            NSError _error;
-            NSObject sizeObject;
-            var size = url.TryGetResource(NSUrl.FileSizeKey, out sizeObject, out _error);
+            OutgoingDocumentAttachmentDescription attachment = null;
+            Stream stream = null;
 
-            var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
-            CommonConfig.Logger.Debug($"PATH = {path}");
+            try
+            {
+                //The url points to a temporary file in the app's sandbox
+                var filename = url.LastPathComponent;
+                stream = new FileStream(url.Path, FileMode.Open, FileAccess.Read);
+                NSError _error;
+                NSObject sizeObject;
+                var result = url.TryGetResource(NSUrl.FileSizeKey, out sizeObject, out _error);
+
+                if (!result)
+                {
+                    //TODO error
+                }
+
+                var sizeInBytes = int.Parse(sizeObject.ToString());
+
+                if (sizeInBytes > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
+                {
+                    await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("attachment_too_big")));
+                    return;
+                    //TODO should remove file from common container?
+                }
+
+                var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
+
+                attachment = new OutgoingDocumentAttachmentDescription
+                {
+                    Name = filename,
+                    SizeInBytes = sizeInBytes,
+                    Stream = stream,
+                    Path = path
+                };
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to save attachment to memory [Url={url}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
+                await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_saving_local_attachment")));
+            }
+
+            stream?.Dispose();
+
+            if (attachment != null)
+            {
+                attachmentsView.AddAttachment(attachment);
+            }
+
         }
 
         async void SendButtonItem_Clicked(object sender, EventArgs e)
@@ -496,6 +547,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void SuggestionsListView_ShouldDisappear(object sender, EventArgs e)
         {
             View.SendSubviewToBack(suggestionsListView);
+        }
+
+        async void AttachmentsView_AttachmentClicked(object sender, IAttachmentDescription e)
+        {
         }
 
         #endregion
