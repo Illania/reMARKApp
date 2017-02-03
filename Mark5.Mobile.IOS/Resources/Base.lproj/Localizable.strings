@@ -1,7 +1,9 @@
 ﻿"actions" = "Actions";
 "add_to_favorites" = "Add to\nfavorites";
 "back" = "Back";
+"bcc" = "Bcc";
 "cancel" = "Cancel";
+"cc" = "Cc";
 "clear_contacts_cache_summary" = "Do you want to remove cached contacts?";
 "clear_contacts_cache_title" = "Clear contacts cache";
 "clear_shortcodes_cache_summary" = "Do you want to remove cached shortcodes?";
@@ -24,6 +26,7 @@
 "creating_system_report___" = "Creating system report...";
 "delete" = "Delete";
 "delete_from_folder" = "Delete from folder";
+"description" = "Description";
 "disable_caching" = "Disable\ncaching";
 "disable_notifications" = "Don't\nnotify";
 "disabled" = "Disabled";
@@ -84,6 +87,7 @@
 "settings" = "Settings";
 "settings" = "Settings";
 "shortcodes" = "Shortcodes";
+"to" = "To";
 "today" = "Today";
 "updating_config___" = "Updating configuration...";
 "username" = "Username";

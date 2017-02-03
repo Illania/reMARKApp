@@ -190,7 +190,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void ShortcodeSelected(ShortcodePreview shortcodePreview)
         {
-            // TODO
+            var vc = new ShortcodeViewController(Folder, shortcodePreview);
+            NavigationController.PushViewController(vc, true);
         }
 
         [Export("longPressed:")]
