@@ -46,7 +46,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         string oldContent;
 
         const string EditableContentClass = "content_c176f8ef-2579-4f1f-86c1-f289beaba2ae";
-        const string TemplateElementClass = "template_75bb41fd-4984-43f5-b61d-3dbbe87bca21";
 
         const string DefaultEditContent = @"<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.01 Transitional//EN"" ""http://www.w3.org/TR/html4/loose.dtd"">
                                             <html>
@@ -54,7 +53,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                                                 </head>
                                                 <body style=""min-height: 500px;"">
                                                     <div class=""" + EditableContentClass + @""" contenteditable=""true"" style=""width: 100%; outline: 0px solid transparent""><br><br></div>
-                                                    <div class=""" + TemplateElementClass + @""" style=""outline: 0px solid transparent""></div>
                                                 </body>
                                             </html>";
 
@@ -74,7 +72,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
             };
-            newContentWebView.SetBackgroundColor(Android.Graphics.Color.Transparent);
+            newContentWebView.SetBackgroundColor(Color.Transparent);
             newContentWebView.AddJavascriptInterface(new GetHtmlContentInterface(this), "GetHtmlContentInterface");
             var customWebViewClient = new CustomWebViewClient();
             customWebViewClient.PageFinishedLoading += (sender, e) =>
@@ -177,12 +175,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public async Task InsertTemplate(Template template)
         {
-            await SetWebContentPart(TemplateElementClass, template.ContentType, template.Content);
+            await SetWebContentPart(EditableContentClass, template.ContentType, template.Content);
         }
 
         public async Task InsertLocalTemplate(string localTemplate)
         {
-            await SetWebContentPart(TemplateElementClass, ContentType.PlainText, localTemplate);
+            await SetWebContentPart(EditableContentClass, ContentType.PlainText, localTemplate);
         }
 
         #endregion

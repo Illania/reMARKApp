@@ -5,12 +5,292 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Foundation;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.TableViewCells;
+using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     
     public class NotificationsListViewController : AbstractViewController
     {
+
+        UIBarButtonItem markAsReadItem;
+
+        UIRefreshControl refreshControl;
+        UITableView tableView;
+
+        bool refreshing;
+
+        public override void LoadView()
+        {
+            base.LoadView();
+
+            InitializeNavigationBar();
+            InitializeView();
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+
+            InitializeNavigationBarTitle();
+            InitializeHandlers();
+        }
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        public override async void ViewDidAppear(bool animated)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            base.ViewDidAppear(animated);
+
+            CommonConfig.Logger.Info($"{nameof(NotificationsListViewController)} appeared");
+
+            var ds = (DataSource)tableView.Source;
+            if (ds.Empty)
+                await RefreshData();
+        }
+
+        public override void ViewWillDisappear(bool animated)
+        {
+            base.ViewWillDisappear(animated);
+
+            DeinitializeHandlers();
+        }
+
+        public override void DidReceiveMemoryWarning()
+        {
+            CommonConfig.Logger.Warning($"{nameof(NotificationsListViewController)} received memory warning!");
+
+            var ds = tableView?.DataSource as DataSource;
+            ds?.Reset();
+
+            base.DidReceiveMemoryWarning();
+        }
+
+        void InitializeNavigationBar()
+        {
+            markAsReadItem = new UIBarButtonItem();
+            markAsReadItem.Title = Localization.GetString("mark_as_read");
+            markAsReadItem.Enabled = false;
+            NavigationItem.SetRightBarButtonItem(markAsReadItem, false);
+        }
+
+        void InitializeView()
+        {
+            AutomaticallyAdjustsScrollViewInsets = true;
+
+            tableView = new UITableView();
+            tableView.ClipsToBounds = false;
+            tableView.Source = new DataSource(this, tableView, Localization.GetString("no_notifications"));
+            tableView.AllowsSelection = true;
+            tableView.RowHeight = UITableView.AutomaticDimension;
+            tableView.EstimatedRowHeight = 60f;
+            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
+            View.AddSubview(tableView);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
+                });
+
+            refreshControl = new UIRefreshControl();
+            refreshControl.BackgroundColor = UIColor.White;
+            refreshControl.AttributedTitle = Localization.GetNSAttributedString("pull_to_refresh");
+            tableView.AddSubview(refreshControl);
+        }
+
+        void InitializeNavigationBarTitle()
+        {
+            NavigationItem.Title = Localization.GetString("notifications");
+        }
+
+        void InitializeHandlers()
+        {
+            if (markAsReadItem != null)
+                markAsReadItem.Clicked += MarkAsReadItem_Clicked;
+
+            if (refreshControl != null)
+                refreshControl.ValueChanged += RefreshControl_ValueChanged;
+        }
+
+        void DeinitializeHandlers()
+        {
+            if (markAsReadItem != null)
+                markAsReadItem.Clicked -= MarkAsReadItem_Clicked;
+            
+            if (refreshControl != null)
+                refreshControl.ValueChanged -= RefreshControl_ValueChanged;
+        }
+
+        async void MarkAsReadItem_Clicked(object sender, EventArgs e)
+        {
+            try
+            {
+                var ds = (DataSource)tableView.Source;
+                await Managers.NotificationsManager.MarkAsRead(ds.Items);
+                ds.Reload();
+
+                markAsReadItem.Enabled = false;
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Marking notifications as read failed", ex);
+
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+        }
+
+        async void RefreshControl_ValueChanged(object sender, EventArgs e) => await RefreshData();
+
+        async Task RefreshData()
+        {
+            if (refreshing) return;
+
+            refreshing = true;
+            refreshControl.ValueChanged -= RefreshControl_ValueChanged;
+
+            CommonConfig.Logger.Info($"Refreshing list of notifications");
+
+            try
+            {
+                var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
+                var ds = (DataSource)tableView.Source;
+                ds.SetItems(notifications);
+
+                markAsReadItem.Enabled = notifications.Any(n => !n.IsRead);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Could not refresh list of notifications", ex);
+
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+
+            refreshControl.EndRefreshing();
+            refreshControl.ValueChanged += RefreshControl_ValueChanged;
+
+            refreshing = false;
+        }
+
+        public void NotificationSelected(Notification n)
+        {
+            // TODO
+        }
+
+        class DataSource : UITableViewSource, IDisposable
+        {
+
+            public bool Empty
+            {
+                get
+                {
+                    return notificationsInView.Count < 1;
+                }
+            }
+
+            public List<Notification> Items
+            {
+                get
+                {
+                    return notificationsInView;
+                }
+            }
+
+            NotificationsListViewController viewController;
+            UITableView tableView;
+            string emptyText;
+
+            bool loading = true;
+            List<Notification> notificationsInView = new List<Notification>();
+
+            public DataSource(NotificationsListViewController viewController, UITableView tableView, string emptyText)
+            {
+                this.viewController = viewController;
+                this.tableView = tableView;
+                this.emptyText = emptyText;
+            }
+
+            public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (loading)
+                {
+                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
+                }
+
+                if (notificationsInView.Count < 1)
+                {
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                    emptyCell.Initialize(emptyText);
+                    return emptyCell;
+                }
+
+                var n = notificationsInView[indexPath.Row];
+
+                var cell = tableView.DequeueReusableCell(NotificationsTableViewCell.Key) as NotificationsTableViewCell ?? NotificationsTableViewCell.Create();
+                cell.Initialize(n);
+
+                return cell;
+            }
+
+            public override nint RowsInSection(UITableView tableview, nint section)
+            {
+                if (loading)
+                    return 1;
+
+                if (notificationsInView.Count < 1)
+                    return 1;
+
+                return notificationsInView.Count;
+            }
+
+            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+            {
+                var n = notificationsInView[indexPath.Row];
+                viewController.NotificationSelected(n);
+            }
+
+            public void SetItems(List<Notification> systemUsers)
+            {
+                loading = false;
+
+                notificationsInView.Clear();
+                notificationsInView.AddRange(systemUsers);
+
+                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+            }
+
+            public void Reload()
+            {
+                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+            }
+
+            public void Reset()
+            {
+                loading = true;
+
+                notificationsInView.Clear();
+                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                base.Dispose(disposing);
+
+                viewController = null;
+                tableView = null;
+                notificationsInView = null;
+            }
+        }
     }
 }

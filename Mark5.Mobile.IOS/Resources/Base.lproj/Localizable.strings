@@ -1,3 +1,4 @@
+"actions" = "Actions";
 "add_to_favorites" = "Add to\nfavorites";
 "attachments" = "Attachments";
 "back" = "Back";
@@ -66,6 +67,7 @@
 "loading_document___" = "Loading document...";
 "loading_template___" = "Loading template...";
 "loading_templates___" = "Loading templates...";
+"links" = "Links";
 "local_folders" = "Local folders";
 "logging_in___" = "Logging in...";
 "logging_out___" = "Logging out...";
@@ -92,6 +94,9 @@
 "no" = "No";
 "normal" = "Normal";
 "no_matching_users" = "There are no matching users";
+"no_notifications" = "There are no notifications";
+"no_object_actions" = "There are no actions";
+"no_object_links" = "There are no links";
 "notifications" = "Notifications";
 "ok" = "OK";
 "opening_attachment___" = "Opening attachment...";

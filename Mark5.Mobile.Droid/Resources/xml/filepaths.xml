@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <paths>
-	<cache-path resource="/" name="shared" />
+	<cache-path resource="." name="cache" />
 	<files-path resource="data/out/" name="outgoing" />
 </paths>

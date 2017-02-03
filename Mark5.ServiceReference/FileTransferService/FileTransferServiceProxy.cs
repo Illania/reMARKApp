@@ -87,7 +87,6 @@ namespace Mark5.ServiceReference.FileTransferService
                     var path = $"{endpointUrl}/{Segments.Attachment}/{req.Id}&documentId={req.DocumentId}";
 
                     var request = new HttpRequestMessage(HttpMethod.Get, path);
-
                     request.Headers.Add(Headers.Token, req.Token);
                     var res = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
 

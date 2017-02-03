@@ -535,7 +535,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (string.IsNullOrWhiteSpace(path))
                 {
-                    throw new Exception("Unable to get attachment path.");
+                    throw new Exception("Unable to open attachment");
                 }
 
                 var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));

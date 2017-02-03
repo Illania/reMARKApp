@@ -55,6 +55,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 BusinessEntities = BusinessEntities,
                 FromFolder = FromFolder,
                 RemoteFolder = folder,
+                Type = Type
             };
         }
 
@@ -193,6 +194,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 SelectedItemPositions = baseState.SelectedItemPositions,
                 BusinessEntities = BusinessEntities,
                 FromFolder = FromFolder,
+                Type = Type
             };
         }
 
@@ -205,6 +207,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 BusinessEntities = flfs.BusinessEntities;
                 FromFolder = flfs.FromFolder;
+                Type = flfs.Type;
                 CommonConfig.Logger.Info($"Restored state state: [businessEntities.Count={BusinessEntities?.Count}, businessEntity.Type={BusinessEntities?.First().ObjectType}, fromFolder.Id={FromFolder?.Id}]");
             }
         }
@@ -213,6 +216,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public List<IBusinessEntity> BusinessEntities { get; set; }
             public Folder FromFolder { get; set; }
+            public ActionType Type { get; set; }
         }
 
         #endregion
