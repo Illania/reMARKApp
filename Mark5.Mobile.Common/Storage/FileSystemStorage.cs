@@ -218,6 +218,13 @@ namespace Mark5.Mobile.Common.Storage
             {
                 var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
 
+                //Can happen when an attachment is added, but the application is closed before sending it
+                if ((await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingDocumentPreview)) == ExistenceCheckResult.NotFound)
+                {
+                    await outgoingDocumentFolder.DeleteAsync();
+                    return null;
+                }
+
                 var documentPreviewFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingDocumentPreview);
                 var documentPreview = await SerializationUtils.DeserializeAsync<DocumentPreview>(await documentPreviewFile.ReadAllTextAsync());
 
