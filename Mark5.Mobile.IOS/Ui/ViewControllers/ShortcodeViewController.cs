@@ -6,7 +6,6 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CoreGraphics;
@@ -72,14 +71,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(ObjectLinksListViewController)} appeared");
+            CommonConfig.Logger.Info($"{nameof(ShortcodeViewController)} appeared");
 
             await RefreshData();
         }
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(ObjectLinksListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning($"{nameof(ShortcodeViewController)} received memory warning!");
 
             var ds = tableView?.DataSource as DataSource;
             ds?.Clear();
@@ -187,6 +186,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (indexPath.Section == 0)
                 {
+                    if (string.IsNullOrWhiteSpace(description))
+                    {
+                        var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                        emptyCell.Initialize(Localization.GetString("no_description"));
+                        return emptyCell;
+                    }
+
                     var cell = new UITableViewCell(UITableViewCellStyle.Default, "cell");
                     cell.TextLabel.Text = description;
                     return cell;
@@ -194,18 +200,39 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (indexPath.Section == 1)
                 {
+                    if (toAddresses.Length < 1)
+                    {
+                        var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                        emptyCell.Initialize(Localization.GetString("no_addresses"));
+                        return emptyCell;
+                    }
+                            
                     var cell = new UITableViewCell(UITableViewCellStyle.Default, "cell");
                     cell.TextLabel.Text = toAddresses[indexPath.Row].Address;
                     return cell;
                 }
                 if (indexPath.Section == 2)
                 {
+                    if (ccAddresses.Length < 1)
+                    {
+                        var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                        emptyCell.Initialize(Localization.GetString("no_addresses"));
+                        return emptyCell;
+                    }
+
                     var cell = new UITableViewCell(UITableViewCellStyle.Default, "cell");
                     cell.TextLabel.Text = ccAddresses[indexPath.Row].Address;
                     return cell;
                 }
                 if (indexPath.Section == 3)
                 {
+                    if (bccAddresses.Length < 1)
+                    {
+                        var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                        emptyCell.Initialize(Localization.GetString("no_addresses"));
+                        return emptyCell;
+                    }
+
                     var cell = new UITableViewCell(UITableViewCellStyle.Default, "cell");
                     cell.TextLabel.Text = bccAddresses[indexPath.Row].Address;
                     return cell;
@@ -226,13 +253,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return 1;
 
                 if (section == 1)
-                    return toAddresses.Length;
+                    return toAddresses.Length > 0 ? toAddresses.Length : 1;
 
                 if (section == 2)
-                    return ccAddresses.Length;
+                    return ccAddresses.Length > 0 ? ccAddresses.Length : 1;
 
                 if (section == 3)
-                    return bccAddresses.Length;
+                    return bccAddresses.Length > 0 ? bccAddresses.Length : 1;
 
                 return 0;
             }
@@ -266,7 +293,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 empty = false;
                 loading = true;
 
-                tableView.ReloadData();
+                tableView.InsertSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
             public void EndRefresh(string description, DocumentAddress[] toAddresses, DocumentAddress[] ccAddresses, DocumentAddress[] bccAddresses)
@@ -279,7 +306,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 this.ccAddresses = ccAddresses;
                 this.bccAddresses = bccAddresses;
 
-                tableView.ReloadData();
+                tableView.BeginUpdates();
+                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                tableView.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, 3)), UITableViewRowAnimation.Fade);
+                tableView.EndUpdates();
             }
 
             public void Clear()
@@ -292,7 +322,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ccAddresses = new DocumentAddress[0];
                 bccAddresses = new DocumentAddress[0];
 
-                tableView.ReloadData();
+                tableView.BeginUpdates();
+                tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(0, 4)), UITableViewRowAnimation.Fade);
+                tableView.EndUpdates();
             }
 
             protected override void Dispose(bool disposing)
