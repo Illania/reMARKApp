@@ -111,6 +111,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 });
         }
 
+        public void ActionClicked(DocumentAddress documentAddress)
+        {
+            // TODO
+        }
+
         async Task RefreshData()
         {
             CommonConfig.Logger.Info("Loading shortcode...");
@@ -315,7 +320,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             void Cell_ActionClicked(object sender, DocumentAddress documentAddress)
             {
-
+                viewController.ActionClicked(documentAddress);
             }
 
             public void StartRefresh()
