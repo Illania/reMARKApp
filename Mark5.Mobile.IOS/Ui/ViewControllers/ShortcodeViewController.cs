@@ -99,6 +99,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.ClipsToBounds = false;
             tableView.Source = new DataSource(this, tableView);
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
+            tableView.RowHeight = UITableView.AutomaticDimension;
+            tableView.EstimatedRowHeight = 60f;
             View.AddSubview(tableView);
             View.AddConstraints(new[]
                 {
@@ -193,7 +195,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         return emptyCell;
                     }
 
-                    var cell = new UITableViewCell(UITableViewCellStyle.Default, "cell");
+                    var cell = new UITableViewCell(UITableViewCellStyle.Default, "descriptionCell");
                     cell.TextLabel.Text = description;
                     return cell;
                 }
@@ -206,11 +208,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         emptyCell.Initialize(Localization.GetString("no_addresses"));
                         return emptyCell;
                     }
-                            
-                    var cell = new UITableViewCell(UITableViewCellStyle.Default, "cell");
-                    cell.TextLabel.Text = toAddresses[indexPath.Row].Address;
-                    return cell;
+
+                    var address = toAddresses[indexPath.Row];
+                    return GetInitializedCell(address);
                 }
+
                 if (indexPath.Section == 2)
                 {
                     if (ccAddresses.Length < 1)
@@ -220,10 +222,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         return emptyCell;
                     }
 
-                    var cell = new UITableViewCell(UITableViewCellStyle.Default, "cell");
-                    cell.TextLabel.Text = ccAddresses[indexPath.Row].Address;
-                    return cell;
+                    var address = ccAddresses[indexPath.Row];
+                    return GetInitializedCell(address);
                 }
+
                 if (indexPath.Section == 3)
                 {
                     if (bccAddresses.Length < 1)
@@ -233,12 +235,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         return emptyCell;
                     }
 
-                    var cell = new UITableViewCell(UITableViewCellStyle.Default, "cell");
-                    cell.TextLabel.Text = bccAddresses[indexPath.Row].Address;
-                    return cell;
+                    var address = bccAddresses[indexPath.Row];
+                    return GetInitializedCell(address);
                 }
 
                 return null;
+            }
+
+            UITableViewCell GetInitializedCell(DocumentAddress documentAddress)
+            {
+                if (string.IsNullOrWhiteSpace(documentAddress.Name))
+                {
+                    var compactCell = tableView.DequeueReusableCell(DocumentAddressesCompactTableViewCell.Key) as DocumentAddressesCompactTableViewCell;
+                    if (compactCell == null)
+                    {
+                        compactCell = DocumentAddressesCompactTableViewCell.Create();
+                        compactCell.ActionClicked += Cell_ActionClicked;
+                    }
+                    compactCell.Initialize(documentAddress);
+                    return compactCell;
+                }
+
+                var cell = tableView.DequeueReusableCell(DocumentAddressesTableViewCell.Key) as DocumentAddressesTableViewCell;
+                if (cell == null)
+                {
+                    cell = DocumentAddressesTableViewCell.Create();
+                    cell.ActionClicked += Cell_ActionClicked;
+                }
+                cell.Initialize(documentAddress);
+                return cell;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
@@ -286,6 +311,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (section == 3) return Localization.GetString("bcc");
 
                 return string.Empty;
+            }
+
+            void Cell_ActionClicked(object sender, DocumentAddress documentAddress)
+            {
+
             }
 
             public void StartRefresh()

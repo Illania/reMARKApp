@@ -179,6 +179,8 @@
     <InterfaceDefinition Include="Ui\TableViewCells\NotificationsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\ObjectActionsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\ObjectLinksTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\DocumentAddressesTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\DocumentAddressesCompactTableViewCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -291,6 +293,14 @@
     <Compile Include="Ui\TableViewCells\ObjectLinksTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\ObjectLinksTableViewCell.designer.cs">
       <DependentUpon>ObjectLinksTableViewCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\TableViewCells\DocumentAddressesTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\DocumentAddressesTableViewCell.designer.cs">
+      <DependentUpon>DocumentAddressesTableViewCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\TableViewCells\DocumentAddressesCompactTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\DocumentAddressesCompactTableViewCell.designer.cs">
+      <DependentUpon>DocumentAddressesCompactTableViewCell.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
