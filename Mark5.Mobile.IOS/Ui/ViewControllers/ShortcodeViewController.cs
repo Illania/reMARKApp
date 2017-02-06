@@ -195,8 +195,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         return emptyCell;
                     }
 
-                    var cell = new UITableViewCell(UITableViewCellStyle.Default, "descriptionCell");
-                    cell.TextLabel.Text = description;
+                    var cell = tableView.DequeueReusableCell(DescriptionTableViewCell.Key) as DescriptionTableViewCell ?? DescriptionTableViewCell.Create();
+                    cell.Initialize(description);
                     return cell;
                 }
 
@@ -210,7 +210,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
 
                     var address = toAddresses[indexPath.Row];
-                    return GetInitializedCell(address);
+                    return GetInitializedDocumentAddressCell(address);
                 }
 
                 if (indexPath.Section == 2)
@@ -223,7 +223,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
 
                     var address = ccAddresses[indexPath.Row];
-                    return GetInitializedCell(address);
+                    return GetInitializedDocumentAddressCell(address);
                 }
 
                 if (indexPath.Section == 3)
@@ -236,13 +236,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
 
                     var address = bccAddresses[indexPath.Row];
-                    return GetInitializedCell(address);
+                    return GetInitializedDocumentAddressCell(address);
                 }
 
                 return null;
             }
 
-            UITableViewCell GetInitializedCell(DocumentAddress documentAddress)
+            UITableViewCell GetInitializedDocumentAddressCell(DocumentAddress documentAddress)
             {
                 if (string.IsNullOrWhiteSpace(documentAddress.Name))
                 {
