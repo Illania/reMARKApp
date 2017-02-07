@@ -413,11 +413,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void AttachmentButtonItem_Clicked(object sender, EventArgs e)
         {
             var c = new UIDocumentMenuViewController(new string[] { "public.content" }, UIDocumentPickerMode.Import);
-            c.Delegate = new MyDelegate(this, HandleAction);
+            c.Delegate = new DocumentMenuDelegate(this, HandleAttachmentUrl);
             PresentViewController(c, true, null);
         }
 
-        async void HandleAction(NSUrl url) //TODO put in right place
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void HandleAttachmentUrl(NSUrl url)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             OutgoingDocumentAttachmentDescription attachment = null;
             Stream stream = null;
@@ -433,7 +435,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (!result)
                 {
-                    //TODO error
+                    throw new Exception(_error.ToString());
                 }
 
                 var sizeInBytes = int.Parse(sizeObject.ToString());
@@ -442,7 +444,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("attachment_too_big")));
                     return;
-                    //TODO should remove file from common container?
+                    //TODO should remove file from common container ourselves? (otherwise it gets deleted automatically when the app closes)
                 }
 
                 var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
@@ -839,12 +841,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
-        class MyDelegate : UIDocumentMenuDelegate, IUIDocumentPickerDelegate
+        class DocumentMenuDelegate : UIDocumentMenuDelegate, IUIDocumentPickerDelegate
         {
             ComposeDocumentViewController viewController;
             Action<NSUrl> urlHanlder;
 
-            public MyDelegate(ComposeDocumentViewController vc, Action<NSUrl> handler)
+            public DocumentMenuDelegate(ComposeDocumentViewController vc, Action<NSUrl> handler)
             {
                 viewController = vc;
                 urlHanlder = handler;
