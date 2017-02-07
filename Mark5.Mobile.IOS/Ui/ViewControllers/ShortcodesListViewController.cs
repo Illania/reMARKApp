@@ -87,7 +87,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             CommonConfig.Logger.Warning($"{nameof(ShortcodesListViewController)} received memory warning!");
 
-            var ds = shortcodesTableView?.DataSource as DataSource;
+            var ds = shortcodesTableView?.Source as DataSource;
             ds?.Reset();
 
             base.DidReceiveMemoryWarning();
@@ -190,8 +190,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void ShortcodeSelected(ShortcodePreview shortcodePreview)
         {
-            var vc = new ShortcodeViewController(Folder, shortcodePreview);
-            NavigationController.PushViewController(vc, true);
+            if (SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                nc.PopToRootViewController(false);
+
+                var vc = (ShortcodeViewController)nc.ViewControllers[0];
+                vc.ClearData();
+                vc.SetData(Folder, shortcodePreview);
+                vc.RefreshData();
+            }
+            else
+            {
+                var vc = new ShortcodeViewController();
+                vc.SetData(Folder, shortcodePreview);
+                NavigationController.PushViewController(vc, true);
+            }
         }
 
         [Export("longPressed:")]
@@ -311,6 +325,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Error($"Could not refresh folders [folder={Folder?.Name}, startRowId={startRowId}, forceClear={forceClear}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
+
+                NavigationController?.PopViewController(true);
             }, startRowId, cts.Token);
         }
 

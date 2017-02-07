@@ -83,13 +83,13 @@ namespace Mark5.Mobile.Common.DataAccess
                         throw new DataNotFoundException("Contact previews could not be found.");
                     }
 
+                    contactPreviews = result;
+                    
                     startRowId = startRowId < 1 ? 1 : startRowId;
                     foreach (var contactPreview in contactPreviews)
                     {
                         contactPreview.RowId = startRowId++;
                     }
-
-                    contactPreviews = result;
                 });
 
                 return contactPreviews;

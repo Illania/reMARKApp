@@ -6,8 +6,10 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Threading;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -15,6 +17,7 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -32,31 +35,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         ShortcodePreview shortcodePreview;
         Shortcode shortcode;
 
+        UIBarButtonItem composeButton;
         UITableView tableView;
         UIToolbar toolbar;
+        UIBarButtonItem fileToButton;
 
-        public ShortcodeViewController(int folderId, int shortcodeId)
-        {
-            this.folderId = folderId;
-            this.shortcodeId = shortcodeId;
-        }
-
-        public ShortcodeViewController(Folder folder, ShortcodePreview shortcodePreview)
-        {
-            this.folder = folder;
-            this.shortcodePreview = shortcodePreview;
-        }
-
-        public ShortcodeViewController(ShortcodePreview shortcodePreview)
-        {
-            this.shortcodePreview = shortcodePreview;
-        }
+        CancellationTokenSource cts;
 
         public override void LoadView()
         {
             base.LoadView();
 
+            InitializeNavigationBar();
             InitializeView();
+            InitializeHandlers();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -66,38 +58,50 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeNavigationBarTitle();
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        public override async void ViewDidAppear(bool animated)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        public override void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
             CommonConfig.Logger.Info($"{nameof(ShortcodeViewController)} appeared");
 
-            await RefreshData();
+            if (!Empty)
+                RefreshData();
+        }
+
+        public override void ViewWillDisappear(bool animated)
+        {
+            base.ViewWillDisappear(animated);
+
+            DeinitializeHandlers();
         }
 
         public override void DidReceiveMemoryWarning()
         {
             CommonConfig.Logger.Warning($"{nameof(ShortcodeViewController)} received memory warning!");
 
-            var ds = tableView?.DataSource as DataSource;
+            var ds = tableView?.Source as DataSource;
             ds?.Clear();
 
             base.DidReceiveMemoryWarning();
         }
 
-        public override void DidRotate(UIInterfaceOrientation fromInterfaceOrientation)
+        public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
         {
-            base.DidRotate(fromInterfaceOrientation);
+            base.ViewWillTransitionToSize(toSize, coordinator);
 
-            tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
-            tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+            coordinator.AnimateAlongsideTransition(ctx => { }, ctx =>
+            {
+                tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+                tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+            });
         }
 
-        void InitializeNavigationBarTitle()
+        void InitializeNavigationBar()
         {
-            NavigationItem.Title = shortcodePreview?.Name;
+            composeButton = new UIBarButtonItem();
+            composeButton.Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"));
+            composeButton.Enabled = false;
+            NavigationItem.SetRightBarButtonItem(composeButton, false);
         }
 
         void InitializeView()
@@ -121,7 +125,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
                 });
 
+            fileToButton = new UIBarButtonItem();
+            fileToButton.Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png"));
+            fileToButton.Enabled = false;
+
             toolbar = new UIToolbar();
+            toolbar.BarStyle = UIBarStyle.Default;
+            toolbar.Items = new[]
+            {
+                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                fileToButton,
+                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace)
+            };
             toolbar.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(toolbar);
             View.AddConstraints(new[]
@@ -133,13 +148,109 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 });
         }
 
+        void InitializeNavigationBarTitle()
+        {
+            NavigationItem.Title = shortcodePreview?.Name;
+        }
+
+        void InitializeHandlers()
+        {
+            if (fileToButton != null)
+                fileToButton.Clicked += FileToButton_Clicked;
+        }
+
+        void DeinitializeHandlers()
+        {
+            if (fileToButton != null)
+                fileToButton.Clicked -= FileToButton_Clicked;
+        }
+
         public void ActionClicked(DocumentAddress documentAddress)
         {
             // TODO
         }
 
-        async Task RefreshData()
+        void FileToButton_Clicked(object sender, EventArgs e)
         {
+            var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, null)); // TODO
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
+            {
+                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { shortcodePreview });
+                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            }));
+
+            if (folder?.InternalType == FolderInternalType.FilterView
+                || folder?.InternalType == FolderInternalType.Static
+                || folder?.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
+            {
+                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { shortcodePreview }, folder);
+                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            }));
+
+            if (folder?.InternalType == FolderInternalType.FilterView
+                || folder?.InternalType == FolderInternalType.Static
+                || folder?.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, null)); // TODO
+
+            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
+                || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, null)); // TODO
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+
+            if (eas.PopoverPresentationController != null)
+                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+
+            PresentViewController(eas, true, null);
+        }
+
+        public void SetData(int folderId, int shortcodeId)
+        {
+            folder = null;
+            shortcodePreview = null;
+            shortcode = null;
+            
+            this.folderId = folderId;
+            this.shortcodeId = shortcodeId;
+        }
+
+        public void SetData(Folder folder, ShortcodePreview shortcodePreview)
+        {
+            folderId = null;
+            shortcodeId = null;
+            shortcode = null;
+
+            this.folder = folder;
+            this.shortcodePreview = shortcodePreview;
+        }
+
+        public void SetData(ShortcodePreview shortcodePreview)
+        {
+            folderId = null;
+            folder = null;
+            shortcodeId = null;
+            shortcode = null;
+
+            this.shortcodePreview = shortcodePreview;
+        }
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        public async void RefreshData()
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            cts?.Cancel();
+            cts = new CancellationTokenSource();
+            var token = cts.Token;
+
+            var folderId = this.folderId;
+            var folder = this.folder;
+            var shortcodeId = this.shortcodeId;
+            var shortcodePreview = this.shortcodePreview;
+            var shortcode = this.shortcode;
+
             CommonConfig.Logger.Info("Loading shortcode...");
 
             var ds = (DataSource)tableView?.Source;
@@ -170,19 +281,53 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var ccAddresses = shortcode.Addresses.Where(da => da.AddressType == DocumentAddressType.Cc).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
                 var bccAddresses = shortcode.Addresses.Where(da => da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
 
+                if (token.IsCancellationRequested) return;
+
                 InitializeNavigationBarTitle();
+
+                if (composeButton != null)
+                    composeButton.Enabled = shortcode.Addresses.Any();
+
+                if (fileToButton != null)
+                    fileToButton.Enabled = true;
+
                 ds.EndRefresh(description, toAddresses, ccAddresses, bccAddresses);
             }
             catch (Exception ex)
             {
+                if (token.IsCancellationRequested) return;
+
                 CommonConfig.Logger.Error($"Could not load shortcode", ex);
 
                 ds.Clear();
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
 
-                NavigationController.DismissViewController(true, null);
+                if (SplitViewController == null)
+                    NavigationController.PopViewController(true);
             }
+        }
+
+        public void ClearData()
+        {
+            cts?.Cancel();
+            
+            folderId = null;
+            folder = null;
+            shortcodeId = null;
+            shortcodePreview = null;
+            shortcode = null;
+
+            InitializeNavigationBarTitle();
+
+            if (composeButton != null)
+                composeButton.Enabled = false;
+
+            if (fileToButton != null)
+                fileToButton.Enabled = false;
+
+            var ds = tableView?.Source as DataSource;
+            ds?.Clear();
         }
 
         class DataSource : UITableViewSource, IDisposable
@@ -371,6 +516,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public void Clear()
             {
+                var sections = NumberOfSections(tableView);
+
                 empty = true;
                 loading = true;
 
@@ -380,7 +527,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 bccAddresses = new DocumentAddress[0];
 
                 tableView.BeginUpdates();
-                tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(0, 4)), UITableViewRowAnimation.Fade);
+                tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(0, sections)), UITableViewRowAnimation.Fade);
                 tableView.EndUpdates();
             }
 

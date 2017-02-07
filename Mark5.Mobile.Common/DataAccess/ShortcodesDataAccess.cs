@@ -81,13 +81,13 @@ namespace Mark5.Mobile.Common.DataAccess
                         throw new DataNotFoundException("Shortcode previews could not be found.");
                     }
 
+                    shortcodePreviews = result;
+
                     startRowId = startRowId < 1 ? 1 : startRowId;
                     foreach (var shortcodePreview in shortcodePreviews)
                     {
                         shortcodePreview.RowId = startRowId++;
                     }
-
-                    shortcodePreviews = result;
                 });
 
                 return shortcodePreviews;
