@@ -199,6 +199,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             subjectView.Edited += Subview_Edited;
 
             attachmentsView.AttachmentClicked += AttachmentsView_AttachmentClicked;
+            attachmentsView.DeleteAttachmentClicked += AttachmentsView_DeleteAttachmentClicked;
         }
 
         void DeInitializeHandlers()
@@ -223,6 +224,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             subjectView.Edited -= Subview_Edited;
 
             attachmentsView.AttachmentClicked -= AttachmentsView_AttachmentClicked;
+            attachmentsView.DeleteAttachmentClicked -= AttachmentsView_DeleteAttachmentClicked;
+
 
             if (suggestionsListView != null)
             {
@@ -621,6 +624,36 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             finally
             {
                 dismissAction();
+            }
+        }
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void AttachmentsView_DeleteAttachmentClicked(object sender, IAttachmentDescription attachment)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            var outgoingAttachment = attachment as OutgoingDocumentAttachmentDescription;
+            if (outgoingAttachment != null)
+            {
+                try
+                {
+                    if (!LocalDocument)
+                    {
+                        await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, outgoingAttachment.Name);
+                    }
+
+                    attachmentsView.RemoveAttachment(sender, outgoingAttachment);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error($"Error while removing attachment [AttachmentName={outgoingAttachment?.Name}, PreviousDocument.Id={PreviousDocument?.Id}," +
+                                              $" PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
+                    await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_removing_local_attachment")));
+                }
+            }
+            else
+            {
+                var remoteAttachment = attachment as AttachmentDescription;
+                attachmentsView.RemoveAttachment(sender, remoteAttachment);
             }
         }
 

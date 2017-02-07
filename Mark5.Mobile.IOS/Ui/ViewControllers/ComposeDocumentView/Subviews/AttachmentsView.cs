@@ -24,6 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         List<IAttachmentDescription> attachmentsDescription = new List<IAttachmentDescription>();
 
         public event EventHandler<IAttachmentDescription> AttachmentClicked = delegate { };
+        public event EventHandler<IAttachmentDescription> DeleteAttachmentClicked = delegate { };
 
         public AttachmentsView()
         {
@@ -104,6 +105,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             UpdateVisibility();
         }
 
+        public void RemoveAttachment(object view, IAttachmentDescription attachmentDescrption)
+        {
+            attachmentsDescription.Remove(attachmentDescrption);
+            (view as UIView).RemoveFromSuperview();
+
+            UpdateVisibility();
+        }
+
         #endregion
 
         #region Utilities
@@ -113,17 +122,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             Hidden = attachmentsDescription.Count < 1;
         }
 
-        void HandleAttachmentClicked(IAttachmentDescription attachmentDescrption)
+        void HandleAttachmentClicked(AttachmentsSubView view, IAttachmentDescription attachmentDescrption)
         {
-            AttachmentClicked(this, attachmentDescrption);
+            AttachmentClicked(view, attachmentDescrption);
         }
 
         void HandleDeleteAttachmentClicked(AttachmentsSubView view, IAttachmentDescription attachmentDescrption)
         {
-            attachmentsDescription.Remove(attachmentDescrption);
-            view.RemoveFromSuperview();
-
-            UpdateVisibility();
+            DeleteAttachmentClicked(view, attachmentDescrption);
         }
 
         #endregion
@@ -131,14 +137,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         class AttachmentsSubView : UIStackView
         {
             readonly IAttachmentDescription attachmentDescription;
-            readonly Action<IAttachmentDescription> attachmentClickedAction;
+            readonly Action<AttachmentsSubView, IAttachmentDescription> attachmentClickedAction;
             readonly Action<AttachmentsSubView, IAttachmentDescription> deleteAttachmentClickedAction;
 
             UIButton filenameButton;
             UIButton deleteButton;
 
-            public AttachmentsSubView(IAttachmentDescription attachmentDescription, Action<IAttachmentDescription> attachmentClickedAction, Action<AttachmentsSubView,
-                                      IAttachmentDescription> deleteAttachmentClickedAction)
+            public AttachmentsSubView(IAttachmentDescription attachmentDescription, Action<AttachmentsSubView, IAttachmentDescription> attachmentClickedAction,
+                                      Action<AttachmentsSubView, IAttachmentDescription> deleteAttachmentClickedAction)
             {
                 this.attachmentDescription = attachmentDescription;
                 this.attachmentClickedAction = attachmentClickedAction;
@@ -161,7 +167,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 filenameButton.SetTitle(attachmentDescription.Name + " (" + UI.PrettyFileSize(attachmentDescription.SizeInBytes) + ")", UIControlState.Normal);
                 filenameButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
                 filenameButton.Opaque = false;
-                filenameButton.TouchUpInside += (sender, e) => attachmentClickedAction(attachmentDescription);
+                filenameButton.TouchUpInside += (sender, e) => attachmentClickedAction(this, attachmentDescription);
                 AddArrangedSubview(filenameButton);
 
                 deleteButton = UIButton.FromType(UIButtonType.ContactAdd); //TODO change look
