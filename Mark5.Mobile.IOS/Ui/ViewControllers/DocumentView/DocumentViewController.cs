@@ -989,9 +989,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     {
 
         readonly UIViewController parentController;
-        readonly AttachmentDescription attachmentDescription;
+        readonly IAttachmentDescription attachmentDescription;
 
-        public AttachmentInteractionControllerDelegate(UIViewController parentController, AttachmentDescription attachmentDescription)
+        public AttachmentInteractionControllerDelegate(UIViewController parentController, IAttachmentDescription attachmentDescription)
         {
             this.attachmentDescription = attachmentDescription;
             this.parentController = parentController;

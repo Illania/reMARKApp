@@ -64,6 +64,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem sendButtonItem;
         UIBarButtonItem attachmentButtonItem;
 
+        UIDocumentInteractionController attachmentInteractionController;
+
         // This value will be later updated from notification.
         float keyboardHeight = 216.0f;
 
@@ -549,8 +551,75 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             View.SendSubviewToBack(suggestionsListView);
         }
 
-        async void AttachmentsView_AttachmentClicked(object sender, IAttachmentDescription e)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void AttachmentsView_AttachmentClicked(object sender, IAttachmentDescription attachmentDescription)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
+
+            try
+            {
+                string path = null;
+
+                var remoteAttachment = attachmentDescription as AttachmentDescription;
+                if (remoteAttachment != null)
+                {
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(remoteAttachment, Document, false, SourceType.Local);
+
+                    if (string.IsNullOrWhiteSpace(path))
+                    {
+                        if (attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes
+                            && PlatformConfig.Preferences.LargeAttachmentWarning
+                            && !await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("big_attachment_title"),
+                                                                   string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(remoteAttachment.SizeInBytes))))
+                        {
+                            dismissAction();
+                            return;
+                        }
+
+                        path = await Managers.DocumentsManager.GetAttachmentAsync(remoteAttachment, Document, false, SourceType.Remote);
+                    }
+                }
+                else
+                {
+                    var outgoingAttachment = attachmentDescription as OutgoingDocumentAttachmentDescription;
+                    path = outgoingAttachment.Path;
+                }
+
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    throw new Exception("Unable to get attachment path.");
+                }
+
+
+                var url = NSUrl.FromFilename(path);
+                attachmentInteractionController = UIDocumentInteractionController.FromUrl(url);
+                attachmentInteractionController.Delegate = new AttachmentInteractionControllerDelegate(this, attachmentDescription);
+
+                var previewSuccessful = attachmentInteractionController.PresentPreview(true);
+
+                if (!previewSuccessful)
+                {
+                    CommonConfig.Logger.Info(string.Format("Failed to present preview for attachment. Presenting open with instead. [documentId={0}, attachment={1}]", Document.Id, attachmentDescription));
+                    var openInSuccessful = attachmentInteractionController.PresentOptionsMenu(View.Frame, View, true);
+                    if (!openInSuccessful)
+                    {
+                        CommonConfig.Logger.Warning(string.Format("Failed to present open in view - there is no app that can open this type of attachment installed. [documentId={0}, attachment={1}]", Document.Id, attachmentDescription));
+                        await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to view attachment [document.Id={Document.Id}, attachment.Name={attachmentDescription?.Name}", ex);
+
+                dismissAction();
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+            finally
+            {
+                dismissAction();
+            }
         }
 
         #endregion
