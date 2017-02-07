@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using Mark5.Mobile.Common.Model;
+using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
@@ -29,7 +30,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             if (folder.Module == ModuleType.Documents)
             {
-                var vc = new DocumentsListViewController { Folder = folder };
+                UIViewController vc;
+
+                if (folder.Local)
+                {
+                    vc = new OutgoingDocumentListViewController();
+                }
+                else
+                {
+                    vc = new DocumentsListViewController { Folder = folder };
+                }
+
                 NavigationController.PushViewController(vc, true);
             }
 
