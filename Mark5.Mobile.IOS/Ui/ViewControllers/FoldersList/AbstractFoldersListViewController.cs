@@ -287,11 +287,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                     await Dialogs.ShowErrorDialogAsync(this, ex);
                 }
+
+                SearchController.SearchBar.UserInteractionEnabled = true;
+                SearchController.SearchBar.Alpha = 1f;
             }
             else
             {
                 EditModeItem.Title = Localization.GetString("done");
                 FoldersTableView.SetEditing(true, true);
+
+                SearchController.SearchBar.UserInteractionEnabled = false;
+                SearchController.SearchBar.Alpha = .5f;
             }
 
             EditModeItem.Clicked += EditModeItem_Clicked;
