@@ -347,6 +347,7 @@
     <Compile Include="Ui\TableViewCells\ObjectLinksTableViewCell.designer.cs">
       <DependentUpon>ObjectLinksTableViewCell.cs</DependentUpon>
     </Compile>
+    <Compile Include="Ui\ViewControllers\OutgoingDocumentListViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
