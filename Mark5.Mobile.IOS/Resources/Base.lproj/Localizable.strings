@@ -69,6 +69,7 @@
 "no_folders_in_section" = "There are no folders in this section";
 "no_matching_contacts" = "There are no matching contacts";
 "no_matching_documents" = "There are no matching documents";
+"no_matching_shortcodes" = "There are no matching shortcodes";
 "no_matching_users" = "There are no matching users";
 "no_notifications" = "There are no notifications";
 "no_object_actions" = "There are no actions";

@@ -83,6 +83,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             cts?.Cancel();
         }
 
+        public override void WillMoveToParentViewController(UIViewController parent)
+        {
+            base.WillMoveToParentViewController(parent);
+
+            if (parent == null && SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                nc.PopToRootViewController(false);
+
+                var vc = (ShortcodeViewController)nc.ViewControllers[0];
+                vc.ClearData();
+            }
+        }
+
         public override void DidReceiveMemoryWarning()
         {
             CommonConfig.Logger.Warning($"{nameof(ShortcodesListViewController)} received memory warning!");
@@ -188,8 +202,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        public void ShortcodeSelected(ShortcodePreview shortcodePreview)
+        public void ShortcodeSelected(UITableView tableView, ShortcodePreview shortcodePreview)
         {
+            if (tableView == searchResultsController.TableView)
+            {
+                var ds = (DataSource)shortcodesTableView.Source;
+                var index = ds.Items.FindIndex(sp => sp.Id == shortcodePreview.Id);
+                if (index >= 0) shortcodesTableView.SelectRow(NSIndexPath.FromRowSection(index, 0), false, UITableViewScrollPosition.Middle);
+            }
+
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];
@@ -226,6 +247,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             shortcodesTableView.SetEditing(true, true);
             NavigationItem.SetRightBarButtonItem(exitEditItem, true);
             NavigationItem.SetLeftBarButtonItem(editItem, true);
+
+            searchController.SearchBar.UserInteractionEnabled = false;
+            searchController.SearchBar.Alpha = .5f;
+
+            if (SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                nc.PopToRootViewController(false);
+
+                var vc = (ShortcodeViewController)nc.ViewControllers[0];
+                vc.ClearData();
+            }
         }
 
         void ExitEditItem_Clicked(object sender, EventArgs e) => EndEditing();
@@ -235,6 +268,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             shortcodesTableView.SetEditing(false, true);
             NavigationItem.SetRightBarButtonItem(null, true);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
+
+            searchController.SearchBar.UserInteractionEnabled = true;
+            searchController.SearchBar.Alpha = 1f;
         }
 
         void EditItem_Clicked(object sender, EventArgs e)
@@ -380,10 +416,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         static bool MatchesQuery(ShortcodePreview sp, string query)
         {
-            if (sp.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
+            if (sp.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
                 return true;
 
-            if (sp.Description.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
+            if (sp.Description.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
                 return true;
 
             return false;
@@ -487,8 +523,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
+                if (tableView.Editing) return;
+
                 var sp = shortcodePreviewsInView[indexPath.Row];
-                viewController.ShortcodeSelected(sp);
+                viewController.ShortcodeSelected(tableView, sp);
             }
 
             public void AppendItems(List<ShortcodePreview> shortcodePreviews)
