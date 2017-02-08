@@ -102,23 +102,24 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                          .ConvertDateTimeToTimestampMilliseconds()
                          .FormatServerTimestampAsCompactShortDateTimeString();
 
-            UIImage directionIcon;
+            UIImage stateIcon;
             switch (container.Info.State)
             {
                 case OutgoingDocumentState.Failed:
-                    directionIcon = UIImage.FromBundle(Path.Combine("icons", "failed.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    stateIcon = UIImage.FromBundle(Path.Combine("icons", "failed.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
                 case OutgoingDocumentState.Sending:
-                    directionIcon = UIImage.FromBundle(Path.Combine("icons", "pencil.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);  //TODO need to put the right one!!!!
+                    stateIcon = UIImage.FromBundle(Path.Combine("icons", "pencil.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);  //TODO need to put the right one!!!!
                     break;
                 case OutgoingDocumentState.Waiting:
-                    directionIcon = UIImage.FromBundle(Path.Combine("icons", "pending.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    stateIcon = UIImage.FromBundle(Path.Combine("icons", "pending.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
                 default:
-                    directionIcon = null;
+                    stateIcon = null;
                     break;
             }
-            IndicatorImageView1.Image = directionIcon;
+
+            IndicatorImageView1.Image = stateIcon;
             IndicatorImageView2.Image = null;
             IndicatorImageView3.Image = documentPreview.AttachmentsCount > 0 ? UIImage.FromBundle(Path.Combine("icons", "attachment.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate) : null; //TODO check
         }
