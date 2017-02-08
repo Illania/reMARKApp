@@ -32,7 +32,7 @@
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_gravity="right|center_vertical"
-            android:src="@drawable/actions_send"
+            android:src="@drawable/action_send"
             android:clickable="true"
             android:background="@android:color/transparent"
             android:tint="@color/brown" />

@@ -577,7 +577,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-
         #region Options menu related
 
         static class MenuItemActions
@@ -592,13 +591,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             optionsMenu.Clear();
 
             var attachmentItem = menu.Add(Menu.None, MenuItemActions.AddAttachment, MenuItemActions.AddAttachment, Resource.String.add_attachment);
-            attachmentItem.SetIcon(Resource.Drawable.actions_attachment);
+            attachmentItem.SetIcon(Resource.Drawable.action_attachment);
             attachmentItem.SetShowAsAction(ShowAsAction.Always);
 
             if (!LocalDocument || LocalDocument && OutgoingDocumentState == OutgoingDocumentState.Failed)
             {
                 var sendItem = optionsMenu.Add(Menu.None, MenuItemActions.SendDocument, MenuItemActions.SendDocument, Resource.String.send);
-                sendItem.SetIcon(Resource.Drawable.actions_send);
+                sendItem.SetIcon(Resource.Drawable.action_send);
                 sendItem.SetShowAsAction(ShowAsAction.Always);
                 UpdateSendButtonState();
             }

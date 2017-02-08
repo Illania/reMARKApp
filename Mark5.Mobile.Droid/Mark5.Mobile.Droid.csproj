@@ -543,10 +543,10 @@
     <AndroidResource Include="Resources\drawable-hdpi\contacts_skype.png" />
     <AndroidResource Include="Resources\drawable-hdpi\contacts_telex.png" />
     <AndroidResource Include="Resources\drawable-hdpi\sending.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\actions_attachment.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\actions_new.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\actions_search.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\actions_send.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_attachment.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_new.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_search.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_send.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\contacts_company.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\contacts_department.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\contacts_email.png" />
@@ -559,10 +559,10 @@
     <AndroidResource Include="Resources\drawable-xhdpi\contacts_skype.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\contacts_telex.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\sending.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\actions_attachment.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\actions_new.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\actions_search.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\actions_send.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_attachment.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_new.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_search.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_send.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\contacts_company.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\contacts_department.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\contacts_email.png" />
@@ -575,10 +575,9 @@
     <AndroidResource Include="Resources\drawable-xxhdpi\contacts_skype.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\contacts_telex.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\sending.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\actions_attachment.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\actions_new.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\actions_search.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\actions_send.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_attachment.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_new.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_search.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_company.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_department.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_email.png" />
@@ -591,6 +590,7 @@
     <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_skype.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_telex.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\sending.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_send.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Xamarin.Build.Download.0.4.2\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.2\build\Xamarin.Build.Download.targets')" />
