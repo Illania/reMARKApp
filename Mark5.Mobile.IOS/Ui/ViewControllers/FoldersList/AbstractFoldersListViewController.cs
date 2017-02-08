@@ -107,10 +107,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             CommonConfig.Logger.Warning($"{nameof(AbstractFoldersListViewController)} received memory warning!");
 
-            var ds = FoldersTableView?.DataSource as DataSource;
+            var ds = FoldersTableView?.Source as DataSource;
             ds?.Reset();
 
-            var gds = FoldersTableView?.DataSource as GrouppedDataSource;
+            var gds = FoldersTableView?.Source as GrouppedDataSource;
             gds?.Reset();
 
             base.DidReceiveMemoryWarning();
@@ -287,11 +287,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                     await Dialogs.ShowErrorDialogAsync(this, ex);
                 }
+
+                SearchController.SearchBar.UserInteractionEnabled = true;
+                SearchController.SearchBar.Alpha = 1f;
             }
             else
             {
                 EditModeItem.Title = Localization.GetString("done");
                 FoldersTableView.SetEditing(true, true);
+
+                SearchController.SearchBar.UserInteractionEnabled = false;
+                SearchController.SearchBar.Alpha = .5f;
             }
 
             EditModeItem.Clicked += EditModeItem_Clicked;
@@ -390,6 +396,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 CommonConfig.Logger.Error($"Could not refresh folders [parentFolder={ParentFolder}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
+
+                if (!IsRootOfFoldersList)
+                    NavigationController?.PopViewController(true);
             }
 
             RefreshControl.EndRefreshing();

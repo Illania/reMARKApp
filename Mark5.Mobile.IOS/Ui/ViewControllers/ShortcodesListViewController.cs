@@ -83,11 +83,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             cts?.Cancel();
         }
 
+        public override void WillMoveToParentViewController(UIViewController parent)
+        {
+            base.WillMoveToParentViewController(parent);
+
+            if (parent == null && SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                nc.PopToRootViewController(false);
+
+                var vc = (ShortcodeViewController)nc.ViewControllers[0];
+                vc.ClearData();
+            }
+        }
+
         public override void DidReceiveMemoryWarning()
         {
             CommonConfig.Logger.Warning($"{nameof(ShortcodesListViewController)} received memory warning!");
 
-            var ds = shortcodesTableView?.DataSource as DataSource;
+            var ds = shortcodesTableView?.Source as DataSource;
             ds?.Reset();
 
             base.DidReceiveMemoryWarning();
@@ -188,9 +202,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        public void ShortcodeSelected(ShortcodePreview shortcodePreview)
+        public void ShortcodeSelected(UITableView tableView, ShortcodePreview shortcodePreview)
         {
-            // TODO
+            if (tableView == searchResultsController.TableView)
+            {
+                var ds = (DataSource)shortcodesTableView.Source;
+                var index = ds.Items.FindIndex(sp => sp.Id == shortcodePreview.Id);
+                if (index >= 0) shortcodesTableView.SelectRow(NSIndexPath.FromRowSection(index, 0), false, UITableViewScrollPosition.Middle);
+            }
+
+            if (SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                nc.PopToRootViewController(false);
+
+                var vc = (ShortcodeViewController)nc.ViewControllers[0];
+                vc.ClearData();
+                vc.SetData(Folder, shortcodePreview);
+                vc.RefreshData();
+            }
+            else
+            {
+                var vc = new ShortcodeViewController();
+                vc.SetData(Folder, shortcodePreview);
+                NavigationController.PushViewController(vc, true);
+            }
         }
 
         [Export("longPressed:")]
@@ -211,6 +247,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             shortcodesTableView.SetEditing(true, true);
             NavigationItem.SetRightBarButtonItem(exitEditItem, true);
             NavigationItem.SetLeftBarButtonItem(editItem, true);
+
+            searchController.SearchBar.UserInteractionEnabled = false;
+            searchController.SearchBar.Alpha = .5f;
+
+            if (SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                nc.PopToRootViewController(false);
+
+                var vc = (ShortcodeViewController)nc.ViewControllers[0];
+                vc.ClearData();
+            }
         }
 
         void ExitEditItem_Clicked(object sender, EventArgs e) => EndEditing();
@@ -220,6 +268,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             shortcodesTableView.SetEditing(false, true);
             NavigationItem.SetRightBarButtonItem(null, true);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
+
+            searchController.SearchBar.UserInteractionEnabled = true;
+            searchController.SearchBar.Alpha = 1f;
         }
 
         void EditItem_Clicked(object sender, EventArgs e)
@@ -256,11 +307,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, null)); // TODO
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
 
             if (eas.PopoverPresentationController != null)
                 eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
+            exitEditItem.Enabled = false;
             PresentViewController(eas, true, null);
         }
 
@@ -310,6 +362,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Error($"Could not refresh folders [folder={Folder?.Name}, startRowId={startRowId}, forceClear={forceClear}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
+
+                NavigationController?.PopViewController(true);
             }, startRowId, cts.Token);
         }
 
@@ -363,10 +417,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         static bool MatchesQuery(ShortcodePreview sp, string query)
         {
-            if (sp.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
+            if (sp.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
                 return true;
 
-            if (sp.Description.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
+            if (sp.Description.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
                 return true;
 
             return false;
@@ -470,8 +524,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
+                if (tableView.Editing) return;
+
                 var sp = shortcodePreviewsInView[indexPath.Row];
-                viewController.ShortcodeSelected(sp);
+                viewController.ShortcodeSelected(tableView, sp);
             }
 
             public void AppendItems(List<ShortcodePreview> shortcodePreviews)

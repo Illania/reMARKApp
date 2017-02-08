@@ -22,7 +22,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         protected override NavigationController CreateSecondaryNavigationController()
         {
-            return new NavigationController(new DocumentViewController());
+            return new NavigationController(new ShortcodeViewController());
         }
     }
 }
