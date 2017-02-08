@@ -100,6 +100,7 @@
 "no_notifications" = "There are no notifications";
 "no_object_actions" = "There are no actions";
 "no_object_links" = "There are no links";
+"no_subject" = "No subject";
 "notifications" = "Notifications";
 "ok" = "OK";
 "opening_attachment___" = "Opening attachment...";

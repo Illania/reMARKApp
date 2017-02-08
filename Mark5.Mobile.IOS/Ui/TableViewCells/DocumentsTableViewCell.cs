@@ -94,9 +94,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             var address = documentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType).FirstOrDefault();
             SenderNameLabel.Text = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
 
-            SubjectLabel.Text = documentPreview.Subject;
+            SubjectLabel.Text = string.IsNullOrWhiteSpace(documentPreview.Subject) ? Localization.GetString("no_subject") : documentPreview.Subject;
             MessagePreviewLabel.Text = !string.IsNullOrWhiteSpace(documentPreview.Preview) ? Regex.Replace(documentPreview.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline) : Localization.GetString("no_content"); ;
-            DateReceivedLabel.Text = documentPreview.DateReceivedTimestamp //TODO check this
+            DateReceivedLabel.Text = container.Info.DateLastSavedTimestamp
                          .ConvertTimestampMillisecondsToDateTime()
                          .ConvertUtcToServerTime()
                          .ConvertDateTimeToTimestampMilliseconds()
