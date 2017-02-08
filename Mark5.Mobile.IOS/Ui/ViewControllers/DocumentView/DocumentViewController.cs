@@ -47,6 +47,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public DocumentPreview DocumentPreview { get; set; }
         public Document Document { get; set; }
         public Guid OutgoingDocumentIdentifier { get; set; }
+        public OutgoingDocumentContainer Container { get; set; }
         public Guid NotificationGuid { get; set; }
 
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
@@ -455,7 +456,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
                 }
 
-
                 if (OutgoingDocumentIdentifier != default(Guid))
                 {
                     var outgoingContainer = await Managers.DocumentsManager.GetOutgoingDocumentContainerAsync(OutgoingDocumentIdentifier, true);
@@ -857,16 +857,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void EditDocumentButtonItem_Clicked(object sender, EventArgs e)
         {
-            var composeDocumentViewController = new ComposeDocumentViewController()
+            ComposeDocumentViewController vc = null;
+            if (OutgoingDocumentIdentifier != default(Guid))
             {
-                PreviousDocumentPreview = DocumentPreview,
-                PreviousDocument = Document,
-                CreationModeFlag = DocumentCreationModeFlag.Edit,
-                PreviousDocumentDirection = DocumentPreview.Direction,
-                PreviousDocumentFolderId = Folder.Id
-            };
+                vc = new ComposeDocumentViewController
+                {
+                    LocalDocument = true,
+                    CreationModeFlag = DocumentCreationModeFlag.Edit,
+                    PreviousDocumentDirection = Container.DocumentPreview.Direction,
+                    OutgoingDocumentGuid = Container.Info.Identifier
+                };
+            }
+            else
+            {
+                vc = new ComposeDocumentViewController
+                {
+                    PreviousDocumentPreview = DocumentPreview,
+                    PreviousDocument = Document,
+                    CreationModeFlag = DocumentCreationModeFlag.Edit,
+                    PreviousDocumentDirection = DocumentPreview.Direction,
+                    PreviousDocumentFolderId = Folder.Id
+                };
+            }
 
-            var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
+            var composeDocumentNavigationController = new UINavigationController(vc);
             composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
             PresentViewController(composeDocumentNavigationController, true, null);
         }

@@ -156,6 +156,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (refreshControl != null)
                 refreshControl.ValueChanged += RefreshControl_ValueChanged;
+
+            Managers.OutgoingDocumentsManager.DocumentBeingSent += OutgoingDocumentsManager_DocumentBeingSent;
+            Managers.OutgoingDocumentsManager.DocumentSendingFailed += OutgoingDocumentsManager_DocumentSendingFailed;
+            Managers.OutgoingDocumentsManager.DocumentSendingSuccessful += OutgoingDocumentsManager_DocumentSendingSuccessful;
         }
 
         void DeinitializeHandlers()
@@ -171,6 +175,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (refreshControl != null)
                 refreshControl.ValueChanged -= RefreshControl_ValueChanged;
+
+            Managers.OutgoingDocumentsManager.DocumentBeingSent -= OutgoingDocumentsManager_DocumentBeingSent;
+            Managers.OutgoingDocumentsManager.DocumentSendingFailed -= OutgoingDocumentsManager_DocumentSendingFailed;
+            Managers.OutgoingDocumentsManager.DocumentSendingSuccessful -= OutgoingDocumentsManager_DocumentSendingSuccessful;
         }
 
         #endregion
@@ -323,6 +331,45 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
+        #region OutgoingDocumentManager event handlers
+
+        void OutgoingDocumentsManager_DocumentBeingSent(object sender, OutgoingDocumentContainer outgoingDocumentContainer)
+        {
+            var ds = (DataSource)documentsTableView.DataSource;
+            var row = ds.GetPosition(outgoingDocumentContainer.Info.Identifier);
+            if (row >= 0)
+            {
+                var container = ds.Items[row];
+                container.Info.State = OutgoingDocumentState.Sending;
+                ds.UpdateRow(row);
+            }
+        }
+
+        void OutgoingDocumentsManager_DocumentSendingFailed(object sender, OutgoingDocumentContainer outgoingDocumentContainer)
+        {
+            var ds = (DataSource)documentsTableView.DataSource;
+            var row = ds.GetPosition(outgoingDocumentContainer.Info.Identifier);
+            if (row >= 0)
+            {
+                var container = ds.Items[row];
+                container.Info.State = OutgoingDocumentState.Failed;
+                ds.UpdateRow(row);
+            }
+        }
+
+        void OutgoingDocumentsManager_DocumentSendingSuccessful(object sender, OutgoingDocumentContainer outgoingDocumentContainer)
+        {
+            var ds = (DataSource)documentsTableView.DataSource;
+            var row = ds.GetPosition(outgoingDocumentContainer.Info.Identifier);
+            if (row >= 0)
+            {
+                ds.Items.RemoveAt(row);
+                ds.RemoveRow(row);
+            }
+        }
+
+        #endregion
+
         class DataSource : UITableViewSource, IDisposable
         {
             static readonly nfloat Height = 100f;
@@ -420,6 +467,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 viewController.DocumentSelected(dp);
             }
 
+            public int GetPosition(Guid identifier)
+            {
+                return outgoingDocumentPreviewsInView.FindIndex(o => o.Info.Identifier == identifier);
+            }
+
             public void AppendItems(List<OutgoingDocumentContainer> containers)
             {
                 loading = false;
@@ -434,20 +486,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 outgoingDocumentPreviewsInView.AddRange(containers);
                 documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
-            }
-
-            void ScrollAndSelect(int row)
-            {
-                var selectedIndexPaths = documentsTableView.IndexPathsForSelectedRows;
-                if (selectedIndexPaths != null)
-                {
-                    foreach (var indexPath in selectedIndexPaths)
-                    {
-                        documentsTableView.DeselectRow(indexPath, true);
-                    }
-                }
-
-                documentsTableView.SelectRow(NSIndexPath.FromRowSection(row, 0), true, UITableViewScrollPosition.Middle);
             }
 
             public void Reset()
@@ -467,10 +505,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 outgoingDocumentPreviewsInView = null;
             }
 
-
-            public void UpdateDocument(OutgoingDocumentContainer documentPreview)
+            public void UpdateRow(int row)
             {
-                //TODO
+                documentsTableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(row, 0) }, UITableViewRowAnimation.Automatic);
+            }
+
+            public void RemoveRow(int row)
+            {
+                documentsTableView.DeleteRows(new NSIndexPath[] { NSIndexPath.FromRowSection(row, 0) }, UITableViewRowAnimation.Automatic);
             }
 
         }

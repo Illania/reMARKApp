@@ -26,6 +26,7 @@
 "confirm_move_to_folder_shortcodes" = "Do you want to move selected shortcodes?";
 "confirm_move_to_folder" = "Move";
 "confirm_save_as_draft" = "Do you want to save the document as draft?";
+"confirm_save_modified_document" = "Do you want to save the modified document?";
 "contacts" = "Contacts";
 "continue" = "Continue";
 "copy_to_folder" = "Copy to folder";
@@ -120,6 +121,7 @@
 "reply" = "Reply";
 "report" = "Report";
 "save_draft" = "Save draft";
+"save_modifications" = "Save modifications";
 "saving_draft___" = "Saving draft...";
 "search" = "Search";
 "search" = "Search";

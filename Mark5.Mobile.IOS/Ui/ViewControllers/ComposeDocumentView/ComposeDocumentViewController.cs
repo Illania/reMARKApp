@@ -378,7 +378,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (LocalDocument)
                 {
-                    //TODO
+                    await SynchOutgoingAttachments(false);
                 }
 
                 await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,
@@ -406,6 +406,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             else
             {
                 NavigationController.PopViewController(true);
+            }
+        }
+
+        public async Task SynchOutgoingAttachments(bool restoreState)
+        {
+            if (restoreState) //We need to remove all the newly added attachments - Restoring state before modifications
+            {
+                var currentAttachments = attachmentsView.GetOutgoingAttachments();
+                var initialAttachmentsNames = OutgoingDocumentInitialAttachments.Select(a => a.Name).ToList();
+
+                var attachmentsToRemove = currentAttachments.Where(a => !initialAttachmentsNames.Contains(a.Name));
+
+                foreach (var attachment in attachmentsToRemove)
+                {
+                    await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Name);
+                }
+            }
+            else //We need to remove all the attachments that are not there already
+            {
+                var currentAttachmentsNames = attachmentsView.GetOutgoingAttachments().Select(a => a.Name).ToList();
+                var initialAttachments = OutgoingDocumentInitialAttachments;
+
+                var attachmentsToRemove = initialAttachments.Where(a => !currentAttachmentsNames.Contains(a.Name));
+
+                foreach (var attachment in attachmentsToRemove)
+                {
+                    await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Name);
+                }
             }
         }
 
@@ -484,7 +512,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (LocalDocument)
             {
-                //TODO    
+                var confirm = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("save_modifications"), Localization.GetString("confirm_save_modified_document"));
+                if (confirm)
+                {
+                    SaveModifiedOutgoingDocument();
+                }
+                else
+                {
+                    await SaveAndCloseComposeActivity();
+                }
             }
             else
             {
@@ -495,9 +531,57 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
                 else
                 {
-                    PopOrDismissViewController();
+                    await SaveAndCloseComposeActivity();
                 }
             }
+        }
+
+        async Task SaveAndCloseComposeActivity()
+        {
+            if (!LocalDocument)
+            {
+                await Managers.DocumentsManager.DeleteOutgoingDocumentFolder(OutgoingDocumentGuid);
+            }
+            else
+            {
+                await SynchOutgoingAttachments(true);
+                await Managers.DocumentsManager.UnlockOutgoingDocumentAsync(OutgoingDocumentGuid);
+                Managers.OutgoingDocumentsManager.Notify(OutgoingDocumentGuid);
+            }
+
+            PopOrDismissViewController();
+        }
+
+        void SaveModifiedOutgoingDocument() //TODO put in right place
+        {
+            if (!LocalDocument)
+            {
+                return;
+            }
+
+            Task.Run(async () =>
+            {
+                foreach (var subView in subViews)
+                {
+                    await subView.UpdateDocument();
+                }
+
+                await SynchOutgoingAttachments(false);
+                await Managers.DocumentsManager.SaveOutgoingDocumentAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,
+                                                                        PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1,
+                                                                          0, false, false);
+            }).ContinueWith(async t =>
+           {
+               if (t.IsFaulted)
+               {
+                   CommonConfig.Logger.Error($"Failed to save modified outgoing document [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", t.Exception.InnerException);
+                   await Dialogs.ShowErrorDialogAsync(this, t.Exception.InnerException);
+               }
+               else
+               {
+                   PopOrDismissViewController();
+               }
+           }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         #endregion
