@@ -56,7 +56,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             }
 
             SubjectLabel.Text = documentPreview.Subject;
-            MessagePreviewLabel.Text = !string.IsNullOrWhiteSpace(documentPreview.Preview) ? Regex.Replace(documentPreview.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline) : Localization.GetString("no_content");;
+            MessagePreviewLabel.Text = !string.IsNullOrWhiteSpace(documentPreview.Preview) ? Regex.Replace(documentPreview.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline) : Localization.GetString("no_content"); ;
             DateReceivedLabel.Text = documentPreview.DateReceivedTimestamp
                          .ConvertTimestampMillisecondsToDateTime()
                          .ConvertUtcToServerTime()
@@ -85,6 +85,42 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             IndicatorImageView1.Image = directionIcon;
             IndicatorImageView2.Image = (PlatformConfig.Preferences.UnreadIndicatorMe ? documentPreview.IsReadByCurrent : documentPreview.IsReadByAnyone) ? null : UIImage.FromBundle(Path.Combine("icons", "full-dot.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             IndicatorImageView3.Image = documentPreview.AttachmentsCount > 0 ? UIImage.FromBundle(Path.Combine("icons", "attachment.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate) : null;
+        }
+
+        public void Initialize(OutgoingDocumentContainer container)
+        {
+            var documentPreview = container.DocumentPreview;
+
+            var address = documentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType).FirstOrDefault();
+            SenderNameLabel.Text = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
+
+            SubjectLabel.Text = documentPreview.Subject;
+            MessagePreviewLabel.Text = !string.IsNullOrWhiteSpace(documentPreview.Preview) ? Regex.Replace(documentPreview.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline) : Localization.GetString("no_content"); ;
+            DateReceivedLabel.Text = documentPreview.DateReceivedTimestamp //TODO check this
+                         .ConvertTimestampMillisecondsToDateTime()
+                         .ConvertUtcToServerTime()
+                         .ConvertDateTimeToTimestampMilliseconds()
+                         .FormatServerTimestampAsCompactShortDateTimeString();
+
+            UIImage directionIcon;
+            switch (container.Info.State)
+            {
+                case OutgoingDocumentState.Failed:
+                    directionIcon = UIImage.FromBundle(Path.Combine("icons", "failed.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    break;
+                case OutgoingDocumentState.Sending:
+                    directionIcon = UIImage.FromBundle(Path.Combine("icons", "pencil.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);  //TODO need to put the right one!!!!
+                    break;
+                case OutgoingDocumentState.Waiting:
+                    directionIcon = UIImage.FromBundle(Path.Combine("icons", "pending.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    break;
+                default:
+                    directionIcon = null;
+                    break;
+            }
+            IndicatorImageView1.Image = directionIcon;
+            IndicatorImageView2.Image = null;
+            IndicatorImageView3.Image = documentPreview.AttachmentsCount > 0 ? UIImage.FromBundle(Path.Combine("icons", "attachment.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate) : null; //TODO check
         }
 
         #endregion

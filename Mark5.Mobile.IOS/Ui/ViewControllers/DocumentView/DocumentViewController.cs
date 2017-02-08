@@ -46,6 +46,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public int? DocumentId { get; set; }
         public DocumentPreview DocumentPreview { get; set; }
         public Document Document { get; set; }
+        public Guid OutgoingDocumentIdentifier { get; set; }
         public Guid NotificationGuid { get; set; }
 
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
@@ -454,16 +455,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
                 }
 
-                if (DocumentId.HasValue && DocumentPreview == null && Document == null)
-                {
-                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(FolderId ?? Folder?.Id, DocumentId.Value);
-                    DocumentPreview = container.DocumentPreview;
-                    Document = container.Document;
-                }
 
-                if (DocumentPreview != null && Document == null)
+                if (OutgoingDocumentIdentifier != default(Guid))
                 {
-                    Document = await Managers.DocumentsManager.GetDocumentAsync(FolderId ?? Folder?.Id, DocumentPreview.Id);
+                    var outgoingContainer = await Managers.DocumentsManager.GetOutgoingDocumentContainerAsync(OutgoingDocumentIdentifier, true);
+                    DocumentPreview = outgoingContainer.DocumentPreview;
+                    Document = outgoingContainer.Document;
+                }
+                else
+                {
+                    if (DocumentId.HasValue && DocumentPreview == null && Document == null)
+                    {
+                        var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(FolderId ?? Folder?.Id, DocumentId.Value);
+                        DocumentPreview = container.DocumentPreview;
+                        Document = container.Document;
+                    }
+
+                    if (DocumentPreview != null && Document == null)
+                    {
+                        Document = await Managers.DocumentsManager.GetDocumentAsync(FolderId ?? Folder?.Id, DocumentPreview.Id);
+                    }
                 }
 
                 RefreshView();
@@ -593,7 +604,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 previousDocumentButtonItem.Enabled = false;
             }
 
-            if (Document == null || (DocumentPreview.Direction != DocumentDirection.Draft))
+            if (Document == null || (DocumentPreview.Direction != DocumentDirection.Draft) || (OutgoingDocumentIdentifier != default(Guid)))
             {
                 var rightButtons = new UIBarButtonItem[2];
                 rightButtons[0] = nextDocumentButtonItem;
