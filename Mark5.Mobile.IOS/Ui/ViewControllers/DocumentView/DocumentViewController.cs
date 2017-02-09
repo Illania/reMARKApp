@@ -156,17 +156,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var rightButtons = new UIBarButtonItem[2];
 
                 nextDocumentButtonItem = new UIBarButtonItem();
-                nextDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("Icons", "arrow-down.png"));
+                nextDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("icons", "arrow-down.png"));
                 nextDocumentButtonItem.Enabled = false;
                 rightButtons[0] = nextDocumentButtonItem;
 
                 previousDocumentButtonItem = new UIBarButtonItem();
-                previousDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("Icons", "arrow-up.png"));
+                previousDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("icons", "arrow-up.png"));
                 previousDocumentButtonItem.Enabled = false;
                 rightButtons[1] = previousDocumentButtonItem;
 
                 editDocumentButtonItem = new UIBarButtonItem();
-                editDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("Icons", "pencil.png"));
+                editDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("icons", "pencil.png"));
                 editDocumentButtonItem.Enabled = true;
 
                 NavigationItem.SetRightBarButtonItems(rightButtons, false);
@@ -296,16 +296,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitToolbar()
         {
             flag = new UIBarButtonItem();
-            flag.Image = UIImage.FromBundle(Path.Combine("Icons", "flag.png"));
+            flag.Image = UIImage.FromBundle(Path.Combine("icons", "flag.png"));
             flag.Enabled = false;
 
             fileTo = new UIBarButtonItem();
-            fileTo.Image = UIImage.FromBundle(Path.Combine("Icons", "worktray.png"));
+            fileTo.Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png"));
             fileTo.Enabled = false;
 
             commentsButton = new UIButton(UIButtonType.System);
             commentsButton.Frame = new CGRect(0.0f, 0.0f, 25.0f, 25.0f);
-            commentsButton.SetImage(UIImage.FromBundle(Path.Combine("Icons", "comments.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            commentsButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "comments.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             commentsButton.Enabled = false;
 
             comments = new BadgeBarButtonItem(commentsButton);
@@ -313,11 +313,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             comments.Enabled = false;
 
             replyActions = new UIBarButtonItem();
-            replyActions.Image = UIImage.FromBundle(Path.Combine("Icons", "reply.png"));
+            replyActions.Image = UIImage.FromBundle(Path.Combine("icons", "reply.png"));
             replyActions.Enabled = false;
 
             userActions = new UIBarButtonItem();
-            userActions.Image = UIImage.FromBundle(Path.Combine("Icons", "actions.png"));
+            userActions.Image = UIImage.FromBundle(Path.Combine("icons", "actions.png"));
             userActions.Enabled = false;
 
             toolbar = new UIToolbar();
