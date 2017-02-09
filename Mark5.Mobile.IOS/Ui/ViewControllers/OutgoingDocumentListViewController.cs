@@ -108,7 +108,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             documentsTableView.ClipsToBounds = false;
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-            documentsTableView.Source = new DataSource(this, documentsTableView, Localization.GetString("folder_empty"), PlatformConfig.Preferences.CompactDocumentsList);
+            documentsTableView.Source = new DataSource(this, documentsTableView, Localization.GetString("folder_empty"));
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
 
             documentsTableView.RowHeight = UITableView.AutomaticDimension;
@@ -393,17 +393,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             OutgoingDocumentListViewController viewController;
             UITableView documentsTableView;
             readonly string emptyText;
-            readonly bool compact;
 
             bool loading = true;
             List<OutgoingDocumentContainer> outgoingDocumentPreviewsInView = new List<OutgoingDocumentContainer>(1000);
 
-            public DataSource(OutgoingDocumentListViewController viewController, UITableView documentsTableView, string emptyText, bool compact)
+            public DataSource(OutgoingDocumentListViewController viewController, UITableView documentsTableView, string emptyTex)
             {
                 this.viewController = viewController;
                 this.documentsTableView = documentsTableView;
                 this.emptyText = emptyText;
-                this.compact = compact;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)

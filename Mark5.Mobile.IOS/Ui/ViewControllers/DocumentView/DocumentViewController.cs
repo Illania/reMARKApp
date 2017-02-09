@@ -153,23 +153,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 nextDocumentButtonItem = null;
                 previousDocumentButtonItem = null;
 
-                var rightButtons = new UIBarButtonItem[2];
 
                 nextDocumentButtonItem = new UIBarButtonItem();
                 nextDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("icons", "arrow-down.png"));
                 nextDocumentButtonItem.Enabled = false;
-                rightButtons[0] = nextDocumentButtonItem;
 
                 previousDocumentButtonItem = new UIBarButtonItem();
                 previousDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("icons", "arrow-up.png"));
                 previousDocumentButtonItem.Enabled = false;
-                rightButtons[1] = previousDocumentButtonItem;
 
                 editDocumentButtonItem = new UIBarButtonItem();
                 editDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("icons", "pencil.png"));
                 editDocumentButtonItem.Enabled = true;
 
-                NavigationItem.SetRightBarButtonItems(rightButtons, false);
+                if (OutgoingDocumentIdentifier == default(Guid))
+                {
+                    var rightButtons = new UIBarButtonItem[2];
+                    rightButtons[0] = nextDocumentButtonItem;
+                    rightButtons[1] = previousDocumentButtonItem;
+                    NavigationItem.SetRightBarButtonItems(rightButtons, false);
+                }
+                else
+                {
+                    var rightButtons = new UIBarButtonItem[1];
+                    rightButtons[0] = editDocumentButtonItem;
+                    NavigationItem.SetRightBarButtonItems(rightButtons, false);
+                }
             }
         }
 
@@ -458,9 +467,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (OutgoingDocumentIdentifier != default(Guid))
                 {
-                    var outgoingContainer = await Managers.DocumentsManager.GetOutgoingDocumentContainerAsync(OutgoingDocumentIdentifier, true);
-                    DocumentPreview = outgoingContainer.DocumentPreview;
-                    Document = outgoingContainer.Document;
+                    Container = await Managers.DocumentsManager.GetOutgoingDocumentContainerAsync(OutgoingDocumentIdentifier, true);
+                    DocumentPreview = Container.DocumentPreview;
+                    Document = Container.Document;
                 }
                 else
                 {
@@ -479,6 +488,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 RefreshView();
                 MarkAsReadIfNecessary();
+
+                //TODO for local documents the datereceived is not correct
             }
             catch (Exception ex)
             {
@@ -499,6 +510,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void MarkAsReadIfNecessary()
         {
+            if (OutgoingDocumentIdentifier != default(Guid))
+            {
+                return;
+            }
+
             setReadStatusCancellationTokenSource?.Cancel();
             setReadStatusCancellationTokenSource = new CancellationTokenSource();
 
@@ -604,7 +620,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 previousDocumentButtonItem.Enabled = false;
             }
 
-            if (Document == null || (DocumentPreview.Direction != DocumentDirection.Draft) || (OutgoingDocumentIdentifier != default(Guid)))
+
+            if (OutgoingDocumentIdentifier != default(Guid))
+            {
+                var rightButtons = new UIBarButtonItem[1];
+                rightButtons[0] = editDocumentButtonItem;
+                NavigationItem.SetRightBarButtonItems(rightButtons, true);
+            }
+            else if (Document == null || (DocumentPreview.Direction != DocumentDirection.Draft))
             {
                 var rightButtons = new UIBarButtonItem[2];
                 rightButtons[0] = nextDocumentButtonItem;
