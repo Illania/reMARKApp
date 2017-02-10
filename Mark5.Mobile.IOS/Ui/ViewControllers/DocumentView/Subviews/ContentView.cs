@@ -96,7 +96,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             BeginInvokeOnMainThread(async () =>
             {
                 //Not sure why it does not work withouth the following line
-                await wkWebView.EvaluateJavaScriptAsync("");
+                await System.Threading.Tasks.Task.Delay(200); //TODO need to do the same on the other view
 
                 initialHeight = webView.ScrollView.ContentSize.Height;
                 initialZoom = webView.ScrollView.ZoomScale;
