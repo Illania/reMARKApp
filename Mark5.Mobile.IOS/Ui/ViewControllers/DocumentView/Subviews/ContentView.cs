@@ -7,6 +7,7 @@
 //
 using System;
 using Foundation;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using UIKit;
 using WebKit;
@@ -32,6 +33,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         UIScrollView mainScrollView;
 
+        //TODO this is an amazing thing:
+        // If the observer is not saved in a variable, we get a "observ
+        IDisposable observer;
+
         Func<WKNavigationAction, WKNavigationActionPolicy> navigationActionDelegate;
 
         bool zoomingStarted;
@@ -53,6 +58,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             configuration.Preferences = preferences;
 
             webView = new WKWebView(CoreGraphics.CGRect.Empty, configuration);
+            observer = webView.ScrollView.AddObserver("contentSize", NSKeyValueObservingOptions.New, HandleWebViewContentSizeChanged);
             webView.NavigationDelegate = this;
             webView.ScrollView.Delegate = this;
             webView.Opaque = false;
@@ -82,29 +88,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 });
         }
 
+        void HandleWebViewContentSizeChanged(NSObservedChange obj)
+        {
+            if (webView.ScrollView.Zooming)
+            {
+                return;
+            }
+
+            BeginInvokeOnMainThread(() =>
+           {
+               initialHeight = webView.ScrollView.ContentSize.Height;
+               initialZoom = webView.ScrollView.ZoomScale;
+               initialWidth = webView.ScrollView.ContentSize.Width;
+
+               heightConstraint.Constant = initialHeight;
+               widthConstraint.Constant = initialWidth;
+           });
+        }
+
         #region IWKNavigationDelegate
 
         [Export("webView:decidePolicyForNavigationAction:decisionHandler:")]
         void DecidePolicy(WKWebView wkWebView, WKNavigationAction navigationAction, Action<WKNavigationActionPolicy> decisionHandler)
         {
             decisionHandler(navigationActionDelegate(navigationAction));
-        }
-
-        [Export("webView:didFinishNavigation:")]
-        void DidFinishNavigation(WKWebView wkWebView, WKNavigation navigation)
-        {
-            BeginInvokeOnMainThread(async () =>
-            {
-                //Not sure why it does not work withouth the following line
-                await System.Threading.Tasks.Task.Delay(200); //TODO need to do the same on the other view
-
-                initialHeight = webView.ScrollView.ContentSize.Height;
-                initialZoom = webView.ScrollView.ZoomScale;
-                initialWidth = webView.ScrollView.ContentSize.Width;
-
-                heightConstraint.Constant = initialHeight;
-                widthConstraint.Constant = initialWidth;
-            });
         }
 
         #endregion
@@ -239,6 +246,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             webView.StopLoading();
             heightConstraint.Constant = defaultHeight;
             widthConstraint.Constant = defaultWidth;
+            initialHeight = 0;
+            initialWidth = 0;
+            initialZoom = 0;
 
             SetContent(ContentType.PlainText, string.Empty);
         }
