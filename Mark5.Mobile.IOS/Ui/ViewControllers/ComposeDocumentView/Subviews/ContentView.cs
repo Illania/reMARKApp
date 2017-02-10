@@ -448,6 +448,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 }
             }
 
+            var scriptElements = currentHtmlDocument.Body.QuerySelectorAll("script");
+            foreach (var scriptElement in scriptElements)
+            {
+                currentHtmlDocument.Body.RemoveChild(scriptElement);
+            }
+
             var processedWebContent = currentHtmlDocument.DocumentElement.OuterHtml;
 
             return await InlineStyles(processedWebContent);
