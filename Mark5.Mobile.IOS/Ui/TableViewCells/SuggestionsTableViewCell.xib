@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+	<device id="retina4_7" orientation="portrait">
+		<adaptation id="fullscreen" />
+	</device>
+	<dependencies>
+		<deployment identifier="iOS" />
+		<plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757" />
+		<capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0" />
+	</dependencies>
+	<objects>
+		<placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" />
+		<placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder" />
+		<tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="44" id="cxk-wN-pdQ" customClass="SuggestionsTableViewCell">
+			<rect key="frame" x="0.0" y="0.0" width="315" height="44" />
+			<autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES" />
+			<tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cxk-wN-pdQ" id="YTl-1W-gDM">
+				<rect key="frame" x="0.0" y="0.0" width="315" height="43.5" />
+				<autoresizingMask key="autoresizingMask" />
+				<subviews>
+					<label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines"
+						adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FLH-HT-nvW">
+						<rect key="frame" x="8" y="3" width="299" height="22" />
+						<fontDescription key="fontDescription" type="boldSystem" pointSize="17" />
+						<color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB" />
+						<nil key="highlightedColor" />
+					</label>
+					<label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" text="Address" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO"
+						translatesAutoresizingMaskIntoConstraints="NO" id="fRf-rx-cQG">
+						<rect key="frame" x="8" y="25" width="299" height="16" />
+						<constraints>
+							<constraint firstAttribute="height" constant="16" id="2e2-DR-LGI" />
+						</constraints>
+						<fontDescription key="fontDescription" type="system" pointSize="13" />
+						<color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB" />
+						<nil key="highlightedColor" />
+					</label>
+					<label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AddressAlternative" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO"
+						translatesAutoresizingMaskIntoConstraints="NO" id="cog-77-YA7">
+						<rect key="frame" x="8" y="11" width="299" height="21" />
+						<fontDescription key="fontDescription" type="system" pointSize="17" />
+						<color key="textColor" cocoaTouchSystemColor="darkTextColor" />
+						<nil key="highlightedColor" />
+					</label>
+				</subviews>
+				<constraints>
+					<constraint firstAttribute="trailing" secondItem="FLH-HT-nvW" secondAttribute="trailing" constant="8" id="Fkn-OS-8L6" />
+					<constraint firstAttribute="trailing" secondItem="fRf-rx-cQG" secondAttribute="trailing" constant="8" id="IP4-or-B7r" />
+					<constraint firstAttribute="bottom" secondItem="fRf-rx-cQG" secondAttribute="bottom" constant="3" id="Qbv-2q-9Au" />
+					<constraint firstItem="fRf-rx-cQG" firstAttribute="top" secondItem="FLH-HT-nvW" secondAttribute="bottom" id="R6H-Ag-Whs" />
+					<constraint firstItem="cog-77-YA7" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY" id="aIF-Cn-aUq" />
+					<constraint firstItem="FLH-HT-nvW" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="8" id="ceN-K0-ZiS" />
+					<constraint firstItem="cog-77-YA7" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="8" id="eDf-Wx-w8h" />
+					<constraint firstItem="fRf-rx-cQG" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="8" id="kf0-x8-86z" />
+					<constraint firstAttribute="trailing" secondItem="cog-77-YA7" secondAttribute="trailing" constant="8" id="lNA-A7-e2e" />
+					<constraint firstItem="FLH-HT-nvW" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="top" constant="3" id="oy4-mR-wxL" />
+				</constraints>
+			</tableViewCellContentView>
+			<connections>
+				<outlet property="SuggestionAddress" destination="fRf-rx-cQG" id="name-outlet-fRf-rx-cQG" />
+				<outlet property="SuggestionAddressAlternative" destination="cog-77-YA7" id="name-outlet-cog-77-YA7" />
+				<outlet property="SuggestionName" destination="FLH-HT-nvW" id="name-outlet-FLH-HT-nvW" />
+			</connections>
+			<point key="canvasLocation" x="255" y="164" />
+		</tableViewCell>
+	</objects>
+</document>
