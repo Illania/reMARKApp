@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="DocumentAddressesCompactTableViewCell" rowHeight="44" id="cxk-wN-pdQ" customClass="DocumentAddressesCompactTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cxk-wN-pdQ" id="YTl-1W-gDM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lXk-7L-Vsg">
+                        <rect key="frame" x="277" y="2" width="40" height="40"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="40" id="G27-Wf-tGQ"/>
+                            <constraint firstAttribute="width" constant="40" id="KeB-Wb-EWN"/>
+                        </constraints>
+                        <inset key="imageEdgeInsets" minX="5" minY="5" maxX="5" maxY="5"/>
+                        <connections>
+                            <action selector="ActionButtonTouchUpInside:" destination="cxk-wN-pdQ" eventType="touchUpInside" id="gkB-fg-Lzd"/>
+                        </connections>
+                    </button>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Address" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5mP-v1-Nsg">
+                        <rect key="frame" x="8" y="11.5" width="261" height="21"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="NH0-Ok-eJx"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="5mP-v1-Nsg" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="8" id="Drl-40-rhl"/>
+                    <constraint firstItem="5mP-v1-Nsg" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY" id="MtG-7d-wfs"/>
+                    <constraint firstAttribute="trailing" secondItem="lXk-7L-Vsg" secondAttribute="trailing" constant="3" id="NIL-Nw-UZj"/>
+                    <constraint firstItem="lXk-7L-Vsg" firstAttribute="leading" secondItem="5mP-v1-Nsg" secondAttribute="trailing" constant="8" id="WMR-bA-6Em"/>
+                    <constraint firstItem="lXk-7L-Vsg" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY" id="fRQ-qf-t0y"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="ActionButton" destination="lXk-7L-Vsg" id="6kc-rl-Aev"/>
+                <outlet property="AddressLabel" destination="5mP-v1-Nsg" id="QMW-xR-deh"/>
+            </connections>
+            <point key="canvasLocation" x="69" y="75"/>
+        </tableViewCell>
+    </objects>
+</document>

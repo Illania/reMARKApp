@@ -189,7 +189,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 dismisAction();
 
-                Dialogs.ShowBlockingDialog(this, "please_restart");
+                Dialogs.ShowBlockingDialog(this, Localization.GetString("please_restart"));
 
                 return;
             }
