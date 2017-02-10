@@ -87,7 +87,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             CommonConfig.Logger.Warning($"{nameof(ContactsListViewController)} received memory warning!");
 
-            var ds = contactsTableView?.DataSource as DataSource;
+            var ds = contactsTableView?.Source as DataSource;
             ds?.Reset();
 
             base.DidReceiveMemoryWarning();
@@ -310,6 +310,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Error($"Could not refresh folders [folder={Folder?.Name}, startRowId={startRowId}, forceClear={forceClear}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
+
+                NavigationController?.PopViewController(true);
             }, startRowId, cts.Token);
         }
 
@@ -363,27 +365,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         static bool MatchesQuery(ContactPreview cp, string query)
         {
-            if (cp.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
+            if (cp.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
             {
                 return true;
             }
-            if (cp.CompanyName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
+            if (cp.CompanyName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
             {
                 return true;
             }
-            if (cp.ShortId.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
+            if (cp.ShortId.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
             {
                 return true;
             }
-            if (cp.Description.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
+            if (cp.Description.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
             {
                 return true;
             }
-            if (cp.PrimaryAddress?.Address?.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0)
+            if (cp.PrimaryAddress?.Address?.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
             {
                 return true;
             }
-            if (cp.Categories.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) > 0))
+            if (cp.Categories.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
             {
                 return true;
             }

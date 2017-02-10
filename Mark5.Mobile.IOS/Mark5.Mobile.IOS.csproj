@@ -192,10 +192,13 @@
     <InterfaceDefinition Include="Ui\TableViewCells\ExternalDocumentsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\ContactsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\ShortcodesTableViewCell.xib" />
-    <InterfaceDefinition Include="Ui\TableViewCells\SuggestionListViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\SuggestionsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\NotificationsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\ObjectActionsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\ObjectLinksTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\DocumentAddressesTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\DocumentAddressesCompactTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\DescriptionTableViewCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -330,8 +333,8 @@
     <Compile Include="Ui\Common\HubMessages\EntityMovedFromFolderMessage.cs" />
     <Compile Include="Ui\ViewControllers\CopyToWorktrayViewController.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsView\SuggestionsListView.cs" />
-    <Compile Include="Ui\TableViewCells\SuggestionListViewCell.cs" />
-    <Compile Include="Ui\TableViewCells\SuggestionListViewCell.designer.cs" />
+    <Compile Include="Ui\TableViewCells\SuggestionsTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\SuggestionsTableViewCell.designer.cs" />
     <Compile Include="Ui\ViewControllers\DocumentListViewController.cs" />
     <Compile Include="Ui\TableViewCells\NotificationsTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\NotificationsTableViewCell.designer.cs">
@@ -346,6 +349,18 @@
     <Compile Include="Ui\TableViewCells\ObjectLinksTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\ObjectLinksTableViewCell.designer.cs">
       <DependentUpon>ObjectLinksTableViewCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\TableViewCells\DocumentAddressesTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\DocumentAddressesTableViewCell.designer.cs">
+      <DependentUpon>DocumentAddressesTableViewCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\TableViewCells\DocumentAddressesCompactTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\DocumentAddressesCompactTableViewCell.designer.cs">
+      <DependentUpon>DocumentAddressesCompactTableViewCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\TableViewCells\DescriptionTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\DescriptionTableViewCell.designer.cs">
+      <DependentUpon>DescriptionTableViewCell.cs</DependentUpon>
     </Compile>
     <Compile Include="Ui\ViewControllers\OutgoingDocumentListViewController.cs" />
   </ItemGroup>

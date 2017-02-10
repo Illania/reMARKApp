@@ -11,19 +11,16 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    [Register("SuggestionListViewCell")]
-    partial class SuggestionListViewCell
+    [Register("SuggestionsTableViewCell")]
+    partial class SuggestionsTableViewCell
     {
         [Outlet]
-        [GeneratedCode("iOS Designer", "1.0")]
         UILabel SuggestionAddress { get; set; }
 
         [Outlet]
-        [GeneratedCode("iOS Designer", "1.0")]
         UILabel SuggestionAddressAlternative { get; set; }
 
         [Outlet]
-        [GeneratedCode("iOS Designer", "1.0")]
         UILabel SuggestionName { get; set; }
 
         void ReleaseDesignerOutlets()

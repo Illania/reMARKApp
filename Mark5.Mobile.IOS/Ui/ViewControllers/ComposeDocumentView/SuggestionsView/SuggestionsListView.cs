@@ -324,10 +324,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsVie
 
             var printableSuggestion = suggestions[indexPath.Row];
 
-            var cell = tableView.DequeueReusableCell(SuggestionListViewCell.Key) as SuggestionListViewCell;
+            var cell = tableView.DequeueReusableCell(SuggestionsTableViewCell.Key) as SuggestionsTableViewCell;
             if (cell == null)
             {
-                cell = SuggestionListViewCell.Create();
+                cell = SuggestionsTableViewCell.Create();
             }
 
             cell.Initialize(printableSuggestion);

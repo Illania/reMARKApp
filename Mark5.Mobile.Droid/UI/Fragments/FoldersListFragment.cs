@@ -303,19 +303,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (folder.Module == ModuleType.Documents)
                 {
                     var i = new Intent(Activity, typeof(DocumentsListActivity));
-                    i.PutExtra(DocumentsListActivity.FolderIntentKey, SerializationUtils.Serialize(folder));
+                    i.PutExtra(DocumentsListActivity.FolderIntentKey, SerializationUtils.Serialize(folder.ShallowCopy()));
                     StartActivity(i);
                 }
                 if (folder.Module == ModuleType.Contacts)
                 {
                     var i = new Intent(Activity, typeof(ContactsListActivity));
-                    i.PutExtra(ContactsListActivity.FolderIntentKey, SerializationUtils.Serialize(folder));
+                    i.PutExtra(ContactsListActivity.FolderIntentKey, SerializationUtils.Serialize(folder.ShallowCopy()));
                     StartActivity(i);
                 }
                 if (folder.Module == ModuleType.Shortcodes)
                 {
                     var i = new Intent(Activity, typeof(ShortcodesListActivity));
-                    i.PutExtra(ShortcodesListActivity.FolderIntentKey, SerializationUtils.Serialize(folder));
+                    i.PutExtra(ShortcodesListActivity.FolderIntentKey, SerializationUtils.Serialize(folder.ShallowCopy()));
                     StartActivity(i);
                 }
             }

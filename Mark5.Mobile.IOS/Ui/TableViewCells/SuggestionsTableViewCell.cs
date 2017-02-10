@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Common.iOS
-// File: SuggestionListViewCell.cs
+// File: SuggestionsTableViewCell.cs
 // Author: Ferdinando Papale <fp@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -15,10 +15,10 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
 
-    public partial class SuggestionListViewCell : UITableViewCell
+    public partial class SuggestionsTableViewCell : UITableViewCell
     {
-        public static readonly UINib Nib = UINib.FromName("SuggestionListViewCell", NSBundle.MainBundle);
-        public static readonly NSString Key = new NSString("SuggestionListViewCell");
+        public static readonly UINib Nib = UINib.FromName("SuggestionsTableViewCell", NSBundle.MainBundle);
+        public static readonly NSString Key = new NSString("SuggestionsTableViewCell");
 
         public PrintableSuggestion PrintableSuggestion
         {
@@ -26,14 +26,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             private set;
         }
 
-        public SuggestionListViewCell(IntPtr handle)
+        public SuggestionsTableViewCell(IntPtr handle)
             : base(handle)
         {
         }
 
-        public static SuggestionListViewCell Create()
+        public static SuggestionsTableViewCell Create()
         {
-            var cell = (SuggestionListViewCell)Nib.Instantiate(null, null)[0];
+            var cell = (SuggestionsTableViewCell)Nib.Instantiate(null, null)[0];
 
             cell.BackgroundColor = UIColor.Clear;
             cell.SuggestionName.Font = Theme.DefaultBoldFont;
