@@ -7,7 +7,6 @@
 //
 using System;
 using Foundation;
-using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using UIKit;
 using WebKit;
@@ -34,7 +33,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         UIScrollView mainScrollView;
 
         //TODO this is an amazing thing:
-        // If the observer is not saved in a variable, we get a "observ
+        // If the observer is not saved in a variable, we get an amazing crash
         IDisposable observer;
 
         Func<WKNavigationAction, WKNavigationActionPolicy> navigationActionDelegate;

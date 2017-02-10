@@ -397,7 +397,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             bool loading = true;
             List<OutgoingDocumentContainer> outgoingDocumentPreviewsInView = new List<OutgoingDocumentContainer>(1000);
 
-            public DataSource(OutgoingDocumentListViewController viewController, UITableView documentsTableView, string emptyTex)
+            public DataSource(OutgoingDocumentListViewController viewController, UITableView documentsTableView, string emptyText)
             {
                 this.viewController = viewController;
                 this.documentsTableView = documentsTableView;
