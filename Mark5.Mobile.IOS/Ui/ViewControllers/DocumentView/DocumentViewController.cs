@@ -39,7 +39,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public GetPreviousDocumentPreviewDelegate GetPreviousDocumentPreview { get; set; }
         public GetNextDocumentPreviewDelegate GetNextDocumentPreview { get; set; }
 
-        public bool Empty { get { return Document == null; } }
+        public bool Empty
+        {
+            get
+            {
+                return Document == null && DocumentPreview == null && FolderId == null
+                    && Folder == null && DocumentId == null && NotificationGuid == default(Guid);
+            }
+        }
 
         public int? FolderId { get; set; }
         public Folder Folder { get; set; }
