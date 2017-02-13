@@ -108,9 +108,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 OutgoingDocumentGuid = Guid.NewGuid();
             }
 
-            PreviousDocumentDirection = DocumentDirection.None;
-            CreationModeFlag = DocumentCreationModeFlag.New;
-
             await LoadDocument();
         }
 
@@ -515,7 +512,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var confirm = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("save_modifications"), Localization.GetString("confirm_save_modified_document"));
                 if (confirm)
                 {
-                    SaveModifiedOutgoingDocument();
+                    await SaveModifiedOutgoingDocument();
                 }
                 else
                 {
@@ -552,14 +549,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PopOrDismissViewController();
         }
 
-        void SaveModifiedOutgoingDocument() //TODO put in right place
+        async Task SaveModifiedOutgoingDocument()
         {
             if (!LocalDocument)
             {
                 return;
             }
 
-            Task.Run(async () =>
+            try
             {
                 foreach (var subView in subViews)
                 {
@@ -570,18 +567,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 await Managers.DocumentsManager.SaveOutgoingDocumentAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,
                                                                         PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1,
                                                                           0, false, false);
-            }).ContinueWith(async t =>
-           {
-               if (t.IsFaulted)
-               {
-                   CommonConfig.Logger.Error($"Failed to save modified outgoing document [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", t.Exception.InnerException);
-                   await Dialogs.ShowErrorDialogAsync(this, t.Exception.InnerException);
-               }
-               else
-               {
-                   PopOrDismissViewController();
-               }
-           }, TaskScheduler.FromCurrentSynchronizationContext());
+
+                PopOrDismissViewController();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to save modified outgoing document [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
         }
 
         #endregion
