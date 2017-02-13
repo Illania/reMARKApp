@@ -58,13 +58,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(DocumentsListViewController)} appeared");
+            CommonConfig.Logger.Info($"{nameof(OutgoingDocumentListViewController)} appeared");
 
             await RefreshData();
 
             if (IsBeingDismissed) return;
-
-            CommonConfig.Logger.Info($"Starting automatic refresh...");
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -343,37 +341,46 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void OutgoingDocumentsManager_DocumentBeingSent(object sender, OutgoingDocumentContainer outgoingDocumentContainer)
         {
-            var ds = (DataSource)documentsTableView.DataSource;
-            var row = ds.GetPosition(outgoingDocumentContainer.Info.Identifier);
-            if (row >= 0)
-            {
-                var container = ds.Items[row];
-                container.Info.State = OutgoingDocumentState.Sending;
-                ds.UpdateRow(row);
-            }
+            BeginInvokeOnMainThread(() =>
+           {
+               var ds = (DataSource)documentsTableView.Source;
+               var row = ds.GetPosition(outgoingDocumentContainer.Info.Identifier);
+               if (row >= 0)
+               {
+                   var container = ds.Items[row];
+                   container.Info.State = OutgoingDocumentState.Sending;
+                   ds.UpdateRow(row);
+               }
+           });
         }
 
         void OutgoingDocumentsManager_DocumentSendingFailed(object sender, OutgoingDocumentContainer outgoingDocumentContainer)
         {
-            var ds = (DataSource)documentsTableView.DataSource;
-            var row = ds.GetPosition(outgoingDocumentContainer.Info.Identifier);
-            if (row >= 0)
+            BeginInvokeOnMainThread(() =>
             {
-                var container = ds.Items[row];
-                container.Info.State = OutgoingDocumentState.Failed;
-                ds.UpdateRow(row);
-            }
+                var ds = (DataSource)documentsTableView.Source;
+                var row = ds.GetPosition(outgoingDocumentContainer.Info.Identifier);
+                if (row >= 0)
+                {
+                    var container = ds.Items[row];
+                    container.Info.State = OutgoingDocumentState.Failed;
+                    ds.UpdateRow(row);
+                }
+            });
         }
 
         void OutgoingDocumentsManager_DocumentSendingSuccessful(object sender, OutgoingDocumentContainer outgoingDocumentContainer)
         {
-            var ds = (DataSource)documentsTableView.DataSource;
-            var row = ds.GetPosition(outgoingDocumentContainer.Info.Identifier);
-            if (row >= 0)
+            BeginInvokeOnMainThread(() =>
             {
-                ds.Items.RemoveAt(row);
-                ds.RemoveRow(row);
-            }
+                var ds = (DataSource)documentsTableView.Source;
+                var row = ds.GetPosition(outgoingDocumentContainer.Info.Identifier);
+                if (row >= 0)
+                {
+                    ds.Items.RemoveAt(row);
+                    ds.RemoveRow(row);
+                }
+            });
         }
 
         #endregion
