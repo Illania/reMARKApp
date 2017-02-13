@@ -60,9 +60,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"{nameof(DocumentsListViewController)} appeared");
 
-            var ds = (DataSource)documentsTableView.Source;
-            if (ds.Empty)
-                await RefreshData();
+            await RefreshData();
 
             if (IsBeingDismissed) return;
 
@@ -200,7 +198,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 NavigationController.PushViewController(documentViewController, true);
             }
-            else //TODO should we keep the move between documents with outgoing documents?
+            else
             {
                 var ds = (DataSource)documentsTableView.Source;
 
@@ -275,19 +273,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var rows = documentsTableView.IndexPathsForSelectedRows.ToArray();
             var selectedDocuments = rows.Select(ip => ((DataSource)documentsTableView.Source).Items[ip.Row]).ToList();
 
-            var result = await Dialogs.ShowListDialogAsync(this, null, new string[] { Localization.GetString("delete") }, editItem); //TODO check if string is present
+            var result = await Dialogs.ShowListDialogAsync(this, null, new string[] { Localization.GetString("delete") }, editItem);
 
             if (result == 0)
             {
-                Delete(selectedDocuments);
+                await Delete(selectedDocuments);
             }
         }
 
-        void Delete(OutgoingDocumentContainer container) => Delete(new List<OutgoingDocumentContainer> { container });
+        async void Delete(OutgoingDocumentContainer container) => await Delete(new List<OutgoingDocumentContainer> { container });
 
-        void Delete(List<OutgoingDocumentContainer> containers)
+        async Task Delete(List<OutgoingDocumentContainer> containers)
         {
-            //TODO
+            foreach (var container in containers)
+            {
+                await Managers.DocumentsManager.DeleteOutgoingDocumentFolder(container.Info.Identifier);
+            }
+
+            await RefreshData();
         }
 
         #endregion
@@ -470,18 +473,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return outgoingDocumentPreviewsInView.FindIndex(o => o.Info.Identifier == identifier);
             }
 
-            public void AppendItems(List<OutgoingDocumentContainer> containers)
-            {
-                loading = false;
-
-                outgoingDocumentPreviewsInView.AddRange(containers);
-                documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
-            }
-
             public void ReplaceItems(List<OutgoingDocumentContainer> containers)
             {
                 loading = false;
 
+                outgoingDocumentPreviewsInView.Clear();
                 outgoingDocumentPreviewsInView.AddRange(containers);
                 documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
             }
