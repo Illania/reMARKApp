@@ -79,7 +79,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             AddConstraints(new[]
                 {
                     NSLayoutConstraint.Create(Label, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1.0f, VerticalMargin),
-                    NSLayoutConstraint.Create(Label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1.0f, HorizontalMargin),
+                    NSLayoutConstraint.Create(Label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1.0f, HorizontalMargin)
                 });
 
             if (!hideAdd)
@@ -98,7 +98,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 AddConstraints(new[]
                     {
                         NSLayoutConstraint.Create(AddButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1.0f, VerticalMargin - AddButton.ContentEdgeInsets.Top),
-                        NSLayoutConstraint.Create(AddButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin - AddButton.ContentEdgeInsets.Right),
+                        NSLayoutConstraint.Create(AddButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin - AddButton.ContentEdgeInsets.Right)
                     });
             }
 
@@ -136,7 +136,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1.0f, VerticalMargin),
                     NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, Label, NSLayoutAttribute.Right, 1.0f, InnerMargin),
                     NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1.0f, -VerticalMargin),
-                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, !hideAdd ? (UIView)AddButton : this, !hideAdd ? NSLayoutAttribute.Left : NSLayoutAttribute.Right, 1.0f, !hideAdd ? -InnerMargin : -HorizontalMargin),
+                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, !hideAdd ? (UIView)AddButton : this, !hideAdd ? NSLayoutAttribute.Left : NSLayoutAttribute.Right, 1.0f, !hideAdd ? -InnerMargin : -HorizontalMargin)
                 });
 
             textViewTapGestureRecognizer = new UITapGestureRecognizer();
@@ -235,7 +235,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             foreach (var email in GetEmails())
             {
-                DocumentPreview.Addresses.Add(new DocumentAddress { Address = email, AddressType = this.AddressType, Type = CommunicationAddressType.Email });
+                DocumentPreview.Addresses.Add(new DocumentAddress { Address = email, AddressType = AddressType, Type = CommunicationAddressType.Email });
             }
             return Task.CompletedTask;
         }
