@@ -8,6 +8,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Foundation;
@@ -19,6 +20,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
+using Mark5.Mobile.IOS.Model.Messages;
 using Mark5.Mobile.IOS.Services;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
@@ -94,7 +96,7 @@ namespace Mark5.Mobile.IOS
         {
             CommonConfig.Logger.Info($"Received APNS token: {deviceToken}");
 
-            var newToken = deviceToken.ToString();
+            var newToken = new string(deviceToken.ToString().Where(char.IsLetterOrDigit).ToArray());
             var oldToken = PlatformConfig.Preferences.PushNotificationToken;
             PlatformConfig.Preferences.PushNotificationToken = newToken;
 
@@ -117,11 +119,17 @@ namespace Mark5.Mobile.IOS
         [Export("userNotificationCenter:willPresentNotification:withCompletionHandler:")]
         public void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification, Action<UNNotificationPresentationOptions> options)
         {
+            PlatformConfig.MessengerHub.PublishAsync(new NewNotificationsMessage(this));
+
+            options(UNNotificationPresentationOptions.Alert);
         }
 
         [Export("userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:")]
         public void DidReceiveNotificationResponse(UNUserNotificationCenter center, UNNotificationResponse response, Action completionHandler)
         {
+            // TODO open document view
+
+            completionHandler();
         }
 
         void InitializeCommon()
@@ -245,6 +253,8 @@ namespace Mark5.Mobile.IOS
                 BeginInvokeOnMainThread(() =>
                 {
                     CommonConfig.Logger.Info("Refreshing APNS token...");
+
+                    UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
 
                     UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) => {
                         if (result)
