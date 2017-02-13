@@ -28,7 +28,7 @@ using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-    public class ContentView : ComposeDocumentSubView, IWKNavigationDelegate, IUIGestureRecognizerDelegate, IWKScriptMessageHandler
+    public class ContentView : ComposeDocumentSubView, IWKNavigationDelegate, IUIGestureRecognizerDelegate, IWKScriptMessageHandler, IUIScrollViewDelegate
     {
         UIButton expandButton;
 
@@ -48,6 +48,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         nfloat centerGestureStartY;
 
         SemaphoreSlim newContentLoadingSemaphore;
+
+        IDisposable newContentObserver;
+        IDisposable oldContentObserver;
 
         const string EditableContentClass = "content_c176f8ef-2579-4f1f-86c1-f289beaba2ae";
 
@@ -100,15 +103,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             newContentWebView.TranslatesAutoresizingMaskIntoConstraints = false;
             newContentWebView.Opaque = false;
 
+            newContentWebView.ScrollView.Delegate = this;
             newContentWebView.ScrollView.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
             newContentWebView.ScrollView.ScrollEnabled = false;
+            newContentObserver = newContentWebView.ScrollView.AddObserver("contentSize", NSKeyValueObservingOptions.New, obj => UpdateWebViewHeight(newContentWebView, newContentHeightConstraint));
             var tapRecognizer = new UITapGestureRecognizer(HandleTap);
             tapRecognizer.Delegate = this;
             newContentWebView.ScrollView.AddGestureRecognizer(tapRecognizer);
             var navigationDelegate = new WebViewNavigationDelegate();
             navigationDelegate.DidFinishNavigationAction = () =>
             {
-                UpdateWebViewHeight(newContentWebView, newContentHeightConstraint);
                 newContentLoadingSemaphore.Release();
             };
             newContentWebView.NavigationDelegate = navigationDelegate;
@@ -124,6 +128,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 });
 
             newContentWebView.LoadHtmlString(DefaultEditContent, null);
+        }
+
+        [Export("viewForZoomingInScrollView:")]
+        public UIView ViewForZoomingInScrollView(UIScrollView scrollView) //TODO need to disable zooming also for the old one (if we do the same the other one doesn't zoom out at the beginning)
+        //Note that this could happen also with this, so we need a different way
+        {
+            return null; //To disable zooming in the new content web view
         }
 
         void InitializePreviousContentControls()
@@ -159,11 +170,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             oldContentWebView.Hidden = true;
             oldContentWebView.Opaque = false;
             var oldContentWebViewNavigationDelegate = new WebViewNavigationDelegate();
-            oldContentWebViewNavigationDelegate.DidFinishNavigationAction = () => UpdateWebViewHeight(oldContentWebView, oldContentHeightConstraint);
             oldContentWebView.NavigationDelegate = oldContentWebViewNavigationDelegate;
 
             oldContentWebView.ScrollView.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
             oldContentWebView.ScrollView.ScrollEnabled = false;
+            oldContentObserver = oldContentWebView.ScrollView.AddObserver("contentSize", NSKeyValueObservingOptions.New, obj => UpdateWebViewHeight(oldContentWebView, oldContentHeightConstraint));
             AddSubview(oldContentWebView);
 
             oldContentHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, 0.5f);
@@ -533,12 +544,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (message.Name == "editableContentFocusedHandler")
             {
                 var scrollView = Superview.Superview as UIScrollView;
-                scrollView.SetContentOffset(new CGPoint(0, centerGestureStartY - scrollView.ContentInset.Top - 20), true);
+                scrollView.SetContentOffset(new CGPoint(0, centerGestureStartY - scrollView.ContentInset.Top - 30), true);
                 newContentWebView.ScrollView.SetContentOffset(new CGPoint(0, 0), true);
             }
             else if (message.Name == "editableContentInputHandler")
             {
-                UpdateWebViewHeight(newContentWebView, newContentHeightConstraint);
+                //UpdateWebViewHeight(newContentWebView, newContentHeightConstraint);
             }
         }
 
