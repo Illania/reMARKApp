@@ -12,12 +12,11 @@ using SystemConfiguration;
 
 namespace Mark5.Mobile.IOS.Services
 {
-    
+
     // https://github.com/xamarin/ios-samples/blob/master/ReachabilitySample/reachability.cs
     // with small modifications for IPv4
     public static class ReachabilityProvider
     {
-
         public static string HostName = "www.google.com";
 
         public static bool IsReachableWithoutRequiringConnection(NetworkReachabilityFlags flags)
@@ -74,7 +73,7 @@ namespace Mark5.Mobile.IOS.Services
                 var ipAddress = new IPAddress(new byte[] { 169, 254, 0, 0 });
                 adHocWiFiNetworkReachability = new NetworkReachability(ipAddress);
                 adHocWiFiNetworkReachability.SetNotification(OnChange);
-                adHocWiFiNetworkReachability.Schedule(CFRunLoop.Current, CFRunLoop.ModeDefault);
+                adHocWiFiNetworkReachability.Schedule(CFRunLoop.Main, CFRunLoop.ModeDefault);
             }
 
             return adHocWiFiNetworkReachability.TryGetFlags(out flags) && IsReachableWithoutRequiringConnection(flags);
@@ -89,7 +88,7 @@ namespace Mark5.Mobile.IOS.Services
                 var ipAddress = new IPAddress(0);
                 defaultRouteReachability = new NetworkReachability(ipAddress);
                 defaultRouteReachability.SetNotification(OnChange);
-                defaultRouteReachability.Schedule(CFRunLoop.Current, CFRunLoop.ModeDefault);
+                defaultRouteReachability.Schedule(CFRunLoop.Main, CFRunLoop.ModeDefault);
             }
             return defaultRouteReachability.TryGetFlags(out flags) && IsReachableWithoutRequiringConnection(flags);
         }
@@ -110,7 +109,7 @@ namespace Mark5.Mobile.IOS.Services
                 reachable = remoteHostReachability.TryGetFlags(out flags);
 
                 remoteHostReachability.SetNotification(OnChange);
-                remoteHostReachability.Schedule(CFRunLoop.Current, CFRunLoop.ModeDefault);
+                remoteHostReachability.Schedule(CFRunLoop.Main, CFRunLoop.ModeDefault);
             }
             else
             {
