@@ -518,7 +518,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public void RemoveRow(int row)
             {
-                if (row == 0)
+                if (outgoingDocumentPreviewsInView.Count < 1 && row == 0)
                 {
                     UpdateRow(0); //We always keep a row for the empty table cell
                 }
@@ -527,7 +527,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     documentsTableView.DeleteRows(new NSIndexPath[] { NSIndexPath.FromRowSection(row, 0) }, UITableViewRowAnimation.Automatic);
                 }
             }
-
         }
     }
 }
