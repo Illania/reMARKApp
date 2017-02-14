@@ -201,9 +201,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             refreshing = false;
         }
 
-        public void NotificationSelected(Notification n)
+        public void NotificationSelected(Notification notification)
         {
-            // TODO
+            // TODO open notification
         }
 
         class DataSource : UITableViewSource, IDisposable
@@ -274,6 +274,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
+                if (tableView.CellAt(indexPath).SelectionStyle == UITableViewCellSelectionStyle.None) return;
+
                 var n = notificationsInView[indexPath.Row];
                 viewController.NotificationSelected(n);
             }
