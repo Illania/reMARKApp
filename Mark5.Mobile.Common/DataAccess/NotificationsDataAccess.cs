@@ -49,17 +49,18 @@ namespace Mark5.Mobile.Common.DataAccess
             try
             {
                 List<Notification> notifications = null;
-                List<Guid> readNotificationsGuids = null;
+                List<ReadNotificationInfo> readNotificationInfos = null;
 
                 await systemDatabase.RunInConnectionAsync(c =>
                 {
                     notifications = c.Table<Notification>().OrderByDescending(n => n.DateTimeTimestamp).ToList();
-                    readNotificationsGuids = c.Table<ReadNotificationInfo>().Select(rni => rni.NotificationGuid).ToList();
+                    readNotificationInfos = c.Table<ReadNotificationInfo>().ToList();
                 });
 
-                if (notifications != null && readNotificationsGuids != null && readNotificationsGuids.Count > 0)
+                if (notifications != null && readNotificationInfos != null && readNotificationInfos.Count > 0)
                 {
-                    notifications.ForEach(n => n.IsRead = readNotificationsGuids.Contains(n.Guid));
+                    var guids = readNotificationInfos.Select(rni => rni.NotificationGuid);
+                    notifications.ForEach(n => n.IsRead = guids.Contains(n.Guid));
                 }
 
                 return notifications;
