@@ -72,6 +72,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     .ConvertUtcToServerTime()
                     .ConvertDateTimeToTimestampMilliseconds()
                     .FormatServerTimestampAsCompactShortDateTimeString();
+
+            SelectionStyle = notification.ObjectType == ObjectType.Document ? UITableViewCellSelectionStyle.Default : UITableViewCellSelectionStyle.None;
         }
 
         #endregion
