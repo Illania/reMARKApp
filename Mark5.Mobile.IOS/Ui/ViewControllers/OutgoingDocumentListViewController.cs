@@ -378,7 +378,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (row >= 0)
                 {
                     ds.Items.RemoveAt(row);
-                    ds.RemoveRow(row);
+                    ds.RemoveRow(row); //TODO start from here tomorrow
                 }
             });
         }
@@ -518,7 +518,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public void RemoveRow(int row)
             {
-                documentsTableView.DeleteRows(new NSIndexPath[] { NSIndexPath.FromRowSection(row, 0) }, UITableViewRowAnimation.Automatic);
+                if (row == 0)
+                {
+                    UpdateRow(0); //We always keep a row for the empty table cell
+                }
+                else
+                {
+                    documentsTableView.DeleteRows(new NSIndexPath[] { NSIndexPath.FromRowSection(row, 0) }, UITableViewRowAnimation.Automatic);
+                }
             }
 
         }
