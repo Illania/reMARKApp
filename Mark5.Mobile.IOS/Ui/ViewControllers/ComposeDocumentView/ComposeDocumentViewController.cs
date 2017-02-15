@@ -139,9 +139,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             sendButtonItem.Enabled = false;
 
             attachmentButtonItem = new UIBarButtonItem();
-            attachmentButtonItem.Title = "ATT";
+            attachmentButtonItem.Title = "ATT"; //TODO need to put an icon here
             attachmentButtonItem.Enabled = true;
-            NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { attachmentButtonItem, sendButtonItem }, false);
+
+            if (LocalDocument)
+            {
+                NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { attachmentButtonItem }, false);
+            }
+            else
+            {
+                NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { sendButtonItem, attachmentButtonItem }, false);
+            }
         }
 
         void InitSubViews()
@@ -252,10 +260,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     PreviousDocumentId = outgoingContainer.Info.PreviousDocumentId;
                     PreviousDocumentFolderId = outgoingContainer.Info.PreviousDocumentdFolderId;
                     OutgoingDocumentState = outgoingContainer.Info.State;
-                    OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag; //TODO  this should not be none
+
+                    OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag; //TODO this should not be none, need to check 
                     if (outgoingContainer.Info.State == OutgoingDocumentState.Failed)
                     {
                         await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_while_sending_document")));
+                        NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { sendButtonItem, attachmentButtonItem }, false);
                     }
                     if (outgoingContainer.LocalAttachments != null)
                     {
@@ -300,6 +310,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 toView.SetEmails(PreconfiguredEmailAddresses);
             }
+
+            sendButtonItem.Enabled = IsFormValid();
 
             await AskIfShouldUseTemplates();
         }
