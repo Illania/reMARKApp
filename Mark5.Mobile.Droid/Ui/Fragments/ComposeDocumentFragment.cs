@@ -229,7 +229,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             OutgoingDocumentInitialAttachments.ForEach(attachmentsView.AddAttachment);
 
-
             if (CreationModeFlag == DocumentCreationModeFlag.New && PreconfiguredEmailAddresses != null)
             {
                 toView.SetEmails(PreconfiguredEmailAddresses);

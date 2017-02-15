@@ -99,7 +99,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 return;
             }
 
-            Hidden = Document.Attachments.Count < 1;
+            Hidden = Document.Attachments.Count < 1 && Container?.LocalAttachments.Count < 1;
         }
 
         #region Event handlers
