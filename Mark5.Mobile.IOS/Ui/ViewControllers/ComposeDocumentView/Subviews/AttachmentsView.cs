@@ -167,7 +167,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 Opaque = false;
                 TranslatesAutoresizingMaskIntoConstraints = false;
                 Alignment = UIStackViewAlignment.Fill;
-                Distribution = UIStackViewDistribution.FillProportionally;
+                Distribution = UIStackViewDistribution.Fill;
                 Axis = UILayoutConstraintAxis.Horizontal;
 
                 filenameButton = UIButton.FromType(UIButtonType.System);
@@ -179,7 +179,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 filenameButton.TouchUpInside += (sender, e) => attachmentClickedAction(this, attachmentDescription);
                 AddArrangedSubview(filenameButton);
 
-                deleteButton = UIButton.FromType(UIButtonType.ContactAdd); //TODO change look
+                deleteButton = UIButton.FromType(UIButtonType.ContactAdd); //TODO change icon
                 deleteButton.TranslatesAutoresizingMaskIntoConstraints = false;
                 deleteButton.TouchUpInside += (sender, e) => deleteAttachmentClickedAction(this, attachmentDescription);
                 AddArrangedSubview(deleteButton);
