@@ -252,7 +252,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     PreviousDocumentId = outgoingContainer.Info.PreviousDocumentId;
                     PreviousDocumentFolderId = outgoingContainer.Info.PreviousDocumentdFolderId;
                     OutgoingDocumentState = outgoingContainer.Info.State;
-                    OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag;
+                    OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag; //TODO  this should not be none
                     if (outgoingContainer.Info.State == OutgoingDocumentState.Failed)
                     {
                         await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_while_sending_document")));
@@ -293,6 +293,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 subView.CreationModeFlag = CreationModeFlag;
                 await subView.RefreshView();
             }
+
+            OutgoingDocumentInitialAttachments.ForEach(attachmentsView.AddAttachment);
 
             if (CreationModeFlag == DocumentCreationModeFlag.New && PreconfiguredEmailAddresses != null)
             {
@@ -516,7 +518,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
                 else
                 {
-                    await SaveAndCloseComposeActivity();
+                    await SaveAndCloseComposeViewController();
                 }
             }
             else
@@ -528,12 +530,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
                 else
                 {
-                    await SaveAndCloseComposeActivity();
+                    await SaveAndCloseComposeViewController();
                 }
             }
         }
 
-        async Task SaveAndCloseComposeActivity()
+        async Task SaveAndCloseComposeViewController()
         {
             if (!LocalDocument)
             {
