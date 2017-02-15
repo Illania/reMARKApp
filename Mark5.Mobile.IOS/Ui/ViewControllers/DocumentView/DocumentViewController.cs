@@ -503,8 +503,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 RefreshView();
                 MarkAsReadIfNecessary();
-
-                //TODO for local documents the datereceived is not correct
             }
             catch (Exception ex)
             {

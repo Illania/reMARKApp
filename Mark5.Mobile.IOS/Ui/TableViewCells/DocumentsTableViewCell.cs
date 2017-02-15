@@ -109,7 +109,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     stateIcon = UIImage.FromBundle(Path.Combine("icons", "failed.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
                 case OutgoingDocumentState.Sending:
-                    stateIcon = UIImage.FromBundle(Path.Combine("icons", "pencil.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);  //TODO need to put the right one!!!!
+                    stateIcon = UIImage.FromBundle(Path.Combine("icons", "pencil.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);  //TODO need to put the right icon
                     break;
                 case OutgoingDocumentState.Waiting:
                     stateIcon = UIImage.FromBundle(Path.Combine("icons", "pending.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
@@ -121,7 +121,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             IndicatorImageView1.Image = stateIcon;
             IndicatorImageView2.Image = null;
-            IndicatorImageView3.Image = documentPreview.AttachmentsCount > 0 ? UIImage.FromBundle(Path.Combine("icons", "attachment.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate) : null; //TODO check
+            IndicatorImageView3.Image = documentPreview.AttachmentsCount > 0 ? UIImage.FromBundle(Path.Combine("icons", "attachment.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate) : null;
         }
 
         #endregion

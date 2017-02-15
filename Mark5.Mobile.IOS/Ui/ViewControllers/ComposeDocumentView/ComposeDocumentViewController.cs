@@ -261,7 +261,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     PreviousDocumentFolderId = outgoingContainer.Info.PreviousDocumentdFolderId;
                     OutgoingDocumentState = outgoingContainer.Info.State;
 
-                    OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag; //TODO this should not be none, need to check 
+                    OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag;
                     if (outgoingContainer.Info.State == OutgoingDocumentState.Failed)
                     {
                         await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_while_sending_document")));

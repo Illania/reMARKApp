@@ -378,7 +378,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (row >= 0)
                 {
                     ds.Items.RemoveAt(row);
-                    ds.RemoveRow(row); //TODO start from here tomorrow
+                    ds.RemoveRow(row);
                 }
             });
         }
