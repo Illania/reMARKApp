@@ -32,8 +32,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         UIScrollView mainScrollView;
 
-        //TODO this is an amazing thing:
-        // If the observer is not saved in a variable, we get an amazing crash
         IDisposable observer;
 
         Func<WKNavigationAction, WKNavigationActionPolicy> navigationActionDelegate;
@@ -87,6 +85,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 });
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            observer.Dispose();
+            base.Dispose(disposing);
+        }
+
+        #region Observer handler
+
         void HandleWebViewContentSizeChanged(NSObservedChange obj)
         {
             if (webView.ScrollView.Zooming)
@@ -104,6 +110,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                widthConstraint.Constant = initialWidth;
            });
         }
+
+        #endregion
 
         #region IWKNavigationDelegate
 
