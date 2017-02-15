@@ -59,6 +59,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         SuggestionsListView suggestionsListView;
 
         bool templateLoaded;
+        bool documentShown;
 
         UIBarButtonItem cancelButtonItem;
         UIBarButtonItem sendButtonItem;
@@ -294,6 +295,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async Task ShowDocument()
         {
+            if (documentShown)
+            {
+                return;
+            }
+
             foreach (var subView in subViews)
             {
                 subView.Document = Document;
@@ -314,6 +320,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             sendButtonItem.Enabled = IsFormValid();
 
             await AskIfShouldUseTemplates();
+
+            documentShown = true;
         }
 
         bool IsFormValid()
