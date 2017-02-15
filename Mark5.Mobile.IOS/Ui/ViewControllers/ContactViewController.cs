@@ -5,7 +5,19 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using CoreGraphics;
+using Foundation;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -13,7 +25,796 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
     public class ContactViewController : AbstractViewController, ISecondaryViewController
     {
-        
-        public bool Empty { get { return true; } }
+
+        public bool Empty { get { return folderId == null && folder == null && contactId == null && contactPreview == null && contact == null; } }
+
+        int? folderId;
+        Folder folder;
+
+        int? contactId;
+        ContactPreview contactPreview;
+        Contact contact;
+
+        UIBarButtonItem composeButton;
+        UITableView tableView;
+        UIToolbar toolbar;
+        UIBarButtonItem fileToButton;
+
+        CancellationTokenSource cts;
+
+        public override void LoadView()
+        {
+            base.LoadView();
+
+            InitializeNavigationBar();
+            InitializeView();
+            InitializeHandlers();
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+
+            InitializeNavigationBarTitle();
+        }
+
+        public override void ViewDidAppear(bool animated)
+        {
+            base.ViewDidAppear(animated);
+
+            CommonConfig.Logger.Info($"{nameof(ContactViewController)} appeared");
+
+            if (!Empty)
+                RefreshData();
+        }
+
+        public override void ViewWillDisappear(bool animated)
+        {
+            base.ViewWillDisappear(animated);
+
+            DeinitializeHandlers();
+        }
+
+        public override void DidReceiveMemoryWarning()
+        {
+            CommonConfig.Logger.Warning($"{nameof(ContactViewController)} received memory warning!");
+
+            var ds = tableView?.Source as DataSource;
+            ds?.Clear();
+
+            base.DidReceiveMemoryWarning();
+        }
+
+        public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
+        {
+            base.ViewWillTransitionToSize(toSize, coordinator);
+
+            coordinator.AnimateAlongsideTransition(ctx => { }, ctx =>
+            {
+                tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+                tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+            });
+        }
+
+        void InitializeNavigationBar()
+        {
+            composeButton = new UIBarButtonItem();
+            composeButton.Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"));
+            composeButton.Enabled = false;
+            NavigationItem.SetRightBarButtonItem(composeButton, false);
+        }
+
+        void InitializeView()
+        {
+            AutomaticallyAdjustsScrollViewInsets = false;
+
+            tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
+            tableView.ClipsToBounds = false;
+            tableView.Source = new DataSource(this, tableView);
+            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
+            tableView.RowHeight = UITableView.AutomaticDimension;
+            tableView.EstimatedRowHeight = 60f;
+            tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+            tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+            View.AddSubview(tableView);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
+                });
+
+            fileToButton = new UIBarButtonItem();
+            fileToButton.Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png"));
+            fileToButton.Enabled = false;
+
+            toolbar = new UIToolbar();
+            toolbar.BarStyle = UIBarStyle.Default;
+            toolbar.Items = new[]
+            {
+                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                fileToButton,
+                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace)
+            };
+            toolbar.TranslatesAutoresizingMaskIntoConstraints = false;
+            View.AddSubview(toolbar);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1.0f, 40.0f),
+                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, -49.0f)
+                });
+        }
+
+        void InitializeNavigationBarTitle()
+        {
+            NavigationItem.Title = contactPreview?.Name;
+        }
+
+        void InitializeHandlers()
+        {
+            if (fileToButton != null)
+                fileToButton.Clicked += FileToButton_Clicked;
+        }
+
+        void DeinitializeHandlers()
+        {
+            if (fileToButton != null)
+                fileToButton.Clicked -= FileToButton_Clicked;
+        }
+
+        void FileToButton_Clicked(object sender, EventArgs e)
+        {
+            var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, null)); // TODO
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
+            {
+                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { contactPreview });
+                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            }));
+
+            if (folder?.InternalType == FolderInternalType.FilterView
+                || folder?.InternalType == FolderInternalType.Static
+                || folder?.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
+            {
+                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { contactPreview }, folder);
+                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            }));
+
+            if (folder?.InternalType == FolderInternalType.FilterView
+                || folder?.InternalType == FolderInternalType.Static
+                || folder?.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, null)); // TODO
+
+            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
+                || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, null)); // TODO
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+
+            if (eas.PopoverPresentationController != null)
+                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+
+            PresentViewController(eas, true, null);
+        }
+
+        public void SetData(int folderId, int contactId)
+        {
+            folder = null;
+            contactPreview = null;
+            contact = null;
+
+            this.folderId = folderId;
+            this.contactId = contactId;
+        }
+
+        public void SetData(Folder folder, ContactPreview contactPreview)
+        {
+            folderId = null;
+            contactId = null;
+            contact = null;
+
+            this.folder = folder;
+            this.contactPreview = contactPreview;
+        }
+
+        public void SetData(ContactPreview contactPreview)
+        {
+            folderId = null;
+            folder = null;
+            contactId = null;
+            contact = null;
+
+            this.contactPreview = contactPreview;
+        }
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        public async void RefreshData()
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            cts?.Cancel();
+            cts = new CancellationTokenSource();
+            var token = cts.Token;
+
+            var folderId = this.folderId;
+            var folder = this.folder;
+            var contactId = this.contactId;
+            var contactPreview = this.contactPreview;
+            var contact = this.contact;
+
+            CommonConfig.Logger.Info("Loading contact...");
+
+            var ds = (DataSource)tableView?.Source;
+
+            try
+            {
+                ds.StartRefresh();
+
+                if (folderId != null && contactId != null)
+                {
+                    var swp = await Managers.ContactsManager.GetContactWithPreviewAsync(folderId.Value, contactId.Value);
+                    contactPreview = swp.ContactPreview;
+                    contact = swp.Contact;
+                }
+
+                if (folder != null && contactPreview != null)
+                {
+                    contact = await Managers.ContactsManager.GetContactAsync(folder, contactPreview.Id);
+                }
+
+                if (folderId == null && folder == null && contactPreview != null)
+                {
+                    contact = await Managers.ContactsManager.GetContactAsync(-1, contactPreview.Id);
+                }
+
+                if (token.IsCancellationRequested) return;
+
+                InitializeNavigationBarTitle();
+
+                if (fileToButton != null)
+                    fileToButton.Enabled = true;
+
+                ds.EndRefresh(contactPreview, contact);
+            }
+            catch (Exception ex)
+            {
+                if (token.IsCancellationRequested) return;
+
+                CommonConfig.Logger.Error($"Could not load contact", ex);
+
+                ds.Clear();
+
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+
+                if (SplitViewController == null)
+                    NavigationController.PopViewController(true);
+            }
+        }
+
+        public void ClearData()
+        {
+            cts?.Cancel();
+
+            folderId = null;
+            folder = null;
+            contactId = null;
+            contactPreview = null;
+            contact = null;
+
+            InitializeNavigationBarTitle();
+
+            if (composeButton != null)
+                composeButton.Enabled = false;
+
+            if (fileToButton != null)
+                fileToButton.Enabled = false;
+
+            var ds = tableView?.Source as DataSource;
+            ds?.Clear();
+        }
+
+        class DataSource : UITableViewSource, IDisposable
+        {
+
+            ContactViewController viewController;
+            UITableView tableView;
+
+            bool empty = true;
+            bool loading = true;
+
+            SectionCollection sections = new SectionCollection();
+
+            public DataSource(ContactViewController viewController, UITableView tableView)
+            {
+                this.viewController = viewController;
+                this.tableView = tableView;
+            }
+
+            public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (empty)
+                    return null;
+
+                if (loading)
+                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
+
+                var row = sections[indexPath.Section].Rows[indexPath.Row];
+                var cell = tableView.DequeueReusableCell(row.Key) ?? row.CreateCell();
+                row.Bind(cell);
+                return cell;
+            }
+
+            public override nint RowsInSection(UITableView tableview, nint section)
+            {
+                if (empty)
+                    return 0;
+
+                if (loading)
+                    return 1;
+
+                return sections[(int)section].Rows.Count;
+            }
+
+            public override nint NumberOfSections(UITableView tableView)
+            {
+                if (empty)
+                    return 0;
+
+                if (loading)
+                    return 1;
+
+                return sections.Count;
+            }
+
+            public override string TitleForHeader(UITableView tableView, nint section)
+            {
+                if (empty) return string.Empty;
+                if (loading) return string.Empty;
+
+                return sections[(int)section].Title;
+            }
+
+            public void StartRefresh()
+            {
+                empty = false;
+                loading = true;
+
+                tableView.InsertSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+            }
+
+            public void EndRefresh(ContactPreview contactPreview, Contact contact)
+            {
+                var allSections = new AbstractSection[] {
+                    new NameSection(),
+                    new DescriptionSection(),
+                    new CommunicationAddressSection(CommunicationAddressType.Email),
+                    new CommunicationAddressSection(CommunicationAddressType.Phone),
+                    new CommunicationAddressSection(CommunicationAddressType.Skype),
+                    new CommunicationAddressSection(CommunicationAddressType.Fax),
+                    new CommunicationAddressSection(CommunicationAddressType.Telex),
+                    new CommunicationAddressSection(CommunicationAddressType.IM),
+                    new CommunicationAddressSection(CommunicationAddressType.Internal),
+                };
+
+                foreach (var section in allSections)
+                {
+                    section.ContactPreview = contactPreview;
+                    section.Contact = contact;
+
+                    if (!section.Empty)
+                    {
+                        section.InitializeRows();
+                        sections.Add(section);
+                    }
+                }
+
+                allSections = null;
+
+                if (sections.Count < 1)
+                {
+                    empty = true;
+                    loading = false;
+
+                    tableView.DeleteSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                }
+                else if (sections.Count == 1)
+                {
+                    empty = false;
+                    loading = false;
+
+                    tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                }
+                else if (sections.Count > 1)
+                {
+                    empty = false;
+                    loading = false;
+
+                    tableView.BeginUpdates();
+                    tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                    tableView.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, sections.Count - 1)), UITableViewRowAnimation.Fade);
+                    tableView.EndUpdates();
+                }
+            }
+
+            public void Clear()
+            {
+                var numberOfSections = NumberOfSections(tableView);
+
+                empty = true;
+                loading = true;
+
+                sections.Clear();
+
+                tableView.BeginUpdates();
+                tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(0, numberOfSections)), UITableViewRowAnimation.Fade);
+                tableView.EndUpdates();
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                base.Dispose(disposing);
+
+                tableView = null;
+                viewController = null;
+
+                sections = null;
+            }
+
+            #region Support classes
+
+            class SectionCollection : List<AbstractSection>
+            {
+            }
+
+            abstract class AbstractSection
+            {
+                
+                WeakReference<ContactPreview> weakContactPreview;
+                WeakReference<Contact> weakContact;
+
+                public ContactPreview ContactPreview
+                {
+                    get
+                    {
+                        ContactPreview result = null;
+                        return (weakContactPreview?.TryGetTarget(out result) ?? false) ? result : null;
+                    }
+                    set
+                    {
+                        weakContactPreview = new WeakReference<ContactPreview>(value);
+                    }
+                }
+
+                public Contact Contact
+                {
+                    get
+                    {
+                        Contact result = null;
+                        return (weakContact?.TryGetTarget(out result) ?? false) ? result : null;
+                    }
+                    set
+                    {
+                        weakContact = new WeakReference<Contact>(value);
+                    }
+                }
+
+                public abstract bool Empty { get; }
+
+                public abstract string Title { get; }
+
+                public RowCollection Rows { get; } = new RowCollection();
+
+                public abstract void InitializeRows();
+            }
+
+            class NameSection : AbstractSection
+            {
+                
+                public override bool Empty
+                {
+                    get
+                    {
+                        if (ContactPreview?.Type == ContactType.Person)
+                            return string.IsNullOrWhiteSpace(Contact?.Position) && string.IsNullOrWhiteSpace(ContactPreview?.CompanyName);
+                        if (ContactPreview?.Type == ContactType.Department)
+                            return string.IsNullOrWhiteSpace(ContactPreview?.CompanyName);
+
+                        return true;
+                    }
+                }
+
+                public override string Title { get { return string.Empty; } }
+
+                public override void InitializeRows()
+                {
+                    if (Empty) return;
+
+                    Rows.Add(new NameRow(ContactPreview, Contact));
+                }
+            }
+
+            class DescriptionSection : AbstractSection
+            {
+
+                public override bool Empty
+                {
+                    get
+                    {
+                        return string.IsNullOrWhiteSpace(ContactPreview?.Description);
+                    }
+                }
+
+                public override string Title { get { return Localization.GetString("description"); } }
+
+                public override void InitializeRows()
+                {
+                    if (Empty) return;
+
+                    Rows.Add(new DescriptionRow(ContactPreview, Contact));
+                }
+            }
+
+            class CommunicationAddressSection : AbstractSection
+            {
+                
+                public override bool Empty
+                {
+                    get
+                    {
+                        return !Contact?.CommunicationAddresses?.Any(ca => ca.Type == type) ?? true;
+                    }
+                }
+
+                public override string Title { get { return Localization.GetString(type.ToString()); } }
+
+                readonly CommunicationAddressType type;
+
+                public CommunicationAddressSection(CommunicationAddressType type)
+                {
+                    this.type = type;
+                }
+
+                public override void InitializeRows()
+                {
+                    if (Empty) return;
+
+                    var cas = Contact.CommunicationAddresses.Where(ca => ca.Type == type).ToArray();
+                    foreach (var ca in cas)
+                    {
+                        Rows.Add(new CommunicationAddressRow(ContactPreview, Contact, ca));
+                    }
+                }
+            }
+
+            class RowCollection : List<AbstractRow>
+            {
+            }
+
+            abstract class AbstractRow
+            {
+
+                WeakReference<ContactPreview> weakContactPreview;
+                WeakReference<Contact> weakContact;
+
+                public ContactPreview ContactPreview
+                {
+                    get
+                    {
+                        ContactPreview result = null;
+                        return (weakContactPreview?.TryGetTarget(out result) ?? false) ? result : null;
+                    }
+                    set
+                    {
+                        weakContactPreview = new WeakReference<ContactPreview>(value);
+                    }
+                }
+
+                public Contact Contact
+                {
+                    get
+                    {
+                        Contact result = null;
+                        return (weakContact?.TryGetTarget(out result) ?? false) ? result : null;
+                    }
+                    set
+                    {
+                        weakContact = new WeakReference<Contact>(value);
+                    }
+                }
+
+                protected AbstractRow(ContactPreview contactPreview, Contact contact)
+                {
+                    ContactPreview = contactPreview;
+                    Contact = contact;
+                }
+
+                public abstract string Key { get; }
+
+                public abstract UITableViewCell CreateCell();
+
+                public abstract void Bind(UITableViewCell cell);
+
+                public virtual void OnClicked(ContactViewController viewController) { }
+            }
+
+            class NameRow : AbstractRow
+            {
+
+                public NameRow(ContactPreview contactPreview, Contact contact)
+                    : base(contactPreview, contact)
+                {
+                }
+
+                public override string Key { get { return "key"; } }
+
+                public override UITableViewCell CreateCell()
+                {
+                    return new UITableViewCell(UITableViewCellStyle.Default, "key");
+                }
+
+                public override void Bind(UITableViewCell cell)
+                {
+                    cell.TextLabel.Text = Contact?.Position + "/" + ContactPreview?.CompanyName;
+                }
+            }
+
+            class DescriptionRow : AbstractRow
+            {
+
+                public DescriptionRow(ContactPreview contactPreview, Contact contact)
+                    : base(contactPreview, contact)
+                {
+                }
+
+                public override string Key { get { return "key"; } }
+
+                public override UITableViewCell CreateCell()
+                {
+                    return new UITableViewCell(UITableViewCellStyle.Default, "key");
+                }
+
+                public override void Bind(UITableViewCell cell)
+                {
+                    cell.TextLabel.Text = ContactPreview?.Description;
+                }
+            }
+
+            class CommunicationAddressRow : AbstractRow
+            {
+                
+                readonly WeakReference<CommunicationAddress> weakCommunicationAddress;
+
+                public CommunicationAddressRow(ContactPreview contactPreview, Contact contact, CommunicationAddress communicationAddress)
+                    : base(contactPreview, contact)
+                {
+                    weakCommunicationAddress = new WeakReference<CommunicationAddress>(communicationAddress);
+                }
+
+                public override string Key { get { return "key"; } }
+
+                public override UITableViewCell CreateCell()
+                {
+                    return new UITableViewCell(UITableViewCellStyle.Default, "key");
+                }
+
+                public override void Bind(UITableViewCell cell)
+                {
+                    CommunicationAddress ca;
+                    weakCommunicationAddress.TryGetTarget(out ca);
+
+                    cell.TextLabel.Text = ca?.Address;
+                }
+            }
+
+            /*class PhysicalAddressRow : AbstractRow
+            {
+
+                public override string Key { get { return "key"; } }
+
+                public override UITableViewCell CreateCell()
+                {
+                    var cell = new UITableViewCell(UITableViewCellStyle.Default, "key");
+
+                    return cell;
+                }
+            }
+
+            class LinkedContactRow : AbstractRow
+            {
+
+                public LinkedContactRow(ContactPreview contactPreview, Contact contact)
+                    : base(contactPreview, contact)
+                {
+                }
+
+                public override string Key { get { return "key"; } }
+
+                public override UITableViewCell CreateCell()
+                {
+                    var cell = new UITableViewCell(UITableViewCellStyle.Default, "key");
+
+                    return cell;
+                }
+            }
+
+            class BirthdateRow : AbstractRow
+            {
+
+                public BirthdateRow(ContactPreview contactPreview, Contact contact)
+                    : base(contactPreview, contact)
+                {
+                }
+
+                public override string Key { get { return "key"; } }
+
+                public override UITableViewCell CreateCell()
+                {
+                    var cell = new UITableViewCell(UITableViewCellStyle.Default, "key");
+
+                    return cell;
+                }
+            }
+
+            class AccountRow : AbstractRow
+            {
+
+                public AccountRow(ContactPreview contactPreview, Contact contact) 
+                    : base(contactPreview, contact)
+                {
+                }
+
+                public override string Key { get { return "key"; } }
+
+                public override UITableViewCell CreateCell()
+                {
+                    var cell = new UITableViewCell(UITableViewCellStyle.Default, "key");
+
+                    return cell;
+                }
+            }
+
+            class VatRow : AbstractRow
+            {
+
+                public VatRow(ContactPreview contactPreview, Contact contact)
+                    : base(contactPreview, contact)
+                {
+                }
+
+                public override string Key { get { return "key"; } }
+
+                public override UITableViewCell CreateCell()
+                {
+                    var cell = new UITableViewCell(UITableViewCellStyle.Default, "key");
+
+                    return cell;
+                }
+            }
+
+            class ResponsibleUsersRow : AbstractRow
+            {
+
+                public ResponsibleUsersRow(ContactPreview contactPreview, Contact contact)
+                    : base(contactPreview, contact)
+                {
+                }
+
+                public override string Key { get { return "key"; } }
+
+                public override UITableViewCell CreateCell()
+                {
+                    var cell = new UITableViewCell(UITableViewCellStyle.Default, "key");
+
+                    return cell;
+                }
+            }*/
+
+            #endregion
+
+        }
     }
 }

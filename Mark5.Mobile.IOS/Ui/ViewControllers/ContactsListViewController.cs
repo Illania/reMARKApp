@@ -188,9 +188,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        public void ContactSelected(ContactPreview contactPreview)
+        public void ContactSelected(UITableView tableView, ContactPreview contactPreview)
         {
-            // TODO
+            if (tableView == searchResultsController.TableView)
+            {
+                var ds = (DataSource)contactsTableView.Source;
+                var index = ds.Items.FindIndex(sp => sp.Id == contactPreview.Id);
+                if (index >= 0) contactsTableView.SelectRow(NSIndexPath.FromRowSection(index, 0), false, UITableViewScrollPosition.Middle);
+            }
+
+            if (SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                nc.PopToRootViewController(false);
+
+                var vc = (ContactViewController)nc.ViewControllers[0];
+                vc.ClearData();
+                vc.SetData(Folder, contactPreview);
+                vc.RefreshData();
+            }
+            else
+            {
+                var vc = new ContactViewController();
+                vc.SetData(Folder, contactPreview);
+                NavigationController.PushViewController(vc, true);
+            }
         }
 
         [Export("longPressed:")]
@@ -493,7 +515,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cp = contactPreviewsInView[indexPath.Row];
-                viewController.ContactSelected(cp);
+                viewController.ContactSelected(tableView, cp);
             }
 
             public void AppendItems(List<ContactPreview> contactPreviews)

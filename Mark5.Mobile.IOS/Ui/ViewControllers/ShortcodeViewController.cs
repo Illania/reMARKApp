@@ -526,9 +526,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ccAddresses = new DocumentAddress[0];
                 bccAddresses = new DocumentAddress[0];
 
-                tableView.BeginUpdates();
                 tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(0, sections)), UITableViewRowAnimation.Fade);
-                tableView.EndUpdates();
             }
 
             protected override void Dispose(bool disposing)
