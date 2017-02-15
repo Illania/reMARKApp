@@ -15,6 +15,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
     {
         public DocumentPreview DocumentPreview { get; set; }
         public Document Document { get; set; }
+        public OutgoingDocumentContainer Container { get; set; }
 
         protected UIView ContainerView;
 

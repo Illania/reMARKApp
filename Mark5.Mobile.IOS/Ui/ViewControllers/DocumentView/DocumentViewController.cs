@@ -578,6 +578,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 v.Document = Document;
                 v.DocumentPreview = DocumentPreview;
+                v.Container = Container;
                 v.RefreshView();
             });
 
@@ -655,27 +656,40 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Subviews event handlers
 
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void AttachmentsList_AttachmentTapped(object sender, AttachmentButtonTappedEventArgs e)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var attachmentDescription = e.Attachment;
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
 
             try
             {
-                var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, false, SourceType.Local);
+                string path = null;
 
-                if (string.IsNullOrWhiteSpace(path))
+                var remoteAttachment = attachmentDescription as AttachmentDescription;
+                if (remoteAttachment != null)
                 {
-                    if (attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes
-                        && PlatformConfig.Preferences.LargeAttachmentWarning
-                        && !await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("big_attachment_title"),
-                                                               string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(e.Attachment.SizeInBytes))))
-                    {
-                        dismissAction();
-                        return;
-                    }
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(remoteAttachment, Document, false, SourceType.Local);
 
-                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, false, SourceType.Remote);
+                    if (string.IsNullOrWhiteSpace(path))
+                    {
+                        if (attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes
+                            && PlatformConfig.Preferences.LargeAttachmentWarning
+                            && !await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("big_attachment_title"),
+                                                                   string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(remoteAttachment.SizeInBytes))))
+                        {
+                            dismissAction();
+                            return;
+                        }
+
+                        path = await Managers.DocumentsManager.GetAttachmentAsync(remoteAttachment, Document, false, SourceType.Remote);
+                    }
+                }
+                else
+                {
+                    var outgoingAttachment = attachmentDescription as OutgoingDocumentAttachmentDescription;
+                    path = outgoingAttachment.Path;
                 }
 
                 if (string.IsNullOrWhiteSpace(path))
@@ -700,11 +714,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
                     }
                 }
-
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to view attachment [document.Id={Document.Id}, attachment.Id={attachmentDescription?.Id}, attachment.Name={attachmentDescription?.Name}", ex);
+                CommonConfig.Logger.Error($"Failed to view attachment [document.Id={Document.Id}, attachment.Name={attachmentDescription?.Name}", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(this, ex);
