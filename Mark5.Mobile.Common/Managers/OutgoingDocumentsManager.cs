@@ -40,6 +40,7 @@ namespace Mark5.Mobile.Common.Managers
         {
             queue = (IPortableConcurrentQueue<Guid>)Activator.CreateInstance(CommonConfig.ConcurrentQueueType.MakeGenericType(new Type[] { typeof(Guid) }));
             semaphore = new SemaphoreSlim(1);
+            UnlockAllDocuments(); //Used to unlock all the documents that were not unlocked because the app closed/crashed on compose view
         }
 
         #region Public methods
@@ -259,6 +260,24 @@ namespace Mark5.Mobile.Common.Managers
         {
             var ids = await FileSystemStorage.GetOutgoingDocumentIdentifiersAsync();
             AddToQueue(ids);
+        }
+
+        void UnlockAllDocuments()
+        {
+            Task.Run(async () =>
+            {
+                var ids = await FileSystemStorage.GetOutgoingDocumentIdentifiersAsync();
+                foreach (var id in ids)
+                {
+                    await FileSystemStorage.UnlockOutgoingDocumentAsync(id);
+                }
+            }).ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                {
+                    CommonConfig.Logger.Error("Error while unlocking documents at startup", t.Exception.InnerException);
+                }
+            });
         }
 
         void AddToQueue(IEnumerable<Guid> identifiers)
