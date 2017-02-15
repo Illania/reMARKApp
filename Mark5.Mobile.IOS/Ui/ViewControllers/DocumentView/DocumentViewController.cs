@@ -134,12 +134,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             CorrectScrollViewInsets();
         }
 
-        public override void ViewWillDisappear(bool animated)
+        public override async void ViewWillDisappear(bool animated)
         {
             base.ViewWillDisappear(animated);
 
             setReadStatusCancellationTokenSource?.Cancel();
             setReadStatusCancellationTokenSource = null;
+
+            if ((IsMovingFromParentViewController || IsBeingDismissed) && OutgoingDocumentIdentifier != default(Guid))
+            {
+                await Managers.DocumentsManager.UnlockOutgoingDocumentAsync(OutgoingDocumentIdentifier);
+                Managers.OutgoingDocumentsManager.Notify(OutgoingDocumentIdentifier);
+            }
 
             DeInitializeHandlers();
         }

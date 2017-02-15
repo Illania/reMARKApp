@@ -544,8 +544,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             else
             {
                 await SynchOutgoingAttachments(true);
-                await Managers.DocumentsManager.UnlockOutgoingDocumentAsync(OutgoingDocumentGuid);
-                Managers.OutgoingDocumentsManager.Notify(OutgoingDocumentGuid);
             }
 
             PopOrDismissViewController();
