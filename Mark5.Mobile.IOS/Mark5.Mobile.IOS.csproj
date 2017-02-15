@@ -170,8 +170,6 @@
     <Folder Include="Ui\ViewControllers\ComposeDocumentView\" />
     <Folder Include="Ui\ViewControllers\ComposeDocumentView\Subviews\" />
     <Folder Include="Utilities\Extensions\" />
-    <Folder Include="Ui\ViewControllers\Common\" />
-    <Folder Include="Ui\ViewControllers\Common\StackView\" />
     <Folder Include="Model\" />
     <Folder Include="Ui\ViewControllers\FoldersList\" />
     <Folder Include="Ui\TableViewCells\" />
@@ -179,6 +177,7 @@
     <Folder Include="Ui\ViewControllers\DocumentView\Subviews\" />
     <Folder Include="Ui\Common\HubMessages\" />
     <Folder Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsView\" />
+    <Folder Include="Ui\ViewControllers\Common\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -255,9 +254,6 @@
     <Compile Include="Utilities\Extensions\UiViewExtension.cs" />
     <Compile Include="Utilities\Extensions\UiTextViewExtensions.cs" />
     <Compile Include="Utilities\Extensions\StringExtensions.cs" />
-    <Compile Include="Ui\ViewControllers\Common\StackView\StackViewController.cs" />
-    <Compile Include="Ui\ViewControllers\Common\StackView\SeparatorSubView.cs" />
-    <Compile Include="Ui\ViewControllers\Common\StackView\StackSubView.cs" />
     <Compile Include="Ui\ViewControllers\FoldersList\AbstractFoldersListViewController.cs" />
     <Compile Include="Ui\ViewControllers\FoldersList\BrowseFoldersListViewController.cs" />
     <Compile Include="Ui\TableViewCells\FoldersTableViewCell.cs" />
@@ -363,6 +359,7 @@
       <DependentUpon>DescriptionTableViewCell.cs</DependentUpon>
     </Compile>
     <Compile Include="Ui\ViewControllers\OutgoingDocumentListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\Common\SeparatorSubView.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

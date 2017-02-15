@@ -15,7 +15,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Ui.ViewControllers.Common.StackView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Utilities;
@@ -23,7 +22,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class ComposeDocumentViewController : StackViewController
+    public class ComposeDocumentViewController : UIViewController
     {
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
@@ -45,6 +44,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         Document Document { get; set; } = new Document();
         DocumentPreview DocumentPreview { get; set; } = new DocumentPreview();
+
+        UIScrollView scrollView;
+        UIStackView stackView;
 
         ToView toView;
         CcView ccView;
@@ -81,6 +83,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.LoadView();
 
+            Initialize();
             InitNavigationBar();
             InitSubViews();
         }
@@ -94,6 +97,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.DidShowNotification, OnKeyboardDidShowNotification);
             NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillChangeFrameNotification, OnKeyboardDidShowNotification);
             NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
+
+            NavigationController.HidesBarsOnSwipe = true;
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -123,11 +128,57 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     UIKeyboard.WillChangeFrameNotification,
                     UIKeyboard.WillHideNotification
                 });
+
+            NavigationController.HidesBarsOnSwipe = false;
         }
 
         #endregion
 
         #region Init methods
+
+        void Initialize()
+        {
+            View.BackgroundColor = UIColor.White;
+
+            scrollView = new UIScrollView
+            {
+                BackgroundColor = UIColor.White,
+                ShowsVerticalScrollIndicator = true,
+                ShowsHorizontalScrollIndicator = false,
+                ScrollEnabled = true,
+                ScrollsToTop = true,
+                UserInteractionEnabled = true,
+                ClipsToBounds = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            View.AddSubview(scrollView);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, View, NSLayoutAttribute.Width, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
+                });
+
+            stackView = new UIStackView
+            {
+                BackgroundColor = UIColor.White,
+                Axis = UILayoutConstraintAxis.Vertical,
+                Alignment = UIStackViewAlignment.Fill,
+                Distribution = UIStackViewDistribution.Fill,
+                Spacing = 0.0f,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            scrollView.AddSubview(stackView);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Top, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Right, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1.0f, 0.0f)
+                });
+        }
 
         void InitNavigationBar()
         {
@@ -180,7 +231,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             contentView = new ContentView();
             subViews.Add(contentView);
 
-            AddArrangedViewsWithSeparators(subViews);
+            subViews.ForEach(stackView.AddArrangedSubview);
         }
 
         void InitializeHandlers()
@@ -351,16 +402,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             keyboardHeight = UI.KeyboardHeightFromNotification(notification);
 
-            var insets = ScrollView.ContentInset;
+            var insets = scrollView.ContentInset;
             insets.Bottom = keyboardHeight;
-            ScrollView.ContentInset = insets;
+            scrollView.ContentInset = insets;
         }
 
         void OnKeyboardWillHideNotification(NSNotification notification)
         {
-            var insets = ScrollView.ContentInset;
+            var insets = scrollView.ContentInset;
             insets.Bottom = 0.0f;
-            ScrollView.ContentInset = insets;
+            scrollView.ContentInset = insets;
         }
 
         #endregion
