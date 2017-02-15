@@ -35,6 +35,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         ContactPreview contactPreview;
         Contact contact;
 
+        bool refreshDataOnAppear;
+
         UIBarButtonItem composeButton;
         UITableView tableView;
         UIToolbar toolbar;
@@ -64,8 +66,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"{nameof(ContactViewController)} appeared");
 
-            if (!Empty)
+            if (refreshDataOnAppear)
+            {
+                refreshDataOnAppear = false;
                 RefreshData();
+            }
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -91,6 +96,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             coordinator.AnimateAlongsideTransition(ctx => { }, ctx =>
             {
+                if (tableView == null) return;
+
                 tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
                 tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
             });
@@ -293,6 +300,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (SplitViewController == null)
                     NavigationController.PopViewController(true);
             }
+        }
+
+        public void SetRefreshDataOnAppear()
+        {
+            refreshDataOnAppear = true;
         }
 
         public void ClearData()
@@ -710,7 +722,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            /*class PhysicalAddressRow : AbstractRow
+            /*
+            class PhysicalAddressRow : AbstractRow
             {
 
                 public override string Key { get { return "key"; } }
@@ -811,7 +824,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     return cell;
                 }
-            }*/
+            }
+            */
 
             #endregion
 

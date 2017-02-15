@@ -35,6 +35,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         ShortcodePreview shortcodePreview;
         Shortcode shortcode;
 
+        bool refreshDataOnAppear;
+
         UIBarButtonItem composeButton;
         UITableView tableView;
         UIToolbar toolbar;
@@ -64,8 +66,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"{nameof(ShortcodeViewController)} appeared");
 
-            if (!Empty)
+            if (refreshDataOnAppear)
+            {
+                refreshDataOnAppear = false;
                 RefreshData();
+            }
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -91,6 +96,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             coordinator.AnimateAlongsideTransition(ctx => { }, ctx =>
             {
+                if (tableView == null) return;
+
                 tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
                 tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
             });
@@ -276,10 +283,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(-1, shortcodePreview.Id);
                 }
 
-                var description = shortcodePreview.Description;
-                var toAddresses = shortcode.Addresses.Where(da => da.AddressType == DocumentAddressType.To).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
-                var ccAddresses = shortcode.Addresses.Where(da => da.AddressType == DocumentAddressType.Cc).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
-                var bccAddresses = shortcode.Addresses.Where(da => da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
+                var description = shortcodePreview?.Description;
+                var toAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.To).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
+                var ccAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.Cc).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
+                var bccAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
 
                 if (token.IsCancellationRequested) return;
 
@@ -306,6 +313,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (SplitViewController == null)
                     NavigationController.PopViewController(true);
             }
+        }
+
+        public void SetRefreshDataOnAppear()
+        {
+            refreshDataOnAppear = true;
         }
 
         public void ClearData()
