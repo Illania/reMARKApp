@@ -270,7 +270,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         string GetHtmlHeader()
         {
-            var date = DocumentPreview.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime()
+            var date = PreviousDocumentPreview.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime()
                          .ConvertUtcToServerTime()
                          .ConvertDateTimeToTimestampMilliseconds()
                         .FormatServerTimestampAsCompactLongDateTimeString();
