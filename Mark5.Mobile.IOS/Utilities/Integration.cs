@@ -10,6 +10,7 @@ using System.Linq;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.IOS.Ui.Common;
 using PCLStorage;
 using UIKit;
 
@@ -91,6 +92,42 @@ namespace Mark5.Mobile.IOS.Utilities
 
             var domain = NSBundle.MainBundle.BundleIdentifier;
             NSUserDefaults.StandardUserDefaults.RemovePersistentDomain(domain);
+        }
+
+        #endregion
+
+        #region Sharing
+
+        public static void OpenUrl(UIViewController viewController, UITableView tableView, UITableViewCell cell, string url)
+        {
+            try
+            {
+                var safariUrl = new NSUrl(url.Trim().StartsWith("http", StringComparison.CurrentCultureIgnoreCase) ? url : "http://" + url);
+                var chromeUrl = new NSUrl(url.Trim().StartsWith("http", StringComparison.CurrentCultureIgnoreCase) ? url.Replace("http", "googlechrome") : "googlechrome://" + url);
+
+                if (UIApplication.SharedApplication.CanOpenUrl(chromeUrl))
+                {
+                    var browserChooser = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+                    browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("safari"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(safariUrl, new NSDictionary(), null)));
+                    browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("chrome"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(chromeUrl, new NSDictionary(), null)));
+                    browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+
+                    if (browserChooser.PopoverPresentationController != null)
+                        browserChooser.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(tableView, cell);
+
+                    viewController.PresentViewController(browserChooser, true, null);
+                }
+                else
+                {
+                    UIApplication.SharedApplication.OpenUrl(safariUrl, new NSDictionary(), null);
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error(ex);
+
+                Dialogs.ShowErrorDialog(viewController, ex);
+            }
         }
 
         #endregion

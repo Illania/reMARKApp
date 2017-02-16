@@ -18,6 +18,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -209,6 +210,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(eas, true, null);
         }
 
+        public void LinkedContactClicked(ContactPreview contactPreview)
+        {
+            var vc = new ContactViewController();
+            vc.SetData(contactPreview);
+            vc.SetRefreshDataOnAppear();
+            NavigationController.PushViewController(vc, true);
+        }
+
+        public void WebPageClicked(UITableView tableView, UITableViewCell cell, string webPageAddress)
+        {
+            Integration.OpenUrl(this, tableView, cell, webPageAddress);
+        }
+
         public void SetData(int folderId, int contactId)
         {
             folder = null;
@@ -391,9 +405,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                if (tableView.CellAt(indexPath).SelectionStyle == UITableViewCellSelectionStyle.None) return;
+                var cell = tableView.CellAt(indexPath);
+                if (cell.SelectionStyle == UITableViewCellSelectionStyle.None) return;
 
-                sections[indexPath.Section].Rows[indexPath.Row].OnClicked(viewController);
+                sections[indexPath.Section].Rows[indexPath.Row].OnClicked(viewController, tableView, cell, indexPath);
             }
 
             public void StartRefresh()
@@ -889,8 +904,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public abstract void Bind(UITableViewCell cell);
 
-                public virtual void OnClicked(ContactViewController viewController) { }
-            }
+                public virtual void OnClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath) { }
+
+           }
 
             class NameRow : AbstractRow
             {
@@ -979,12 +995,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     weakLinkedContactPreview = new WeakReference<ContactPreview>(linkedContactPreview);
                 }
 
+                public override string Key { get { return base.Key + "_LinkedContact"; } }
+
+                public override UITableViewCell CreateCell()
+                {
+                    var cell = base.CreateCell();
+                    cell.SelectionStyle = UITableViewCellSelectionStyle.Default;
+                    cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
+                    return cell;
+                }
+
                 public override void Bind(UITableViewCell cell)
                 {
                     ContactPreview cp;
                     weakLinkedContactPreview.TryGetTarget(out cp);
 
                     cell.TextLabel.Text = cp.Name;
+                }
+
+                public override void OnClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                {
+                    ContactPreview cp;
+                    if (!weakLinkedContactPreview.TryGetTarget(out cp)) return;
+
+                    viewController.LinkedContactClicked(cp);
                 }
             }
 
@@ -996,9 +1030,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
+                public override string Key { get { return base.Key + "_WebPage"; } }
+
+                public override UITableViewCell CreateCell()
+                {
+                    var cell = base.CreateCell();
+                    cell.SelectionStyle = UITableViewCellSelectionStyle.Default;
+                    cell.TextLabel.TextColor = Theme.DarkBlue;
+                    return cell;
+                }
+
                 public override void Bind(UITableViewCell cell)
                 {
-                    cell.TextLabel.Text = Contact.WebPageAddress;
+                    cell.TextLabel.AttributedText = new NSAttributedString(Contact.WebPageAddress, underlineStyle: NSUnderlineStyle.Single);
+                }
+
+                public override void OnClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                {
+                    viewController.WebPageClicked(tableView, cell, Contact.WebPageAddress);
                 }
             }
 
@@ -1075,5 +1124,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             #endregion
 
         }
-    }
+
+   }
 }
