@@ -269,18 +269,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (folderId != null && shortcodeId != null)
                 {
                     var swp = await Managers.ShortcodesManager.GetShortcodeWithPreviewAsync(folderId.Value, shortcodeId.Value);
-                    shortcodePreview = swp.ShortcodePreview;
-                    shortcode = swp.Shortcode;
+                    this.shortcodePreview = swp.ShortcodePreview;
+                    this.shortcode = swp.Shortcode;
                 }
 
                 if (folder != null && shortcodePreview != null)
                 {
-                    shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(folder, shortcodePreview.Id);
+                    this.shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(folder, shortcodePreview.Id);
                 }
 
                 if (folderId == null && folder == null && shortcodePreview != null)
                 {
-                    shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(-1, shortcodePreview.Id);
+                    this.shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(-1, shortcodePreview.Id);
                 }
 
                 var description = shortcodePreview?.Description;
