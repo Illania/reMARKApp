@@ -881,6 +881,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public virtual UITableViewCell CreateCell()
                 {
                     var cell = new UITableViewCell(UITableViewCellStyle.Default, Key);
+                    cell.TextLabel.Font = Theme.DefaultFont;
                     cell.Accessory = UITableViewCellAccessory.None;
                     cell.SelectionStyle = UITableViewCellSelectionStyle.None;
                     return cell;
@@ -913,9 +914,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
+                public override string Key { get { return DescriptionTableViewCell.Key; } }
+
+                public override UITableViewCell CreateCell()
+                {
+                    return DescriptionTableViewCell.Create();
+                }
+
                 public override void Bind(UITableViewCell cell)
                 {
-                    cell.TextLabel.Text = ContactPreview?.Description;
+                    var dtvc = (DescriptionTableViewCell)cell;
+                    dtvc.Initialize(ContactPreview.Description);
                 }
             }
 
