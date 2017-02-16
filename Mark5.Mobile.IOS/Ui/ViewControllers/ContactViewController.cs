@@ -410,6 +410,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     new CommunicationAddressSection(CommunicationAddressType.Telex),
                     new CommunicationAddressSection(CommunicationAddressType.IM),
                     new CommunicationAddressSection(CommunicationAddressType.Internal),
+                    new PhysicalAddressSection(),
+                    new LinkedContactSection(LinkedContactSection.LinkedContactSectionMode.PrimaryPerson),
+                    new LinkedContactSection(LinkedContactSection.LinkedContactSectionMode.Persons),
+                    new LinkedContactSection(LinkedContactSection.LinkedContactSectionMode.Departments),
+                    new LinkedContactSection(LinkedContactSection.LinkedContactSectionMode.Companies),
+                    new BirthdateSection(),
+                    new AccountSection(),
+                    new VatSection(),
+                    new ResponsibleUsersSection()
                 };
 
                 foreach (var section in allSections)
@@ -552,13 +561,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             class DescriptionSection : AbstractSection
             {
 
-                public override bool Empty
-                {
-                    get
-                    {
-                        return string.IsNullOrWhiteSpace(ContactPreview?.Description);
-                    }
-                }
+                public override bool Empty { get { return string.IsNullOrWhiteSpace(ContactPreview?.Description); } }
 
                 public override string Title { get { return Localization.GetString("description"); } }
 
@@ -573,13 +576,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             class CommunicationAddressSection : AbstractSection
             {
                 
-                public override bool Empty
-                {
-                    get
-                    {
-                        return !Contact?.CommunicationAddresses?.Any(ca => ca.Type == type) ?? true;
-                    }
-                }
+                public override bool Empty { get { return !Contact?.CommunicationAddresses?.Any(ca => ca.Type == type) ?? true; } }
 
                 public override string Title { get { return Localization.GetString(type.ToString()); } }
 
@@ -599,6 +596,177 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     {
                         Rows.Add(new CommunicationAddressRow(ContactPreview, Contact, ca));
                     }
+                }
+            }
+
+            class PhysicalAddressSection : AbstractSection
+            {
+
+                public override bool Empty { get { return !Contact?.PhysicalAddresses?.Any() ?? true; } }
+
+                public override string Title { get { return Localization.GetString("address");} }
+
+                public override void InitializeRows()
+                {
+                    if (Empty) return;
+
+                    var pas = Contact.PhysicalAddresses.ToArray();
+                    foreach (var pa in pas)
+                    {
+                        Rows.Add(new PhysicalAddressRow(ContactPreview, Contact, pa));
+                    }
+                }
+            }
+
+
+            class LinkedContactSection : AbstractSection
+            {
+
+                public enum LinkedContactSectionMode
+                {
+                    None,
+                    PrimaryPerson,
+                    Persons,
+                    Departments,
+                    Companies
+                }
+
+                readonly LinkedContactSectionMode mode;
+
+                public override bool Empty
+                {
+                    get
+                    {
+                        if (mode == LinkedContactSectionMode.PrimaryPerson)
+                            return Contact?.PrimaryPerson == null;
+                        if (mode == LinkedContactSectionMode.Persons)
+                            return !Contact?.Children?.Any(cp => cp.Type == ContactType.Person) ?? true;
+                        if (mode == LinkedContactSectionMode.Departments)
+                            return !Contact?.Children?.Any(cp => cp.Type == ContactType.Department) ?? true;
+                        if (mode == LinkedContactSectionMode.Companies)
+                            return !Contact?.Children?.Any(cp => cp.Type == ContactType.Company) ?? true;
+
+                        return true;
+                    }
+                }
+
+                public override string Title
+                {
+                    get
+                    {
+                        if (mode == LinkedContactSectionMode.PrimaryPerson)
+                            return Localization.GetString("primary_person");
+                        if (mode == LinkedContactSectionMode.Persons)
+                            return Localization.GetString("persons");
+                        if (mode == LinkedContactSectionMode.Departments)
+                            return Localization.GetString("departments");
+                        if (mode == LinkedContactSectionMode.Companies)
+                            return Localization.GetString("companies");
+
+                        return string.Empty;
+                    } 
+                }
+
+                public LinkedContactSection(LinkedContactSectionMode mode)
+                {
+                    this.mode = mode;
+                }
+
+                public override void InitializeRows()
+                {
+                    if (Empty) return;
+
+                    if (mode == LinkedContactSectionMode.PrimaryPerson)
+                    {
+                        Rows.Add(new LinkedContactRow(ContactPreview, Contact, Contact.PrimaryPerson));
+                    }
+
+                    if (mode == LinkedContactSectionMode.Persons)
+                    {
+                        var cps = Contact.Children.Where(cp => cp.Type == ContactType.Person).ToArray();
+                        foreach (var cp in cps)
+                        {
+                            Rows.Add(new LinkedContactRow(ContactPreview, Contact, cp));
+                        }
+                    }
+
+                    if (mode == LinkedContactSectionMode.Departments)
+                    {
+                        var cps = Contact.Children.Where(cp => cp.Type == ContactType.Department).ToArray();
+                        foreach (var cp in cps)
+                        {
+                            Rows.Add(new LinkedContactRow(ContactPreview, Contact, cp));
+                        }
+                    }
+
+                    if (mode == LinkedContactSectionMode.Companies)
+                    {
+                        var cps = Contact.Children.Where(cp => cp.Type == ContactType.Company).ToArray();
+                        foreach (var cp in cps)
+                        {
+                            Rows.Add(new LinkedContactRow(ContactPreview, Contact, cp));
+                        }
+                    }
+                }
+            }
+
+            class BirthdateSection : AbstractSection
+            {
+
+                public override bool Empty { get { return Contact?.BirthDateTimestamp == -1; } }
+
+                public override string Title { get { return Localization.GetString("birthdate"); } }
+
+                public override void InitializeRows()
+                {
+                    if (Empty) return;
+
+                    Rows.Add(new BirthdateRow(ContactPreview, Contact));
+                }
+            }
+
+            class AccountSection : AbstractSection
+            {
+
+                public override bool Empty { get { return string.IsNullOrWhiteSpace(Contact?.Account); } }
+
+                public override string Title { get { return Localization.GetString("account"); } }
+
+                public override void InitializeRows()
+                {
+                    if (Empty) return;
+
+                    Rows.Add(new AccountRow(ContactPreview, Contact));
+                }
+            }
+
+            class VatSection : AbstractSection
+            {
+
+                public override bool Empty { get { return string.IsNullOrWhiteSpace(Contact?.Vat); } }
+
+                public override string Title { get { return Localization.GetString("vat"); } }
+
+                public override void InitializeRows()
+                {
+                    if (Empty) return;
+
+                    Rows.Add(new VatRow(ContactPreview, Contact));
+                }
+            }
+
+            class ResponsibleUsersSection : AbstractSection
+            {
+
+                public override bool Empty { get { return !Contact?.ResponsibleUsers?.Any() ?? true; } }
+
+                public override string Title { get { return Localization.GetString("vat"); } }
+
+                public override void InitializeRows()
+                {
+                    if (Empty) return;
+
+                    Rows.Add(new ResponsibleUsersRow(ContactPreview, Contact));
                 }
             }
 
@@ -722,9 +890,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            /*
             class PhysicalAddressRow : AbstractRow
             {
+
+                readonly WeakReference<PhysicalAddress> weakPhysicalAddress;
+
+                public PhysicalAddressRow(ContactPreview contactPreview, Contact contact, PhysicalAddress physicalAddress)
+                    : base(contactPreview, contact)
+                {
+                    weakPhysicalAddress = new WeakReference<PhysicalAddress>(physicalAddress);
+                }
 
                 public override string Key { get { return "key"; } }
 
@@ -733,15 +908,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var cell = new UITableViewCell(UITableViewCellStyle.Default, "key");
 
                     return cell;
+                }
+
+                public override void Bind(UITableViewCell cell)
+                {
+                    PhysicalAddress pa;
+                    weakPhysicalAddress.TryGetTarget(out pa);
+
+                    cell.TextLabel.Text = pa.Street;
                 }
             }
 
             class LinkedContactRow : AbstractRow
             {
+                
+                readonly WeakReference<ContactPreview> weakLinkedContactPreview;
 
-                public LinkedContactRow(ContactPreview contactPreview, Contact contact)
+                public LinkedContactRow(ContactPreview contactPreview, Contact contact, ContactPreview linkedContactPreview)
                     : base(contactPreview, contact)
                 {
+                    weakLinkedContactPreview = new WeakReference<ContactPreview>(linkedContactPreview);
                 }
 
                 public override string Key { get { return "key"; } }
@@ -751,6 +937,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var cell = new UITableViewCell(UITableViewCellStyle.Default, "key");
 
                     return cell;
+                }
+
+                public override void Bind(UITableViewCell cell)
+                {
+                    ContactPreview cp;
+                    weakLinkedContactPreview.TryGetTarget(out cp);
+
+                    cell.TextLabel.Text = cp.Name;
                 }
             }
 
@@ -770,6 +964,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     return cell;
                 }
+
+                public override void Bind(UITableViewCell cell)
+                {
+                    cell.TextLabel.Text = Contact.BirthDateTimestamp.ToString();
+                }
             }
 
             class AccountRow : AbstractRow
@@ -787,6 +986,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var cell = new UITableViewCell(UITableViewCellStyle.Default, "key");
 
                     return cell;
+                }
+
+                public override void Bind(UITableViewCell cell)
+                {
+                    cell.TextLabel.Text = Contact.Account;
                 }
             }
 
@@ -806,6 +1010,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     return cell;
                 }
+
+                public override void Bind(UITableViewCell cell)
+                {
+                    cell.TextLabel.Text = Contact.Vat;
+                }
             }
 
             class ResponsibleUsersRow : AbstractRow
@@ -824,8 +1033,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     return cell;
                 }
+
+                public override void Bind(UITableViewCell cell)
+                {
+                    cell.TextLabel.Text = string.Join(", ", Contact.ResponsibleUsers.Values.OrderBy(s => s));
+                }
             }
-            */
 
             #endregion
 
