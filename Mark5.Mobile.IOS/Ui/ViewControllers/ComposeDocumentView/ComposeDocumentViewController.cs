@@ -373,6 +373,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             await AskIfShouldUseTemplates();
 
             documentShown = true;
+
+            //In those cases there is no predefined To
+            if (CreationModeFlag == DocumentCreationModeFlag.New || CreationModeFlag == DocumentCreationModeFlag.Forward)
+            {
+                toView.StartEditing();
+            }
         }
 
         bool IsFormValid()
@@ -633,6 +639,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     await subView.UpdateDocument();
                 }
+
+                DocumentPreview.Direction = PreviousDocumentPreview.Direction;
 
                 await SynchOutgoingAttachments(false);
                 await Managers.DocumentsManager.SaveOutgoingDocumentAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,

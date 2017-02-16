@@ -185,7 +185,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public async void DocumentSelected(OutgoingDocumentContainer container)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            if (documentsTableView.Editing)
+            if (documentsTableView.Editing || container.Info.State == OutgoingDocumentState.Sending)
             {
                 return;
             }
