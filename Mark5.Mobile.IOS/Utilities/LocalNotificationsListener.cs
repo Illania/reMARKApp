@@ -24,6 +24,8 @@ namespace Mark5.Mobile.IOS.Utilities
 
         static void OutgoingDocumentsManager_DocumentSendingFailed(object sender, OutgoingDocumentContainer e)
         {
+            //TODO Questions for Bartosz:
+            //Should we open the outgoing document list when the user clicks on the notification or do nothing? I vote for nothing
             var notificatioContent = new UNMutableNotificationContent();
 
             var titleString = Localization.GetString("failed_send_document_notification_title");
