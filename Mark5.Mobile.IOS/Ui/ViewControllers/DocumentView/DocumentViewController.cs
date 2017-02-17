@@ -593,13 +593,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             RefreshNavigationBar();
 
-            flag.Enabled = true;
-            fileTo.Enabled = true;
-            replyActions.Enabled = true;
+            var isLocalDocument = OutgoingDocumentIdentifier != default(Guid);
+
+            flag.Enabled = !isLocalDocument;
+            fileTo.Enabled = !isLocalDocument;
+            replyActions.Enabled = !isLocalDocument;
             comments.BadgeValue = DocumentPreview.CommentsCount.ToString();
-            comments.Enabled = true;
-            commentsButton.Enabled = true;
-            userActions.Enabled = true;
+            comments.Enabled = !isLocalDocument;
+            commentsButton.Enabled = !isLocalDocument;
+            userActions.Enabled = !isLocalDocument;
 
             UIView.Animate(0.075d, stackViewBeforeContent.LayoutIfNeeded);
             UIView.Animate(0.1d, () => stackViewBeforeContent.Alpha = 1.0f);
