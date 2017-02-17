@@ -15,10 +15,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
     public abstract class ComposeDocumentSubView : UIStackView
     {
-        protected float HorizontalMargin = 15.0f;
-        protected float VerticalMargin = 12.0f;
-        protected float InnerMargin = 5.0f;
-
         protected UIView ContainerView;
 
         public DocumentPreview DocumentPreview { get; set; }
@@ -28,6 +24,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
 
         protected float MinimumHeight = 21.0f;
+        protected float HorizontalMargin = 15.0f;
+        protected float VerticalMargin = 12.0f;
+        protected float InnerMargin = 5.0f;
 
         protected ComposeDocumentSubView()
         {

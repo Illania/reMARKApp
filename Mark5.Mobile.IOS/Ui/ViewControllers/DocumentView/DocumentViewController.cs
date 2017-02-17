@@ -17,6 +17,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.ViewControllers.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -218,7 +219,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
                 });
 
@@ -1038,25 +1039,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
         #endregion
-
-    }
-
-    public class ActionableLayoutScrollView : UIScrollView
-    {
-        public Action<UIScrollView> LayoutSubviewsAction
-        {
-            get;
-            set;
-        }
-
-        public override void LayoutSubviews()
-        {
-            base.LayoutSubviews();
-            if (LayoutSubviewsAction != null)
-            {
-                LayoutSubviewsAction(this);
-            }
-        }
     }
 
     class AttachmentInteractionControllerDelegate : UIDocumentInteractionControllerDelegate
