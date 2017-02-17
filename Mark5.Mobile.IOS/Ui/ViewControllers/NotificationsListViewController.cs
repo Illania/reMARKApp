@@ -13,8 +13,10 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.IOS.Model.Messages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -29,6 +31,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UITableView tableView;
 
         bool refreshing;
+
+        TinyMessageSubscriptionToken newNotificationsMessageToken;
 
         public override void LoadView()
         {
@@ -54,14 +58,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"{nameof(NotificationsListViewController)} appeared");
 
+            if (newNotificationsMessageToken != null)
+            {
+                PlatformConfig.MessengerHub.Unsubscribe<NewNotificationsMessage>(newNotificationsMessageToken);
+                newNotificationsMessageToken = null;
+            }
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+            newNotificationsMessageToken = PlatformConfig.MessengerHub.Subscribe<NewNotificationsMessage>(msg => InvokeOnMainThread(async () => await RefreshData()));
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+
             var ds = (DataSource)tableView.Source;
-            if (ds.Empty)
-                await RefreshData();
+            await RefreshData();
         }
 
         public override void ViewWillDisappear(bool animated)
         {
             base.ViewWillDisappear(animated);
+
+            if (newNotificationsMessageToken != null)
+            {
+                PlatformConfig.MessengerHub.Unsubscribe<NewNotificationsMessage>(newNotificationsMessageToken);
+                newNotificationsMessageToken = null;
+            }
 
             DeinitializeHandlers();
         }
@@ -183,9 +201,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             refreshing = false;
         }
 
-        public void NotificationSelected(Notification n)
+        public void NotificationSelected(Notification notification)
         {
-            // TODO
+            // TODO open notification
         }
 
         class DataSource : UITableViewSource, IDisposable
@@ -256,6 +274,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
+                if (tableView.CellAt(indexPath).SelectionStyle == UITableViewCellSelectionStyle.None) return;
+
                 var n = notificationsInView[indexPath.Row];
                 viewController.NotificationSelected(n);
             }

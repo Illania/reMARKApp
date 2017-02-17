@@ -179,6 +179,7 @@
     <Folder Include="Ui\ViewControllers\DocumentView\Subviews\" />
     <Folder Include="Ui\Common\HubMessages\" />
     <Folder Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsView\" />
+    <Folder Include="Model\Messages\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -362,6 +363,8 @@
     <Compile Include="Ui\TableViewCells\DescriptionTableViewCell.designer.cs">
       <DependentUpon>DescriptionTableViewCell.cs</DependentUpon>
     </Compile>
+    <Compile Include="Utilities\NotificationsUtilities.cs" />
+    <Compile Include="Model\Messages\NewNotificationsMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
