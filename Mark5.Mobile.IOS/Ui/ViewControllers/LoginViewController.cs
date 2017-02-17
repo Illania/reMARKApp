@@ -19,6 +19,7 @@ using Mark5.Mobile.IOS.Services;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
+using UserNotifications;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -608,13 +609,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (dismissAction != null) dismissAction();
 
-                UIApplication.SharedApplication.RegisterUserNotificationSettings(UIUserNotificationSettings.GetSettingsForTypes(UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound, null));
-                UIApplication.SharedApplication.RegisterForRemoteNotifications();
+                UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) => { });
 
-                PresentViewController(new SplitMainViewController
-                {
-                    ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
-                }, true, null);
+                UIViewController vc;
+                if (Integration.IsIPad())
+                    vc = new SplitMainViewController
+                    {
+                        ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
+                    };
+                else
+                    vc = new SimpleMainViewController
+                    {
+                        ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
+                    };
+
+                PresentViewController(vc, true, null);
             }
             catch (Exception ex)
             {

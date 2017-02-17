@@ -178,6 +178,7 @@
     <Folder Include="Ui\Common\HubMessages\" />
     <Folder Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsView\" />
     <Folder Include="Ui\ViewControllers\Common\" />
+    <Folder Include="Model\Messages\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -362,6 +363,8 @@
     <Compile Include="Ui\ViewControllers\Common\SeparatorSubView.cs" />
     <Compile Include="Ui\ViewControllers\Common\ActionableLayoutScrollView.cs" />
     <Compile Include="Utilities\LocalNotificationsListener.cs" />
+    <Compile Include="Utilities\NotificationsUtilities.cs" />
+    <Compile Include="Model\Messages\NewNotificationsMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
