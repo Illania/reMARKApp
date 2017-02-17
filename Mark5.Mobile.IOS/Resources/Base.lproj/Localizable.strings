@@ -61,6 +61,8 @@
 "error_removing_local_attachment" = "Error while removing local attachment";
 "error_saving_local_attachment" = "Error while saving local attachment";
 "favorites" = "Favorites";
+"failed_send_document_notification_content" = "One or more messages could not be sent";
+"failed_send_document_notification_title" = "Failed to send messages";
 "filter" = "Filter";
 "folder_empty" = "Folder is empty";
 "folders" = "Folders";
