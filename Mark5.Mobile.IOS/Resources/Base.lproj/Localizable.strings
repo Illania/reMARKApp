@@ -5,6 +5,7 @@
 "back" = "Back";
 "bcc" = "Bcc";
 "birthdate" = "Birthdate";
+"call" = "Call";
 "cancel" = "Cancel";
 "cc" = "Cc";
 "chrome" = "Google Chrome";
@@ -110,6 +111,7 @@
 "skype" = "Skype";
 "system" = "System";
 "telex" = "Telex";
+"text" = "Text";
 "to" = "To";
 "today" = "Today";
 "updating_config___" = "Updating configuration...";

@@ -210,6 +210,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(eas, true, null);
         }
 
+        void CommunicationAddressClicked(UITableView tableView, UITableViewCell cell, CommunicationAddress ca)
+        {
+            if (ca.Type == CommunicationAddressType.Email)
+            {
+                // TODO
+            }
+
+            if (ca.Type == CommunicationAddressType.Phone)
+            {
+                Integration.Call(this, tableView, cell, ca.Address);
+            }
+
+            if (ca.Type == CommunicationAddressType.Mobile)
+            {
+                Integration.CallOrText(this, tableView, cell, ca.Address);
+            }
+        }
+
         public void LinkedContactClicked(ContactPreview contactPreview)
         {
             var vc = new ContactViewController();
@@ -955,12 +973,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     weakCommunicationAddress = new WeakReference<CommunicationAddress>(communicationAddress);
                 }
 
+                public override string Key { get { return base.Key + "_CommunicationAddress"; } }
+
                 public override void Bind(UITableViewCell cell)
                 {
                     CommunicationAddress ca;
                     weakCommunicationAddress.TryGetTarget(out ca);
 
                     cell.TextLabel.Text = ca?.Address;
+                    cell.SelectionStyle = (ca.Type == CommunicationAddressType.Email || ca.Type == CommunicationAddressType.Phone || ca.Type == CommunicationAddressType.Mobile)
+                        ? UITableViewCellSelectionStyle.Default
+                        : UITableViewCellSelectionStyle.None;
+                }
+
+                public override void OnClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                {
+                    CommunicationAddress ca;
+                    if (!weakCommunicationAddress.TryGetTarget(out ca)) return;
+
+                    viewController.CommunicationAddressClicked(tableView, cell, ca);
                 }
             }
 

@@ -98,6 +98,64 @@ namespace Mark5.Mobile.IOS.Utilities
 
         #region Sharing
 
+        public static void Call(UIViewController viewController, UITableView tableView, UITableViewCell cell, string number)
+        {
+            try
+            {
+                var processedNumber = new string(number.Where(c => char.IsDigit(c)).ToArray());
+
+                if (number.Split('|').FirstOrDefault()?.Length > 0)
+                    processedNumber = "+" + processedNumber;
+
+                var callUrl = new NSUrl("tel://" + processedNumber);
+
+                var callChooser = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("call") + " " + processedNumber, UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(callUrl, new NSDictionary(), null)));
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+
+                if (callChooser.PopoverPresentationController != null)
+                    callChooser.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(tableView, cell);
+
+                viewController.PresentViewController(callChooser, true, null);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error(ex);
+
+                Dialogs.ShowErrorDialog(viewController, ex);
+            }
+        }
+
+        public static void CallOrText(UIViewController viewController, UITableView tableView, UITableViewCell cell, string number)
+        {
+            try
+            {
+                var processedNumber = new string(number.Where(c => char.IsDigit(c)).ToArray());
+
+                if (number.Split('|').FirstOrDefault()?.Length > 0)
+                    processedNumber = "+" + processedNumber;
+
+                var callUrl = new NSUrl("tel://" + processedNumber);
+                var textUrl = new NSUrl("sms://" + processedNumber);
+
+                var callChooser = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("call") + " " + processedNumber, UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(callUrl, new NSDictionary(), null)));
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("text") + " " + processedNumber, UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(textUrl, new NSDictionary(), null)));
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+
+                if (callChooser.PopoverPresentationController != null)
+                    callChooser.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(tableView, cell);
+
+                viewController.PresentViewController(callChooser, true, null);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error(ex);
+
+                Dialogs.ShowErrorDialog(viewController, ex);
+            }
+        }
+
         public static void OpenUrl(UIViewController viewController, UITableView tableView, UITableViewCell cell, string url)
         {
             try
