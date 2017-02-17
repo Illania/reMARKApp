@@ -41,6 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         Dictionary<UIView, NSLayoutConstraint[]> constraintsStash;
 
         NSLayoutConstraint newContentHeightConstraint;
+        NSLayoutConstraint newContentWidthConstraint;
 
         NSLayoutConstraint oldContentZeroHeightConstraint;
         NSLayoutConstraint oldContentHeightConstraint;
@@ -103,10 +104,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             newContentWebView.TranslatesAutoresizingMaskIntoConstraints = false;
             newContentWebView.Opaque = false;
 
-            newContentWebView.ScrollView.Delegate = this;
-            newContentWebView.ScrollView.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
+            newContentWebView.ScrollView.ScrollsToTop = false;
+            newContentWebView.ScrollView.Bounces = false;
             newContentWebView.ScrollView.ScrollEnabled = false;
-            newContentObserver = newContentWebView.ScrollView.AddObserver("contentSize", NSKeyValueObservingOptions.New, obj => UpdateWebViewHeight(newContentWebView, newContentHeightConstraint));
+            newContentWebView.ScrollView.UserInteractionEnabled = true;
+            newContentObserver = newContentWebView.ScrollView.AddObserver("contentSize", NSKeyValueObservingOptions.New, obj => UpdateWebViewSize(newContentWebView, newContentHeightConstraint, newContentWidthConstraint));
             var tapRecognizer = new UITapGestureRecognizer(HandleTap);
             tapRecognizer.Delegate = this;
             newContentWebView.ScrollView.AddGestureRecognizer(tapRecognizer);
@@ -117,14 +119,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             };
             newContentWebView.NavigationDelegate = navigationDelegate;
 
-            newContentHeightConstraint = NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, 200);
+            newContentHeightConstraint = NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, 200.0f);
+            newContentWidthConstraint = NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, 1.0f);
+
             ContainerView.AddSubview(newContentWebView);
             AddConstraints(new[]
                 {
                     NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1.0f, VerticalMargin),
                     NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1.0f, HorizontalMargin),
                     NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin),
-                    newContentHeightConstraint
+                    newContentHeightConstraint,
+                    newContentWidthConstraint
                 });
 
             newContentWebView.LoadHtmlString(DefaultEditContent, null);
@@ -174,7 +179,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             oldContentWebView.ScrollView.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
             oldContentWebView.ScrollView.ScrollEnabled = false;
-            oldContentObserver = oldContentWebView.ScrollView.AddObserver("contentSize", NSKeyValueObservingOptions.New, obj => UpdateWebViewHeight(oldContentWebView, oldContentHeightConstraint));
+            oldContentObserver = oldContentWebView.ScrollView.AddObserver("contentSize", NSKeyValueObservingOptions.New, obj => UpdateWebViewSize(oldContentWebView, oldContentHeightConstraint, null));
             ContainerView.AddSubview(oldContentWebView);
 
             oldContentHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, 0.5f);
@@ -543,8 +548,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             if (message.Name == "editableContentFocusedHandler")
             {
-                var scrollView = Superview.Superview as UIScrollView;
-                scrollView.SetContentOffset(new CGPoint(0, centerGestureStartY - scrollView.ContentInset.Top - 30), true);
+                var scrollView = Superview as UIScrollView;
+                scrollView.SetContentOffset(new CGPoint(0, centerGestureStartY - scrollView.ContentInset.Top - 60), true);
                 newContentWebView.ScrollView.SetContentOffset(new CGPoint(0, 0), true);
             }
             else if (message.Name == "editableContentInputHandler")
@@ -553,9 +558,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
         }
 
-        void UpdateWebViewHeight(WKWebView webView, NSLayoutConstraint heightConstraint)
+        void UpdateWebViewSize(WKWebView webView, NSLayoutConstraint heightConstraint, NSLayoutConstraint widthConstraint)
         {
             heightConstraint.Constant = webView.ScrollView.ContentSize.Height;
+            if (widthConstraint != null)
+            {
+                widthConstraint.Constant = webView.ScrollView.ContentSize.Width;
+                CommonConfig.Logger.Info($"H={heightConstraint.Constant}, W={widthConstraint.Constant} ");
+            }
         }
 
         #endregion
