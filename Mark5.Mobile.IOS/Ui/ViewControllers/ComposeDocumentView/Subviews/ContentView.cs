@@ -28,7 +28,7 @@ using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-    public class ContentView : ComposeDocumentSubView, IWKNavigationDelegate, IUIGestureRecognizerDelegate, IWKScriptMessageHandler, IUIScrollViewDelegate
+    public class ContentView : ComposeDocumentSubView, IWKNavigationDelegate, IUIGestureRecognizerDelegate, IWKScriptMessageHandler
     {
         UIButton expandButton;
 
@@ -135,13 +135,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             newContentObserver.Dispose();
             oldContentObserver.Dispose();
             base.Dispose(disposing);
-        }
-
-        [Export("viewForZoomingInScrollView:")]
-        public UIView ViewForZoomingInScrollView(UIScrollView scrollView) //TODO need to disable zooming also for the old one (if we do the same the other one doesn't zoom out at the beginning)
-        //Note that this could happen also with this, so we need a different way
-        {
-            return null; //To disable zooming in the new content web view
         }
 
         void InitializePreviousContentControls()
