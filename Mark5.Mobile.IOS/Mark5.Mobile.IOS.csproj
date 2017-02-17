@@ -361,6 +361,7 @@
     <Compile Include="Ui\ViewControllers\OutgoingDocumentListViewController.cs" />
     <Compile Include="Ui\ViewControllers\Common\SeparatorSubView.cs" />
     <Compile Include="Ui\ViewControllers\Common\ActionableLayoutScrollView.cs" />
+    <Compile Include="Utilities\LocalNotificationsListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
