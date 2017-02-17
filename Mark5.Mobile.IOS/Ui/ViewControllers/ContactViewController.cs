@@ -228,6 +228,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
+        void PhysicalAddressClicked(UITableView tableView, UITableViewCell cell, PhysicalAddress pa) => Integration.ShowOnMap(this, tableView, cell, pa);
+
         public void LinkedContactClicked(ContactPreview contactPreview)
         {
             var vc = new ContactViewController();
@@ -236,10 +238,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationController.PushViewController(vc, true);
         }
 
-        public void WebPageClicked(UITableView tableView, UITableViewCell cell, string webPageAddress)
-        {
-            Integration.OpenUrl(this, tableView, cell, webPageAddress);
-        }
+        public void WebPageClicked(UITableView tableView, UITableViewCell cell, string webPageAddress) => Integration.OpenUrl(this, tableView, cell, webPageAddress);
 
         public void SetData(int folderId, int contactId)
         {
@@ -1006,12 +1005,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     weakPhysicalAddress = new WeakReference<PhysicalAddress>(physicalAddress);
                 }
 
+                public override string Key { get { return base.Key + "_PhysicalAddress"; } }
+
+                public override UITableViewCell CreateCell()
+                {
+                    var cell = base.CreateCell();
+                    cell.SelectionStyle = UITableViewCellSelectionStyle.Default;
+                    return cell;
+                }
+
                 public override void Bind(UITableViewCell cell)
                 {
                     PhysicalAddress pa;
                     weakPhysicalAddress.TryGetTarget(out pa);
 
                     cell.TextLabel.Text = pa.Street;
+                }
+
+                public override void OnClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                {
+                    PhysicalAddress pa;
+                    if (!weakPhysicalAddress.TryGetTarget(out pa)) return;
+
+                    viewController.PhysicalAddressClicked(tableView, cell, pa);
                 }
             }
 

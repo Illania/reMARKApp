@@ -88,6 +88,8 @@
 "no_object_links" = "There are no links";
 "notifications" = "Notifications";
 "ok" = "OK";
+"open_in_apple_maps" = "Open in Apple Maps";
+"open_in_google_maps" = "Open in Google Maps";
 "own_worktray" = "My worktray";
 "password" = "Password";
 "persons" = "Persons";

@@ -7,9 +7,11 @@
 //
 using System;
 using System.Linq;
+using System.Text;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using PCLStorage;
 using UIKit;
@@ -109,8 +111,8 @@ namespace Mark5.Mobile.IOS.Utilities
 
                 var callUrl = new NSUrl("tel://" + processedNumber);
 
-                var callChooser = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
-                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("call") + " " + processedNumber, UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(callUrl, new NSDictionary(), null)));
+                var callChooser = UIAlertController.Create(null, processedNumber, UIAlertControllerStyle.ActionSheet);
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("call"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(callUrl, new NSDictionary(), null)));
                 callChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
                 if (callChooser.PopoverPresentationController != null)
@@ -138,15 +140,71 @@ namespace Mark5.Mobile.IOS.Utilities
                 var callUrl = new NSUrl("tel://" + processedNumber);
                 var textUrl = new NSUrl("sms://" + processedNumber);
 
-                var callChooser = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
-                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("call") + " " + processedNumber, UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(callUrl, new NSDictionary(), null)));
-                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("text") + " " + processedNumber, UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(textUrl, new NSDictionary(), null)));
+                var callChooser = UIAlertController.Create(null, processedNumber, UIAlertControllerStyle.ActionSheet);
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("call"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(callUrl, new NSDictionary(), null)));
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("text"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(textUrl, new NSDictionary(), null)));
                 callChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
                 if (callChooser.PopoverPresentationController != null)
                     callChooser.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(tableView, cell);
 
                 viewController.PresentViewController(callChooser, true, null);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error(ex);
+
+                Dialogs.ShowErrorDialog(viewController, ex);
+            }
+        }
+
+        public static void ShowOnMap(UIViewController viewController, UITableView tableView, UITableViewCell cell, PhysicalAddress physicalAddress)
+        {
+            try
+            {
+                var qb = new StringBuilder();
+                if (!string.IsNullOrEmpty(physicalAddress.Street))
+                {
+                    qb.Append(physicalAddress.Street).Append(", ");
+                }
+                if (!string.IsNullOrEmpty(physicalAddress.ZipCode))
+                {
+                    qb.Append(physicalAddress.ZipCode);
+                    if (string.IsNullOrEmpty(physicalAddress.City))
+                    {
+                        qb.Append(", ");
+                    }
+                }
+                if (!string.IsNullOrEmpty(physicalAddress.City))
+                {
+                    qb.Append(" ").Append(physicalAddress.City).Append(", ");
+                }
+                if (!string.IsNullOrEmpty(physicalAddress.Country?.Name))
+                {
+                    qb.Append(physicalAddress.Country.Name);
+                }
+
+                var address = Uri.EscapeUriString(qb.ToString());
+
+                var appleMapsUrl = new NSUrl($"http://maps.apple.com/maps?q={address}");
+                var googleMapsUrl = new NSUrl($"comgooglemapsurl://maps.google.com/?q={address}");
+
+                if (UIApplication.SharedApplication.CanOpenUrl(googleMapsUrl))
+                {
+                    var browserChooser = UIAlertController.Create(null, qb.ToString(), UIAlertControllerStyle.ActionSheet);
+                    browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("open_in_apple_maps"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(appleMapsUrl, new NSDictionary(), null)));
+                    browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("open_in_google_maps"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(googleMapsUrl, new NSDictionary(), null)));
+                    browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+
+                    if (browserChooser.PopoverPresentationController != null)
+                        browserChooser.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(tableView, cell);
+
+                    viewController.PresentViewController(browserChooser, true, null);
+                }
+                else
+                {
+                    UIApplication.SharedApplication.OpenUrl(appleMapsUrl, new NSDictionary(), null);
+                }
             }
             catch (Exception ex)
             {

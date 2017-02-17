@@ -57,6 +57,7 @@
 		<string>http</string>
 		<string>https</string>
 		<string>googlechrome</string>
+		<string>comgooglemapsurl</string>
 	</array>
 </dict>
 </plist>
