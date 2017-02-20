@@ -365,6 +365,7 @@
     <Compile Include="Utilities\LocalNotificationsListener.cs" />
     <Compile Include="Utilities\NotificationsUtilities.cs" />
     <Compile Include="Model\Messages\NewNotificationsMessage.cs" />
+    <Compile Include="Ui\ViewControllers\CommentsListViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

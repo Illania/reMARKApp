@@ -1,4 +1,5 @@
 "actions" = "Actions";
+"add" = "Add";
 "add_to_favorites" = "Add to\nfavorites";
 "attachments" = "Attachments";
 "attachment_too_big" = "The attachment is bigger than the maximum allowed size on the server";
@@ -17,6 +18,7 @@
 "clear_shortcodes_cache_title" = "Clear shortcodes cache";
 "clearing_contacts_cache___" = "Clearing cache...";
 "clearing_shortcodes_cache___" = "Clearing cache...";
+"comments" = "Comments";
 "confirm_copy_to_folder_contacts" = "Do you want to copy selected contacts?";
 "confirm_copy_to_folder_documents" = "Do you want to copy selected documents?";
 "confirm_copy_to_folder_shortcodes" = "Do you want to copy selected shortcodes?";
