@@ -89,6 +89,7 @@
 "mark_as_unread" = "Mark as unread";
 "marking_document_as_read___" = "Marking document as read...";
 "marking_document_as_unread___" = "Marking document as unread...";
+"me" = "Me";
 "more" = "More";
 "move_to_folder" = "Move to folder";
 "moving___" = "Moving...";
@@ -106,6 +107,7 @@
 "no_templates_title" = "No templates";
 "no" = "No";
 "normal" = "Normal";
+"no_comments" = "No comments present";
 "no_matching_shortcodes" = "There are no matching shortcodes";
 "no_matching_users" = "There are no matching users";
 "no_notifications" = "There are no notifications";

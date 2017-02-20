@@ -8,10 +8,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
@@ -29,9 +31,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UITextView commentContent;
         NSLayoutConstraint commentEditViewBottomConstraint;
         NSLayoutConstraint commentContentMaximumHeightConstraint;
-        UIRefreshControl refreshControl;
 
-        public Document Document { get; set; }
+        public BusinessEntity Entity { get; set; }
 
         public CommentsListViewController()
         {
@@ -46,6 +47,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeNavigationBar();
             InitializeListView();
+            InitializeEditView();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -92,7 +94,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             AutomaticallyAdjustsScrollViewInsets = true;
 
             commentsTableView = new UITableView();
-            commentsTableView.Source = new DataSource(commentsTableView);
+            commentsTableView.Source = new DataSource(commentsTableView, Localization.GetString("no_comments"));
             commentsTableView.TranslatesAutoresizingMaskIntoConstraints = false;
             commentsTableView.Bounces = true;
             commentsTableView.CellLayoutMarginsFollowReadableWidth = false;
@@ -106,11 +108,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(commentsTableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(commentsTableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
                 });
-
-            refreshControl = new UIRefreshControl();
-            refreshControl.BackgroundColor = UIColor.White;
-            refreshControl.AttributedTitle = Localization.GetNSAttributedString("pull_to_refresh");
-            commentsTableView.AddSubview(refreshControl);
         }
 
         void InitializeEditView()
@@ -179,15 +176,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(commentContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Bottom, 1.0f, -CommentEditViewInnerMargin),
                     commentContentMaximumHeightConstraint,
                 });
+
+
+            View.AddGestureRecognizer(new UITapGestureRecognizer(() => commentContent.EndEditing(true)));
         }
 
         void InitializeHandlers()
         {
             if (doneButtonItem != null)
                 doneButtonItem.Clicked += DoneButtonItem_Clicked;
-
-            if (refreshControl != null)
-                refreshControl.ValueChanged -= RefreshControl_ValueChanged;
 
             if (addComment != null)
                 addComment.TouchUpInside += AddComment_TouchUpInside;
@@ -208,6 +205,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void RefreshView()
         {
+            if (Entity == null)
+            {
+                return;
+            }
+
+            List<Comment> comments;
+
+            switch (Entity.ObjectType)
+            {
+                case ObjectType.Document:
+                    comments = (Entity as Document).Comments;
+                    break;
+                case ObjectType.Contact:
+                    comments = (Entity as Contact).Comments;
+                    break;
+                default:
+                    throw new ArgumentException("The input business entity does not have comments defined in the model");
+            }
+
+            var ds = (commentsTableView.Source as DataSource);
+            ds.RefreshData(comments);
         }
 
         #endregion
@@ -216,12 +234,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DoneButtonItem_Clicked(object sender, EventArgs e)
         {
-
-        }
-
-        void RefreshControl_ValueChanged(object sender, EventArgs e)
-        {
-
+            DismissViewController(true, null); //TODO need to add check if a comment has not been sent
         }
 
         void AddComment_TouchUpInside(object sender, EventArgs e)
@@ -231,7 +244,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CommentContent_Changed(object sender, EventArgs e)
         {
-
+            UpdateCommentContentHeight();
+            UpdateAddCommentEnabled();
         }
 
         #endregion
@@ -280,6 +294,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Utilities
 
+        void UpdateAddCommentEnabled()
+        {
+            addComment.Enabled = !string.IsNullOrEmpty(commentContent.Text);
+        }
+
         void UpdateCommentContentHeight()
         {
             if (NavigationController != null)
@@ -308,8 +327,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable
         {
+            const float CellHeight = 58.0f;
+            const float TextViewHeight = 27.0f;
+
             UITableView tableView;
-            List<Comment> comments;
+            List<Comment> commentsInView = new List<Comment>();
+
+            readonly string emptyText;
 
             public bool Empty
             {
@@ -323,23 +347,58 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 get
                 {
-                    return comments;
+                    return commentsInView;
                 }
             }
 
-            public DataSource(UITableView tableView)
+            public DataSource(UITableView tableView, string emptyText)
             {
                 this.tableView = tableView;
+                this.emptyText = emptyText;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
-                throw new NotImplementedException();
+                if (Empty)
+                {
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                    emptyCell.Initialize(emptyText);
+                    return emptyCell;
+                }
+
+                var cell = tableView.DequeueReusableCell(CommentsTableViewCell.Key) as CommentsTableViewCell ?? CommentsTableViewCell.Create();
+                cell.Initialize(commentsInView[indexPath.Row]);
+                return cell;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                throw new NotImplementedException();
+                return Empty ? 1 : commentsInView.Count;
+            }
+
+            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (Empty)
+                {
+                    return CellHeight;
+                }
+
+                var tempView = new UITextView();
+                tempView.Text = commentsInView[indexPath.Row].Content;
+                var textHeight = tempView.SizeThatFits(new CGSize(tableView.Frame.Width, float.MaxValue)).Height;
+
+                return CellHeight - TextViewHeight + textHeight;
+            }
+
+            public void RefreshData(List<Comment> newComments)
+            {
+                if (newComments == null)
+                {
+                    return;
+                }
+
+                commentsInView.AddRange(newComments);
+                tableView.ReloadData();
             }
 
             protected override void Dispose(bool disposing)

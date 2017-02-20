@@ -991,7 +991,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CommentsButton_TouchUpInside(object sender, EventArgs e)
         {
-            //TODO
+            var commentsListViewController = new CommentsListViewController();
+            var commentsListViewNavigationController = new UINavigationController(commentsListViewController);
+            commentsListViewNavigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+            commentsListViewController.Entity = Document;
+
+            //TODO handle changing of comments
+
+            PresentViewController(commentsListViewNavigationController, true, null);
         }
 
         void DoFileToWorktray()
