@@ -11,6 +11,7 @@ using System.Linq;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -237,9 +238,48 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DismissViewController(true, null); //TODO need to add check if a comment has not been sent
         }
 
-        void AddComment_TouchUpInside(object sender, EventArgs e)
+        async void AddComment_TouchUpInside(object sender, EventArgs e)
         {
+            commentContent.EndEditing(true);
 
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("add_comment___"));
+            var newCommentContent = commentContent.Text;
+
+            try
+            {
+                Comment newComment;
+
+                switch (Entity.ObjectType)
+                {
+                    case ObjectType.Document:
+                        var document = Entity as Document;
+                        newComment = await Managers.DocumentsManager.AddComment(document, newCommentContent);
+                        //PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count)); //TODO
+                        break;
+                    case ObjectType.Contact:
+                        var contact = Entity as Contact;
+                        newComment = await Managers.ContactsManager.AddComment(contact, newCommentContent);
+                        break;
+                    default:
+                        throw new ArgumentException("The input business entity does not have comments defined in the model");
+                }
+
+                var ds = commentsTableView.Source as DataSource;
+                ds.AddComment(newComment);
+                commentsTableView.ScrollToRow(NSIndexPath.FromRowSection(ds.Items.Count - 1, 0), UITableViewScrollPosition.Middle, true);
+                commentContent.Text = string.Empty;
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to add comment attachment [entity.Id={Entity?.Id}, commentContent={newCommentContent}] ", ex);
+
+                dismissAction();
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+            finally
+            {
+                dismissAction();
+            }
         }
 
         void CommentContent_Changed(object sender, EventArgs e)
@@ -399,6 +439,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 commentsInView.AddRange(newComments);
                 tableView.ReloadData();
+            }
+
+            public void AddComment(Comment newComment)
+            {
+                if (newComment == null)
+                {
+                    return;
+                }
+
+                commentsInView.Add(newComment);
+                tableView.InsertRows(new NSIndexPath[] { NSIndexPath.FromRowSection(commentsInView.Count - 1, 0) }, UITableViewRowAnimation.Automatic);
             }
 
             protected override void Dispose(bool disposing)
