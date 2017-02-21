@@ -38,10 +38,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         bool refreshDataOnAppear;
 
-        UIBarButtonItem composeButton;
         UITableView tableView;
         UIToolbar toolbar;
+        UIBarButtonItem assignCategoryButton;
         UIBarButtonItem fileToButton;
+        UIBarButtonItem actionsLinksButton;
 
         CancellationTokenSource cts;
 
@@ -49,7 +50,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.LoadView();
 
-            InitializeNavigationBar();
             InitializeView();
             InitializeHandlers();
         }
@@ -104,14 +104,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
         }
 
-        void InitializeNavigationBar()
-        {
-            composeButton = new UIBarButtonItem();
-            composeButton.Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"));
-            composeButton.Enabled = false;
-            NavigationItem.SetRightBarButtonItem(composeButton, false);
-        }
-
         void InitializeView()
         {
             AutomaticallyAdjustsScrollViewInsets = false;
@@ -134,17 +126,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
                 });
 
+            assignCategoryButton = new UIBarButtonItem();
+            assignCategoryButton.Image = UIImage.FromBundle(Path.Combine("icons", "flag.png"));
+            assignCategoryButton.Enabled = false;
+
             fileToButton = new UIBarButtonItem();
             fileToButton.Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png"));
             fileToButton.Enabled = false;
+
+            actionsLinksButton = new UIBarButtonItem();
+            actionsLinksButton.Image = UIImage.FromBundle(Path.Combine("icons", "actions.png"));
+            actionsLinksButton.Enabled = false;
 
             toolbar = new UIToolbar();
             toolbar.BarStyle = UIBarStyle.Default;
             toolbar.Items = new[]
             {
+                assignCategoryButton,
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 fileToButton,
-                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace)
+                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                actionsLinksButton,
             };
             toolbar.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(toolbar);
@@ -164,14 +166,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeHandlers()
         {
+            if (assignCategoryButton != null)
+                assignCategoryButton.Clicked += AssignCategoryButton_Clicked;
+
             if (fileToButton != null)
                 fileToButton.Clicked += FileToButton_Clicked;
+
+            if (actionsLinksButton != null)
+                actionsLinksButton.Clicked += ActionsLinksButton_Clicked;
         }
 
         void DeinitializeHandlers()
         {
+            if (assignCategoryButton != null)
+                assignCategoryButton.Clicked -= AssignCategoryButton_Clicked;
+
             if (fileToButton != null)
                 fileToButton.Clicked -= FileToButton_Clicked;
+
+            if (actionsLinksButton != null)
+                actionsLinksButton.Clicked -= ActionsLinksButton_Clicked;
         }
 
         void RowLongPressed(UILongPressGestureRecognizer gr)
@@ -185,6 +199,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var row = dataSource?.RowAt(indexPath);
             if (cell != null && row != null)
                 row.OnLongClicked(this, tableView, cell, indexPath);
+        }
+
+        void AssignCategoryButton_Clicked(object sender, EventArgs e)
+        {
+            // TODO
         }
 
         void FileToButton_Clicked(object sender, EventArgs e)
@@ -222,6 +241,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
             PresentViewController(eas, true, null);
+        }
+
+        void ActionsLinksButton_Clicked(object sender, EventArgs e)
+        {
+            // TODO
         }
 
         void CommunicationAddressClicked(UITableView tableView, UITableViewCell cell, CommunicationAddress ca)
@@ -328,8 +352,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 InitializeNavigationBarTitle();
 
+                if (assignCategoryButton != null)
+                    assignCategoryButton.Enabled = true;
+
                 if (fileToButton != null)
                     fileToButton.Enabled = true;
+
+                if (actionsLinksButton != null)
+                    actionsLinksButton.Enabled = true;
 
                 ds.EndRefresh(this.contactPreview, contact);
             }
@@ -365,11 +395,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeNavigationBarTitle();
 
-            if (composeButton != null)
-                composeButton.Enabled = false;
+            if (assignCategoryButton != null)
+                assignCategoryButton.Enabled = false;
 
             if (fileToButton != null)
                 fileToButton.Enabled = false;
+
+            if (actionsLinksButton != null)
+                actionsLinksButton.Enabled = false;
 
             var ds = tableView?.Source as DataSource;
             ds?.Clear();
