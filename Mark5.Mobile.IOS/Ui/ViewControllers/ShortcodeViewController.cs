@@ -23,7 +23,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    
+
     public class ShortcodeViewController : AbstractViewController, ISecondaryViewController
     {
 
@@ -66,9 +66,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewDidAppear(animated);
 
             CommonConfig.Logger.Info($"{nameof(ShortcodeViewController)} appeared");
-
-            if (tableView?.IndexPathForSelectedRow != null)
-                tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
 
             if (refreshDataOnAppear)
             {
@@ -239,7 +236,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             folder = null;
             shortcodePreview = null;
             shortcode = null;
-            
+
             this.folderId = folderId;
             this.shortcodeId = shortcodeId;
         }
@@ -349,7 +346,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void ClearData()
         {
             cts?.Cancel();
-            
+
             folderId = null;
             folder = null;
             shortcodeId = null;
@@ -529,6 +526,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (documentAddress == null) return;
 
                 viewController.DocumentAddressClicked(documentAddress);
+
+                if (tableView?.IndexPathForSelectedRow != null)
+                    tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
             }
 
             public void StartRefresh()

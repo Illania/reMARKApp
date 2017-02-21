@@ -67,9 +67,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"{nameof(ContactViewController)} appeared");
 
-            if (tableView?.IndexPathForSelectedRow != null)
-                tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
-
             if (refreshDataOnAppear)
             {
                 refreshDataOnAppear = false;
@@ -445,6 +442,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (cell.SelectionStyle == UITableViewCellSelectionStyle.None) return;
 
                 sections[indexPath.Section].Rows[indexPath.Row].OnClicked(viewController, tableView, cell, indexPath);
+
+                if (tableView?.IndexPathForSelectedRow != null)
+                    tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
             }
 
             public void StartRefresh()
