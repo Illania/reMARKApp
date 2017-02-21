@@ -20,6 +20,7 @@
 "clearing_contacts_cache___" = "Clearing cache...";
 "clearing_shortcodes_cache___" = "Clearing cache...";
 "comments" = "Comments";
+"confirm" = "Confirm";
 "confirm_copy_to_folder_contacts" = "Do you want to copy selected contacts?";
 "confirm_copy_to_folder_documents" = "Do you want to copy selected documents?";
 "confirm_copy_to_folder_shortcodes" = "Do you want to copy selected shortcodes?";
@@ -50,7 +51,8 @@
 "done" = "Done";
 "downloading_attachment___" = "Downloading attachment...";
 "edit" = "Edit";
-"edit_not_possible" = "Comments can be edited maximum 1 minute after creation";
+"edit_message" = "Edit message";
+"edit_not_possible" = "Comments can be edited maximum one minute after creation";
 "editing_comment___" = "Editing comment...";
 "enable_caching" = "Enable\ncaching";
 "enable_notifications" = "Notify";

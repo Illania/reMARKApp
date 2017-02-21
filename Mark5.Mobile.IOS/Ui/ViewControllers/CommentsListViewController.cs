@@ -26,6 +26,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     {
         const int CommentContentMaximumLinesNumber = 5;
         const float CommentEditViewInnerMargin = 7.0f;
+        const int SecondsToEdit = 60;
 
         UIBarButtonItem doneButtonItem;
         UITableView commentsTableView;
@@ -116,7 +117,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitializeEditView()
         {
             commentEditView = new UIView();
-            commentEditView.BackgroundColor = UIColor.FromRGB(248.0f / 255.0f, 248.0f / 255.0f, 248.0f / 255.0f); //TODO should we take it from official color?
+            commentEditView.BackgroundColor = UIColor.FromRGB(248.0f / 255.0f, 248.0f / 255.0f, 248.0f / 255.0f);
             commentEditView.TranslatesAutoresizingMaskIntoConstraints = false;
             commentEditView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             commentEditViewBottomConstraint = NSLayoutConstraint.Create(commentEditView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f);
@@ -194,12 +195,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (commentContent != null)
                 commentContent.Changed += CommentContent_Changed;
-
         }
 
         void DeInitializeHandlers()
         {
-            //TODO
+            if (doneButtonItem != null)
+                doneButtonItem.Clicked -= DoneButtonItem_Clicked;
+
+            if (addComment != null)
+                addComment.TouchUpInside -= AddComment_TouchUpInside;
+
+            if (commentContent != null)
+                commentContent.Changed -= CommentContent_Changed;
         }
 
         #endregion
@@ -237,7 +244,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DoneButtonItem_Clicked(object sender, EventArgs e)
         {
-            DismissViewController(true, null); //TODO need to add check if a comment has not been sent
+            DismissViewController(true, null);
         }
 
         async void AddComment_TouchUpInside(object sender, EventArgs e)
@@ -256,7 +263,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     case ObjectType.Document:
                         var document = Entity as Document;
                         newComment = await Managers.DocumentsManager.AddComment(document, newCommentContent);
-                        //PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count)); //TODO
                         break;
                     case ObjectType.Contact:
                         var contact = Entity as Contact;
@@ -296,6 +302,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DeleteComment(Comment comment)
         {
+            commentsTableView.Editing = false;
+
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting_comment___"));
 
             Task.Run(async () =>
@@ -305,7 +313,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                      case ObjectType.Document:
                          var document = Entity as Document;
                          await Managers.DocumentsManager.DeleteComment(document, comment);
-                         //PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count)); //TODO
                          break;
                      case ObjectType.Contact:
                          var contact = Entity as Contact;
@@ -331,52 +338,79 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
              }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        void EditCommment(Comment comment)
+        void StartEditComment(Comment comment)
         {
-            var isEditable = DateTime.Now.ToUniversalTime().Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= 10; //TODO for testing
+            commentsTableView.Editing = false;
+
+            var isEditable = DateTime.Now.ToUniversalTime().Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= SecondsToEdit;
 
             if (!isEditable)
             {
-                Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("error"), Localization.GetString("edit_not_possible")); //TODO on mark5 if you start editing before 60 seconds, you can finish editing also after
+                Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("error"), Localization.GetString("edit_not_possible"));
                 return;
             }
 
+            var alert = UIAlertController.Create(Localization.GetString("edit_message"), string.Empty, UIAlertControllerStyle.Alert);
+            var cancelAction = UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null);
+            var confirmAction = UIAlertAction.Create(Localization.GetString("confirm"), UIAlertActionStyle.Default, obj => FinalizeEditComment(comment, alert.TextFields[0].Text));
+            alert.AddAction(cancelAction);
+            alert.AddAction(confirmAction);
+            alert.AddTextField(tf =>
+            {
+                tf.Text = comment.Content;
+            });
 
-            //var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("editing_comment___"));
-            //var newComment = comment.ShallowCopy();
-            //newComment.Content = newContent;
+            PresentViewController(alert, true, null);
+        }
 
-            //Task.Run(async () =>
-            // {
-            //     switch (Entity.ObjectType)
-            //     {
-            //         case ObjectType.Document:
-            //             var document = Entity as Document;
-            //             await Managers.DocumentsManager.EditComment(document, newComment);
-            //             PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
-            //             break;
-            //         case ObjectType.Contact:
-            //             var contact = Entity as Contact;
-            //             await Managers.ContactsManager.EditComment(contact, newComment);
-            //             break;
-            //         default:
-            //             throw new ArgumentException("The input business entity does not have comments defined in the model");
-            //     }
-            // }).ContinueWith(async t =>
-            // {
-            //     dismissAction();
+        void FinalizeEditComment(Comment oldComment, string newContent)
+        {
+            if (oldComment == null || newContent == null)
+            {
+                return;
+            }
 
-            //     if (t.IsFaulted)
-            //     {
-            //         CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
-            //         await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
-            //     }
-            //     else
-            //     {
-            //         adapter.EditItem(newComment);
-            //     }
-            // }, TaskScheduler.FromCurrentSynchronizationContext());
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("editing_comment___"));
+            var newComment = oldComment.ShallowCopy();
+            newComment.Content = newContent;
 
+            Task.Run(async () =>
+             {
+                 bool result;
+
+                 switch (Entity.ObjectType)
+                 {
+                     case ObjectType.Document:
+                         var document = Entity as Document;
+                         result = await Managers.DocumentsManager.EditComment(document, newComment);
+                         break;
+                     case ObjectType.Contact:
+                         var contact = Entity as Contact;
+                         result = await Managers.ContactsManager.EditComment(contact, newComment);
+                         break;
+                     default:
+                         throw new ArgumentException("The input business entity does not have comments defined in the model");
+                 }
+
+                 return result;
+             }).ContinueWith(async t =>
+             {
+                 dismissAction();
+
+                 if (t.IsFaulted)
+                 {
+                     CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={oldComment.Id}, comment.Content={oldComment.Content}] ", t.Exception.InnerException);
+                     await Dialogs.ShowErrorDialogAsync(this, t.Exception.InnerException);
+                 }
+                 else if (t.Result)
+                 {
+                     (commentsTableView.Source as DataSource).EditComment(newComment);
+                 }
+                 else
+                 {
+                     await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("error"), Localization.GetString("edit_not_possible"));
+                 }
+             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         #endregion
@@ -534,11 +568,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     deleteAction.BackgroundColor = Theme.Blue;
                     actions.Add(deleteAction);
 
-                    var isEditable = DateTime.Now.ToUniversalTime().Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= 10; //TODO for testing
+                    var isEditable = DateTime.Now.ToUniversalTime().Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= SecondsToEdit;
 
                     if (isEditable)
                     {
-                        var editAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive, Localization.GetString("edit"), (a, ip) => viewController.EditCommment(comment));
+                        var editAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive, Localization.GetString("edit"), (a, ip) => viewController.StartEditComment(comment));
                         editAction.BackgroundColor = Theme.DarkBlue;
                         actions.Add(editAction);
                     }
@@ -609,7 +643,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             protected override void Dispose(bool disposing)
             {
-                base.Dispose(disposing); //TODO finish
+                base.Dispose(disposing);
+
+                tableView = null;
+                commentsInView = null;
             }
 
         }
