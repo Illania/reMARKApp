@@ -40,6 +40,18 @@ namespace Mark5.ServiceReference.AppService
             SendTimeout = new TimeSpan(0, 15, 0)
         };
 
+        readonly Binding shortTimeoutsBinding = new BasicHttpBinding
+        {
+            Name = "AppService.v3",
+            Namespace = "com.nordic-it.appservice.v3",
+            MaxBufferSize = 16 * 1024 * 1024,
+            MaxReceivedMessageSize = 16 * 1024 * 1024,
+            OpenTimeout = new TimeSpan(0, 2, 0),
+            ReceiveTimeout = new TimeSpan(0, 2, 0),
+            CloseTimeout = new TimeSpan(0, 2, 0),
+            SendTimeout = new TimeSpan(0, 2, 0)
+        };
+
         readonly EndpointAddress endpoint;
 
         public AppServiceProxy(bool ssl, string hostname, int port)
@@ -475,7 +487,7 @@ namespace Mark5.ServiceReference.AppService
 
         public async Task<TestResult> TestAsync(TestParameters parameters, CancellationToken ct = default(CancellationToken))
         {
-            var c = GetClient();
+            var c = GetClient(true);
             var result = await InvokeAsync(c, c.BeginTest, c.EndTest, parameters, ct);
             c = null;
             return result;
@@ -485,9 +497,9 @@ namespace Mark5.ServiceReference.AppService
 
         #region Helpers
 
-        AppServiceClient GetClient()
+        AppServiceClient GetClient(bool shortTimeouts = false)
         {
-            return new AppServiceClient(binding, endpoint);
+            return new AppServiceClient(shortTimeouts ? shortTimeoutsBinding : binding, endpoint);
         }
 
         async Task<TResult> InvokeAsync<TResult, TParameter>(AppServiceClient client, Func<TParameter, AsyncCallback, object, IAsyncResult> beginMethod,
