@@ -45,6 +45,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             cell.CommentContentLabel.TextContainer.LineFragmentPadding = 0.0f;
             cell.CommentContentLabel.TextContainerInset = UIEdgeInsets.Zero;
+            cell.CommentContentLabel.ScrollEnabled = false;
 
             cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 

@@ -98,6 +98,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             AutomaticallyAdjustsScrollViewInsets = true;
 
             commentsTableView = new UITableView();
+            commentsTableView.EstimatedRowHeight = 60;
+            commentsTableView.RowHeight = UITableView.AutomaticDimension;
             commentsTableView.Source = new DataSource(this, commentsTableView, Localization.GetString("no_comments"));
             commentsTableView.TranslatesAutoresizingMaskIntoConstraints = false;
             commentsTableView.Bounces = true;
@@ -524,6 +526,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 this.emptyText = emptyText;
             }
 
+            #region Overrides
+
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 if (Empty)
@@ -541,20 +545,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override nint RowsInSection(UITableView tableview, nint section)
             {
                 return Empty ? 1 : commentsInView.Count;
-            }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                if (Empty)
-                {
-                    return CellHeight;
-                }
-
-                var tempView = new UITextView();
-                tempView.Text = commentsInView[indexPath.Row].Content;
-                var textHeight = tempView.SizeThatFits(new CGSize(tableView.Frame.Width, float.MaxValue)).Height;
-
-                return CellHeight - TextViewHeight + textHeight;
             }
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
@@ -580,6 +570,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 return actions.ToArray();
             }
+
+            #endregion
 
             public void RefreshData(List<Comment> newComments)
             {
@@ -648,8 +640,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 tableView = null;
                 commentsInView = null;
             }
-
         }
-
     }
 }
