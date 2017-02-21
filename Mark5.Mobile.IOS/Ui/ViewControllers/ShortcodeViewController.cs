@@ -18,6 +18,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -65,6 +66,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewDidAppear(animated);
 
             CommonConfig.Logger.Info($"{nameof(ShortcodeViewController)} appeared");
+
+            if (tableView?.IndexPathForSelectedRow != null)
+                tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
 
             if (refreshDataOnAppear)
             {
@@ -123,6 +127,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.EstimatedRowHeight = 60f;
             tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
             tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+            tableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed) { MinimumPressDuration = 1f });
             View.AddSubview(tableView);
             View.AddConstraints(new[]
                 {
@@ -172,10 +177,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 fileToButton.Clicked -= FileToButton_Clicked;
         }
 
-        public void ActionClicked(DocumentAddress documentAddress)
+        void RowLongPressed(UILongPressGestureRecognizer gr)
+        {
+            if (gr.State != UIGestureRecognizerState.Began) return;
+
+            var location = gr.LocationInView(tableView);
+            var indexPath = tableView?.IndexPathForRowAtPoint(location);
+            var cell = tableView?.CellAt(indexPath);
+            var dataSource = tableView?.Source as DataSource;
+            var da = dataSource?.DocumentAddessAtRow(indexPath);
+            if (cell != null && da != null)
+                CopyToClipboard(tableView, cell, da.Address);
+        }
+
+        public void DocumentAddressClicked(DocumentAddress documentAddress)
         {
             // TODO
         }
+
+        public void CopyToClipboard(UITableView tableView, UITableViewCell cell, string text) => Integration.CopyToClipboard(this, tableView, cell, text);
 
         void FileToButton_Clicked(object sender, EventArgs e)
         {
@@ -269,19 +289,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (folderId != null && shortcodeId != null)
                 {
                     var swp = await Managers.ShortcodesManager.GetShortcodeWithPreviewAsync(folderId.Value, shortcodeId.Value);
-                    this.shortcodePreview = swp.ShortcodePreview;
-                    this.shortcode = swp.Shortcode;
+                    shortcodePreview = swp.ShortcodePreview;
+                    shortcode = swp.Shortcode;
                 }
 
                 if (folder != null && shortcodePreview != null)
                 {
-                    this.shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(folder, shortcodePreview.Id);
+                    shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(folder, shortcodePreview.Id);
                 }
 
                 if (folderId == null && folder == null && shortcodePreview != null)
                 {
-                    this.shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(-1, shortcodePreview.Id);
+                    shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(-1, shortcodePreview.Id);
                 }
+
+                this.folderId = folderId;
+                this.folder = folder;
+                this.shortcodeId = shortcodeId;
+                this.shortcodePreview = shortcodePreview;
+                this.shortcode = shortcode;
 
                 var description = shortcodePreview?.Description;
                 var toAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.To).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
@@ -293,7 +319,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 InitializeNavigationBarTitle();
 
                 if (composeButton != null)
-                    composeButton.Enabled = shortcode.Addresses.Any();
+                    composeButton.Enabled = shortcode?.Addresses?.Any() ?? false;
 
                 if (fileToButton != null)
                     fileToButton.Enabled = true;
@@ -430,22 +456,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 if (string.IsNullOrWhiteSpace(documentAddress.Name))
                 {
-                    var compactCell = tableView.DequeueReusableCell(DocumentAddressesCompactTableViewCell.Key) as DocumentAddressesCompactTableViewCell;
-                    if (compactCell == null)
-                    {
-                        compactCell = DocumentAddressesCompactTableViewCell.Create();
-                        compactCell.ActionClicked += Cell_ActionClicked;
-                    }
+                    var compactCell = tableView.DequeueReusableCell(DocumentAddressesCompactTableViewCell.Key) as DocumentAddressesCompactTableViewCell ?? DocumentAddressesCompactTableViewCell.Create();
                     compactCell.Initialize(documentAddress);
                     return compactCell;
                 }
 
-                var cell = tableView.DequeueReusableCell(DocumentAddressesTableViewCell.Key) as DocumentAddressesTableViewCell;
-                if (cell == null)
-                {
-                    cell = DocumentAddressesTableViewCell.Create();
-                    cell.ActionClicked += Cell_ActionClicked;
-                }
+                var cell = tableView.DequeueReusableCell(DocumentAddressesTableViewCell.Key) as DocumentAddressesTableViewCell ?? DocumentAddressesTableViewCell.Create();
                 cell.Initialize(documentAddress);
                 return cell;
             }
@@ -497,9 +513,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return string.Empty;
             }
 
-            void Cell_ActionClicked(object sender, DocumentAddress documentAddress)
+            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                viewController.ActionClicked(documentAddress);
+                if (tableView.CellAt(indexPath).SelectionStyle == UITableViewCellSelectionStyle.None) return;
+
+                DocumentAddress documentAddress = null;
+
+                if (indexPath.Section == 1)
+                    documentAddress = toAddresses[indexPath.Row];
+                if (indexPath.Section == 2)
+                    documentAddress = ccAddresses[indexPath.Row];
+                if (indexPath.Section == 3)
+                    documentAddress = bccAddresses[indexPath.Row];
+
+                if (documentAddress == null) return;
+
+                viewController.DocumentAddressClicked(documentAddress);
             }
 
             public void StartRefresh()
@@ -539,6 +568,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 bccAddresses = new DocumentAddress[0];
 
                 tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(0, sections)), UITableViewRowAnimation.Fade);
+            }
+
+            public DocumentAddress DocumentAddessAtRow(NSIndexPath indexPath)
+            {
+                DocumentAddress documentAddress = null;
+
+                if (indexPath.Section == 1)
+                    documentAddress = toAddresses[indexPath.Row];
+                if (indexPath.Section == 2)
+                    documentAddress = ccAddresses[indexPath.Row];
+                if (indexPath.Section == 3)
+                    documentAddress = bccAddresses[indexPath.Row];
+
+                return documentAddress;
             }
 
             protected override void Dispose(bool disposing)

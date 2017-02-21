@@ -8,11 +8,13 @@
 using System;
 using System.Linq;
 using System.Text;
+using AudioToolbox;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.ViewControllers;
 using PCLStorage;
 using UIKit;
 
@@ -244,6 +246,18 @@ namespace Mark5.Mobile.IOS.Utilities
 
                 Dialogs.ShowErrorDialog(viewController, ex);
             }
+        }
+
+        public static void CopyToClipboard(UIViewController viewController, UITableView tableView, UITableViewCell cell, string text)
+        {
+            var browserChooser = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+            browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_clipboard"), UIAlertActionStyle.Default, a => UIPasteboard.General.String = text));
+            browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+
+            if (browserChooser.PopoverPresentationController != null)
+                browserChooser.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(tableView, cell);
+
+            viewController.PresentViewController(browserChooser, true, null);
         }
 
         #endregion

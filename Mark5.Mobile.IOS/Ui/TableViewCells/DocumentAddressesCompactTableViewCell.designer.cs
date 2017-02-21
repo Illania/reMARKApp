@@ -13,10 +13,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 	partial class DocumentAddressesCompactTableViewCell
 	{
 		[Outlet]
-		UIKit.UIButton ActionButton { get; set; }
+		UIKit.UILabel AddressLabel { get; set; }
 
 		[Outlet]
-		UIKit.UILabel AddressLabel { get; set; }
+		UIKit.UIImageView IconImage { get; set; }
 
 		[Action ("ActionButtonTouchUpInside:")]
 		partial void ActionButtonTouchUpInside (UIKit.UIButton sender);
@@ -28,9 +28,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 				AddressLabel = null;
 			}
 
-			if (ActionButton != null) {
-				ActionButton.Dispose ();
-				ActionButton = null;
+			if (IconImage != null) {
+				IconImage.Dispose ();
+				IconImage = null;
 			}
 		}
 	}

@@ -11,7 +11,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="DocumentAddressesTableViewCell" rowHeight="60" id="cxk-wN-pdQ" customClass="DocumentAddressesTableViewCell">
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="DocumentAddressesTableViewCell" rowHeight="60" id="cxk-wN-pdQ" customClass="DocumentAddressesTableViewCell">
             <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cxk-wN-pdQ" id="YTl-1W-gDM">
@@ -19,7 +19,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5mP-v1-Nsg">
-                        <rect key="frame" x="8" y="8" width="266" height="21"/>
+                        <rect key="frame" x="20" y="8" width="45" height="21"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="z9V-Ty-slL"/>
                         </constraints>
@@ -28,7 +28,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Address" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Eig-5v-ryp">
-                        <rect key="frame" x="8" y="31" width="266" height="21"/>
+                        <rect key="frame" x="20" y="31" width="56.5" height="21"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="uiR-Wd-S52"/>
                         </constraints>
@@ -36,33 +36,27 @@
                         <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lXk-7L-Vsg">
-                        <rect key="frame" x="277" y="9" width="40" height="40"/>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="uwU-Z8-NJD">
+                        <rect key="frame" x="292" y="19" width="20" height="20"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="40" id="F3f-VN-t33"/>
-                            <constraint firstAttribute="height" constant="40" id="bph-Ok-DBX"/>
+                            <constraint firstAttribute="width" constant="20" id="Jrw-Mv-j1y"/>
+                            <constraint firstAttribute="height" constant="20" id="Tmd-yh-6tz"/>
                         </constraints>
-                        <inset key="imageEdgeInsets" minX="5" minY="5" maxX="5" maxY="5"/>
-                        <connections>
-                            <action selector="ActionButtonTouchUpInside:" destination="cxk-wN-pdQ" eventType="touchUpInside" id="15B-gA-H5h"/>
-                        </connections>
-                    </button>
+                    </imageView>
                 </subviews>
                 <constraints>
                     <constraint firstItem="5mP-v1-Nsg" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="top" constant="8" id="259-Xg-dlv"/>
-                    <constraint firstItem="Eig-5v-ryp" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="8" id="AW2-kq-3ff"/>
-                    <constraint firstItem="lXk-7L-Vsg" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY" id="Jhu-ju-mao"/>
+                    <constraint firstItem="Eig-5v-ryp" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="20" id="AW2-kq-3ff"/>
                     <constraint firstAttribute="bottom" secondItem="Eig-5v-ryp" secondAttribute="bottom" constant="7.5" id="Xze-xH-QHx"/>
-                    <constraint firstItem="5mP-v1-Nsg" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="8" id="ZFU-RA-KQD"/>
-                    <constraint firstItem="lXk-7L-Vsg" firstAttribute="leading" secondItem="Eig-5v-ryp" secondAttribute="trailing" constant="3" id="fVh-4V-WLN"/>
+                    <constraint firstItem="5mP-v1-Nsg" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="20" id="ZFU-RA-KQD"/>
                     <constraint firstItem="Eig-5v-ryp" firstAttribute="top" secondItem="5mP-v1-Nsg" secondAttribute="bottom" constant="2" id="o8H-e2-2Jf"/>
-                    <constraint firstItem="lXk-7L-Vsg" firstAttribute="leading" secondItem="5mP-v1-Nsg" secondAttribute="trailing" constant="3" id="tjL-9A-rQ3"/>
-                    <constraint firstAttribute="trailing" secondItem="lXk-7L-Vsg" secondAttribute="trailing" constant="3" id="ym0-yh-d15"/>
+                    <constraint firstAttribute="trailing" secondItem="uwU-Z8-NJD" secondAttribute="trailing" constant="8" id="r8C-lh-Hjd"/>
+                    <constraint firstItem="uwU-Z8-NJD" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY" id="yhK-fb-hHq"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
-                <outlet property="ActionButton" destination="lXk-7L-Vsg" id="bQl-mD-dIm"/>
                 <outlet property="AddressLabel" destination="Eig-5v-ryp" id="T1U-b4-B3K"/>
+                <outlet property="ImageIcon" destination="uwU-Z8-NJD" id="7tO-eY-mSA"/>
                 <outlet property="NameLabel" destination="5mP-v1-Nsg" id="pqV-dL-9CN"/>
             </connections>
             <point key="canvasLocation" x="69" y="67"/>

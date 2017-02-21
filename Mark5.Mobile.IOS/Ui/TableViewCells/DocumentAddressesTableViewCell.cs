@@ -21,10 +21,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static readonly NSString Key = new NSString("DocumentAddressesTableViewCell");
         public static readonly UINib Nib = UINib.FromName("DocumentAddressesTableViewCell", NSBundle.MainBundle);
 
-        DocumentAddress documentAddress;
-
-        public event EventHandler<DocumentAddress> ActionClicked;
-
         protected DocumentAddressesTableViewCell(IntPtr handle)
             : base(handle)
         {
@@ -33,25 +29,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static DocumentAddressesTableViewCell Create()
         {
             var cell = (DocumentAddressesTableViewCell)Nib.Instantiate(null, null)[0];
-
             cell.AddressLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
-            cell.ActionButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-
+            cell.ImageIcon.Image = UIImage.FromBundle(Path.Combine("icons", "email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             return cell;
         }
 
         public void Initialize(DocumentAddress documentAddress)
         {
-            this.documentAddress = documentAddress;
-
             NameLabel.Text = documentAddress.Name;
             AddressLabel.Text = documentAddress.FullAddress;
-        }
-
-        partial void ActionButtonTouchUpInside(UIButton sender)
-        {
-            if (ActionClicked != null)
-                ActionClicked(this, documentAddress);
         }
     }
 }

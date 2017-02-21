@@ -127,6 +127,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.EstimatedRowHeight = 60f;
             tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
             tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+            tableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed) { MinimumPressDuration = 1f });
             View.AddSubview(tableView);
             View.AddConstraints(new[]
                 {
@@ -174,6 +175,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (fileToButton != null)
                 fileToButton.Clicked -= FileToButton_Clicked;
+        }
+
+        void RowLongPressed(UILongPressGestureRecognizer gr)
+        {
+            if (gr.State != UIGestureRecognizerState.Began) return;
+
+            var location = gr.LocationInView(tableView);
+            var indexPath = tableView?.IndexPathForRowAtPoint(location);
+            var cell = tableView?.CellAt(indexPath);
+            var dataSource = tableView?.Source as DataSource;
+            var row = dataSource?.RowAt(indexPath);
+            if (cell != null && row != null)
+                row.OnLongClicked(this, tableView, cell, indexPath);
         }
 
         void FileToButton_Clicked(object sender, EventArgs e)
@@ -243,6 +257,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void WebPageClicked(UITableView tableView, UITableViewCell cell, string webPageAddress) => Integration.OpenUrl(this, tableView, cell, webPageAddress);
 
+        public void CopyToClipboard(UITableView tableView, UITableViewCell cell, string text) => Integration.CopyToClipboard(this, tableView, cell, text);
+
         public void SetData(int folderId, int contactId)
         {
             folder = null;
@@ -298,17 +314,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var swp = await Managers.ContactsManager.GetContactWithPreviewAsync(folderId.Value, contactId.Value);
                     this.contactPreview = swp.ContactPreview;
-                    this.contact = swp.Contact;
+                    contact = swp.Contact;
                 }
 
                 if (folder != null && contactPreview != null)
                 {
-                    this.contact = await Managers.ContactsManager.GetContactAsync(folder, contactPreview.Id);
+                    contact = await Managers.ContactsManager.GetContactAsync(folder, contactPreview.Id);
                 }
 
                 if (folderId == null && folder == null && contactPreview != null)
                 {
-                    this.contact = await Managers.ContactsManager.GetContactAsync(-1, contactPreview.Id);
+                    contact = await Managers.ContactsManager.GetContactAsync(-1, contactPreview.Id);
                 }
 
                 if (token.IsCancellationRequested) return;
@@ -318,7 +334,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (fileToButton != null)
                     fileToButton.Enabled = true;
 
-                ds.EndRefresh(this.contactPreview, this.contact);
+                ds.EndRefresh(this.contactPreview, contact);
             }
             catch (Exception ex)
             {
@@ -519,6 +535,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 tableView.EndUpdates();
             }
 
+            public AbstractRow RowAt(NSIndexPath indexPath)
+            {
+                return sections[indexPath.Section].Rows[indexPath.Row];
+            }
+
             protected override void Dispose(bool disposing)
             {
                 base.Dispose(disposing);
@@ -531,11 +552,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             #region Support classes
 
-            class SectionCollection : List<AbstractSection>
+            public class SectionCollection : List<AbstractSection>
             {
             }
 
-            abstract class AbstractSection
+            public abstract class AbstractSection
             {
                 
                 WeakReference<ContactPreview> weakContactPreview;
@@ -576,7 +597,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public abstract void InitializeRows();
             }
 
-            class NameSection : AbstractSection
+            public class NameSection : AbstractSection
             {
                 
                 public override bool Empty
@@ -602,7 +623,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            class DescriptionSection : AbstractSection
+            public class DescriptionSection : AbstractSection
             {
 
                 public override bool Empty { get { return string.IsNullOrWhiteSpace(ContactPreview?.Description); } }
@@ -617,7 +638,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            class CommunicationAddressSection : AbstractSection
+            public class CommunicationAddressSection : AbstractSection
             {
                 
                 public override bool Empty { get { return !Contact?.CommunicationAddresses?.Any(ca => ca.Type == type) ?? true; } }
@@ -668,7 +689,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            class PhysicalAddressSection : AbstractSection
+            public class PhysicalAddressSection : AbstractSection
             {
 
                 public override bool Empty { get { return !Contact?.PhysicalAddresses?.Any() ?? true; } }
@@ -687,8 +708,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-
-            class LinkedContactSection : AbstractSection
+            public class LinkedContactSection : AbstractSection
             {
 
                 public enum LinkedContactSectionMode
@@ -779,7 +799,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            class WebPageSection : AbstractSection
+            public class WebPageSection : AbstractSection
             {
 
                 public override bool Empty { get { return string.IsNullOrWhiteSpace(Contact?.WebPageAddress); } }
@@ -794,7 +814,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            class BirthdateSection : AbstractSection
+            public class BirthdateSection : AbstractSection
             {
 
                 public override bool Empty { get { return Contact?.BirthDateTimestamp == -1; } }
@@ -809,7 +829,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            class AccountSection : AbstractSection
+            public class AccountSection : AbstractSection
             {
 
                 public override bool Empty { get { return string.IsNullOrWhiteSpace(Contact?.Account); } }
@@ -824,7 +844,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            class VatSection : AbstractSection
+            public class VatSection : AbstractSection
             {
 
                 public override bool Empty { get { return string.IsNullOrWhiteSpace(Contact?.Vat); } }
@@ -839,7 +859,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            class ResponsibleUsersSection : AbstractSection
+            public class ResponsibleUsersSection : AbstractSection
             {
 
                 public override bool Empty { get { return !Contact?.ResponsibleUsers?.Any() ?? true; } }
@@ -854,7 +874,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            class ShortIdSection : AbstractSection
+            public class ShortIdSection : AbstractSection
             {
 
                 public override bool Empty { get { return string.IsNullOrWhiteSpace(ContactPreview?.ShortId); } }
@@ -869,11 +889,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            class RowCollection : List<AbstractRow>
+            public class RowCollection : List<AbstractRow>
             {
             }
 
-            abstract class AbstractRow
+            public abstract class AbstractRow
             {
 
                 WeakReference<ContactPreview> weakContactPreview;
@@ -926,9 +946,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public virtual void OnClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath) { }
 
-           }
+                public virtual void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath) { }
 
-            class NameRow : AbstractRow
+            }
+
+            public class NameRow : AbstractRow
             {
 
                 public NameRow(ContactPreview contactPreview, Contact contact)
@@ -940,9 +962,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     cell.TextLabel.Text = Contact?.Position + "/" + ContactPreview?.CompanyName;
                 }
+
+                public override void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                {
+                    viewController.CopyToClipboard(tableView, cell, ContactPreview.Description);
+                }
             }
 
-            class DescriptionRow : AbstractRow
+            public class DescriptionRow : AbstractRow
             {
 
                 public DescriptionRow(ContactPreview contactPreview, Contact contact)
@@ -962,9 +989,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var dtvc = (DescriptionTableViewCell)cell;
                     dtvc.Initialize(ContactPreview.Description);
                 }
+
+                public override void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                {
+                    viewController.CopyToClipboard(tableView, cell, ContactPreview.Description);
+                }
             }
 
-            class CommunicationAddressRow : AbstractRow
+            public class CommunicationAddressRow : AbstractRow
             {
                 
                 readonly WeakReference<CommunicationAddress> weakCommunicationAddress;
@@ -995,9 +1027,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     viewController.CommunicationAddressClicked(tableView, cell, ca);
                 }
+
+                public override void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                {
+                    viewController.CopyToClipboard(tableView, cell, cell.TextLabel.Text);
+                }
             }
 
-            class PhysicalAddressRow : AbstractRow
+            public class PhysicalAddressRow : AbstractRow
             {
 
                 readonly WeakReference<PhysicalAddress> weakPhysicalAddress;
@@ -1032,9 +1069,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     viewController.PhysicalAddressClicked(tableView, cell, pa);
                 }
+
+                public override void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                {
+                    viewController.CopyToClipboard(tableView, cell, cell.TextLabel.Text);
+                }
             }
 
-            class LinkedContactRow : AbstractRow
+            public class LinkedContactRow : AbstractRow
             {
                 
                 readonly WeakReference<ContactPreview> weakLinkedContactPreview;
@@ -1072,7 +1114,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            class WebPageRow : AbstractRow
+            public class WebPageRow : AbstractRow
             {
 
                 public WebPageRow(ContactPreview contactPreview, Contact contact)
@@ -1099,9 +1141,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     viewController.WebPageClicked(tableView, cell, Contact.WebPageAddress);
                 }
+
+                public override void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                {
+                    viewController.CopyToClipboard(tableView, cell, Contact.WebPageAddress);
+                }
             }
 
-            class BirthdateRow : AbstractRow
+            public class BirthdateRow : AbstractRow
             {
 
                 public BirthdateRow(ContactPreview contactPreview, Contact contact)
@@ -1115,7 +1162,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            class AccountRow : AbstractRow
+            public class AccountRow : AbstractRow
             {
 
                 public AccountRow(ContactPreview contactPreview, Contact contact) 
@@ -1127,9 +1174,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     cell.TextLabel.Text = Contact.Account;
                 }
+
+                public override void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                {
+                    viewController.CopyToClipboard(tableView, cell, Contact.Account);
+                }
             }
 
-            class VatRow : AbstractRow
+            public class VatRow : AbstractRow
             {
 
                 public VatRow(ContactPreview contactPreview, Contact contact)
@@ -1141,9 +1193,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     cell.TextLabel.Text = Contact.Vat;
                 }
+
+                public override void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                {
+                    viewController.CopyToClipboard(tableView, cell, Contact.Vat);
+                }
             }
 
-            class ResponsibleUsersRow : AbstractRow
+            public class ResponsibleUsersRow : AbstractRow
             {
 
                 public ResponsibleUsersRow(ContactPreview contactPreview, Contact contact)
@@ -1157,7 +1214,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            class ShortIdRow : AbstractRow
+            public class ShortIdRow : AbstractRow
             {
 
                 public ShortIdRow(ContactPreview contactPreview, Contact contact)
