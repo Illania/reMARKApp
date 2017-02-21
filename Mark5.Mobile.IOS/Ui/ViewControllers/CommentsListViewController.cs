@@ -8,11 +8,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Utilities;
@@ -95,7 +97,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             AutomaticallyAdjustsScrollViewInsets = true;
 
             commentsTableView = new UITableView();
-            commentsTableView.Source = new DataSource(commentsTableView, Localization.GetString("no_comments"));
+            commentsTableView.Source = new DataSource(this, commentsTableView, Localization.GetString("no_comments"));
             commentsTableView.TranslatesAutoresizingMaskIntoConstraints = false;
             commentsTableView.Bounces = true;
             commentsTableView.CellLayoutMarginsFollowReadableWidth = false;
@@ -290,6 +292,95 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
+        #region Actions
+
+        void DeleteComment(Comment comment)
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting_comment___"));
+
+            Task.Run(async () =>
+             {
+                 switch (Entity.ObjectType)
+                 {
+                     case ObjectType.Document:
+                         var document = Entity as Document;
+                         await Managers.DocumentsManager.DeleteComment(document, comment);
+                         //PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count)); //TODO
+                         break;
+                     case ObjectType.Contact:
+                         var contact = Entity as Contact;
+                         await Managers.ContactsManager.DeleteComment(contact, comment);
+                         break;
+                     default:
+                         throw new ArgumentException("The input business entity does not have comments defined in the model");
+                 }
+             }).ContinueWith(async t =>
+             {
+                 dismissAction();
+
+                 if (t.IsFaulted)
+                 {
+                     CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
+                     await Dialogs.ShowErrorDialogAsync(this, t.Exception.InnerException);
+                 }
+                 else
+                 {
+                     (commentsTableView.Source as DataSource).RemoveComment(comment);
+                 }
+
+             }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        void EditCommment(Comment comment)
+        {
+            var isEditable = DateTime.Now.ToUniversalTime().Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= 10; //TODO for testing
+
+            if (!isEditable)
+            {
+                Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("error"), Localization.GetString("edit_not_possible")); //TODO on mark5 if you start editing before 60 seconds, you can finish editing also after
+                return;
+            }
+
+
+            //var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("editing_comment___"));
+            //var newComment = comment.ShallowCopy();
+            //newComment.Content = newContent;
+
+            //Task.Run(async () =>
+            // {
+            //     switch (Entity.ObjectType)
+            //     {
+            //         case ObjectType.Document:
+            //             var document = Entity as Document;
+            //             await Managers.DocumentsManager.EditComment(document, newComment);
+            //             PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
+            //             break;
+            //         case ObjectType.Contact:
+            //             var contact = Entity as Contact;
+            //             await Managers.ContactsManager.EditComment(contact, newComment);
+            //             break;
+            //         default:
+            //             throw new ArgumentException("The input business entity does not have comments defined in the model");
+            //     }
+            // }).ContinueWith(async t =>
+            // {
+            //     dismissAction();
+
+            //     if (t.IsFaulted)
+            //     {
+            //         CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
+            //         await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
+            //     }
+            //     else
+            //     {
+            //         adapter.EditItem(newComment);
+            //     }
+            // }, TaskScheduler.FromCurrentSynchronizationContext());
+
+        }
+
+        #endregion
+
         #region Keyboard Related
 
         void OnKeyboardDidShowNotification(NSNotification notification)
@@ -371,6 +462,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             const float TextViewHeight = 27.0f;
 
             UITableView tableView;
+            CommentsListViewController viewController;
             List<Comment> commentsInView = new List<Comment>();
 
             readonly string emptyText;
@@ -391,9 +483,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            public DataSource(UITableView tableView, string emptyText)
+            public DataSource(CommentsListViewController viewController, UITableView tableView, string emptyText)
             {
                 this.tableView = tableView;
+                this.viewController = viewController;
                 this.emptyText = emptyText;
             }
 
@@ -430,6 +523,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return CellHeight - TextViewHeight + textHeight;
             }
 
+            public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                var actions = new List<UITableViewRowAction>();
+                var comment = commentsInView[indexPath.Row];
+
+                if (comment.UserId == ServerConfig.SystemSettings.UserInfo.User.Id)
+                {
+                    var deleteAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive, Localization.GetString("delete"), (a, ip) => viewController.DeleteComment(comment));
+                    deleteAction.BackgroundColor = Theme.Blue;
+                    actions.Add(deleteAction);
+
+                    var isEditable = DateTime.Now.ToUniversalTime().Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= 10; //TODO for testing
+
+                    if (isEditable)
+                    {
+                        var editAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive, Localization.GetString("edit"), (a, ip) => viewController.EditCommment(comment));
+                        editAction.BackgroundColor = Theme.DarkBlue;
+                        actions.Add(editAction);
+                    }
+                }
+
+                return actions.ToArray();
+            }
+
             public void RefreshData(List<Comment> newComments)
             {
                 if (newComments == null)
@@ -449,13 +566,52 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 commentsInView.Add(newComment);
-                tableView.InsertRows(new NSIndexPath[] { NSIndexPath.FromRowSection(commentsInView.Count - 1, 0) }, UITableViewRowAnimation.Automatic);
+
+                if (commentsInView.Count == 1)
+                {
+                    tableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(commentsInView.Count - 1, 0) }, UITableViewRowAnimation.Automatic);
+                }
+                else
+                {
+                    tableView.InsertRows(new NSIndexPath[] { NSIndexPath.FromRowSection(commentsInView.Count - 1, 0) }, UITableViewRowAnimation.Automatic);
+                }
+            }
+
+            public void RemoveComment(Comment comment)
+            {
+                var position = commentsInView.FindIndex(c => c.Id == comment.Id);
+                if (position >= 0)
+                {
+                    commentsInView.RemoveAt(position);
+                }
+
+                if (commentsInView.Count == 0)
+                {
+                    tableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Automatic);
+
+                }
+                else
+                {
+                    tableView.DeleteRows(new NSIndexPath[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Automatic);
+                }
+            }
+
+            public void EditComment(Comment editedContent)
+            {
+                var position = commentsInView.FindIndex(c => c.Id == editedContent.Id);
+                if (position >= 0)
+                {
+                    commentsInView[position].Content = editedContent.Content;
+                }
+
+                tableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Automatic);
             }
 
             protected override void Dispose(bool disposing)
             {
                 base.Dispose(disposing); //TODO finish
             }
+
         }
 
     }

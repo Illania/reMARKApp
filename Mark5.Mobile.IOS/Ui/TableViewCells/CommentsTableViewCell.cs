@@ -55,7 +55,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         {
             Comment = comment;
 
-            var username = comment.UserName.Equals(ServerConfig.SystemSettings.UserInfo.User.Username, StringComparison.CurrentCultureIgnoreCase) ?
+            var username = comment.UserId == ServerConfig.SystemSettings.UserInfo.User.Id ?
                                   Localization.GetString("me") : comment.UserName.ToUpper(CultureInfo.CurrentCulture);
             CommentAuthorLabel.Text = username;
             DateAddedLabel.Text = comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()

@@ -41,6 +41,7 @@
 "delete_from_folder" = "Delete from folder";
 "delete" = "Delete";
 "delete_from_folder" = "Delete from folder";
+"deleting_comment___" = "Deleting comment...";
 "description" = "Description";
 "disable_caching" = "Disable\ncaching";
 "disable_notifications" = "Don't\nnotify";
@@ -49,9 +50,12 @@
 "done" = "Done";
 "downloading_attachment___" = "Downloading attachment...";
 "edit" = "Edit";
+"edit_not_possible" = "Comments can be edited maximum 1 minute after creation";
+"editing_comment___" = "Editing comment...";
 "enable_caching" = "Enable\ncaching";
 "enable_notifications" = "Notify";
 "enabled" = "Enabled";
+"error" = "Error";
 "error_appserviceexception_title" = "Error";
 "error_dataaccessexception_title" = "Cache error occured";
 "error_datanotfoundexception_message" = "This item is not available offline";
