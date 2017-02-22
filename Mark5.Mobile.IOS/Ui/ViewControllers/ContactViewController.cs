@@ -115,6 +115,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
             tableView.RowHeight = UITableView.AutomaticDimension;
             tableView.EstimatedRowHeight = 60f;
+            tableView.CellLayoutMarginsFollowReadableWidth = false;
             tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
             tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
             tableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed) { MinimumPressDuration = 1f });
