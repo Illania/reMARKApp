@@ -996,8 +996,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             commentsListViewNavigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
             commentsListViewController.Entity = Document;
 
-            //TODO handle changing of comments
-
             PresentViewController(commentsListViewNavigationController, true, null);
         }
 
