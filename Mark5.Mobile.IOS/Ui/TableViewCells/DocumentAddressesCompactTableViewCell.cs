@@ -20,10 +20,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static readonly NSString Key = new NSString("DocumentAddressesCompactTableViewCell");
         public static readonly UINib Nib = UINib.FromName("DocumentAddressesCompactTableViewCell", NSBundle.MainBundle);
 
-        DocumentAddress documentAddress;
-
-        public event EventHandler<DocumentAddress> ActionClicked;
-
         protected DocumentAddressesCompactTableViewCell(IntPtr handle)
             : base(handle)
         {
@@ -32,23 +28,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static DocumentAddressesCompactTableViewCell Create()
         {
             var cell = (DocumentAddressesCompactTableViewCell)Nib.Instantiate(null, null)[0];
-
-            cell.ActionButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-
+            cell.IconImage.Image = UIImage.FromBundle(Path.Combine("icons", "email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             return cell;
         }
 
         public void Initialize(DocumentAddress documentAddress)
         {
-            this.documentAddress = documentAddress;
-
             AddressLabel.Text = documentAddress.FullAddress;
-        }
-
-        partial void ActionButtonTouchUpInside(UIButton sender)
-        {
-            if (ActionClicked != null)
-                ActionClicked(this, documentAddress);
         }
     }
 }

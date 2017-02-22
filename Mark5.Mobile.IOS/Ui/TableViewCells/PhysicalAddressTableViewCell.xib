@@ -11,18 +11,15 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="DocumentAddressesCompactTableViewCell" rowHeight="44" id="cxk-wN-pdQ" customClass="DocumentAddressesCompactTableViewCell">
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="PhysicalAddressTableViewCell" rowHeight="44" id="cxk-wN-pdQ" customClass="PhysicalAddressTableViewCell">
             <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cxk-wN-pdQ" id="YTl-1W-gDM">
                 <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Address" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5mP-v1-Nsg">
-                        <rect key="frame" x="20" y="11.5" width="264" height="21"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="21" id="NH0-Ok-eJx"/>
-                        </constraints>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Address" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5mP-v1-Nsg">
+                        <rect key="frame" x="20" y="11" width="264" height="22"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -38,8 +35,9 @@
                 <constraints>
                     <constraint firstAttribute="trailing" secondItem="gDn-B7-ybC" secondAttribute="trailing" constant="8" id="8fG-dg-mYQ"/>
                     <constraint firstItem="5mP-v1-Nsg" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="20" id="Drl-40-rhl"/>
-                    <constraint firstItem="5mP-v1-Nsg" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY" id="MtG-7d-wfs"/>
-                    <constraint firstItem="gDn-B7-ybC" firstAttribute="leading" secondItem="5mP-v1-Nsg" secondAttribute="trailing" constant="8" id="P7I-mf-0Qd"/>
+                    <constraint firstItem="5mP-v1-Nsg" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="top" constant="11" id="NgG-B8-aMN"/>
+                    <constraint firstAttribute="bottom" secondItem="5mP-v1-Nsg" secondAttribute="bottom" constant="11" id="hvE-mq-OQf"/>
+                    <constraint firstItem="gDn-B7-ybC" firstAttribute="leading" secondItem="5mP-v1-Nsg" secondAttribute="trailing" constant="8" id="i5U-D2-ySB"/>
                     <constraint firstItem="gDn-B7-ybC" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY" id="mfY-8i-bKv"/>
                 </constraints>
             </tableViewCellContentView>

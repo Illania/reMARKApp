@@ -200,6 +200,9 @@
     <InterfaceDefinition Include="Ui\TableViewCells\DocumentAddressesCompactTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\DescriptionTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\CommentsTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\CommunicationAddressTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\CommunicationAddressCompactTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\PhysicalAddressTableViewCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -370,6 +373,18 @@
     <Compile Include="Ui\TableViewCells\CommentsTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\CommentsTableViewCell.designer.cs">
       <DependentUpon>CommentsTableViewCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\TableViewCells\CommunicationAddressTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\CommunicationAddressTableViewCell.designer.cs">
+      <DependentUpon>CommunicationAddressTableViewCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\TableViewCells\CommunicationAddressCompactTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\CommunicationAddressCompactTableViewCell.designer.cs">
+      <DependentUpon>CommunicationAddressCompactTableViewCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\TableViewCells\PhysicalAddressTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\PhysicalAddressTableViewCell.designer.cs">
+      <DependentUpon>PhysicalAddressTableViewCell.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
