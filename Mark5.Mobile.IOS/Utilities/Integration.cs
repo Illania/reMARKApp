@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: Integration.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -96,6 +96,22 @@ namespace Mark5.Mobile.IOS.Utilities
 
             var domain = NSBundle.MainBundle.BundleIdentifier;
             NSUserDefaults.StandardUserDefaults.RemovePersistentDomain(domain);
+        }
+
+        #endregion
+
+        #region Apple apps
+
+        public static void OpenLink(NSUrl url, Action failureCompletionHandler)
+        {
+            var options = new UIApplicationOpenUrlOptions();
+            UIApplication.SharedApplication.OpenUrl(url, options, (result) =>
+            {
+                if (!result)
+                {
+                    failureCompletionHandler();
+                }
+            });
         }
 
         #endregion

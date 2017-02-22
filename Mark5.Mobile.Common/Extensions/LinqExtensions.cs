@@ -32,6 +32,12 @@ namespace Mark5.Mobile.Common.Extensions
         {
             return e.SelectMany(childSelector).Concat(e);
         }
+
+        public static int IndexOf<T>(this IEnumerable<T> enumeration, Func<T, bool> predicate)
+        {
+            //The +1 and -1 are used to exactly mimic the original IndexOf
+            return enumeration.Select((value, index) => new { value, index = index + 1 }).Where(s => predicate(s.value)).Select(s => s.index).FirstOrDefault() - 1;
+        }
     }
 
 }

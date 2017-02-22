@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: LambdaEqualityComparer.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>

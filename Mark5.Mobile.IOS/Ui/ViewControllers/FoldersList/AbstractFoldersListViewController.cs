@@ -262,7 +262,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         void ComposeDocumentItem_Clicked(object sender, EventArgs e)
         {
-            // TODO
+            var composeDocumentViewController = new ComposeDocumentViewController
+            {
+                CreationModeFlag = DocumentCreationModeFlag.New,
+                PreviousDocumentDirection = DocumentDirection.None
+            };
+
+            var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
+            composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
+            PresentViewController(composeDocumentNavigationController, true, null);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -878,7 +886,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 loading = true;
 
                 foldersInView.Clear();
-                
+
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
             }
 
@@ -1075,7 +1083,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 return tableView.Editing ? (indexPath.LongSection == Section.Favorites && foldersInView[Section.Favorites].Count > 0) : indexPath.LongSection != Section.Local;
             }
-            
+
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
                 if (disableRowActions) return new UITableViewRowAction[0];
