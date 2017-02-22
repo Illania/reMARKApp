@@ -11,7 +11,7 @@ using TinyMessenger;
 
 namespace Mark5.Mobile.IOS.Ui.Common.HubMessages
 {
-    public class CommentsCountChangeMessage : TinyMessageBase
+    public class CommentsCountChangedMessage : TinyMessageBase
     {
         public ObjectType ObjectType
         {
@@ -31,7 +31,7 @@ namespace Mark5.Mobile.IOS.Ui.Common.HubMessages
             private set;
         }
 
-        public CommentsCountChangeMessage(object sender, ObjectType objectType, int entityId, int commentsCount) : base(sender)
+        public CommentsCountChangedMessage(object sender, ObjectType objectType, int entityId, int commentsCount) : base(sender)
         {
             ObjectType = objectType;
             EntityId = entityId;
