@@ -199,6 +199,7 @@
     <InterfaceDefinition Include="Ui\TableViewCells\DocumentAddressesTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\DocumentAddressesCompactTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\DescriptionTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\CommentsTableViewCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -365,6 +366,11 @@
     <Compile Include="Utilities\LocalNotificationsListener.cs" />
     <Compile Include="Utilities\NotificationsUtilities.cs" />
     <Compile Include="Model\Messages\NewNotificationsMessage.cs" />
+    <Compile Include="Ui\ViewControllers\CommentsListViewController.cs" />
+    <Compile Include="Ui\TableViewCells\CommentsTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\CommentsTableViewCell.designer.cs">
+      <DependentUpon>CommentsTableViewCell.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
