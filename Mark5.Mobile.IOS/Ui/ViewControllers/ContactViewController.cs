@@ -15,6 +15,7 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -852,7 +853,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public class BirthdateSection : AbstractSection
             {
 
-                public override bool Empty { get { return Contact?.BirthDateTimestamp == -1; } }
+                public override bool Empty { get { return Contact?.BirthDateTimestamp == -6847804800000 || Contact?.BirthDateTimestamp == -1; } } // SQL null date, aka 1/1/1753
 
                 public override string Title { get { return Localization.GetString("birthdate"); } }
 
@@ -995,7 +996,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    cell.TextLabel.Text = Contact?.Position + "/" + ContactPreview?.CompanyName;
+                    if (ContactPreview?.Type == ContactType.Person)
+                        cell.TextLabel.Text = string.Join(", ", new[] { Contact.Position, ContactPreview.CompanyName }.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray());
+                    if (ContactPreview?.Type == ContactType.Department)
+                        cell.TextLabel.Text = ContactPreview.CompanyName;
                 }
 
                 public override void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
@@ -1225,7 +1229,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    cell.TextLabel.Text = Contact.BirthDateTimestamp.ToString();
+                    cell.TextLabel.Text = Contact.BirthDateTimestamp
+                         .ConvertTimestampMillisecondsToDateTime()
+                         .ConvertUtcToServerTime()
+                         .ConvertDateTimeToTimestampMilliseconds()
+                         .FormatServerTimestampAsLongDateString();
                 }
             }
 

@@ -18,6 +18,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         static NSDateFormatter timeFormatter;
         static NSDateFormatter dateFormatter;
+        static NSDateFormatter longDateFormatter;
         static NSDateFormatter dateTimeFormatter;
 
         static DateTimeUtils()
@@ -31,6 +32,11 @@ namespace Mark5.Mobile.IOS.Utilities
             dateFormatter.DateStyle = NSDateFormatterStyle.Short;
             dateFormatter.TimeStyle = NSDateFormatterStyle.None;
             dateFormatter.TimeZone = new NSTimeZone("GMT");
+
+            longDateFormatter = new NSDateFormatter();
+            longDateFormatter.DateStyle = NSDateFormatterStyle.Medium;
+            longDateFormatter.TimeStyle = NSDateFormatterStyle.None;
+            longDateFormatter.TimeZone = new NSTimeZone("GMT");
 
             dateTimeFormatter = new NSDateFormatter();
             dateTimeFormatter.DateStyle = NSDateFormatterStyle.Short;
@@ -62,6 +68,15 @@ namespace Mark5.Mobile.IOS.Utilities
         public static string FormatServerTimestampAsDateString(this long timestamp)
         {
             return dateFormatter.StringFor(NSDate.FromTimeIntervalSince1970(timestamp / 1000));
+        }
+
+        /// <summary>
+        /// IMPORTANT!!!
+        /// THIS METHOD ACCEPTS TIMESTAMP IN SERVER TIMEZONE
+        /// </summary>
+        public static string FormatServerTimestampAsLongDateString(this long timestamp)
+        {
+            return longDateFormatter.StringFor(NSDate.FromTimeIntervalSince1970(timestamp / 1000));
         }
 
         /// <summary>
