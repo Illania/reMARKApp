@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.IOS
-// File: ShortcodesListViewController.cs
+// File: ShortcodesSearchResultsViewController.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2017 Nordic IT
@@ -8,8 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
@@ -22,27 +20,16 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-
-    public class ShortcodesListViewController : AbstractViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
+    
+    public class ShortcodesSearchResultsViewController : AbstractViewController, IUIGestureRecognizerDelegate
     {
 
-        public Folder Folder { get; set; }
+        public SearchShortcodesCriteria Criteria { get; set; }
 
         UIBarButtonItem exitEditItem;
         UIBarButtonItem editItem;
 
-        UIRefreshControl refreshControl;
         UITableView shortcodesTableView;
-        UISearchController searchController;
-        UITableViewController searchResultsController;
-        DataSource searchResultsDataSource;
-
-        CancellationTokenSource searchCancellationTokenSource;
-        readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
-
-        bool refreshing;
-
-        CancellationTokenSource cts;
 
         #region UIViewController overrides
 
@@ -52,7 +39,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeNavigationBar();
             InitializeView();
-            InitializeSearchBar();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -79,8 +65,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillDisappear(animated);
 
             DeinitializeHandlers();
-
-            cts?.Cancel();
         }
 
         public override void WillMoveToParentViewController(UIViewController parent)
@@ -99,7 +83,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(ShortcodesListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning($"{nameof(ShortcodesSearchResultsViewController)} received memory warning!");
 
             var ds = shortcodesTableView?.Source as DataSource;
             ds?.Reset();
@@ -142,36 +126,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Delegate = this
             };
             shortcodesTableView.AddGestureRecognizer(longPressRecognizer);
-
-            refreshControl = new UIRefreshControl();
-            refreshControl.BackgroundColor = UIColor.White;
-            refreshControl.AttributedTitle = Localization.GetNSAttributedString("pull_to_refresh");
-            shortcodesTableView.AddSubview(refreshControl);
-        }
-
-        void InitializeSearchBar()
-        {
-            DefinesPresentationContext = true;
-
-            searchResultsController = new UITableViewController();
-            searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_shortcodes"));
-            searchResultsController.TableView.Source = searchResultsDataSource;
-
-            searchController = new UISearchController(searchResultsController)
-            {
-                HidesNavigationBarDuringPresentation = true,
-                DimsBackgroundDuringPresentation = true,
-                ObscuresBackgroundDuringPresentation = true,
-                SearchResultsUpdater = this
-            };
-            searchController.SearchBar.Placeholder = Localization.GetString("filter");
-
-            shortcodesTableView.TableHeaderView = searchController.SearchBar;
         }
 
         void InitializeNavigationBarTitle()
         {
-            NavigationItem.Title = Folder.Name;
+            NavigationItem.Title = Localization.GetString("search_results");
         }
 
         void InitializeHandlers()
@@ -181,9 +140,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (editItem != null)
                 editItem.Clicked += EditItem_Clicked;
-
-            if (refreshControl != null)
-                refreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
         void DeinitializeHandlers()
@@ -193,9 +149,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (editItem != null)
                 editItem.Clicked -= EditItem_Clicked;
-
-            if (refreshControl != null)
-                refreshControl.ValueChanged -= RefreshControl_ValueChanged;
         }
 
         #endregion
@@ -204,13 +157,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void ShortcodeSelected(UITableView tableView, ShortcodePreview shortcodePreview)
         {
-            if (tableView == searchResultsController.TableView)
-            {
-                var ds = (DataSource)shortcodesTableView.Source;
-                var index = ds.Items.FindIndex(sp => sp.Id == shortcodePreview.Id);
-                if (index >= 0) shortcodesTableView.SelectRow(NSIndexPath.FromRowSection(index, 0), false, UITableViewScrollPosition.Middle);
-            }
-
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];
@@ -218,13 +164,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var vc = (ShortcodeViewController)nc.ViewControllers[0];
                 vc.ClearData();
-                vc.SetData(Folder, shortcodePreview);
+                vc.SetData(shortcodePreview);
                 vc.RefreshData();
             }
             else
             {
                 var vc = new ShortcodeViewController();
-                vc.SetData(Folder, shortcodePreview);
+                vc.SetData(shortcodePreview);
                 vc.SetRefreshDataOnAppear();
                 NavigationController.PushViewController(vc, true);
             }
@@ -249,9 +195,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationItem.SetRightBarButtonItem(exitEditItem, true);
             NavigationItem.SetLeftBarButtonItem(editItem, true);
 
-            searchController.SearchBar.UserInteractionEnabled = false;
-            searchController.SearchBar.Alpha = .5f;
-
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];
@@ -269,9 +212,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             shortcodesTableView.SetEditing(false, true);
             NavigationItem.SetRightBarButtonItem(null, true);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
-
-            searchController.SearchBar.UserInteractionEnabled = true;
-            searchController.SearchBar.Alpha = 1f;
         }
 
         void EditItem_Clicked(object sender, EventArgs e)
@@ -290,20 +230,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NavigationController.PresentViewController(new NavigationController(vc), true, null);
             }));
 
-            if (Folder.InternalType == FolderInternalType.FilterView
-                || Folder.InternalType == FolderInternalType.Static
-                || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
-            {
-                var vc = new CopyMoveToFolderListViewController(selectedShortcodes.Cast<IBusinessEntity>().ToList(), Folder);
-                NavigationController.PresentViewController(new NavigationController(vc), true, null);
-            }));
-
-            if (Folder.InternalType == FolderInternalType.FilterView
-                || Folder.InternalType == FolderInternalType.Static
-                || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, null)); // TODO
-
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
                 || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, null)); // TODO
@@ -321,116 +247,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Refreshing
 
-        void RefreshControl_ValueChanged(object sender, EventArgs e) => RefreshData(forceClear: true);
-
-        void RefreshData(int startRowId = -1, bool forceClear = false)
-        {
-            if (refreshing) return;
-
-            refreshing = true;
-            refreshControl.ValueChanged -= RefreshControl_ValueChanged;
-
-            CommonConfig.Logger.Info($"Refreshing shortcodes list [folder={Folder?.Name}, startRowId={startRowId}, forceClear={forceClear}]");
-
-            cts?.Cancel();
-            cts = new CancellationTokenSource();
-
-            if (forceClear)
-            {
-                var ds = (DataSource)shortcodesTableView.Source;
-                ds.Reset();
-            }
-
-            Managers.ShortcodesManager.GetAllShortcodePreviews(Folder, sps =>
-            {
-                Managers.DownloadManager.Notify(ObjectType.Shortcode, Folder.Id);
-                InvokeOnMainThread(() =>
-                {
-                    var ds = (DataSource)shortcodesTableView.Source;
-                    ds.AppendItems(sps);
-                });
-            }, () =>
-            {
-                refreshControl.EndRefreshing();
-                refreshControl.ValueChanged += RefreshControl_ValueChanged;
-
-                refreshing = false;
-
-                CommonConfig.Logger.Info($"Refresh finished");
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-            }, async ex =>
+        async void RefreshData()
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            try
             {
-                refreshControl.EndRefreshing();
-                refreshControl.ValueChanged += RefreshControl_ValueChanged;
+                CommonConfig.Logger.Info($"Refreshing shortcodes list... [criteria={Criteria}]");
 
-                refreshing = false;
+                var results = await Managers.SearchManager.SearchShortcodesAsync(Criteria);
 
-                CommonConfig.Logger.Error($"Could not refresh shortcodes [folder={Folder?.Name}, startRowId={startRowId}, forceClear={forceClear}]", ex);
+                var ds = (DataSource)shortcodesTableView.Source;
+                ds.AppendItems(results);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Could not refresh shortcodes list [criteria={Criteria}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
 
                 NavigationController?.PopViewController(true);
-            }, startRowId, cts.Token);
-        }
-
-        #endregion
-
-        #region Searching
-
-        void IUISearchResultsUpdating.UpdateSearchResultsForSearchController(UISearchController searchController)
-        {
-            var searchText = searchController.SearchBar.Text;
-
-            if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
-            {
-                searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
-                searchCancellationTokenSourceList.Clear();
-                searchResultsDataSource.Reset();
             }
-            else
-            {
-                if (searchCancellationTokenSource != null)
-                {
-                    searchCancellationTokenSource.Cancel();
-                    searchCancellationTokenSourceList.Remove(searchCancellationTokenSource);
-                    searchCancellationTokenSource = null;
-                }
-
-                searchCancellationTokenSource = new CancellationTokenSource();
-                searchCancellationTokenSourceList.Add(searchCancellationTokenSource);
-
-                DoSearchShortcodes(searchText, searchCancellationTokenSource.Token);
-            }
-        }
-
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        async void DoSearchShortcodes(string searchText, CancellationToken ct)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
-        {
-            searchResultsDataSource.Reset();
-
-            await Task.Delay(500);
-
-            if (ct.IsCancellationRequested) return;
-
-            var ds = (DataSource)shortcodesTableView.Source;
-            var filteredShortcodes = ds.Items.Where(sp => MatchesQuery(sp, searchText)).ToList();
-
-            if (ct.IsCancellationRequested) return;
-
-            searchResultsDataSource.AppendItems(filteredShortcodes);
-        }
-
-        static bool MatchesQuery(ShortcodePreview sp, string query)
-        {
-            if (sp.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-
-            if (sp.Description.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-
-            return false;
         }
 
         #endregion
@@ -456,14 +293,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            ShortcodesListViewController viewController;
+            ShortcodesSearchResultsViewController viewController;
             UITableView shortcodesTableView;
             readonly string emptyText;
 
             bool loading = true;
             List<ShortcodePreview> shortcodePreviewsInView = new List<ShortcodePreview>(1000);
 
-            public DataSource(ShortcodesListViewController viewController, UITableView shortcodesTableView, string emptyText)
+            public DataSource(ShortcodesSearchResultsViewController viewController, UITableView shortcodesTableView, string emptyText)
             {
                 this.viewController = viewController;
                 this.shortcodesTableView = shortcodesTableView;
