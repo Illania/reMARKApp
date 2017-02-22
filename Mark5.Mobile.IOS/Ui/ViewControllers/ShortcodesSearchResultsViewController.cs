@@ -107,7 +107,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             shortcodesTableView = new UITableView();
             shortcodesTableView.ClipsToBounds = false;
-            shortcodesTableView.Source = new DataSource(this, shortcodesTableView, Localization.GetString("folder_empty"));
+            shortcodesTableView.Source = new DataSource(this, shortcodesTableView, Localization.GetString("no_shortcodes_found"));
             shortcodesTableView.AllowsSelectionDuringEditing = false;
             shortcodesTableView.AllowsMultipleSelectionDuringEditing = true;
             shortcodesTableView.TranslatesAutoresizingMaskIntoConstraints = false;

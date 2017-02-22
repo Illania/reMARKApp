@@ -107,7 +107,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             contactsTableView = new UITableView();
             contactsTableView.ClipsToBounds = false;
-            contactsTableView.Source = new DataSource(this, contactsTableView, Localization.GetString("folder_empty"));
+            contactsTableView.Source = new DataSource(this, contactsTableView, Localization.GetString("no_contacts_found"));
             contactsTableView.AllowsSelectionDuringEditing = false;
             contactsTableView.AllowsMultipleSelectionDuringEditing = true;
             contactsTableView.TranslatesAutoresizingMaskIntoConstraints = false;
