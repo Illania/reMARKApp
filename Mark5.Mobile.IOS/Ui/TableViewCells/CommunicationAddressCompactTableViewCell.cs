@@ -36,30 +36,28 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         {
             AddressLabel.Font = communicationAddress.IsPrimary ? Theme.DefaultBoldFont : Theme.DefaultFont;
 
-            if (communicationAddress.Type == CommunicationAddressType.Email)
+            switch (communicationAddress.Type)
             {
-                AddressLabel.Text = communicationAddress.Address;
-                IconImage.Image = UIImage.FromBundle(Path.Combine("icons", "email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            }
-            else if (communicationAddress.Type == CommunicationAddressType.Mobile)
-            {
-                AddressLabel.Text = GetAddressFormatted(communicationAddress);
-                IconImage.Image = UIImage.FromBundle(Path.Combine("icons", "phone.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            }
-            else if (communicationAddress.Type == CommunicationAddressType.Phone)
-            {
-                AddressLabel.Text = GetAddressFormatted(communicationAddress);
-                IconImage.Image = UIImage.FromBundle(Path.Combine("icons", "phone.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            }
-            else if (communicationAddress.Type == CommunicationAddressType.Fax)
-            {
-                AddressLabel.Text = GetAddressFormatted(communicationAddress);
-                IconImage.Image = null;
-            }
-            else
-            {
-                AddressLabel.Text = communicationAddress.Address;
-                IconImage.Image = null;
+                case CommunicationAddressType.Email:
+                    AddressLabel.Text = communicationAddress.Address;
+                    IconImage.Image = UIImage.FromBundle(Path.Combine("icons", "email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    break;
+                case CommunicationAddressType.Mobile:
+                    AddressLabel.Text = GetAddressFormatted(communicationAddress);
+                    IconImage.Image = UIImage.FromBundle(Path.Combine("icons", "phone.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    break;
+                case CommunicationAddressType.Phone:
+                    AddressLabel.Text = GetAddressFormatted(communicationAddress);
+                    IconImage.Image = UIImage.FromBundle(Path.Combine("icons", "phone.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    break;
+                case CommunicationAddressType.Fax:
+                    AddressLabel.Text = GetAddressFormatted(communicationAddress);
+                    IconImage.Image = null;
+                    break;
+                default:
+                    AddressLabel.Text = communicationAddress.Address;
+                    IconImage.Image = null;
+                    break;
             }
         }
 
