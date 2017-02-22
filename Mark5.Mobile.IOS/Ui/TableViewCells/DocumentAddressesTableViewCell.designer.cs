@@ -16,7 +16,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 		UIKit.UILabel AddressLabel { get; set; }
 
 		[Outlet]
-		UIKit.UIImageView ImageIcon { get; set; }
+		UIKit.UIImageView IconImage { get; set; }
 
 		[Outlet]
 		UIKit.UILabel NameLabel { get; set; }
@@ -28,9 +28,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 				AddressLabel = null;
 			}
 
-			if (ImageIcon != null) {
-				ImageIcon.Dispose ();
-				ImageIcon = null;
+			if (IconImage != null) {
+				IconImage.Dispose ();
+				IconImage = null;
 			}
 
 			if (NameLabel != null) {

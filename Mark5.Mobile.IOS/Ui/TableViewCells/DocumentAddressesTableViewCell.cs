@@ -30,7 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         {
             var cell = (DocumentAddressesTableViewCell)Nib.Instantiate(null, null)[0];
             cell.AddressLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
-            cell.ImageIcon.Image = UIImage.FromBundle(Path.Combine("icons", "email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            cell.IconImage.Image = UIImage.FromBundle(Path.Combine("icons", "email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             return cell;
         }
 

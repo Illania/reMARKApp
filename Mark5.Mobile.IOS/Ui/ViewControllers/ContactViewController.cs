@@ -348,6 +348,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     contact = await Managers.ContactsManager.GetContactAsync(-1, contactPreview.Id);
                 }
 
+                contact.CommunicationAddresses = contact.CommunicationAddresses.OrderBy(ca => ca.Address).ToList();
+
                 if (token.IsCancellationRequested) return;
 
                 InitializeNavigationBarTitle();
@@ -494,12 +496,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     new NameSection(),
                     new DescriptionSection(),
                     new CommunicationAddressSection(CommunicationAddressType.Email),
-                    new CommunicationAddressSection(CommunicationAddressType.Phone),
                     new CommunicationAddressSection(CommunicationAddressType.Mobile),
+                    new CommunicationAddressSection(CommunicationAddressType.Phone),
                     new CommunicationAddressSection(CommunicationAddressType.Skype),
                     new CommunicationAddressSection(CommunicationAddressType.Fax),
-                    new CommunicationAddressSection(CommunicationAddressType.Telex),
                     new CommunicationAddressSection(CommunicationAddressType.IM),
+                    new CommunicationAddressSection(CommunicationAddressType.Telex),
                     new CommunicationAddressSection(CommunicationAddressType.Internal),
                     new PhysicalAddressSection(),
                     new LinkedContactSection(LinkedContactSection.LinkedContactSectionMode.PrimaryPerson),
@@ -1040,17 +1042,50 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     weakCommunicationAddress = new WeakReference<CommunicationAddress>(communicationAddress);
                 }
 
-                public override string Key { get { return base.Key + "_CommunicationAddress"; } }
+                public override string Key
+                {
+                    get
+                    {
+                        CommunicationAddress ca;
+                        weakCommunicationAddress.TryGetTarget(out ca);
+
+                        if (string.IsNullOrWhiteSpace(ca.Description))
+                        {
+                            return CommunicationAddressCompactTableViewCell.Key;
+                        }
+
+                        return CommunicationAddressTableViewCell.Key;
+                    }
+                }
+
+                public override UITableViewCell CreateCell()
+                {
+                    CommunicationAddress ca;
+                    weakCommunicationAddress.TryGetTarget(out ca);
+
+                    if (string.IsNullOrWhiteSpace(ca.Description))
+                    {
+                        return CommunicationAddressCompactTableViewCell.Create();
+                    }
+
+                    return CommunicationAddressTableViewCell.Create();
+                }
 
                 public override void Bind(UITableViewCell cell)
                 {
                     CommunicationAddress ca;
                     weakCommunicationAddress.TryGetTarget(out ca);
 
-                    cell.TextLabel.Text = ca?.Address;
-                    cell.SelectionStyle = (ca.Type == CommunicationAddressType.Email || ca.Type == CommunicationAddressType.Phone || ca.Type == CommunicationAddressType.Mobile)
-                        ? UITableViewCellSelectionStyle.Default
-                        : UITableViewCellSelectionStyle.None;
+                    if (string.IsNullOrWhiteSpace(ca.Description))
+                    {
+                        var cactcv = (CommunicationAddressCompactTableViewCell)cell;
+                        cactcv.Initialize(ca);
+                    }
+                    else
+                    {
+                        var catcv = (CommunicationAddressTableViewCell)cell;
+                        catcv.Initialize(ca);
+                    }
                 }
 
                 public override void OnClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
@@ -1078,13 +1113,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     weakPhysicalAddress = new WeakReference<PhysicalAddress>(physicalAddress);
                 }
 
-                public override string Key { get { return base.Key + "_PhysicalAddress"; } }
+                public override string Key { get { return PhysicalAddressTableViewCell.Key; } }
 
                 public override UITableViewCell CreateCell()
                 {
-                    var cell = base.CreateCell();
-                    cell.SelectionStyle = UITableViewCellSelectionStyle.Default;
-                    return cell;
+                    return PhysicalAddressTableViewCell.Create();
                 }
 
                 public override void Bind(UITableViewCell cell)
@@ -1092,7 +1125,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     PhysicalAddress pa;
                     weakPhysicalAddress.TryGetTarget(out pa);
 
-                    cell.TextLabel.Text = pa.Street;
+                    var patvc = (PhysicalAddressTableViewCell)cell;
+                    patvc.Initialize(pa);
                 }
 
                 public override void OnClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
