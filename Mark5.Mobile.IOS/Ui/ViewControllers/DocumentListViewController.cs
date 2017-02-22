@@ -17,6 +17,7 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.Common.HubMessages;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using ObjCRuntime;
@@ -59,6 +60,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeNavigationBar();
             InitializeView();
             InitializeSearchBar();
+            SubscribeToMessages();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -185,6 +187,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitializeNavigationBarTitle()
         {
             NavigationItem.Title = Folder.Name;
+        }
+
+        void SubscribeToMessages()
+        {
+            PlatformConfig.MessengerHub.Subscribe<CommentsCountChangedMessage>(CommentsCountChangedHandler, m => m.ObjectType == ObjectType.Document);
         }
 
         void InitializeHandlers()
@@ -526,15 +533,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
-        #region DocumentViewController Events
+        #region Events
 
         void DocumentViewController_ReadStatusUpdated(object sender, ReadStatusUpdatedEventArgs e)
         {
-            if (searchController.Active)
-            {
-
-            }
-
             var selectedRow = documentsTableView.IndexPathForSelectedRow;
 
             (documentsTableView.Source as DataSource).UpdateDocumentPreview(e.DocumentPreview);
@@ -545,6 +547,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (selectedRow != null)
             {
                 documentsTableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+            }
+        }
+
+        void CommentsCountChangedHandler(CommentsCountChangedMessage message)
+        {
+            var ds = documentsTableView.Source as DataSource;
+            var index = ds.Items.FindIndex(dp => dp.Id == message.EntityId);
+            if (index >= 0)
+            {
+                var documentPreview = ds.Items[index];
+                documentPreview.CommentsCount = message.CommentsCount;
+
+                var selectedRow = documentsTableView.IndexPathForSelectedRow;
+
+                documentsTableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Automatic);
+
+                if (selectedRow != null)
+                {
+                    documentsTableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                }
             }
         }
 
@@ -862,7 +884,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 documentsTableView = null;
                 documentPreviewsInView = null;
             }
-
 
             public void UpdateDocumentPreview(DocumentPreview documentPreview)
             {

@@ -9,8 +9,8 @@ using TinyMessenger;
 
 namespace Mark5.Mobile.IOS.Model.Messages
 {
-    
-    public class NewNotificationsMessage : TinyMessageBase
+
+    public class NewNotificationsMessage : TinyMessageBase //TODO this message is not together with the others in UI/COMMON/HUBMESSAGES
     {
 
         public NewNotificationsMessage(object sender)

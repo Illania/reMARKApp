@@ -17,7 +17,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
-    
+
     public class CopyMoveToFolderListViewController : AbstractFoldersListViewController
     {
 
@@ -203,7 +203,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             try
             {
                 await Managers.CommonActionsManager.MoveToFolder(businessEntities, fromFolder, folder);
-                PlatformConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, businessEntities.First().ObjectType, fromFolder.Id, businessEntities.Select(b => b.Id).ToList()));
+                PlatformConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, businessEntities.First().ObjectType, fromFolder.Id, businessEntities.Select(b => b.Id).ToList())); //TODO we don't subscribe to this anywhere 
                 dismissAction();
             }
             catch (Exception ex)
