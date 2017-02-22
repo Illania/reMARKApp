@@ -17,6 +17,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.ViewControllers.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -53,6 +54,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public int? DocumentId { get; set; }
         public DocumentPreview DocumentPreview { get; set; }
         public Document Document { get; set; }
+        public Guid OutgoingDocumentIdentifier { get; set; }
+        public OutgoingDocumentContainer Container { get; set; }
         public Guid NotificationGuid { get; set; }
 
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
@@ -132,12 +135,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             CorrectScrollViewInsets();
         }
 
-        public override void ViewWillDisappear(bool animated)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        public override async void ViewWillDisappear(bool animated)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void 
         {
             base.ViewWillDisappear(animated);
 
             setReadStatusCancellationTokenSource?.Cancel();
             setReadStatusCancellationTokenSource = null;
+
+            if ((IsMovingFromParentViewController || IsBeingDismissed) && OutgoingDocumentIdentifier != default(Guid))
+            {
+                await Managers.DocumentsManager.UnlockOutgoingDocumentAsync(OutgoingDocumentIdentifier);
+                Managers.OutgoingDocumentsManager.Notify(OutgoingDocumentIdentifier);
+            }
 
             DeInitializeHandlers();
         }
@@ -158,23 +169,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 nextDocumentButtonItem = null;
                 previousDocumentButtonItem = null;
 
-                var rightButtons = new UIBarButtonItem[2];
 
                 nextDocumentButtonItem = new UIBarButtonItem();
-                nextDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("Icons", "arrow-down.png"));
+                nextDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("icons", "arrow-down.png"));
                 nextDocumentButtonItem.Enabled = false;
-                rightButtons[0] = nextDocumentButtonItem;
 
                 previousDocumentButtonItem = new UIBarButtonItem();
-                previousDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("Icons", "arrow-up.png"));
+                previousDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("icons", "arrow-up.png"));
                 previousDocumentButtonItem.Enabled = false;
-                rightButtons[1] = previousDocumentButtonItem;
 
                 editDocumentButtonItem = new UIBarButtonItem();
-                editDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("Icons", "pencil.png"));
+                editDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("icons", "pencil.png"));
                 editDocumentButtonItem.Enabled = true;
 
-                NavigationItem.SetRightBarButtonItems(rightButtons, false);
+                if (OutgoingDocumentIdentifier == default(Guid))
+                {
+                    var rightButtons = new UIBarButtonItem[2];
+                    rightButtons[0] = nextDocumentButtonItem;
+                    rightButtons[1] = previousDocumentButtonItem;
+                    NavigationItem.SetRightBarButtonItems(rightButtons, false);
+                }
+                else
+                {
+                    var rightButtons = new UIBarButtonItem[1];
+                    rightButtons[0] = editDocumentButtonItem;
+                    NavigationItem.SetRightBarButtonItems(rightButtons, false);
+                }
             }
         }
 
@@ -199,7 +219,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
                 });
 
@@ -301,16 +321,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitToolbar()
         {
             flag = new UIBarButtonItem();
-            flag.Image = UIImage.FromBundle(Path.Combine("Icons", "flag.png"));
+            flag.Image = UIImage.FromBundle(Path.Combine("icons", "flag.png"));
             flag.Enabled = false;
 
             fileTo = new UIBarButtonItem();
-            fileTo.Image = UIImage.FromBundle(Path.Combine("Icons", "worktray.png"));
+            fileTo.Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png"));
             fileTo.Enabled = false;
 
             commentsButton = new UIButton(UIButtonType.System);
             commentsButton.Frame = new CGRect(0.0f, 0.0f, 25.0f, 25.0f);
-            commentsButton.SetImage(UIImage.FromBundle(Path.Combine("Icons", "comments.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            commentsButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "comments.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             commentsButton.Enabled = false;
 
             comments = new BadgeBarButtonItem(commentsButton);
@@ -318,11 +338,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             comments.Enabled = false;
 
             replyActions = new UIBarButtonItem();
-            replyActions.Image = UIImage.FromBundle(Path.Combine("Icons", "reply.png"));
+            replyActions.Image = UIImage.FromBundle(Path.Combine("icons", "reply.png"));
             replyActions.Enabled = false;
 
             userActions = new UIBarButtonItem();
-            userActions.Image = UIImage.FromBundle(Path.Combine("Icons", "actions.png"));
+            userActions.Image = UIImage.FromBundle(Path.Combine("icons", "actions.png"));
             userActions.Enabled = false;
 
             toolbar = new UIToolbar();
@@ -461,16 +481,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
                 }
 
-                if (DocumentId.HasValue && DocumentPreview == null && Document == null)
+                if (OutgoingDocumentIdentifier != default(Guid))
                 {
-                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(FolderId ?? Folder?.Id, DocumentId.Value);
-                    DocumentPreview = container.DocumentPreview;
-                    Document = container.Document;
+                    Container = await Managers.DocumentsManager.GetOutgoingDocumentContainerAsync(OutgoingDocumentIdentifier, true);
+                    DocumentPreview = Container.DocumentPreview;
+                    Document = Container.Document;
                 }
-
-                if (DocumentPreview != null && Document == null)
+                else
                 {
-                    Document = await Managers.DocumentsManager.GetDocumentAsync(FolderId ?? Folder?.Id, DocumentPreview.Id);
+                    if (DocumentId.HasValue && DocumentPreview == null && Document == null)
+                    {
+                        var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(FolderId ?? Folder?.Id, DocumentId.Value);
+                        DocumentPreview = container.DocumentPreview;
+                        Document = container.Document;
+                    }
+
+                    if (DocumentPreview != null && Document == null)
+                    {
+                        Document = await Managers.DocumentsManager.GetDocumentAsync(FolderId ?? Folder?.Id, DocumentPreview.Id);
+                    }
                 }
 
                 RefreshView();
@@ -495,6 +524,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void MarkAsReadIfNecessary()
         {
+            if (OutgoingDocumentIdentifier != default(Guid))
+            {
+                return;
+            }
+
             setReadStatusCancellationTokenSource?.Cancel();
             setReadStatusCancellationTokenSource = new CancellationTokenSource();
 
@@ -551,6 +585,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 v.Document = Document;
                 v.DocumentPreview = DocumentPreview;
+                v.Container = Container;
                 v.RefreshView();
             });
 
@@ -558,13 +593,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             RefreshNavigationBar();
 
-            flag.Enabled = true;
-            fileTo.Enabled = true;
-            replyActions.Enabled = true;
-            comments.BadgeValue = DocumentPreview.CommentsCount.ToString();
-            comments.Enabled = true;
-            commentsButton.Enabled = true;
-            userActions.Enabled = true;
+            var isLocalDocument = OutgoingDocumentIdentifier != default(Guid);
+
+            flag.Enabled = !isLocalDocument;
+            fileTo.Enabled = !isLocalDocument;
+            replyActions.Enabled = !isLocalDocument;
+            comments.BadgeValue = Document.Comments.Count.ToString();
+            comments.Enabled = !isLocalDocument;
+            commentsButton.Enabled = !isLocalDocument;
+            userActions.Enabled = !isLocalDocument;
 
             UIView.Animate(0.075d, stackViewBeforeContent.LayoutIfNeeded);
             UIView.Animate(0.1d, () => stackViewBeforeContent.Alpha = 1.0f);
@@ -600,7 +637,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 previousDocumentButtonItem.Enabled = false;
             }
 
-            if (Document == null || (DocumentPreview.Direction != DocumentDirection.Draft))
+
+            if (OutgoingDocumentIdentifier != default(Guid))
+            {
+                var rightButtons = new UIBarButtonItem[1];
+                rightButtons[0] = editDocumentButtonItem;
+                NavigationItem.SetRightBarButtonItems(rightButtons, true);
+            }
+            else if (Document == null || (DocumentPreview.Direction != DocumentDirection.Draft))
             {
                 var rightButtons = new UIBarButtonItem[2];
                 rightButtons[0] = nextDocumentButtonItem;
@@ -621,27 +665,40 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Subviews event handlers
 
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void AttachmentsList_AttachmentTapped(object sender, AttachmentButtonTappedEventArgs e)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var attachmentDescription = e.Attachment;
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
 
             try
             {
-                var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, false, SourceType.Local);
+                string path = null;
 
-                if (string.IsNullOrWhiteSpace(path))
+                var remoteAttachment = attachmentDescription as AttachmentDescription;
+                if (remoteAttachment != null)
                 {
-                    if (attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes
-                        && PlatformConfig.Preferences.LargeAttachmentWarning
-                        && !await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("big_attachment_title"),
-                                                               string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(e.Attachment.SizeInBytes))))
-                    {
-                        dismissAction();
-                        return;
-                    }
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(remoteAttachment, Document, false, SourceType.Local);
 
-                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, Document, false, SourceType.Remote);
+                    if (string.IsNullOrWhiteSpace(path))
+                    {
+                        if (attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes
+                            && PlatformConfig.Preferences.LargeAttachmentWarning
+                            && !await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("big_attachment_title"),
+                                                                   string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(remoteAttachment.SizeInBytes))))
+                        {
+                            dismissAction();
+                            return;
+                        }
+
+                        path = await Managers.DocumentsManager.GetAttachmentAsync(remoteAttachment, Document, false, SourceType.Remote);
+                    }
+                }
+                else
+                {
+                    var outgoingAttachment = attachmentDescription as OutgoingDocumentAttachmentDescription;
+                    path = outgoingAttachment.Path;
                 }
 
                 if (string.IsNullOrWhiteSpace(path))
@@ -666,11 +723,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
                     }
                 }
-
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to view attachment [document.Id={Document.Id}, attachment.Id={attachmentDescription?.Id}, attachment.Name={attachmentDescription?.Name}", ex);
+                CommonConfig.Logger.Error($"Failed to view attachment [document.Id={Document.Id}, attachment.Name={attachmentDescription?.Name}", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(this, ex);
@@ -853,16 +909,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void EditDocumentButtonItem_Clicked(object sender, EventArgs e)
         {
-            var composeDocumentViewController = new ComposeDocumentViewController()
+            ComposeDocumentViewController vc = null;
+            if (OutgoingDocumentIdentifier != default(Guid))
             {
-                PreviousDocumentPreview = DocumentPreview,
-                PreviousDocument = Document,
-                CreationModeFlag = DocumentCreationModeFlag.Edit,
-                PreviousDocumentDirection = DocumentPreview.Direction,
-                PreviousDocumentFolderId = Folder.Id
-            };
+                vc = new ComposeDocumentViewController
+                {
+                    LocalDocument = true,
+                    CreationModeFlag = DocumentCreationModeFlag.Edit,
+                    PreviousDocumentDirection = Container.DocumentPreview.Direction,
+                    OutgoingDocumentGuid = Container.Info.Identifier
+                };
+            }
+            else
+            {
+                vc = new ComposeDocumentViewController
+                {
+                    PreviousDocumentPreview = DocumentPreview,
+                    PreviousDocument = Document,
+                    CreationModeFlag = DocumentCreationModeFlag.Edit,
+                    PreviousDocumentDirection = DocumentPreview.Direction,
+                    PreviousDocumentFolderId = Folder.Id
+                };
+            }
 
-            var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
+            var composeDocumentNavigationController = new UINavigationController(vc);
             composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
             PresentViewController(composeDocumentNavigationController, true, null);
         }
@@ -921,7 +991,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CommentsButton_TouchUpInside(object sender, EventArgs e)
         {
-            //TODO
+            var commentsListViewController = new CommentsListViewController();
+            var commentsListViewNavigationController = new UINavigationController(commentsListViewController);
+            commentsListViewNavigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+            commentsListViewController.Entity = Document;
+
+            PresentViewController(commentsListViewNavigationController, true, null);
         }
 
         void DoFileToWorktray()
@@ -971,25 +1046,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
         #endregion
-
-    }
-
-    public class ActionableLayoutScrollView : UIScrollView
-    {
-        public Action<UIScrollView> LayoutSubviewsAction
-        {
-            get;
-            set;
-        }
-
-        public override void LayoutSubviews()
-        {
-            base.LayoutSubviews();
-            if (LayoutSubviewsAction != null)
-            {
-                LayoutSubviewsAction(this);
-            }
-        }
     }
 
     class AttachmentInteractionControllerDelegate : UIDocumentInteractionControllerDelegate

@@ -1,5 +1,7 @@
 "actions" = "Actions";
+"add" = "Add";
 "add_to_favorites" = "Add to\nfavorites";
+"adding_comment___" = "Adding comment...";
 "attachments" = "Attachments";
 "attachment_too_big" = "The attachment is bigger than the maximum allowed size on the server";
 "back" = "Back";
@@ -17,6 +19,8 @@
 "clear_shortcodes_cache_title" = "Clear shortcodes cache";
 "clearing_contacts_cache___" = "Clearing cache...";
 "clearing_shortcodes_cache___" = "Clearing cache...";
+"comments" = "Comments";
+"confirm" = "Confirm";
 "confirm_copy_to_folder_contacts" = "Do you want to copy selected contacts?";
 "confirm_copy_to_folder_documents" = "Do you want to copy selected documents?";
 "confirm_copy_to_folder_shortcodes" = "Do you want to copy selected shortcodes?";
@@ -26,6 +30,7 @@
 "confirm_move_to_folder_shortcodes" = "Do you want to move selected shortcodes?";
 "confirm_move_to_folder" = "Move";
 "confirm_save_as_draft" = "Do you want to save the document as draft?";
+"confirm_save_modified_document" = "Do you want to save the modified document?";
 "contacts" = "Contacts";
 "continue" = "Continue";
 "copy_to_folder" = "Copy to folder";
@@ -37,6 +42,7 @@
 "delete_from_folder" = "Delete from folder";
 "delete" = "Delete";
 "delete_from_folder" = "Delete from folder";
+"deleting_comment___" = "Deleting comment...";
 "description" = "Description";
 "disable_caching" = "Disable\ncaching";
 "disable_notifications" = "Don't\nnotify";
@@ -45,9 +51,13 @@
 "done" = "Done";
 "downloading_attachment___" = "Downloading attachment...";
 "edit" = "Edit";
+"edit_message" = "Edit message";
+"edit_not_possible" = "Comments can be edited maximum one minute after creation";
+"editing_comment___" = "Editing comment...";
 "enable_caching" = "Enable\ncaching";
 "enable_notifications" = "Notify";
 "enabled" = "Enabled";
+"error" = "Error";
 "error_appserviceexception_title" = "Error";
 "error_dataaccessexception_title" = "Cache error occured";
 "error_datanotfoundexception_message" = "This item is not available offline";
@@ -60,6 +70,8 @@
 "error_removing_local_attachment" = "Error while removing local attachment";
 "error_saving_local_attachment" = "Error while saving local attachment";
 "favorites" = "Favorites";
+"failed_send_document_notification_content" = "One or more messages could not be sent";
+"failed_send_document_notification_title" = "Failed to send messages";
 "filter" = "Filter";
 "folder_empty" = "Folder is empty";
 "folders" = "Folders";
@@ -84,6 +96,7 @@
 "mark_as_unread" = "Mark as unread";
 "marking_document_as_read___" = "Marking document as read...";
 "marking_document_as_unread___" = "Marking document as unread...";
+"me" = "Me";
 "more" = "More";
 "move_to_folder" = "Move to folder";
 "moving___" = "Moving...";
@@ -101,11 +114,13 @@
 "no_templates_title" = "No templates";
 "no" = "No";
 "normal" = "Normal";
+"no_comments" = "No comments present";
 "no_matching_shortcodes" = "There are no matching shortcodes";
 "no_matching_users" = "There are no matching users";
 "no_notifications" = "There are no notifications";
 "no_object_actions" = "There are no actions";
 "no_object_links" = "There are no links";
+"no_subject" = "No subject";
 "notifications" = "Notifications";
 "ok" = "OK";
 "opening_attachment___" = "Opening attachment...";
@@ -125,6 +140,7 @@
 "reply" = "Reply";
 "report" = "Report";
 "save_draft" = "Save draft";
+"save_modifications" = "Save modifications";
 "saving_draft___" = "Saving draft...";
 "search" = "Search";
 "search" = "Search";

@@ -8,13 +8,15 @@
 using System;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.IOS.Ui.ViewControllers.Common.StackView;
+using Mark5.Mobile.IOS.Ui.ViewControllers.Common;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-    public abstract class ComposeDocumentSubView : StackSubView
+    public abstract class ComposeDocumentSubView : UIStackView
     {
+        protected UIView ContainerView;
+
         public DocumentPreview DocumentPreview { get; set; }
         public Document Document { get; set; }
         public DocumentPreview PreviousDocumentPreview { get; set; }
@@ -22,6 +24,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
 
         protected float MinimumHeight = 21.0f;
+        protected float HorizontalMargin = 15.0f;
+        protected float VerticalMargin = 12.0f;
+        protected float InnerMargin = 5.0f;
 
         protected ComposeDocumentSubView()
         {
@@ -30,14 +35,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void Initialize()
         {
+            BackgroundColor = UIColor.White;
             Opaque = false;
+            Axis = UILayoutConstraintAxis.Vertical;
+            Alignment = UIStackViewAlignment.Fill;
+            Distribution = UIStackViewDistribution.Fill;
+            Spacing = 0.0f;
             TranslatesAutoresizingMaskIntoConstraints = false;
-            SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+
+            ContainerView = new UIView();
+            AddArrangedSubview(ContainerView);
+
+            AddArrangedSubview(new SeparatorSubView());
         }
 
         #region Event handlers
 
-        protected void HandleScrollToView(object sender, EventArgs e)
+        protected void HandleScrollToView(object sender, EventArgs e) //TODO check if still valid
         {
             var parentScrollView = Superview.Superview as UIScrollView;
             if (parentScrollView != null)

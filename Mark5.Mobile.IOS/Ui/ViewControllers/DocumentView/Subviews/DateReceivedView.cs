@@ -20,7 +20,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         public override void RefreshView()
         {
-            if (DocumentPreview != null)
+            if (Container != null)
+            {
+                TextView.Text = Container.Info.DateLastSavedTimestamp
+                        .ConvertTimestampMillisecondsToDateTime()
+                        .ConvertUtcToServerTime()
+                        .ConvertDateTimeToTimestampMilliseconds()
+                        .FormatServerTimestampAsCompactLongDateTimeString();
+            }
+            else if (DocumentPreview != null)
             {
                 TextView.Text = DocumentPreview.DateReceivedTimestamp
                          .ConvertTimestampMillisecondsToDateTime()

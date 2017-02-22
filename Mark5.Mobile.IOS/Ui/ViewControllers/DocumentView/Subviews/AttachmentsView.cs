@@ -80,6 +80,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 var alssv = new AttachmentsSubView(this, ad);
                 stackView.AddArrangedSubview(alssv);
             }
+
+            if (Container != null)
+            {
+                foreach (var ad in Container.LocalAttachments)
+                {
+                    var alssv = new AttachmentsSubView(this, ad);
+                    stackView.AddArrangedSubview(alssv);
+                }
+            }
         }
 
         public override void UpdateVisibility()
@@ -90,7 +99,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 return;
             }
 
-            Hidden = Document.Attachments.Count < 1;
+            Hidden = Document.Attachments.Count < 1 && Container?.LocalAttachments.Count < 1;
         }
 
         #region Event handlers
@@ -106,7 +115,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
     class AttachmentsSubView : UIView
     {
 
-        public AttachmentDescription Attachment
+        public IAttachmentDescription Attachment
         {
             get
             {
@@ -115,11 +124,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         }
 
         readonly AttachmentsView view;
-        readonly AttachmentDescription attachmentDescription;
+        readonly IAttachmentDescription attachmentDescription;
 
         UIButton attachmentButton;
 
-        public AttachmentsSubView(AttachmentsView view, AttachmentDescription attachmentDescription)
+        public AttachmentsSubView(AttachmentsView view, IAttachmentDescription attachmentDescription)
         {
             this.view = view;
             this.attachmentDescription = attachmentDescription;
@@ -153,13 +162,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
     public class AttachmentButtonTappedEventArgs : EventArgs
     {
 
-        public AttachmentDescription Attachment
+        public IAttachmentDescription Attachment
         {
             get;
             private set;
         }
 
-        public AttachmentButtonTappedEventArgs(AttachmentDescription attachment)
+        public AttachmentButtonTappedEventArgs(IAttachmentDescription attachment)
         {
             Attachment = attachment;
         }

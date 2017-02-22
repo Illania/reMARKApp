@@ -15,7 +15,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Ui.ViewControllers.Common.StackView;
+using Mark5.Mobile.IOS.Ui.ViewControllers.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Utilities;
@@ -23,7 +23,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class ComposeDocumentViewController : StackViewController
+    public class ComposeDocumentViewController : UIViewController
     {
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
@@ -46,6 +46,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         Document Document { get; set; } = new Document();
         DocumentPreview DocumentPreview { get; set; } = new DocumentPreview();
 
+        ActionableLayoutScrollView scrollView;
+        UIStackView stackView;
+
         ToView toView;
         CcView ccView;
         BccView bccView;
@@ -59,6 +62,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         SuggestionsListView suggestionsListView;
 
         bool templateLoaded;
+        bool documentShown;
 
         UIBarButtonItem cancelButtonItem;
         UIBarButtonItem sendButtonItem;
@@ -80,6 +84,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.LoadView();
 
+            Initialize();
             InitNavigationBar();
             InitSubViews();
         }
@@ -93,6 +98,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.DidShowNotification, OnKeyboardDidShowNotification);
             NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillChangeFrameNotification, OnKeyboardDidShowNotification);
             NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
+
+            NavigationController.HidesBarsOnSwipe = true;
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -108,9 +115,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 OutgoingDocumentGuid = Guid.NewGuid();
             }
 
-            PreviousDocumentDirection = DocumentDirection.None;
-            CreationModeFlag = DocumentCreationModeFlag.New;
-
             await LoadDocument();
         }
 
@@ -125,11 +129,68 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     UIKeyboard.WillChangeFrameNotification,
                     UIKeyboard.WillHideNotification
                 });
+
+            NavigationController.HidesBarsOnSwipe = false;
         }
 
         #endregion
 
         #region Init methods
+
+        void Initialize()
+        {
+            View.BackgroundColor = UIColor.White;
+
+            scrollView = new ActionableLayoutScrollView
+            {
+                LayoutSubviewsAction = HandleScrollViewLayoutSubviewsAction,
+                BackgroundColor = UIColor.White,
+                ShowsVerticalScrollIndicator = true,
+                ShowsHorizontalScrollIndicator = false,
+                ScrollEnabled = true,
+                ScrollsToTop = true,
+                UserInteractionEnabled = true,
+                ClipsToBounds = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            View.AddSubview(scrollView);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
+                });
+
+            stackView = new UIStackView
+            {
+                BackgroundColor = UIColor.White,
+                Axis = UILayoutConstraintAxis.Vertical,
+                Alignment = UIStackViewAlignment.Fill,
+                Distribution = UIStackViewDistribution.Fill,
+                Spacing = 0.0f,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            scrollView.AddSubview(stackView);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Top, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Right, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1.0f, 0.0f)
+                });
+
+            contentView = new ContentView();
+            scrollView.AddSubview(contentView);
+            View.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, stackView, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Right, 1.0f, 0.0f),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, scrollView, NSLayoutAttribute.Width, 1.0f, 0.0f)
+            });
+        }
 
         void InitNavigationBar()
         {
@@ -142,39 +203,49 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             sendButtonItem.Enabled = false;
 
             attachmentButtonItem = new UIBarButtonItem();
-            attachmentButtonItem.Title = "ATT";
+            attachmentButtonItem.Title = "ATT"; //TODO need to put an icon here
             attachmentButtonItem.Enabled = true;
-            NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { attachmentButtonItem, sendButtonItem }, false);
+
+            if (LocalDocument)
+            {
+                NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { attachmentButtonItem }, false);
+            }
+            else
+            {
+                NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { sendButtonItem, attachmentButtonItem }, false);
+            }
         }
 
         void InitSubViews()
         {
+            var subviewsInStacView = new List<ComposeDocumentSubView>();
+
             toView = new ToView();
-            subViews.Add(toView);
+            subviewsInStacView.Add(toView);
 
             ccView = new CcView();
-            subViews.Add(ccView);
+            subviewsInStacView.Add(ccView);
 
             bccView = new BccView();
-            subViews.Add(bccView);
+            subviewsInStacView.Add(bccView);
 
             lineView = new LineView(this);
-            subViews.Add(lineView);
+            subviewsInStacView.Add(lineView);
 
             priorityView = new PriorityView(this);
             if (PlatformConfig.Preferences.ComposePriorityEnabled)
-                subViews.Add(priorityView);
+                subviewsInStacView.Add(priorityView);
 
             subjectView = new SubjectView();
-            subViews.Add(subjectView);
+            subviewsInStacView.Add(subjectView);
 
             attachmentsView = new AttachmentsView();
-            subViews.Add(attachmentsView);
+            subviewsInStacView.Add(attachmentsView);
 
-            contentView = new ContentView();
+            subviewsInStacView.ForEach(stackView.AddArrangedSubview);
+
+            subViews.AddRange(subviewsInStacView);
             subViews.Add(contentView);
-
-            AddArrangedViewsWithSeparators(subViews);
         }
 
         void InitializeHandlers()
@@ -255,10 +326,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     PreviousDocumentId = outgoingContainer.Info.PreviousDocumentId;
                     PreviousDocumentFolderId = outgoingContainer.Info.PreviousDocumentdFolderId;
                     OutgoingDocumentState = outgoingContainer.Info.State;
+
                     OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag;
                     if (outgoingContainer.Info.State == OutgoingDocumentState.Failed)
                     {
                         await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_while_sending_document")));
+                        NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { sendButtonItem, attachmentButtonItem }, false);
                     }
                     if (outgoingContainer.LocalAttachments != null)
                     {
@@ -287,6 +360,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async Task ShowDocument()
         {
+            if (documentShown)
+            {
+                return;
+            }
+
             foreach (var subView in subViews)
             {
                 subView.Document = Document;
@@ -297,12 +375,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 await subView.RefreshView();
             }
 
+            OutgoingDocumentInitialAttachments.ForEach(attachmentsView.AddAttachment);
+
             if (CreationModeFlag == DocumentCreationModeFlag.New && PreconfiguredEmailAddresses != null)
             {
                 toView.SetEmails(PreconfiguredEmailAddresses);
             }
 
+            sendButtonItem.Enabled = IsFormValid();
+
             await AskIfShouldUseTemplates();
+
+            documentShown = true;
+
+            //In those cases there is no predefined To
+            if (CreationModeFlag == DocumentCreationModeFlag.New || CreationModeFlag == DocumentCreationModeFlag.Forward)
+            {
+                toView.StartEditing();
+            }
         }
 
         bool IsFormValid()
@@ -332,16 +422,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             keyboardHeight = UI.KeyboardHeightFromNotification(notification);
 
-            var insets = ScrollView.ContentInset;
+            var insets = scrollView.ContentInset;
             insets.Bottom = keyboardHeight;
-            ScrollView.ContentInset = insets;
+            scrollView.ContentInset = insets;
         }
 
         void OnKeyboardWillHideNotification(NSNotification notification)
         {
-            var insets = ScrollView.ContentInset;
+            var insets = scrollView.ContentInset;
             insets.Bottom = 0.0f;
-            ScrollView.ContentInset = insets;
+            scrollView.ContentInset = insets;
         }
 
         #endregion
@@ -378,7 +468,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (LocalDocument)
                 {
-                    //TODO
+                    await SynchOutgoingAttachments(false);
                 }
 
                 await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,
@@ -406,6 +496,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             else
             {
                 NavigationController.PopViewController(true);
+            }
+        }
+
+        public async Task SynchOutgoingAttachments(bool restoreState)
+        {
+            if (restoreState) //We need to remove all the newly added attachments - Restoring state before modifications
+            {
+                var currentAttachments = attachmentsView.GetOutgoingAttachments();
+                var initialAttachmentsNames = OutgoingDocumentInitialAttachments.Select(a => a.Name).ToList();
+
+                var attachmentsToRemove = currentAttachments.Where(a => !initialAttachmentsNames.Contains(a.Name));
+
+                foreach (var attachment in attachmentsToRemove)
+                {
+                    await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Name);
+                }
+            }
+            else //We need to remove all the attachments that are not there already
+            {
+                var currentAttachmentsNames = attachmentsView.GetOutgoingAttachments().Select(a => a.Name).ToList();
+                var initialAttachments = OutgoingDocumentInitialAttachments;
+
+                var attachmentsToRemove = initialAttachments.Where(a => !currentAttachmentsNames.Contains(a.Name));
+
+                foreach (var attachment in attachmentsToRemove)
+                {
+                    await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Name);
+                }
             }
         }
 
@@ -484,7 +602,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (LocalDocument)
             {
-                //TODO    
+                var confirm = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("save_modifications"), Localization.GetString("confirm_save_modified_document"));
+                if (confirm)
+                {
+                    await SaveModifiedOutgoingDocument();
+                }
+                else
+                {
+                    await SaveAndCloseComposeViewController();
+                }
             }
             else
             {
@@ -495,8 +621,52 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
                 else
                 {
-                    PopOrDismissViewController();
+                    await SaveAndCloseComposeViewController();
                 }
+            }
+        }
+
+        async Task SaveAndCloseComposeViewController()
+        {
+            if (!LocalDocument)
+            {
+                await Managers.DocumentsManager.DeleteOutgoingDocumentFolder(OutgoingDocumentGuid);
+            }
+            else
+            {
+                await SynchOutgoingAttachments(true);
+            }
+
+            PopOrDismissViewController();
+        }
+
+        async Task SaveModifiedOutgoingDocument()
+        {
+            if (!LocalDocument)
+            {
+                return;
+            }
+
+            try
+            {
+                foreach (var subView in subViews)
+                {
+                    await subView.UpdateDocument();
+                }
+
+                DocumentPreview.Direction = PreviousDocumentPreview.Direction;
+
+                await SynchOutgoingAttachments(false);
+                await Managers.DocumentsManager.SaveOutgoingDocumentAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,
+                                                                        PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1,
+                                                                          0, false, false);
+
+                PopOrDismissViewController();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to save modified outgoing document [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
 
@@ -870,6 +1040,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             template.Content = templateContent;
+        }
+
+        #endregion
+
+        #region ScrollView LayoutSubViews Action
+
+        void HandleScrollViewLayoutSubviewsAction(UIScrollView consideredScrollView)
+        {
+            //Used to keep the views before and after the content anchored to the scrollView
+            var minimumVisibleX = consideredScrollView.ContentOffset.X;
+
+            var actualFrame = stackView.Frame;
+            actualFrame.X = minimumVisibleX;
+            stackView.Frame = actualFrame;
         }
 
         #endregion

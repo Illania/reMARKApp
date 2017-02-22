@@ -6,7 +6,7 @@
 // Copyright (c) 2017 Nordic IT
 //
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.IOS.Ui.ViewControllers.Common.StackView;
+using Mark5.Mobile.IOS.Ui.ViewControllers.Common;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
@@ -15,6 +15,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
     {
         public DocumentPreview DocumentPreview { get; set; }
         public Document Document { get; set; }
+        public OutgoingDocumentContainer Container { get; set; }
 
         protected UIView ContainerView;
 

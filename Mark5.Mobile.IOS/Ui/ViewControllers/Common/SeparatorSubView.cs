@@ -3,12 +3,12 @@
 // File: SeparatorSubView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
 //
-// Copyright (c) 2016 Nordic IT
+// Copyright (c) 2017 Nordic IT
 //
-using System;
+
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers.Common.StackView
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.Common
 {
     public class SeparatorSubView : UIView
     {
@@ -38,7 +38,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.Common.StackView
                 constraint.Priority = 500;
             }
             AddConstraints(constraints);
-
         }
     }
 }

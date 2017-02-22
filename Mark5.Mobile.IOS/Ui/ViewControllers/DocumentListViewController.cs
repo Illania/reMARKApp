@@ -225,6 +225,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public async void DocumentSelected(DocumentPreview documentPreview)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
+            if (documentsTableView.Editing)
+            {
+                return;
+            }
+
             if (SplitViewController == null || SplitViewController.Collapsed)
             {
                 var ds = (DataSource)documentsTableView.Source;
