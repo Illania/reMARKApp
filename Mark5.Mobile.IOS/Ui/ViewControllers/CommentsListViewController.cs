@@ -180,9 +180,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(commentContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Left, 1.0f, CommentEditViewInnerMargin),
                     NSLayoutConstraint.Create(commentContent, NSLayoutAttribute.Right, NSLayoutRelation.Equal, addComment, NSLayoutAttribute.Left, 1.0f, -CommentEditViewInnerMargin),
                     NSLayoutConstraint.Create(commentContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Bottom, 1.0f, -CommentEditViewInnerMargin),
-                    commentContentMaximumHeightConstraint,
+                    commentContentMaximumHeightConstraint
                 });
-
 
             View.AddGestureRecognizer(new UITapGestureRecognizer(() => commentContent.EndEditing(true)));
         }
@@ -259,19 +258,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 Comment newComment;
-                int newCommentsCount;
 
                 switch (Entity.ObjectType)
                 {
                     case ObjectType.Document:
                         var document = Entity as Document;
                         newComment = await Managers.DocumentsManager.AddComment(document, newCommentContent);
-                        newCommentsCount = document.Comments.Count;
+                        PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentsCountChangedMessage(this, document.Id, document.Comments.Count));
                         break;
                     case ObjectType.Contact:
                         var contact = Entity as Contact;
                         newComment = await Managers.ContactsManager.AddComment(contact, newCommentContent);
-                        newCommentsCount = contact.Comments.Count;
                         break;
                     default:
                         throw new ArgumentException("The input business entity does not have comments defined in the model");
@@ -282,7 +279,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 commentsTableView.ScrollToRow(NSIndexPath.FromRowSection(ds.Items.Count - 1, 0), UITableViewScrollPosition.Middle, true);
                 commentContent.Text = string.Empty;
 
-                PlatformConfig.MessengerHub.Publish(new CommentsCountChangedMessage(this, Entity.ObjectType, Entity.Id, newCommentsCount));
             }
             catch (Exception ex)
             {
@@ -315,24 +311,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             Task.Run(async () =>
              {
-                 int newCommentsCount;
                  switch (Entity.ObjectType)
                  {
                      case ObjectType.Document:
                          var document = Entity as Document;
                          await Managers.DocumentsManager.DeleteComment(document, comment);
-                         newCommentsCount = document.Comments.Count;
+                         PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentsCountChangedMessage(this, document.Id, document.Comments.Count));
                          break;
                      case ObjectType.Contact:
                          var contact = Entity as Contact;
                          await Managers.ContactsManager.DeleteComment(contact, comment);
-                         newCommentsCount = contact.Comments.Count;
                          break;
                      default:
                          throw new ArgumentException("The input business entity does not have comments defined in the model");
                  }
 
-                 return newCommentsCount;
              }).ContinueWith(async t =>
              {
                  dismissAction();
@@ -345,7 +338,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                  else
                  {
                      (commentsTableView.Source as DataSource).RemoveComment(comment);
-                     PlatformConfig.MessengerHub.Publish(new CommentsCountChangedMessage(this, Entity.ObjectType, Entity.Id, t.Result));
                  }
 
              }, TaskScheduler.FromCurrentSynchronizationContext());

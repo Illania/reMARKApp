@@ -371,7 +371,7 @@
     <Compile Include="Ui\TableViewCells\CommentsTableViewCell.designer.cs">
       <DependentUpon>CommentsTableViewCell.cs</DependentUpon>
     </Compile>
-    <Compile Include="Ui\Common\HubMessages\CommentsCountChangedMessage.cs" />
+    <Compile Include="Ui\Common\HubMessages\DocumentPreviewCommentsCountChangedMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

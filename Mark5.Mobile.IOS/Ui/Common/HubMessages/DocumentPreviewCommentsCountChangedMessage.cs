@@ -11,15 +11,9 @@ using TinyMessenger;
 
 namespace Mark5.Mobile.IOS.Ui.Common.HubMessages
 {
-    public class CommentsCountChangedMessage : TinyMessageBase
+    public class DocumentPreviewCommentsCountChangedMessage : TinyMessageBase
     {
-        public ObjectType ObjectType
-        {
-            get;
-            private set;
-        }
-
-        public int EntityId
+        public int DocumentPreviewId
         {
             get;
             private set;
@@ -31,11 +25,10 @@ namespace Mark5.Mobile.IOS.Ui.Common.HubMessages
             private set;
         }
 
-        public CommentsCountChangedMessage(object sender, ObjectType objectType, int entityId, int commentsCount) : base(sender)
+        public DocumentPreviewCommentsCountChangedMessage(object sender, int documentId, int commentCount) : base(sender)
         {
-            ObjectType = objectType;
-            EntityId = entityId;
-            CommentsCount = commentsCount;
+            DocumentPreviewId = documentId;
+            CommentsCount = commentCount;
         }
     }
 }
