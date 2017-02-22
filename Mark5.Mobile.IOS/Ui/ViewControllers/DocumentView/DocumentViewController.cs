@@ -598,7 +598,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             flag.Enabled = !isLocalDocument;
             fileTo.Enabled = !isLocalDocument;
             replyActions.Enabled = !isLocalDocument;
-            comments.BadgeValue = DocumentPreview.CommentsCount.ToString();
+            comments.BadgeValue = Document.Comments.Count.ToString();
             comments.Enabled = !isLocalDocument;
             commentsButton.Enabled = !isLocalDocument;
             userActions.Enabled = !isLocalDocument;
@@ -991,7 +991,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CommentsButton_TouchUpInside(object sender, EventArgs e)
         {
-            //TODO
+            var commentsListViewController = new CommentsListViewController();
+            var commentsListViewNavigationController = new UINavigationController(commentsListViewController);
+            commentsListViewNavigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+            commentsListViewController.Entity = Document;
+
+            PresentViewController(commentsListViewNavigationController, true, null);
         }
 
         void DoFileToWorktray()

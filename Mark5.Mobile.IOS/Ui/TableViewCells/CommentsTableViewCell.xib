@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="58" id="cxk-wN-pdQ" customClass="CommentsTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="58"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cxk-wN-pdQ" id="YTl-1W-gDM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="57.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" misplaced="YES" text="Author" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xJi-KY-25X">
+                        <rect key="frame" x="20" y="4" width="156" height="20"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="20" id="g0u-2z-Whb"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="1000" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" misplaced="YES" text="24/12/2014, 15:40 AM" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PvP-fF-nT7">
+                        <rect key="frame" x="183" y="6" width="130" height="16"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="16" id="IVh-Xs-6pH"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                        <color key="textColor" red="0.33333333333333331" green="0.33333333333333331" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Lorem ipsum dolor sit er elit lamet..." textAlignment="justified" translatesAutoresizingMaskIntoConstraints="NO" id="C67-Qa-em9">
+                        <rect key="frame" x="20" y="24" width="280" height="29"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                        <dataDetectorType key="dataDetectorTypes" phoneNumber="YES" link="YES" address="YES" calendarEvent="YES"/>
+                    </textView>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="PvP-fF-nT7" secondAttribute="trailing" constant="20" id="2ej-y3-3Iw"/>
+                    <constraint firstItem="xJi-KY-25X" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="20" id="53a-fQ-VFy"/>
+                    <constraint firstItem="C67-Qa-em9" firstAttribute="top" secondItem="PvP-fF-nT7" secondAttribute="bottom" constant="2" id="8aR-qY-Tie"/>
+                    <constraint firstAttribute="trailing" secondItem="C67-Qa-em9" secondAttribute="trailing" constant="20" id="8xp-Md-1Ye"/>
+                    <constraint firstItem="xJi-KY-25X" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="top" constant="4" id="JvF-5V-s3i"/>
+                    <constraint firstItem="C67-Qa-em9" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="20" id="g5d-ay-jye"/>
+                    <constraint firstItem="PvP-fF-nT7" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="top" constant="6" id="pIm-X9-oFf"/>
+                    <constraint firstAttribute="bottom" secondItem="C67-Qa-em9" secondAttribute="bottom" constant="5" id="sH0-GA-eeL"/>
+                    <constraint firstItem="PvP-fF-nT7" firstAttribute="leading" secondItem="xJi-KY-25X" secondAttribute="trailing" constant="7" id="tvk-ml-NkE"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="CommentAuthorLabel" destination="xJi-KY-25X" id="BoQ-iE-LUR"/>
+                <outlet property="CommentContentLabel" destination="C67-Qa-em9" id="rRc-X9-ONY"/>
+                <outlet property="DateAddedLabel" destination="PvP-fF-nT7" id="6ag-iP-asL"/>
+            </connections>
+            <point key="canvasLocation" x="234" y="280"/>
+        </tableViewCell>
+    </objects>
+    <simulatedMetricsContainer key="defaultSimulatedMetrics">
+        <simulatedStatusBarMetrics key="statusBar"/>
+        <simulatedOrientationMetrics key="orientation"/>
+        <simulatedScreenMetrics key="destination" type="retina4_7.fullscreen"/>
+    </simulatedMetricsContainer>
+</document>

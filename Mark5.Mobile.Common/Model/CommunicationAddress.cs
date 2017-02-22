@@ -8,8 +8,10 @@
 
 namespace Mark5.Mobile.Common.Model
 {
+    
     public class CommunicationAddress
     {
+        
         public CommunicationAddressType Type { get; set; }
 
         public string Description { get; set; }
@@ -26,7 +28,9 @@ namespace Mark5.Mobile.Common.Model
             Description = description;
         }
 
-        public CommunicationAddress() { }
+        public CommunicationAddress()
+        {
+        }
     }
 }
 
