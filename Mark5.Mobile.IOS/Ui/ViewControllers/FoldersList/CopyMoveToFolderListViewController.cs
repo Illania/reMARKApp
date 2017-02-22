@@ -11,13 +11,13 @@ using System.Linq;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Ui.Common.HubMessages;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
-    
+
     public class CopyMoveToFolderListViewController : AbstractFoldersListViewController
     {
 
@@ -203,7 +203,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             try
             {
                 await Managers.CommonActionsManager.MoveToFolder(businessEntities, fromFolder, folder);
-                PlatformConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, businessEntities.First().ObjectType, fromFolder.Id, businessEntities.Select(b => b.Id).ToList()));
+                PlatformConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, businessEntities.First().ObjectType, fromFolder.Id, businessEntities.Select(b => b.Id).ToList())); //TODO we don't subscribe to this anywhere 
                 dismissAction();
             }
             catch (Exception ex)
