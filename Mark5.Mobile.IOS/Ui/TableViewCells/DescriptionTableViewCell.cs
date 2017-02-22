@@ -7,6 +7,7 @@
 //
 using System;
 using Foundation;
+using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
@@ -25,7 +26,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static DescriptionTableViewCell Create()
         {
-            return (DescriptionTableViewCell)Nib.Instantiate(null, null)[0];
+            var cell = (DescriptionTableViewCell)Nib.Instantiate(null, null)[0];
+            cell.DescriptionLabel.Font = Theme.DefaultFont;
+            return cell;
         }
 
         public void Initialize(string description)

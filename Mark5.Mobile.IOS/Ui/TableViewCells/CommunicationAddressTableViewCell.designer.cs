@@ -9,8 +9,8 @@ using System.CodeDom.Compiler;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-	[Register ("DocumentAddressesTableViewCell")]
-	partial class DocumentAddressesTableViewCell
+	[Register ("CommunicationAddressTableViewCell")]
+	partial class CommunicationAddressTableViewCell
 	{
 		[Outlet]
 		UIKit.UILabel AddressLabel { get; set; }
@@ -23,6 +23,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 		
 		void ReleaseDesignerOutlets ()
 		{
+			if (NameLabel != null) {
+				NameLabel.Dispose ();
+				NameLabel = null;
+			}
+
 			if (AddressLabel != null) {
 				AddressLabel.Dispose ();
 				AddressLabel = null;
@@ -31,11 +36,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 			if (IconImage != null) {
 				IconImage.Dispose ();
 				IconImage = null;
-			}
-
-			if (NameLabel != null) {
-				NameLabel.Dispose ();
-				NameLabel = null;
 			}
 		}
 	}

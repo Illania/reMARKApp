@@ -5,3 +5,4 @@ packages
 obj
 bin
 Resource.designer.cs
+project.lock.json

@@ -83,6 +83,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             cts?.Cancel();
         }
 
+        public override void WillMoveToParentViewController(UIViewController parent)
+        {
+            base.WillMoveToParentViewController(parent);
+
+            if (parent == null && SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                nc.PopToRootViewController(false);
+
+                var vc = (ContactViewController)nc.ViewControllers[0];
+                vc.ClearData();
+            }
+        }
+
         public override void DidReceiveMemoryWarning()
         {
             CommonConfig.Logger.Warning($"{nameof(ContactsListViewController)} received memory warning!");
@@ -188,9 +202,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        public void ContactSelected(ContactPreview contactPreview)
+        public void ContactSelected(UITableView tableView, ContactPreview contactPreview)
         {
-            // TODO
+            if (tableView == searchResultsController.TableView)
+            {
+                var ds = (DataSource)contactsTableView.Source;
+                var index = ds.Items.FindIndex(sp => sp.Id == contactPreview.Id);
+                if (index >= 0) contactsTableView.SelectRow(NSIndexPath.FromRowSection(index, 0), false, UITableViewScrollPosition.Middle);
+            }
+
+            if (SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                nc.PopToRootViewController(false);
+
+                var vc = (ContactViewController)nc.ViewControllers[0];
+                vc.ClearData();
+                vc.SetData(Folder, contactPreview);
+                vc.RefreshData();
+            }
+            else
+            {
+                var vc = new ContactViewController();
+                vc.SetData(Folder, contactPreview);
+                vc.SetRefreshDataOnAppear();
+                NavigationController.PushViewController(vc, true);
+            }
         }
 
         [Export("longPressed:")]
@@ -211,6 +248,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             contactsTableView.SetEditing(true, true);
             NavigationItem.SetRightBarButtonItem(exitEditItem, true);
             NavigationItem.SetLeftBarButtonItem(editItem, true);
+
+            searchController.SearchBar.UserInteractionEnabled = false;
+            searchController.SearchBar.Alpha = .5f;
+
+            if (SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                nc.PopToRootViewController(false);
+
+                var vc = (ContactViewController)nc.ViewControllers[0];
+                vc.ClearData();
+            }
         }
 
         void ExitEditItem_Clicked(object sender, EventArgs e) => EndEditing();
@@ -220,6 +269,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             contactsTableView.SetEditing(false, true);
             NavigationItem.SetRightBarButtonItem(null, true);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
+
+            searchController.SearchBar.UserInteractionEnabled = true;
+            searchController.SearchBar.Alpha = 1f;
         }
 
         void EditItem_Clicked(object sender, EventArgs e)
@@ -256,11 +308,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, null)); // TODO
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
 
             if (eas.PopoverPresentationController != null)
                 eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
+            exitEditItem.Enabled = false;
             PresentViewController(eas, true, null);
         }
 
@@ -281,6 +334,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             cts?.Cancel();
             cts = new CancellationTokenSource();
+
+            if (forceClear)
+            {
+                var ds = (DataSource)contactsTableView.Source;
+                ds.Reset();
+            }
 
             Managers.ContactsManager.GetAllContactPreviews(Folder, cps =>
             {
@@ -492,8 +551,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
+                if (tableView.Editing) return;
+                
                 var cp = contactPreviewsInView[indexPath.Row];
-                viewController.ContactSelected(cp);
+                viewController.ContactSelected(tableView, cp);
             }
 
             public void AppendItems(List<ContactPreview> contactPreviews)

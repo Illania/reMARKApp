@@ -4,7 +4,6 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -15,11 +14,11 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cxk-wN-pdQ" id="YTl-1W-gDM">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="59"/>
+                <rect key="frame" x="0.0" y="0.0" width="320" height="59.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Description" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fkg-3v-fBZ">
-                        <rect key="frame" x="8" y="8" width="304" height="44"/>
+                        <rect key="frame" x="20" y="8" width="292" height="44"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -29,7 +28,7 @@
                     <constraint firstItem="Fkg-3v-fBZ" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="top" constant="8" id="06e-G9-QxL"/>
                     <constraint firstAttribute="trailing" secondItem="Fkg-3v-fBZ" secondAttribute="trailing" constant="8" id="EIq-Eq-rja"/>
                     <constraint firstAttribute="bottom" secondItem="Fkg-3v-fBZ" secondAttribute="bottom" constant="7.5" id="bFI-3E-FFl"/>
-                    <constraint firstItem="Fkg-3v-fBZ" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="8" id="m1r-6o-p7c"/>
+                    <constraint firstItem="Fkg-3v-fBZ" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="20" id="m1r-6o-p7c"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>

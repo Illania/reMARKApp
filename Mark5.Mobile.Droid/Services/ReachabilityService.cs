@@ -41,7 +41,7 @@ namespace Mark5.Mobile.Droid.Services
             IsReachable = CheckNetworkAvailability();
         }
 
-        public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.Service, bool testOnly = false)
+        public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.ServiceConnection, bool testOnly = false)
         {
             if (!testOnly)
             {

@@ -50,5 +50,14 @@
 	</dict>
 	<key>NSContactsUsageDescription</key>
 	<string>We need access to your contacts to display suggested emails.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+		<string>sms</string>
+		<string>http</string>
+		<string>https</string>
+		<string>googlechrome</string>
+		<string>comgooglemapsurl</string>
+	</array>
 </dict>
 </plist>

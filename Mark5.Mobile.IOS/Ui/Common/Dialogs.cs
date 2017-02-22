@@ -108,6 +108,32 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return tcs.Task;
         }
 
+        public static void ShowErrorDialog(UIViewController vc, Exception ex)
+        {
+            var alert = UIAlertController.Create(GetErrorTitle(ex), GetErrorContent(ex), UIAlertControllerStyle.Alert);
+            alert.AddAction(UIAlertAction.Create(Localization.GetString("ok"), UIAlertActionStyle.Default, null));
+            if (ShouldShowCreateReport(ex))
+            {
+                alert.AddAction(UIAlertAction.Create(Localization.GetString("report"), UIAlertActionStyle.Cancel, a =>
+                {
+                    var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
+                    Task.Run(() =>
+                    {
+                        return SystemReportCollector.CreateFullReport();
+                    }).ContinueWith(t =>
+                    {
+                        dismissAction();
+
+                        if (!t.IsFaulted)
+                        {
+                            vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, null);
+                        }
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                }));
+            }
+            vc.PresentViewController(alert, true, null);
+        }
+
         static string GetErrorTitle(Exception ex)
         {
             if (ex is AppServiceException)

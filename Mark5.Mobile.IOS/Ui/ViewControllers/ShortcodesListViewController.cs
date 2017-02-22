@@ -225,6 +225,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var vc = new ShortcodeViewController();
                 vc.SetData(Folder, shortcodePreview);
+                vc.SetRefreshDataOnAppear();
                 NavigationController.PushViewController(vc, true);
             }
         }
@@ -333,6 +334,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             cts?.Cancel();
             cts = new CancellationTokenSource();
+
+            if (forceClear)
+            {
+                var ds = (DataSource)shortcodesTableView.Source;
+                ds.Reset();
+            }
 
             Managers.ShortcodesManager.GetAllShortcodePreviews(Folder, sps =>
             {
