@@ -15,7 +15,7 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cxk-wN-pdQ" id="YTl-1W-gDM">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="59"/>
+                <rect key="frame" x="0.0" y="0.0" width="320" height="59.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5mP-v1-Nsg">
@@ -57,9 +57,9 @@
                 </constraints>
             </tableViewCellContentView>
             <connections>
-                <outlet property="DescriptionLabel" destination="5mP-v1-Nsg" id="pqV-dL-9CN"/>
-                <outlet property="IconImage" destination="uwU-Z8-NJD" id="7tO-eY-mSA"/>
-                <outlet property="NameLabel" destination="Eig-5v-ryp" id="T1U-b4-B3K"/>
+                <outlet property="AddressLabel" destination="Eig-5v-ryp" id="eql-uQ-fMw"/>
+                <outlet property="IconImage" destination="uwU-Z8-NJD" id="7Qa-Mh-2xd"/>
+                <outlet property="NameLabel" destination="5mP-v1-Nsg" id="0FO-0p-Yyc"/>
             </connections>
             <point key="canvasLocation" x="69" y="67"/>
         </tableViewCell>

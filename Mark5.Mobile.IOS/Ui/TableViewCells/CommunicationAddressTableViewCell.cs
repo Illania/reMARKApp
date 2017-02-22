@@ -30,14 +30,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static CommunicationAddressTableViewCell Create()
         {
             var cell = (CommunicationAddressTableViewCell)Nib.Instantiate(null, null)[0];
-            cell.DescriptionLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
+            cell.AddressLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
             return cell;
         }
 
         public void Initialize(CommunicationAddress communicationAddress)
         {
-            AddressLabel.Font = communicationAddress.IsPrimary ? Theme.DefaultBoldFont : Theme.DefaultFont;
-            DescriptionLabel.Text = communicationAddress.Description;
+            NameLabel.Font = communicationAddress.IsPrimary ? Theme.DefaultBoldFont : Theme.DefaultFont;
+            NameLabel.Text = communicationAddress.Description;
 
             if (communicationAddress.Type == CommunicationAddressType.Email)
             {

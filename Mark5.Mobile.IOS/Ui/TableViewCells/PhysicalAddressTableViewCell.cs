@@ -7,6 +7,7 @@
 //
 using System;
 using System.IO;
+using System.Text;
 using Contacts;
 using Foundation;
 using Mark5.Mobile.Common.Model;
@@ -40,11 +41,18 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 State = pa.Area,
                 PostalCode = pa.ZipCode,
                 City = pa.City,
-                Country = pa.Country.Name
+                Country = pa.Country.Name,
             };
 
+            var sb = new StringBuilder();
+            if (pa.Type != null && pa.Type.Id > 0)
+            {
+                sb.Append(pa.Type.Name).AppendLine();
+            }
+
             var formatter = new CNPostalAddressFormatter();
-            AddressLabel.Text = formatter.GetStringFromPostalAddress(cnAddress);
+            sb.Append(formatter.GetStringFromPostalAddress(cnAddress));
+            AddressLabel.Text = sb.ToString();
         }
     }
 }
