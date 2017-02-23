@@ -386,6 +386,9 @@
     <Compile Include="Ui\TableViewCells\PhysicalAddressTableViewCell.designer.cs">
       <DependentUpon>PhysicalAddressTableViewCell.cs</DependentUpon>
     </Compile>
+    <Compile Include="Ui\ViewControllers\ShortcodesSearchResultsViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ContactsSearchResultsViewController.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentsSearchResultsViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

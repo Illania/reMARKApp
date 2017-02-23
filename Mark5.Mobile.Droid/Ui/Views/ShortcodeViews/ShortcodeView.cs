@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: ShortcodeView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -34,14 +34,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
             : base(context)
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            Elevation = ConversionUtils.ConvertDpToPixels(2.0f);
-            Radius = ConversionUtils.ConvertDpToPixels(2.0f);
+            Elevation = ConversionUtils.ConvertDpToPixels(2f);
+            Radius = ConversionUtils.ConvertDpToPixels(2f);
             UseCompatPadding = true;
 
-            DistanceVeryLarge = ConversionUtils.ConvertDpToPixels(24.0f);
-            DistanceLarge = ConversionUtils.ConvertDpToPixels(16.0f);
-            DistanceNormal = ConversionUtils.ConvertDpToPixels(8.0f);
-            DistanceSmall = ConversionUtils.ConvertDpToPixels(4.0f);
+            DistanceVeryLarge = ConversionUtils.ConvertDpToPixels(24f);
+            DistanceLarge = ConversionUtils.ConvertDpToPixels(16f);
+            DistanceNormal = ConversionUtils.ConvertDpToPixels(8f);
+            DistanceSmall = ConversionUtils.ConvertDpToPixels(4f);
 
             Visibility = ViewStates.Gone;
 

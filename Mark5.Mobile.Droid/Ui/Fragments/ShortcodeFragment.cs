@@ -57,7 +57,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
             linearLayout.SetClipToPadding(false);
-            var padding = ConversionUtils.ConvertDpToPixels(10.0f);
+            var padding = ConversionUtils.ConvertDpToPixels(10f);
             linearLayout.SetPadding(padding, padding, padding, padding);
 
             linearLayout.AddView(new DescriptionView(Context));

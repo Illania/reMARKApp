@@ -17,7 +17,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
     
     public partial class FoldersSearchResultsTableViewCell : UITableViewCell
     {
-        
+
+        public const float Height = 65f;
+
         public static readonly NSString Key = new NSString("FoldersSearchResultsTableViewCell");
         public static readonly UINib Nib = UINib.FromName("FoldersSearchResultsTableViewCell", NSBundle.MainBundle);
 

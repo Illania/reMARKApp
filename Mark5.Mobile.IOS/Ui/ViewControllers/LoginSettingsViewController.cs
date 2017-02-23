@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: LoginSettingsViewController.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -123,7 +123,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = $"{NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"]} ({NSBundle.MainBundle.InfoDictionary["CFBundleVersion"]})";
                 cell.DetailTextLabel.TextColor = UIColor.Gray;
-                cell.DetailTextLabel.Font = UIFont.SystemFontOfSize(17.0f);
+                cell.DetailTextLabel.Font = UIFont.SystemFontOfSize(17f);
 
                 return cell;
             }
@@ -137,9 +137,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             switch (specifier.Key)
             {
                 case AppVersionKey:
-                    return 44.0f;
+                    return 44f;
                 default:
-                    return 0.0f;
+                    return 0f;
             }
         }
 
@@ -178,7 +178,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (string.IsNullOrWhiteSpace(footerText))
             {
-                return 0.0f;
+                return 0f;
             }
 
             var width = tableView.Frame.Width - tableView.LayoutMargins.Left - tableView.LayoutMargins.Right;
@@ -187,7 +187,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             attributes.Font = Theme.DefaultFont;
             var size = new NSString(footerText).GetBoundingRect(new CGSize(width, nfloat.MaxValue), NSStringDrawingOptions.UsesLineFragmentOrigin, attributes, null);
 
-            return size.Height + 10.0f;
+            return size.Height + 10f;
         }
 
         class InMemorySettingsStore : AbstractSettingsStore

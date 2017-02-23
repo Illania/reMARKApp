@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -14,12 +15,12 @@
         <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="PhysicalAddressTableViewCell" rowHeight="44" id="cxk-wN-pdQ" customClass="PhysicalAddressTableViewCell">
             <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cxk-wN-pdQ" id="YTl-1W-gDM">
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" layoutMarginsFollowReadableWidth="YES" tableViewCell="cxk-wN-pdQ" id="YTl-1W-gDM">
                 <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Address" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5mP-v1-Nsg">
-                        <rect key="frame" x="20" y="11" width="264" height="22"/>
+                        <rect key="frame" x="16" y="11" width="268" height="22"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -27,18 +28,18 @@
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="gDn-B7-ybC">
                         <rect key="frame" x="292" y="12" width="20" height="20"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="20" id="cVQ-K7-ZmL"/>
-                            <constraint firstAttribute="width" constant="20" id="kaq-5g-7oD"/>
+                            <constraint firstAttribute="height" constant="20" id="Uds-SN-7OV"/>
+                            <constraint firstAttribute="width" constant="20" id="on5-wP-2O4"/>
                         </constraints>
                     </imageView>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="trailing" secondItem="gDn-B7-ybC" secondAttribute="trailing" constant="8" id="8fG-dg-mYQ"/>
-                    <constraint firstItem="5mP-v1-Nsg" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="20" id="Drl-40-rhl"/>
-                    <constraint firstItem="5mP-v1-Nsg" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="top" constant="11" id="NgG-B8-aMN"/>
-                    <constraint firstAttribute="bottom" secondItem="5mP-v1-Nsg" secondAttribute="bottom" constant="11" id="hvE-mq-OQf"/>
-                    <constraint firstItem="gDn-B7-ybC" firstAttribute="leading" secondItem="5mP-v1-Nsg" secondAttribute="trailing" constant="8" id="i5U-D2-ySB"/>
-                    <constraint firstItem="gDn-B7-ybC" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY" id="mfY-8i-bKv"/>
+                    <constraint firstItem="gDn-B7-ybC" firstAttribute="leading" secondItem="5mP-v1-Nsg" secondAttribute="trailing" constant="8" id="0Md-tO-Abl"/>
+                    <constraint firstItem="5mP-v1-Nsg" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="topMargin" id="IG0-nb-Cba"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="5mP-v1-Nsg" secondAttribute="bottom" id="jey-GV-yUL"/>
+                    <constraint firstItem="5mP-v1-Nsg" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" constant="8" id="m2c-QC-bi0"/>
+                    <constraint firstItem="gDn-B7-ybC" firstAttribute="trailing" secondItem="YTl-1W-gDM" secondAttribute="trailingMargin" id="vRR-PE-AjE"/>
+                    <constraint firstItem="gDn-B7-ybC" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY" id="zd8-3s-4YO"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>

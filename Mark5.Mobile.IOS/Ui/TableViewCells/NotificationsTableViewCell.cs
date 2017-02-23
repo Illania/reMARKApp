@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: NotificationsTableViewCell.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -39,7 +39,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             var cell = (NotificationsTableViewCell)Nib.Instantiate(null, null)[0];
 
             cell.TitleLabel.Font = Theme.DefaultBoldFont;
-            cell.DateReceivedLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
+            cell.DateReceivedLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
 
             return cell;
         }

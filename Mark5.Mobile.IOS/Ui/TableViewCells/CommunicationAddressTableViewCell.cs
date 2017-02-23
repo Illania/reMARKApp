@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: CommunicationAddressTableViewCell.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -30,7 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static CommunicationAddressTableViewCell Create()
         {
             var cell = (CommunicationAddressTableViewCell)Nib.Instantiate(null, null)[0];
-            cell.AddressLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
+            cell.AddressLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
             return cell;
         }
 

@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: CommunicationAddressesSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
@@ -59,7 +59,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
             ContentLayout = new LinearLayoutCompat(context);
             ContentLayout.Orientation = Vertical;
-            ContentLayout.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1.0f);
+            ContentLayout.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1f);
 
             internalLayout.AddView(ContentLayout);
 
@@ -196,7 +196,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 {
                     var descriptionTextView = new AppCompatTextView(context);
                     descriptionTextView.Text = descriptionText;
-                    var descriptionTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent, 1.0f);
+                    var descriptionTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent, 1f);
                     descriptionTextViewLayoutParams.TopMargin = distanceSmall / 2;
                     descriptionTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
                     AddView(descriptionTextView, descriptionTextViewLayoutParams);

@@ -1,11 +1,10 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common.iOS
 // File: SuggestionsTableViewCell.cs
 // Author: Ferdinando Papale <fp@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
-
 using System;
 using Foundation;
 using Mark5.Mobile.Common.Model;
@@ -17,6 +16,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
     public partial class SuggestionsTableViewCell : UITableViewCell
     {
+        
         public static readonly UINib Nib = UINib.FromName("SuggestionsTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("SuggestionsTableViewCell");
 
@@ -36,9 +36,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             var cell = (SuggestionsTableViewCell)Nib.Instantiate(null, null)[0];
 
             cell.BackgroundColor = UIColor.Clear;
-            cell.SuggestionName.Font = Theme.DefaultBoldFont;
-            cell.SuggestionAddress.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
-            cell.SuggestionAddressAlternative.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
+            cell.SuggestionName.Font = Theme.DefaultFont;
+            cell.SuggestionAddress.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
+            cell.SuggestionAddressAlternative.Font = Theme.DefaultFont;
 
             return cell;
         }
