@@ -15,6 +15,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using UIKit;
@@ -243,11 +244,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var ds = categoriesListView.Source as DataSource;
 
-            if (ds.DidCategoriesChanged)
+            if (ds.CategoriesChanged)
             {
                 CommonConfig.Logger.Info(string.Format("Categories changed - will update. [entity={0}]", BusinessEntityPreview));
 
-                var categoriesToAssign = ds.GetChangedUnassignedCategories(); //TODO need to put the right one
+                var categoriesToAssign = ds.SelectedCategories;
 
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("updating_categories___"));
 
@@ -258,16 +259,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         case ObjectType.Document:
                             var documentPreview = BusinessEntityPreview as DocumentPreview;
                             await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, categoriesToAssign.ToList());
-                            //PlatformConfig.MessengerHub.Publish(new DocumentPreviewCategoriesChangedMessage(this, documentPreview.Id, documentPreview.Categories));
+                            PlatformConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, documentPreview.Id, ObjectType.Document, documentPreview.Categories)); //TODO probably we don't need categories
                             break;
                         case ObjectType.Contact:
                             var contactPreview = BusinessEntityPreview as ContactPreview;
                             await Managers.ContactsManager.SetCategoriesAsync(contactPreview, categoriesToAssign.ToList());
-                            //PlatformConfig.MessengerHub.Publish(new ContactPreviewCategoriesChangedMessage(this, contactPreview.Id, contactPreview.Categories)); //TODO
+                            PlatformConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, contactPreview.Id, ObjectType.Contact, contactPreview.Categories)); //TODO probably we don't need categories
                             break;
                         default:
                             throw new ArgumentException("Invalid BusinessEntityPreview!");
                     }
+
+                    RefreshAssignedCategories();
+                    UpdateAfterExitEditMode();
                 }
                 catch (Exception ex)
                 {
@@ -301,7 +305,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource
         {
-            public bool DidCategoriesChanged
+            public bool CategoriesChanged
             {
                 get;
                 private set;
@@ -349,18 +353,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             readonly HashSet<Category> selectedCategories;
             readonly string emptyText;
 
-            public bool FirstLoad
-            {
-                get;
-                set;
-            }
-
             public DataSource(UITableView tableView, string emptyText)
             {
                 this.tableView = tableView;
                 this.emptyText = emptyText;
 
-                FirstLoad = true;
 
                 sectionIndexes = new List<string>();
                 categoriesInView = new Dictionary<string, List<Category>>();
@@ -373,11 +370,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
-                if (FirstLoad)
-                {
-                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
-                }
-
                 if (Empty)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
@@ -466,7 +458,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override NSIndexPath WillSelectRow(UITableView tableView, NSIndexPath indexPath)
             {
-                DidCategoriesChanged |= tableView.Editing;
+                CategoriesChanged |= tableView.Editing;
 
                 return tableView.Editing ? indexPath : null;
             }
@@ -487,7 +479,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override NSIndexPath WillDeselectRow(UITableView tableView, NSIndexPath indexPath)
             {
-                DidCategoriesChanged |= tableView.Editing;
+                CategoriesChanged |= tableView.Editing;
 
                 return tableView.Editing ? indexPath : null;
             }
@@ -522,8 +514,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public void RefreshData(List<Category> assignedCategories, List<Category> availableCategories)
             {
-                FirstLoad = false;
-
                 if (assignedCategories != null)
                 {
                     this.assignedCategories.Clear();
@@ -579,7 +569,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 sectionIndexes = categoriesInView.Keys.OrderBy(i => i).ToList();
 
-                UIView.Transition(tableView, 0.25d, UIViewAnimationOptions.TransitionCrossDissolve, tableView.ReloadData, null); //TODO
+                UIView.TransitionNotify(tableView, 0.25d, UIViewAnimationOptions.TransitionCrossDissolve, tableView.ReloadData, null);
             }
 
             public void EditingDidBegin()
@@ -622,7 +612,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 sectionIndexes = categoriesInView.Keys.OrderBy(i => i).ToList();
 
-                UIView.Transition(tableView, 0.25d, UIViewAnimationOptions.TransitionCrossDissolve, tableView.ReloadData, null);
+                UIView.TransitionNotify(tableView, 0.25d, UIViewAnimationOptions.TransitionCrossDissolve, tableView.ReloadData, null);
             }
 
             public void EditingDidEnd()
@@ -634,17 +624,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     tableView.DeselectRow(indexPath, false);
                 }
 
-                DidCategoriesChanged = false;
-            }
-
-            public List<Category> GetChangedAssignedCategories()
-            {
-                return assignedCategories.Except(SelectedCategories).ToList();
-            }
-
-            public List<Category> GetChangedUnassignedCategories()
-            {
-                return availableCategories.Intersect(SelectedCategories).ToList();
+                CategoriesChanged = false;
             }
 
             public NSIndexPath IndexPathForCategory(Category category)
@@ -666,14 +646,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public void SelectCategory(Category category)
             {
-                DidCategoriesChanged |= tableView.Editing;
+                CategoriesChanged |= tableView.Editing;
                 tableView.SelectRow(IndexPathForCategory(category), true, UITableViewScrollPosition.None);
                 selectedCategories.Add(category);
             }
 
             public void DeselectCategory(Category category)
             {
-                DidCategoriesChanged |= tableView.Editing;
+                CategoriesChanged |= tableView.Editing;
                 tableView.DeselectRow(IndexPathForCategory(category), true);
                 selectedCategories.Remove(category);
             }
