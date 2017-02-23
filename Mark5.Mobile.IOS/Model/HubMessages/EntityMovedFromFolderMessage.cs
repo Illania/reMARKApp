@@ -9,9 +9,8 @@ using System.Collections.Generic;
 using Mark5.Mobile.Common.Model;
 using TinyMessenger;
 
-namespace Mark5.Mobile.IOS.Ui.Common.HubMessages
+namespace Mark5.Mobile.IOS.Model.HubMessages
 {
-    
     public class EntityMovedFromFolderMessage : TinyMessageBase
     {
 
