@@ -20,7 +20,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
-using Mark5.Mobile.IOS.Model.Messages;
+using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Services;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
@@ -32,7 +32,7 @@ using UserNotifications;
 
 namespace Mark5.Mobile.IOS
 {
-    
+
     [Register("AppDelegate")]
     public class AppDelegate : UIApplicationDelegate, IUNUserNotificationCenterDelegate
     {
@@ -105,7 +105,7 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.Logger.Info($"New APNS token is different, so try to unsubscribe old one...");
                 Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, oldToken).FireAndForget();
             }
-        
+
             CommonConfig.Logger.Info($"Sending new APNS token...");
             Managers.NotificationsManager.Subscribe(DeviceType.IOS, newToken).FireAndForget();
         }
@@ -119,7 +119,10 @@ namespace Mark5.Mobile.IOS
         [Export("userNotificationCenter:willPresentNotification:withCompletionHandler:")]
         public void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification, Action<UNNotificationPresentationOptions> options)
         {
-            PlatformConfig.MessengerHub.PublishAsync(new NewNotificationsMessage(this));
+            if (notification.Request.Identifier != LocalNotificationsListener.FailedSendingIdentifier)
+            {
+                PlatformConfig.MessengerHub.PublishAsync(new NewNotificationsMessage(this));
+            }
 
             options(UNNotificationPresentationOptions.Alert);
         }
@@ -244,6 +247,8 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.Logger.Info($"Refreshing reachability status...");
                 await CommonConfig.ReachabilityService.Refresh();
 
+                LocalNotificationsListener.Initialize();
+
                 CommonConfig.Logger.Info($"Registering {nameof(ReachabilityReceiver)}...");
                 PlatformConfig.ReachabilityReceiver.Register();
 
@@ -256,7 +261,8 @@ namespace Mark5.Mobile.IOS
 
                     UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
 
-                    UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) => {
+                    UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) =>
+                    {
                         if (result)
                         {
                             BeginInvokeOnMainThread(() =>

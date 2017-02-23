@@ -100,6 +100,22 @@ namespace Mark5.Mobile.IOS.Utilities
 
         #endregion
 
+        #region Apple apps
+
+        public static void OpenLink(NSUrl url, Action failureCompletionHandler)
+        {
+            var options = new UIApplicationOpenUrlOptions();
+            UIApplication.SharedApplication.OpenUrl(url, options, (result) =>
+            {
+                if (!result)
+                {
+                    failureCompletionHandler();
+                }
+            });
+        }
+
+        #endregion
+
         #region Sharing
 
         public static void Call(UIViewController viewController, UITableView tableView, UITableViewCell cell, string number)

@@ -13,8 +13,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -23,7 +25,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    
+
     public class DocumentsListViewController : AbstractViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
     {
 
@@ -45,6 +47,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
         AutoRefreshWorker autoRefreshWorker;
+        Action newDocumentsAvailableAction;
 
         bool refreshing;
 
@@ -57,6 +60,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeNavigationBar();
             InitializeView();
             InitializeSearchBar();
+            SubscribeToMessages();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -128,8 +132,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             documentsTableView = new UITableView();
             documentsTableView.ClipsToBounds = false;
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void            documentsTableView.Source = new DataSource(this, documentsTableView, async (startId) => await RefreshData(startId), Localization.GetString("folder_empty"), PlatformConfig.Preferences.CompactDocumentsList);
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void            documentsTableView.RowHeight = UITableView.AutomaticDimension;
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+            documentsTableView.Source = new DataSource(this, documentsTableView, async (startId) => await RefreshData(startId), Localization.GetString("folder_empty"), PlatformConfig.Preferences.CompactDocumentsList);
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+
+            documentsTableView.RowHeight = UITableView.AutomaticDimension;
             documentsTableView.EstimatedRowHeight = DocumentsTableViewCell.Height;
             documentsTableView.AllowsSelectionDuringEditing = false;
             documentsTableView.AllowsMultipleSelectionDuringEditing = true;
@@ -181,6 +189,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationItem.Title = Folder.Name;
         }
 
+        void SubscribeToMessages()
+        {
+            PlatformConfig.MessengerHub.Subscribe<DocumentPreviewCommentsCountChangedMessage>(CommentsCountChangedHandler);
+        }
+
         void InitializeHandlers()
         {
             if (composeDocumentItem != null)
@@ -191,7 +204,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (editItem != null)
                 editItem.Clicked += EditItem_Clicked;
-            
+
             if (refreshControl != null)
                 refreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
@@ -215,9 +228,73 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        public void DocumentSelected(DocumentPreview documentPreview)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        public async void DocumentSelected(DocumentPreview documentPreview)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            // TODO
+            if (documentsTableView.Editing)
+            {
+                return;
+            }
+
+            if (SplitViewController == null || SplitViewController.Collapsed)
+            {
+                var ds = (DataSource)documentsTableView.Source;
+
+                var documentViewController = new DocumentViewController();
+                documentViewController.DocumentPreview = documentPreview;
+                documentViewController.Folder = Folder;
+                documentViewController.HidesBottomBarWhenPushed = true;
+                if (!searchController.Active)
+                {
+                    documentViewController.GetNextDocumentPreview = ds.GetNextDocumentPreview;
+                    documentViewController.GetPreviousDocumentPreview = ds.GetPreviousDocumentPreview;
+                }
+
+                documentViewController.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
+                newDocumentsAvailableAction = documentViewController.RefreshNavigationBar;
+                NavigationController.PushViewController(documentViewController, true);
+            }
+            else
+            {
+                var ds = (DataSource)documentsTableView.Source;
+
+                var documentNavigationController = ((UINavigationController)SplitViewController.ViewControllers[1]);
+                documentNavigationController.PopToViewController(documentNavigationController.ViewControllers[0], false);
+
+                var documentViewController = (DocumentViewController)documentNavigationController.ViewControllers[0];
+
+                if (documentViewController.Folder != Folder || documentViewController.DocumentPreview != documentPreview)
+                {
+                    if (searchController.Active)
+                    {
+                        documentViewController.GetNextDocumentPreview = null;
+                        documentViewController.GetPreviousDocumentPreview = null;
+
+                        newDocumentsAvailableAction = null;
+                    }
+                    else
+                    {
+                        documentViewController.GetNextDocumentPreview = ds.GetNextDocumentPreview;
+                        documentViewController.GetPreviousDocumentPreview = ds.GetPreviousDocumentPreview;
+
+                        newDocumentsAvailableAction = documentViewController.RefreshNavigationBar;
+                    }
+
+                    documentViewController.FolderId = null;
+                    documentViewController.DocumentId = null;
+                    documentViewController.Document = null;
+
+                    documentViewController.Folder = Folder;
+                    documentViewController.DocumentPreview = documentPreview;
+                    documentViewController.HidesBottomBarWhenPushed = false;
+
+                    documentViewController.ReadStatusUpdated -= DocumentViewController_ReadStatusUpdated;
+                    documentViewController.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
+
+                    await documentViewController.Reload();
+                }
+            }
         }
 
         [Export("longPressed:")]
@@ -242,7 +319,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void ComposeDocumentItem_Clicked(object sender, EventArgs e)
         {
-            // TODO
+            var composeDocumentViewController = new ComposeDocumentViewController
+            {
+                CreationModeFlag = DocumentCreationModeFlag.New,
+                PreviousDocumentDirection = DocumentDirection.None
+            };
+
+            var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
+            composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
+            PresentViewController(composeDocumentNavigationController, true, null);
         }
 
         void ExitEditItem_Clicked(object sender, EventArgs e) => EndEditing();
@@ -315,8 +400,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void MarkAsRead(DocumentPreview documentPreview, NSIndexPath row) => MarkAsRead(new List<DocumentPreview> { documentPreview }, new[] { row });
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void        async void MarkAsRead(List<DocumentPreview> documentPreviews, NSIndexPath[] rows)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void        {
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void MarkAsRead(List<DocumentPreview> documentPreviews, NSIndexPath[] rows)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
             CommonConfig.Logger.Info($"Attempting to mark as read [documentPreviews={documentPreviews.Count}]...");
 
             try
@@ -334,8 +421,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void MarkAsUnread(DocumentPreview documentPreview, NSIndexPath row) => MarkAsUnread(new List<DocumentPreview> { documentPreview }, new[] { row });
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void        async void MarkAsUnread(List<DocumentPreview> documentPreviews, NSIndexPath[] rows)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void        {
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void MarkAsUnread(List<DocumentPreview> documentPreviews, NSIndexPath[] rows)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
             CommonConfig.Logger.Info($"Attempting to mark as unread [documentPreviews={documentPreviews.Count}]...");
 
             try
@@ -379,6 +468,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
                 ds.AppendItems(documentPreviews);
+
+                if (documentPreviews.Any() && newDocumentsAvailableAction != null)
+                    newDocumentsAvailableAction();
             }
             catch (Exception ex)
             {
@@ -421,6 +513,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     var ds = documentsTableView.Source as DataSource;
                     ds?.PrependItems(documents);
+
+                    if (newDocumentsAvailableAction != null)
+                        newDocumentsAvailableAction();
                 }
             }
             catch (Exception ex)
@@ -434,6 +529,50 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             refreshControl.Enabled = true;
             refreshing = false;
+        }
+
+        #endregion
+
+        #region Events
+
+        void DocumentViewController_ReadStatusUpdated(object sender, ReadStatusUpdatedEventArgs e)
+        {
+            InvokeOnMainThread(() =>
+            {
+                var selectedRow = documentsTableView.IndexPathForSelectedRow;
+
+                (documentsTableView.Source as DataSource).UpdateDocumentPreview(e.DocumentPreview);
+                documentsTableView.ReloadData();
+
+                if (selectedRow != null)
+                {
+                    documentsTableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                }
+            });
+        }
+
+        void CommentsCountChangedHandler(DocumentPreviewCommentsCountChangedMessage message)
+        {
+            InvokeOnMainThread(() =>
+            {
+                var ds = documentsTableView.Source as DataSource;
+                var index = ds.Items.FindIndex(dp => dp.Id == message.DocumentPreviewId);
+
+                if (index >= 0)
+                {
+                    var documentPreview = ds.Items[index];
+                    documentPreview.CommentsCount = message.CommentsCount;
+
+                    var selectedRow = documentsTableView.IndexPathForSelectedRow;
+
+                    documentsTableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Automatic);
+
+                    if (selectedRow != null)
+                    {
+                        documentsTableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                    }
+                }
+            });
         }
 
         #endregion
@@ -586,7 +725,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            public override nint RowsInSection(UITableView tableview, nint section) 
+            public override nint RowsInSection(UITableView tableview, nint section)
             {
                 if (loading)
                     return 1;
@@ -663,6 +802,73 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
             }
 
+            public DocumentPreview GetNextDocumentPreview(DocumentPreview documentPreview,
+                                                          out bool previousDocumentAvailable,
+                                                          out bool nextDocumentAvailable,
+                                                          bool scrollToDocument = false)
+            {
+                var currentDocumentRow = documentPreviewsInView.IndexOf(d => d.Id == documentPreview.Id);
+                if (currentDocumentRow < 0)
+                {
+                    previousDocumentAvailable = false;
+                    nextDocumentAvailable = false;
+                    return null;
+                }
+
+                var nextDocumentRow = currentDocumentRow + 1;
+                previousDocumentAvailable = true;
+                nextDocumentAvailable = nextDocumentRow < documentPreviewsInView.Count - 1;
+
+                if (!nextDocumentAvailable && LoadMoreEnabled && loadMoreAction != null)
+                    loadMoreAction(documentPreviewsInView.Last().Id);
+
+                if (scrollToDocument)
+                {
+                    ScrollAndSelect(nextDocumentRow);
+                }
+
+                return documentPreviewsInView.ElementAtOrDefault(nextDocumentRow);
+            }
+
+            public DocumentPreview GetPreviousDocumentPreview(DocumentPreview documentPreview,
+                                                              out bool previousDocumentAvailable,
+                                                              out bool nextDocumentAvailable,
+                                                              bool scrollToDocument = false)
+            {
+                var currentDocumentRow = documentPreviewsInView.IndexOf(d => d.Id == documentPreview.Id);
+                if (currentDocumentRow < 0)
+                {
+                    previousDocumentAvailable = false;
+                    nextDocumentAvailable = false;
+                    return null;
+                }
+
+                var previousDocumentRow = currentDocumentRow - 1;
+                previousDocumentAvailable = previousDocumentRow > 0;
+                nextDocumentAvailable = previousDocumentRow < documentPreviewsInView.Count - 1;
+
+                if (scrollToDocument)
+                {
+                    ScrollAndSelect(previousDocumentRow);
+                }
+
+                return documentPreviewsInView.ElementAtOrDefault(previousDocumentRow);
+            }
+
+            void ScrollAndSelect(int row)
+            {
+                var selectedIndexPaths = documentsTableView.IndexPathsForSelectedRows;
+                if (selectedIndexPaths != null)
+                {
+                    foreach (var indexPath in selectedIndexPaths)
+                    {
+                        documentsTableView.DeselectRow(indexPath, true);
+                    }
+                }
+
+                documentsTableView.SelectRow(NSIndexPath.FromRowSection(row, 0), true, UITableViewScrollPosition.Middle);
+            }
+
             public void Reset()
             {
                 loading = true;
@@ -679,11 +885,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 documentsTableView = null;
                 documentPreviewsInView = null;
             }
+
+            public void UpdateDocumentPreview(DocumentPreview documentPreview)
+            {
+                var documentRow = documentPreviewsInView.IndexOf(d => d.Id == documentPreview.Id);
+                if (documentRow < 0)
+                    return;
+
+                documentsTableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(documentRow, 0) }, UITableViewRowAnimation.Automatic);
+            }
+
         }
 
         class AutoRefreshWorker : NSObject
         {
-            
+
             CancellationTokenSource cts;
 
             readonly Func<int, Task> work;
@@ -714,7 +930,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                             var first = firstOrDefaultItem();
                             if (first != null)
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void                                InvokeOnMainThread(async () => await work(first.Id));
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+                                InvokeOnMainThread(async () => await work(first.Id));
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
                         }
                     });

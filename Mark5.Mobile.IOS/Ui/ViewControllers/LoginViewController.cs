@@ -537,7 +537,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     loginButton.TouchUpInside += LoginButton_TouchUpInside;
                     return;
                 }
-                
+
                 if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("warning"), Localization.GetString("warning_ssl_off"), Localization.GetString("continue"), Localization.GetString("cancel")))
                 {
                     loginButton.TouchUpInside += LoginButton_TouchUpInside;
@@ -598,6 +598,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 await Managers.DownloadManager.Start();
                 await Managers.OutgoingDocumentsManager.Start();
+
+                LocalNotificationsListener.Initialize();
 
                 CommonConfig.Logger.Info($"Refreshing reachability status...");
                 await CommonConfig.ReachabilityService.Refresh();

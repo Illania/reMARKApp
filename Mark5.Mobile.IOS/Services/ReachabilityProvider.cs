@@ -12,12 +12,11 @@ using SystemConfiguration;
 
 namespace Mark5.Mobile.IOS.Services
 {
-    
+
     // https://github.com/xamarin/ios-samples/blob/master/ReachabilitySample/reachability.cs
     // with small modifications for IPv4
     public static class ReachabilityProvider
     {
-
         public static string HostName = "www.google.com";
 
         public static bool IsReachableWithoutRequiringConnection(NetworkReachabilityFlags flags)

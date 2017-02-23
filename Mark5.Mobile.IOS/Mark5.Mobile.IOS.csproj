@@ -18,7 +18,7 @@
     <DefineConstants>DEBUG;ENABLE_TEST_CLOUD;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignKey>iPhone Developer: Lars Hansen (TUYUES9KMZ)</CodesignKey>
     <MtouchDebug>true</MtouchDebug>
     <MtouchFastDev>true</MtouchFastDev>
     <MtouchUseSGen>true</MtouchUseSGen>
@@ -30,6 +30,8 @@
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
     <DeviceSpecificBuild>false</DeviceSpecificBuild>
+    <CodesignProvision>840a3d1f-e198-49d0-a939-835e472a1e97</CodesignProvision>
+    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>pdbonly</DebugType>
@@ -120,6 +122,12 @@
     <Reference Include="SQLitePCLRaw.batteries_v2">
       <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.2\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
     </Reference>
+    <Reference Include="AngleSharp">
+      <HintPath>..\packages\AngleSharp.0.9.9\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="PreMailer.Net">
+      <HintPath>..\lib\PreMailer.Net.dll</HintPath>
+    </Reference>
     <Reference Include="HockeySDK">
       <HintPath>..\packages\HockeySDK.Xamarin.4.1.1\lib\Xamarin.iOS10\HockeySDK.dll</HintPath>
     </Reference>
@@ -159,11 +167,17 @@
     <Folder Include="Resources\startscreens\" />
     <Folder Include="Resources\Settings.bundle\" />
     <Folder Include="Resources\Base.lproj\" />
+    <Folder Include="Ui\ViewControllers\ComposeDocumentView\" />
+    <Folder Include="Ui\ViewControllers\ComposeDocumentView\Subviews\" />
+    <Folder Include="Utilities\Extensions\" />
     <Folder Include="Model\" />
     <Folder Include="Ui\ViewControllers\FoldersList\" />
     <Folder Include="Ui\TableViewCells\" />
-    <Folder Include="Ui\Common\HubMessages\" />
-    <Folder Include="Model\Messages\" />
+    <Folder Include="Ui\ViewControllers\DocumentView\" />
+    <Folder Include="Ui\ViewControllers\DocumentView\Subviews\" />
+    <Folder Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsView\" />
+    <Folder Include="Ui\ViewControllers\Common\" />
+    <Folder Include="Model\HubMessages\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -177,12 +191,14 @@
     <InterfaceDefinition Include="Ui\TableViewCells\ExternalDocumentsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\ContactsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\ShortcodesTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\SuggestionsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\NotificationsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\ObjectActionsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\ObjectLinksTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\DocumentAddressesTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\DocumentAddressesCompactTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\DescriptionTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\CommentsTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\CommunicationAddressTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\CommunicationAddressCompactTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\PhysicalAddressTableViewCell.xib" />
@@ -227,9 +243,23 @@
     <Compile Include="Ui\Common\AbstractSplitViewController.cs" />
     <Compile Include="Ui\Common\AbstractViewController.cs" />
     <Compile Include="Ui\Common\ITaggedViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\ComposeDocumentViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ComposeDocumentSubView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ToView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\BccView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\CcView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\RecipientsView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\SubjectView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\PriorityView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\LineView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ContentView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\AttachmentsView.cs" />
+    <Compile Include="Utilities\Extensions\ObjectExtensions.cs" />
+    <Compile Include="Utilities\Extensions\UiViewExtension.cs" />
+    <Compile Include="Utilities\Extensions\UiTextViewExtensions.cs" />
+    <Compile Include="Utilities\Extensions\StringExtensions.cs" />
     <Compile Include="Ui\ViewControllers\FoldersList\AbstractFoldersListViewController.cs" />
     <Compile Include="Ui\ViewControllers\FoldersList\BrowseFoldersListViewController.cs" />
-    <Compile Include="Ui\ViewControllers\DocumentViewController.cs" />
     <Compile Include="Ui\TableViewCells\FoldersTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\FoldersTableViewCell.designer.cs">
       <DependentUpon>FoldersTableViewCell.cs</DependentUpon>
@@ -257,6 +287,24 @@
     <Compile Include="Ui\TableViewCells\EditTextViewCell.designer.cs">
       <DependentUpon>EditTextViewCell.cs</DependentUpon>
     </Compile>
+    <Compile Include="Ui\ViewControllers\DocumentView\DocumentViewController.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\ToView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\CcView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\BccView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\FromView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\SubjectView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\DateReceivedView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\PriorityView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\ContentView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\ReferenceNumberView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\CreatorView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\OriginatorView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\AttachmentsView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\DocumentSubView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\RecipientsView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\ReadByView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\Subviews\TextSubView.cs" />
+    <Compile Include="Ui\Common\BadgeBarButtonItem.cs" />
     <Compile Include="Ui\TableViewCells\DocumentsCompactTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\DocumentsCompactTableViewCell.designer.cs">
       <DependentUpon>DocumentsCompactTableViewCell.cs</DependentUpon>
@@ -267,7 +315,6 @@
     </Compile>
     <Compile Include="Utilities\DateTimeUtils.cs" />
     <Compile Include="Utilities\UI.cs" />
-    <Compile Include="Ui\ViewControllers\DocumentsListViewController.cs" />
     <Compile Include="Ui\TableViewCells\ExternalDocumentsTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\ExternalDocumentsTableViewCell.designer.cs">
       <DependentUpon>ExternalDocumentsTableViewCell.cs</DependentUpon>
@@ -283,8 +330,11 @@
       <DependentUpon>ShortcodesTableViewCell.cs</DependentUpon>
     </Compile>
     <Compile Include="Ui\ViewControllers\FoldersList\CopyMoveToFolderListViewController.cs" />
-    <Compile Include="Ui\Common\HubMessages\EntityMovedFromFolderMessage.cs" />
     <Compile Include="Ui\ViewControllers\CopyToWorktrayViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsView\SuggestionsListView.cs" />
+    <Compile Include="Ui\TableViewCells\SuggestionsTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\SuggestionsTableViewCell.designer.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentListViewController.cs" />
     <Compile Include="Ui\TableViewCells\NotificationsTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\NotificationsTableViewCell.designer.cs">
       <DependentUpon>NotificationsTableViewCell.cs</DependentUpon>
@@ -311,8 +361,19 @@
     <Compile Include="Ui\TableViewCells\DescriptionTableViewCell.designer.cs">
       <DependentUpon>DescriptionTableViewCell.cs</DependentUpon>
     </Compile>
+    <Compile Include="Ui\ViewControllers\OutgoingDocumentListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\Common\SeparatorSubView.cs" />
+    <Compile Include="Ui\ViewControllers\Common\ActionableLayoutScrollView.cs" />
+    <Compile Include="Utilities\LocalNotificationsListener.cs" />
     <Compile Include="Utilities\NotificationsUtilities.cs" />
-    <Compile Include="Model\Messages\NewNotificationsMessage.cs" />
+    <Compile Include="Model\HubMessages\NewNotificationsMessage.cs" />
+    <Compile Include="Ui\ViewControllers\CommentsListViewController.cs" />
+    <Compile Include="Ui\TableViewCells\CommentsTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\CommentsTableViewCell.designer.cs">
+      <DependentUpon>CommentsTableViewCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Model\HubMessages\DocumentPreviewCommentsCountChangedMessage.cs" />
+    <Compile Include="Model\HubMessages\EntityMovedFromFolderMessage.cs" />
     <Compile Include="Ui\TableViewCells\CommunicationAddressTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\CommunicationAddressTableViewCell.designer.cs">
       <DependentUpon>CommunicationAddressTableViewCell.cs</DependentUpon>

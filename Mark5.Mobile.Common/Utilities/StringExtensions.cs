@@ -45,6 +45,12 @@ namespace Mark5.Mobile.Common.Utilities
             return source.IndexOf(toCheck, StringComparison.CurrentCultureIgnoreCase) >= 0;
         }
 
+        public static string SafeSubstringBefore(this string str, string value, StringComparison comparisonType)
+        {
+            var index = str.IndexOf(value, comparisonType);
+            return index > 0 ? str.SafeSubstring(0, index) : str;
+        }
+
         public static string SafeSubstringBeforeLast(this string str, char value)
         {
             var index = str.LastIndexOf(value);
@@ -55,6 +61,12 @@ namespace Mark5.Mobile.Common.Utilities
         {
             var index = str.LastIndexOf(value);
             return index > 0 ? str.SafeSubstring(index + 1) : str;
+        }
+
+        public static string SafeSubstringAfterLast(this string str, string value, StringComparison comparisonType)
+        {
+            var index = str.LastIndexOf(value, comparisonType);
+            return index > 0 ? str.SafeSubstring(index + value.Length) : str;
         }
 
     }

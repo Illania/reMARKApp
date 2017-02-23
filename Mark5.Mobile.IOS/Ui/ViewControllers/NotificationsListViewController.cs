@@ -13,7 +13,7 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.IOS.Model.Messages;
+using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using TinyMessenger;
@@ -21,7 +21,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    
+
     public class NotificationsListViewController : AbstractViewController
     {
 
@@ -146,7 +146,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (markAsReadItem != null)
                 markAsReadItem.Clicked -= MarkAsReadItem_Clicked;
-            
+
             if (refreshControl != null)
                 refreshControl.ValueChanged -= RefreshControl_ValueChanged;
         }

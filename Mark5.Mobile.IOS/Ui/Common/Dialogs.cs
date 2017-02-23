@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: Dialogs.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -49,6 +49,56 @@ namespace Mark5.Mobile.IOS.Ui.Common
             alert.AddAction(UIAlertAction.Create(confirmationText, UIAlertActionStyle.Default, a => tcs.SetResult(true)));
             vc.PresentViewController(alert, true, null);
             return tcs.Task;
+        }
+
+        public static Task<int> ShowListDialogAsync(UIViewController vc, string message, string[] listStrings, UIView anchorView)
+        {
+            var tcs = new TaskCompletionSource<int>();
+            var actionSheet = PrepareLisDialogActionSheet(tcs, message, listStrings);
+            if (actionSheet.PopoverPresentationController != null)
+            {
+                actionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(anchorView);
+            }
+            vc.PresentViewController(actionSheet, true, null);
+            return tcs.Task;
+        }
+
+        public static Task<int> ShowListDialogAsync(UIViewController vc, string message, string[] listStrings, UIBarButtonItem anchorBarButtonItem)
+        {
+            var tcs = new TaskCompletionSource<int>();
+            var actionSheet = PrepareLisDialogActionSheet(tcs, message, listStrings);
+            if (actionSheet.PopoverPresentationController != null)
+            {
+                actionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(anchorBarButtonItem);
+            }
+            vc.PresentViewController(actionSheet, true, null);
+            return tcs.Task;
+        }
+
+        public static Task<int> ShowListDialogAsync(UIViewController vc, string message, string[] listStrings, UITableView tableView, UITableViewCell anchorCell)
+        {
+            var tcs = new TaskCompletionSource<int>();
+            var actionSheet = PrepareLisDialogActionSheet(tcs, message, listStrings);
+            if (actionSheet.PopoverPresentationController != null)
+            {
+                actionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(tableView, anchorCell);
+            }
+            vc.PresentViewController(actionSheet, true, null);
+            return tcs.Task;
+        }
+
+        static UIAlertController PrepareLisDialogActionSheet(TaskCompletionSource<int> tcs, string message, string[] listStrings)
+        {
+            var actionSheet = UIAlertController.Create(null, message, UIAlertControllerStyle.ActionSheet);
+
+            for (int i = 0; i < listStrings.Length; i++)
+            {
+                var ab = i; //Can't use i, because it's the variable, not the value, that's captured in the lambda)
+                actionSheet.AddAction(UIAlertAction.Create(listStrings[i], UIAlertActionStyle.Default, a => tcs.SetResult(ab)));
+            }
+
+            actionSheet.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => tcs.SetResult(-1)));
+            return actionSheet;
         }
 
         public static void ShowBlockingDialog(UIViewController vc, string content)
