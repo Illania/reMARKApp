@@ -333,7 +333,9 @@
     <Compile Include="Ui\ViewControllers\CopyToWorktrayViewController.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsView\SuggestionsListView.cs" />
     <Compile Include="Ui\TableViewCells\SuggestionsTableViewCell.cs" />
-    <Compile Include="Ui\TableViewCells\SuggestionsTableViewCell.designer.cs" />
+    <Compile Include="Ui\TableViewCells\SuggestionsTableViewCell.designer.cs">
+      <DependentUpon>SuggestionsTableViewCell.cs</DependentUpon>
+    </Compile>
     <Compile Include="Ui\ViewControllers\DocumentListViewController.cs" />
     <Compile Include="Ui\TableViewCells\NotificationsTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\NotificationsTableViewCell.designer.cs">
