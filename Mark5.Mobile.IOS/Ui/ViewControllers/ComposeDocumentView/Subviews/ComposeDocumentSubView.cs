@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: ComposeDocumentSubview.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
@@ -23,10 +23,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public Document PreviousDocument { get; set; }
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
 
-        protected float MinimumHeight = 21.0f;
-        protected float HorizontalMargin = 15.0f;
-        protected float VerticalMargin = 12.0f;
-        protected float InnerMargin = 5.0f;
+        protected float MinimumHeight = 21f;
+        protected float HorizontalMargin = 15f;
+        protected float VerticalMargin = 12f;
+        protected float InnerMargin = 5f;
 
         protected ComposeDocumentSubView()
         {
@@ -40,7 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             Axis = UILayoutConstraintAxis.Vertical;
             Alignment = UIStackViewAlignment.Fill;
             Distribution = UIStackViewDistribution.Fill;
-            Spacing = 0.0f;
+            Spacing = 0f;
             TranslatesAutoresizingMaskIntoConstraints = false;
 
             ContainerView = new UIView();

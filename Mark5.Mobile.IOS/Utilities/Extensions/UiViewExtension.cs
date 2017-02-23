@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: UiViewExtension.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
@@ -67,7 +67,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static bool IsVisible(this UIView view)
         {
-            return !view.Hidden && view.Alpha > 0.0f;
+            return !view.Hidden && view.Alpha > 0f;
         }
 
         #region Helper methods

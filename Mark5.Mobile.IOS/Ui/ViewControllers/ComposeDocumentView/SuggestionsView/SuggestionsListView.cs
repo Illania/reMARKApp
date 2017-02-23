@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: SuggestionsListView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
@@ -43,7 +43,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsVie
         RecipientsView recipientsView;
 
         // This value will be later updated from notification.
-        float keyboardHeight = 216.0f;
+        float keyboardHeight = 216f;
 
         readonly ComposeDocumentViewController viewController;
 
@@ -71,13 +71,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsVie
             spaceView.Opaque = false;
             spaceView.BackgroundColor = UIColor.Clear;
             spaceView.TranslatesAutoresizingMaskIntoConstraints = false;
-            spaceHeightConstraint = NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, 1.0f);
+            spaceHeightConstraint = NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f);
             AddSubview(spaceView);
             AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1f, 0f),
                     spaceHeightConstraint
                 });
 
@@ -86,10 +86,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsVie
             AddSubview(suggestionsTextView);
             AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, spaceView, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, this, NSLayoutAttribute.Width, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, 20.0f)
+                    NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, spaceView, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, this, NSLayoutAttribute.Width, 1f, 0f),
+                    NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 20f)
                 });
 
             suggestionsTextView.SearchRequested += (sender, e) => DoSearch(e);
@@ -102,30 +102,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsVie
             AddSubview(separator);
             AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(separator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, suggestionsTextView, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(separator, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(separator, NSLayoutAttribute.Width, NSLayoutRelation.Equal, this, NSLayoutAttribute.Width, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(separator, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, 1.0f)
+                    NSLayoutConstraint.Create(separator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, suggestionsTextView, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(separator, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(separator, NSLayoutAttribute.Width, NSLayoutRelation.Equal, this, NSLayoutAttribute.Width, 1f, 0f),
+                    NSLayoutConstraint.Create(separator, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f)
                 });
         }
 
         void InitializeListView()
         {
             suggestionsTableView = new UITableView();
-            suggestionsTableView.TranslatesAutoresizingMaskIntoConstraints = false;
             suggestionsTableView.BackgroundColor = Theme.LighterGray;
+            suggestionsTableView.RowHeight = UITableView.AutomaticDimension;
+            suggestionsTableView.EstimatedRowHeight = 44f;
             suggestionsTableView.TableFooterView = new UIView(CGRect.Empty); //Used to avoid showing empty rows at the bottom
-
-            suggestionsListViewSource = new SuggestionsListViewSource(this, suggestionsTableView);
-            suggestionsTableView.Source = suggestionsListViewSource;
-
+            suggestionsTableView.Source = suggestionsListViewSource = new SuggestionsListViewSource(this, suggestionsTableView);;
+            suggestionsTableView.TranslatesAutoresizingMaskIntoConstraints = false;
             AddSubview(suggestionsTableView);
             AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, separator, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, this, NSLayoutAttribute.Width, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
+                    NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, separator, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, this, NSLayoutAttribute.Width, 1f, 0f),
+                    NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, 0f)
                 });
         }
 
@@ -166,11 +165,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsVie
         void OnKeyboardWillHideNotification(NSNotification notification)
         {
             var contentInset = suggestionsTableView.ContentInset;
-            contentInset.Bottom = 0.0f;
+            contentInset.Bottom = 0f;
             suggestionsTableView.ContentInset = contentInset;
 
             var scrollIndicatorInset = suggestionsTableView.ScrollIndicatorInsets;
-            scrollIndicatorInset.Bottom = 0.0f;
+            scrollIndicatorInset.Bottom = 0f;
             suggestionsTableView.ContentInset = scrollIndicatorInset;
         }
 
@@ -246,7 +245,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsVie
         {
             base.LayoutSubviews();
 
-            nfloat offset = 0.0f;
+            nfloat offset = 0f;
             if (viewController != null && viewController.NavigationController != null && viewController.NavigationController.NavigationBar != null
                 && viewController.NavigationController.NavigationBar.Frame != CGRect.Empty)
             {
@@ -312,24 +311,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsVie
         {
             if (Loading && indexPath.Row == suggestions.Count)
             {
-                return tableView.DequeueReusableCell(WaitTableViewCell.Key) ?? WaitTableViewCell.Create();
+                var waitingCell = tableView.DequeueReusableCell(WaitTableViewCell.Key) ?? WaitTableViewCell.Create();
+                waitingCell.BackgroundColor = UIColor.Clear;
+                return waitingCell;
             }
 
             if (Empty)
             {
                 var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
                 emptyCell.Initialize(Localization.GetString("no_suggestions_available"));
+                emptyCell.BackgroundColor = UIColor.Clear;
                 return emptyCell;
             }
 
             var printableSuggestion = suggestions[indexPath.Row];
 
-            var cell = tableView.DequeueReusableCell(SuggestionsTableViewCell.Key) as SuggestionsTableViewCell;
-            if (cell == null)
-            {
-                cell = SuggestionsTableViewCell.Create();
-            }
-
+            var cell = tableView.DequeueReusableCell(SuggestionsTableViewCell.Key) as SuggestionsTableViewCell ?? SuggestionsTableViewCell.Create();
             cell.Initialize(printableSuggestion);
 
             return cell;

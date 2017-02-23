@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: RecipientsView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
@@ -78,8 +78,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             ContainerView.AddSubview(Label);
             ContainerView.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(Label, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1.0f, VerticalMargin),
-                    NSLayoutConstraint.Create(Label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1.0f, HorizontalMargin)
+                    NSLayoutConstraint.Create(Label, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                    NSLayoutConstraint.Create(Label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
                 });
 
             if (!hideAdd)
@@ -90,15 +90,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 AddButton.BackgroundColor = UIColor.Clear;
                 AddButton.TouchUpInside += HandleAddButtonTapped;
                 AddButton.TranslatesAutoresizingMaskIntoConstraints = false;
-                AddButton.ContentEdgeInsets = new UIEdgeInsets(5.0f, 5.0f, 5.0f, 5.0f);
+                AddButton.ContentEdgeInsets = new UIEdgeInsets(5f, 5f, 5f, 5f);
                 AddButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
                 AddButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
                 AddButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
                 ContainerView.AddSubview(AddButton);
                 ContainerView.AddConstraints(new[]
                     {
-                        NSLayoutConstraint.Create(AddButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1.0f, VerticalMargin - AddButton.ContentEdgeInsets.Top),
-                        NSLayoutConstraint.Create(AddButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin - AddButton.ContentEdgeInsets.Right)
+                        NSLayoutConstraint.Create(AddButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin - AddButton.ContentEdgeInsets.Top),
+                        NSLayoutConstraint.Create(AddButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin - AddButton.ContentEdgeInsets.Right)
                     });
             }
 
@@ -116,7 +116,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             TextView.AutocorrectionType = UITextAutocorrectionType.No;
             TextView.Font = Theme.DefaultFont;
             TextView.Opaque = false;
-            TextView.TextContainer.LineFragmentPadding = 0.0f;
+            TextView.TextContainer.LineFragmentPadding = 0f;
             TextView.TextContainerInset = UIEdgeInsets.Zero;
             TextView.ClipsToBounds = false;
             TextView.ScrollEnabled = false;
@@ -133,10 +133,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             ContainerView.AddSubview(TextView);
             ContainerView.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1.0f, VerticalMargin),
-                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, Label, NSLayoutAttribute.Right, 1.0f, InnerMargin),
-                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1.0f, -VerticalMargin),
-                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, !hideAdd ? (UIView)AddButton : this, !hideAdd ? NSLayoutAttribute.Left : NSLayoutAttribute.Right, 1.0f, !hideAdd ? -InnerMargin : -HorizontalMargin)
+                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, Label, NSLayoutAttribute.Right, 1f, InnerMargin),
+                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
+                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, !hideAdd ? (UIView)AddButton : this, !hideAdd ? NSLayoutAttribute.Left : NSLayoutAttribute.Right, 1f, !hideAdd ? -InnerMargin : -HorizontalMargin)
                 });
 
             textViewTapGestureRecognizer = new UITapGestureRecognizer();
