@@ -20,7 +20,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Address" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5mP-v1-Nsg">
-                        <rect key="frame" x="8" y="11.5" width="276" height="21"/>
+                        <rect key="frame" x="16" y="11.5" width="268" height="21"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="rBe-Rs-XAe"/>
                         </constraints>
@@ -40,7 +40,7 @@
                     <constraint firstItem="gDn-B7-ybC" firstAttribute="trailing" secondItem="YTl-1W-gDM" secondAttribute="trailingMargin" id="38n-Jb-Jjn"/>
                     <constraint firstItem="5mP-v1-Nsg" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY" id="Bbw-Is-e2Q"/>
                     <constraint firstItem="gDn-B7-ybC" firstAttribute="leading" secondItem="5mP-v1-Nsg" secondAttribute="trailing" constant="8" id="Ztv-sO-Kzy"/>
-                    <constraint firstItem="5mP-v1-Nsg" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" id="j2D-32-AGN"/>
+                    <constraint firstItem="5mP-v1-Nsg" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" constant="8" id="j2D-32-AGN"/>
                     <constraint firstItem="gDn-B7-ybC" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY" id="z7u-fq-TWo"/>
                 </constraints>
             </tableViewCellContentView>

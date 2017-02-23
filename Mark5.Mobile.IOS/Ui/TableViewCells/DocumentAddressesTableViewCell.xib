@@ -20,7 +20,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5mP-v1-Nsg">
-                        <rect key="frame" x="8" y="11" width="276" height="21"/>
+                        <rect key="frame" x="16" y="11" width="268" height="21"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="edE-eD-BsE"/>
                         </constraints>
@@ -29,7 +29,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Address" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Eig-5v-ryp">
-                        <rect key="frame" x="8" y="36" width="276" height="18"/>
+                        <rect key="frame" x="16" y="36" width="268" height="18"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="18" id="u7m-WO-qoH"/>
                         </constraints>
@@ -46,8 +46,8 @@
                     </imageView>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="5mP-v1-Nsg" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" id="0BF-pr-Ozz"/>
-                    <constraint firstItem="Eig-5v-ryp" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" id="0l6-BR-HN3"/>
+                    <constraint firstItem="5mP-v1-Nsg" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" constant="8" id="0BF-pr-Ozz"/>
+                    <constraint firstItem="Eig-5v-ryp" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" constant="8" id="0l6-BR-HN3"/>
                     <constraint firstItem="uwU-Z8-NJD" firstAttribute="leading" secondItem="Eig-5v-ryp" secondAttribute="trailing" constant="8" id="3kc-0H-iDz"/>
                     <constraint firstItem="Eig-5v-ryp" firstAttribute="top" secondItem="5mP-v1-Nsg" secondAttribute="bottom" constant="4" id="4cO-WV-U0S"/>
                     <constraint firstAttribute="bottomMargin" secondItem="Eig-5v-ryp" secondAttribute="bottom" id="Vds-0z-hk0"/>

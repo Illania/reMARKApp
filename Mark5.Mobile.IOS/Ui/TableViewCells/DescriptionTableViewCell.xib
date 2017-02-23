@@ -20,14 +20,14 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Description" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fkg-3v-fBZ">
-                        <rect key="frame" x="8" y="11" width="304" height="38"/>
+                        <rect key="frame" x="16" y="11" width="296" height="38"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="Fkg-3v-fBZ" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" id="1Yo-1A-hNW"/>
+                    <constraint firstItem="Fkg-3v-fBZ" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" constant="8" id="1Yo-1A-hNW"/>
                     <constraint firstItem="Fkg-3v-fBZ" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="topMargin" id="8sd-cK-jzA"/>
                     <constraint firstAttribute="bottomMargin" secondItem="Fkg-3v-fBZ" secondAttribute="bottom" id="Hws-mG-KpN"/>
                     <constraint firstItem="Fkg-3v-fBZ" firstAttribute="trailing" secondItem="YTl-1W-gDM" secondAttribute="trailingMargin" id="bFU-JH-yDB"/>

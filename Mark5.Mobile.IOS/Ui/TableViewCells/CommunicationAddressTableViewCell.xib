@@ -20,7 +20,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5mP-v1-Nsg">
-                        <rect key="frame" x="8" y="11" width="276" height="21"/>
+                        <rect key="frame" x="16" y="11" width="268" height="21"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="m1N-Hv-Bc5"/>
                         </constraints>
@@ -29,7 +29,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Address" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Eig-5v-ryp">
-                        <rect key="frame" x="8" y="36" width="276" height="18"/>
+                        <rect key="frame" x="16" y="36" width="268" height="21"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="VJx-nY-cf2"/>
                         </constraints>
@@ -38,7 +38,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="uwU-Z8-NJD">
-                        <rect key="frame" x="292" y="22.5" width="20" height="20"/>
+                        <rect key="frame" x="292" y="24" width="20" height="20"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="20" id="0T7-vh-CNt"/>
                             <constraint firstAttribute="width" constant="20" id="RwB-uv-zuf"/>
@@ -51,9 +51,9 @@
                     <constraint firstItem="Eig-5v-ryp" firstAttribute="top" secondItem="5mP-v1-Nsg" secondAttribute="bottom" constant="4" id="Box-db-PF1"/>
                     <constraint firstItem="5mP-v1-Nsg" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="topMargin" id="FJa-wm-xt6"/>
                     <constraint firstItem="uwU-Z8-NJD" firstAttribute="leading" secondItem="Eig-5v-ryp" secondAttribute="trailing" constant="8" id="Xg8-7u-FKj"/>
-                    <constraint firstItem="Eig-5v-ryp" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" id="cQz-Fs-mxA"/>
+                    <constraint firstItem="Eig-5v-ryp" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" constant="8" id="cQz-Fs-mxA"/>
                     <constraint firstItem="uwU-Z8-NJD" firstAttribute="trailing" secondItem="YTl-1W-gDM" secondAttribute="trailingMargin" id="mXE-f9-pgm"/>
-                    <constraint firstItem="5mP-v1-Nsg" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" id="pxs-cM-vNJ"/>
+                    <constraint firstItem="5mP-v1-Nsg" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" constant="8" id="pxs-cM-vNJ"/>
                     <constraint firstItem="uwU-Z8-NJD" firstAttribute="leading" secondItem="5mP-v1-Nsg" secondAttribute="trailing" constant="8" id="uhV-p0-Fdr"/>
                 </constraints>
             </tableViewCellContentView>

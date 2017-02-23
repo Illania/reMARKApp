@@ -20,14 +20,14 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="chF-Hs-udR">
-                        <rect key="frame" x="8" y="11" width="304" height="128"/>
+                        <rect key="frame" x="16" y="11" width="296" height="128"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                     </textView>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="chF-Hs-udR" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" id="4pl-9M-guZ"/>
+                    <constraint firstItem="chF-Hs-udR" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" constant="8" id="4pl-9M-guZ"/>
                     <constraint firstAttribute="trailingMargin" secondItem="chF-Hs-udR" secondAttribute="trailing" id="Znq-jI-ZgN"/>
                     <constraint firstAttribute="bottomMargin" secondItem="chF-Hs-udR" secondAttribute="bottom" id="bHg-it-4yE"/>
                     <constraint firstItem="chF-Hs-udR" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="topMargin" id="mTD-bG-IRP"/>

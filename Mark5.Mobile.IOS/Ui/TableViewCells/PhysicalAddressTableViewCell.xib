@@ -20,7 +20,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Address" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5mP-v1-Nsg">
-                        <rect key="frame" x="8" y="11" width="276" height="22"/>
+                        <rect key="frame" x="16" y="11" width="268" height="22"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -37,7 +37,7 @@
                     <constraint firstItem="gDn-B7-ybC" firstAttribute="leading" secondItem="5mP-v1-Nsg" secondAttribute="trailing" constant="8" id="0Md-tO-Abl"/>
                     <constraint firstItem="5mP-v1-Nsg" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="topMargin" id="IG0-nb-Cba"/>
                     <constraint firstAttribute="bottomMargin" secondItem="5mP-v1-Nsg" secondAttribute="bottom" id="jey-GV-yUL"/>
-                    <constraint firstItem="5mP-v1-Nsg" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" id="m2c-QC-bi0"/>
+                    <constraint firstItem="5mP-v1-Nsg" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" constant="8" id="m2c-QC-bi0"/>
                     <constraint firstItem="gDn-B7-ybC" firstAttribute="trailing" secondItem="YTl-1W-gDM" secondAttribute="trailingMargin" id="vRR-PE-AjE"/>
                     <constraint firstItem="gDn-B7-ybC" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY" id="zd8-3s-4YO"/>
                 </constraints>
