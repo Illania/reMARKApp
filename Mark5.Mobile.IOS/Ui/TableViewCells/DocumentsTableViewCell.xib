@@ -12,15 +12,15 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" layoutMarginsFollowReadableWidth="YES" selectionStyle="blue" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="DocumentsTableViewCell" rowHeight="128" id="2" customClass="DocumentsTableViewCell">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="128"/>
+        <tableViewCell contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" layoutMarginsFollowReadableWidth="YES" selectionStyle="blue" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="DocumentsTableViewCell" rowHeight="132" id="2" customClass="DocumentsTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="132"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" layoutMarginsFollowReadableWidth="YES" tableViewCell="2" id="T2N-bu-S3y">
-                <rect key="frame" x="0.0" y="0.0" width="287" height="127"/>
+                <rect key="frame" x="0.0" y="0.0" width="287" height="131"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cr6-01-3sv">
-                        <rect key="frame" x="0.0" y="2" width="8" height="124"/>
+                        <rect key="frame" x="0.0" y="1.5" width="8" height="128.5"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="8" id="Qpa-Mr-bBM"/>
@@ -80,7 +80,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="283" translatesAutoresizingMaskIntoConstraints="NO" id="7nc-Uc-eSh">
-                        <rect key="frame" x="38" y="61" width="242" height="56"/>
+                        <rect key="frame" x="38" y="61" width="242" height="60"/>
                         <string key="text">Message preview / Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque venenatis nulla sit amet consequat porta. Quisque convallis, diam ut dictum viverra, metus massa ultrices nisl, eget mollis lectus ante ut justo. Ut metus nunc, pulvinar sit amet erat at, viverra vestibulum nisi. Cras mollis sed enim varius vulputate.</string>
                         <fontDescription key="fontDescription" type="system" pointSize="12"/>
                         <color key="textColor" red="0.33333333333333331" green="0.33333333333333331" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -124,7 +124,7 @@
                 <outlet property="SenderNameLabel" destination="z17-lR-ayH" id="csb-I5-tNR"/>
                 <outlet property="SubjectLabel" destination="m6q-Yl-iSk" id="7Aq-Xq-dNE"/>
             </connections>
-            <point key="canvasLocation" x="25" y="70"/>
+            <point key="canvasLocation" x="25" y="73"/>
         </tableViewCell>
     </objects>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

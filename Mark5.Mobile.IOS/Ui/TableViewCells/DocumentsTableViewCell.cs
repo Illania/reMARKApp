@@ -23,7 +23,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
     public partial class DocumentsTableViewCell : UITableViewCell
     {
 
-        public const float Height = 128f;
+        public const float Height = 130f;
 
         public static readonly UINib Nib = UINib.FromName("DocumentsTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("DocumentsTableViewCell");
