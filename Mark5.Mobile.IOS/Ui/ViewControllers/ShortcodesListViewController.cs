@@ -438,8 +438,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         class DataSource : UITableViewSource, IDisposable
         {
 
-            static readonly nfloat Height = 65f;
-
             public bool Empty
             {
                 get
@@ -504,7 +502,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                return Height;
+                return ShortcodesTableViewCell.Height;
             }
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
