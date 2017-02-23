@@ -976,7 +976,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DoAssignCategory()
         {
-            //TODO
+            var categoriesListViewController = new CategoriesListViewController();
+            categoriesListViewController.BusinessEntityPreview = DocumentPreview;
+            var categoriesListNavigationController = new UINavigationController(categoriesListViewController);
+            categoriesListNavigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+
+            //TODO remember the update of categories in document preview 
+
+            PresentViewController(categoriesListNavigationController, true, null);
         }
 
         void UserActions_Clicked(object sender, EventArgs e)

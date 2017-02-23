@@ -186,6 +186,7 @@
 "unable_open_link_content" = "There are no applications that can open link type ";
 "unable_open_link_title" = "Unable to open link";
 "updating_config___" = "Updating configuration...";
+"updating_categories___" = "Updating categories...";
 "urgent" = "Urgent";
 "username" = "Username";
 "vat" = "VAT";
