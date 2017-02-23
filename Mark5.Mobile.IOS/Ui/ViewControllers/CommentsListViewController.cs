@@ -14,6 +14,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Utilities;
@@ -263,6 +264,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     case ObjectType.Document:
                         var document = Entity as Document;
                         newComment = await Managers.DocumentsManager.AddComment(document, newCommentContent);
+                        PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentsCountChangedMessage(this, document.Id, document.Comments.Count));
                         break;
                     case ObjectType.Contact:
                         var contact = Entity as Contact;
@@ -276,6 +278,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ds.AddComment(newComment);
                 commentsTableView.ScrollToRow(NSIndexPath.FromRowSection(ds.Items.Count - 1, 0), UITableViewScrollPosition.Middle, true);
                 commentContent.Text = string.Empty;
+
             }
             catch (Exception ex)
             {
@@ -313,6 +316,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                      case ObjectType.Document:
                          var document = Entity as Document;
                          await Managers.DocumentsManager.DeleteComment(document, comment);
+                         PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentsCountChangedMessage(this, document.Id, document.Comments.Count));
                          break;
                      case ObjectType.Contact:
                          var contact = Entity as Contact;
@@ -321,6 +325,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                      default:
                          throw new ArgumentException("The input business entity does not have comments defined in the model");
                  }
+
              }).ContinueWith(async t =>
              {
                  dismissAction();

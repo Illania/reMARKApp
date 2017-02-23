@@ -175,10 +175,9 @@
     <Folder Include="Ui\TableViewCells\" />
     <Folder Include="Ui\ViewControllers\DocumentView\" />
     <Folder Include="Ui\ViewControllers\DocumentView\Subviews\" />
-    <Folder Include="Ui\Common\HubMessages\" />
     <Folder Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsView\" />
     <Folder Include="Ui\ViewControllers\Common\" />
-    <Folder Include="Model\Messages\" />
+    <Folder Include="Model\HubMessages\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -332,7 +331,6 @@
       <DependentUpon>ShortcodesTableViewCell.cs</DependentUpon>
     </Compile>
     <Compile Include="Ui\ViewControllers\FoldersList\CopyMoveToFolderListViewController.cs" />
-    <Compile Include="Ui\Common\HubMessages\EntityMovedFromFolderMessage.cs" />
     <Compile Include="Ui\ViewControllers\CopyToWorktrayViewController.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsView\SuggestionsListView.cs" />
     <Compile Include="Ui\TableViewCells\SuggestionsTableViewCell.cs" />
@@ -369,17 +367,19 @@
     <Compile Include="Ui\ViewControllers\Common\ActionableLayoutScrollView.cs" />
     <Compile Include="Utilities\LocalNotificationsListener.cs" />
     <Compile Include="Utilities\NotificationsUtilities.cs" />
-    <Compile Include="Model\Messages\NewNotificationsMessage.cs" />
     <Compile Include="Ui\ViewControllers\CategoriesListViewController.cs" />
     <Compile Include="Ui\TableViewCells\CategoriesTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\CategoriesTableViewCell.designer.cs">
       <DependentUpon>CategoriesTableViewCell.cs</DependentUpon>
     </Compile>
+    <Compile Include="Model\HubMessages\NewNotificationsMessage.cs" />
     <Compile Include="Ui\ViewControllers\CommentsListViewController.cs" />
     <Compile Include="Ui\TableViewCells\CommentsTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\CommentsTableViewCell.designer.cs">
       <DependentUpon>CommentsTableViewCell.cs</DependentUpon>
     </Compile>
+    <Compile Include="Model\HubMessages\DocumentPreviewCommentsCountChangedMessage.cs" />
+    <Compile Include="Model\HubMessages\EntityMovedFromFolderMessage.cs" />
     <Compile Include="Ui\TableViewCells\CommunicationAddressTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\CommunicationAddressTableViewCell.designer.cs">
       <DependentUpon>CommunicationAddressTableViewCell.cs</DependentUpon>

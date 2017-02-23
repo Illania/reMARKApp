@@ -7,9 +7,8 @@
 //
 using TinyMessenger;
 
-namespace Mark5.Mobile.IOS.Model.Messages
+namespace Mark5.Mobile.IOS.Model.HubMessages
 {
-    
     public class NewNotificationsMessage : TinyMessageBase
     {
 
