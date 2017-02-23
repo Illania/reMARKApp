@@ -20,6 +20,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
     
     public partial class ExternalDocumentsTableViewCell : UITableViewCell
     {
+
+        public const float Height = 65f;
         
         public static readonly UINib Nib = UINib.FromName("ExternalDocumentsTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("ExternalDocumentsTableViewCell");

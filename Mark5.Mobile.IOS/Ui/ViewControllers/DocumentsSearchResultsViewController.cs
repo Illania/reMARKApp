@@ -97,7 +97,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             documentsTableView.Source = new DataSource(this, documentsTableView, Localization.GetString("no_documents_found"), PlatformConfig.Preferences.CompactDocumentsList);
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
             documentsTableView.RowHeight = UITableView.AutomaticDimension;
-            documentsTableView.EstimatedRowHeight = 75f;
+            documentsTableView.EstimatedRowHeight = DocumentsTableViewCell.Height;
             documentsTableView.AllowsSelectionDuringEditing = false;
             documentsTableView.AllowsMultipleSelectionDuringEditing = true;
             documentsTableView.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -297,10 +297,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         class DataSource : UITableViewSource, IDisposable
         {
 
-            static readonly nfloat Height = 100f;
-            static readonly nfloat CompactHeight = 52f;
-            static readonly nfloat ExternalHeight = 52f;
-
             public bool Empty
             {
                 get
@@ -384,9 +380,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
             {
                 if (documentPreviewsInView.Count > 0 && documentPreviewsInView[indexPath.Row]?.Direction == DocumentDirection.External)
-                    return ExternalHeight;
+                    return ExternalDocumentsTableViewCell.Height;
 
-                return compact ? CompactHeight : Height;
+                return compact ? DocumentsCompactTableViewCell.Height : DocumentsTableViewCell.Height;
             }
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
