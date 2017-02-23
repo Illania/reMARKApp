@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: ObjectActionsTableViewCell.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -32,7 +32,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             var cell = (ObjectActionsTableViewCell)Nib.Instantiate(null, null)[0];
 
             cell.UsernameLabel.Font = Theme.DefaultBoldFont;
-            cell.DateLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
+            cell.DateLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
 
             cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 

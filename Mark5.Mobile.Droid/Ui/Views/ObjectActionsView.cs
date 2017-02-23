@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: ObjectActionsView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -38,14 +38,14 @@ namespace Mark5.Mobile.Droid.Ui.Views
         void InitializeView(string title, ObjectAction[] objectActions)
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            Elevation = ConversionUtils.ConvertDpToPixels(2.0f);
-            Radius = ConversionUtils.ConvertDpToPixels(2.0f);
+            Elevation = ConversionUtils.ConvertDpToPixels(2f);
+            Radius = ConversionUtils.ConvertDpToPixels(2f);
             UseCompatPadding = true;
 
-            distanceVeryLarge = ConversionUtils.ConvertDpToPixels(24.0f);
-            distanceLarge = ConversionUtils.ConvertDpToPixels(16.0f);
-            distanceNormal = ConversionUtils.ConvertDpToPixels(8.0f);
-            distanceSmall = ConversionUtils.ConvertDpToPixels(4.0f);
+            distanceVeryLarge = ConversionUtils.ConvertDpToPixels(24f);
+            distanceLarge = ConversionUtils.ConvertDpToPixels(16f);
+            distanceNormal = ConversionUtils.ConvertDpToPixels(8f);
+            distanceSmall = ConversionUtils.ConvertDpToPixels(4f);
 
             innerLayout = new LinearLayoutCompat(Context)
             {

@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: ShortcodesSearchResultsViewController.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -114,10 +114,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             View.AddSubview(shortcodesTableView);
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(shortcodesTableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(shortcodesTableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(shortcodesTableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(shortcodesTableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
+                    NSLayoutConstraint.Create(shortcodesTableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(shortcodesTableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(shortcodesTableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(shortcodesTableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
                 });
 
             var longPressRecognizer = new UILongPressGestureRecognizer(this, new Selector("longPressed:"))

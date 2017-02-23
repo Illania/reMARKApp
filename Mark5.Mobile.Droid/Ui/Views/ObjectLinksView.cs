@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: ObjectLinksView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -42,14 +42,14 @@ namespace Mark5.Mobile.Droid.Ui.Views
         void InitializeView(string title, ObjectLink[] objectLinks)
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            Elevation = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 2.0f, Resources.DisplayMetrics) + 0.5f);
-            Radius = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 2.0f, Resources.DisplayMetrics) + 0.5f);
+            Elevation = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 2f, Resources.DisplayMetrics) + 0.5f);
+            Radius = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 2f, Resources.DisplayMetrics) + 0.5f);
             UseCompatPadding = true;
 
-            distanceVeryLarge = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 24.0f, Resources.DisplayMetrics) + 0.5f);
-            distanceLarge = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 16.0f, Resources.DisplayMetrics) + 0.5f);
-            distanceNormal = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 8.0f, Resources.DisplayMetrics) + 0.5f);
-            distanceSmall = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 4.0f, Resources.DisplayMetrics) + 0.5f);
+            distanceVeryLarge = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 24f, Resources.DisplayMetrics) + 0.5f);
+            distanceLarge = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 16f, Resources.DisplayMetrics) + 0.5f);
+            distanceNormal = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 8f, Resources.DisplayMetrics) + 0.5f);
+            distanceSmall = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 4f, Resources.DisplayMetrics) + 0.5f);
 
             innerLayout = new LinearLayoutCompat(Context)
             {

@@ -42,8 +42,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int CategoriesRequest = 2;
         }
 
-        const float CardElevation = 2.0f;
-        const float CardRadius = 2.0f;
+        const float CardElevation = 2f;
+        const float CardRadius = 2f;
 
         public int? FolderId { get; set; }
         public Folder Folder { get; set; }

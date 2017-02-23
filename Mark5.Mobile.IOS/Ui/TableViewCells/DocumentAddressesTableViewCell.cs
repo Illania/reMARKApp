@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: DocumentAddressesTableViewCell.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -29,7 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static DocumentAddressesTableViewCell Create()
         {
             var cell = (DocumentAddressesTableViewCell)Nib.Instantiate(null, null)[0];
-            cell.AddressLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
+            cell.AddressLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
             cell.IconImage.Image = UIImage.FromBundle(Path.Combine("icons", "email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             return cell;
         }

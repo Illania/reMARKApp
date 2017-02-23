@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: ExternalDocumentsTableViewCell.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -36,7 +36,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             var cell = (ExternalDocumentsTableViewCell)Nib.Instantiate(null, null)[0];
 
             cell.NameLabel.Font = Theme.DefaultBoldFont;
-            cell.DateReceivedLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
+            cell.DateReceivedLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
 
             return cell;
         }
@@ -93,15 +93,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 CategoriesView.AddSubview(categoryView);
 
                 if (previousView == null)
-                    CategoriesView.AddConstraint(NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Top, 1.0f, 0.0f));
+                    CategoriesView.AddConstraint(NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Top, 1f, 0f));
                 else
-                    CategoriesView.AddConstraint(NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, previousView, NSLayoutAttribute.Bottom, 1.0f, 0.0f));
+                    CategoriesView.AddConstraint(NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, previousView, NSLayoutAttribute.Bottom, 1f, 0f));
 
                 CategoriesView.AddConstraints(new[]
                     {
-                        NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                        NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Right, 1.0f, 0.0f),
-                        NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, 1.0f)
+                        NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Left, 1f, 0f),
+                        NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Right, 1f, 0f),
+                        NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 1f)
                     });
 
                 views.Add(categoryView);
@@ -110,12 +110,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             if (previousView != null)
             {
-                CategoriesView.AddConstraint(NSLayoutConstraint.Create(previousView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Bottom, 1.0f, 0.0f));
+                CategoriesView.AddConstraint(NSLayoutConstraint.Create(previousView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Bottom, 1f, 0f));
             }
 
             for (int i = 1; i < views.Count; i++)
             {
-                CategoriesView.AddConstraint(NSLayoutConstraint.Create(views[0], NSLayoutAttribute.Height, NSLayoutRelation.Equal, views[i], NSLayoutAttribute.Height, 1.0f, 0.0f));
+                CategoriesView.AddConstraint(NSLayoutConstraint.Create(views[0], NSLayoutAttribute.Height, NSLayoutRelation.Equal, views[i], NSLayoutAttribute.Height, 1f, 0f));
             }
         }
 

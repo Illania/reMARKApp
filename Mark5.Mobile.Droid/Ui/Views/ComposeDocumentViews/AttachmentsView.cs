@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: AttachmentsView.cs
 // Author: Ferdinando Papale fp@nordic-it.com
@@ -147,10 +147,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 documentAttachment = attachment;
 
-                var minimumWidth = ConversionUtils.ConvertDpToPixels(100.0f);
-                var maximumWidth = ConversionUtils.ConvertDpToPixels(175.0f);
-                var margin = ConversionUtils.ConvertDpToPixels(8.0f);
-                var innerMargin = ConversionUtils.ConvertDpToPixels(4.0f);
+                var minimumWidth = ConversionUtils.ConvertDpToPixels(100f);
+                var maximumWidth = ConversionUtils.ConvertDpToPixels(175f);
+                var margin = ConversionUtils.ConvertDpToPixels(8f);
+                var innerMargin = ConversionUtils.ConvertDpToPixels(4f);
 
                 Orientation = Vertical;
 
@@ -161,7 +161,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     RightMargin = margin,
                     BottomMargin = margin
                 };
-                Elevation = ConversionUtils.ConvertDpToPixels(2.0f);
+                Elevation = ConversionUtils.ConvertDpToPixels(2f);
 
                 SetBackgroundResource(Resource.Drawable.rounded_background);
 

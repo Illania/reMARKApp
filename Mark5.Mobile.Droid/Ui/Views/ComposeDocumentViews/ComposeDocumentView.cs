@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: ComposeDocumentView.cs
 // Author: Ferdinando Papale fp@nordic-it.com
@@ -35,10 +35,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
-            DistanceVeryLarge = ConversionUtils.ConvertDpToPixels(56.0f);
-            DistanceLarge = ConversionUtils.ConvertDpToPixels(16.0f);
-            DistanceNormal = ConversionUtils.ConvertDpToPixels(8.0f);
-            DistanceSmall = ConversionUtils.ConvertDpToPixels(4.0f);
+            DistanceVeryLarge = ConversionUtils.ConvertDpToPixels(56f);
+            DistanceLarge = ConversionUtils.ConvertDpToPixels(16f);
+            DistanceNormal = ConversionUtils.ConvertDpToPixels(8f);
+            DistanceSmall = ConversionUtils.ConvertDpToPixels(4f);
         }
 
         public abstract Task RefreshView();

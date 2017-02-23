@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: SettingsViewController.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -68,7 +68,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var footerText = SettingsReader.GetFooterText(section);
 
-            if (string.IsNullOrWhiteSpace(footerText)) return 0.0f;
+            if (string.IsNullOrWhiteSpace(footerText)) return 0f;
 
             var width = tableView.Frame.Width - tableView.LayoutMargins.Left - tableView.LayoutMargins.Right;
 
@@ -76,7 +76,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             attributes.Font = Theme.DefaultFont;
             var size = new NSString(footerText).GetBoundingRect(new CGSize(width, nfloat.MaxValue), NSStringDrawingOptions.UsesLineFragmentOrigin, attributes, null);
 
-            return size.Height + 10.0f;
+            return size.Height + 10f;
         }
 
         [Export("tableView:cellForSpecifier:")]
@@ -102,7 +102,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = Managers.ActiveConnectionInfo?.Username;
                 cell.DetailTextLabel.TextColor = UIColor.Gray;
-                cell.DetailTextLabel.Font = UIFont.SystemFontOfSize(17.0f);
+                cell.DetailTextLabel.Font = UIFont.SystemFontOfSize(17f);
 
                 return cell;
             }
@@ -116,7 +116,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = ci?.Hostname + ":" + ci?.Port;
                 cell.DetailTextLabel.TextColor = UIColor.Gray;
-                cell.DetailTextLabel.Font = UIFont.SystemFontOfSize(17.0f);
+                cell.DetailTextLabel.Font = UIFont.SystemFontOfSize(17f);
 
                 return cell;
             }
@@ -130,7 +130,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = sslOff ? Localization.GetString("enabled") : Localization.GetString("disabled");
                 cell.DetailTextLabel.TextColor = sslOff ? UIColor.Gray : Theme.Brown;
-                cell.DetailTextLabel.Font = sslOff ? UIFont.SystemFontOfSize(17.0f) : UIFont.BoldSystemFontOfSize(17.0f);
+                cell.DetailTextLabel.Font = sslOff ? UIFont.SystemFontOfSize(17f) : UIFont.BoldSystemFontOfSize(17f);
 
                 return cell;
             }
@@ -142,7 +142,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = string.Format("{0} ({1})", NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"], NSBundle.MainBundle.InfoDictionary["CFBundleVersion"]);
                 cell.DetailTextLabel.TextColor = UIColor.Gray;
-                cell.DetailTextLabel.Font = UIFont.SystemFontOfSize(17.0f);
+                cell.DetailTextLabel.Font = UIFont.SystemFontOfSize(17f);
 
                 return cell;
             }

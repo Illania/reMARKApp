@@ -95,7 +95,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             compactLayout.Gravity = (int)GravityFlags.CenterVertical;
             AddView(compactLayout);
 
-            var size = ConversionUtils.ConvertDpToPixels(40.0f);
+            var size = ConversionUtils.ConvertDpToPixels(40f);
             letter = new AppCompatTextView(Context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(size, size),

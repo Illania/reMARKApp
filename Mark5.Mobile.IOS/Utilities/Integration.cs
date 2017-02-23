@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: Integration.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -26,7 +26,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         #region iPhone/iPad recognition
 
-        const float IPhonePlusMaxBounds = 736.0f;
+        const float IPhonePlusMaxBounds = 736f;
 
         public static bool IsIPhone()
         {
@@ -47,15 +47,15 @@ namespace Mark5.Mobile.IOS.Utilities
 
         #region Screen size
 
-        public static readonly CGSize IPhone4SScreenSize = new CGSize(640.0f, 960.0f);
-        public static readonly CGSize IPhone5ScreenSize = new CGSize(640.0f, 1136.0f);
-        public static readonly CGSize IPhone6ScreenSize = new CGSize(750.0f, 1334.0f);
-        public static readonly CGSize IPhone6ZoomScreenSize = new CGSize(640.0f, 1136.0f);
-        public static readonly CGSize IPhone6PlusScreenSize = new CGSize(1242.0f, 2208.0f);
-        public static readonly CGSize IPhone6PlusZoomScreenSize = new CGSize(1125.0f, 2001.0f);
-        public static readonly CGSize IPadScreenSize = new CGSize(768.0f, 1024.0f);
-        public static readonly CGSize IPadRetinaScreenSize = new CGSize(1536.0f, 2048.0f);
-        public static readonly CGSize IPadProScreenSize = new CGSize(2048.0f, 2732.0f);
+        public static readonly CGSize IPhone4SScreenSize = new CGSize(640f, 960f);
+        public static readonly CGSize IPhone5ScreenSize = new CGSize(640f, 1136f);
+        public static readonly CGSize IPhone6ScreenSize = new CGSize(750f, 1334f);
+        public static readonly CGSize IPhone6ZoomScreenSize = new CGSize(640f, 1136f);
+        public static readonly CGSize IPhone6PlusScreenSize = new CGSize(1242f, 2208f);
+        public static readonly CGSize IPhone6PlusZoomScreenSize = new CGSize(1125f, 2001f);
+        public static readonly CGSize IPadScreenSize = new CGSize(768f, 1024f);
+        public static readonly CGSize IPadRetinaScreenSize = new CGSize(1536f, 2048f);
+        public static readonly CGSize IPadProScreenSize = new CGSize(2048f, 2732f);
 
         public static CGSize GetScreenSizeInPixels()
         {

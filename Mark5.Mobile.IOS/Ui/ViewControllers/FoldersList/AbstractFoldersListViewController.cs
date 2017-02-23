@@ -202,10 +202,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             View.AddSubview(FoldersTableView);
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(FoldersTableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(FoldersTableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(FoldersTableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(FoldersTableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
+                    NSLayoutConstraint.Create(FoldersTableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(FoldersTableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(FoldersTableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(FoldersTableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
                 });
 
             RefreshControl = new UIRefreshControl();
