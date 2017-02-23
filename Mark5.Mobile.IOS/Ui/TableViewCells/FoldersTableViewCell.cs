@@ -18,6 +18,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
     public partial class FoldersTableViewCell : UITableViewCell
     {
 
+        public const float Height = 44f;
+
         public static readonly UINib Nib = UINib.FromName("FoldersTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("FoldersTableViewCell");
 

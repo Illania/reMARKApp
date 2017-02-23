@@ -767,7 +767,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                return 44f;
+                return FoldersTableViewCell.Height;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
@@ -1009,7 +1009,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                return 44f;
+                return FoldersTableViewCell.Height;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
@@ -1284,7 +1284,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                return 44f;
+                return FoldersSearchResultsTableViewCell.Height;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)

@@ -72,7 +72,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="Subject / Lorem ipsum dolor sit amet" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="m6q-Yl-iSk">
-                        <rect key="frame" x="38" y="35" width="241" height="21"/>
+                        <rect key="frame" x="38" y="36" width="241" height="21"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="leW-Oy-OZM"/>
                         </constraints>
@@ -80,7 +80,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="283" translatesAutoresizingMaskIntoConstraints="NO" id="7nc-Uc-eSh">
-                        <rect key="frame" x="38" y="56" width="242" height="61"/>
+                        <rect key="frame" x="38" y="61" width="242" height="56"/>
                         <string key="text">Message preview / Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque venenatis nulla sit amet consequat porta. Quisque convallis, diam ut dictum viverra, metus massa ultrices nisl, eget mollis lectus ante ut justo. Ut metus nunc, pulvinar sit amet erat at, viverra vestibulum nisi. Cras mollis sed enim varius vulputate.</string>
                         <fontDescription key="fontDescription" type="system" pointSize="12"/>
                         <color key="textColor" red="0.33333333333333331" green="0.33333333333333331" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -98,13 +98,13 @@
                     <constraint firstItem="m6q-Yl-iSk" firstAttribute="leading" secondItem="lvW-Ah-e37" secondAttribute="trailing" constant="8" id="EzJ-bL-hyb"/>
                     <constraint firstItem="HLr-sB-4mm" firstAttribute="top" secondItem="cL7-tj-7kF" secondAttribute="bottom" constant="4" id="FnP-NO-dbD"/>
                     <constraint firstItem="cr6-01-3sv" firstAttribute="centerY" secondItem="T2N-bu-S3y" secondAttribute="centerY" id="HBS-PR-oMC"/>
-                    <constraint firstItem="m6q-Yl-iSk" firstAttribute="top" secondItem="T2N-bu-S3y" secondAttribute="topMargin" constant="24" id="HPO-9a-ezH"/>
-                    <constraint firstItem="7nc-Uc-eSh" firstAttribute="top" secondItem="dRz-Gg-Y8D" secondAttribute="bottom" constant="24" id="IYi-9u-oqI"/>
                     <constraint firstItem="KjF-zx-pGL" firstAttribute="leading" secondItem="cr6-01-3sv" secondAttribute="trailing" constant="7" id="Ki1-kq-i94"/>
                     <constraint firstItem="cL7-tj-7kF" firstAttribute="leading" secondItem="cr6-01-3sv" secondAttribute="trailing" constant="7" id="LCx-Uo-fLp"/>
                     <constraint firstItem="KjF-zx-pGL" firstAttribute="top" secondItem="T2N-bu-S3y" secondAttribute="topMargin" constant="2" id="Mi2-xs-aoh"/>
                     <constraint firstItem="lvW-Ah-e37" firstAttribute="top" secondItem="KjF-zx-pGL" secondAttribute="bottom" constant="4" id="NUr-fl-FrT"/>
                     <constraint firstItem="cL7-tj-7kF" firstAttribute="top" secondItem="lvW-Ah-e37" secondAttribute="bottom" constant="4" id="dft-TF-S1U"/>
+                    <constraint firstItem="m6q-Yl-iSk" firstAttribute="top" secondItem="dRz-Gg-Y8D" secondAttribute="bottom" constant="4" id="dsQ-Sm-F1P"/>
+                    <constraint firstItem="7nc-Uc-eSh" firstAttribute="top" secondItem="m6q-Yl-iSk" secondAttribute="bottom" constant="4" id="gm4-1h-X2P"/>
                     <constraint firstItem="HLr-sB-4mm" firstAttribute="leading" secondItem="cr6-01-3sv" secondAttribute="trailing" constant="7" id="hUL-aM-Oa1"/>
                     <constraint firstItem="dRz-Gg-Y8D" firstAttribute="leading" secondItem="z17-lR-ayH" secondAttribute="trailing" constant="8" id="kfu-Ns-MH7"/>
                     <constraint firstAttribute="trailingMargin" secondItem="7nc-Uc-eSh" secondAttribute="trailing" constant="-1" id="nMt-eQ-VUX"/>
