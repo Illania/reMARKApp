@@ -30,6 +30,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         UIImageView IndicatorImageView3 { get; set; }
 
         [Outlet]
+        UIImageView IndicatorImageView4 { get; set; }
+
+        [Outlet]
         UILabel MessagePreviewLabel { get; set; }
 
         [Outlet]
@@ -61,6 +64,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 IndicatorImageView2 = null;
             }
             if (IndicatorImageView3 != null)
+            {
+                IndicatorImageView3.Dispose();
+                IndicatorImageView3 = null;
+            }
+            if (IndicatorImageView4 != null)
             {
                 IndicatorImageView3.Dispose();
                 IndicatorImageView3 = null;
