@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: DocumentViewController.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -207,10 +207,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             View.AddSubview(mainScrollView);
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
+                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
                 });
 
             stackViewBeforeContent = new UIStackView
@@ -219,25 +219,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Axis = UILayoutConstraintAxis.Vertical,
                 Alignment = UIStackViewAlignment.Fill,
                 Distribution = UIStackViewDistribution.Fill,
-                Spacing = 0.0f,
+                Spacing = 0f,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             mainScrollView.AddSubview(stackViewBeforeContent);
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Top, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1.0f, 0.0f)
+                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f)
                 });
 
             contentView = new ContentView(mainScrollView, DecidePolicyForNavigationAction);
             mainScrollView.AddSubview(contentView);
             mainScrollView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, stackViewBeforeContent, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Right, 1.0f, 0.0f),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, mainScrollView, NSLayoutAttribute.Width, 1.0f, 0.0f)
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, stackViewBeforeContent, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, mainScrollView, NSLayoutAttribute.Width, 1f, 0f)
             });
 
             stackViewAfterContent = new UIStackView
@@ -246,16 +246,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Axis = UILayoutConstraintAxis.Vertical,
                 Alignment = UIStackViewAlignment.Fill,
                 Distribution = UIStackViewDistribution.Fill,
-                Spacing = 0.0f,
+                Spacing = 0f,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             mainScrollView.AddSubview(stackViewAfterContent);
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, contentView, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Bottom, 1.0f, 0.0f)
+                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, contentView, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f),
+                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Bottom, 1f, 0f)
                 });
         }
 
@@ -319,7 +319,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             fileTo.Enabled = false;
 
             commentsButton = new UIButton(UIButtonType.System);
-            commentsButton.Frame = new CGRect(0.0f, 0.0f, 25.0f, 25.0f);
+            commentsButton.Frame = new CGRect(0f, 0f, 25f, 25f);
             commentsButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "comments.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             commentsButton.Enabled = false;
 
@@ -353,6 +353,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             toolbar.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             toolbar.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             View.AddSubview(toolbar);
+            toolbarBottomConstraint = NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f);
             View.AddConstraints(new[]
                 {
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1.0f, 40.0f),
@@ -362,10 +363,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 });
         }
 
+        void CorrectToolbar()
+        {
+            toolbarBottomConstraint.Constant = SplitViewController != null ? -49f : 0f;
+        }
+
         void CorrectScrollViewInsets()
         {
-            mainScrollView.ContentInset = new UIEdgeInsets(mainScrollView.ContentInset.Top, 0.0f, mainScrollView.ContentInset.Bottom + toolbar.Frame.Height, 0.0f);
-            mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(mainScrollView.ScrollIndicatorInsets.Top, 0.0f, mainScrollView.ScrollIndicatorInsets.Bottom + toolbar.Frame.Height, 0.0f);
+            mainScrollView.ContentInset = new UIEdgeInsets(mainScrollView.ContentInset.Top, 0f, mainScrollView.ContentInset.Bottom + toolbar.Frame.Height, 0f);
+            mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(mainScrollView.ScrollIndicatorInsets.Top, 0f, mainScrollView.ScrollIndicatorInsets.Bottom + toolbar.Frame.Height, 0f);
         }
 
         void InitializeHandlers()
@@ -589,9 +595,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             userActions.Enabled = !isLocalDocument;
 
             UIView.Animate(0.075d, stackViewBeforeContent.LayoutIfNeeded);
-            UIView.Animate(0.1d, () => stackViewBeforeContent.Alpha = 1.0f);
+            UIView.Animate(0.1d, () => stackViewBeforeContent.Alpha = 1f);
             UIView.Animate(0.075d, stackViewAfterContent.LayoutIfNeeded);
-            UIView.Animate(0.1d, () => stackViewAfterContent.Alpha = 1.0f);
+            UIView.Animate(0.1d, () => stackViewAfterContent.Alpha = 1f);
         }
 
         public void RefreshNavigationBar()

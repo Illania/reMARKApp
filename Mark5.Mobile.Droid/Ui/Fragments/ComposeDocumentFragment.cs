@@ -33,7 +33,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class ComposeDocumentFragment : RetainableStateFragment
     {
 
-        const string DefaultTitle = "New document";
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
         const int AttachmentRequestCode = 111;
 
@@ -243,7 +242,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Subview_Edited(object sender, EventArgs e)
         {
-            ((AppCompatActivity)Activity).SupportActionBar.Title = !subjectView.Empty ? subjectView.Subject : DefaultTitle;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = !subjectView.Empty ? subjectView.Subject : GetString(Resource.String.new_document);
             UpdateSendButtonState();
 
             if (sender is LineView && PlatformConfig.Preferences.RemoveLine && CreationModeFlag == DocumentCreationModeFlag.ReplyAll
@@ -258,7 +257,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void AttachmentsView_AttachmentClicked(object sender, IAttachmentDescription attachment)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var option = await Dialogs.ShowListDialog(Context, attachment.Name, Resource.Array.attachment_clicked_options, true);
 
@@ -266,7 +267,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
 
-                string path = null;
+                string path = null; 
 
                 var outgoingAttachment = attachment as OutgoingDocumentAttachmentDescription;
                 if (outgoingAttachment != null)

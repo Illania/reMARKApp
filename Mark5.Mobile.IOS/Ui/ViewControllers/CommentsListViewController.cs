@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: ${Project}
 // File: CommentsListViewController.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
@@ -25,7 +25,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class CommentsListViewController : AbstractViewController
     {
         const int CommentContentMaximumLinesNumber = 5;
-        const float CommentEditViewInnerMargin = 7.0f;
+        const float CommentEditViewInnerMargin = 7f;
         const int SecondsToEdit = 60;
 
         UIBarButtonItem doneButtonItem;
@@ -98,37 +98,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             AutomaticallyAdjustsScrollViewInsets = true;
 
             commentsTableView = new UITableView();
-            commentsTableView.EstimatedRowHeight = 60;
-            commentsTableView.RowHeight = UITableView.AutomaticDimension;
             commentsTableView.Source = new DataSource(this, commentsTableView, Localization.GetString("no_comments"));
-            commentsTableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            commentsTableView.Bounces = true;
-            commentsTableView.CellLayoutMarginsFollowReadableWidth = false;
-            commentsTableView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.OnDrag;
+            commentsTableView.EstimatedRowHeight = CommentsTableViewCell.Height;
+            commentsTableView.RowHeight = UITableView.AutomaticDimension;
             commentsTableView.ClipsToBounds = false;
-
+            commentsTableView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.OnDrag;
+            commentsTableView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(commentsTableView);
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(commentsTableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(commentsTableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(commentsTableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f)
+                    NSLayoutConstraint.Create(commentsTableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(commentsTableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(commentsTableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f)
                 });
         }
 
         void InitializeEditView()
         {
             commentEditView = new UIView();
-            commentEditView.BackgroundColor = UIColor.FromRGB(248.0f / 255.0f, 248.0f / 255.0f, 248.0f / 255.0f);
+            commentEditView.BackgroundColor = UIColor.FromRGB(248f / 255f, 248f / 255f, 248f / 255f);
             commentEditView.TranslatesAutoresizingMaskIntoConstraints = false;
             commentEditView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            commentEditViewBottomConstraint = NSLayoutConstraint.Create(commentEditView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f);
+            commentEditViewBottomConstraint = NSLayoutConstraint.Create(commentEditView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f);
             View.AddSubview(commentEditView);
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(commentEditView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(commentEditView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(commentsTableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Top, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(commentEditView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(commentEditView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(commentsTableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Top, 1f, 0f),
                     commentEditViewBottomConstraint
                 });
 
@@ -139,10 +136,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             commentEditView.AddSubview(borderView);
             commentEditView.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Top, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Right, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1.0f, 1.0f)
+                    NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f)
                 });
 
             addComment = new UIButton(UIButtonType.System);
@@ -158,8 +155,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             commentEditView.AddSubview(addComment);
             commentEditView.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(addComment, NSLayoutAttribute.Right, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Right, 1.0f, -CommentEditViewInnerMargin),
-                    NSLayoutConstraint.Create(addComment, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.CenterY, 1.0f, 0.0f)
+                    NSLayoutConstraint.Create(addComment, NSLayoutAttribute.Right, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Right, 1f, -CommentEditViewInnerMargin),
+                    NSLayoutConstraint.Create(addComment, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.CenterY, 1f, 0f)
                 });
 
             commentContent = new UITextView();
@@ -168,18 +165,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             commentContent.ScrollEnabled = false;
             commentContent.Font = Theme.DefaultFont;
             commentContent.Layer.BorderColor = UIColor.Gray.ColorWithAlpha(0.5f).CGColor;
-            commentContent.Layer.BorderWidth = 1.0f;
-            commentContent.Layer.CornerRadius = 5.0f;
+            commentContent.Layer.BorderWidth = 1f;
+            commentContent.Layer.CornerRadius = 5f;
             commentContent.ClipsToBounds = true;
             commentContent.TranslatesAutoresizingMaskIntoConstraints = false;
             commentEditView.AddSubview(commentContent);
-            commentContentMaximumHeightConstraint = NSLayoutConstraint.Create(commentContent, NSLayoutAttribute.Height, NSLayoutRelation.LessThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1.0f, commentContent.SizeThatFits(commentContent.Frame.Size).Height);
+            commentContentMaximumHeightConstraint = NSLayoutConstraint.Create(commentContent, NSLayoutAttribute.Height, NSLayoutRelation.LessThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, commentContent.SizeThatFits(commentContent.Frame.Size).Height);
             commentEditView.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(commentContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Top, 1.0f, CommentEditViewInnerMargin),
-                    NSLayoutConstraint.Create(commentContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Left, 1.0f, CommentEditViewInnerMargin),
-                    NSLayoutConstraint.Create(commentContent, NSLayoutAttribute.Right, NSLayoutRelation.Equal, addComment, NSLayoutAttribute.Left, 1.0f, -CommentEditViewInnerMargin),
-                    NSLayoutConstraint.Create(commentContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Bottom, 1.0f, -CommentEditViewInnerMargin),
+                    NSLayoutConstraint.Create(commentContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Top, 1f, CommentEditViewInnerMargin),
+                    NSLayoutConstraint.Create(commentContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Left, 1f, CommentEditViewInnerMargin),
+                    NSLayoutConstraint.Create(commentContent, NSLayoutAttribute.Right, NSLayoutRelation.Equal, addComment, NSLayoutAttribute.Left, 1f, -CommentEditViewInnerMargin),
+                    NSLayoutConstraint.Create(commentContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Bottom, 1f, -CommentEditViewInnerMargin),
                     commentContentMaximumHeightConstraint
                 });
 
@@ -434,7 +431,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void OnKeyboardWillHideNotification(NSNotification notification)
         {
-            AdjustViewToKeyboard(0.0f, notification);
+            AdjustViewToKeyboard(0f, notification);
         }
 
         void AdjustViewToKeyboard(float offset, NSNotification notification = null)
@@ -454,7 +451,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 View.LayoutIfNeeded();
             }
 
-            if (offset > 0.0f)
+            if (offset > 0f)
             {
                 ScrollCommentsToTop(true);
             }
@@ -476,7 +473,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var heightThatFits = commentContent.SizeThatFits(commentContent.Frame.Size).Height;
                 var targetHeight = Math.Min(heightThatFits, commentContent.Font.LineHeight * CommentContentMaximumLinesNumber);
                 targetHeight = Math.Min(targetHeight, commentEditView.Frame.Bottom - NavigationController.NavigationBar.Frame.Bottom - 2 * CommentEditViewInnerMargin);
-                if (targetHeight >= 0.0f)
+                if (targetHeight >= 0f)
                 {
                     commentContentMaximumHeightConstraint.Constant = (nfloat)targetHeight;
                     commentContent.ScrollEnabled = heightThatFits > targetHeight;

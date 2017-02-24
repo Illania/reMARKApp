@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: CommunicationAddressTableViewCell.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -30,7 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static CommunicationAddressTableViewCell Create()
         {
             var cell = (CommunicationAddressTableViewCell)Nib.Instantiate(null, null)[0];
-            cell.AddressLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2.0f);
+            cell.AddressLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
             return cell;
         }
 
@@ -66,16 +66,17 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         string GetAddressFormatted(CommunicationAddress ca)
         {
-            if (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone || ca.Type == CommunicationAddressType.Fax)
-            {
-                var addressParts = ca.Address.Split('|');
-                if (addressParts[0].Length > 0)
+            if (ca.Address.Contains("|"))
+                if (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone || ca.Type == CommunicationAddressType.Fax)
                 {
-                    addressParts[0] = "+" + addressParts[0];
-                }
+                    var addressParts = ca.Address.Split('|');
+                    if (addressParts[0].Length > 0)
+                    {
+                        addressParts[0] = "+" + addressParts[0];
+                    }
 
-                return string.Join(" ", addressParts.Where(s => !string.IsNullOrWhiteSpace(s)));
-            }
+                    return string.Join(" ", addressParts.Where(s => !string.IsNullOrWhiteSpace(s)));
+                }
 
             return ca.Address;
         }

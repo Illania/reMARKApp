@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: UI.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -34,7 +34,7 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             try
             {
-                float alpha = 255.0f;
+                float alpha = 255f;
                 float red, green, blue;
 
                 switch (hexString.Length)
@@ -65,7 +65,7 @@ namespace Mark5.Mobile.IOS.Utilities
                         throw new ArgumentException(string.Format("Invalid HEX string passed: {0}.", hexString));
                 }
 
-                return UIColor.FromRGBA(red / 255.0f, green / 255.0f, blue / 255.0f, alpha / 255.0f);
+                return UIColor.FromRGBA(red / 255f, green / 255f, blue / 255f, alpha / 255f);
             }
             catch (Exception ex)
             {

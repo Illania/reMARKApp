@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: DocumentView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
@@ -19,9 +19,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         protected UIView ContainerView;
 
-        protected float HorizontalMargin = 15.0f;
-        protected float VerticalMargin = 12.0f;
-        protected float InnerMargin = 5.0f;
+        protected float HorizontalMargin = 15f;
+        protected float VerticalMargin = 12f;
+        protected float InnerMargin = 5f;
 
         protected DocumentSubView()
         {
@@ -35,7 +35,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             Axis = UILayoutConstraintAxis.Vertical;
             Alignment = UIStackViewAlignment.Fill;
             Distribution = UIStackViewDistribution.Fill;
-            Spacing = 0.0f;
+            Spacing = 0f;
             TranslatesAutoresizingMaskIntoConstraints = false;
 
             ContainerView = new UIView();

@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: DocumentView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -31,9 +31,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
-            DistanceLarge = ConversionUtils.ConvertDpToPixels(16.0f);
-            DistanceNormal = ConversionUtils.ConvertDpToPixels(8.0f);
-            DistanceSmall = ConversionUtils.ConvertDpToPixels(4.0f);
+            DistanceLarge = ConversionUtils.ConvertDpToPixels(16f);
+            DistanceNormal = ConversionUtils.ConvertDpToPixels(8f);
+            DistanceSmall = ConversionUtils.ConvertDpToPixels(4f);
 
             Visibility = ViewStates.Gone;
         }

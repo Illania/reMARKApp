@@ -22,6 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity]
     public class ComposeDocumentActivity : AppCompatActivity
     {
+        
         Toolbar toolbar;
         ComposeDocumentFragment cdf;
 

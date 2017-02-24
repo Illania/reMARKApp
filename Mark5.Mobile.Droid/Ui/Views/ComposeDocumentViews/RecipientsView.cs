@@ -32,8 +32,10 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
+    
     public class RecipientsView : ComposeDocumentView
     {
+    
         public event EventHandler Edited = delegate { };
 
         readonly AppCompatMultiAutoCompleteTextView emailEditor;
@@ -60,7 +62,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             get
             {
-                return Validator.ExtractValidEmails(emailEditor.Text).Count == emailEditor.Text.Split(',').Length;
+                return Validator.ExtractValidEmails(emailEditor.Text).Count == emailEditor.Text.Split(',').Count(s => !string.IsNullOrWhiteSpace(s));
             }
         }
 

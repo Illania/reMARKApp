@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: LinkedContactSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
@@ -57,7 +57,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
             ContentLayout = new LinearLayoutCompat(context);
             ContentLayout.Orientation = Vertical;
-            ContentLayout.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1.0f);
+            ContentLayout.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1f);
 
             internalLayout.AddView(ContentLayout);
 

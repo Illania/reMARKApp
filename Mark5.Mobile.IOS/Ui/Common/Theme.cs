@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: Theme.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -26,7 +26,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             get
             {
-                return UIColor.FromRGB(8.0f / 255.0f, 51.0f / 255.0f, 77.0f / 255.0f);
+                return UIColor.FromRGB(8f / 255f, 51f / 255f, 77f / 255f);
             }
         }
 
@@ -34,7 +34,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             get
             {
-                return UIColor.FromRGB(18.0f / 255.0f, 61.0f / 255.0f, 87.0f / 255.0f);
+                return UIColor.FromRGB(18f / 255f, 61f / 255f, 87f / 255f);
             }
         }
 
@@ -42,7 +42,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             get
             {
-                return UIColor.FromRGB(69.0f / 255.0f, 133.0f / 255.0f, 176.0f / 255.0f);
+                return UIColor.FromRGB(69f / 255f, 133f / 255f, 176f / 255f);
             }
         }
 
@@ -50,7 +50,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             get
             {
-                return UIColor.FromRGB(153.0f / 255.0f, 135.0f / 255.0f, 107.0f / 255.0f);
+                return UIColor.FromRGB(153f / 255f, 135f / 255f, 107f / 255f);
             }
         }
 
@@ -58,7 +58,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             get
             {
-                return UIColor.FromRGB(204.0f / 255.0f, 192.0f / 255.0f, 178.0f / 255.0f);
+                return UIColor.FromRGB(204f / 255f, 192f / 255f, 178f / 255f);
             }
         }
 
@@ -74,7 +74,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             get
             {
-                return UIColor.FromRGB(227.0f / 255.0f, 227.0f / 255.0f, 227.0f / 255.0f);
+                return UIColor.FromRGB(227f / 255f, 227f / 255f, 227f / 255f);
             }
         }
 
@@ -82,7 +82,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             get
             {
-                return UIColor.FromRGB(245.0f / 255.0f, 245.0f / 255.0f, 245.0f / 255.0f);
+                return UIColor.FromRGB(245f / 255f, 245f / 255f, 245f / 255f);
             }
         }
 
@@ -98,7 +98,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             get
             {
-                return UIColor.FromRGB(150.0f / 255.0f, 150.0f / 255.0f, 150.0f / 255.0f);
+                return UIColor.FromRGB(150f / 255f, 150f / 255f, 150f / 255f);
             }
         }
 
@@ -118,7 +118,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         const string DefaultBoldFontName = "Avenir-Black";
         const string DefaultLightFontName = "Avenir-Light";
 
-        const float DefaultFontSize = 16.0f;
+        const float DefaultFontSize = 16f;
 
         public static UIFont DefaultFont
         {
@@ -148,7 +148,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             get
             {
-                return UIFont.SystemFontOfSize(16.0f);
+                return UIFont.SystemFontOfSize(16f);
             }
         }
 
@@ -156,7 +156,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             get
             {
-                return UIFont.SystemFontOfSize(12.0f);
+                return UIFont.SystemFontOfSize(12f);
             }
         }
 
@@ -190,13 +190,13 @@ namespace Mark5.Mobile.IOS.Ui.Common
             // UINavigationBar
             var uiNavigationBarTitleTextAttributes = UINavigationBar.Appearance.GetTitleTextAttributes();
             uiNavigationBarTitleTextAttributes.TextColor = LightGray;
-            uiNavigationBarTitleTextAttributes.Font = DefaultBoldFont.WithRelativeSize(1.0f);
+            uiNavigationBarTitleTextAttributes.Font = DefaultBoldFont.WithRelativeSize(1f);
             UINavigationBar.Appearance.SetTitleTextAttributes(uiNavigationBarTitleTextAttributes);
 
             // UIBarItem
             var uiBarItemTitleTextAttributes = UIBarItem.Appearance.GetTitleTextAttributes(UIControlState.Normal);
             uiBarItemTitleTextAttributes.TextColor = LightGray;
-            uiBarItemTitleTextAttributes.Font = DefaultFont.WithRelativeSize(1.0f);
+            uiBarItemTitleTextAttributes.Font = DefaultFont.WithRelativeSize(1f);
             UIBarItem.Appearance.SetTitleTextAttributes(uiBarItemTitleTextAttributes, UIControlState.Normal);
 
             // UILabel
@@ -210,7 +210,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             // UITabBarItem
             var uiTabBarItemTitleTextAttributes = UITabBarItem.Appearance.GetTitleTextAttributes(UIControlState.Normal);
-            uiTabBarItemTitleTextAttributes.Font = DefaultFont.WithRelativeSize(-5.0f);
+            uiTabBarItemTitleTextAttributes.Font = DefaultFont.WithRelativeSize(-5f);
             UITabBarItem.Appearance.SetTitleTextAttributes(uiTabBarItemTitleTextAttributes, UIControlState.Normal);
 
             // UISegmentedControl
