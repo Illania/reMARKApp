@@ -554,7 +554,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var cell = tableView.CellAt(indexPath) as CategoriesTableViewCell;
                 if (cell != null)
                 {
-                    selectedCategories.Remove(cell.Category);
+                    selectedCategories.RemoveAll(c => c.Id == cell.Category.Id);
                 }
             }
 
