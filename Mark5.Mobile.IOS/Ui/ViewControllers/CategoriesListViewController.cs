@@ -43,10 +43,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
         SearchDataSource searchDataSource;
+        DataSource dataSource;
 
         List<Category> availableCategories = new List<Category>();
-        List<Category> assignedCategories = new List<Category>();
-        List<Category> selectedCategories = new List<Category>();
 
         public CategoriesListViewController()
         {
@@ -105,7 +104,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             EdgesForExtendedLayout = UIRectEdge.None;
 
             categoriesListView = new UITableView();
-            var dataSource = new DataSource(categoriesListView, Localization.GetString("no_categories"), selectedCategories, availableCategories, assignedCategories);
+            dataSource = new DataSource(categoriesListView, Localization.GetString("no_categories"));
             categoriesListView.Source = dataSource;
             categoriesListView.CellLayoutMarginsFollowReadableWidth = false;
             categoriesListView.AllowsSelection = false;
@@ -134,7 +133,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             searchResultsController.TableView.AllowsSelectionDuringEditing = true;
             searchResultsController.TableView.AllowsMultipleSelection = false;
             searchResultsController.TableView.AllowsMultipleSelectionDuringEditing = true;
-            searchDataSource = new SearchDataSource(searchResultsController.TableView, Localization.GetString("no_matching_categories"), selectedCategories, availableCategories);
+            searchDataSource = new SearchDataSource(Localization.GetString("no_matching_categories"), this);
             searchResultsController.TableView.Source = searchDataSource;
 
             searchController = new UISearchController(searchResultsController)
@@ -196,16 +195,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 switch (BusinessEntityPreview.ObjectType)
                 {
                     case ObjectType.Document:
-                        availableCategories.AddRange(await Managers.DocumentsManager.GetAllCategoriesAsync());
+                        availableCategories = await Managers.DocumentsManager.GetAllCategoriesAsync();
                         break;
                     case ObjectType.Contact:
-                        availableCategories.AddRange(await Managers.ContactsManager.GetAllCategoriesAsync());
+                        availableCategories = await Managers.ContactsManager.GetAllCategoriesAsync();
                         break;
                     default:
                         throw new ArgumentException("The business entity provided does not have categories in the model");
                 }
 
                 editModeButtonItem.Enabled = true;
+                dataSource.RefreshAvailableCategories(availableCategories);
             }
             catch (Exception ex)
             {
@@ -220,20 +220,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void RefreshAssignedCategories()
         {
+            List<Category> assignedCategories;
+
             switch (BusinessEntityPreview.ObjectType)
             {
                 case ObjectType.Document:
-                    assignedCategories.AddRange((BusinessEntityPreview as DocumentPreview).Categories);
+                    assignedCategories = (BusinessEntityPreview as DocumentPreview).Categories;
                     break;
                 case ObjectType.Contact:
-                    assignedCategories.AddRange((BusinessEntityPreview as ContactPreview).Categories);
+                    assignedCategories = (BusinessEntityPreview as ContactPreview).Categories;
                     break;
                 default:
                     throw new ArgumentException("The business entity provided does not have categories in the model");
             }
 
-            var ds = categoriesListView.Source as DataSource;
-            ds.RefreshAssignedCategories();
+            dataSource.RefreshAssignedCategories(assignedCategories);
             categoriesListView.ReloadData();
         }
 
@@ -258,22 +259,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             categoriesListView.TableHeaderView = searchController.SearchBar;
 
-            var ds = categoriesListView.Source as DataSource;
-            ds.EditingWillBegin();
+            dataSource.EditingWillBegin();
             categoriesListView.SetEditing(true, true);
             searchResultsController.TableView.SetEditing(true, true);
-            ds.EditingDidBegin();
+            dataSource.EditingDidBegin();
         }
 
         async void ExitEditModeButtonItem_Clicked(object sender, EventArgs e)
         {
-            var ds = categoriesListView.Source as DataSource;
-
-            if (ds.CategoriesChanged)
+            if (dataSource.CategoriesChanged)
             {
                 CommonConfig.Logger.Info(string.Format("Categories changed - will update. [entity={0}]", BusinessEntityPreview));
 
-                var categoriesToAssign = ds.SelectedCategories;
+                var categoriesToAssign = dataSource.SelectedCategories;
 
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("updating_categories___"));
 
@@ -320,16 +318,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             categoriesListView.TableHeaderView = null;
 
-            var ds = categoriesListView.Source as DataSource;
-            ds.EditingWillEnd();
+            dataSource.EditingWillEnd();
             categoriesListView.SetEditing(false, true);
             searchResultsController.TableView.SetEditing(false, true);
-            ds.EditingDidEnd();
+            dataSource.EditingDidEnd();
         }
 
         #endregion
 
-        #region Search Results
+        #region Search 
 
         public void UpdateSearchResultsForSearchController(UISearchController searchController)
         {
@@ -361,12 +358,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             searchDataSource.Reset();
 
-            await Task.Delay(100);
+            await Task.Delay(100); //TODO Is it a good idea to have this delay?
 
             if (ct.IsCancellationRequested) return;
 
-            searchDataSource.RefreshData(searchText);
+            var matchingCategories = availableCategories.FindAll(c => MatchesQuery(c, searchText));
+
+            searchDataSource.RefreshData(matchingCategories, dataSource.SelectedCategories);
             searchResultsController.TableView.ReloadData();
+        }
+
+        bool MatchesQuery(Category category, string query)
+        {
+            return category.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0;
+        }
+
+        public void SearchCategorySelected(Category category)
+        {
+            dataSource.SelectCategory(category);
+        }
+
+        public void SearchCategoryDeselected(Category category)
+        {
+            dataSource.DeselectCategory(category);
         }
 
         #endregion
@@ -405,16 +419,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             readonly List<Category> selectedCategories;
             readonly string emptyText;
 
-            public DataSource(UITableView tableView, string emptyText, List<Category> selectedCategories, List<Category> availableCategories, List<Category> assignedCategories)
+            public DataSource(UITableView tableView, string emptyText)
             {
                 this.tableView = tableView;
                 this.emptyText = emptyText;
 
                 sectionIndexes = new List<string>();
                 categoriesInView = new Dictionary<string, List<Category>>();
-                this.assignedCategories = assignedCategories;
-                this.availableCategories = availableCategories;
-                this.selectedCategories = selectedCategories;
+                assignedCategories = new List<Category>();
+                availableCategories = new List<Category>();
+                selectedCategories = new List<Category>();
             }
 
             #region UITableViewDataSource implementation
@@ -440,7 +454,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var categoryListViewCell = cell as CategoriesTableViewCell;
                     if (categoryListViewCell != null)
                     {
-                        if (selectedCategories.Contains(categoryListViewCell.Category))
+                        if (selectedCategories.FindIndex(c => c.Id == categoryListViewCell.Category.Id) >= 0)
                         {
                             tableView.SelectRow(indexPath, false, UITableViewScrollPosition.None);
                         }
@@ -544,24 +558,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            // This method is implemented only to workaround a bug in Xamarin.iOS or iOS 8.1.2 on
-            // iPhone 6 and 6 Plus related to AppeareanceWhenContainedIn method. The rest is described
-            // in Theme.cs file.
-            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section)
-            {
-                var tableViewHeaderFooterView = headerView as UITableViewHeaderFooterView;
-                if (tableViewHeaderFooterView != null)
-                {
-                    tableViewHeaderFooterView.TextLabel.TextColor = Theme.TintColor;
-                }
-            }
-
             #endregion
 
-            public void RefreshAssignedCategories()
+            #region Public methods
+
+            public void RefreshAssignedCategories(List<Category> categories)
             {
+                if (categories != null)
+                {
+                    assignedCategories.Clear();
+                    assignedCategories.AddRange(categories);
+                }
+
                 categoriesInView = assignedCategories.GroupBy(c => c.Name.SafeSubstring(0, 1).ToUpper(CultureInfo.CurrentCulture)).ToDictionary(g => g.Key, g => g.OrderBy(c => c.Name).ToList(), StringComparer.OrdinalIgnoreCase);
                 sectionIndexes = categoriesInView.Keys.OrderBy(i => i).ToList();
+            }
+
+            public void RefreshAvailableCategories(List<Category> categories)
+            {
+                if (categories != null)
+                {
+                    availableCategories.Clear();
+                    availableCategories.AddRange(categories);
+                }
             }
 
             public void EditingWillBegin()
@@ -578,19 +597,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public void EditingDidBegin()
             {
                 selectedCategories.AddRange(assignedCategories);
-
-                for (var i = 0; i < sectionIndexes.Count; i++)
-                {
-                    for (var j = 0; j < categoriesInView[sectionIndexes[i]].Count; j++)
-                    {
-                        var indexPath = NSIndexPath.FromRowSection(j, i);
-                        var cell = tableView.CellAt(indexPath) as CategoriesTableViewCell;
-                        if (cell != null && selectedCategories.Contains(cell.Category))
-                        {
-                            tableView.SelectRow(indexPath, false, UITableViewScrollPosition.None);
-                        }
-                    }
-                }
             }
 
             public void EditingWillEnd()
@@ -598,21 +604,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 sectionIndexes.Clear();
                 categoriesInView.Clear();
 
-                foreach (var category in assignedCategories)
-                {
-                    var key = category.Name.SafeSubstring(0, 1).ToUpper(CultureInfo.CurrentCulture);
-                    if (categoriesInView.ContainsKey(key))
-                    {
-                        categoriesInView[key].Add(category);
-                    }
-                    else
-                    {
-                        var categories = new List<Category>();
-                        categories.Add(category);
-                        categoriesInView.Add(key, categories);
-                    }
-                }
-
+                categoriesInView = assignedCategories.GroupBy(c => c.Name.SafeSubstring(0, 1).ToUpper(CultureInfo.CurrentCulture)).ToDictionary(g => g.Key, g => g.OrderBy(c => c.Name).ToList(), StringComparer.OrdinalIgnoreCase);
                 sectionIndexes = categoriesInView.Keys.OrderBy(i => i).ToList();
 
                 UIView.TransitionNotify(tableView, 0.25d, UIViewAnimationOptions.TransitionCrossDissolve, tableView.ReloadData, null);
@@ -630,37 +622,47 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CategoriesChanged = false;
             }
 
-            //public NSIndexPath IndexPathForCategory(Category category) //TODO check if necessary
-            //{
-            //    var index = 0;
-            //    var section = 0;
+            public NSIndexPath IndexPathForCategory(Category category)
+            {
+                var index = 0;
+                var section = 0;
 
-            //    foreach (var entry in categoriesInView)
-            //    {
-            //        if (entry.Value.Contains(category))
-            //        {
-            //            index = entry.Value.IndexOf(category);
-            //            section = sectionIndexes.IndexOf(entry.Key);
-            //        }
-            //    }
+                foreach (var keyValuePair in categoriesInView)
+                {
+                    index = keyValuePair.Value.FindIndex(c => c.Id == category.Id);
+                    if (index >= 0)
+                    {
+                        section = sectionIndexes.IndexOf(keyValuePair.Key);
+                        return NSIndexPath.FromItemSection(index, section);
+                    }
+                }
 
-            //    return NSIndexPath.FromItemSection(index, section);
-            //}
+                return null;
+            }
 
-            //public void SelectCategory(Category category) //TODO check if they are used
-            //{
-            //    CategoriesChanged |= tableView.Editing;
-            //    tableView.SelectRow(IndexPathForCategory(category), true, UITableViewScrollPosition.None);
-            //    selectedCategories.Add(category);
-            //}
+            public void SelectCategory(Category category)
+            {
+                var categoryIndexPath = IndexPathForCategory(category);
+                if (categoryIndexPath != null)
+                {
+                    CategoriesChanged |= tableView.Editing;
+                    tableView.SelectRow(categoryIndexPath, true, UITableViewScrollPosition.None);
+                    selectedCategories.Add(category);
+                }
+            }
 
-            //public void DeselectCategory(Category category)
-            //{
-            //    CategoriesChanged |= tableView.Editing;
-            //    tableView.DeselectRow(IndexPathForCategory(category), true);
-            //    selectedCategories.Remove(category);
-            //}
+            public void DeselectCategory(Category category)
+            {
+                var categoryIndexPath = IndexPathForCategory(category);
+                if (categoryIndexPath != null)
+                {
+                    CategoriesChanged |= tableView.Editing;
+                    tableView.DeselectRow(categoryIndexPath, true);
+                    selectedCategories.RemoveAll(c => c.Id == category.Id);
+                }
+            }
 
+            #endregion
         }
 
         class SearchDataSource : UITableViewSource
@@ -673,22 +675,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            readonly UITableView tableView;
-
             List<string> sectionIndexes;
             Dictionary<string, List<Category>> categoriesInView;
 
             List<Category> selectedCategories;
-            List<Category> availableCategories;
+
             readonly string emptyText;
+            readonly CategoriesListViewController vc;
 
-            public SearchDataSource(UITableView tableView, string emptyText, List<Category> selectedCategories, List<Category> availableCategories)
+            public SearchDataSource(string emptyText, CategoriesListViewController vc)
             {
-                this.tableView = tableView;
                 this.emptyText = emptyText;
-                this.selectedCategories = selectedCategories;
-                this.availableCategories = availableCategories;
+                this.vc = vc;
 
+                selectedCategories = new List<Category>();
                 sectionIndexes = new List<string>();
                 categoriesInView = new Dictionary<string, List<Category>>();
             }
@@ -711,24 +711,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
             {
-                if (tableView.Editing)
+                var categoryListViewCell = cell as CategoriesTableViewCell;
+                if (categoryListViewCell != null)
                 {
-                    var categoryListViewCell = cell as CategoriesTableViewCell;
-                    if (categoryListViewCell != null)
+                    if (selectedCategories.FindIndex(c => categoryListViewCell.Category.Id == c.Id) >= 0)
                     {
-                        if (selectedCategories.FindIndex(c => c.Id == categoryListViewCell.Category.Id) >= 0)
-                        {
-                            tableView.SelectRow(indexPath, false, UITableViewScrollPosition.None);
-                        }
-                        else
-                        {
-                            tableView.DeselectRow(indexPath, false);
-                        }
+                        tableView.SelectRow(indexPath, false, UITableViewScrollPosition.None);
                     }
-                }
-                else
-                {
-                    tableView.DeselectRow(indexPath, false);
+                    else
+                    {
+                        tableView.DeselectRow(indexPath, false);
+                    }
                 }
             }
 
@@ -783,11 +776,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return UITableViewCellEditingStyle.None;
             }
 
-            public override NSIndexPath WillSelectRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return tableView.Editing ? indexPath : null;
-            }
-
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (Empty)
@@ -798,13 +786,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var cell = tableView.CellAt(indexPath) as CategoriesTableViewCell;
                 if (cell != null)
                 {
-                    //selectedCategories.Add(cell.Category); //TODO
+                    selectedCategories.Add(cell.Category);
+                    vc.SearchCategorySelected(cell.Category);
                 }
-            }
-
-            public override NSIndexPath WillDeselectRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return tableView.Editing ? indexPath : null;
             }
 
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
@@ -812,19 +796,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var cell = tableView.CellAt(indexPath) as CategoriesTableViewCell;
                 if (cell != null)
                 {
-                    //selectedCategories.Remove(cell.Category); //TODO
-                }
-            }
-
-            // This method is implemented only to workaround a bug in Xamarin.iOS or iOS 8.1.2 on
-            // iPhone 6 and 6 Plus related to AppeareanceWhenContainedIn method. The rest is described
-            // in Theme.cs file.
-            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section)
-            {
-                var tableViewHeaderFooterView = headerView as UITableViewHeaderFooterView;
-                if (tableViewHeaderFooterView != null)
-                {
-                    tableViewHeaderFooterView.TextLabel.TextColor = Theme.TintColor;
+                    selectedCategories.Remove(cell.Category);
+                    vc.SearchCategoryDeselected(cell.Category);
                 }
             }
 
@@ -832,13 +805,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             #region Public methods
 
-            public void RefreshData(string searchText)
+            public void RefreshData(List<Category> filteredCategories, List<Category> selectedCategories)
             {
-                var matchingCategories = availableCategories.FindAll(c => MatchesQuery(c, searchText));
-                var assignedCategoriesId = new HashSet<int>(selectedCategories.Select(c => c.Id));
+                this.selectedCategories = selectedCategories;
 
-                sectionIndexes = matchingCategories.Select(c => c.Name.SafeSubstring(0, 1).ToUpper(CultureInfo.CurrentCulture)).Distinct().OrderBy(i => i).ToList();
-                categoriesInView = matchingCategories.GroupBy(c => c.Name.SafeSubstring(0, 1).ToUpper(CultureInfo.CurrentCulture))
+                sectionIndexes = filteredCategories.Select(c => c.Name.SafeSubstring(0, 1).ToUpper(CultureInfo.CurrentCulture)).Distinct().OrderBy(i => i).ToList();
+                categoriesInView = filteredCategories.GroupBy(c => c.Name.SafeSubstring(0, 1).ToUpper(CultureInfo.CurrentCulture))
                                                      .ToDictionary(g => g.Key, g => g.OrderBy(c => c.Name).ToList(), StringComparer.OrdinalIgnoreCase);
             }
 
@@ -846,15 +818,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 sectionIndexes.Clear();
                 categoriesInView.Clear();
-            }
-
-            #endregion
-
-            #region Utility
-
-            bool MatchesQuery(Category category, string query)
-            {
-                return category.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0;
+                selectedCategories.Clear();
             }
 
             #endregion
