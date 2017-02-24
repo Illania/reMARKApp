@@ -6,7 +6,6 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System.Linq;
-using System.Text;
 using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.Utilities

@@ -1,5 +1,4 @@
 {
-  "locked": false,
   "version": 1,
   "targets": {
     ".NETStandard,Version=v1.4": {
@@ -5526,5 +5525,8 @@
       "System.ServiceModel.Primitives >= 4.3.0"
     ],
     ".NETStandard,Version=v1.4": []
+  },
+  "packageFolders": {
+    "/Users/bartoszcichecki/.nuget/packages/": {}
   }
 }

@@ -1,5 +1,4 @@
 {
-  "locked": false,
   "version": 2,
   "targets": {
     ".NETStandard,Version=v1.4": {
@@ -3641,5 +3640,10 @@
       "NETStandard.Library >= 1.6.1"
     ],
     ".NETStandard,Version=v1.4": []
+  },
+  "tools": {},
+  "projectFileToolGroups": {},
+  "packageFolders": {
+    "/Users/bartoszcichecki/.nuget/packages/": {}
   }
 }
