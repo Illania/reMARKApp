@@ -52,6 +52,18 @@ namespace Mark5.Mobile.Droid.Utilities
         /// IMPORTANT!!!
         /// THIS METHOD ACCEPTS TIMESTAMP IN SERVER TIMEZONE
         /// </summary>
+        public static string FormatServerTimestampAsLongDateString(this long timestamp, Context context)
+        {
+            var date = new Java.Util.Date(timestamp);
+            var df = DateFormat.GetMediumDateFormat(context);
+            df.TimeZone = Java.Util.TimeZone.GetTimeZone("GMT");
+            return df.Format(date);
+        }
+
+        /// <summary>
+        /// IMPORTANT!!!
+        /// THIS METHOD ACCEPTS TIMESTAMP IN SERVER TIMEZONE
+        /// </summary>
         public static string FormatServerTimestampAsTimeAndDateString(this long timestamp, Context context)
         {
             var date = new Java.Util.Date(timestamp);
