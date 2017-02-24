@@ -192,6 +192,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void SubscribeToMessages()
         {
             PlatformConfig.MessengerHub.Subscribe<DocumentPreviewCommentsCountChangedMessage>(CommentsCountChangedHandler);
+            PlatformConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(CategoriesChangedHandler, m => m.ObjectType == ObjectType.Document);
         }
 
         void InitializeHandlers()
@@ -244,7 +245,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var documentViewController = new DocumentViewController();
                 documentViewController.DocumentPreview = documentPreview;
                 documentViewController.Folder = Folder;
-                documentViewController.HidesBottomBarWhenPushed = true;
                 if (!searchController.Active)
                 {
                     documentViewController.GetNextDocumentPreview = ds.GetNextDocumentPreview;
@@ -562,6 +562,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var documentPreview = ds.Items[index];
                     documentPreview.CommentsCount = message.CommentsCount;
+
+                    var selectedRow = documentsTableView.IndexPathForSelectedRow;
+
+                    documentsTableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Automatic);
+
+                    if (selectedRow != null)
+                    {
+                        documentsTableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                    }
+                }
+            });
+        }
+
+        void CategoriesChangedHandler(EntityCategoriesChangedMessage message)
+        {
+            InvokeOnMainThread(() =>
+            {
+                var ds = documentsTableView.Source as DataSource;
+                var index = ds.Items.FindIndex(dp => dp.Id == message.EntityId);
+
+                if (index >= 0)
+                {
+                    var documentPreview = ds.Items[index];
+                    documentPreview.Categories.Clear();
+                    documentPreview.Categories.AddRange(message.Categories);
 
                     var selectedRow = documentsTableView.IndexPathForSelectedRow;
 
