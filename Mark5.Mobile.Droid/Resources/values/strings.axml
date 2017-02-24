@@ -11,7 +11,7 @@
 		<item>Open attachment</item>
 		<item>Remove attachment</item>
 	</string-array>
-	<string name="app_name">MARK5 BETA</string>
+	<string name="app_name">MARK5</string>
 	<string name="attachment_clicked">Select action</string>
 	<string name="attachment_too_big">The attachment is bigger than the maximum allowed size on the server</string>
 	<string name="bcc">Bcc</string>
