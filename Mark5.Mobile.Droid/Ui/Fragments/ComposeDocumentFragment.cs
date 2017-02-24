@@ -257,7 +257,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void AttachmentsView_AttachmentClicked(object sender, IAttachmentDescription attachment)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var option = await Dialogs.ShowListDialog(Context, attachment.Name, Resource.Array.attachment_clicked_options, true);
 
@@ -265,7 +267,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
 
-                string path = null;
+                string path = null; 
 
                 var outgoingAttachment = attachment as OutgoingDocumentAttachmentDescription;
                 if (outgoingAttachment != null)

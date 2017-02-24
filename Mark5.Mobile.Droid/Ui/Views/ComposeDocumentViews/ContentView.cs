@@ -258,15 +258,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             var header = new StringBuilder();
             header.Append("<br/><hr/>");
-            header.Append(string.Format("<b>From</b>: {0}", GetAddressTextFromPreviousDocument(DocumentAddressType.From))).Append("</br>");
-            header.Append(string.Format("<b>Date</b>: {0}", date)).Append("</br>");
-            header.Append(string.Format("<b>To</b>: {0}", GetAddressTextFromPreviousDocument(DocumentAddressType.To))).Append("</br>");
+            var fromText = PreviousDocumentPreview.Direction == DocumentDirection.Incoming ? GetAddressTextFromPreviousDocument(DocumentAddressType.From) : GetLinesTextFromPreviousDocument();
+            if (!string.IsNullOrWhiteSpace(fromText))
+            {
+                header.Append($"<b>From</b>: {fromText}").Append("</br>");
+            }
+            header.Append($"<b>Date</b>: {date}").Append("</br>");
+            header.Append($"<b>To</b>: {GetAddressTextFromPreviousDocument(DocumentAddressType.To)}").Append("</br>");
             var ccText = GetAddressTextFromPreviousDocument(DocumentAddressType.Cc);
             if (!string.IsNullOrWhiteSpace(ccText))
             {
-                header.Append(string.Format("<b>Cc</b>: {0}", ccText)).Append("</br>");
+                header.Append($"<b>Cc</b>: {ccText}").Append("</br>");
             }
-            header.Append(string.Format("<b>Subject</b>: {0}", PreviousDocumentPreview.Subject)).Append("</br>");
+            header.Append($"<b>Subject</b>: {PreviousDocumentPreview.Subject}").Append("</br>");
             header.Append("<br/><br/>");
 
             return header.ToString();
@@ -439,6 +443,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 }
             }
             return sb.ToString();
+        }
+
+        string GetLinesTextFromPreviousDocument()
+        {
+            return string.Join(", ", PreviousDocument.Lines.Select(l => l.FromAddress));
         }
 
         #endregion
