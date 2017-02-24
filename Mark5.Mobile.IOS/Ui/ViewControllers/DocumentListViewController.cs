@@ -245,7 +245,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var documentViewController = new DocumentViewController();
                 documentViewController.DocumentPreview = documentPreview;
                 documentViewController.Folder = Folder;
-                documentViewController.HidesBottomBarWhenPushed = true;
                 if (!searchController.Active)
                 {
                     documentViewController.GetNextDocumentPreview = ds.GetNextDocumentPreview;
@@ -587,7 +586,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var documentPreview = ds.Items[index];
                     documentPreview.Categories.Clear();
-                    documentPreview.Categories.AddRange(message.Categories); //TODO actually also only reloading would be enough, should we also do this?
+                    documentPreview.Categories.AddRange(message.Categories);
 
                     var selectedRow = documentsTableView.IndexPathForSelectedRow;
 

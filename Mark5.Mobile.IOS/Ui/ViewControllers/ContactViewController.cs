@@ -204,7 +204,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void AssignCategoryButton_Clicked(object sender, EventArgs e)
         {
-            // TODO
+            var categoriesListViewController = new CategoriesListViewController();
+            categoriesListViewController.BusinessEntityPreview = contactPreview;
+            var categoriesListNavigationController = new UINavigationController(categoriesListViewController);
+            categoriesListNavigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+
+            PresentViewController(categoriesListNavigationController, true, null);
         }
 
         void FileToButton_Clicked(object sender, EventArgs e)
@@ -594,7 +599,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public abstract class AbstractSection
             {
-                
+
                 WeakReference<ContactPreview> weakContactPreview;
                 WeakReference<Contact> weakContact;
 
@@ -635,7 +640,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public class NameSection : AbstractSection
             {
-                
+
                 public override bool Empty
                 {
                     get
@@ -676,7 +681,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public class CommunicationAddressSection : AbstractSection
             {
-                
+
                 public override bool Empty { get { return !Contact?.CommunicationAddresses?.Any(ca => ca.Type == type) ?? true; } }
 
                 public override string Title
@@ -730,7 +735,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override bool Empty { get { return !Contact?.PhysicalAddresses?.Any() ?? true; } }
 
-                public override string Title { get { return Localization.GetString("address");} }
+                public override string Title { get { return Localization.GetString("address"); } }
 
                 public override void InitializeRows()
                 {
@@ -789,7 +794,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                             return Localization.GetString("companies");
 
                         return string.Empty;
-                    } 
+                    }
                 }
 
                 public LinkedContactSection(LinkedContactSectionMode mode)
@@ -1037,7 +1042,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public class CommunicationAddressRow : AbstractRow
             {
-                
+
                 readonly WeakReference<CommunicationAddress> weakCommunicationAddress;
 
                 public CommunicationAddressRow(ContactPreview contactPreview, Contact contact, CommunicationAddress communicationAddress)
@@ -1149,7 +1154,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public class LinkedContactRow : AbstractRow
             {
-                
+
                 readonly WeakReference<ContactPreview> weakLinkedContactPreview;
 
                 public LinkedContactRow(ContactPreview contactPreview, Contact contact, ContactPreview linkedContactPreview)
@@ -1240,7 +1245,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public class AccountRow : AbstractRow
             {
 
-                public AccountRow(ContactPreview contactPreview, Contact contact) 
+                public AccountRow(ContactPreview contactPreview, Contact contact)
                     : base(contactPreview, contact)
                 {
                 }
@@ -1307,5 +1312,5 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         }
 
-   }
+    }
 }

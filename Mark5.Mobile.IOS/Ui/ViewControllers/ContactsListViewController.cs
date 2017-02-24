@@ -14,6 +14,7 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -53,6 +54,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeNavigationBar();
             InitializeView();
             InitializeSearchBar();
+            SubscribeToMessages();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -167,6 +169,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             searchController.SearchBar.Placeholder = Localization.GetString("filter");
 
             contactsTableView.TableHeaderView = searchController.SearchBar;
+        }
+
+        void SubscribeToMessages()
+        {
+            PlatformConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(CategoriesChangedHandler, m => m.ObjectType == ObjectType.Contact);
         }
 
         void InitializeNavigationBarTitle()
@@ -454,6 +461,36 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
+
+        #region Events
+
+        void CategoriesChangedHandler(EntityCategoriesChangedMessage message)
+        {
+            InvokeOnMainThread(() =>
+            {
+                var ds = contactsTableView.Source as DataSource;
+                var index = ds.Items.FindIndex(dp => dp.Id == message.EntityId);
+
+                if (index >= 0)
+                {
+                    var contactPreview = ds.Items[index];
+                    contactPreview.Categories.Clear();
+                    contactPreview.Categories.AddRange(message.Categories);
+
+                    var selectedRow = contactsTableView.IndexPathForSelectedRow;
+
+                    contactsTableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Automatic);
+
+                    if (selectedRow != null)
+                    {
+                        contactsTableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                    }
+                }
+            });
+        }
+
+        #endregion
+
         class DataSource : UITableViewSource, IDisposable
         {
 
@@ -552,7 +589,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (tableView.Editing) return;
-                
+
                 var cp = contactPreviewsInView[indexPath.Row];
                 viewController.ContactSelected(tableView, cp);
             }

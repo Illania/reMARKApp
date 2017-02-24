@@ -25,16 +25,8 @@ using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class DocumentViewController : UIViewController, ISecondaryViewController
+    public class DocumentViewController : AbstractViewController, ISecondaryViewController
     {
-        static UIBarButtonItem FlexibleSpace
-        {
-            get
-            {
-                return new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace);
-            }
-        }
-
         public bool Modal { get; set; }
 
         public GetPreviousDocumentPreviewDelegate GetPreviousDocumentPreview { get; set; }
@@ -121,7 +113,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillAppear(animated);
 
             InitializeHandlers();
-            CorrectToolbar();
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -350,31 +341,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             toolbar.Items = new[]
             {
                 flag,
-                FlexibleSpace,
+                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 fileTo,
-                FlexibleSpace,
+                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 replyActions,
-                FlexibleSpace,
+                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 comments,
-                FlexibleSpace,
+                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 userActions
             };
             toolbar.TranslatesAutoresizingMaskIntoConstraints = false;
             toolbar.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             toolbar.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             View.AddSubview(toolbar);
-            toolbarBottomConstraint = NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f);
             View.AddConstraints(new[]
                 {
+                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1.0f, 40.0f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
-                    toolbarBottomConstraint
+                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, -49.0f)
                 });
-        }
-
-        void CorrectToolbar()
-        {
-            toolbarBottomConstraint.Constant = SplitViewController != null ? -49.0f : 0.0f;
         }
 
         void CorrectScrollViewInsets()
@@ -980,8 +966,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             categoriesListViewController.BusinessEntityPreview = DocumentPreview;
             var categoriesListNavigationController = new UINavigationController(categoriesListViewController);
             categoriesListNavigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
-
-            //TODO remember the update of categories in document preview 
 
             PresentViewController(categoriesListNavigationController, true, null);
         }
