@@ -397,7 +397,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 get
                 {
-                    return !sectionIndexes.Any() || !categoriesInView.Any(); //TODO wht this?
+                    return !sectionIndexes.Any() || !categoriesInView.Any();
                 }
             }
 
