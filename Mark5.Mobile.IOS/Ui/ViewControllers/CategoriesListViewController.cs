@@ -100,7 +100,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeCategoriesListView()
         {
-            //AutomaticallyAdjustsScrollViewInsets = true; //TODO need to understand why it does not work
+            //AutomaticallyAdjustsScrollViewInsets = true; //TODO need to understand why it does not work, it seems to have no effect
             EdgesForExtendedLayout = UIRectEdge.None;
 
             categoriesListView = new UITableView();

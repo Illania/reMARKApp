@@ -353,7 +353,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             toolbar.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             toolbar.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             View.AddSubview(toolbar);
-            toolbarBottomConstraint = NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f);
             View.AddConstraints(new[]
                 {
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1.0f, 40.0f),
@@ -361,11 +360,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, -49.0f)
                 });
-        }
-
-        void CorrectToolbar()
-        {
-            toolbarBottomConstraint.Constant = SplitViewController != null ? -49f : 0f;
         }
 
         void CorrectScrollViewInsets()
@@ -977,7 +971,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void UserActions_Clicked(object sender, EventArgs e)
         {
-            //TODO
+
         }
 
         void DoFileToFolder(bool move)
