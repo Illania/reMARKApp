@@ -83,7 +83,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem userActions;
 
         UIToolbar toolbar;
-        NSLayoutConstraint toolbarBottomConstraint;
 
         List<DocumentSubView> subViews;
 

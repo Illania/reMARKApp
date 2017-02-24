@@ -66,11 +66,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             settingsNavigationController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "settings.png"));
             settingsNavigationController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "settings-filled.png"));
             settingsNavigationController.Tag = SettingsTag;
-        }
-
-        public override void ViewWillAppear(bool animated)
-        {
-            base.ViewWillAppear(animated);
 
             Delegate = this;
 
@@ -105,14 +100,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 SelectedIndex = 1;
             }
-        }
-
-        public override void ViewDidDisappear(bool animated)
-        {
-            base.ViewDidDisappear(animated);
-
-            Delegate = null;
-            ViewControllers = null;
         }
 
         [Export("tabBarController:didEndCustomizingViewControllers:changed:")]

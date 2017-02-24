@@ -51,7 +51,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeNavigationBar();
             InitializeView();
-            InitializeHandlers();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -59,6 +58,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillAppear(animated);
 
             InitializeNavigationBarTitle();
+            InitializeHandlers();
         }
 
         public override void ViewDidAppear(bool animated)

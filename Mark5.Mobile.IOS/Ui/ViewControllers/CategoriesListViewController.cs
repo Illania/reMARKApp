@@ -244,7 +244,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DismissButtonItem_Clicked(object sender, EventArgs e)
         {
-            NavigationController.DismissViewController(true, null);
+            DismissViewController(true, null);
         }
 
         void CancelButtomItem_Clicked(object sender, EventArgs e)
