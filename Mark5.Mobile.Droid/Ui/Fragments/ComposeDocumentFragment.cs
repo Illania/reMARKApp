@@ -33,7 +33,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class ComposeDocumentFragment : RetainableStateFragment
     {
 
-        const string DefaultTitle = "New document";
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
         const int AttachmentRequestCode = 111;
 
@@ -243,7 +242,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Subview_Edited(object sender, EventArgs e)
         {
-            ((AppCompatActivity)Activity).SupportActionBar.Title = !subjectView.Empty ? subjectView.Subject : DefaultTitle;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = !subjectView.Empty ? subjectView.Subject : GetString(Resource.String.new_document);
             UpdateSendButtonState();
 
             if (sender is LineView && PlatformConfig.Preferences.RemoveLine && CreationModeFlag == DocumentCreationModeFlag.ReplyAll
