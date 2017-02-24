@@ -189,7 +189,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void DocumentAddressClicked(DocumentAddress documentAddress)
         {
-            // TODO
+            // TODO wire
         }
 
         public void CopyToClipboard(UITableView tableView, UITableViewCell cell, string text) => Integration.CopyToClipboard(this, tableView, cell, text);
@@ -217,11 +217,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (folder?.InternalType == FolderInternalType.FilterView
                 || folder?.InternalType == FolderInternalType.Static
                 || folder?.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, null)); // TODO
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, null)); // TODO wire
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
                 || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, null)); // TODO
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, null)); // TODO wire
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 

@@ -216,7 +216,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, null)); // TODO
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, null)); // TODO wire
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { contactPreview });
@@ -235,11 +235,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (folder?.InternalType == FolderInternalType.FilterView
                 || folder?.InternalType == FolderInternalType.Static
                 || folder?.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, null)); // TODO
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, null)); // TODO wire
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
                 || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, null)); // TODO
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, null)); // TODO wire
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
@@ -249,16 +249,39 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(eas, true, null);
         }
 
-        void ActionsLinksButton_Clicked(object sender, EventArgs e)
+        async void ActionsLinksButton_Clicked(object sender, EventArgs e)
         {
-            // TODO
+            var actionLinksListString = new string[] { Localization.GetString( "actions"),
+                    Localization.GetString("links") };
+
+            var result = await Dialogs.ShowListDialogAsync(this, null, actionLinksListString, actionsLinksButton);
+
+            if (result < 0)
+                return;
+
+            UIViewController vc = null;
+
+            switch (result)
+            {
+                case 0:
+                    vc = new ObjectActionsListViewController(contact);
+                    break;
+                case 1:
+                    vc = new ObjectLinksListViewController(contact);
+                    break;
+            }
+
+            var navigationController = new UINavigationController(vc);
+            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+
+            PresentViewController(navigationController, true, null);
         }
 
         void CommunicationAddressClicked(UITableView tableView, UITableViewCell cell, CommunicationAddress ca)
         {
             if (ca.Type == CommunicationAddressType.Email)
             {
-                // TODO
+                // TODO wire
             }
 
             if (ca.Type == CommunicationAddressType.Phone)

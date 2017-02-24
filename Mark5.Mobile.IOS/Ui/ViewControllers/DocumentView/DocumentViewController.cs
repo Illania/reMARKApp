@@ -969,14 +969,37 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(categoriesListNavigationController, true, null);
         }
 
-        void UserActions_Clicked(object sender, EventArgs e)
+        async void UserActions_Clicked(object sender, EventArgs e)
         {
+            var actionLinksListString = new string[] { Localization.GetString( "actions"),
+                    Localization.GetString("links") };
 
+            var result = await Dialogs.ShowListDialogAsync(this, null, actionLinksListString, userActions);
+
+            if (result < 0)
+                return;
+
+            UIViewController vc = null;
+
+            switch (result)
+            {
+                case 0:
+                    vc = new ObjectActionsListViewController(Document);
+                    break;
+                case 1:
+                    vc = new ObjectLinksListViewController(Document);
+                    break;
+            }
+
+            var navigationController = new UINavigationController(vc);
+            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+
+            PresentViewController(navigationController, true, null);
         }
 
         void DoFileToFolder(bool move)
         {
-            //TODO
+            //TODO wire
         }
 
         void CommentsButton_TouchUpInside(object sender, EventArgs e)
@@ -991,12 +1014,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DoFileToWorktray()
         {
-            //TODO
+            //TODO wire
         }
 
         void DoDeleteFromFolder()
         {
-            //TODO
+            //TODO wire
         }
 
         void DoReply(DocumentCreationModeFlag creationModeFlag)
