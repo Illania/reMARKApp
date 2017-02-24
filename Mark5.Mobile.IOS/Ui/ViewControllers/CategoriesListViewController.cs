@@ -262,7 +262,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             dataSource.EditingWillBegin();
             categoriesListView.SetEditing(true, true);
             searchResultsController.TableView.SetEditing(true, true);
-            dataSource.EditingDidBegin();
         }
 
         async void ExitEditModeButtonItem_Clicked(object sender, EventArgs e)
@@ -281,19 +280,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     {
                         case ObjectType.Document:
                             var documentPreview = BusinessEntityPreview as DocumentPreview;
-                            await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, categoriesToAssign.ToList());
-                            PlatformConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, documentPreview.Id, ObjectType.Document, documentPreview.Categories)); //TODO probably we don't need categories
+                            await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, categoriesToAssign);
+                            PlatformConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, documentPreview.Id, ObjectType.Document, categoriesToAssign));
                             break;
                         case ObjectType.Contact:
                             var contactPreview = BusinessEntityPreview as ContactPreview;
-                            await Managers.ContactsManager.SetCategoriesAsync(contactPreview, categoriesToAssign.ToList());
-                            PlatformConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, contactPreview.Id, ObjectType.Contact, contactPreview.Categories)); //TODO probably we don't need categories
+                            await Managers.ContactsManager.SetCategoriesAsync(contactPreview, categoriesToAssign);
+                            PlatformConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, contactPreview.Id, ObjectType.Contact, categoriesToAssign));
                             break;
                         default:
                             throw new ArgumentException("Invalid BusinessEntityPreview!");
                     }
 
-                    RefreshAssignedCategories();
+                    dataSource.RefreshAssignedCategories(categoriesToAssign);
+                    categoriesListView.ReloadData();
+
                     UpdateAfterExitEditMode();
                 }
                 catch (Exception ex)
@@ -321,7 +322,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             dataSource.EditingWillEnd();
             categoriesListView.SetEditing(false, true);
             searchResultsController.TableView.SetEditing(false, true);
-            dataSource.EditingDidEnd();
         }
 
         #endregion
@@ -592,11 +592,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 sectionIndexes = categoriesInView.Keys.OrderBy(i => i).ToList();
 
                 UIView.TransitionNotify(tableView, 0.25d, UIViewAnimationOptions.TransitionCrossDissolve, tableView.ReloadData, null);
-            }
 
-            public void EditingDidBegin()
-            {
                 selectedCategories.AddRange(assignedCategories);
+
             }
 
             public void EditingWillEnd()
@@ -608,10 +606,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 sectionIndexes = categoriesInView.Keys.OrderBy(i => i).ToList();
 
                 UIView.TransitionNotify(tableView, 0.25d, UIViewAnimationOptions.TransitionCrossDissolve, tableView.ReloadData, null);
-            }
 
-            public void EditingDidEnd()
-            {
                 selectedCategories.Clear();
 
                 foreach (var indexPath in tableView.IndexPathsForVisibleRows)
