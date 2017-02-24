@@ -25,16 +25,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
         public override void RefreshView()
         {
-            var bd = Contact?.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime();
-
-            if (bd != null && bd.Value != default(DateTime))
+            if (Contact?.BirthDateTimestamp == -6847804800000 || Contact?.BirthDateTimestamp == -1)
             {
-                Visibility = ViewStates.Visible;
-                Content = bd.Value.ToLongDateString();
+                Visibility = ViewStates.Gone;
             }
             else
             {
-                Visibility = ViewStates.Gone;
+                Visibility = ViewStates.Visible;
+                Content = Contact?.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime()
+                         .ConvertUtcToServerTime()
+                         .ConvertDateTimeToTimestampMilliseconds()
+                         .FormatServerTimestampAsLongDateString(Context);
             }
         }
     }

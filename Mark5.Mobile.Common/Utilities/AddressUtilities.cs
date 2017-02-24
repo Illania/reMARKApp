@@ -13,35 +13,21 @@ namespace Mark5.Mobile.Common.Utilities
 {
     public static class AddressUtilities
     {
-        public static string FormatCommunicationAddress(CommunicationAddress communicationAddress)
+        public static string FormatCommunicationAddress(CommunicationAddress ca)
         {
-            if (new[] { CommunicationAddressType.Fax, CommunicationAddressType.Phone, CommunicationAddressType.Mobile, CommunicationAddressType.Telex }.Contains(communicationAddress.Type))
-            {
-                var stringBuilder = new StringBuilder();
-                var addressParts = communicationAddress.Address.Split('|');
+            if (ca.Address.Contains("|"))
+                if (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone || ca.Type == CommunicationAddressType.Fax)
+                {
+                    var addressParts = ca.Address.Split('|');
+                    if (addressParts[0].Length > 0)
+                    {
+                        addressParts[0] = "+" + addressParts[0];
+                    }
 
-                var countryPrefix = addressParts[0];
-                var firstPart = addressParts[1];
-                var secondPart = addressParts[2];
-
-                if (!string.IsNullOrEmpty(countryPrefix))
-                {
-                    stringBuilder.Append($"+{countryPrefix} ");
-                }
-                if (!string.IsNullOrEmpty(firstPart))
-                {
-                    stringBuilder.Append($"{firstPart} ");
-                }
-                if (!string.IsNullOrEmpty(secondPart))
-                {
-                    stringBuilder.Append(secondPart);
+                    return string.Join(" ", addressParts.Where(s => !string.IsNullOrWhiteSpace(s)));
                 }
 
-                return stringBuilder.ToString();
-            }
-
-            return communicationAddress.Address;
-
+            return ca.Address;
         }
 
         public static string FormatPhysicalAddress(PhysicalAddress pe)

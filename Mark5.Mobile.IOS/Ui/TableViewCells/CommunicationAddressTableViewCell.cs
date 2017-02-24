@@ -66,16 +66,17 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         string GetAddressFormatted(CommunicationAddress ca)
         {
-            if (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone || ca.Type == CommunicationAddressType.Fax)
-            {
-                var addressParts = ca.Address.Split('|');
-                if (addressParts[0].Length > 0)
+            if (ca.Address.Contains("|"))
+                if (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone || ca.Type == CommunicationAddressType.Fax)
                 {
-                    addressParts[0] = "+" + addressParts[0];
-                }
+                    var addressParts = ca.Address.Split('|');
+                    if (addressParts[0].Length > 0)
+                    {
+                        addressParts[0] = "+" + addressParts[0];
+                    }
 
-                return string.Join(" ", addressParts.Where(s => !string.IsNullOrWhiteSpace(s)));
-            }
+                    return string.Join(" ", addressParts.Where(s => !string.IsNullOrWhiteSpace(s)));
+                }
 
             return ca.Address;
         }
