@@ -25,21 +25,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         const string Value1CellId = "Value1CellId";
 
-        const string DocumentsToDownloadKey = "DocumentsToDownload";
+        const string CreateSystemReportKey = "createSystemReport";
         const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
-        const string SynchroniseContactsKey = "SynchroniseContacts";
-        const string SynchroniseShortcodesKey = "SynchroniseShortcodes";
-        const string UsernameKey = "username";
-        const string UseTemplateKey = "UseTemplate";
+        const string DocumentsToDownloadKey = "DocumentsToDownload";
         const string LocalTemplateKey = "localTemplate";
+        const string LogoutKey = "logout";
+        const string OpenSettingsAppKey = "openSettingsApp";
+        const string SendFeedbackKey = "sendFeedback";
         const string ServerAddressKey = "serverAddress";
         const string SslEnabledKey = "sslEnabled";
-        const string VersionKey = "version";
-        const string LogoutKey = "logout";
-        const string SendFeedbackKey = "sendFeedback";
-        const string CreateSystemReportKey = "createSystemReport";
+        const string SynchroniseContactsKey = "SynchroniseContacts";
+        const string SynchroniseShortcodesKey = "SynchroniseShortcodes";
         const string UpdateConfigKey = "updateConfig";
-        const string OpenSettingsAppKey = "openSettingsApp";
+        const string UsernameKey = "username";
+        const string UseTemplateKey = "UseTemplate";
+        const string VersionKey = "version";
 
         public SettingsViewController()
         {
@@ -167,12 +167,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        [Export("settingsViewController:buttonTappedForSpecifier:")]
-        public virtual async void ButtonTappedForSpecifier(AppSettingsViewController sender, SettingsSpecifier specifier)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        [Export("settingsViewController:buttonTappedForSpecifier:")]        public virtual async void ButtonTappedForSpecifier(AppSettingsViewController sender, SettingsSpecifier specifier)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             if (specifier.Key == LogoutKey)
             {
-                var dismisAction = Dialogs.ShowInfiniteProgressDialog("logging_out___");
+                var dismisAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_out___"));
 
                 try
                 {
@@ -181,8 +182,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         await Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
+                    CommonConfig.Logger.Error(ex);
                 }
 
                 PlatformConfig.Preferences.ResetOnLaunch = true;
@@ -203,7 +205,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == CreateSystemReportKey)
             {
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog("creating_system_report___");
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
 
                 var report = await SystemReportCollector.CreateFullReportAsync();
 
@@ -218,7 +220,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == UpdateConfigKey)
             {
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog("updating_config___");
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("updating_config___"));
 
                 try
                 {
@@ -252,7 +254,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             // Nothing to do
         }
 
-        async void SettingsChanged(NSNotification n)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void        async void SettingsChanged(NSNotification n)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var key = n.Object.ToString();
 

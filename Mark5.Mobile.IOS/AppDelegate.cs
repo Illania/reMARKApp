@@ -164,6 +164,8 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.Logger.Level = LogLevel.DEBUG;
 #endif
 
+                Dialogs.Initialize();
+
                 ((ConsoleAndFileLogger)CommonConfig.Logger).CleanUpOldLogFiles();
                 await DatabaseUtils.InitializeDatabases();
 

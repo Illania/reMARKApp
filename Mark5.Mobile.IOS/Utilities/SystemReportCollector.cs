@@ -96,18 +96,18 @@ namespace Mark5.Mobile.IOS.Utilities
             sb.AppendLine(SerializationUtils.Serialize(ServerConfig.SystemSettings));
             sb.AppendLine();
 
-            sb.AppendLine("===== Preferences =====");
-            foreach (var kv in PlatformConfig.Preferences.All)
-            {
-                sb.AppendLine(kv.Key + ": " + kv.Value);
-            }
-            sb.AppendLine();
-
             sb.AppendLine("===== Memory information =====");
             sb.AppendLine("Free disk space: " + Integration.GetFreeDiskSpace() / 1024 /1024);
             sb.AppendLine("Total disk space: " + Integration.GetTotalDiskSpace() / 1024 / 1024);
             sb.AppendLine("[MONO] Total memory: " + GC.GetTotalMemory(false) / 1024);
             sb.AppendLine("[MONO] Total memory after GC: " + GC.GetTotalMemory(true) / 1024);
+            sb.AppendLine();
+
+            sb.AppendLine("===== Preferences =====");
+            foreach (var kv in PlatformConfig.Preferences.All)
+            {
+                sb.AppendLine(kv.Key + ": " + kv.Value);
+            }
             sb.AppendLine();
             
             return sb.ToString();

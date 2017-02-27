@@ -141,7 +141,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (ds.IsOwnSelected)
             {
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog("copying_to_own_worktray___");
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("copying_to_own_worktray___"));
 
                 try
                 {
@@ -160,7 +160,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var selectedUsers = ds.SelectedItems;
             if (selectedUsers.Count > 0)
             {
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog("copying_to_worktray___");
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("copying_to_worktray___"));
 
                 try
                 {
