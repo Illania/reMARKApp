@@ -30,6 +30,12 @@
 "confirm_copy_to_folder_documents" = "Do you want to copy selected documents?";
 "confirm_copy_to_folder_shortcodes" = "Do you want to copy selected shortcodes?";
 "confirm_copy_to_folder" = "Copy";
+"confirm_delete_document" = "Do you want to delete the selected document?";
+"confirm_delete_from_folder_document" = "Do you want to delete the selected document from folder?";
+"confirm_delete_contact" = "Do you want to delete the selected contact?";
+"confirm_delete_from_folder_contact" = "Do you want to delete the selected contact from folder?";
+"confirm_delete_shortcode" = "Do you want to delete the selected shortcode?";
+"confirm_delete_from_folder_shortcode" = "Do you want to delete the selected shortcode from folder?";
 "confirm_move_to_folder_contacts" = "Do you want to move selected contacts?";
 "confirm_move_to_folder_documents" = "Do you want to move selected documents?";
 "confirm_move_to_folder_shortcodes" = "Do you want to move selected shortcodes?";
@@ -49,6 +55,8 @@
 "delete_from_folder" = "Delete from folder";
 "delete" = "Delete";
 "deleting_comment___" = "Deleting comment...";
+"deleting___" = "Deleting...";
+"deleting_from_folder___" = "Deleting from folder...";
 "departments" = "Departments";
 "description" = "Description";
 "disable_caching" = "Disable\ncaching";

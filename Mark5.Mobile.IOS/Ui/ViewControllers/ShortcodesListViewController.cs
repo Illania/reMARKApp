@@ -14,6 +14,7 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -53,6 +54,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeNavigationBar();
             InitializeView();
             InitializeSearchBar();
+            SubscribeToMessages();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -167,6 +169,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             searchController.SearchBar.Placeholder = Localization.GetString("filter");
 
             shortcodesTableView.TableHeaderView = searchController.SearchBar;
+        }
+
+        void SubscribeToMessages()
+        {
+            PlatformConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleShortcodeRemovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
+            PlatformConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleShortcodeDeleted, m => m.ObjectType == ObjectType.Shortcode);
         }
 
         void InitializeNavigationBarTitle()
@@ -435,6 +443,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
+        #region Messages handlers
+
+        void HandleShortcodeRemovedFromFolder(EntityRemovedFromFolderMessage m)
+        {
+            var ds = (DataSource)shortcodesTableView.Source;
+            ds.RemoveItems(m.EntitiesId);
+        }
+
+        void HandleShortcodeDeleted(EntityDeletedMessage m)
+        {
+            var ds = (DataSource)shortcodesTableView.Source;
+            ds.RemoveItems(m.EntitiesId);
+        }
+
+        #endregion
+
         class DataSource : UITableViewSource, IDisposable
         {
 
@@ -540,6 +564,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loading = false;
 
                 shortcodePreviewsInView.AddRange(shortcodePreviews);
+                shortcodesTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+            }
+
+            public void RemoveItems(List<int> shortcodeIds)
+            {
+                shortcodePreviewsInView.RemoveAll(s => shortcodeIds.Contains(s.Id));
                 shortcodesTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
             }
 
