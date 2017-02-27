@@ -40,6 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.NegativeText(negativeTextId);
             builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
             builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(false)));
+            builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
         }
@@ -54,6 +55,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.NegativeText(negativeTextId);
             builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
             builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(false)));
+            builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
         }
@@ -66,6 +68,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Content(contentId);
             builder.PositiveText(Resource.String.ok);
             builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
+            builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
         }
@@ -78,6 +81,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Content(content);
             builder.PositiveText(Resource.String.ok);
             builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
+            builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
         }
@@ -102,6 +106,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 if (equalityComparer == null ? selected.Equals(values[i]) : equalityComparer.Equals(selected, values[i]))
                     selectedIndex = i;
             md.SelectedIndex = selectedIndex;
+            builder.Cancelable(false);
             md.Show();
             return tcs.Task;
         }
@@ -131,6 +136,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                         selectedIndexes.Add(i);
                 md.SetSelectedIndices(selectedIndexes.Select(i => new Java.Lang.Integer(i)).ToArray());
             }
+            builder.Cancelable(false);
             md.Show();
             return tcs.Task;
         }
@@ -146,6 +152,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             {
                 builder.NegativeText(Resource.String.cancel);
             }
+            builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
         }
@@ -161,6 +168,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             {
                 builder.NegativeText(Resource.String.cancel);
             }
+            builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
         }
@@ -176,6 +184,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             {
                 builder.NegativeText(Resource.String.cancel);
             }
+            builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
         }
@@ -196,6 +205,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             }));
             builder.NegativeText(Resource.String.cancel);
             builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(initialTimestamp)));
+            builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
         }
@@ -215,6 +225,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.OnPositive(new SingleButtonCallback(positiveAction));
             if (negativeAction != null)
                 builder.OnNegative(new SingleButtonCallback(negativeAction));
+            builder.Cancelable(false);
             builder.Show();
         }
 
@@ -232,6 +243,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.OnPositive(new SingleButtonCallback(() => positiveAction(editTextView.Text)));
             if (negativeAction != null)
                 builder.OnNegative(new SingleButtonCallback(negativeAction));
+            builder.Cancelable(false);
             builder.Show();
         }
 
@@ -243,6 +255,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.PositiveText(Resource.String.ok);
             if (action != null)
                 builder.OnPositive(new SingleButtonCallback(action));
+            builder.Cancelable(false);
             builder.Show();
         }
 
@@ -252,12 +265,12 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Title(titleId);
             builder.Content(contentId);
             builder.Progress(true, -1);
-            builder.Cancelable(false);
             if (cts != null)
             {
                 builder.PositiveText(Resource.String.cancel);
                 builder.OnPositive(new SingleButtonCallback(cts.Cancel));
             }
+            builder.Cancelable(false);
             var dialog = builder.Show();
             return dialog.Dismiss;
         }
@@ -296,6 +309,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     }, TaskScheduler.FromCurrentSynchronizationContext());
                 }));
             }
+            builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
         }
@@ -330,6 +344,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     }, TaskScheduler.FromCurrentSynchronizationContext());
                 }));
             }
+            builder.Cancelable(false);
             builder.Show();
         }
 
