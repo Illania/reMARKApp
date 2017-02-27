@@ -189,7 +189,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void DocumentAddressClicked(DocumentAddress documentAddress)
         {
-            // TODO wire
+            var composeDocumentViewController = new ComposeDocumentViewController
+            {
+                PreconfiguredEmailAddresses = new string[] { documentAddress.FullAddress },
+                CreationModeFlag = DocumentCreationModeFlag.New,
+            };
+            var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
+            composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
+            PresentViewController(composeDocumentNavigationController, true, null);
         }
 
         public void CopyToClipboard(UITableView tableView, UITableViewCell cell, string text) => Integration.CopyToClipboard(this, tableView, cell, text);
