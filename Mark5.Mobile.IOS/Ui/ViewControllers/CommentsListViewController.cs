@@ -22,8 +22,10 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
+    
     public class CommentsListViewController : AbstractViewController
     {
+    
         const int CommentContentMaximumLinesNumber = 5;
         const float CommentEditViewInnerMargin = 7f;
         const int SecondsToEdit = 60;
@@ -240,10 +242,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Event handlers
 
-        void DoneButtonItem_Clicked(object sender, EventArgs e)
-        {
-            DismissViewController(true, null);
-        }
+        void DoneButtonItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
 
         async void AddComment_TouchUpInside(object sender, EventArgs e)
         {
@@ -275,7 +274,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ds.AddComment(newComment);
                 commentsTableView.ScrollToRow(NSIndexPath.FromRowSection(ds.Items.Count - 1, 0), UITableViewScrollPosition.Middle, true);
                 commentContent.Text = string.Empty;
-
             }
             catch (Exception ex)
             {
@@ -345,7 +343,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             commentsTableView.Editing = false;
 
             var isEditable = DateTime.Now.ToUniversalTime().Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= SecondsToEdit;
-
             if (!isEditable)
             {
                 Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("error"), Localization.GetString("edit_not_possible"));
@@ -355,12 +352,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var alert = UIAlertController.Create(Localization.GetString("edit_message"), string.Empty, UIAlertControllerStyle.Alert);
             var cancelAction = UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null);
             var confirmAction = UIAlertAction.Create(Localization.GetString("confirm"), UIAlertActionStyle.Default, obj => FinalizeEditComment(comment, alert.TextFields[0].Text));
+            alert.AddTextField(tf => tf.Text = comment.Content);
             alert.AddAction(cancelAction);
             alert.AddAction(confirmAction);
-            alert.AddTextField(tf =>
-            {
-                tf.Text = comment.Content;
-            });
 
             PresentViewController(alert, true, null);
         }
@@ -494,6 +488,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable
         {
+
             UITableView tableView;
             CommentsListViewController viewController;
             List<Comment> commentsInView = new List<Comment>();
@@ -578,7 +573,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 commentsInView.AddRange(newComments);
-                tableView.ReloadData();
+                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
             }
 
             public void AddComment(Comment newComment)
@@ -606,16 +601,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (position >= 0)
                 {
                     commentsInView.RemoveAt(position);
-                }
 
-                if (commentsInView.Count == 0)
-                {
-                    tableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Automatic);
-
-                }
-                else
-                {
-                    tableView.DeleteRows(new NSIndexPath[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Automatic);
+                    if (commentsInView.Count == 0)
+                    {
+                        tableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Automatic);
+                    }
+                    else
+                    {
+                        tableView.DeleteRows(new NSIndexPath[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Automatic);
+                    }
                 }
             }
 
@@ -625,9 +619,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (position >= 0)
                 {
                     commentsInView[position].Content = editedContent.Content;
-                }
 
-                tableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Automatic);
+                    tableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Automatic);
+                }
             }
 
             protected override void Dispose(bool disposing)
