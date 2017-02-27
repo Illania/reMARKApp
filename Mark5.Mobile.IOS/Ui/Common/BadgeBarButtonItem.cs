@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: BadgeBarButtonItem.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
@@ -297,7 +297,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             if (badge != null)
             {
-                UIView.AnimateNotify(0.15f, 0.0F,
+                UIView.AnimateNotify(0.15f, 0f,
                     UIViewAnimationOptions.CurveEaseIn, () =>
                     {
                         badge.Transform = CGAffineTransform.MakeScale(0.1f, 0.1f);

@@ -22,13 +22,15 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    
+
     public class CommentsListViewController : AbstractViewController
     {
-    
+
         const int CommentContentMaximumLinesNumber = 5;
         const float CommentEditViewInnerMargin = 7f;
         const int SecondsToEdit = 60;
+
+        public BusinessEntity Entity { get; set; }
 
         UIBarButtonItem doneButtonItem;
         UITableView commentsTableView;
@@ -38,7 +40,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         NSLayoutConstraint commentEditViewBottomConstraint;
         NSLayoutConstraint commentContentMaximumHeightConstraint;
 
-        public BusinessEntity Entity { get; set; }
+        NSObject didShowNotificationObserver;
+        NSObject willChangeFrameNotificationObserver;
+        NSObject willHideNotification;
 
         public CommentsListViewController()
         {
@@ -60,9 +64,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.DidShowNotification, OnKeyboardDidShowNotification);
-            NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillChangeFrameNotification, OnKeyboardWillChangeFrameNotification);
-            NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
+            didShowNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.DidShowNotification, OnKeyboardDidShowNotification);
+            willChangeFrameNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillChangeFrameNotification, OnKeyboardWillChangeFrameNotification);
+            willHideNotification = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
 
             InitializeHandlers();
         }
@@ -81,6 +85,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void ViewWillDisappear(bool animated)
         {
             base.ViewWillDisappear(animated);
+
+            NSNotificationCenter.DefaultCenter.RemoveObservers(new[] { didShowNotificationObserver, willChangeFrameNotificationObserver, willHideNotification });
 
             DeInitializeHandlers();
         }
@@ -413,20 +419,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Keyboard Related
 
-        void OnKeyboardDidShowNotification(NSNotification notification)
-        {
-            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification);
-        }
+        void OnKeyboardDidShowNotification(NSNotification notification) => AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification);
 
-        void OnKeyboardWillChangeFrameNotification(NSNotification notification)
-        {
-            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification);
-        }
+        void OnKeyboardWillChangeFrameNotification(NSNotification notification) => AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification);
 
-        void OnKeyboardWillHideNotification(NSNotification notification)
-        {
-            AdjustViewToKeyboard(0f, notification);
-        }
+        void OnKeyboardWillHideNotification(NSNotification notification) => AdjustViewToKeyboard(0f, notification);
 
         void AdjustViewToKeyboard(float offset, NSNotification notification = null)
         {
@@ -446,9 +443,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             if (offset > 0f)
-            {
                 ScrollCommentsToTop(true);
-            }
         }
 
         #endregion
@@ -479,9 +474,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var commentsCount = (commentsTableView.Source as DataSource).Items.Count;
             if (commentsCount > 0)
-            {
                 commentsTableView.ScrollToRow(NSIndexPath.FromRowSection(0, 0), UITableViewScrollPosition.Top, animated);
-            }
         }
 
         #endregion
@@ -568,9 +561,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public void RefreshData(List<Comment> newComments)
             {
                 if (newComments == null)
-                {
                     return;
-                }
 
                 commentsInView.AddRange(newComments);
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
@@ -579,20 +570,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public void AddComment(Comment newComment)
             {
                 if (newComment == null)
-                {
                     return;
-                }
 
                 commentsInView.Add(newComment);
 
                 if (commentsInView.Count == 1)
-                {
                     tableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(commentsInView.Count - 1, 0) }, UITableViewRowAnimation.Automatic);
-                }
                 else
-                {
                     tableView.InsertRows(new NSIndexPath[] { NSIndexPath.FromRowSection(commentsInView.Count - 1, 0) }, UITableViewRowAnimation.Automatic);
-                }
             }
 
             public void RemoveComment(Comment comment)
@@ -603,13 +588,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     commentsInView.RemoveAt(position);
 
                     if (commentsInView.Count == 0)
-                    {
                         tableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Automatic);
-                    }
                     else
-                    {
                         tableView.DeleteRows(new NSIndexPath[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Automatic);
-                    }
                 }
             }
 

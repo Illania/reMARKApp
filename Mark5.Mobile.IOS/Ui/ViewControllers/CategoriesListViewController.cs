@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: CategoriesListViewController.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
@@ -23,12 +23,11 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class CategoriesListViewController : AbstractMainViewController, IUISearchResultsUpdating
+
+    public class CategoriesListViewController : AbstractViewController, IUISearchResultsUpdating
     {
-        public BusinessEntityPreview BusinessEntityPreview
-        {
-            get; set;
-        }
+
+        public BusinessEntityPreview BusinessEntityPreview { get; set; }
 
         UIBarButtonItem dismissButtonItem;
         UIBarButtonItem cancelButtonItem;
@@ -100,26 +99,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeCategoriesListView()
         {
-            //AutomaticallyAdjustsScrollViewInsets = true; //TODO need to understand why it does not work, it seems to have no effect
-            EdgesForExtendedLayout = UIRectEdge.None;
+            AutomaticallyAdjustsScrollViewInsets = true;
 
             categoriesListView = new UITableView();
-            dataSource = new DataSource(categoriesListView, Localization.GetString("no_categories"));
-            categoriesListView.Source = dataSource;
-            categoriesListView.CellLayoutMarginsFollowReadableWidth = false;
+            categoriesListView.Source = dataSource = new DataSource(categoriesListView, Localization.GetString("no_categories")); ;
             categoriesListView.AllowsSelection = false;
             categoriesListView.AllowsSelectionDuringEditing = true;
             categoriesListView.AllowsMultipleSelection = false;
             categoriesListView.AllowsMultipleSelectionDuringEditing = true;
-            categoriesListView.TranslatesAutoresizingMaskIntoConstraints = false;
             categoriesListView.ClipsToBounds = false;
+            categoriesListView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(categoriesListView);
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(categoriesListView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(categoriesListView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(categoriesListView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(categoriesListView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, 0.0f),
+                    NSLayoutConstraint.Create(categoriesListView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(categoriesListView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(categoriesListView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(categoriesListView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f),
                 });
         }
 
@@ -133,8 +129,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             searchResultsController.TableView.AllowsSelectionDuringEditing = true;
             searchResultsController.TableView.AllowsMultipleSelection = false;
             searchResultsController.TableView.AllowsMultipleSelectionDuringEditing = true;
-            searchDataSource = new SearchDataSource(Localization.GetString("no_matching_categories"), this);
-            searchResultsController.TableView.Source = searchDataSource;
+            searchResultsController.TableView.Source = searchDataSource = new SearchDataSource(Localization.GetString("no_matching_categories"), this);
 
             searchController = new UISearchController(searchResultsController)
             {
@@ -242,15 +237,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Event handlers
 
-        void DismissButtonItem_Clicked(object sender, EventArgs e)
-        {
-            DismissViewController(true, null);
-        }
+        void DismissButtonItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
 
-        void CancelButtomItem_Clicked(object sender, EventArgs e)
-        {
-            UpdateAfterExitEditMode();
-        }
+        void CancelButtomItem_Clicked(object sender, EventArgs e) => UpdateAfterExitEditMode();
 
         void EditModeButtonItem_Clicked(object sender, EventArgs e)
         {
@@ -354,11 +343,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        async void DoSearchCategory(string searchText, CancellationTokenSource ct)
+
+
+
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void        async void DoSearchCategory(string searchText, CancellationTokenSource ct)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             searchDataSource.Reset();
 
-            await Task.Delay(100); //TODO Is it a good idea to have this delay?
+            await Task.Delay(100);
 
             if (ct.IsCancellationRequested) return;
 
@@ -373,20 +367,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             return category.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0;
         }
 
-        public void SearchCategorySelected(Category category)
-        {
-            dataSource.SelectCategory(category);
-        }
+        public void SearchCategorySelected(Category category) => dataSource.SelectCategory(category);
 
-        public void SearchCategoryDeselected(Category category)
-        {
-            dataSource.DeselectCategory(category);
-        }
+        public void SearchCategoryDeselected(Category category) => dataSource.DeselectCategory(category);
 
         #endregion
 
         class DataSource : UITableViewSource
         {
+            
             public bool CategoriesChanged
             {
                 get;
@@ -513,7 +502,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                return 44.0f;
+                return 44f;
             }
 
             public override UITableViewCellEditingStyle EditingStyleForRow(UITableView tableView, NSIndexPath indexPath)
@@ -763,7 +752,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                return 44.0f;
+                return 44f;
             }
 
             public override UITableViewCellEditingStyle EditingStyleForRow(UITableView tableView, NSIndexPath indexPath)
@@ -831,6 +820,5 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return obj.Id.GetHashCode();
             }
         }
-
     }
 }

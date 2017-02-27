@@ -204,12 +204,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void AssignCategoryButton_Clicked(object sender, EventArgs e)
         {
-            var categoriesListViewController = new CategoriesListViewController();
-            categoriesListViewController.BusinessEntityPreview = contactPreview;
-            var categoriesListNavigationController = new UINavigationController(categoriesListViewController);
-            categoriesListNavigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
-
-            PresentViewController(categoriesListNavigationController, true, null);
+            var vc = new NavigationController(new CategoriesListViewController { BusinessEntityPreview = contactPreview }, UIModalPresentationStyle.PageSheet);
+            PresentViewController(vc, true, null);
         }
 
         void FileToButton_Clicked(object sender, EventArgs e)
