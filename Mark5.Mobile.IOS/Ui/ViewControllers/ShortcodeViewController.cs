@@ -253,7 +253,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var composeDocumentViewController = new ComposeDocumentViewController
             {
                 CreationModeFlag = DocumentCreationModeFlag.New,
-                PreConfiguredShortcode = shortcode,
+                PreConfiguredShortcode = shortcode
             };
             var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
             composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;

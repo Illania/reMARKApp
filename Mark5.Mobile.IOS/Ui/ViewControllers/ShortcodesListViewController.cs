@@ -173,9 +173,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void SubscribeToMessages()
         {
-            PlatformConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleShortcodeRemovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
-            PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleShortcodeMovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
-            PlatformConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleShortcodeDeleted, m => m.ObjectType == ObjectType.Shortcode);
+            PlatformConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
+            PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
+            PlatformConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Shortcode);
         }
 
         void InitializeNavigationBarTitle()
@@ -550,8 +550,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationController.PresentViewController(new NavigationController(vc), true, null);
         }
 
-        //TODO action to add shortcode to new document
-
         void DoShowMoreActionSheet(NSIndexPath indexPath, ShortcodePreview selectedShortcode)
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
@@ -592,11 +590,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Messages handlers
 
-        void HandleShortcodeRemovedFromFolder(EntityRemovedFromFolderMessage m) => RemoveShortcodesFromList(m.EntitiesId);
+        void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m) => RemoveShortcodesFromList(m.EntitiesId);
 
-        void HandleShortcodeDeleted(EntityDeletedMessage m) => RemoveShortcodesFromList(m.EntitiesId);
+        void HandleMovedFromFolder(EntityMovedFromFolderMessage m) => RemoveShortcodesFromList(m.EntitiesId);
 
-        void HandleShortcodeMovedFromFolder(EntityMovedFromFolderMessage m) => RemoveShortcodesFromList(m.EntitiesId);
+        void HandleDeleted(EntityDeletedMessage m) => RemoveShortcodesFromList(m.EntitiesId);
 
         #endregion
 

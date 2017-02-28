@@ -16,6 +16,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -216,7 +217,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, null)); // TODO wire
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
+            {
+                var vc = new CopyToWorktrayViewController { BusinessEntities = new List<IBusinessEntity> { contact } };
+                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            }));
+
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { contactPreview });
@@ -235,11 +241,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (folder?.InternalType == FolderInternalType.FilterView
                 || folder?.InternalType == FolderInternalType.Static
                 || folder?.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, null)); // TODO wire
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, RemoveFromFolder));
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
                 || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, null)); // TODO wire
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, Delete));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
@@ -337,6 +343,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             contact = null;
 
             this.contactPreview = contactPreview;
+        }
+
+        public bool IsShowingContactWithId(int contactId)
+        {
+            return contactPreview?.Id == contactId || this.contactId == contactId;
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -438,6 +449,88 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var ds = tableView?.Source as DataSource;
             ds?.Clear();
         }
+
+        #region Actions
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void RemoveFromFolder(UIAlertAction a)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_contact"));
+
+            if (!result)
+                return;
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting_from_folder___"));
+
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to remove contact from folder [contactId={contact.Id}, folderId={folder.Id}]");
+
+                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { contact }, folder);
+
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Contact, folder.Id, new List<int> { contact.Id }));
+
+                dismissAction();
+
+                if (SplitViewController != null && !SplitViewController.Collapsed)
+                {
+                    ClearData();
+                }
+                else
+                {
+                    NavigationController.PopViewController(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Error while removing contact from folder [contactId={contact.Id}, folderId={folder.Id}]", ex);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+        }
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void Delete(UIAlertAction a)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_contact"));
+
+            if (!result)
+                return;
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting___"));
+
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to delete contact [contactId={contact.Id}]");
+
+                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { contact });
+
+                PlatformConfig.MessengerHub.Publish(new EntityDeletedMessage(this, ObjectType.Contact, new List<int> { contact.Id }));
+
+                dismissAction();
+
+                if (SplitViewController != null && !SplitViewController.Collapsed)
+                {
+                    ClearData();
+                }
+                else
+                {
+                    NavigationController.PopViewController(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Error while deleting contact [contactId={contact.Id}]", ex);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+        }
+
+        #endregion
 
         class DataSource : UITableViewSource, IDisposable
         {
