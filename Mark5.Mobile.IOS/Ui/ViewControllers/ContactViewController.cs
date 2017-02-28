@@ -216,7 +216,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { contactPreview });
-                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+                PresentViewController(new NavigationController(vc), true, null);
             }));
 
             if (folder?.InternalType == FolderInternalType.FilterView
@@ -225,7 +225,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { contactPreview }, folder);
-                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+                PresentViewController(new NavigationController(vc), true, null);
             }));
 
             if (folder?.InternalType == FolderInternalType.FilterView

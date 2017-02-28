@@ -358,7 +358,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyMoveToFolderListViewController(selectedDocuments.Cast<IBusinessEntity>().ToList());
-                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+                PresentViewController(new NavigationController(vc), true, null);
             }));
 
             if (Folder.InternalType == FolderInternalType.FilterView
@@ -367,7 +367,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyMoveToFolderListViewController(selectedDocuments.Cast<IBusinessEntity>().ToList(), Folder);
-                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+                PresentViewController(new NavigationController(vc), true, null);
             }));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, null)); // TODO
@@ -395,7 +395,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void CopyToWorktray(List<DocumentPreview> documentPreviews)
         {
             var vc = new CopyToWorktrayViewController { BusinessEntities = documentPreviews.Cast<IBusinessEntity>().ToList() };
-            NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            PresentViewController(new NavigationController(vc), true, null);
         }
 
         void MarkAsRead(DocumentPreview documentPreview, NSIndexPath row) => MarkAsRead(new List<DocumentPreview> { documentPreview }, new[] { row });

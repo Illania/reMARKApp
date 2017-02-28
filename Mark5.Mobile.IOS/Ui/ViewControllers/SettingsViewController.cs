@@ -8,7 +8,6 @@
 using System;
 using CoreGraphics;
 using Foundation;
-using HockeyApp.iOS;
 using InAppSettingsKit;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
@@ -203,7 +202,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (specifier.Key == LogoutKey)
             {
-                var dismisAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_out___"));
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_out___"));
 
                 try
                 {
@@ -219,7 +218,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 PlatformConfig.Preferences.ResetOnLaunch = true;
 
-                dismisAction();
+                dismissAction();
 
                 Dialogs.ShowBlockingDialog(this, Localization.GetString("please_restart"));
 
@@ -228,21 +227,54 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == SendFeedbackKey)
             {
-                BITHockeyManager.SharedHockeyManager.FeedbackManager.ShowFeedbackListView();
+                try
+                {
+                    if (!SystemReportCollector.CanMailReport)
+                    {
+                        await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_mail_report_title"), Localization.GetString("cannot_mail_report_content"));
+                        return;
+                    }
+
+                    var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
+
+                    var report = await SystemReportCollector.CreateFullReportAsync();
+
+                    dismissAction();
+
+                    var mc = SystemReportCollector.CreateMailReportController(report);
+                    PresentViewController(mc, true, null);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Could not mail system report", ex);
+
+                    Dialogs.ShowErrorDialog(this, ex);
+                }
+
+
                 return;
             }
 
             if (specifier.Key == CreateSystemReportKey)
             {
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
+                try
+                {
+                    var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
 
-                var report = await SystemReportCollector.CreateFullReportAsync();
+                    var report = await SystemReportCollector.CreateFullReportAsync();
 
-                dismissAction();
+                    dismissAction();
 
-                var src = SystemReportCollector.CreateShareReportController(report);
-                if (src.PopoverPresentationController != null) src.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(sender.TableView, sender.TableView.CellAt(sender.SettingsReader.GetIndexPath(specifier.Key)));
-                PresentViewController(src, true, null);
+                    var src = SystemReportCollector.CreateShareReportController(report);
+                    if (src.PopoverPresentationController != null) src.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(sender.TableView, sender.TableView.CellAt(sender.SettingsReader.GetIndexPath(specifier.Key)));
+                    PresentViewController(src, true, null);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Could not share system report", ex);
+
+                    Dialogs.ShowErrorDialog(this, ex);
+                }
 
                 return;
             }
