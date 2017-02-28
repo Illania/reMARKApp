@@ -7,10 +7,10 @@
 //
 using System;
 using Foundation;
+using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities.Extensions;
 using ObjCRuntime;
 using UIKit;
-using Mark5.Mobile.IOS.Utilities.Extensions;
-using Mark5.Mobile.IOS.Ui.Common;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
