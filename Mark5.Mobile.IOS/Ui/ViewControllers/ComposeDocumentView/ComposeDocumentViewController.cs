@@ -39,6 +39,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
         public string[] PreconfiguredEmailAddresses { get; set; }
+        public Shortcode PreConfiguredShortcode;
         public Document PreviousDocument { get; set; }
 
         public DocumentPreview PreviousDocumentPreview { get; set; }
@@ -377,9 +378,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             OutgoingDocumentInitialAttachments.ForEach(attachmentsView.AddAttachment);
 
-            if (CreationModeFlag == DocumentCreationModeFlag.New && PreconfiguredEmailAddresses != null)
+            if (CreationModeFlag == DocumentCreationModeFlag.New)
             {
-                toView.SetEmails(PreconfiguredEmailAddresses);
+                if (PreconfiguredEmailAddresses != null)
+                {
+                    toView.SetEmails(PreconfiguredEmailAddresses);
+                }
+
+                AddAddressesFromShortcode(PreConfiguredShortcode);
             }
 
             sendButtonItem.Enabled = IsFormValid();
@@ -393,6 +399,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 toView.StartEditing();
             }
+        }
+
+        void AddAddressesFromShortcode(Shortcode shortcode)
+        {
+            if (shortcode == null || shortcode.Addresses == null || !shortcode.Addresses.Any())
+            {
+                return;
+            }
+
+            var addresses = shortcode.Addresses;
+            toView.SetEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.Address));
+            ccView.SetEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.Address));
+            bccView.SetEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.Address));
         }
 
         bool IsFormValid()

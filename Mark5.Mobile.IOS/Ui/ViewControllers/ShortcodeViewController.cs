@@ -166,12 +166,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (fileToButton != null)
                 fileToButton.Clicked += FileToButton_Clicked;
+
+            if (composeButton != null)
+                composeButton.Clicked += ComposeButton_Clicked;
         }
 
         void DeinitializeHandlers()
         {
             if (fileToButton != null)
                 fileToButton.Clicked -= FileToButton_Clicked;
+
+            if (composeButton != null)
+                composeButton.Clicked -= ComposeButton_Clicked;
         }
 
         void RowLongPressed(UILongPressGestureRecognizer gr)
@@ -240,6 +246,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
             PresentViewController(eas, true, null);
+        }
+
+        void ComposeButton_Clicked(object sender, EventArgs e)
+        {
+            var composeDocumentViewController = new ComposeDocumentViewController
+            {
+                CreationModeFlag = DocumentCreationModeFlag.New,
+                PreConfiguredShortcode = shortcode,
+            };
+            var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
+            composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
+            PresentViewController(composeDocumentNavigationController, true, null);
         }
 
         public void SetData(int folderId, int shortcodeId)

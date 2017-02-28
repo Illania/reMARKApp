@@ -154,7 +154,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 StartActivity(ComposeDocumentActivity.CreateIntent(Context,
                                                                    DocumentCreationModeFlag.New,
                                                                    DocumentDirection.None,
-                                                                   preconfiguredEmailAddresses: Shortcode.Addresses.Where(a => a.Type == CommunicationAddressType.Email).Select(a => a.Address).ToList()));
+                                                                   preconfiguredEmailAddresses: Shortcode.Addresses.Where(a => a.Type == CommunicationAddressType.Email).Select(a => a.Address).ToList())); //TODO WRONG, need to fix it
             }
 
             if (item.ItemId == MenuItemActions.CopyToWorktray)
