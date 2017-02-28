@@ -475,7 +475,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void RemoveFromFolder(ContactPreview selectedContact) => RemoveFromFolder(new List<ContactPreview> { selectedContact });
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        async void RemoveFromFolder(List<ContactPreview> selectedContact)
+        async void RemoveFromFolder(List<ContactPreview> selectedContacts)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_contacts"));
@@ -492,9 +492,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Info($"Attempting to remove contacts from folder [folderId={Folder.Id}]");
 
-                await Managers.CommonActionsManager.RemoveFromFolder(selectedContact.Cast<IBusinessEntity>().ToList(), Folder);
+                await Managers.CommonActionsManager.RemoveFromFolder(selectedContacts.Cast<IBusinessEntity>().ToList(), Folder);
 
-                RemoveContactsFromList(selectedContact.Select(s => s.Id));
+                RemoveContactsFromList(selectedContacts.Select(s => s.Id));
                 EndEditing();
 
                 dismissAction();
@@ -512,7 +512,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void Delete(ContactPreview selectedContact) => Delete(new List<ContactPreview> { selectedContact });
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        async void Delete(List<ContactPreview> selectedContact)
+        async void Delete(List<ContactPreview> selectedContacts)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_contacts"));
@@ -529,9 +529,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Info($"Attempting to delete contacts]");
 
-                await Managers.CommonActionsManager.Delete(selectedContact.Cast<IBusinessEntity>().ToList());
+                await Managers.CommonActionsManager.Delete(selectedContacts.Cast<IBusinessEntity>().ToList());
 
-                RemoveContactsFromList(selectedContact.Select(s => s.Id));
+                RemoveContactsFromList(selectedContacts.Select(s => s.Id));
                 EndEditing();
 
                 dismissAction();

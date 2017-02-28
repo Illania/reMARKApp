@@ -602,6 +602,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void RemoveShortcodesFromList(IEnumerable<int> ids)
         {
+            if (searchController.Active)
+            {
+                searchResultsDataSource.RemoveItems(ids.ToList());
+            }
+
             var ds = (DataSource)shortcodesTableView.Source;
             ds.RemoveItems(ids.ToList());
             if (SplitViewController != null && !SplitViewController.Collapsed)
