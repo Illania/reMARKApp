@@ -332,7 +332,6 @@
     <Compile Include="Ui\Fragments\OutgoingDocumentsListFragment.cs" />
     <Compile Include="Utilities\Hockey\CustomCrashManagerListener.cs" />
     <Compile Include="Utilities\Hockey\CustomFeedbackActivity.cs" />
-    <Compile Include="Utilities\Hockey\CustomFeedbackManagerLister.cs" />
     <Compile Include="Ui\Common\HubMessages\EntityRemovedMessage.cs" />
     <Compile Include="Ui\Common\HubMessages\EntityRemovedFromFolderMessage.cs" />
     <Compile Include="Ui\Common\HubMessages\DocumentPreviewPriorityChangedMessage.cs" />
