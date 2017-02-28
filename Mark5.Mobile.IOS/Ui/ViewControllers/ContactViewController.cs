@@ -1005,7 +1005,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
-                    viewController.CopyToClipboard(tableView, cell, ContactPreview.Description);
+                    viewController.CopyToClipboard(tableView, cell, cell.TextLabel.Text);
                 }
             }
 
