@@ -8,6 +8,7 @@
 using System;
 using CoreGraphics;
 using Foundation;
+using HockeyApp.iOS;
 using InAppSettingsKit;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
@@ -79,6 +80,40 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             return size.Height + 10f;
         }
 
+        public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+        {
+            var cell = base.GetCell(tableView, indexPath);
+
+            if (cell.TextLabel != null)
+                cell.TextLabel.Font = Theme.DefaultFont;
+            if (cell.DetailTextLabel != null)
+                cell.DetailTextLabel.Font = Theme.DefaultLightFont;
+
+            return cell;
+        }
+
+        public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+        {
+            var specifier = SettingsReader.GetSpecifier(indexPath);
+            if (specifier.Type == "PSMultiValueSpecifier")
+            {
+                var vc = new CustomSpecifierValuesViewController();
+                vc.CurrentSpecifier = specifier;
+                vc.SettingsReader = SettingsReader;
+                vc.SettingsStore = SettingsStore;
+                vc.View.TintColor = View.TintColor;
+
+                // Compared to original code, assignment of currentChildViewController
+                // was skipped, because it is not in the binding and is not very important
+
+                NavigationController.PushViewController(vc, true);
+
+                return;
+            }
+
+            base.RowSelected(tableView, indexPath);
+        }
+
         [Export("tableView:cellForSpecifier:")]
         public virtual UITableViewCell GetCellForSpecifier(UITableView tableView, SettingsSpecifier specifier)
         {
@@ -115,8 +150,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = ci?.Hostname + ":" + ci?.Port;
-                cell.DetailTextLabel.TextColor = UIColor.Gray;
-                cell.DetailTextLabel.Font = UIFont.SystemFontOfSize(17f);
 
                 return cell;
             }
@@ -130,7 +163,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = sslOff ? Localization.GetString("enabled") : Localization.GetString("disabled");
                 cell.DetailTextLabel.TextColor = sslOff ? UIColor.Gray : Theme.Brown;
-                cell.DetailTextLabel.Font = sslOff ? UIFont.SystemFontOfSize(17f) : UIFont.BoldSystemFontOfSize(17f);
 
                 return cell;
             }
@@ -141,8 +173,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = string.Format("{0} ({1})", NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"], NSBundle.MainBundle.InfoDictionary["CFBundleVersion"]);
-                cell.DetailTextLabel.TextColor = UIColor.Gray;
-                cell.DetailTextLabel.Font = UIFont.SystemFontOfSize(17f);
 
                 return cell;
             }
@@ -198,8 +228,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == SendFeedbackKey)
             {
-                // TODO
-
+                BITHockeyManager.SharedHockeyManager.FeedbackManager.ShowFeedbackListView();
                 return;
             }
 
@@ -354,5 +383,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
         void RefreshHiddenSettings() => SetHiddenKeys(PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk ? null : new[] { LocalTemplateKey }, false);
+
+        class CustomSpecifierValuesViewController : SpecifierValuesViewController
+        {
+
+            public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+            {
+                var cell = base.GetCell(tableView, indexPath);
+
+                if (cell.TextLabel != null)
+                    cell.TextLabel.Font = Theme.DefaultFont;
+                if (cell.DetailTextLabel != null)
+                    cell.DetailTextLabel.Font = Theme.DefaultLightFont;
+
+                return cell;
+            }
+        }
     }
 }

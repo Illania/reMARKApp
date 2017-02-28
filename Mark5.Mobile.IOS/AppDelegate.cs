@@ -12,6 +12,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Foundation;
+using HockeyApp.iOS;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
@@ -55,6 +56,11 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.Logger.Info("MARK5 initializing...");
                 var isLoggedIn = InitializePlatform(application);
                 CommonConfig.Logger.Info("MARK5 initialized");
+
+                BITHockeyManager.SharedHockeyManager.Configure(PlatformConfig.HockeyId);
+                BITHockeyManager.SharedHockeyManager.CrashManager.CrashManagerStatus = PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BITCrashManagerStatus.Disabled;
+                BITHockeyManager.SharedHockeyManager.StartManager();
+                BITHockeyManager.SharedHockeyManager.Authenticator.AuthenticateInstallation();
 
                 Window = new UIWindow(UIScreen.MainScreen.Bounds);
                 Theme.ApplyTheme(Window);

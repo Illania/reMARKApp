@@ -51,6 +51,7 @@
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
     <CodesignProvision>d21b6e09-3a9c-4161-89a2-8a2e3b9d5ad2</CodesignProvision>
+    <MtouchUseLlvm>true</MtouchUseLlvm>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>pdbonly</DebugType>
@@ -140,9 +141,6 @@
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.10.0.1-beta1\lib\netstandard1.1\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="SVProgressHUD">
-      <HintPath>..\packages\SVProgressHUD.2.1.2\lib\Xamarin.iOS10\SVProgressHUD.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -401,6 +399,7 @@
     <Compile Include="Ui\ViewControllers\ShortcodesSearchResultsViewController.cs" />
     <Compile Include="Ui\ViewControllers\ContactsSearchResultsViewController.cs" />
     <Compile Include="Ui\ViewControllers\DocumentsSearchResultsViewController.cs" />
+    <Compile Include="Utilities\Extensions\NSObjectExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
