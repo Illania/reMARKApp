@@ -272,6 +272,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.shortcodePreview = shortcodePreview;
         }
 
+        public bool IsShowingShortcodeWithId(int shortcodeId)
+        {
+            return shortcodePreview?.Id == shortcodeId || this.shortcodeId == shortcodeId;
+        }
+
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void RefreshData()
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void

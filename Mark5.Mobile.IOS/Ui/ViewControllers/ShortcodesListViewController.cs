@@ -174,6 +174,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void SubscribeToMessages()
         {
             PlatformConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleShortcodeRemovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
+            PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleShortcodeMovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
             PlatformConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleShortcodeDeleted, m => m.ObjectType == ObjectType.Shortcode);
         }
 
@@ -450,6 +451,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
+        void RemoveFromFolder(ShortcodePreview selectedShortcode) => RemoveFromFolder(new List<ShortcodePreview> { selectedShortcode });
+
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void RemoveFromFolder(List<ShortcodePreview> selectedShortcodes)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
@@ -484,6 +487,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
+
+        void Delete(ShortcodePreview selectedShortcode) => Delete(new List<ShortcodePreview> { selectedShortcode });
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void Delete(List<ShortcodePreview> selectedShortcodes)
@@ -545,9 +550,42 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationController.PresentViewController(new NavigationController(vc), true, null);
         }
 
-        void ShowMoreActions(ShortcodePreview shortcodePreview)
-        {
+        //TODO action to add shortcode to new document
 
+        void DoShowMoreActionSheet(NSIndexPath indexPath, ShortcodePreview selectedShortcode)
+        {
+            var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
+            {
+                CopyToFolder(selectedShortcode);
+                EndEditing();
+            }));
+
+            if (Folder.InternalType == FolderInternalType.FilterView
+                || Folder.InternalType == FolderInternalType.Static
+                || Folder.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
+            {
+                MoveToFolder(selectedShortcode);
+                EndEditing();
+            }));
+
+            if (Folder.InternalType == FolderInternalType.FilterView
+                || Folder.InternalType == FolderInternalType.Static
+                || Folder.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedShortcode)));
+
+            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
+                || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcode)));
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => EndEditing()));
+
+            if (eas.PopoverPresentationController != null)
+                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(shortcodesTableView, shortcodesTableView.CellAt(indexPath));
+
+            PresentViewController(eas, true, null);
         }
 
         #endregion
@@ -558,6 +596,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void HandleShortcodeDeleted(EntityDeletedMessage m) => RemoveShortcodesFromList(m.EntitiesId);
 
+        void HandleShortcodeMovedFromFolder(EntityMovedFromFolderMessage m) => RemoveShortcodesFromList(m.EntitiesId);
+
         #endregion
 
         #region Utilities
@@ -566,6 +606,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var ds = (DataSource)shortcodesTableView.Source;
             ds.RemoveItems(ids.ToList());
+            if (SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                var vc = (ShortcodeViewController)nc.ViewControllers[0];
+                if (ids.Select(id => vc.IsShowingShortcodeWithId(id)).Any(v => v))
+                {
+                    vc.ClearData();
+                }
+            }
         }
 
         #endregion
@@ -651,7 +700,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var shortcodePreview = shortcodePreviewsInView[indexPath.Row];
 
-                var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("more"), (a, ip) => { viewController.ShowMoreActions(shortcodePreview); });
+                var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("more"), (a, ip) => { viewController.DoShowMoreActionSheet(indexPath, shortcodePreview); });
                 moreAction.BackgroundColor = Theme.Blue;
                 actions.Add(moreAction);
 

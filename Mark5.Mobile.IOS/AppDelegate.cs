@@ -272,7 +272,10 @@ namespace Mark5.Mobile.IOS
                         }
                         else
                         {
-                            CommonConfig.Logger.Error(new NSErrorException(error));
+                            if (error != null)
+                            {
+                                CommonConfig.Logger.Error(new NSErrorException(error));
+                            }
                         }
                     });
                 });

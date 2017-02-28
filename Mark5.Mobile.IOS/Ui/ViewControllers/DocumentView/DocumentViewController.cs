@@ -509,7 +509,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void MarkAsReadIfNecessary()
         {
-            if (OutgoingDocumentIdentifier != default(Guid))
+            if (OutgoingDocumentIdentifier != default(Guid) || Document == null || DocumentPreview == null)
             {
                 return;
             }
@@ -559,7 +559,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void RefreshView()
         {
-            if (Document == null | DocumentPreview == null)
+            if (Document == null || DocumentPreview == null)
             {
                 return;
             }
