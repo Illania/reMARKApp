@@ -45,7 +45,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public bool LocalDocument { get; set; }
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
-        public string[] PreconfiguredEmailAddresses { get; set; }
+        public string[] PreconfiguredEmailToAddresses { get; set; }
+        public string[] PreconfiguredEmailCcAddresses { get; set; }
+        public string[] PreconfiguredEmailBccAddresses { get; set; }
         public Action CloseRequest { get; set; }
 
         Document PreviousDocument { get; set; }
@@ -228,9 +230,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             OutgoingDocumentInitialAttachments.ForEach(attachmentsView.AddAttachment);
 
-            if (CreationModeFlag == DocumentCreationModeFlag.New && PreconfiguredEmailAddresses != null)
+            if (CreationModeFlag == DocumentCreationModeFlag.New)
             {
-                toView.SetEmails(PreconfiguredEmailAddresses);
+                if (PreconfiguredEmailToAddresses != null)
+                    toView.SetEmails(PreconfiguredEmailToAddresses);
+                if (PreconfiguredEmailCcAddresses != null)
+                    ccView.SetEmails(PreconfiguredEmailCcAddresses);
+                if (PreconfiguredEmailBccAddresses != null)
+                    bccView.SetEmails(PreconfiguredEmailBccAddresses);
             }
 
             UpdateSendButtonState();

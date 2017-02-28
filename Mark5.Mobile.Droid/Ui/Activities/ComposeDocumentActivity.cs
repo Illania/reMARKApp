@@ -31,33 +31,44 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         const string PreviousDocumentFolderIdIntentKey = "PreviousDocumentFolderIdIntent_ac0d9a31-2ddc-497b-8fbe-7fd5a51b2257";
         const string PreviousDocumentDirectionIntentKey = "PreviousDocumentDirectionIntent_edefdcd2-764f-439d-891b-178b8de29333";
         const string OutgoingDocumentGuidIntentKey = "OutgoingDocumentGuidIntent_7901fa2b-f096-4e9e-82b9-5aeae9f39d05";
-        const string PreconfiguredEmailAddressesIntentKey = "PreconfiguredEmailAddressesIntent_25ff402c-268e-477c-890c-80d68e60ab01";
+        const string PreconfiguredEmailToAddressesIntentKey = "PreconfiguredEmailToAddressesIntent_25ff402c-268e-477c-890c-80d68e60ab01";
+        const string PreconfiguredEmailCcAddressesIntentKey = "PreconfiguredEmailCcAddressesIntent_051636c4-f032-4736-9d05-b9c0427bba5b";
+        const string PreconfiguredEmailBccAddressesIntentKey = "PreconfiguredEmailBccAddressesIntent_c7d5b5ce-497c-460d-bcbd-331b3e01b656";
 
         const string cdfFragmentTagKey = "fragmentTagKey";
         string cdfFragmentTag;
 
-        public static Intent CreateIntent(Context context, DocumentCreationModeFlag creationModeFlag, DocumentDirection previousDocumentDirection, int? precedingDocumentId = null,
-                                          int? precedingDocumentFolderId = null, Guid outgoingDocumentGuid = default(Guid), List<string> preconfiguredEmailAddresses = null)
+        public static Intent CreateIntent(Context context,
+                                          DocumentCreationModeFlag creationModeFlag,
+                                          DocumentDirection previousDocumentDirection,
+                                          int? precedingDocumentId = null,
+                                          int? precedingDocumentFolderId = null,
+                                          Guid outgoingDocumentGuid = default(Guid),
+                                          List<string> preconfiguredEmailToAddresses = null,
+                                          List<string> preconfiguredEmailCcAddresses = null,
+                                          List<string> preconfiguredEmailBccAddresses = null)
         {
             var intent = new Intent(context, typeof(ComposeDocumentActivity));
             intent.PutExtra(CreationModeFlagIntentKey, (int)creationModeFlag);
             intent.PutExtra(PreviousDocumentDirectionIntentKey, (int)previousDocumentDirection);
+
             if (outgoingDocumentGuid != default(Guid))
-            {
                 intent.PutExtra(OutgoingDocumentGuidIntentKey, outgoingDocumentGuid.ToString());
-            }
+
             if (precedingDocumentId != null)
-            {
                 intent.PutExtra(PreviousDocumentIdIntentKey, precedingDocumentId.Value);
-            }
+
             if (precedingDocumentFolderId != null)
-            {
                 intent.PutExtra(PreviousDocumentFolderIdIntentKey, precedingDocumentFolderId.Value);
-            }
-            if (preconfiguredEmailAddresses != null)
-            {
-                intent.PutExtra(PreconfiguredEmailAddressesIntentKey, preconfiguredEmailAddresses.ToArray());
-            }
+
+            if (preconfiguredEmailToAddresses != null)
+                intent.PutExtra(PreconfiguredEmailToAddressesIntentKey, preconfiguredEmailToAddresses.ToArray());
+
+            if (preconfiguredEmailCcAddresses != null)
+                intent.PutExtra(PreconfiguredEmailCcAddressesIntentKey, preconfiguredEmailCcAddresses.ToArray());
+
+            if (preconfiguredEmailBccAddresses != null)
+                intent.PutExtra(PreconfiguredEmailBccAddressesIntentKey, preconfiguredEmailBccAddresses.ToArray());
 
             return intent;
         }
@@ -90,8 +101,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (Intent.HasExtra(PreviousDocumentFolderIdIntentKey))
                     cdf.PreviousDocumentFolderId = Intent.Extras.GetInt(PreviousDocumentFolderIdIntentKey);
 
-                if (Intent.HasExtra(PreconfiguredEmailAddressesIntentKey))
-                    cdf.PreconfiguredEmailAddresses = Intent.Extras.GetStringArray(PreconfiguredEmailAddressesIntentKey);
+                if (Intent.HasExtra(PreconfiguredEmailToAddressesIntentKey))
+                    cdf.PreconfiguredEmailToAddresses = Intent.Extras.GetStringArray(PreconfiguredEmailToAddressesIntentKey);
+
+                if (Intent.HasExtra(PreconfiguredEmailCcAddressesIntentKey))
+                    cdf.PreconfiguredEmailCcAddresses = Intent.Extras.GetStringArray(PreconfiguredEmailCcAddressesIntentKey);
+
+                if (Intent.HasExtra(PreconfiguredEmailBccAddressesIntentKey))
+                    cdf.PreconfiguredEmailBccAddresses = Intent.Extras.GetStringArray(PreconfiguredEmailBccAddressesIntentKey);
 
                 if (Intent.HasExtra(OutgoingDocumentGuidIntentKey))
                 {
