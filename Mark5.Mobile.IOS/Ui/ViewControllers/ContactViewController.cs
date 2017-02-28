@@ -148,7 +148,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 fileToButton,
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                actionsLinksButton,
+                actionsLinksButton
             };
             toolbar.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(toolbar);
@@ -283,25 +283,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(navigationController, true, null);
         }
 
-        void CommunicationAddressClicked(UITableView tableView, UITableViewCell cell, CommunicationAddress ca)
+        void CommunicationAddressClicked(UITableView tv, UITableViewCell cell, CommunicationAddress ca)
         {
             if (ca.Type == CommunicationAddressType.Email)
             {
-                // TODO wire
+                var composeDocumentViewController = new ComposeDocumentViewController
+                {
+                    PreconfiguredEmailAddresses = new string[] { ca.Address },
+                    CreationModeFlag = DocumentCreationModeFlag.New
+                };
+                var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
+                composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
+                PresentViewController(composeDocumentNavigationController, true, null);
             }
 
             if (ca.Type == CommunicationAddressType.Phone)
             {
-                Integration.Call(this, tableView, cell, ca.Address);
+                Integration.Call(this, tv, cell, ca.Address);
             }
 
             if (ca.Type == CommunicationAddressType.Mobile)
             {
-                Integration.CallOrText(this, tableView, cell, ca.Address);
+                Integration.CallOrText(this, tv, cell, ca.Address);
             }
         }
 
-        void PhysicalAddressClicked(UITableView tableView, UITableViewCell cell, PhysicalAddress pa) => Integration.ShowOnMap(this, tableView, cell, pa);
+        void PhysicalAddressClicked(UITableView tv, UITableViewCell cell, PhysicalAddress pa) => Integration.ShowOnMap(this, tv, cell, pa);
 
         public void LinkedContactClicked(ContactPreview contactPreview)
         {
