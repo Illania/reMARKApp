@@ -6,6 +6,7 @@
 // Copyright (c) 2017 Nordic IT
 //
 using System;
+using System.Linq;
 using CoreAnimation;
 using CoreFoundation;
 using CoreGraphics;
@@ -252,7 +253,7 @@ namespace SVProgressHUD
 
         #endregion
 
-        #region Dismiss
+        #region Dismiss methods
 
         void Dismiss(double delay = 0, Action completionHandler = null)
         {
@@ -338,9 +339,25 @@ namespace SVProgressHUD
 
         #endregion
 
+        #region Helper methods
+
         void UpdateViewHierarchy()
         {
-            throw new NotImplementedException();
+            if (controlView.Superview == null)
+                if (ContainerView != null)
+                    ContainerView.AddSubview(controlView);
+                else
+#if !SV_APP_EXTENSIONS
+                    GetFrontWindow().AddSubview(controlView);
+#else
+                    if (ViewForExtension != null)
+                        ViewForExtension.AddSubview(controlView);
+#endif
+            else
+                controlView.Superview.BringSubviewToFront(controlView);
+
+            if (Superview == null)
+                controlView.AddSubview(this);
         }
 
         void UpdateHudFrame()
@@ -348,6 +365,7 @@ namespace SVProgressHUD
             throw new NotImplementedException();
         }
 
+        [Export("positionHud:")]
         void PositionHud(object p)
         {
             throw new NotImplementedException();
@@ -355,23 +373,62 @@ namespace SVProgressHUD
 
         void AddBlur()
         {
-            throw new NotImplementedException();
+            var blurEffectStyle = DefaultStyle == Style.Dark ? UIBlurEffectStyle.Dark : UIBlurEffectStyle.ExtraLight;
+            var blurEffect = UIBlurEffect.FromStyle(blurEffectStyle);
+
+            hudView.Effect = blurEffect;
+            hudVibrancyView.Effect = UIVibrancyEffect.FromBlurEffect(blurEffect);
         }
 
         void RegisterNotifications()
         {
-            throw new NotImplementedException();
+            NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("positionHud:"), UIApplication.DidChangeStatusBarOrientationNotification, null);
+            NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("positionHud:"), UIApplication.DidBecomeActiveNotification, null);
+            NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("positionHud:"), UIKeyboard.WillShowNotification, null);
+            NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("positionHud:"), UIKeyboard.DidShowNotification, null);
+            NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("positionHud:"), UIKeyboard.WillHideNotification, null);
+            NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("positionHud:"), UIKeyboard.DidHideNotification, null);
         }
 
         void CancelRingLayerAnimation()
         {
-            throw new NotImplementedException();
+            CATransaction.Begin();
+            CATransaction.DisableActions = true;
+            hudView.Layer.RemoveAllAnimations();
+            ringView.StrokeEnd = 0f;
+            CATransaction.Commit();
+
+            ringView.RemoveFromSuperview();
+            backgroundRingView.RemoveFromSuperview();
         }
 
         void CancelIndefiniteAnimatedViewAnimation()
         {
-            throw new NotImplementedException();
+            if (indefiniteAnimatedView.RespondsToSelector(new Selector("stopAnimating")))
+                indefiniteAnimatedView.PerformSelector(new Selector("stopAnimating"));
+
+            indefiniteAnimatedView.RemoveFromSuperview();
         }
+
+        UIWindow GetFrontWindow()
+        {
+#if !SV_APP_EXTENSIONS
+            var frontToBackWindows = UIApplication.SharedApplication.Windows.ToArray();
+            Array.Reverse(frontToBackWindows);
+
+            foreach (var window in frontToBackWindows)
+            {
+                var windowOnMainScreen = window.Screen == UIScreen.MainScreen;
+                var windowVisible = !window.Hidden && window.Alpha > 0f;
+                var windowLevelSupported = window.WindowLevel >= UIWindowLevel.Normal && window.WindowLevel <= MaxSupportedWindowLevel;
+
+                if (windowOnMainScreen && windowVisible && windowLevelSupported)
+                    return window;
+            }
+#endif
+            return null;
+        }
+
 
         UIColor GetForegroundColorForStyle()
         {
@@ -397,5 +454,8 @@ namespace SVProgressHUD
         {
             return string.IsNullOrWhiteSpace(statusLabel.Text) ? null : NSDictionary.FromObjectAndKey(FromObject(statusLabel.Text), FromObject(StatusUserInfoKey));
         }
+
+        #endregion
+
     }
 }
