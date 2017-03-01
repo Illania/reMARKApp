@@ -8,6 +8,8 @@
 using System;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Utilities
@@ -24,6 +26,21 @@ namespace Mark5.Mobile.IOS.Utilities
             decimal adjustedSize = (decimal)bytes / (1L << (mag * 10));
 
             return string.Format("{0:n1} {1}", adjustedSize, SizeSuffixes[mag]);
+        }
+
+        public static string PriorityString(Priority priority) //TODO need to put it everywhere it is needed
+        {
+            switch (priority)
+            {
+                case Common.Model.Priority.Low:
+                    return Localization.GetString("priority_low");
+                case Common.Model.Priority.Normal:
+                    return Localization.GetString("priority_normal");
+                case Common.Model.Priority.Urgent:
+                    return Localization.GetString("priority_urgent");
+                default:
+                    throw new ArgumentException("The input priority should not be shown to the user");
+            }
         }
 
         #endregion

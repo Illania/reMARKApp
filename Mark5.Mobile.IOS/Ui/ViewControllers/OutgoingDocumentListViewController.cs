@@ -181,49 +181,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        public async void DocumentSelected(OutgoingDocumentContainer container)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        public void DocumentSelected(OutgoingDocumentContainer container)
         {
             if (documentsTableView.Editing || container.Info.State == OutgoingDocumentState.Sending)
             {
                 return;
             }
 
-            if (SplitViewController == null || SplitViewController.Collapsed)
+            if (SplitViewController != null && !SplitViewController.Collapsed)
             {
                 var ds = (DataSource)documentsTableView.Source;
 
-                var documentViewController = new DocumentViewController();
-                documentViewController.OutgoingDocumentIdentifier = container.Info.Identifier;
-                documentViewController.Folder = outgoingFolder;
-                documentViewController.HidesBottomBarWhenPushed = true;
+                var nc = ((UINavigationController)SplitViewController.ViewControllers[1]);
+                nc.PopToViewController(nc.ViewControllers[0], false);
 
-                NavigationController.PushViewController(documentViewController, true);
+                var vc = (DocumentViewController)nc.ViewControllers[0];
+
+                if (vc.IsShowingOutgoingDocumentWithGuid(container.Info.Identifier))
+                    return;
+
+                vc.HidesBottomBarWhenPushed = false;
+
+                vc.ClearData();
+                vc.SetData(container.Info.Identifier);
+                vc.RefreshData();
             }
             else
             {
                 var ds = (DataSource)documentsTableView.Source;
 
-                var documentNavigationController = ((UINavigationController)SplitViewController.ViewControllers[1]);
-                documentNavigationController.PopToViewController(documentNavigationController.ViewControllers[0], false);
+                var vc = new DocumentViewController();
+                vc.HidesBottomBarWhenPushed = true;
 
-                var documentViewController = (DocumentViewController)documentNavigationController.ViewControllers[0];
+                vc.ClearData();
+                vc.SetData(container.Info.Identifier);
+                vc.SetRefreshDataOnAppear();
 
-                if (documentViewController.Folder != outgoingFolder || documentViewController.DocumentPreview != container.DocumentPreview)
-                {
-                    documentViewController.GetNextDocumentPreview = null;
-                    documentViewController.GetPreviousDocumentPreview = null;
-
-                    documentViewController.FolderId = null;
-                    documentViewController.DocumentId = null;
-
-                    documentViewController.OutgoingDocumentIdentifier = container.Info.Identifier;
-                    documentViewController.Folder = outgoingFolder;
-                    documentViewController.HidesBottomBarWhenPushed = false;
-
-                    await documentViewController.Reload();
-                }
+                NavigationController.PushViewController(vc, true);
             }
         }
 

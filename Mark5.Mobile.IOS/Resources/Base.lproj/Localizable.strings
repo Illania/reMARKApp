@@ -166,6 +166,9 @@
 "port" = "Port";
 "primary_person" = "Primary person";
 "priority" = "Priority";
+"priority_low" = "Low";
+"priority_normal" = "Normal";
+"priority_urgent" = "Urgent";
 "pull_to_refresh" = "Pull to refresh";
 "read_by" = "Read by";
 "reference_number" = "Reference number";
@@ -184,6 +187,8 @@
 "sending_document" = "Sending document...";
 "search_results" = "Search results";
 "set_priority" = "Set priority";
+"select_priority" = "Select priority";
+"setting_priority___" = "Setting priority...";
 "settings" = "Settings";
 "short_id" = "Short ID";
 "shortcodes" = "Shortcodes";
