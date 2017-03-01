@@ -131,9 +131,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
-            var newItem = menu.Add(Menu.None, 10, 10, "New");
-            newItem.SetIcon(Resource.Drawable.action_new);
-            newItem.SetShowAsAction(ShowAsAction.Always);
+            if (RemoteFolder?.Module == ModuleType.Documents)
+            {
+                var newItem = menu.Add(Menu.None, 10, 10, "New");
+                newItem.SetIcon(Resource.Drawable.action_new);
+                newItem.SetShowAsAction(ShowAsAction.Always);
+            }
 
             var searchItem = menu.FindItem(Resource.Id.action_search);
             searchItem.SetIcon(Resource.Drawable.action_search);
