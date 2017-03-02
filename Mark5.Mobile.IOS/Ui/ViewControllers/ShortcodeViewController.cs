@@ -290,6 +290,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.shortcodePreview = shortcodePreview;
         }
 
+        public void SetData(int shortcodeId)
+        {
+            folderId = null;
+            folder = null;
+            shortcode = null;
+            shortcodePreview = null;
+
+            this.shortcodeId = shortcodeId;
+        }
+
         public bool IsShowingShortcodeWithId(int shortcodeId)
         {
             return shortcodePreview?.Id == shortcodeId || this.shortcodeId == shortcodeId;

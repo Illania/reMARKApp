@@ -128,7 +128,51 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void ObjectLinkSelected(ObjectLink link)
         {
-            // TODO
+            switch (link.ToObjectType)
+            {
+                case ObjectType.Document: //TODO need to finish this
+                    PresentDocumentViewController(link.ToObjectId);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public void PresentDocumentViewController(int documentId)
+        {
+            var vc = new DocumentViewController();
+            vc.Modal = true;
+            vc.SetRefreshDataOnAppear();
+            vc.SetData(documentId);
+
+            var navigationController = new UINavigationController(vc);
+            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+
+            PresentViewController(navigationController, true, null);
+        }
+
+        public void PresentContactViewController(int contactId) //TODO need to test
+        {
+            var vc = new ContactViewController();
+            vc.SetRefreshDataOnAppear();
+            vc.SetData(contactId);
+
+            var navigationController = new UINavigationController(vc);
+            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+
+            PresentViewController(navigationController, true, null);
+        }
+
+        public void PresentShortcodeViewController(int shortcodeId)
+        {
+            var vc = new ShortcodeViewController();
+            vc.SetRefreshDataOnAppear();
+            vc.SetData(shortcodeId);
+
+            var navigationController = new UINavigationController(vc);
+            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+
+            PresentViewController(navigationController, true, null);
         }
 
         async Task RefreshData()

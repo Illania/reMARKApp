@@ -352,6 +352,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.contactPreview = contactPreview;
         }
 
+        public void SetData(int contactId)
+        {
+            folderId = null;
+            folder = null;
+            contactPreview = null;
+            contact = null;
+
+            this.contactId = contactId;
+        }
+
         public bool IsShowingContactWithId(int contactId)
         {
             return contactPreview?.Id == contactId || this.contactId == contactId;

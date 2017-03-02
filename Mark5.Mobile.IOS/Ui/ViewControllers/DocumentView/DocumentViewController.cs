@@ -365,7 +365,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1.0f, 40.0f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1.0f, 0.0f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1.0f, 0.0f),
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, -49.0f)
+                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1.0f, Modal ? 0 : -49.0f)
                 });
         }
 
@@ -436,19 +436,39 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void SetData(Folder folder, DocumentPreview documentPreview,
                             GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
         {
+            documentId = null;
+            document = null;
+            folderId = null;
+
+            this.documentPreview = documentPreview;
+            this.folder = folder;
             this.getNextDocumentPreview = getNextDocumentPreview;
             this.getPreviousDocumentPreview = getPreviousDocumentPreview;
+        }
 
-            SetData(folder, documentPreview);
+        public void SetData(int documentId)
+        {
+            document = null;
+            folder = null;
+            folderId = null;
+            documentPreview = null;
+            getNextDocumentPreview = null;
+            getPreviousDocumentPreview = null;
+
+            this.documentId = documentId;
         }
 
         public void SetData(DocumentPreview documentPreview,
                     GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
         {
+            document = null;
+            documentId = null;
+            folderId = null;
+            folder = null;
+
+            this.documentPreview = documentPreview;
             this.getNextDocumentPreview = getNextDocumentPreview;
             this.getPreviousDocumentPreview = getPreviousDocumentPreview;
-
-            SetData(null, documentPreview);
         }
 
         public void SetData(Folder folder, DocumentPreview documentPreview)

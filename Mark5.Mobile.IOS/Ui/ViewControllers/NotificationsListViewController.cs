@@ -203,7 +203,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void NotificationSelected(Notification notification)
         {
-            // TODO open notification
+            if (notification.ObjectType == ObjectType.Document)
+            {
+                PresentDocumentViewController(notification.ObjectId);
+            }
+            //TODO else?
+        }
+
+        public void PresentDocumentViewController(int documentId)
+        {
+            var vc = new DocumentViewController();
+            vc.Modal = true;
+            vc.SetRefreshDataOnAppear();
+            vc.SetData(documentId);
+
+            var navigationController = new UINavigationController(vc);
+            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+
+            PresentViewController(navigationController, true, null);
         }
 
         class DataSource : UITableViewSource, IDisposable
