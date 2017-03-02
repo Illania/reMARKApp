@@ -7,6 +7,7 @@
 //
 using System;
 using System.Linq;
+using System.Threading;
 using CoreAnimation;
 using CoreFoundation;
 using CoreGraphics;
@@ -70,26 +71,26 @@ namespace SVProgressHUD
 
         #region Initialization
 
-        static ProgressHUD _instance;
+        static Lazy<ProgressHUD> _instanceLazy;
         public static ProgressHUD Instance
         {
             get
             {
-                if (_instance == null)
+                if (_instanceLazy == null)
                     throw new InvalidOperationException("ProgressHUD was not initialized yet.");
-                return _instance;
+                return _instanceLazy.Value;
             }
         }
 
         public static void Initialize()
         {
-            if (_instance != null)
+            if (_instanceLazy != null)
                 throw new InvalidOperationException("ProgressHUD was already initialized.");
 
 #if !SV_APP_EXTENSIONS
-            _instance = new ProgressHUD(UIApplication.SharedApplication.Delegate.GetWindow().Bounds);
+            _instanceLazy = new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIApplication.SharedApplication.Delegate.GetWindow().Bounds); }, LazyThreadSafetyMode.ExecutionAndPublication);
 #else
-            _instance = new ProgressHUD(UIScreen.MainScreen.Bounds);
+            _instanceLazy = new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds); }, LazyThreadSafetyMode.ExecutionAndPublication);
 #endif
         }
 
@@ -243,7 +244,7 @@ namespace SVProgressHUD
                     {
                         AutoresizingMask = UIViewAutoresizing.FlexibleBottomMargin | UIViewAutoresizing.FlexibleTopMargin | UIViewAutoresizing.FlexibleRightMargin | UIViewAutoresizing.FlexibleLeftMargin
                     };
-                    _hudView.Layer.MasksToBounds = true;
+                    _hudVibrancyView.Layer.MasksToBounds = true;
                 }
 
                 if (_hudVibrancyView.Superview == null)
@@ -371,6 +372,10 @@ namespace SVProgressHUD
             : base(frame)
         {
             UserInteractionEnabled = false;
+            activityCount = 0;
+
+            HudView.ContentView.Alpha = 0f;
+            BackgroundView.Alpha = 0f;
         }
 
         #endregion
@@ -530,7 +535,9 @@ namespace SVProgressHUD
 
         #region Dismiss methods
 
-        void Dismiss(double delay = 0, Action completionHandler = null)
+        public void Dismiss() => Dismiss(0);
+
+        public void Dismiss(double delay, Action completionHandler = null)
         {
             var weakThis = new WeakReference<ProgressHUD>(this);
             NSOperationQueue.MainQueue.AddOperation(() =>
@@ -863,7 +870,7 @@ namespace SVProgressHUD
             UIWindow keyboardWindow = null;
             foreach (var testWindow in UIApplication.SharedApplication.Windows)
             {
-                if (keyboardWindow.Class == testWindow.Class)
+                if (testWindow.Class != new Class("UIWindow"))
                 {
                     keyboardWindow = testWindow;
                     break;
@@ -940,7 +947,7 @@ namespace SVProgressHUD
         }
 
         [Export("controlViewDidReceiveTouchEvent:forEvent:")]
-        void ControlViewDidReceiveTouchEvent(object sender, UIEvent e)
+        void ControlViewDidReceiveTouchEvent(NSObject sender, UIEvent e)
         {
             NSNotificationCenter.DefaultCenter.PostNotificationName(DidReceiveTouchEventNotification, this, GetNotificationUserInfo());
 

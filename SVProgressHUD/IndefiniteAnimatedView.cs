@@ -8,11 +8,13 @@
 using System;
 using CoreAnimation;
 using CoreGraphics;
+using Foundation;
 using UIKit;
 
 namespace SVProgressHUD
 {
 
+    [Register("IndefiniteAnimatedView")]
     class IndefiniteAnimatedView : UIView
     {
 
@@ -122,7 +124,7 @@ namespace SVProgressHUD
             if (indefiniteAnimatedLayer == null)
             {
                 var arcCenter = new CGPoint(Radius + StrokeThickness / 2 + 5, Radius + StrokeThickness / 2 + 5);
-                var smoothedPath = UIBezierPath.FromArc(arcCenter, Radius, (nfloat)(-Math.PI / 2d), (nfloat)(Math.PI * 1.5d), true);
+                var smoothedPath = UIBezierPath.FromArc(arcCenter, Radius, (nfloat)(-Math.PI * 3d / 2d), (nfloat)(Math.PI / 2d + Math.PI * 5), true);
 
                 indefiniteAnimatedLayer = new CAShapeLayer
                 {

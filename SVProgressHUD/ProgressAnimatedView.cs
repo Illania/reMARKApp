@@ -8,11 +8,13 @@
 using System;
 using CoreAnimation;
 using CoreGraphics;
+using Foundation;
 using UIKit;
 
 namespace SVProgressHUD
 {
 
+    [Register("ProgressAnimatedView")]
     class ProgressAnimatedView : UIView
     {
 

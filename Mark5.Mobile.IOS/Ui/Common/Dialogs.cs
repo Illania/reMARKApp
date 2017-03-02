@@ -13,6 +13,7 @@ using Mark5.Mobile.Common.Model.Exceptions;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.ServiceReference.Exceptions;
 using UIKit;
+using SVProgressHUD;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
@@ -22,10 +23,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public static void Initialize()
         {
-            SVProgressHUD.SetDefaultStyle(SVProgressHUDStyle.Light);
-            SVProgressHUD.SetDefaultMaskType(SVProgressHUDMaskType.Black);
-            SVProgressHUD.SetDefaultAnimationType(SVProgressHUDAnimationType.Flat);
-            SVProgressHUD.SetFont(Theme.DefaultFont);
+            ProgressHUD.DefaultStyle = Style.Light;
+            ProgressHUD.DefaultMaskType = MaskType.Black;
+            ProgressHUD.DefaultAnimationType = AnimationType.Flat;
+            ProgressHUD.Font = Theme.DefaultFont;
+            ProgressHUD.Initialize();
         }
 
         #region Awaitable dialogs
@@ -121,9 +123,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public static Action ShowInfiniteProgressDialog(string content)
         {
-            SVProgressHUD.ShowWithStatus(Localization.GetString(content));
-            return SVProgressHUD.Dismiss;
-            return () => { };
+            ProgressHUD.Instance.Show(Localization.GetString(content));
+            return ProgressHUD.Instance.Dismiss;
         }
 
         #endregion

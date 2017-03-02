@@ -8,10 +8,12 @@
 using System;
 using CoreAnimation;
 using CoreGraphics;
+using Foundation;
 
 namespace SVProgressHUD
 {
-    
+
+    [Register("RadialGradientLayer")]
     class RadialGradientLayer : CALayer
     {
 
