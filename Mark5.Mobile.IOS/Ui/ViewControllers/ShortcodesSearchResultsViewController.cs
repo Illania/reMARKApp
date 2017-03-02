@@ -20,7 +20,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    
+
     public class ShortcodesSearchResultsViewController : AbstractViewController, IPrimaryViewController, IUIGestureRecognizerDelegate
     {
 
@@ -223,21 +223,125 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var rows = shortcodesTableView.IndexPathsForSelectedRows.ToArray();
             var selectedShortcodes = rows.Select(ip => ((DataSource)shortcodesTableView.Source).Items[ip.Row]).ToList();
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, null)); // TODO
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
+            {
+                CopyToWorktray(selectedShortcodes);
+                EndEditing();
+            }));
+
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
             {
-                var vc = new CopyMoveToFolderListViewController(selectedShortcodes.Cast<IBusinessEntity>().ToList());
-                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+                CopyToFolder(selectedShortcodes);
+                EndEditing();
             }));
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
                 || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, null)); // TODO
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcodes)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
 
             if (eas.PopoverPresentationController != null)
                 eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+
+            exitEditItem.Enabled = false;
+            PresentViewController(eas, true, null);
+        }
+
+        void CopyToWorktray(ShortcodePreview shortcodePreview) => CopyToWorktray(new List<ShortcodePreview> { shortcodePreview });
+
+        void CopyToWorktray(List<ShortcodePreview> shortcodePreviews)
+        {
+            var vc = new CopyToWorktrayViewController { BusinessEntities = shortcodePreviews.Cast<IBusinessEntity>().ToList() };
+            NavigationController.PresentViewController(new NavigationController(vc), true, null);
+        }
+
+        void Delete(ShortcodePreview selectedShortcode) => Delete(new List<ShortcodePreview> { selectedShortcode });
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void Delete(List<ShortcodePreview> selectedShortcodes)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_shortcodes"));
+
+            if (!result)
+            {
+                EndEditing();
+                return;
+            }
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting___"));
+
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to delete shortcodes]");
+
+                await Managers.CommonActionsManager.Delete(selectedShortcodes.Cast<IBusinessEntity>().ToList());
+
+                RemoveShortcodesFromList(selectedShortcodes.Select(s => s.Id));
+                EndEditing();
+
+                dismissAction();
+            }
+            catch (Exception ex)
+            {
+                EndEditing();
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Error while deleting shortcodes", ex);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+
+        }
+
+        void CopyToFolder(ShortcodePreview shortcodePreview) => CopyToFolder(new List<ShortcodePreview> { shortcodePreview });
+
+        void CopyToFolder(List<ShortcodePreview> shortcodePreviews)
+        {
+            var vc = new CopyMoveToFolderListViewController(shortcodePreviews.Cast<IBusinessEntity>().ToList());
+            NavigationController.PresentViewController(new NavigationController(vc), true, null);
+        }
+
+        void RemoveShortcodesFromList(IEnumerable<int> ids)
+        {
+
+            var ds = (DataSource)shortcodesTableView.Source;
+            ds.RemoveItems(ids.ToList());
+            if (SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                var vc = (ShortcodeViewController)nc.ViewControllers[0];
+                if (ids.Select(id => vc.IsShowingShortcodeWithId(id)).Any(v => v))
+                {
+                    vc.ClearData();
+                }
+            }
+        }
+
+        void DoShowMoreActionSheet(NSIndexPath indexPath, ShortcodePreview selectedShortcode)
+        {
+            var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
+            {
+                CopyToWorktray(selectedShortcode);
+                EndEditing();
+            }));
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
+            {
+                CopyToFolder(selectedShortcode);
+                EndEditing();
+            }));
+
+            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
+                || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcode)));
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
+
+            if (eas.PopoverPresentationController != null)
+                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(shortcodesTableView, shortcodesTableView.CellAt(indexPath));
 
             exitEditItem.Enabled = false;
             PresentViewController(eas, true, null);
@@ -353,11 +457,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var shortcodePreview = shortcodePreviewsInView[indexPath.Row];
 
-                var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("more"), (a, ip) => { viewController.EndEditing(); }); // TODO
+                var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("more"), (a, ip) => { viewController.DoShowMoreActionSheet(indexPath, shortcodePreview); });
                 moreAction.BackgroundColor = Theme.Blue;
                 actions.Add(moreAction);
 
-                var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("copy_to_worktray"), (a, ip) => { viewController.EndEditing(); }); // TODO
+                var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("copy_to_worktray"), (a, ip) => { viewController.CopyToWorktray(shortcodePreview); viewController.EndEditing(); });
                 copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
                 actions.Add(copyToWorktrayAction);
 
@@ -377,6 +481,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loading = false;
 
                 shortcodePreviewsInView.AddRange(shortcodePreviews);
+                shortcodesTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+            }
+
+            public void RemoveItems(List<int> shortcodeIds)
+            {
+                shortcodePreviewsInView.RemoveAll(s => shortcodeIds.Contains(s.Id));
                 shortcodesTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
             }
 

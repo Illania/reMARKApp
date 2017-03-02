@@ -50,8 +50,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         AutoRefreshWorker autoRefreshWorker;
         Action newDocumentsAvailableAction;
 
-        CancellationTokenSource cts;
-
         bool refreshing;
 
         #region UIViewController overrides
@@ -1046,8 +1044,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public void RemoveItems(List<int> documentIds)
             {
-                documentPreviewsInView.RemoveAll(s => documentIds.Contains(s.Id));
-                documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+                var indices = documentPreviewsInView.Select((d, i) => new { d, i }).Where(x => documentIds.Contains(x.d.Id)).Select(x => x.i).ToList();
+                indices.OrderByDescending(i => i).ForEach(documentPreviewsInView.RemoveAt);
+
+                if (!documentPreviewsInView.Any())
+                {
+                    documentsTableView.ReloadData();
+                }
+                else
+                {
+                    //var indexPaths = indices.Select(i => NSIndexPath.FromRowSection(i, 0)).ToArray();
+                    //documentsTableView.DeleteRows(indexPaths, UITableViewRowAnimation.Automatic);
+                    documentsTableView.ReloadData(); //TODO I do not understand why this does not work (with the other metods) when we use the swype action to delete from folder, need to investigate
+                }
             }
 
             public DocumentPreview GetNextDocumentPreview(DocumentPreview documentPreview,
