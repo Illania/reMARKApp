@@ -28,7 +28,7 @@ namespace Mark5.Mobile.IOS.Utilities
             return string.Format("{0:n1} {1}", adjustedSize, SizeSuffixes[mag]);
         }
 
-        public static string PriorityString(Priority priority) //TODO need to put it everywhere it is needed
+        public static string PriorityString(Priority priority)
         {
             switch (priority)
             {

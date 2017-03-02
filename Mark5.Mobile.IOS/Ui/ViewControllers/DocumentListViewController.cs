@@ -250,7 +250,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var vc = (DocumentViewController)nc.ViewControllers[0];
 
-                if (vc.isShowingDocumentWithId(documentPreview.Id)) //TODO need to do the same for shortcodes and contacts
+                if (vc.isShowingDocumentWithId(documentPreview.Id))
                     return;
 
                 vc.HidesBottomBarWhenPushed = false;

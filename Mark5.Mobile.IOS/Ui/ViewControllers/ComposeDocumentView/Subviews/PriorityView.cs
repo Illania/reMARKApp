@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities;
 using ObjCRuntime;
 using UIKit;
 
@@ -49,11 +50,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             ContainerView.AddConstraints(new[]
                 {
                     NSLayoutConstraint.Create(label, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                    NSLayoutConstraint.Create(label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
+                    NSLayoutConstraint.Create(label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
                 });
 
             selectedPriorityLabel = new UILabel();
-            selectedPriorityLabel.Text = GetPriorityText(Priority.Normal);
+            selectedPriorityLabel.Text = UI.PriorityString(Priority.Normal);
             selectedPriorityLabel.Font = Theme.DefaultFont;
             selectedPriorityLabel.Opaque = false;
             selectedPriorityLabel.Lines = 1;
@@ -66,7 +67,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     NSLayoutConstraint.Create(selectedPriorityLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
                     NSLayoutConstraint.Create(selectedPriorityLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, label, NSLayoutAttribute.Right, 1f, InnerMargin),
                     NSLayoutConstraint.Create(selectedPriorityLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
-                    NSLayoutConstraint.Create(selectedPriorityLabel, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
+                    NSLayoutConstraint.Create(selectedPriorityLabel, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
                 });
         }
 
@@ -102,7 +103,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             HandleScrollToView(this, EventArgs.Empty);
             ActionSheetWillAppear(this, EventArgs.Empty);
 
-            var templateListStrings = new string[] { GetPriorityText(Priority.Urgent), GetPriorityText(Priority.Normal), GetPriorityText(Priority.Low) };
+            var templateListStrings = new string[] { UI.PriorityString(Priority.Urgent), UI.PriorityString(Priority.Normal), UI.PriorityString(Priority.Low) };
 
             var result = await Dialogs.ShowListDialogAsync(viewController, null, templateListStrings, selectedPriorityLabel);
             switch (result)
@@ -125,27 +126,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #region Helper methods
 
-        static string GetPriorityText(Priority priority)
-        {
-            switch (priority)
-            {
-                case Priority.Low:
-                    return Localization.GetString("low");
-                case Priority.Normal:
-                    return Localization.GetString("normal");
-                case Priority.Urgent:
-                    return Localization.GetString("urgent");
-                default:
-                    throw new ArgumentException(string.Format("Unknown priority. [priority={0}]", priority));
-            }
-        }
-
         void SelectPriority(Priority priority)
         {
             selectedPriorityLabel.TextColor = UIColor.DarkTextColor;
 
             selectedPriority = priority;
-            selectedPriorityLabel.Text = GetPriorityText(priority);
+            selectedPriorityLabel.Text = UI.PriorityString(priority);
 
             Edited(this, EventArgs.Empty);
         }

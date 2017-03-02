@@ -7,6 +7,7 @@
 //
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 {
@@ -22,7 +23,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         {
             if (DocumentPreview != null)
             {
-                TextView.Text = DocumentPreview.Priority.ToString(); //TODO we need to use localization strings
+                TextView.Text = UI.PriorityString(DocumentPreview.Priority);
             }
         }
 
