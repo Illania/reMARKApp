@@ -16,9 +16,11 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews;
+using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 using WebKit;
@@ -93,7 +95,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public event EventHandler<ReadStatusUpdatedEventArgs> ReadStatusUpdated;
 
-        CancellationTokenSource setReadStatusCancellationTokenSource;
+        CancellationTokenSource readStatusCts;
+        CancellationTokenSource loadCts;
 
         bool refreshDataOnAppear;
 
@@ -135,8 +138,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillDisappear(animated);
 
-            setReadStatusCancellationTokenSource?.Cancel();
-            setReadStatusCancellationTokenSource = null;
+            readStatusCts?.Cancel();
+            readStatusCts = null;
 
             if ((IsMovingFromParentViewController || IsBeingDismissed) && outgoingDocumentIdentifier != default(Guid))
             {
@@ -462,6 +465,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void ClearData()
         {
+            loadCts?.Cancel();
+
             document = null;
             documentPreview = null;
             folder = null;
@@ -488,9 +493,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             comments.Enabled = false;
             commentsButton.Enabled = false;
             userActions.Enabled = false;
+
+            RefreshView();
         }
 
-        public bool IsShowingDocumentPreviewWithId(int documentId)
+        public bool isShowingDocumentWithId(int documentId)
         {
             return documentPreview?.Id == documentId || this.documentId == documentId;
         }
@@ -513,6 +520,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public async void RefreshData()
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
+            loadCts?.Cancel();
+            loadCts = new CancellationTokenSource();
+            var token = loadCts.Token;
+
             try
             {
                 if (notificationGuid != default(Guid))
@@ -541,6 +552,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
                 }
 
+                if (token.IsCancellationRequested) return;
+
                 RefreshView();
                 MarkAsReadIfNecessary();
             }
@@ -568,15 +581,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
             }
 
-            setReadStatusCancellationTokenSource?.Cancel();
-            setReadStatusCancellationTokenSource = new CancellationTokenSource();
+            readStatusCts?.Cancel();
+            readStatusCts = new CancellationTokenSource();
 
             Task.Run(async () =>
             {
                 var f = folder;
                 var d = document;
                 var dp = documentPreview;
-                var token = setReadStatusCancellationTokenSource.Token;
+                var token = readStatusCts.Token;
 
                 try
                 {
@@ -613,12 +626,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void RefreshView()
         {
-            if (document == null || documentPreview == null)
-            {
-                return;
-            }
-
-            Title = documentPreview.Subject;
+            Title = documentPreview?.Subject;
 
             subViews.ForEach(v =>
             {
@@ -634,13 +642,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var isLocalDocument = outgoingDocumentIdentifier != default(Guid);
 
-            flag.Enabled = !isLocalDocument;
-            fileTo.Enabled = !isLocalDocument;
-            replyActions.Enabled = !isLocalDocument;
-            comments.BadgeValue = document.Comments.Count.ToString();
-            comments.Enabled = !isLocalDocument;
-            commentsButton.Enabled = !isLocalDocument;
-            userActions.Enabled = !isLocalDocument;
+            flag.Enabled = !isLocalDocument && document != null;
+            fileTo.Enabled = !isLocalDocument && document != null;
+            replyActions.Enabled = !isLocalDocument && document != null;
+            comments.BadgeValue = document?.Comments.Count.ToString();
+            comments.Enabled = !isLocalDocument && document != null;
+            commentsButton.Enabled = !isLocalDocument && document != null;
+            userActions.Enabled = !isLocalDocument && document != null;
 
             UIView.Animate(0.075d, stackViewBeforeContent.LayoutIfNeeded);
             UIView.Animate(0.1d, () => stackViewBeforeContent.Alpha = 1f);
@@ -877,33 +885,91 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        async void FileTo_Clicked(object sender, EventArgs e)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void ShowPriorityActionSheet(UIBarButtonItem barButtonItem)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            var fileToListStrings = new string[] { Localization.GetString("copy_to_worktray"),
-                Localization.GetString("copy_to_folder"),
-                Localization.GetString("move_to_folder"),
-                Localization.GetString("delete_from_folder")};
-
-            var result = await Dialogs.ShowListDialogAsync(this, null, fileToListStrings, fileTo);
+            var priorities = new List<Priority> { Priority.Low, Priority.Normal, Priority.Urgent };
+            var priorityStrings = priorities.Select(p => UI.PriorityString(p));
+            var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("select_priority"), priorityStrings.ToArray(), barButtonItem);
 
             if (result < 0)
                 return;
 
-            switch (result)
+            var priority = priorities[result];
+
+            await SetPriority(priority);
+        }
+
+        async Task SetPriority(Priority priority)
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("setting_priority___"));
+
+            try
             {
-                case 0:
-                    DoFileToWorktray();
-                    break;
-                case 1:
-                    DoFileToFolder(false);
-                    break;
-                case 2:
-                    DoFileToFolder(true);
-                    break;
-                case 3:
-                    DoDeleteFromFolder();
-                    break;
+                CommonConfig.Logger.Info($"Attempting to setting priority for document [documentId{document.Id}]");
+                await Managers.DocumentsManager.SetDocumentsPriorityAsync(new List<DocumentPreview> { documentPreview }, priority);
+
+                UpdatePriority();
+
+                dismissAction();
             }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Error while setting priority for document [documentId{document.Id}", ex);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+        }
+
+        public void UpdatePriority()
+        {
+            priorityView.RefreshView();
+            priorityView.UpdateVisibility();
+        }
+
+        void FileTo_Clicked(object sender, EventArgs e)
+        {
+            var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
+            {
+                var vc = new CopyToWorktrayViewController { BusinessEntities = new List<IBusinessEntity> { document } };
+                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
+            {
+                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { document });
+                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            }));
+
+            if (folder?.InternalType == FolderInternalType.FilterView
+                || folder?.InternalType == FolderInternalType.Static
+                || folder?.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
+            {
+                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { document }, folder);
+                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            }));
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet((UIBarButtonItem)sender)));
+
+            if (folder?.InternalType == FolderInternalType.FilterView
+                || folder?.InternalType == FolderInternalType.Static
+                || folder?.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, RemoveFromFolder));
+
+            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
+                || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, Delete));
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+
+            if (eas.PopoverPresentationController != null)
+                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+
+            PresentViewController(eas, true, null);
         }
 
         #endregion
@@ -1051,11 +1117,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(navigationController, true, null);
         }
 
-        void DoFileToFolder(bool move)
-        {
-            //TODO wire
-        }
-
         void CommentsButton_TouchUpInside(object sender, EventArgs e)
         {
             var commentsListViewController = new CommentsListViewController();
@@ -1064,16 +1125,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             commentsListViewController.Entity = document;
 
             PresentViewController(commentsListViewNavigationController, true, null);
-        }
-
-        void DoFileToWorktray()
-        {
-            //TODO wire
-        }
-
-        void DoDeleteFromFolder()
-        {
-            //TODO wire
         }
 
         void DoReply(DocumentCreationModeFlag creationModeFlag)
@@ -1092,6 +1143,91 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
             PresentViewController(composeDocumentNavigationController, true, null);
         }
+
+        void CopyToWorktray()
+        {
+            var vc = new CopyToWorktrayViewController { BusinessEntities = new List<IBusinessEntity> { document } };
+            NavigationController.PresentViewController(new NavigationController(vc), true, null);
+        }
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void RemoveFromFolder(UIAlertAction a)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_document"));
+
+            if (!result)
+                return;
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting_from_folder___"));
+
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to remove documnet from folder [documentId={document.Id}, folderId={folder.Id}]");
+
+                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { document }, folder);
+
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Document, folder.Id, new List<int> { document.Id }));
+
+                dismissAction();
+
+                if (SplitViewController != null && !SplitViewController.Collapsed)
+                {
+                    ClearData();
+                }
+                else
+                {
+                    NavigationController.PopViewController(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Error while removing document from folder [documentId={document.Id}, folderId={folder.Id}]", ex);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+        }
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void Delete(UIAlertAction a)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_document"));
+
+            if (!result)
+                return;
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting___"));
+
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to delete document [documentId={document.Id}]");
+
+                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { document });
+
+                PlatformConfig.MessengerHub.Publish(new EntityDeletedMessage(this, ObjectType.Document, new List<int> { document.Id }));
+
+                dismissAction();
+
+                if (SplitViewController != null && !SplitViewController.Collapsed)
+                {
+                    ClearData();
+                }
+                else
+                {
+                    NavigationController.PopViewController(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Error while deleting document [documentId={document.Id}]", ex);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+        }
+
 
         #endregion
 

@@ -50,6 +50,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         AutoRefreshWorker autoRefreshWorker;
         Action newDocumentsAvailableAction;
 
+        CancellationTokenSource cts;
+
         bool refreshing;
 
         #region UIViewController overrides
@@ -194,6 +196,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             PlatformConfig.MessengerHub.Subscribe<DocumentPreviewCommentsCountChangedMessage>(CommentsCountChangedHandler);
             PlatformConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(CategoriesChangedHandler, m => m.ObjectType == ObjectType.Document);
+
+            PlatformConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Document);
+            PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Document);
+            PlatformConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Document);
         }
 
         void InitializeHandlers()
@@ -246,7 +252,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var vc = (DocumentViewController)nc.ViewControllers[0];
 
-                if (vc.IsShowingDocumentPreviewWithId(documentPreview.Id)) //TODO need to do the same for shortcodes and contacts
+                if (vc.isShowingDocumentWithId(documentPreview.Id)) //TODO need to do the same for shortcodes and contacts
                     return;
 
                 vc.HidesBottomBarWhenPushed = false;
@@ -418,6 +424,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 EndEditing();
 
+                UpdatePriorityForDocument(selectedDocuments.Select(d => d.Id));
+
                 dismissAction();
             }
             catch (Exception ex)
@@ -570,28 +578,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void DoShowMoreActionSheet(NSIndexPath indexPath, DocumentPreview selectedDocuments)
+        void DoShowMoreActionSheet(NSIndexPath indexPath, DocumentPreview selectedDocument)
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a => { CopyToFolder(selectedDocuments); EndEditing(); }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a => { CopyToFolder(selectedDocument); EndEditing(); }));
 
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static
                 || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a => { MoveToFolder(selectedDocuments); EndEditing(); }));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a => { MoveToFolder(selectedDocument); EndEditing(); }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocuments, documentsTableView, documentsTableView.CellAt(indexPath))));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocument, documentsTableView, documentsTableView.CellAt(indexPath))));
 
             if (Folder.InternalType == FolderInternalType.FilterView
                 || Folder.InternalType == FolderInternalType.Static
                 || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedDocuments)));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedDocument)));
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
                 || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed
-                || selectedDocuments.Direction == DocumentDirection.Draft)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocuments)));
+                || selectedDocument.Direction == DocumentDirection.Draft)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocument)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
@@ -619,10 +627,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 var vc = (DocumentViewController)nc.ViewControllers[0];
-                //if (ids.Select(id => vc.IsShowingShortcodeWithId(id)).Any(v => v)) //TODO need to do this later
-                //{
-                //    vc.ClearData();
-                //}
+                if (ids.Select(id => vc.isShowingDocumentWithId(id)).Any(v => v))
+                {
+                    vc.ClearData();
+                }
+            }
+        }
+
+        void UpdatePriorityForDocument(IEnumerable<int> ids)
+        {
+            if (SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                var vc = (DocumentViewController)nc.ViewControllers[0];
+                if (ids.Select(id => vc.isShowingDocumentWithId(id)).Any(v => v))
+                {
+                    vc.UpdatePriority();
+                }
             }
         }
 
@@ -853,6 +874,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             return false;
         }
+
+        #endregion
+
+        #region Messages handlers
+
+        void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m) => RemoveDocumentsFromList(m.EntitiesId);
+
+        void HandleMovedFromFolder(EntityMovedFromFolderMessage m) => RemoveDocumentsFromList(m.EntitiesId);
+
+        void HandleDeleted(EntityDeletedMessage m) => RemoveDocumentsFromList(m.EntitiesId);
 
         #endregion
 
