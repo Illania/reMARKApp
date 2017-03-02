@@ -581,7 +581,7 @@ namespace SVProgressHUD
                         strongThis.HudView.RemoveFromSuperview();
                         strongThis.RemoveFromSuperview();
 
-                        strongThis.progress = 0f;
+                        strongThis.progress = UndefinedProgress;
                         strongThis.CancelRingLayerAnimation();
                         strongThis.CancelIndefiniteAnimatedViewAnimation();
 
@@ -711,7 +711,7 @@ namespace SVProgressHUD
 
             StatusLabel.Frame = labelRect;
             StatusLabel.Center = new CGPoint(HudView.Bounds.GetMidX(), centerY);
-            StatusLabel.Hidden = !string.IsNullOrWhiteSpace(StatusLabel.Text);
+            StatusLabel.Hidden = string.IsNullOrWhiteSpace(StatusLabel.Text);
 
             CATransaction.Commit();
         }
