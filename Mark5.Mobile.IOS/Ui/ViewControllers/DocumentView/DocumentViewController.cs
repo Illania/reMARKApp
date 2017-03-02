@@ -442,6 +442,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             SetData(folder, documentPreview);
         }
 
+        public void SetData(DocumentPreview documentPreview,
+                    GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
+        {
+            this.getNextDocumentPreview = getNextDocumentPreview;
+            this.getPreviousDocumentPreview = getPreviousDocumentPreview;
+
+            SetData(null, documentPreview);
+        }
+
         public void SetData(Folder folder, DocumentPreview documentPreview)
         {
             document = null;

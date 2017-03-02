@@ -370,7 +370,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 || selectedDocuments.All(dp => dp.Direction == DocumentDirection.Draft))
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocuments)));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
 
             if (eas.PopoverPresentationController != null)
                 eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
@@ -526,11 +526,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationController.PresentViewController(new NavigationController(vc), true, null);
         }
 
-        void CopyToWorktray(DocumentPreview documentPreview) => CopyToWorktray(new List<DocumentPreview> { documentPreview });
+        void CopyToWorktray(DocumentPreview selectedDocument) => CopyToWorktray(new List<DocumentPreview> { selectedDocument });
 
-        void CopyToWorktray(List<DocumentPreview> documentPreviews)
+        void CopyToWorktray(List<DocumentPreview> selectedDocuments)
         {
-            var vc = new CopyToWorktrayViewController { BusinessEntities = documentPreviews.Cast<IBusinessEntity>().ToList() };
+            var vc = new CopyToWorktrayViewController { BusinessEntities = selectedDocuments.Cast<IBusinessEntity>().ToList() };
             NavigationController.PresentViewController(new NavigationController(vc), true, null);
         }
 

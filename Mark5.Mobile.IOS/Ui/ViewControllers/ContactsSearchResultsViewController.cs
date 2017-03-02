@@ -163,6 +163,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 nc.PopToRootViewController(false);
 
                 var vc = (ContactViewController)nc.ViewControllers[0];
+
+                if (vc.IsShowingContactWithId(contactPreview.Id))
+                    return;
+
                 vc.ClearData();
                 vc.SetData(contactPreview);
                 vc.RefreshData();

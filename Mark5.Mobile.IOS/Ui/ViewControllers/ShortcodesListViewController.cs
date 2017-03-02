@@ -226,6 +226,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 nc.PopToRootViewController(false);
 
                 var vc = (ShortcodeViewController)nc.ViewControllers[0];
+
+                if (vc.IsShowingShortcodeWithId(shortcodePreview.Id))
+                    return;
+
                 vc.ClearData();
                 vc.SetData(Folder, shortcodePreview);
                 vc.RefreshData();
