@@ -35,8 +35,8 @@ namespace SVProgressHUD
         const float ParallaxDepthPoints = 10f;
         const float UndefinedProgress = -1;
         const float DefaultAnimationDuration = 0.15f;
-        const float VerticalSpacing = 12f;
-        const float HorizontalSpacing = 12f;
+        const float VerticalSpacing = 14f;
+        const float HorizontalSpacing = 14f;
         const float LabelSpacing = 8f;
 
         #endregion

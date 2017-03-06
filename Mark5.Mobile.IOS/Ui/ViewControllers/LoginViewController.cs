@@ -331,6 +331,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             loginButton.TitleLabel.Font = Theme.DefaultBoldFont;
             loginButton.TranslatesAutoresizingMaskIntoConstraints = false;
             loginButton.Enabled = false;
+            loginButton.Alpha = 0.7f;
             View.AddSubview(loginButton);
             loginButtonTopConstraint = NSLayoutConstraint.Create(loginButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, portTextField, NSLayoutAttribute.Bottom, 1f, LoginButtonToTextFieldInitialDistance);
             View.AddConstraints(new[]
@@ -690,6 +691,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             result &= Validator.IsPortValid(portTextField.Text);
 
             loginButton.Enabled = result;
+            loginButton.Alpha = result ? 1f : 0.7f;
         }
 
         #endregion
