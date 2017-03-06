@@ -48,6 +48,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeNavigationBarTitle();
             InitializeHandlers();
+
+            if (tableView?.IndexPathForSelectedRow != null)
+                tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
+
+            if (tableView?.IndexPathsForSelectedRows?.Length > 0)
+                foreach (var selectedIndexPath in tableView?.IndexPathsForSelectedRows)
+                    tableView.DeselectRow(selectedIndexPath, true);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void

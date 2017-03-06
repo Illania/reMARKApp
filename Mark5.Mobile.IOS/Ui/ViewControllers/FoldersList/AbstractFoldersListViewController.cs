@@ -39,7 +39,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected UIBarButtonItem ComposeDocumentItem;
 
         protected UIRefreshControl RefreshControl;
-        protected UITableView FoldersTableView;
+        protected UITableView TableView;
         protected UISearchController SearchController;
         protected UITableViewController SearchResultsController;
         protected SearchDataSource SearchResultsDataSource;
@@ -85,6 +85,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             InitializeNavigationBarTitle();
             InitializeHandlers();
+
+            if (TableView?.IndexPathForSelectedRow != null)
+                TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
+
+            if (TableView?.IndexPathsForSelectedRows?.Length > 0)
+                foreach (var selectedIndexPath in TableView?.IndexPathsForSelectedRows)
+                    TableView.DeselectRow(selectedIndexPath, true);
         }
 
         public override void ViewDidAppear(bool animated)
@@ -108,10 +115,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             CommonConfig.Logger.Warning($"{nameof(AbstractFoldersListViewController)} received memory warning!");
 
-            var ds = FoldersTableView?.Source as DataSource;
+            var ds = TableView?.Source as DataSource;
             ds?.Reset();
 
-            var gds = FoldersTableView?.Source as GrouppedDataSource;
+            var gds = TableView?.Source as GrouppedDataSource;
             gds?.Reset();
 
             base.DidReceiveMemoryWarning();
@@ -192,27 +199,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             AutomaticallyAdjustsScrollViewInsets = true;
 
-            FoldersTableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
-            FoldersTableView.ClipsToBounds = false;
+            TableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
+            TableView.ClipsToBounds = false;
             if (IsRootOfFoldersList)
-                FoldersTableView.Source = new GrouppedDataSource(this, FoldersTableView, ParentFolder.Module, DisableRowActions);
+                TableView.Source = new GrouppedDataSource(this, TableView, ParentFolder.Module, DisableRowActions);
             else
-                FoldersTableView.Source = new DataSource(this, FoldersTableView, ParentFolder.Module, DisableRowActions);
-            FoldersTableView.AllowsSelectionDuringEditing = false;
-            FoldersTableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            View.AddSubview(FoldersTableView);
+                TableView.Source = new DataSource(this, TableView, ParentFolder.Module, DisableRowActions);
+            TableView.AllowsSelectionDuringEditing = false;
+            TableView.TranslatesAutoresizingMaskIntoConstraints = false;
+            View.AddSubview(TableView);
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(FoldersTableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(FoldersTableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(FoldersTableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(FoldersTableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+                    NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
                 });
 
             RefreshControl = new UIRefreshControl();
             RefreshControl.BackgroundColor = UIColor.White;
             RefreshControl.AttributedTitle = Localization.GetNSAttributedString("pull_to_refresh");
-            FoldersTableView.AddSubview(RefreshControl);
+            TableView.AddSubview(RefreshControl);
         }
 
         protected virtual void InitializeSearchBar()
@@ -232,7 +239,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             };
             SearchController.SearchBar.Placeholder = Localization.GetString("filter");
 
-            FoldersTableView.TableHeaderView = SearchController.SearchBar;
+            TableView.TableHeaderView = SearchController.SearchBar;
         }
 
         protected virtual void InitializeHandlers()
@@ -280,14 +287,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             EditModeItem.Clicked -= EditModeItem_Clicked;
 
-            if (FoldersTableView.Editing)
+            if (TableView.Editing)
             {
                 EditModeItem.Title = Localization.GetString("edit");
-                FoldersTableView.SetEditing(false, true);
+                TableView.SetEditing(false, true);
 
                 try
                 {
-                    var gds = (GrouppedDataSource)FoldersTableView.Source;
+                    var gds = (GrouppedDataSource)TableView.Source;
                     await Managers.FoldersManager.SetFavoriteFoldersAsync(ParentFolder.Module, gds.GetFavoriteFolders());
                 }
                 catch (Exception ex)
@@ -303,7 +310,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             else
             {
                 EditModeItem.Title = Localization.GetString("done");
-                FoldersTableView.SetEditing(true, true);
+                TableView.SetEditing(true, true);
 
                 SearchController.SearchBar.UserInteractionEnabled = false;
                 SearchController.SearchBar.Alpha = .5f;
@@ -330,7 +337,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 if (IsRootOfFoldersList)
                 {
-                    var gds = (GrouppedDataSource)FoldersTableView.Source;
+                    var gds = (GrouppedDataSource)TableView.Source;
 
                     var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(ParentFolder.Module);
 
@@ -369,7 +376,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 }
                 else
                 {
-                    var ds = (DataSource)FoldersTableView.Source;
+                    var ds = (DataSource)TableView.Source;
 
                     List<Folder> folders;
                     if (!forceRefresh && ParentFolder.HasSubFolders && ParentFolder.SubFolders != null && ParentFolder.SubFolders.Count > 0)
@@ -447,7 +454,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
 
-                var gds = FoldersTableView.Source as GrouppedDataSource;
+                var gds = TableView.Source as GrouppedDataSource;
                 if (gds != null)
                 {
                     gds.FavoriteStatus[folder.Id] = true;
@@ -456,16 +463,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
 
                     var indexPaths = gds.GetIndexPaths(folder.Id);
-                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                    TableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
                 }
 
-                var ds = FoldersTableView.Source as DataSource;
+                var ds = TableView.Source as DataSource;
                 if (ds != null)
                 {
                     ds.FavoriteStatus[folder.Id] = true;
 
                     var indexPaths = ds.GetIndexPaths(folder.Id);
-                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                    TableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
                 }
             }
             catch (Exception ex)
@@ -484,7 +491,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
 
-                var gds = FoldersTableView.Source as GrouppedDataSource;
+                var gds = TableView.Source as GrouppedDataSource;
                 if (gds != null)
                 {
                     gds.FavoriteStatus[folder.Id] = false;
@@ -493,16 +500,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
 
                     var indexPaths = gds.GetIndexPaths(folder.Id);
-                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                    TableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
                 }
 
-                var ds = FoldersTableView.Source as DataSource;
+                var ds = TableView.Source as DataSource;
                 if (ds != null)
                 {
                     ds.FavoriteStatus[folder.Id] = false;
 
                     var indexPaths = ds.GetIndexPaths(folder.Id);
-                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                    TableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
                 }
             }
             catch (Exception ex)
@@ -521,22 +528,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, folder.Module, new List<Folder> { folder }, true);
 
-                var gds = FoldersTableView.Source as GrouppedDataSource;
+                var gds = TableView.Source as GrouppedDataSource;
                 if (gds != null)
                 {
                     var folders = gds.GetFolders(folder.Id);
                     folders.ForEach(f => f.Subscribed = true);
                     var indexPaths = gds.GetIndexPaths(folder.Id);
-                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                    TableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
                 }
 
-                var ds = FoldersTableView.Source as DataSource;
+                var ds = TableView.Source as DataSource;
                 if (ds != null)
                 {
                     var folders = ds.GetFolders(folder.Id);
                     folders.ForEach(f => f.Subscribed = true);
                     var indexPaths = ds.GetIndexPaths(folder.Id);
-                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                    TableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
                 }
             }
             catch (Exception ex)
@@ -555,22 +562,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, folder.Module, new List<Folder> { folder }, false);
 
-                var gds = FoldersTableView.Source as GrouppedDataSource;
+                var gds = TableView.Source as GrouppedDataSource;
                 if (gds != null)
                 {
                     var folders = gds.GetFolders(folder.Id);
                     folders.ForEach(f => f.Subscribed = false);
                     var indexPaths = gds.GetIndexPaths(folder.Id);
-                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                    TableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
                 }
 
-                var ds = FoldersTableView.Source as DataSource;
+                var ds = TableView.Source as DataSource;
                 if (ds != null)
                 {
                     var folders = ds.GetFolders(folder.Id);
                     folders.ForEach(f => f.Subscribed = false);
                     var indexPaths = ds.GetIndexPaths(folder.Id);
-                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                    TableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
                 }
             }
             catch (Exception ex)
@@ -589,22 +596,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 await Managers.FoldersManager.AddOfflineFolderAsync(folder.Module, folder);
 
-                var gds = FoldersTableView.Source as GrouppedDataSource;
+                var gds = TableView.Source as GrouppedDataSource;
                 if (gds != null)
                 {
                     gds.CachingStatus[folder.Id] = true;
 
                     var indexPaths = gds.GetIndexPaths(folder.Id);
-                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                    TableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
                 }
 
-                var ds = FoldersTableView.Source as DataSource;
+                var ds = TableView.Source as DataSource;
                 if (ds != null)
                 {
                     ds.CachingStatus[folder.Id] = true;
 
                     var indexPaths = ds.GetIndexPaths(folder.Id);
-                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                    TableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
                 }
             }
             catch (Exception ex)
@@ -623,22 +630,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 await Managers.FoldersManager.RemoveOfflineFolderAsync(folder.Module, folder);
 
-                var gds = FoldersTableView.Source as GrouppedDataSource;
+                var gds = TableView.Source as GrouppedDataSource;
                 if (gds != null)
                 {
                     gds.CachingStatus[folder.Id] = false;
 
                     var indexPaths = gds.GetIndexPaths(folder.Id);
-                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                    TableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
                 }
 
-                var ds = FoldersTableView.Source as DataSource;
+                var ds = TableView.Source as DataSource;
                 if (ds != null)
                 {
                     ds.CachingStatus[folder.Id] = false;
 
                     var indexPaths = ds.GetIndexPaths(folder.Id);
-                    FoldersTableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+                    TableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
                 }
             }
             catch (Exception ex)

@@ -20,7 +20,7 @@
 "cannot_open_attachment_title" = "Cannot open attachment";
 "categories" = "Categories";
 "cc" = "Cc";
-"chrome" = "Google Chrome";
+"chrome" = "Open in Google Chrome";
 "clear_contacts_cache_summary" = "Do you want to remove cached contacts?";
 "clear_contacts_cache_title" = "Clear contacts cache";
 "clear_shortcodes_cache_summary" = "Do you want to remove cached shortcodes?";
@@ -164,13 +164,14 @@
 "reply_all" = "Reply all";
 "report" = "Report";
 "responsible_users" = "Responsible users";
-"safari" = "Safari";
+"safari" = "Open in Safari";
 "save_draft" = "Save draft";
 "save_modifications" = "Save modifications";
 "saving_draft___" = "Saving draft...";
 "search" = "Search";
 "search_results" = "Search results";
 "send" = "Send";
+"send_text" = "Send text message";
 "sending_document" = "Sending document...";
 "set_priority" = "Set priority";
 "settings" = "Settings";
@@ -188,7 +189,6 @@
 "template_selection_default" = "Default template";
 "template_selection_local" = "Local template";
 "template_selection_title" = "Do you want to use a template in this message?";
-"text" = "Text";
 "to" = "To";
 "today" = "Today";
 "unable_open_link_content" = "There are no applications that can open link type ";

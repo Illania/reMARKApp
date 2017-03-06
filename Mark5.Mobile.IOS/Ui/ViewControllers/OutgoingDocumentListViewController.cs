@@ -33,7 +33,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem editItem;
 
         UIRefreshControl refreshControl;
-        UITableView documentsTableView;
+        UITableView tableView;
 
         bool refreshing;
 
@@ -53,6 +53,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeNavigationBarTitle();
             InitializeHandlers();
+
+            if (tableView?.IndexPathForSelectedRow != null)
+                tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
+
+            if (tableView?.IndexPathsForSelectedRows?.Length > 0)
+                foreach (var selectedIndexPath in tableView?.IndexPathsForSelectedRows)
+                    tableView.DeselectRow(selectedIndexPath, true);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -79,7 +86,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             CommonConfig.Logger.Warning($"{nameof(DocumentsListViewController)} received memory warning!");
 
-            var ds = documentsTableView?.DataSource as DataSource;
+            var ds = tableView?.DataSource as DataSource;
             ds?.Reset();
 
             base.DidReceiveMemoryWarning();
@@ -103,25 +110,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             AutomaticallyAdjustsScrollViewInsets = true;
 
-            documentsTableView = new UITableView();
-            documentsTableView.ClipsToBounds = false;
+            tableView = new UITableView();
+            tableView.ClipsToBounds = false;
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-            documentsTableView.Source = new DataSource(this, documentsTableView, Localization.GetString("folder_empty"));
+            tableView.Source = new DataSource(this, tableView, Localization.GetString("folder_empty"));
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
 
-            documentsTableView.RowHeight = UITableView.AutomaticDimension;
-            documentsTableView.EstimatedRowHeight = 75f;
-            documentsTableView.AllowsSelectionDuringEditing = false;
-            documentsTableView.AllowsMultipleSelectionDuringEditing = true;
-            documentsTableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            View.AddSubview(documentsTableView);
+            tableView.RowHeight = UITableView.AutomaticDimension;
+            tableView.EstimatedRowHeight = 75f;
+            tableView.AllowsSelectionDuringEditing = false;
+            tableView.AllowsMultipleSelectionDuringEditing = true;
+            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
+            View.AddSubview(tableView);
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(documentsTableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(documentsTableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(documentsTableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(documentsTableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
                 });
 
             var longPressRecognizer = new UILongPressGestureRecognizer(this, new Selector("longPressed:"))
@@ -129,12 +136,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 MinimumPressDuration = 1f,
                 Delegate = this
             };
-            documentsTableView.AddGestureRecognizer(longPressRecognizer);
+            tableView.AddGestureRecognizer(longPressRecognizer);
 
             refreshControl = new UIRefreshControl();
             refreshControl.BackgroundColor = UIColor.White;
             refreshControl.AttributedTitle = Localization.GetNSAttributedString("pull_to_refresh");
-            documentsTableView.AddSubview(refreshControl);
+            tableView.AddSubview(refreshControl);
         }
 
         void InitializeNavigationBarTitle()
@@ -188,14 +195,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public async void DocumentSelected(OutgoingDocumentContainer container)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            if (documentsTableView.Editing || container.Info.State == OutgoingDocumentState.Sending)
+            if (tableView.Editing || container.Info.State == OutgoingDocumentState.Sending)
             {
                 return;
             }
 
             if (SplitViewController == null || SplitViewController.Collapsed)
             {
-                var ds = (DataSource)documentsTableView.Source;
+                var ds = (DataSource)tableView.Source;
 
                 var documentViewController = new DocumentViewController();
                 documentViewController.OutgoingDocumentIdentifier = container.Info.Identifier;
@@ -206,7 +213,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             else
             {
-                var ds = (DataSource)documentsTableView.Source;
+                var ds = (DataSource)tableView.Source;
 
                 var documentNavigationController = ((UINavigationController)SplitViewController.ViewControllers[1]);
                 documentNavigationController.PopToViewController(documentNavigationController.ViewControllers[0], false);
@@ -233,19 +240,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         [Export("longPressed:")]
         public void LongPressed(UILongPressGestureRecognizer recognizer)
         {
-            if (documentsTableView.Editing) return;
+            if (tableView.Editing) return;
 
             StartEditing();
 
-            var point = recognizer.LocationInView(documentsTableView);
-            var indexPath = documentsTableView.IndexPathForRowAtPoint(point);
+            var point = recognizer.LocationInView(tableView);
+            var indexPath = tableView.IndexPathForRowAtPoint(point);
 
-            documentsTableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
+            tableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
         }
 
         void StartEditing()
         {
-            documentsTableView.SetEditing(true, true);
+            tableView.SetEditing(true, true);
             NavigationItem.SetRightBarButtonItem(exitEditItem, true);
             NavigationItem.SetLeftBarButtonItem(editItem, true);
         }
@@ -267,17 +274,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void EndEditing()
         {
-            documentsTableView.SetEditing(false, true);
+            tableView.SetEditing(false, true);
             NavigationItem.SetRightBarButtonItem(composeDocumentItem, true);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
         }
 
         async void EditItem_Clicked(object sender, EventArgs e)
         {
-            if (documentsTableView.IndexPathsForSelectedRows == null || documentsTableView.IndexPathsForSelectedRows.Length < 1) return;
+            if (tableView.IndexPathsForSelectedRows == null || tableView.IndexPathsForSelectedRows.Length < 1) return;
 
-            var rows = documentsTableView.IndexPathsForSelectedRows.ToArray();
-            var selectedDocuments = rows.Select(ip => ((DataSource)documentsTableView.Source).Items[ip.Row]).ToList();
+            var rows = tableView.IndexPathsForSelectedRows.ToArray();
+            var selectedDocuments = rows.Select(ip => ((DataSource)tableView.Source).Items[ip.Row]).ToList();
 
             var result = await Dialogs.ShowListDialogAsync(this, null, new string[] { Localization.GetString("delete") }, editItem);
 
@@ -316,7 +323,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                var ds = (DataSource)documentsTableView.Source;
+                var ds = (DataSource)tableView.Source;
 
                 if (forceClear)
                     ds.Reset();
@@ -346,7 +353,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             BeginInvokeOnMainThread(() =>
            {
-               var ds = (DataSource)documentsTableView.Source;
+               var ds = (DataSource)tableView.Source;
                var row = ds.GetPosition(outgoingDocumentContainer.Info.Identifier);
                if (row >= 0)
                {
@@ -361,7 +368,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             BeginInvokeOnMainThread(() =>
             {
-                var ds = (DataSource)documentsTableView.Source;
+                var ds = (DataSource)tableView.Source;
                 var row = ds.GetPosition(outgoingDocumentContainer.Info.Identifier);
                 if (row >= 0)
                 {
@@ -376,7 +383,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             BeginInvokeOnMainThread(() =>
             {
-                var ds = (DataSource)documentsTableView.Source;
+                var ds = (DataSource)tableView.Source;
                 var row = ds.GetPosition(outgoingDocumentContainer.Info.Identifier);
                 if (row >= 0)
                 {

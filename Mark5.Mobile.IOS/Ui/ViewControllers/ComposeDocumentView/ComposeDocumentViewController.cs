@@ -22,7 +22,7 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 {
     
-    public class ComposeDocumentViewController : UIViewController
+    public class ComposeDocumentViewController : AbstractViewController
     {
         
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
