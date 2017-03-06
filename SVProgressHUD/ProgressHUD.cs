@@ -219,7 +219,7 @@ namespace SVProgressHUD
                 {
                     _hudView = new UIVisualEffectView
                     {
-                        AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
+                        AutoresizingMask = UIViewAutoresizing.FlexibleBottomMargin | UIViewAutoresizing.FlexibleTopMargin | UIViewAutoresizing.FlexibleRightMargin | UIViewAutoresizing.FlexibleLeftMargin
                     };
                     _hudView.Layer.MasksToBounds = true;
                 }
@@ -742,7 +742,7 @@ namespace SVProgressHUD
                     var keyboardFrame = ((NSValue)keyboardInfo[UIKeyboard.FrameBeginUserInfoKey]).CGRectValue;
                     animationDuration = ((NSNumber)keyboardInfo[UIKeyboard.AnimationDurationUserInfoKey]).DoubleValue;
 
-                    keyboardHeight = (float)(orientation.IsPortrait() ? keyboardFrame.Height : keyboardFrame.Width);
+                    keyboardHeight = (float)keyboardFrame.Height;
                 }
             }
             else
@@ -754,17 +754,6 @@ namespace SVProgressHUD
 #else
             var statusBarFrame = CGRect.Empty;
 #endif
-
-            if (orientation.IsLandscape())
-            {
-                var temp = orientationFrame.Width;
-                orientationFrame.Width = orientationFrame.Height;
-                orientationFrame.Height = temp;
-
-                temp = statusBarFrame.Width;
-                statusBarFrame.Width = statusBarFrame.Height;
-                statusBarFrame.Height = temp;
-            }
 
             UpdateMotionEffectForOrientation(orientation);
 
@@ -796,8 +785,8 @@ namespace SVProgressHUD
         void MoveToPoint(CGPoint newCenter, float angle)
         {
             HudView.Transform = CGAffineTransform.MakeRotation(angle);
-            if (ContainerView == null)
-                HudView.Center = ControlView.Center;
+            if (ContainerView != null)
+                HudView.Center = ContainerView.Center;
             else
                 HudView.Center = new CGPoint(newCenter.X + CenterOffset.Horizontal, newCenter.Y + CenterOffset.Vertical);
         }

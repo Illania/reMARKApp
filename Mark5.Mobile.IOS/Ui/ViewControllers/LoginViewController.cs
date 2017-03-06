@@ -552,6 +552,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Info("Logging in...");
 
+                usernameTextField.ResignFirstResponder();
+                passwordTextField.ResignFirstResponder();
+                hostnameTextField.ResignFirstResponder();
+                portTextField.ResignFirstResponder();
+
                 dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_in___"));
 
                 switch (sslMode)
@@ -634,6 +639,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Error("Log in failed", ex);
 
                 await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("login_failed"), Localization.GetString("login_failed_desc"));
+
+                usernameTextField.BecomeFirstResponder();
 
                 loginButton.TouchUpInside += LoginButton_TouchUpInside;
             }
