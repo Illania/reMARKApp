@@ -155,10 +155,8 @@
 "port" = "Port";
 "primary_person" = "Primary person";
 "priority" = "Priority";
-"pull_to_refresh" = "Pull to refresh";
 "read_by" = "Read by";
 "reference_number" = "Reference number";
-"refreshing___" = "Refreshing...";
 "remove_from_favorites" = "Remove from\nfavorites";
 "reply" = "Reply";
 "reply_all" = "Reply all";

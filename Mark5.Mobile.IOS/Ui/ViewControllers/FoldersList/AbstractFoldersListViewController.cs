@@ -220,7 +220,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             RefreshControl = new UIRefreshControl();
             RefreshControl.BackgroundColor = UIColor.White;
-            RefreshControl.AttributedTitle = Localization.GetNSAttributedString("pull_to_refresh");
             TableView.AddSubview(RefreshControl);
         }
 

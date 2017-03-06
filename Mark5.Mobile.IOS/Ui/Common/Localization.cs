@@ -15,9 +15,5 @@ namespace Mark5.Mobile.IOS.Ui.Common
     {
 
         public static string GetString(string key) => NSBundle.MainBundle.LocalizedString(key, key);
-
-        public static NSString GetNSString(string key) => new NSString(NSBundle.MainBundle.LocalizedString(key, key));
-
-        public static NSAttributedString GetNSAttributedString(string key) => new NSAttributedString(NSBundle.MainBundle.LocalizedString(key, key), new UIStringAttributes());
     }
 }
