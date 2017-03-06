@@ -238,16 +238,14 @@
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
 			<string>cache</string>
-			<key>FooterText</key>
-			<string>cache_settings</string>
 		</dict>
 		<dict>
 			<key>Type</key>
 			<string>PSMultiValueSpecifier</string>
 			<key>Title</key>
-			<string>limit_cache</string>
+			<string>clean_cache_interval_days</string>
 			<key>Key</key>
-			<string>limitCache</string>
+			<string>CleanCacheIntervalDays</string>
 			<key>Titles</key>
 			<array>
 				<string>do_not_limit</string>
