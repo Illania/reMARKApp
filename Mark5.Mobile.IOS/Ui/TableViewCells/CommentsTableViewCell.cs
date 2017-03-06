@@ -9,9 +9,10 @@ using System;
 using System.Globalization;
 using Foundation;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
+using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
@@ -52,11 +53,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             CommentAuthorLabel.Text = comment.UserId == ServerConfig.SystemSettings.UserInfo.User.Id
                                   ? Localization.GetString("me")
-                                  : comment.UserName.ToUpper(CultureInfo.CurrentCulture);;
+                                  : comment.UserName.ToUpper(CultureInfo.CurrentCulture);
             DateAddedLabel.Text = comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()
-                        .ConvertUtcToServerTime()
-                        .ConvertDateTimeToTimestampMilliseconds()
-                        .FormatServerTimestampAsCompactLongDateTimeString();
+                                                            .ConvertUtcToServerTime()
+                                                            .ConvertDateTimeToTimestampMilliseconds()
+                                                            .FormatServerTimestampAsCompactLongDateTimeString();
             CommentContentLabel.Text = comment.Content;
         }
     }

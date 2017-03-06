@@ -8,7 +8,7 @@
 using System;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers.Common
+namespace Mark5.Mobile.IOS.Ui.Common
 {
     public class ActionableLayoutScrollView : UIScrollView
     {

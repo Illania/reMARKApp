@@ -7,7 +7,7 @@
 //
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.Common
+namespace Mark5.Mobile.IOS.Utilities.Extensions
 {
     
     public static class UIFontExtensions
