@@ -180,6 +180,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 {
                     EditModeItem = new UIBarButtonItem();
                     EditModeItem.Title = Localization.GetString("edit");
+                    EditModeItem.Enabled = false;
                     NavigationItem.SetLeftBarButtonItem(EditModeItem, false);
                 }
             }
@@ -190,6 +191,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 {
                     EditModeItem = new UIBarButtonItem();
                     EditModeItem.Title = Localization.GetString("edit");
+                    EditModeItem.Enabled = false;
                     NavigationItem.SetLeftBarButtonItem(EditModeItem, false);
                 }
             }
@@ -373,6 +375,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     }
                     gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
                     gds.SetFolders(GrouppedDataSource.Section.Folders, folders);
+
+                    EditModeItem.Enabled = gds.ItemsInSection(GrouppedDataSource.Section.Favorites) > 0;
                 }
                 else
                 {
@@ -464,6 +468,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                     var indexPaths = gds.GetIndexPaths(folder.Id);
                     TableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+
+                    EditModeItem.Enabled = gds.ItemsInSection(GrouppedDataSource.Section.Favorites) > 0;
                 }
 
                 var ds = TableView.Source as DataSource;
@@ -501,6 +507,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                     var indexPaths = gds.GetIndexPaths(folder.Id);
                     TableView.ReloadRows(indexPaths, UITableViewRowAnimation.Automatic);
+
+                    EditModeItem.Enabled = gds.ItemsInSection(GrouppedDataSource.Section.Favorites) > 0;
                 }
 
                 var ds = TableView.Source as DataSource;
@@ -1224,6 +1232,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     }
                 }
                 return folders.ToArray();
+            }
+
+            public int ItemsInSection(nint section)
+            {
+                return foldersInView[section].Count;
             }
 
             public List<Folder> GetFavoriteFolders()
