@@ -45,7 +45,8 @@ namespace SVProgressHUD
             }
             set
             {
-                if (Math.Abs(_radius - value) > 0.00001f)
+#pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator                if (_radius != value)
+#pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
                 {
                     _radius = value;
 

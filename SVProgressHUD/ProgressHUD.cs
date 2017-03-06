@@ -486,8 +486,6 @@ namespace SVProgressHUD
             {
                 NSNotificationCenter.DefaultCenter.PostNotificationName(WillAppearNotification, this, GetNotificationUserInfo());
                 HudView.Transform = CGAffineTransform.Scale(HudView.Transform, 1.3f, 1.3f);
-                if (DefaultStyle != Style.Custom)
-                    AddBlur();
 
                 Action animation = () =>
                 {
@@ -681,7 +679,8 @@ namespace SVProgressHUD
                 hudHeight += LabelSpacing;
 
             HudView.Bounds = new CGRect(0f, 0f, Math.Max(MinimumSize.Width, hudWidth), Math.Max(MinimumSize.Height, hudHeight));
-            HudVibrancyView.Bounds = HudView.Bounds;
+            HudVibrancyView.Bounds = new CGRect(0f, 0f, Math.Max(MinimumSize.Width, hudWidth), Math.Max(MinimumSize.Height, hudHeight));
+            HudVibrancyView.Frame = new CGRect(0f, 0f, HudVibrancyView.Frame.Width, HudVibrancyView.Frame.Height);
 
             CATransaction.Begin();
             CATransaction.DisableActions = true;
@@ -737,12 +736,14 @@ namespace SVProgressHUD
 
             if (notification != null)
             {
-                var keyboardInfo = notification.UserInfo;
-                var keyboardFrame = ((NSValue)keyboardInfo[UIKeyboard.FrameBeginUserInfoKey]).CGRectValue;
-                animationDuration = ((NSNumber)keyboardInfo[UIKeyboard.AnimationDurationUserInfoKey]).DoubleValue;
-
                 if (notification.Name == UIKeyboard.WillShowNotification || notification.Name == UIKeyboard.DidShowNotification)
+                {
+                    var keyboardInfo = notification.UserInfo;
+                    var keyboardFrame = ((NSValue)keyboardInfo[UIKeyboard.FrameBeginUserInfoKey]).CGRectValue;
+                    animationDuration = ((NSNumber)keyboardInfo[UIKeyboard.AnimationDurationUserInfoKey]).DoubleValue;
+
                     keyboardHeight = (float)(orientation.IsPortrait() ? keyboardFrame.Height : keyboardFrame.Width);
+                }
             }
             else
                 keyboardHeight = GetVisibleKeyboardHeight();
