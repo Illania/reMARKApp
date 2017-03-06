@@ -15,15 +15,16 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 {
+    
     public class ComposeDocumentViewController : UIViewController
     {
+        
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
         string DefaultTitle = Localization.GetString("new_document");
@@ -564,7 +565,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("attachment_too_big")));
                     return;
-                    //TODO should remove file from common container ourselves? (otherwise it gets deleted automatically when the app closes)
                 }
 
                 var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
@@ -708,7 +708,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
                     NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
                 });
 
                 View.SendSubviewToBack(suggestionsListView);

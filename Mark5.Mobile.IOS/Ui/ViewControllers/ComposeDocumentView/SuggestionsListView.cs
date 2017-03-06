@@ -21,10 +21,12 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.SuggestionsView
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 {
+    
     public class SuggestionsListView : UIView
     {
+    
         UIView spaceView;
         SuggestionsTextView suggestionsTextView;
         SeparatorSubView separator;

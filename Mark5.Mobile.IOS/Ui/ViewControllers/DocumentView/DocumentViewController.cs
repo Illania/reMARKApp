@@ -17,6 +17,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -24,8 +25,10 @@ using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
+    
     public class DocumentViewController : AbstractViewController, ISecondaryViewController
     {
+        
         public bool Modal { get; set; }
 
         public GetPreviousDocumentPreviewDelegate GetPreviousDocumentPreview { get; set; }
@@ -992,7 +995,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DoReply(DocumentCreationModeFlag creationModeFlag)
         {
-            var composeDocumentViewController = new ComposeDocumentViewController()
+            var composeDocumentViewController = new ComposeDocumentViewController
             {
                 PreviousDocumentId = DocumentPreview.Id,
                 CreationModeFlag = creationModeFlag,

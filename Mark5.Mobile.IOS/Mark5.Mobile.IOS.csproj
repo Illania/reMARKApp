@@ -176,7 +176,6 @@
     <Folder Include="Ui\TableViewCells\" />
     <Folder Include="Ui\ViewControllers\DocumentView\" />
     <Folder Include="Ui\ViewControllers\DocumentView\Subviews\" />
-    <Folder Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsView\" />
     <Folder Include="Model\HubMessages\" />
   </ItemGroup>
   <ItemGroup>
@@ -331,7 +330,6 @@
     </Compile>
     <Compile Include="Ui\ViewControllers\FoldersList\CopyMoveToFolderListViewController.cs" />
     <Compile Include="Ui\ViewControllers\CopyToWorktrayViewController.cs" />
-    <Compile Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsView\SuggestionsListView.cs" />
     <Compile Include="Ui\TableViewCells\SuggestionsTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\SuggestionsTableViewCell.designer.cs">
       <DependentUpon>SuggestionsTableViewCell.cs</DependentUpon>
@@ -399,6 +397,7 @@
     <Compile Include="Ui\Common\ActionableLayoutScrollView.cs" />
     <Compile Include="Ui\Common\SeparatorSubView.cs" />
     <Compile Include="Utilities\Extensions\UIFontExtensions.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsListView.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
