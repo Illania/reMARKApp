@@ -331,6 +331,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             loginButton.TitleLabel.Font = Theme.DefaultBoldFont;
             loginButton.TranslatesAutoresizingMaskIntoConstraints = false;
             loginButton.Enabled = false;
+            loginButton.Alpha = 0.7f;
             View.AddSubview(loginButton);
             loginButtonTopConstraint = NSLayoutConstraint.Create(loginButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, portTextField, NSLayoutAttribute.Bottom, 1f, LoginButtonToTextFieldInitialDistance);
             View.AddConstraints(new[]
@@ -552,6 +553,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Info("Logging in...");
 
+                usernameTextField.ResignFirstResponder();
+                passwordTextField.ResignFirstResponder();
+                hostnameTextField.ResignFirstResponder();
+                portTextField.ResignFirstResponder();
+
                 dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_in___"));
 
                 switch (sslMode)
@@ -635,6 +641,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("login_failed"), Localization.GetString("login_failed_desc"));
 
+                usernameTextField.BecomeFirstResponder();
+
                 loginButton.TouchUpInside += LoginButton_TouchUpInside;
             }
         }
@@ -683,6 +691,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             result &= Validator.IsPortValid(portTextField.Text);
 
             loginButton.Enabled = result;
+            loginButton.Alpha = result ? 1f : 0.7f;
         }
 
         #endregion

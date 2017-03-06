@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mark5.Mobile.Droid", "Mark5
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mark5.Mobile.IOS", "Mark5.Mobile.IOS\Mark5.Mobile.IOS.csproj", "{F3502B1A-5264-41A8-95BE-9CEAF02780A3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SVProgressHUD", "SVProgressHUD\SVProgressHUD.csproj", "{5E2E279C-8BBE-4F87-8C1D-B921758790B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -91,6 +93,16 @@ Global
 		{F3502B1A-5264-41A8-95BE-9CEAF02780A3}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 		{F3502B1A-5264-41A8-95BE-9CEAF02780A3}.Debug|iPhone.ActiveCfg = Debug|iPhone
 		{F3502B1A-5264-41A8-95BE-9CEAF02780A3}.Debug|iPhone.Build.0 = Debug|iPhone
+		{5E2E279C-8BBE-4F87-8C1D-B921758790B3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5E2E279C-8BBE-4F87-8C1D-B921758790B3}.Release|x86.ActiveCfg = Release|Any CPU
+		{5E2E279C-8BBE-4F87-8C1D-B921758790B3}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{5E2E279C-8BBE-4F87-8C1D-B921758790B3}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{5E2E279C-8BBE-4F87-8C1D-B921758790B3}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{5E2E279C-8BBE-4F87-8C1D-B921758790B3}.Release|iPhone.Build.0 = Release|Any CPU
+		{5E2E279C-8BBE-4F87-8C1D-B921758790B3}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{5E2E279C-8BBE-4F87-8C1D-B921758790B3}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{5E2E279C-8BBE-4F87-8C1D-B921758790B3}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{5E2E279C-8BBE-4F87-8C1D-B921758790B3}.Debug|iPhone.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6C099FEF-30C6-4D04-917A-FB0C3E561D93} = {568A965C-A051-444B-B396-251AA5E00F99}

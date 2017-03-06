@@ -414,6 +414,10 @@
       <Project>{26873336-60F0-4734-8286-A1ECC902AB95}</Project>
       <Name>TinyMessenger</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SVProgressHUD\SVProgressHUD.csproj">
+      <Project>{5E2E279C-8BBE-4F87-8C1D-B921758790B3}</Project>
+      <Name>SVProgressHUD</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\startscreens\start-screen-bg-ipad-landscape.png" />
