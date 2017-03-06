@@ -1,8 +1,6 @@
-﻿"1_month" = "1 month";
-"1_week" = "Week";
+﻿"1_week" = "1 week";
 "2_weeks" = "2 weeks";
 "3_days" = "3 days";
-"3_weeks" = "3 weeks";
 "about" = "About MARK5";
 "accept_selfsigned" = "Accept self-signed certificates";
 "advanced" = "Advanced";
@@ -22,7 +20,6 @@
 "create_system_report" = "Create system report";
 "default_template" = "Default MARK5 template";
 "default_template_short" = "Default";
-"do_not_limit" = "Never";
 "document_body_request_type" = "Viewing format";
 "documents" = "Documents";
 "documents_to_download" = "Documents to download";

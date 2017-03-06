@@ -248,21 +248,15 @@
 			<string>CleanCacheIntervalDays</string>
 			<key>Titles</key>
 			<array>
-				<string>do_not_limit</string>
 				<string>3_days</string>
 				<string>1_week</string>
 				<string>2_weeks</string>
-				<string>3_weeks</string>
-				<string>1_month</string>
 			</array>
 			<key>Values</key>
 			<array>
-				<integer>-1</integer>
 				<integer>3</integer>
 				<integer>7</integer>
 				<integer>14</integer>
-				<integer>21</integer>
-				<integer>31</integer>
 			</array>
 			<key>DefaultValue</key>
 			<integer>7</integer>
