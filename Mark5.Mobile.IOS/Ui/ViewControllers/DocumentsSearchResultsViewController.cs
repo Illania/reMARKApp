@@ -241,7 +241,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(documentPreviews, true);
-                tableView.ReloadRows(rows, UITableViewRowAnimation.Automatic);
+                tableView.ReloadRows(rows, UITableViewRowAnimation.Fade);
             }
             catch (Exception ex)
             {
@@ -262,7 +262,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(documentPreviews, false);
-                tableView.ReloadRows(rows, UITableViewRowAnimation.Automatic);
+                tableView.ReloadRows(rows, UITableViewRowAnimation.Fade);
             }
             catch (Exception ex)
             {
@@ -438,7 +438,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loading = false;
 
                 documentPreviewsInView.AddRange(documentPreviews);
-                documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+                documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
             public void Reset()
@@ -446,7 +446,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loading = true;
 
                 documentPreviewsInView.Clear();
-                documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+                documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
             protected override void Dispose(bool disposing)

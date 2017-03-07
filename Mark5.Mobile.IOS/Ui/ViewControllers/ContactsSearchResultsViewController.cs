@@ -385,7 +385,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loading = false;
 
                 contactPreviewsInView.AddRange(contactPreviews);
-                contactsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+                contactsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
             public void Reset()
@@ -393,7 +393,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loading = true;
 
                 contactPreviewsInView.Clear();
-                contactsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+                contactsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
             protected override void Dispose(bool disposing)

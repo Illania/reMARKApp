@@ -564,7 +564,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return;
 
                 commentsInView.AddRange(newComments);
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
             public void AddComment(Comment newComment)
@@ -575,9 +575,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 commentsInView.Add(newComment);
 
                 if (commentsInView.Count == 1)
-                    tableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(commentsInView.Count - 1, 0) }, UITableViewRowAnimation.Automatic);
+                    tableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(commentsInView.Count - 1, 0) }, UITableViewRowAnimation.Fade);
                 else
-                    tableView.InsertRows(new NSIndexPath[] { NSIndexPath.FromRowSection(commentsInView.Count - 1, 0) }, UITableViewRowAnimation.Automatic);
+                    tableView.InsertRows(new NSIndexPath[] { NSIndexPath.FromRowSection(commentsInView.Count - 1, 0) }, UITableViewRowAnimation.Fade);
             }
 
             public void RemoveComment(Comment comment)
@@ -588,9 +588,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     commentsInView.RemoveAt(position);
 
                     if (commentsInView.Count == 0)
-                        tableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Automatic);
+                        tableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Fade);
                     else
-                        tableView.DeleteRows(new NSIndexPath[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Automatic);
+                        tableView.DeleteRows(new NSIndexPath[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Fade);
                 }
             }
 
@@ -601,7 +601,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     commentsInView[position].Content = editedContent.Content;
 
-                    tableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Automatic);
+                    tableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Fade);
                 }
             }
 

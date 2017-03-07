@@ -285,11 +285,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     categoriesListView.ReloadData();
 
                     UpdateAfterExitEditMode();
+
+                    dismissAction();
                 }
                 catch (Exception ex)
                 {
-                    dismissAction();
                     CommonConfig.Logger.Error($"Error while updating categories [entity={BusinessEntityPreview}]", ex);
+                    
+                    dismissAction();
+
                     await Dialogs.ShowErrorDialogAsync(this, ex);
                 }
             }
@@ -343,10 +347,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-
-
-
-
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void        async void DoSearchCategory(string searchText, CancellationTokenSource ct)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
@@ -364,7 +364,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         bool MatchesQuery(Category category, string query)
         {
-            return category.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0;
+            return category.Name.ContainsCaseInsensitive(query);
         }
 
         public void SearchCategorySelected(Category category) => dataSource.SelectCategory(category);

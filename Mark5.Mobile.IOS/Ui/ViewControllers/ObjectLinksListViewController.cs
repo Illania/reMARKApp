@@ -291,8 +291,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 objectLInksInView = new Dictionary<string, ObjectLink[]>(objectLinks);
 
                 tableView.BeginUpdates();
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
-                tableView.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, objectLinksSections.Length - 1)), UITableViewRowAnimation.Automatic);
+                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                tableView.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, objectLinksSections.Length - 1)), UITableViewRowAnimation.Fade);
                 tableView.EndUpdates();
             }
 
@@ -306,8 +306,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 objectLInksInView.Clear();
 
                 tableView.BeginUpdates();
-                tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, sectionsCount - 1)), UITableViewRowAnimation.Automatic);
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+                tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, sectionsCount - 1)), UITableViewRowAnimation.Fade);
+                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
                 tableView.EndUpdates();
             }
 

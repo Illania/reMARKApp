@@ -500,7 +500,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 outgoingDocumentPreviewsInView.Clear();
                 outgoingDocumentPreviewsInView.AddRange(containers);
-                documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+                documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
             public void Reset()
@@ -508,7 +508,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loading = true;
 
                 outgoingDocumentPreviewsInView.Clear();
-                documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+                documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
             protected override void Dispose(bool disposing)
@@ -522,7 +522,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public void UpdateRow(int row)
             {
-                documentsTableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(row, 0) }, UITableViewRowAnimation.Automatic);
+                documentsTableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(row, 0) }, UITableViewRowAnimation.Fade);
             }
 
             public void RemoveRow(int row)
@@ -533,7 +533,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
                 else
                 {
-                    documentsTableView.DeleteRows(new NSIndexPath[] { NSIndexPath.FromRowSection(row, 0) }, UITableViewRowAnimation.Automatic);
+                    documentsTableView.DeleteRows(new NSIndexPath[] { NSIndexPath.FromRowSection(row, 0) }, UITableViewRowAnimation.Fade);
                 }
             }
         }

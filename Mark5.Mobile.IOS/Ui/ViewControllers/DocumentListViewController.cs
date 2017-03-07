@@ -16,6 +16,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -416,7 +417,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(documentPreviews, true);
-                tableView.ReloadRows(rows, UITableViewRowAnimation.Automatic);
+                tableView.ReloadRows(rows, UITableViewRowAnimation.Fade);
             }
             catch (Exception ex)
             {
@@ -437,7 +438,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(documentPreviews, false);
-                tableView.ReloadRows(rows, UITableViewRowAnimation.Automatic);
+                tableView.ReloadRows(rows, UITableViewRowAnimation.Fade);
             }
             catch (Exception ex)
             {
@@ -572,7 +573,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     var selectedRow = tableView.IndexPathForSelectedRow;
 
-                    tableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Automatic);
+                    tableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
 
                     if (selectedRow != null)
                     {
@@ -597,7 +598,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     var selectedRow = tableView.IndexPathForSelectedRow;
 
-                    tableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Automatic);
+                    tableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
 
                     if (selectedRow != null)
                     {
@@ -657,19 +658,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         static bool MatchesQuery(DocumentPreview dp, string query)
         {
-            if (dp.Subject.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+            if (dp.Subject.ContainsCaseInsensitive(query))
                 return true;
 
-            if (dp.Preview.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+            if (dp.Preview.ContainsCaseInsensitive(query))
                 return true;
 
-            if (dp.Addresses.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
+            if (dp.Addresses.Any(da => da.Name.ContainsCaseInsensitive(query)))
                 return true;
 
-            if (dp.Addresses.Any(da => da.Address.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
+            if (dp.Addresses.Any(da => da.Address.ContainsCaseInsensitive(query)))
                 return true;
 
-            if (dp.Categories.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
+            if (dp.Categories.Any(da => da.Name.ContainsCaseInsensitive(query)))
                 return true;
 
             return false;
@@ -823,7 +824,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 documentPreviewsInView.InsertRange(0, documentPreviews);
                 var indexes = Enumerable.Range(0, documentPreviews.Count).Select(i => NSIndexPath.FromRowSection(i, 0)).ToArray();
-                documentsTableView.InsertRows(indexes, UITableViewRowAnimation.Automatic);
+                documentsTableView.InsertRows(indexes, UITableViewRowAnimation.Fade);
             }
 
             public void AppendItems(List<DocumentPreview> documentPreviews)
@@ -831,7 +832,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loading = false;
 
                 documentPreviewsInView.AddRange(documentPreviews);
-                documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+                documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
             public DocumentPreview GetNextDocumentPreview(DocumentPreview documentPreview,
@@ -906,7 +907,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loading = true;
 
                 documentPreviewsInView.Clear();
-                documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+                documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
             protected override void Dispose(bool disposing)
@@ -924,7 +925,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (documentRow < 0)
                     return;
 
-                documentsTableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(documentRow, 0) }, UITableViewRowAnimation.Automatic);
+                documentsTableView.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(documentRow, 0) }, UITableViewRowAnimation.Fade);
             }
 
         }

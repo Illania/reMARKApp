@@ -336,7 +336,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 systemUsersInView.Clear();
                 systemUsersInView.AddRange(systemUsers);
 
-                tableView.ReloadSections(NSIndexSet.FromIndex(1), UITableViewRowAnimation.Automatic);
+                tableView.ReloadSections(NSIndexSet.FromIndex(1), UITableViewRowAnimation.Fade);
             }
 
             public void Reset()
@@ -344,7 +344,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loading = true;
 
                 systemUsersInView.Clear();
-                tableView.ReloadSections(NSIndexSet.FromIndex(1), UITableViewRowAnimation.Automatic);
+                tableView.ReloadSections(NSIndexSet.FromIndex(1), UITableViewRowAnimation.Fade);
             }
 
             protected override void Dispose(bool disposing)
