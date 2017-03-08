@@ -17,14 +17,16 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Utilities;
+using MobileCoreServices;
+using Photos;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 {
-    
+
     public class ComposeDocumentViewController : AbstractViewController
     {
-        
+
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
         string DefaultTitle = Localization.GetString("new_document");
@@ -533,9 +535,52 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void AttachmentButtonItem_Clicked(object sender, EventArgs e)
         {
-            var c = new UIDocumentMenuViewController(new string[] { "public.content" }, UIDocumentPickerMode.Import);
-            c.Delegate = new DocumentMenuDelegate(this, HandleAttachmentUrl);
-            PresentViewController(c, true, null);
+            var sourceChooser = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+            sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("take_photo"), UIAlertActionStyle.Default, a =>
+            {
+                var picker = new UIImagePickerController
+                {
+                    AllowsEditing = false,
+                    SourceType = UIImagePickerControllerSourceType.Camera,
+                    CameraCaptureMode = UIImagePickerControllerCameraCaptureMode.Photo,
+                    CameraDevice = UIImagePickerControllerCameraDevice.Rear,
+                    Delegate = new ImagePickerControllerDelegate(this, HandleAttachmentImage),
+                    ModalPresentationStyle = UIModalPresentationStyle.PageSheet
+                };
+                if (picker.PopoverPresentationController != null)
+                    picker.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+                PresentViewController(picker, true, null);
+            }));
+            sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("existing_photo"), UIAlertActionStyle.Default, a =>
+            {
+                var picker = new UIImagePickerController
+                {
+                    AllowsEditing = false,
+                    SourceType = UIImagePickerControllerSourceType.SavedPhotosAlbum,
+                    MediaTypes = new[] { UTType.Image.ToString() },
+                    Delegate = new ImagePickerControllerDelegate(this, HandleAttachmentImage),
+                    ModalPresentationStyle = UIModalPresentationStyle.PageSheet
+                };
+                if (picker.PopoverPresentationController != null)
+                    picker.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+                PresentViewController(picker, true, null);
+            }));
+            sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("browse_files"), UIAlertActionStyle.Default, a =>
+            {
+                var picker = new UIDocumentMenuViewController(new string[] { "public.content" }, UIDocumentPickerMode.Import)
+                {
+                    Delegate = new DocumentMenuDelegate(this, HandleAttachmentUrl)
+                };
+                if (picker.PopoverPresentationController != null)
+                    picker.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+                PresentViewController(picker, true, null);
+            }));
+            sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+
+            if (sourceChooser.PopoverPresentationController != null)
+                sourceChooser.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+
+            PresentViewController(sourceChooser, true, null);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -555,9 +600,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 var result = url.TryGetResource(NSUrl.FileSizeKey, out sizeObject, out _error);
 
                 if (!result)
-                {
                     throw new Exception(_error.ToString());
-                }
 
                 var sizeInBytes = int.Parse(sizeObject.ToString());
 
@@ -579,17 +622,61 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to save attachment to memory [Url={url}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
+                CommonConfig.Logger.Error($"Failed to save attachment [Url={url}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
+
                 await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_saving_local_attachment")));
             }
-
-            stream?.Dispose();
-
-            if (attachment != null)
+            finally
             {
-                attachmentsView.AddAttachment(attachment);
+                stream?.Dispose();
             }
 
+            if (attachment != null)
+                attachmentsView.AddAttachment(attachment);
+        }
+
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void HandleAttachmentImage(string filename, NSData jpegData)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            OutgoingDocumentAttachmentDescription attachment = null;
+            Stream stream = null;
+
+            try
+            {
+                var sizeInBytes = (long)jpegData.Length;
+                stream = jpegData.AsStream();
+
+                if (sizeInBytes > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
+                {
+                    await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("attachment_too_big")));
+                    return;
+                }
+
+                var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
+
+                attachment = new OutgoingDocumentAttachmentDescription
+                {
+                    Name = filename,
+                    SizeInBytes = sizeInBytes,
+                    Stream = stream,
+                    Path = path
+                };
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to save image [FileName={filename}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_saving_local_attachment")));
+            }
+            finally
+            {
+                stream?.Dispose();
+            }
+
+            if (attachment != null)
+                attachmentsView.AddAttachment(attachment);
         }
 
         async void SendButtonItem_Clicked(object sender, EventArgs e)
@@ -1057,33 +1144,90 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         #endregion
 
+        class ImagePickerControllerDelegate : UIImagePickerControllerDelegate
+        {
+
+            readonly WeakReference<ComposeDocumentViewController> vcWeak;
+            readonly Action<string, NSData> handler;
+
+            public ImagePickerControllerDelegate(ComposeDocumentViewController vc, Action<string, NSData> handler)
+            {
+                vcWeak = new WeakReference<ComposeDocumentViewController>(vc);
+                this.handler = handler;
+            }
+
+            public override void FinishedPickingMedia(UIImagePickerController picker, NSDictionary info)
+            {
+                try
+                {
+                    NSData jpegImage;
+                    using (var image = (UIImage)info[UIImagePickerController.OriginalImage])
+                        jpegImage = image.AsJPEG();
+
+                    var referenceUrl = (NSUrl)info[UIImagePickerController.ReferenceUrl];
+
+                    string filename;
+                    if (referenceUrl != null)
+                    {
+                        var results = PHAsset.FetchAssets(new[] { referenceUrl }, null);
+                        var asset = (PHAsset)results.firstObject;
+
+                        var assetResources = PHAssetResource.GetAssetResources(asset);
+                        filename = assetResources[0].OriginalFilename;
+                    }
+                    else
+                    {
+                        filename = "photo_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".jpg";
+                    }
+
+                    picker.DismissViewController(true, null);
+
+                    handler(filename, jpegImage);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Could not pick media", ex);
+
+                    ComposeDocumentViewController vc;
+                    if (vcWeak.TryGetTarget(out vc))
+                        Dialogs.ShowErrorDialog(vc, ex);
+
+                    picker.DismissViewController(true, null);
+                }
+            }
+        }
+
         class DocumentMenuDelegate : UIDocumentMenuDelegate, IUIDocumentPickerDelegate
         {
-            ComposeDocumentViewController viewController;
-            Action<NSUrl> urlHanlder;
+
+            readonly WeakReference<ComposeDocumentViewController> vcWeak;
+            readonly Action<NSUrl> handler;
 
             public DocumentMenuDelegate(ComposeDocumentViewController vc, Action<NSUrl> handler)
             {
-                viewController = vc;
-                urlHanlder = handler;
+                vcWeak = new WeakReference<ComposeDocumentViewController>(vc);
+                this.handler = handler;
             }
 
             public void DidPickDocument(UIDocumentPickerViewController controller, NSUrl url)
             {
-                urlHanlder(url);
+                handler(url);
             }
 
             public override void DidPickDocumentPicker(UIDocumentMenuViewController documentMenu, UIDocumentPickerViewController documentPicker)
             {
                 documentPicker.Delegate = this;
-                documentPicker.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
-                viewController.PresentViewController(documentPicker, true, null);
+                documentPicker.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
+
+                ComposeDocumentViewController vc;
+                if (vcWeak.TryGetTarget(out vc))
+                    vc.PresentViewController(documentPicker, true, null);
             }
 
             public override void WasCancelled(UIDocumentMenuViewController documentMenu)
             {
+                // Nothing to do
             }
         }
-
     }
 }

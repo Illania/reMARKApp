@@ -12,6 +12,7 @@
 "big_attachment_title" = "Big attachment";
 "big_attachment_warning" = "This attachment is {0} large. Do you still want to download this file?";
 "birthdate" = "Birthdate";
+"browse_files" = "Browse files...";
 "call" = "Call";
 "cancel" = "Cancel";
 "cannot_mail_report_content" = "There are no mail accounts configured on your device. You need to have an account configured before you can send feedback.";
@@ -80,6 +81,7 @@
 "error_removing_local_attachment" = "Error while removing local attachment";
 "error_saving_local_attachment" = "Error while saving local attachment";
 "error_while_sending_document" = "Error while sending document.";
+"existing_photo" = "Add existing photo";
 "failed_send_document_notification_content" = "One or more messages could not be sent";
 "failed_send_document_notification_title" = "Failed to send messages";
 "favorites" = "Favorites";
@@ -122,6 +124,7 @@
 "no_categories" = "No categories present";
 "no_comments" = "No comments present";
 "no_contacts_found" = "No contacts were found";
+"no_content" = "This document has no content";
 "no_description" = "No description";
 "no_documents_found" = "No documents were found";
 "no_folders_found" = "No folders found";
@@ -179,6 +182,7 @@
 "skype" = "Skype";
 "subject" = "Subject";
 "system" = "System";
+"take_photo" = "Capture new photo";
 "tap_select_line" = "Tap to select a line";
 "telex" = "Telex";
 "template_null" = "You do not have a default template set.";
