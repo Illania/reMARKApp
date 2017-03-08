@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using AssetsLibrary;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
