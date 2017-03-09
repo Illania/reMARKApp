@@ -12,22 +12,22 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="ContactsTableViewCell" rowHeight="65" id="2" customClass="ContactsTableViewCell">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="65"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="ContactsTableViewCell" rowHeight="68" id="2" customClass="ContactsTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="68"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" layoutMarginsFollowReadableWidth="YES" tableViewCell="2" id="4yj-Dm-ife">
-                <rect key="frame" x="0.0" y="0.0" width="287" height="64"/>
+                <rect key="frame" x="0.0" y="0.0" width="287" height="67.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lgO-rg-Y2X">
-                        <rect key="frame" x="0.0" y="2" width="8" height="63.5"/>
+                        <rect key="frame" x="2" y="2" width="6" height="63.5"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="8" id="YfT-WB-0pf"/>
+                            <constraint firstAttribute="width" constant="6" id="YfT-WB-0pf"/>
                         </constraints>
                     </view>
                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name of contact" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nZL-LM-VbB">
-                        <rect key="frame" x="16" y="11" width="263" height="21"/>
+                        <rect key="frame" x="18" y="11" width="261" height="21"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="IKq-LK-9hA"/>
                         </constraints>
@@ -36,7 +36,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Description" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DfU-9f-SwL">
-                        <rect key="frame" x="16" y="36" width="263" height="21"/>
+                        <rect key="frame" x="18" y="36" width="261" height="21"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="hhI-bJ-qEw"/>
                         </constraints>
@@ -49,18 +49,19 @@
                     <constraint firstItem="nZL-LM-VbB" firstAttribute="top" secondItem="4yj-Dm-ife" secondAttribute="topMargin" id="Kl3-Ms-zEq"/>
                     <constraint firstItem="lgO-rg-Y2X" firstAttribute="centerY" secondItem="4yj-Dm-ife" secondAttribute="centerY" id="S38-G9-mLI"/>
                     <constraint firstItem="DfU-9f-SwL" firstAttribute="top" secondItem="nZL-LM-VbB" secondAttribute="bottom" constant="4" id="Suk-pE-z6W"/>
-                    <constraint firstItem="DfU-9f-SwL" firstAttribute="leading" secondItem="lgO-rg-Y2X" secondAttribute="trailing" constant="8" id="Vbd-jd-Wcg"/>
+                    <constraint firstItem="DfU-9f-SwL" firstAttribute="leading" secondItem="lgO-rg-Y2X" secondAttribute="trailing" constant="10" id="Vbd-jd-Wcg"/>
                     <constraint firstItem="lgO-rg-Y2X" firstAttribute="height" secondItem="4yj-Dm-ife" secondAttribute="height" constant="-4" id="Z7f-BP-2vT"/>
                     <constraint firstAttribute="trailingMargin" secondItem="DfU-9f-SwL" secondAttribute="trailing" id="aY0-vp-xU8"/>
                     <constraint firstAttribute="bottomMargin" secondItem="DfU-9f-SwL" secondAttribute="bottom" id="eLU-wu-VYn"/>
-                    <constraint firstItem="nZL-LM-VbB" firstAttribute="leading" secondItem="lgO-rg-Y2X" secondAttribute="trailing" constant="8" id="eMS-0D-p0z"/>
-                    <constraint firstItem="lgO-rg-Y2X" firstAttribute="leading" secondItem="4yj-Dm-ife" secondAttribute="leadingMargin" constant="-8" id="vJK-ac-C9R"/>
+                    <constraint firstItem="nZL-LM-VbB" firstAttribute="leading" secondItem="lgO-rg-Y2X" secondAttribute="trailing" constant="10" id="eMS-0D-p0z"/>
+                    <constraint firstItem="lgO-rg-Y2X" firstAttribute="leading" secondItem="4yj-Dm-ife" secondAttribute="leadingMargin" constant="-6" id="vJK-ac-C9R"/>
                     <constraint firstAttribute="trailingMargin" secondItem="nZL-LM-VbB" secondAttribute="trailing" id="zck-W6-hsc"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
                 <outlet property="CategoriesView" destination="lgO-rg-Y2X" id="2lf-0n-CZb"/>
                 <outlet property="DescriptionLabel" destination="DfU-9f-SwL" id="nf9-og-Vl2"/>
+                <outlet property="LeadingConstraint" destination="vJK-ac-C9R" id="TNO-Ki-Ec9"/>
                 <outlet property="NameLabel" destination="nZL-LM-VbB" id="In7-Km-eTy"/>
             </connections>
         </tableViewCell>

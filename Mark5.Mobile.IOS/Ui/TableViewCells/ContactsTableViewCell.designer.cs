@@ -1,45 +1,50 @@
-﻿// WARNING
+// WARNING
 //
-// This file has been generated automatically by Xamarin Studio from the outlets and
-// actions declared in your storyboard file.
-// Manual changes to this file will not be maintained.
+// This file has been generated automatically by Xamarin Studio to store outlets and
+// actions made in the UI designer. If it is removed, they will be lost.
+// Manual changes to this file may not be handled correctly.
 //
 using Foundation;
-using System;
 using System.CodeDom.Compiler;
-using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    [Register("ContactsTableViewCell")]
-    partial class ContactsTableViewCell
-    {
-        [Outlet]
-        UIView CategoriesView { get; set; }
+	[Register ("ContactsTableViewCell")]
+	partial class ContactsTableViewCell
+	{
+		[Outlet]
+		UIKit.UIView CategoriesView { get; set; }
 
-        [Outlet]
-        UILabel DescriptionLabel { get; set; }
+		[Outlet]
+		UIKit.UILabel DescriptionLabel { get; set; }
 
-        [Outlet]
-        UILabel NameLabel { get; set; }
+		[Outlet]
+		UIKit.NSLayoutConstraint LeadingConstraint { get; set; }
 
-        void ReleaseDesignerOutlets()
-        {
-            if (CategoriesView != null)
-            {
-                CategoriesView.Dispose();
-                CategoriesView = null;
-            }
-            if (DescriptionLabel != null)
-            {
-                DescriptionLabel.Dispose();
-                DescriptionLabel = null;
-            }
-            if (NameLabel != null)
-            {
-                NameLabel.Dispose();
-                NameLabel = null;
-            }
-        }
-    }
+		[Outlet]
+		UIKit.UILabel NameLabel { get; set; }
+		
+		void ReleaseDesignerOutlets ()
+		{
+			if (LeadingConstraint != null) {
+				LeadingConstraint.Dispose ();
+				LeadingConstraint = null;
+			}
+
+			if (CategoriesView != null) {
+				CategoriesView.Dispose ();
+				CategoriesView = null;
+			}
+
+			if (DescriptionLabel != null) {
+				DescriptionLabel.Dispose ();
+				DescriptionLabel = null;
+			}
+
+			if (NameLabel != null) {
+				NameLabel.Dispose ();
+				NameLabel = null;
+			}
+		}
+	}
 }
