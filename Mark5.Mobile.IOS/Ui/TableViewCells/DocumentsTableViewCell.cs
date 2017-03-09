@@ -138,7 +138,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public override void LayoutSubviews()
         {
             base.LayoutSubviews();
-            
+
             LeadingConstraint.Constant = Editing ? 0f : -15f;
         }
 
@@ -162,6 +162,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         void UpdateCategoriesColors()
         {
+            if (categoriesColors == null)
+            {
+                foreach (var subView in CategoriesView.Subviews)
+                    subView.RemoveFromSuperview();
+                return;
+            }
+
             if (CategoriesView.Subviews.Length == categoriesColors.Length)
             {
                 for (int i = 0; i < CategoriesView.Subviews.Length; i++)
