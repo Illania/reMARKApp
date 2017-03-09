@@ -139,7 +139,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         {
             base.LayoutSubviews();
 
-            LeadingConstraint.Constant = Editing ? 0f : -15f;
+            LeadingConstraint.Constant = Editing ? 0f : -6f;
         }
 
         public override void SetSelected(bool selected, bool animated)
