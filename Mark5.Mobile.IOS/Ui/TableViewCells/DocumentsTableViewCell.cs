@@ -29,6 +29,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static readonly UINib Nib = UINib.FromName("DocumentsTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("DocumentsTableViewCell");
 
+        UIColor[] categoriesColors;
+
         public DocumentsTableViewCell(IntPtr handle)
             : base(handle)
         {
@@ -66,7 +68,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                          .ConvertDateTimeToTimestampMilliseconds()
                          .FormatServerTimestampAsCompactShortDateTimeString();
 
-            UpdateCategoriesView(documentPreview);
+            categoriesColors = documentPreview.Categories.Select(c => UI.UIColorFromHexString(c.HexColor)).ToArray();
+            UpdateCategoriesColors();
 
             UIImage directionIcon;
             switch (documentPreview.Direction)
@@ -132,62 +135,73 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         #region UITableViewCell overrides
 
+        public override void LayoutSubviews()
+        {
+            base.LayoutSubviews();
+            
+            LeadingConstraint.Constant = Editing ? 0f : -15f;
+        }
+
         public override void SetSelected(bool selected, bool animated)
         {
-            var colors = new Queue<UIColor>();
-            foreach (var view in CategoriesView.Subviews)
-                colors.Enqueue(view.BackgroundColor);
-
             base.SetSelected(selected, animated);
 
-            foreach (var view in CategoriesView.Subviews)
-                view.BackgroundColor = colors.Dequeue();
+            UpdateCategoriesColors();
+        }
+
+        public override void SetHighlighted(bool highlighted, bool animated)
+        {
+            base.SetHighlighted(highlighted, animated);
+
+            UpdateCategoriesColors();
         }
 
         #endregion
 
         #region Helper methods
 
-        public void UpdateCategoriesView(DocumentPreview documentPreview)
+        void UpdateCategoriesColors()
         {
-            foreach (var subView in CategoriesView.Subviews)
+            if (CategoriesView.Subviews.Length == categoriesColors.Length)
             {
-                subView.RemoveFromSuperview();
+                for (int i = 0; i < CategoriesView.Subviews.Length; i++)
+                    CategoriesView.Subviews[i].BackgroundColor = categoriesColors[i];
             }
-
-            var views = new List<UIView>();
-            UIView previousView = null;
-            foreach (var category in documentPreview.Categories)
+            else
             {
-                var categoryView = new UIView();
-                categoryView.BackgroundColor = UI.UIColorFromHexString(category.HexColor);
-                categoryView.TranslatesAutoresizingMaskIntoConstraints = false;
-                CategoriesView.AddSubview(categoryView);
+                foreach (var subView in CategoriesView.Subviews)
+                    subView.RemoveFromSuperview();
 
-                if (previousView == null)
-                    CategoriesView.AddConstraint(NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Top, 1f, 0f));
-                else
-                    CategoriesView.AddConstraint(NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, previousView, NSLayoutAttribute.Bottom, 1f, 0f));
+                var views = new List<UIView>();
+                UIView previousView = null;
+                foreach (var color in categoriesColors)
+                {
+                    var categoryView = new UIView();
+                    categoryView.BackgroundColor = color;
+                    categoryView.TranslatesAutoresizingMaskIntoConstraints = false;
+                    CategoriesView.AddSubview(categoryView);
 
-                CategoriesView.AddConstraints(new[]
-                    {
+                    if (previousView == null)
+                        CategoriesView.AddConstraint(NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Top, 1f, 0f));
+                    else
+                        CategoriesView.AddConstraint(NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, previousView, NSLayoutAttribute.Bottom, 1f, 0f));
+
+                    CategoriesView.AddConstraints(new[]
+                        {
                         NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Left, 1f, 0f),
                         NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Right, 1f, 0f),
                         NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 1f)
                     });
 
-                views.Add(categoryView);
-                previousView = categoryView;
-            }
+                    views.Add(categoryView);
+                    previousView = categoryView;
+                }
 
-            if (previousView != null)
-            {
-                CategoriesView.AddConstraint(NSLayoutConstraint.Create(previousView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Bottom, 1f, 0f));
-            }
+                if (previousView != null)
+                    CategoriesView.AddConstraint(NSLayoutConstraint.Create(previousView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Bottom, 1f, 0f));
 
-            for (int i = 1; i < views.Count; i++)
-            {
-                CategoriesView.AddConstraint(NSLayoutConstraint.Create(views[0], NSLayoutAttribute.Height, NSLayoutRelation.Equal, views[i], NSLayoutAttribute.Height, 1f, 0f));
+                for (int i = 1; i < views.Count; i++)
+                    CategoriesView.AddConstraint(NSLayoutConstraint.Create(views[0], NSLayoutAttribute.Height, NSLayoutRelation.Equal, views[i], NSLayoutAttribute.Height, 1f, 0f));
             }
         }
 

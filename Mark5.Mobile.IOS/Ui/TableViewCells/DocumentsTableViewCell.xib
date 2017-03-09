@@ -16,7 +16,7 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="130"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" layoutMarginsFollowReadableWidth="YES" tableViewCell="2" id="T2N-bu-S3y">
-                <rect key="frame" x="0.0" y="0.0" width="287" height="129"/>
+                <rect key="frame" x="0.0" y="0.0" width="287" height="129.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cr6-01-3sv">
@@ -120,6 +120,7 @@
                 <outlet property="IndicatorImageView2" destination="lvW-Ah-e37" id="nhF-Au-ZlO"/>
                 <outlet property="IndicatorImageView3" destination="cL7-tj-7kF" id="03a-0R-0uX"/>
                 <outlet property="IndicatorImageView4" destination="HLr-sB-4mm" id="cac-JC-H9K"/>
+                <outlet property="LeadingConstraint" destination="upk-sh-FD6" id="pUK-qc-tuW"/>
                 <outlet property="MessagePreviewLabel" destination="7nc-Uc-eSh" id="JpF-8f-vc2"/>
                 <outlet property="SenderNameLabel" destination="z17-lR-ayH" id="csb-I5-tNR"/>
                 <outlet property="SubjectLabel" destination="m6q-Yl-iSk" id="7Aq-Xq-dNE"/>

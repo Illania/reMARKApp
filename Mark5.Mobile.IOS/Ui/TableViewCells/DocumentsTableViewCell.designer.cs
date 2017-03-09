@@ -31,6 +31,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 		UIKit.UIImageView IndicatorImageView4 { get; set; }
 
 		[Outlet]
+		UIKit.NSLayoutConstraint LeadingConstraint { get; set; }
+
+		[Outlet]
 		UIKit.UILabel MessagePreviewLabel { get; set; }
 
 		[Outlet]
@@ -41,6 +44,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 		
 		void ReleaseDesignerOutlets ()
 		{
+			if (LeadingConstraint != null) {
+				LeadingConstraint.Dispose ();
+				LeadingConstraint = null;
+			}
+
 			if (CategoriesView != null) {
 				CategoriesView.Dispose ();
 				CategoriesView = null;
