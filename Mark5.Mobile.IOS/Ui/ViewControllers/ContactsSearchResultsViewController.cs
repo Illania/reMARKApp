@@ -283,7 +283,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         class DataSource : UITableViewSource, IDisposable
         {
 
-            public bool Empty { get { return contactPreviewsInView.Count < 1; } }
+            public bool Empty { get { return !contactPreviewsInView.SelectMany(v => v).Any(); } }
 
             public IEnumerable<ContactPreview> Items { get { return contactPreviewsInView.SelectMany(i => i); } }
 
@@ -306,7 +306,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
 
-                if (contactPreviewsInView.Count < 1)
+                if (!contactPreviewsInView.SelectMany(v => v).Any())
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
                     emptyCell.Initialize(emptyText);
@@ -326,7 +326,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return 1;
 
-                if (contactPreviewsInView.Count < 1)
+                if (!contactPreviewsInView.SelectMany(v => v).Any())
                     return 1;
 
                 return contactPreviewsInView.Count;
@@ -337,7 +337,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return 1;
 
-                if (contactPreviewsInView.Count < 1)
+                if (!contactPreviewsInView.SelectMany(v => v).Any())
                     return 1;
 
                 return contactPreviewsInView[(int)section].Count;
