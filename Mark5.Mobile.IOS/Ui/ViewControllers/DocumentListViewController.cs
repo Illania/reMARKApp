@@ -264,7 +264,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 vc.HidesBottomBarWhenPushed = false;
 
                 vc.ClearData();
-                vc.ReadStatusUpdated -= DocumentViewController_ReadStatusUpdated; //TODO should we use a message for this...?
+                vc.ReadStatusUpdated -= DocumentViewController_ReadStatusUpdated;
                 vc.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
 
                 if (!searchController.Active)
@@ -1055,16 +1055,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var indices = documentPreviewsInView.Select((d, i) => new { d, i }).Where(x => documentIds.Contains(x.d.Id)).Select(x => x.i).ToList();
                 indices.OrderByDescending(i => i).ForEach(documentPreviewsInView.RemoveAt);
 
+                documentsTableView.BeginUpdates();
+
                 if (!documentPreviewsInView.Any())
                 {
-                    documentsTableView.ReloadData();
+                    documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
                 }
                 else
                 {
-                    //var indexPaths = indices.Select(i => NSIndexPath.FromRowSection(i, 0)).ToArray();
-                    //documentsTableView.DeleteRows(indexPaths, UITableViewRowAnimation.Automatic);
-                    documentsTableView.ReloadData(); //TODO I do not understand why this does not work (with the other metods) when we use the swype action to delete from folder, need to investigate
+                    var indexPaths = indices.Select(i => NSIndexPath.FromRowSection(i, 0)).ToArray();
+                    documentsTableView.DeleteRows(indexPaths, UITableViewRowAnimation.Automatic);
                 }
+
+                documentsTableView.EndUpdates();
             }
 
             public DocumentPreview GetNextDocumentPreview(DocumentPreview documentPreview,
