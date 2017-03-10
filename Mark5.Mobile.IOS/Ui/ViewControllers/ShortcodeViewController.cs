@@ -28,6 +28,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
     public class ShortcodeViewController : AbstractViewController, ISecondaryViewController
     {
+        public bool Modal { get; set; }
+
         public bool Empty { get { return folderId == null && folder == null && shortcodeId == null && shortcodePreview == null && shortcode == null; } }
 
         int? folderId;
@@ -40,6 +42,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         bool refreshDataOnAppear;
 
         UIBarButtonItem composeButton;
+        UIBarButtonItem doneButtonItem;
+
         UITableView tableView;
         UIToolbar toolbar;
         UIBarButtonItem fileToButton;
@@ -107,10 +111,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            composeButton = new UIBarButtonItem();
-            composeButton.Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"));
-            composeButton.Enabled = false;
-            NavigationItem.SetRightBarButtonItem(composeButton, false);
+            if (Modal)
+            {
+                doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+                NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
+            }
+            else
+            {
+                composeButton = new UIBarButtonItem();
+                composeButton.Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"));
+                composeButton.Enabled = false;
+                NavigationItem.SetRightBarButtonItem(composeButton, false);
+            }
         }
 
         void InitializeView()
@@ -154,7 +166,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 40f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, -49f)
+                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, Modal ? 0 : -49f)
                 });
         }
 
@@ -170,6 +182,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (composeButton != null)
                 composeButton.Clicked += ComposeButton_Clicked;
+
+            if (doneButtonItem != null)
+                doneButtonItem.Clicked += DoneButtonItem_Clicked;
         }
 
         void DeinitializeHandlers()
@@ -179,6 +194,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (composeButton != null)
                 composeButton.Clicked -= ComposeButton_Clicked;
+
+            if (doneButtonItem != null)
+                doneButtonItem.Clicked -= DoneButtonItem_Clicked;
         }
 
         void RowLongPressed(UILongPressGestureRecognizer gr)
@@ -259,6 +277,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
             composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
             PresentViewController(composeDocumentNavigationController, true, null);
+        }
+
+        void DoneButtonItem_Clicked(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
         }
 
         public void SetData(int folderId, int shortcodeId)
@@ -343,6 +366,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (folderId == null && folder == null && shortcodePreview != null)
                 {
                     shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(-1, shortcodePreview.Id);
+                }
+
+                if (folderId == null && folder == null && shortcodePreview == null)
+                {
+                    var swp = await Managers.ShortcodesManager.GetShortcodeWithPreviewAsync(-1, shortcodeId.Value);
+                    shortcodePreview = swp.ShortcodePreview;
+                    shortcode = swp.Shortcode;
                 }
 
                 this.folderId = folderId;

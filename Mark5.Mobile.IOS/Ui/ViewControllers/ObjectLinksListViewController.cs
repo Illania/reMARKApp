@@ -135,16 +135,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void ObjectLinkSelected(ObjectLink link)
         {
-            switch (link.ToObjectType)
+            ObjectType switchObjectType;
+            int objectId;
+
+            if (businessEntity.ObjectType == link.FromObjectType && businessEntity.Id == link.FromObjectId)
+            {
+                switchObjectType = link.ToObjectType;
+                objectId = link.ToObjectId;
+            }
+            else
+            {
+                switchObjectType = link.FromObjectType;
+                objectId = link.FromObjectId;
+            }
+
+            switch (switchObjectType)
             {
                 case ObjectType.Document:
-                    PresentDocumentViewController(link.ToObjectId);
+                    PresentDocumentViewController(objectId);
                     break;
                 case ObjectType.Contact:
-                    PresentContactViewController(link.ToObjectId);
+                    PresentContactViewController(objectId);
                     break;
                 case ObjectType.Shortcode:
-                    PresentShortcodeViewController(link.ToObjectId);
+                    PresentShortcodeViewController(objectId);
                     break;
             }
         }
@@ -162,7 +176,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(navigationController, true, null);
         }
 
-        public void PresentContactViewController(int contactId) //TODO need to test
+        public void PresentContactViewController(int contactId)
         {
             var vc = new ContactViewController();
             vc.Modal = true;
@@ -178,6 +192,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void PresentShortcodeViewController(int shortcodeId)
         {
             var vc = new ShortcodeViewController();
+            vc.Modal = true;
             vc.SetRefreshDataOnAppear();
             vc.SetData(shortcodeId);
 
