@@ -31,8 +31,6 @@
 	<string>Assets.xcassets/AppIcon.appiconset</string>
 	<key>CFBundleShortVersionString</key>
 	<string>2.0</string>
-	<key>CFBundleVersion</key>
-	<string>99</string>
 	<key>UIStatusBarStyle</key>
 	<string>UIStatusBarStyleLightContent</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
@@ -63,5 +61,7 @@
 	<string>We need access to your photos to be able to attach pictures to email.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>We need access to your camera to be able to attach pictures to email.</string>
+	<key>CFBundleVersion</key>
+	<string>100</string>
 </dict>
 </plist>
