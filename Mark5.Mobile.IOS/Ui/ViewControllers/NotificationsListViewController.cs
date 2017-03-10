@@ -209,11 +209,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void NotificationSelected(Notification notification)
         {
-            if (notification.ObjectType == ObjectType.Document)
+            switch (notification.ObjectType)
             {
-                PresentDocumentViewController(notification.ObjectId);
+                case ObjectType.Document:
+                    PresentDocumentViewController(notification.ObjectId);
+                    break;
+                case ObjectType.Contact:
+
+                    PresentContactViewController(notification.ObjectId);
+                    break;
+                case ObjectType.Shortcode:
+
+                    PresentShortcodeViewController(notification.ObjectId);
+                    break;
             }
-            //TODO else?
         }
 
         public void PresentDocumentViewController(int documentId)
@@ -222,6 +231,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             vc.Modal = true;
             vc.SetRefreshDataOnAppear();
             vc.SetData(documentId);
+
+            var navigationController = new UINavigationController(vc);
+            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+
+            PresentViewController(navigationController, true, null);
+        }
+
+        public void PresentContactViewController(int contactId)
+        {
+            var vc = new ContactViewController();
+            vc.Modal = true;
+            vc.SetRefreshDataOnAppear();
+            vc.SetData(contactId);
+
+            var navigationController = new UINavigationController(vc);
+            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+
+            PresentViewController(navigationController, true, null);
+        }
+
+        public void PresentShortcodeViewController(int shortcodeId)
+        {
+            var vc = new ShortcodeViewController();
+            vc.Modal = true;
+            vc.SetRefreshDataOnAppear();
+            vc.SetData(shortcodeId);
 
             var navigationController = new UINavigationController(vc);
             navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
