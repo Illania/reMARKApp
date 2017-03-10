@@ -29,6 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
     public class ContactViewController : AbstractViewController, ISecondaryViewController
     {
+        public bool Modal { get; set; }
 
         public bool Empty { get { return folderId == null && folder == null && contactId == null && contactPreview == null && contact == null; } }
 
@@ -46,6 +47,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem assignCategoryButton;
         UIBarButtonItem fileToButton;
         UIBarButtonItem actionsLinksButton;
+        UIBarButtonItem doneButtonItem;
 
         CancellationTokenSource cts;
 
@@ -60,7 +62,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            InitializeNavigationBarTitle();
+            InitializeNavigationBar();
             InitializeHandlers();
         }
 
@@ -158,8 +160,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 40f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, -49f)
+                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, Modal ? 0 : -49f)
                 });
+        }
+
+        void InitializeNavigationBar()
+        {
+            if (Modal)
+            {
+                doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+                NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
+            }
+
+            InitializeNavigationBarTitle();
         }
 
         void InitializeNavigationBarTitle()
@@ -177,6 +190,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (actionsLinksButton != null)
                 actionsLinksButton.Clicked += ActionsLinksButton_Clicked;
+
+            if (doneButtonItem != null)
+                doneButtonItem.Clicked += DoneButtonItem_Clicked;
         }
 
         void DeinitializeHandlers()
@@ -189,6 +205,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (actionsLinksButton != null)
                 actionsLinksButton.Clicked -= ActionsLinksButton_Clicked;
+
+            if (doneButtonItem != null)
+                doneButtonItem.Clicked -= DoneButtonItem_Clicked;
         }
 
         void RowLongPressed(UILongPressGestureRecognizer gr)
@@ -280,6 +299,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(navigationController, true, null);
         }
 
+        void DoneButtonItem_Clicked(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
+        }
+
         void CommunicationAddressClicked(UITableView tv, UITableViewCell cell, CommunicationAddress ca)
         {
             if (ca.Type == CommunicationAddressType.Email)
@@ -310,6 +334,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void LinkedContactClicked(ContactPreview contactPreview)
         {
             var vc = new ContactViewController();
+            vc.Modal = Modal;
             vc.SetData(contactPreview);
             vc.SetRefreshDataOnAppear();
             NavigationController.PushViewController(vc, true);
@@ -400,6 +425,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (folderId == null && folder == null && contactPreview != null)
                 {
                     contact = await Managers.ContactsManager.GetContactAsync(-1, contactPreview.Id);
+                }
+
+                if (folderId == null && folder == null && contactPreview == null)
+                {
+                    var swp = await Managers.ContactsManager.GetContactWithPreviewAsync(-1, contactId.Value);
+                    this.contactPreview = swp.ContactPreview;
+                    contact = swp.Contact;
                 }
 
                 contact.CommunicationAddresses = contact.CommunicationAddresses.OrderBy(ca => ca.Address).ToList();

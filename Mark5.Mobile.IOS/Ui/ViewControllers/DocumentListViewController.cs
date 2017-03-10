@@ -1063,7 +1063,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
                 else
                 {
-                    var indexPaths = indices.Select(i => NSIndexPath.FromRowSection(i, 0)).ToArray();
+                    var indexPaths = indices.Select(i => NSIndexPath.FromRowSection(i, 0)).ToArray(); //TODO need to understand why we have a strange behaviour with slide deletion
                     documentsTableView.DeleteRows(indexPaths, UITableViewRowAnimation.Automatic);
                 }
 

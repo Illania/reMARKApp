@@ -636,15 +636,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var indices = documentPreviewsInView.Select((d, i) => new { d, i }).Where(x => documentIds.Contains(x.d.Id)).Select(x => x.i).ToList();
                 indices.OrderByDescending(i => i).ForEach(documentPreviewsInView.RemoveAt);
 
+                documentsTableView.BeginUpdates();
+
                 if (!documentPreviewsInView.Any())
                 {
-                    documentsTableView.ReloadData();
+                    documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
                 }
                 else
                 {
-                    //TODO same problem as in the non search version, need to figure it out
-                    documentsTableView.ReloadData();
+                    var indexPaths = indices.Select(i => NSIndexPath.FromRowSection(i, 0)).ToArray();
+                    documentsTableView.DeleteRows(indexPaths, UITableViewRowAnimation.Automatic);
                 }
+
+                documentsTableView.EndUpdates();
             }
 
             public DocumentPreview GetNextDocumentPreview(DocumentPreview documentPreview,

@@ -137,10 +137,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             switch (link.ToObjectType)
             {
-                case ObjectType.Document: //TODO need to finish this
+                case ObjectType.Document:
                     PresentDocumentViewController(link.ToObjectId);
                     break;
-                default:
+                case ObjectType.Contact:
+                    PresentContactViewController(link.ToObjectId);
+                    break;
+                case ObjectType.Shortcode:
+                    PresentShortcodeViewController(link.ToObjectId);
                     break;
             }
         }
@@ -161,6 +165,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void PresentContactViewController(int contactId) //TODO need to test
         {
             var vc = new ContactViewController();
+            vc.Modal = true;
             vc.SetRefreshDataOnAppear();
             vc.SetData(contactId);
 
