@@ -32,9 +32,9 @@
     <DeviceSpecificBuild>false</DeviceSpecificBuild>
     <CodesignProvision>840a3d1f-e198-49d0-a939-835e472a1e97</CodesignProvision>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-  </PropertyGroup>
+<RunCodeAnalysis>true</RunCodeAnalysis>  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType></DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\iPhone\Release</OutputPath>
     <DefineConstants></DefineConstants>
@@ -52,7 +52,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <CodesignProvision>d21b6e09-3a9c-4161-89a2-8a2e3b9d5ad2</CodesignProvision>
     <MtouchUseLlvm>true</MtouchUseLlvm>
-  </PropertyGroup>
+<RunCodeAnalysis>true</RunCodeAnalysis>  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
@@ -68,7 +68,7 @@
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
-  </PropertyGroup>
+<RunCodeAnalysis>true</RunCodeAnalysis>  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -91,7 +91,7 @@
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
     <CodesignProvision>840a3d1f-e198-49d0-a939-835e472a1e97</CodesignProvision>
-  </PropertyGroup>
+<RunCodeAnalysis>true</RunCodeAnalysis>  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
