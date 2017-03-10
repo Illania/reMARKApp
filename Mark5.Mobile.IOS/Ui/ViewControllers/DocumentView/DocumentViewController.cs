@@ -79,6 +79,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         ReadByView readByView;
         ReferenceNumberView referenceNumberView;
 
+        UIView grayBackgroundView;
+        UIActivityIndicatorView spinner;
+
         UIBarButtonItem flag;
         UIBarButtonItem fileTo;
         UIButton commentsButton;
@@ -265,6 +268,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f),
                     NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Bottom, 1f, 0f)
+                });
+
+            grayBackgroundView = new UIView();
+            grayBackgroundView.BackgroundColor = UIColor.GroupTableViewBackgroundColor;
+            grayBackgroundView.TranslatesAutoresizingMaskIntoConstraints = false;
+            View.AddSubview(grayBackgroundView);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(grayBackgroundView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(grayBackgroundView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(grayBackgroundView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(grayBackgroundView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+                });
+            View.BringSubviewToFront(grayBackgroundView);
+
+            spinner = new UIActivityIndicatorView();
+            spinner.Hidden = false;
+            spinner.ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.WhiteLarge;
+            grayBackgroundView.AddSubview(spinner);
+            grayBackgroundView.BringSubviewToFront(spinner);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(spinner, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, grayBackgroundView, NSLayoutAttribute.CenterX, 1f, 0f),
+                    NSLayoutConstraint.Create(spinner, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, grayBackgroundView, NSLayoutAttribute.CenterY, 1f, 0f)
                 });
         }
 
@@ -557,6 +584,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
+                spinner.StartAnimating();
+                await Task.Delay(4000);
+
                 if (notificationGuid != default(Guid))
                 {
                     await Managers.NotificationsManager.MarkAsRead(notificationGuid);
@@ -586,6 +616,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (token.IsCancellationRequested) return;
 
                 RefreshView();
+
+                spinner.StopAnimating();
+                View.SendSubviewToBack(grayBackgroundView);
+
                 MarkAsReadIfNecessary();
             }
             catch (Exception ex)
