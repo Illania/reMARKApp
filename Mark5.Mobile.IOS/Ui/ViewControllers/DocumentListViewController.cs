@@ -621,23 +621,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void RemoveDocumentsFromList(IEnumerable<int> ids)
         {
-            if (searchController.Active)
+            BeginInvokeOnMainThread(() =>
             {
-                searchResultsDataSource.RemoveItems(ids.ToList());
-            }
-
-            var ds = (DataSource)tableView.Source;
-            ds.RemoveItems(ids.ToList());
-
-            if (SplitViewController != null && !SplitViewController.Collapsed)
-            {
-                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
-                var vc = (DocumentViewController)nc.ViewControllers[0];
-                if (ids.Select(id => vc.isShowingDocumentWithId(id)).Any(v => v))
+                if (searchController.Active)
                 {
-                    vc.ClearData();
+                    searchResultsDataSource.RemoveItems(ids.ToList());
                 }
-            }
+
+                var ds = (DataSource)tableView.Source;
+                ds.RemoveItems(ids.ToList());
+
+                if (SplitViewController != null && !SplitViewController.Collapsed)
+                {
+                    var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                    var vc = (DocumentViewController)nc.ViewControllers[0];
+                    if (ids.Select(id => vc.isShowingDocumentWithId(id)).Any(v => v))
+                    {
+                        vc.ClearData();
+                    }
+                }
+            });
         }
 
         void UpdatePriorityForDocument(IEnumerable<int> ids)
