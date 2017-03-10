@@ -551,7 +551,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void CopyToWorktray(List<ContactPreview> selectedContacts)
         {
             var vc = new CopyToWorktrayViewController { BusinessEntities = selectedContacts.Cast<IBusinessEntity>().ToList() };
-            NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void CopyToFolder(ContactPreview selecteContact) => CopyToFolder(new List<ContactPreview> { selecteContact });
@@ -559,7 +559,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void CopyToFolder(List<ContactPreview> selectedContacts)
         {
             var vc = new CopyMoveToFolderListViewController(selectedContacts.Cast<IBusinessEntity>().ToList());
-            NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void MoveToFolder(ContactPreview selectedContact) => MoveToFolder(new List<ContactPreview> { selectedContact });
@@ -567,7 +567,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void MoveToFolder(List<ContactPreview> selectedContacts)
         {
             var vc = new CopyMoveToFolderListViewController(selectedContacts.Cast<IBusinessEntity>().ToList(), Folder);
-            NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void DoShowMoreActionSheet(NSIndexPath indexPath, ContactPreview selectedContact)
@@ -618,7 +618,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void HandleCategoriesChanged(EntityCategoriesChangedMessage message)
         {
-            InvokeOnMainThread(() =>
+            BeginInvokeOnMainThread(() =>
             {
                 var ds = tableView.Source as DataSource;
                 var indexPath = ds.FindItemIndexPath(message.EntityId);

@@ -10,8 +10,10 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
+    
     public class ActionableLayoutScrollView : UIScrollView
     {
+        
         public Action<UIScrollView> LayoutSubviewsAction
         {
             get;
@@ -21,11 +23,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public override void LayoutSubviews()
         {
             base.LayoutSubviews();
+
             if (LayoutSubviewsAction != null)
-            {
                 LayoutSubviewsAction(this);
-            }
         }
     }
-
 }

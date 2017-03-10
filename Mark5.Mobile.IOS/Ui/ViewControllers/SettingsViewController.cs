@@ -241,8 +241,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     dismissAction();
 
-                    var mc = SystemReportCollector.CreateMailReportController(report);
-                    PresentViewController(mc, true, null);
+                    var mrc = SystemReportCollector.CreateMailReportController(report);
+                    PresentViewController(mrc, true, null);
                 }
                 catch (Exception ex)
                 {

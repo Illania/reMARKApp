@@ -214,14 +214,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void DocumentAddressClicked(DocumentAddress documentAddress)
         {
-            var composeDocumentViewController = new ComposeDocumentViewController
+            var vc = new ComposeDocumentViewController
             {
                 PreconfiguredEmailAddresses = new string[] { documentAddress.FullAddress },
                 CreationModeFlag = DocumentCreationModeFlag.New
             };
-            var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
-            composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
-            PresentViewController(composeDocumentNavigationController, true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         public void CopyToClipboard(UITableView tableView, UITableViewCell cell, string text) => Integration.CopyToClipboard(this, tableView, cell, text);
@@ -233,12 +231,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyToWorktrayViewController { BusinessEntities = new List<IBusinessEntity> { shortcode } };
-                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }));
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { shortcodePreview });
-                PresentViewController(new NavigationController(vc), true, null);
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }));
 
             if (folder?.InternalType == FolderInternalType.FilterView
@@ -247,7 +245,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { shortcodePreview }, folder);
-                PresentViewController(new NavigationController(vc), true, null);
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }));
 
             if (folder?.InternalType == FolderInternalType.FilterView
@@ -269,14 +267,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void ComposeButton_Clicked(object sender, EventArgs e)
         {
-            var composeDocumentViewController = new ComposeDocumentViewController
+            var vc = new ComposeDocumentViewController
             {
                 CreationModeFlag = DocumentCreationModeFlag.New,
                 PreConfiguredShortcode = shortcode
             };
-            var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
-            composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
-            PresentViewController(composeDocumentNavigationController, true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void DoneButtonItem_Clicked(object sender, EventArgs e)

@@ -170,10 +170,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             vc.SetRefreshDataOnAppear();
             vc.SetData(documentId);
 
-            var navigationController = new UINavigationController(vc);
-            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
-
-            PresentViewController(navigationController, true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         public void PresentContactViewController(int contactId)
@@ -183,10 +180,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             vc.SetRefreshDataOnAppear();
             vc.SetData(contactId);
 
-            var navigationController = new UINavigationController(vc);
-            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
-
-            PresentViewController(navigationController, true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         public void PresentShortcodeViewController(int shortcodeId)
@@ -196,10 +190,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             vc.SetRefreshDataOnAppear();
             vc.SetData(shortcodeId);
 
-            var navigationController = new UINavigationController(vc);
-            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
-
-            PresentViewController(navigationController, true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         async Task RefreshData()

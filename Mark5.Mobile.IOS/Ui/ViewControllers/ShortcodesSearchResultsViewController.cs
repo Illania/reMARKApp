@@ -265,7 +265,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void CopyToWorktray(List<ShortcodePreview> shortcodePreviews)
         {
             var vc = new CopyToWorktrayViewController { BusinessEntities = shortcodePreviews.Cast<IBusinessEntity>().ToList() };
-            NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void Delete(ShortcodePreview selectedShortcode) => Delete(new List<ShortcodePreview> { selectedShortcode });
@@ -311,7 +311,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void CopyToFolder(List<ShortcodePreview> shortcodePreviews)
         {
             var vc = new CopyMoveToFolderListViewController(shortcodePreviews.Cast<IBusinessEntity>().ToList());
-            NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void RemoveShortcodesFromList(IEnumerable<int> ids)

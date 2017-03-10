@@ -542,7 +542,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void CopyToWorktray(List<ShortcodePreview> shortcodePreviews)
         {
             var vc = new CopyToWorktrayViewController { BusinessEntities = shortcodePreviews.Cast<IBusinessEntity>().ToList() };
-            NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void CopyToFolder(ShortcodePreview shortcodePreview) => CopyToFolder(new List<ShortcodePreview> { shortcodePreview });
@@ -550,7 +550,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void CopyToFolder(List<ShortcodePreview> shortcodePreviews)
         {
             var vc = new CopyMoveToFolderListViewController(shortcodePreviews.Cast<IBusinessEntity>().ToList());
-            NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void MoveToFolder(ShortcodePreview shortcodePreview) => MoveToFolder(new List<ShortcodePreview> { shortcodePreview });
@@ -558,7 +558,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void MoveToFolder(List<ShortcodePreview> shortcodePreviews)
         {
             var vc = new CopyMoveToFolderListViewController(shortcodePreviews.Cast<IBusinessEntity>().ToList(), Folder);
-            NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void DoShowMoreActionSheet(NSIndexPath indexPath, ShortcodePreview selectedShortcode)

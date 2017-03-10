@@ -271,15 +271,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         void ComposeDocumentItem_Clicked(object sender, EventArgs e)
         {
-            var composeDocumentViewController = new ComposeDocumentViewController
+            var vc = new ComposeDocumentViewController
             {
                 CreationModeFlag = DocumentCreationModeFlag.New,
                 PreviousDocumentDirection = DocumentDirection.None
             };
 
-            var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
-            composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
-            PresentViewController(composeDocumentNavigationController, true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
