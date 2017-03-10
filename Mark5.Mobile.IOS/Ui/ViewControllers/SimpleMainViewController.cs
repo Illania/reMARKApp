@@ -98,7 +98,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     settingsNavigationController
                 };
 
-                SelectedIndex = 1;
+                SelectedIndex = 0;
             }
         }
 
