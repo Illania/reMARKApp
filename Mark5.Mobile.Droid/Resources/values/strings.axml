@@ -18,6 +18,8 @@
 	<string name="birthdate">Birthdate</string>
 	<string name="by">by</string>
 	<string name="cancel">Cancel</string>
+	<string name="cannot_edit_comment_content">This comment cannot be edited anymore.</string>
+	<string name="cannot_edit_comment_title">Cannot edit comment</string>
 	<string name="cannot_open_attachment_without_ext">Attachments without extensions cannot be opened</string>
 	<string name="categories">Categories</string>
 	<string name="cc">Cc</string>

@@ -12,7 +12,7 @@ using Mark5.Mobile.IOS.Ui.Common;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-    
+
     public static class DateTimeUtils
     {
 

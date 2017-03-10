@@ -152,15 +152,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
 
                 AddView(titleTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-
-                LongClickable = true;
-                LongClick += (sender, e) =>
-                {
-                    if (!string.IsNullOrWhiteSpace(titleTextView.Text))
-                    {
-                        Integration.CopyToClipboard(context, titleTextView.Text);
-                    }
-                };
             }
         }
     }

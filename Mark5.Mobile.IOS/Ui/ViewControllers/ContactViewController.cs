@@ -19,6 +19,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -205,12 +206,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void AssignCategoryButton_Clicked(object sender, EventArgs e)
         {
-            var categoriesListViewController = new CategoriesListViewController();
-            categoriesListViewController.BusinessEntityPreview = contactPreview;
-            var categoriesListNavigationController = new UINavigationController(categoriesListViewController);
-            categoriesListNavigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
-
-            PresentViewController(categoriesListNavigationController, true, null);
+            var vc = new NavigationController(new CategoriesListViewController { BusinessEntityPreview = contactPreview }, UIModalPresentationStyle.PageSheet);
+            PresentViewController(vc, true, null);
         }
 
         void FileToButton_Clicked(object sender, EventArgs e)
@@ -226,7 +223,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { contactPreview });
-                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+                PresentViewController(new NavigationController(vc), true, null);
             }));
 
             if (folder?.InternalType == FolderInternalType.FilterView
@@ -235,7 +232,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { contactPreview }, folder);
-                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+                PresentViewController(new NavigationController(vc), true, null);
             }));
 
             if (folder?.InternalType == FolderInternalType.FilterView
@@ -1142,7 +1139,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
-                    viewController.CopyToClipboard(tableView, cell, ContactPreview.Description);
+                    viewController.CopyToClipboard(tableView, cell, cell.TextLabel.Text);
                 }
             }
 

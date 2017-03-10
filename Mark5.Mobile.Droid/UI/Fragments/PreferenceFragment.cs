@@ -143,7 +143,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (preference.Key == GetString(Resource.String.pref_key_advanced_send_feedback))
             {
-                FeedbackManager.ShowFeedbackActivity(Activity);
+                var sendIntent = new Intent();
+                sendIntent.SetAction(Intent.ActionSendto);
+                sendIntent.SetData(Android.Net.Uri.Parse("mailto:support@nordic-it.com?subject=MARK5%20for%20Android%20Feedback"));
+                StartActivity(sendIntent);
+
                 return true;
             }
 

@@ -5,7 +5,6 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-
 using System;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +12,7 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Utilities;
+using MessageUI;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Utilities
@@ -20,6 +20,14 @@ namespace Mark5.Mobile.IOS.Utilities
 
     public static class SystemReportCollector
     {
+
+        public static bool CanMailReport
+        {
+            get
+            {
+                return MFMailComposeViewController.CanSendMail;
+            }
+        }
 
         public static UIActivityViewController CreateShareReportController(string report)
         {
@@ -38,6 +46,17 @@ namespace Mark5.Mobile.IOS.Utilities
                                     }
             };
             return avc;
+        }
+
+        public static MFMailComposeViewController CreateMailReportController(string report)
+        {
+            var mc = new MFMailComposeViewController();
+            mc.SetToRecipients(new[] { "support@nordic-it.com" });
+            mc.SetSubject("MARK5 for iOS Feedback");
+            mc.AddAttachmentData(NSData.FromString(report), "text/plain", "MARK5_Android_System_Report.txt");
+            mc.Finished += (sender2, e) => e.Controller.DismissViewController(true, null);
+            mc.NavigationBar.TintColor = UIColor.White;
+            return mc;
         }
 
         public static string CreateFullReport()
@@ -96,18 +115,18 @@ namespace Mark5.Mobile.IOS.Utilities
             sb.AppendLine(SerializationUtils.Serialize(ServerConfig.SystemSettings));
             sb.AppendLine();
 
-            sb.AppendLine("===== Preferences =====");
-            foreach (var kv in PlatformConfig.Preferences.All)
-            {
-                sb.AppendLine(kv.Key + ": " + kv.Value);
-            }
-            sb.AppendLine();
-
             sb.AppendLine("===== Memory information =====");
             sb.AppendLine("Free disk space: " + Integration.GetFreeDiskSpace() / 1024 /1024);
             sb.AppendLine("Total disk space: " + Integration.GetTotalDiskSpace() / 1024 / 1024);
             sb.AppendLine("[MONO] Total memory: " + GC.GetTotalMemory(false) / 1024);
             sb.AppendLine("[MONO] Total memory after GC: " + GC.GetTotalMemory(true) / 1024);
+            sb.AppendLine();
+
+            sb.AppendLine("===== Preferences =====");
+            foreach (var kv in PlatformConfig.Preferences.All)
+            {
+                sb.AppendLine(kv.Key + ": " + kv.Value);
+            }
             sb.AppendLine();
             
             return sb.ToString();

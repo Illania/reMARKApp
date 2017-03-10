@@ -160,7 +160,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
                 var callChooser = UIAlertController.Create(null, processedNumber, UIAlertControllerStyle.ActionSheet);
                 callChooser.AddAction(UIAlertAction.Create(Localization.GetString("call"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(callUrl, new NSDictionary(), null)));
-                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("text"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(textUrl, new NSDictionary(), null)));
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("send_text"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(textUrl, new NSDictionary(), null)));
                 callChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
                 if (callChooser.PopoverPresentationController != null)
@@ -241,7 +241,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
                 if (UIApplication.SharedApplication.CanOpenUrl(chromeUrl))
                 {
-                    var browserChooser = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+                    var browserChooser = UIAlertController.Create(null, url, UIAlertControllerStyle.ActionSheet);
                     browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("safari"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(safariUrl, new NSDictionary(), null)));
                     browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("chrome"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(chromeUrl, new NSDictionary(), null)));
                     browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));

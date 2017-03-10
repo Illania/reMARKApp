@@ -592,7 +592,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (e.Type == CommunicationAddressType.Email)
             {
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None, preconfiguredEmailAddresses: new List<string> { e.Address }));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None, preconfiguredEmailToAddresses: new List<string> { e.Address }));
                 return;
             }
             if (e.Type == CommunicationAddressType.Mobile || e.Type == CommunicationAddressType.Phone)

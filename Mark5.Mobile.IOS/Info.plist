@@ -59,5 +59,9 @@
 		<string>googlechrome</string>
 		<string>comgooglemapsurl</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to your photos to be able to attach pictures to email.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>We need access to your camera to be able to attach pictures to email.</string>
 </dict>
 </plist>

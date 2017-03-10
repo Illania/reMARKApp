@@ -8,7 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.OS;
@@ -16,7 +15,6 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
-using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
@@ -27,8 +25,11 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
+    
     public class CommentsListFragment : RetainableStateFragment
     {
+
+        const int SecondsToEdit = 60;
 
         public BusinessEntity Entity { get; set; }
 
@@ -126,11 +127,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void CreateContextMenu(IContextMenu menu, View view, IContextMenuContextMenuInfo menuInfo)
         {
-            menu.Add(Menu.None, MenuItemActions.EditComment, MenuItemActions.EditComment, Resource.String.edit);
-            menu.Add(Menu.None, MenuItemActions.DeleteComment, MenuItemActions.DeleteComment, Resource.String.delete);
-
             var position = recyclerView.GetChildAdapterPosition(view);
             adapter.SelectedPosition = position;
+
+            var comment = adapter.GetSelectedItem();
+            var isEditable = DateTime.UtcNow.Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= SecondsToEdit;
+
+            if (isEditable)
+                menu.Add(Menu.None, MenuItemActions.EditComment, MenuItemActions.EditComment, Resource.String.edit);
+     
+            menu.Add(Menu.None, MenuItemActions.DeleteComment, MenuItemActions.DeleteComment, Resource.String.delete);
         }
 
         public override bool OnContextItemSelected(IMenuItem item)
@@ -139,8 +145,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.EditComment)
             {
-                Dialogs.ShowEditTextDialog(Context, Resource.String.edit_comment_message, comment.Content, (text) => EditComment(comment, text), null,
-                                          Resource.String.confirm, Resource.String.cancel);
+                var isEditable = DateTime.UtcNow.Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= SecondsToEdit;
+                if (!isEditable)
+                {
+                    Dialogs.ShowConfirmDialog(Context, Resource.String.cannot_edit_comment_title, Resource.String.cannot_edit_comment_content);
+                }
+                else
+                {
+                    Dialogs.ShowEditTextDialog(Context, Resource.String.edit_comment_message, comment.Content, (text) => EditComment(comment, text), null,
+                                              Resource.String.confirm, Resource.String.cancel);
+                }
             }
 
             if (item.ItemId == MenuItemActions.DeleteComment)
@@ -361,9 +375,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var commentFromCurrentUser = ServerConfig.SystemSettings.UserInfo.User.Id == comment.UserId;
 
                 if (commentFromCurrentUser)
-                {
                     cvh.ItemView.SetOnCreateContextMenuListener(new ActionOnCreateContextMenuListener(action));
-                }
 
                 cvh.Username = commentFromCurrentUser ? "Me" : comment.UserName;
                 cvh.Date = comment.DateAddedTimestamp

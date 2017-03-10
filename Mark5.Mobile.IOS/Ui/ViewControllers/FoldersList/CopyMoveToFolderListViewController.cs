@@ -154,7 +154,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (!confirmed) return;
 
             CommonConfig.Logger.Info($"Copying business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]");
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog("copying___");
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("copying___"));
 
             try
             {
@@ -198,7 +198,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (!confirmed) return;
 
             CommonConfig.Logger.Info($"Moving business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]");
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog("moving___");
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("moving___"));
 
             try
             {

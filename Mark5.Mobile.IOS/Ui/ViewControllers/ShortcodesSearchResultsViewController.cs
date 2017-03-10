@@ -12,6 +12,7 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -29,7 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem exitEditItem;
         UIBarButtonItem editItem;
 
-        UITableView shortcodesTableView;
+        UITableView tableView;
 
         #region UIViewController overrides
 
@@ -47,6 +48,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeNavigationBarTitle();
             InitializeHandlers();
+
+            if (tableView?.IndexPathForSelectedRow != null)
+                tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
+
+            if (tableView?.IndexPathsForSelectedRows?.Length > 0)
+                foreach (var selectedIndexPath in tableView?.IndexPathsForSelectedRows)
+                    tableView.DeselectRow(selectedIndexPath, true);
         }
 
         public override void ViewDidAppear(bool animated)
@@ -55,7 +63,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"{nameof(ShortcodesListViewController)} appeared");
 
-            var ds = (DataSource)shortcodesTableView.Source;
+            var ds = (DataSource)tableView.Source;
             if (ds.Empty)
                 RefreshData();
         }
@@ -85,7 +93,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             CommonConfig.Logger.Warning($"{nameof(ShortcodesSearchResultsViewController)} received memory warning!");
 
-            var ds = shortcodesTableView?.Source as DataSource;
+            var ds = tableView?.Source as DataSource;
             ds?.Reset();
 
             base.DidReceiveMemoryWarning();
@@ -105,19 +113,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             AutomaticallyAdjustsScrollViewInsets = true;
 
-            shortcodesTableView = new UITableView();
-            shortcodesTableView.ClipsToBounds = false;
-            shortcodesTableView.Source = new DataSource(this, shortcodesTableView, Localization.GetString("no_shortcodes_found"));
-            shortcodesTableView.AllowsSelectionDuringEditing = false;
-            shortcodesTableView.AllowsMultipleSelectionDuringEditing = true;
-            shortcodesTableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            View.AddSubview(shortcodesTableView);
+            tableView = new UITableView();
+            tableView.ClipsToBounds = false;
+            tableView.Source = new DataSource(this, tableView, Localization.GetString("no_shortcodes_found"));
+            tableView.AllowsSelectionDuringEditing = false;
+            tableView.AllowsMultipleSelectionDuringEditing = true;
+            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
+            View.AddSubview(tableView);
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(shortcodesTableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(shortcodesTableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(shortcodesTableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(shortcodesTableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
                 });
 
             var longPressRecognizer = new UILongPressGestureRecognizer(this, new Selector("longPressed:"))
@@ -125,7 +133,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 MinimumPressDuration = 1f,
                 Delegate = this
             };
-            shortcodesTableView.AddGestureRecognizer(longPressRecognizer);
+            tableView.AddGestureRecognizer(longPressRecognizer);
         }
 
         void InitializeNavigationBarTitle()
@@ -183,19 +191,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         [Export("longPressed:")]
         public void LongPressed(UILongPressGestureRecognizer recognizer)
         {
-            if (shortcodesTableView.Editing) return;
+            if (tableView.Editing) return;
 
             StartEditing();
 
-            var point = recognizer.LocationInView(shortcodesTableView);
-            var indexPath = shortcodesTableView.IndexPathForRowAtPoint(point);
+            var point = recognizer.LocationInView(tableView);
+            var indexPath = tableView.IndexPathForRowAtPoint(point);
 
-            shortcodesTableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
+            tableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
         }
 
         void StartEditing()
         {
-            shortcodesTableView.SetEditing(true, true);
+            tableView.SetEditing(true, true);
             NavigationItem.SetRightBarButtonItem(exitEditItem, true);
             NavigationItem.SetLeftBarButtonItem(editItem, true);
 
@@ -213,19 +221,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void EndEditing()
         {
-            shortcodesTableView.SetEditing(false, true);
+            tableView.SetEditing(false, true);
             NavigationItem.SetRightBarButtonItem(null, true);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
         }
 
         void EditItem_Clicked(object sender, EventArgs e)
         {
-            if (shortcodesTableView.IndexPathsForSelectedRows == null || shortcodesTableView.IndexPathsForSelectedRows.Length < 1) return;
+            if (tableView.IndexPathsForSelectedRows == null || tableView.IndexPathsForSelectedRows.Length < 1) return;
 
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
-            var rows = shortcodesTableView.IndexPathsForSelectedRows.ToArray();
-            var selectedShortcodes = rows.Select(ip => ((DataSource)shortcodesTableView.Source).Items[ip.Row]).ToList();
+            var rows = tableView.IndexPathsForSelectedRows.ToArray();
+            var selectedShortcodes = rows.Select(ip => ((DataSource)tableView.Source).FindItemAtIndexPath(ip)).ToList();
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
             {
@@ -309,7 +317,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void RemoveShortcodesFromList(IEnumerable<int> ids)
         {
 
-            var ds = (DataSource)shortcodesTableView.Source;
+            var ds = (DataSource)tableView.Source;
             ds.RemoveItems(ids.ToList());
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
@@ -345,7 +353,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
 
             if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(shortcodesTableView, shortcodesTableView.CellAt(indexPath));
+                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(tableView, tableView.CellAt(indexPath));
 
             exitEditItem.Enabled = false;
             PresentViewController(eas, true, null);
@@ -365,7 +373,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var results = await Managers.SearchManager.SearchShortcodesAsync(Criteria);
 
-                var ds = (DataSource)shortcodesTableView.Source;
+                var ds = (DataSource)tableView.Source;
                 ds.AppendItems(results);
             }
             catch (Exception ex)
@@ -383,42 +391,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         class DataSource : UITableViewSource, IDisposable
         {
 
-            public bool Empty
-            {
-                get
-                {
-                    return shortcodePreviewsInView.Count < 1;
-                }
-            }
+            public bool Empty { get { return shortcodePreviewsInView.Count < 1; } }
 
-            public List<ShortcodePreview> Items
-            {
-                get
-                {
-                    return shortcodePreviewsInView;
-                }
-            }
+            public IEnumerable<ShortcodePreview> Items { get { return shortcodePreviewsInView.SelectMany(i => i); } }
 
             ShortcodesSearchResultsViewController viewController;
-            UITableView shortcodesTableView;
+            UITableView tableView;
             readonly string emptyText;
 
             bool loading = true;
-            List<ShortcodePreview> shortcodePreviewsInView = new List<ShortcodePreview>(1000);
+            List<List<ShortcodePreview>> shortcodePreviewsInView = new List<List<ShortcodePreview>>(25);
 
-            public DataSource(ShortcodesSearchResultsViewController viewController, UITableView shortcodesTableView, string emptyText)
+            public DataSource(ShortcodesSearchResultsViewController viewController, UITableView tableView, string emptyText)
             {
                 this.viewController = viewController;
-                this.shortcodesTableView = shortcodesTableView;
+                this.tableView = tableView;
                 this.emptyText = emptyText;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 if (loading)
-                {
                     return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
-                }
 
                 if (shortcodePreviewsInView.Count < 1)
                 {
@@ -427,11 +421,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return emptyCell;
                 }
 
-                var sp = shortcodePreviewsInView[indexPath.Row];
+                var cp = shortcodePreviewsInView[indexPath.Section][indexPath.Row];
 
                 var cell = tableView.DequeueReusableCell(ShortcodesTableViewCell.Key) as ShortcodesTableViewCell ?? ShortcodesTableViewCell.Create();
-                cell.Initialize(sp);
+                cell.Initialize(cp);
+
                 return cell;
+            }
+
+            public override nint NumberOfSections(UITableView tableView)
+            {
+                if (loading)
+                    return 1;
+
+                if (shortcodePreviewsInView.Count < 1)
+                    return 1;
+
+                return shortcodePreviewsInView.Count;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
@@ -442,7 +448,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (shortcodePreviewsInView.Count < 1)
                     return 1;
 
-                return shortcodePreviewsInView.Count;
+                return shortcodePreviewsInView[(int)section].Count;
+            }
+
+            public override string[] SectionIndexTitles(UITableView tableView)
+            {
+                return shortcodePreviewsInView.SelectMany(i => i).Select(cp => cp.Name.SafeSubstring(0, 1).ToUpper()).Distinct().ToArray();
+            }
+
+            public override nint SectionFor(UITableView tableView, string title, nint atIndex)
+            {
+                for (int section = 0; section < shortcodePreviewsInView.Count; section++)
+                {
+                    var row = shortcodePreviewsInView[section].FindIndex(cp => cp.Name.SafeSubstring(0, 1).ToUpper() == title);
+                    if (row >= 0)
+                    {
+                        tableView.ScrollToRow(NSIndexPath.FromRowSection(row, section), UITableViewScrollPosition.Top, true);
+                        break;
+                    }
+                }
+
+                return -1;
             }
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
@@ -459,7 +485,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var actions = new List<UITableViewRowAction>();
 
-                var shortcodePreview = shortcodePreviewsInView[indexPath.Row];
+                var shortcodePreview = shortcodePreviewsInView[indexPath.Section][indexPath.Row];
 
                 var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("more"), (a, ip) => { viewController.DoShowMoreActionSheet(indexPath, shortcodePreview); });
                 moreAction.BackgroundColor = Theme.Blue;
@@ -476,30 +502,88 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 if (tableView.Editing) return;
 
-                var sp = shortcodePreviewsInView[indexPath.Row];
-                viewController.ShortcodeSelected(tableView, sp);
+                var cp = shortcodePreviewsInView[indexPath.Section][indexPath.Row];
+                viewController.ShortcodeSelected(tableView, cp);
             }
 
             public void AppendItems(List<ShortcodePreview> shortcodePreviews)
             {
                 loading = false;
 
-                shortcodePreviewsInView.AddRange(shortcodePreviews);
-                shortcodesTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+                var count = shortcodePreviewsInView.Count;
+                var isInputListPopulated = shortcodePreviews.Any();
+
+                if (isInputListPopulated)
+                    shortcodePreviewsInView.Add(shortcodePreviews);
+
+                if (count == 0)
+                    tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                else if (isInputListPopulated)
+                    tableView.InsertSections(NSIndexSet.FromIndex(shortcodePreviewsInView.Count - 1), UITableViewRowAnimation.Fade);
             }
 
             public void RemoveItems(List<int> shortcodeIds)
             {
-                shortcodePreviewsInView.RemoveAll(s => shortcodeIds.Contains(s.Id));
-                shortcodesTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+                tableView.BeginUpdates();
+
+                var indexPaths = shortcodeIds.Select(id => FindItemIndexPath(id)).Where(idx => idx != null)
+                                             .OrderByDescending(idx => idx.Section).ThenByDescending(idx => idx.Row).ToList();
+                foreach (var indexPath in indexPaths)
+                {
+                    shortcodePreviewsInView[indexPath.Section].RemoveAt(indexPath.Row);
+                    if (!shortcodePreviewsInView[indexPath.Section].Any())
+                    {
+                        shortcodePreviewsInView.RemoveAt(indexPath.Section);
+                        if (shortcodePreviewsInView.Count == 0)
+                        {
+                            tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                        }
+                        else
+                        {
+                            tableView.DeleteSections(NSIndexSet.FromIndex(indexPath.Section), UITableViewRowAnimation.Automatic);
+                        }
+                    }
+                    else
+                    {
+                        tableView.DeleteRows(new NSIndexPath[] { indexPath }, UITableViewRowAnimation.Automatic);
+                    }
+                }
+
+                tableView.EndUpdates();
             }
 
             public void Reset()
             {
                 loading = true;
 
+                var count = shortcodePreviewsInView.Count;
+
                 shortcodePreviewsInView.Clear();
-                shortcodesTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+
+                tableView.BeginUpdates();
+                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, count - 1)), UITableViewRowAnimation.Fade);
+                tableView.EndUpdates();
+            }
+
+            public NSIndexPath FindItemIndexPath(ShortcodePreview sp)
+            {
+                return FindItemIndexPath(sp.Id);
+            }
+
+            public NSIndexPath FindItemIndexPath(int id)
+            {
+                for (int section = 0; section < shortcodePreviewsInView.Count; section++)
+                    for (int row = 0; row < shortcodePreviewsInView[section].Count; row++)
+                        if (shortcodePreviewsInView[section][row].Id == id)
+                            return NSIndexPath.FromRowSection(row, section);
+
+                return null;
+            }
+
+            public ShortcodePreview FindItemAtIndexPath(NSIndexPath indexPath)
+            {
+                return shortcodePreviewsInView[indexPath.Section][indexPath.Row];
             }
 
             protected override void Dispose(bool disposing)
@@ -507,7 +591,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 base.Dispose(disposing);
 
                 viewController = null;
-                shortcodesTableView = null;
+                tableView = null;
                 shortcodePreviewsInView = null;
             }
         }

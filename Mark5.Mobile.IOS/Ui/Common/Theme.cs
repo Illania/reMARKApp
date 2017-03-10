@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
@@ -204,7 +205,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             // UIBarButtonItem
             var uiBarButtonItemTitleTextAttributes = UIBarButtonItem.Appearance.GetTitleTextAttributes(UIControlState.Normal);
-            uiBarItemTitleTextAttributes.TextColor = Blue;
+            uiBarItemTitleTextAttributes.TextColor = White;
             uiBarButtonItemTitleTextAttributes.Font = DefaultFont;
             UIBarButtonItem.Appearance.SetTitleTextAttributes(uiBarButtonItemTitleTextAttributes, UIControlState.Normal);
 
@@ -214,7 +215,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             UITabBarItem.Appearance.SetTitleTextAttributes(uiTabBarItemTitleTextAttributes, UIControlState.Normal);
 
             // UISegmentedControl
-            var uiSegmentControlTitleTextAttributes = UIBarButtonItem.Appearance.GetTitleTextAttributes(UIControlState.Normal);
+            var uiSegmentControlTitleTextAttributes = UISegmentedControl.Appearance.GetTitleTextAttributes(UIControlState.Normal);
             uiSegmentControlTitleTextAttributes.Font = DefaultFont;
             UISegmentedControl.Appearance.SetTitleTextAttributes(uiSegmentControlTitleTextAttributes, UIControlState.Normal);
         }

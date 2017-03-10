@@ -25,21 +25,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         const string Value1CellId = "Value1CellId";
 
-        const string DocumentsToDownloadKey = "DocumentsToDownload";
+        const string CreateSystemReportKey = "createSystemReport";
         const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
-        const string SynchroniseContactsKey = "SynchroniseContacts";
-        const string SynchroniseShortcodesKey = "SynchroniseShortcodes";
-        const string UsernameKey = "username";
-        const string UseTemplateKey = "UseTemplate";
+        const string DocumentsToDownloadKey = "DocumentsToDownload";
         const string LocalTemplateKey = "localTemplate";
+        const string LogoutKey = "logout";
+        const string OpenSettingsAppKey = "openSettingsApp";
+        const string SendFeedbackKey = "sendFeedback";
         const string ServerAddressKey = "serverAddress";
         const string SslEnabledKey = "sslEnabled";
-        const string VersionKey = "version";
-        const string LogoutKey = "logout";
-        const string SendFeedbackKey = "sendFeedback";
-        const string CreateSystemReportKey = "createSystemReport";
+        const string SynchroniseContactsKey = "SynchroniseContacts";
+        const string SynchroniseShortcodesKey = "SynchroniseShortcodes";
         const string UpdateConfigKey = "updateConfig";
-        const string OpenSettingsAppKey = "openSettingsApp";
+        const string UsernameKey = "username";
+        const string UseTemplateKey = "UseTemplate";
+        const string VersionKey = "version";
 
         public SettingsViewController()
         {
@@ -79,6 +79,40 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             return size.Height + 10f;
         }
 
+        public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+        {
+            var cell = base.GetCell(tableView, indexPath);
+
+            if (cell.TextLabel != null)
+                cell.TextLabel.Font = Theme.DefaultFont;
+            if (cell.DetailTextLabel != null)
+                cell.DetailTextLabel.Font = Theme.DefaultLightFont;
+
+            return cell;
+        }
+
+        public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+        {
+            var specifier = SettingsReader.GetSpecifier(indexPath);
+            if (specifier.Type == "PSMultiValueSpecifier")
+            {
+                var vc = new CustomSpecifierValuesViewController();
+                vc.CurrentSpecifier = specifier;
+                vc.SettingsReader = SettingsReader;
+                vc.SettingsStore = SettingsStore;
+                vc.View.TintColor = View.TintColor;
+
+                // Compared to original code, assignment of currentChildViewController
+                // was skipped, because it is not in the binding and is not very important
+
+                NavigationController.PushViewController(vc, true);
+
+                return;
+            }
+
+            base.RowSelected(tableView, indexPath);
+        }
+
         [Export("tableView:cellForSpecifier:")]
         public virtual UITableViewCell GetCellForSpecifier(UITableView tableView, SettingsSpecifier specifier)
         {
@@ -115,8 +149,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = ci?.Hostname + ":" + ci?.Port;
-                cell.DetailTextLabel.TextColor = UIColor.Gray;
-                cell.DetailTextLabel.Font = UIFont.SystemFontOfSize(17f);
 
                 return cell;
             }
@@ -130,7 +162,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = sslOff ? Localization.GetString("enabled") : Localization.GetString("disabled");
                 cell.DetailTextLabel.TextColor = sslOff ? UIColor.Gray : Theme.Brown;
-                cell.DetailTextLabel.Font = sslOff ? UIFont.SystemFontOfSize(17f) : UIFont.BoldSystemFontOfSize(17f);
 
                 return cell;
             }
@@ -141,8 +172,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = string.Format("{0} ({1})", NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"], NSBundle.MainBundle.InfoDictionary["CFBundleVersion"]);
-                cell.DetailTextLabel.TextColor = UIColor.Gray;
-                cell.DetailTextLabel.Font = UIFont.SystemFontOfSize(17f);
 
                 return cell;
             }
@@ -167,12 +196,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        [Export("settingsViewController:buttonTappedForSpecifier:")]
-        public virtual async void ButtonTappedForSpecifier(AppSettingsViewController sender, SettingsSpecifier specifier)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        [Export("settingsViewController:buttonTappedForSpecifier:")]        public virtual async void ButtonTappedForSpecifier(AppSettingsViewController sender, SettingsSpecifier specifier)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             if (specifier.Key == LogoutKey)
             {
-                var dismisAction = Dialogs.ShowInfiniteProgressDialog("logging_out___");
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_out___"));
 
                 try
                 {
@@ -181,13 +211,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         await Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
+                    CommonConfig.Logger.Error(ex);
                 }
 
                 PlatformConfig.Preferences.ResetOnLaunch = true;
 
-                dismisAction();
+                dismissAction();
 
                 Dialogs.ShowBlockingDialog(this, Localization.GetString("please_restart"));
 
@@ -196,29 +227,61 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == SendFeedbackKey)
             {
-                // TODO
+                try
+                {
+                    if (!SystemReportCollector.CanMailReport)
+                    {
+                        await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_mail_report_title"), Localization.GetString("cannot_mail_report_content"));
+                        return;
+                    }
+
+                    var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
+
+                    var report = await SystemReportCollector.CreateFullReportAsync();
+
+                    dismissAction();
+
+                    var mc = SystemReportCollector.CreateMailReportController(report);
+                    PresentViewController(mc, true, null);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Could not mail system report", ex);
+
+                    Dialogs.ShowErrorDialog(this, ex);
+                }
+
 
                 return;
             }
 
             if (specifier.Key == CreateSystemReportKey)
             {
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog("creating_system_report___");
+                try
+                {
+                    var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
 
-                var report = await SystemReportCollector.CreateFullReportAsync();
+                    var report = await SystemReportCollector.CreateFullReportAsync();
 
-                dismissAction();
+                    dismissAction();
 
-                var src = SystemReportCollector.CreateShareReportController(report);
-                if (src.PopoverPresentationController != null) src.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(sender.TableView, sender.TableView.CellAt(sender.SettingsReader.GetIndexPath(specifier.Key)));
-                PresentViewController(src, true, null);
+                    var src = SystemReportCollector.CreateShareReportController(report);
+                    if (src.PopoverPresentationController != null) src.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(sender.TableView, sender.TableView.CellAt(sender.SettingsReader.GetIndexPath(specifier.Key)));
+                    PresentViewController(src, true, null);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Could not share system report", ex);
+
+                    Dialogs.ShowErrorDialog(this, ex);
+                }
 
                 return;
             }
 
             if (specifier.Key == UpdateConfigKey)
             {
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog("updating_config___");
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("updating_config___"));
 
                 try
                 {
@@ -252,7 +315,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             // Nothing to do
         }
 
-        async void SettingsChanged(NSNotification n)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void        async void SettingsChanged(NSNotification n)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var key = n.Object.ToString();
 
@@ -351,5 +415,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
         void RefreshHiddenSettings() => SetHiddenKeys(PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk ? null : new[] { LocalTemplateKey }, false);
+
+        class CustomSpecifierValuesViewController : SpecifierValuesViewController
+        {
+
+            public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+            {
+                var cell = base.GetCell(tableView, indexPath);
+
+                if (cell.TextLabel != null)
+                    cell.TextLabel.Font = Theme.DefaultFont;
+                if (cell.DetailTextLabel != null)
+                    cell.DetailTextLabel.Font = Theme.DefaultLightFont;
+
+                return cell;
+            }
+        }
     }
 }

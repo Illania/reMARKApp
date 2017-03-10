@@ -17,7 +17,7 @@ namespace Mark5.Mobile.IOS
     public static class PlatformConfig
     {
 
-        public const string HockeyId = "137e2a4fb6384cb3a51de617dd2f5999";
+        public const string HockeyId = "c81873e5ee604880bf15a59e957f4d79";
 
         public static SSLCertificateVerificationManager SSLCertificateVerificationManager { get; set; }
 

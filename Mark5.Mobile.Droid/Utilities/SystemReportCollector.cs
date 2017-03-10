@@ -19,6 +19,7 @@ using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
+    
     public static class SystemReportCollector
     {
 
@@ -27,7 +28,7 @@ namespace Mark5.Mobile.Droid.Utilities
             var sendIntent = new Intent();
             sendIntent.SetAction(Intent.ActionSend);
             sendIntent.PutExtra(Intent.ExtraEmail, new[] { "support@nordic-it.com" });
-            sendIntent.PutExtra(Intent.ExtraSubject, "MARK5 for Android - System report");
+            sendIntent.PutExtra(Intent.ExtraSubject, "MARK5 for Android System report");
             sendIntent.PutExtra(Intent.ExtraText, report);
             sendIntent.SetType("text/plain");
             return Intent.CreateChooser(sendIntent, context.GetText(Resource.String.share));
@@ -38,6 +39,8 @@ namespace Mark5.Mobile.Droid.Utilities
             var sb = new StringBuilder();
 
             sb.Append(CreateSystemInfoReport());
+            sb.AppendLine();
+            sb.Append(CreateServerInfoReport());
             sb.AppendLine();
             sb.Append(CreateLogCatReport());
 
@@ -82,10 +85,6 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("Friendly device name: " + Managers.ActiveConnectionInfo?.FriendlyDeviceName);
             sb.AppendLine("Installation ID: " + Managers.ActiveConnectionInfo?.InstallationId);
             sb.AppendLine("Firebase Instance ID: " + FirebaseInstanceId.Instance?.Token);
-            sb.AppendLine();
-
-            sb.AppendLine("===== Server information =====");
-            sb.AppendLine(SerializationUtils.Serialize(ServerConfig.SystemSettings));
             sb.AppendLine();
 
             sb.AppendLine("===== Preferences =====");
@@ -143,6 +142,14 @@ namespace Mark5.Mobile.Droid.Utilities
                 sb.AppendLine(propName + ": " + props.GetProperty(propName));
             }
 
+            return sb.ToString();
+        }
+
+        public static string CreateServerInfoReport()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("===== Server information =====");
+            sb.AppendLine(SerializationUtils.Serialize(ServerConfig.SystemSettings));
             return sb.ToString();
         }
 

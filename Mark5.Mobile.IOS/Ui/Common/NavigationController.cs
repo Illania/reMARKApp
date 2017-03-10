@@ -27,7 +27,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public NavigationController(UIViewController rootViewController, UIModalPresentationStyle style)
             : this(rootViewController)
         {
-            ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
+            ModalPresentationStyle = style;
         }
     }
 }

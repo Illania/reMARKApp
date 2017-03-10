@@ -154,7 +154,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 StartActivity(ComposeDocumentActivity.CreateIntent(Context,
                                                                    DocumentCreationModeFlag.New,
                                                                    DocumentDirection.None,
-                                                                   preconfiguredEmailAddresses: Shortcode.Addresses.Where(a => a.Type == CommunicationAddressType.Email).Select(a => a.Address).ToList())); //TODO WRONG, need to fix it
+                                                                   preconfiguredEmailToAddresses: Shortcode.Addresses.Where(a => a.Type == CommunicationAddressType.Email && a.AddressType == DocumentAddressType.To).Select(a => a.Address).ToList(),
+                                                                   preconfiguredEmailCcAddresses: Shortcode.Addresses.Where(a => a.Type == CommunicationAddressType.Email && a.AddressType == DocumentAddressType.Cc).Select(a => a.Address).ToList(),
+                                                                   preconfiguredEmailBccAddresses: Shortcode.Addresses.Where(a => a.Type == CommunicationAddressType.Email && a.AddressType == DocumentAddressType.Bcc).Select(a => a.Address).ToList()));
             }
 
             if (item.ItemId == MenuItemActions.CopyToWorktray)
@@ -347,7 +349,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
                 }
 
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None, preconfiguredEmailAddresses: new List<string> { e.Address }));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None, preconfiguredEmailToAddresses: new List<string> { e.Address }));
             }
         }
 

@@ -58,7 +58,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             CommonConfig.Logger.Info($"Starting {nameof(SplashActivity)}...");
 
             CrashManager.Register(this, PlatformConfig.HockeyId, new CustomCrashManagerListener());
-            FeedbackManager.Register(this, PlatformConfig.HockeyId, new CustomFeedbackManagerLister());
             CrashManager.ResetAlwaysSend(new Java.Lang.Ref.WeakReference(this));
 
             Task.Run(async () =>
