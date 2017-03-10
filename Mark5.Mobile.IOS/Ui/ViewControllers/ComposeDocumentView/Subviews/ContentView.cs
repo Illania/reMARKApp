@@ -30,7 +30,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
     public class ContentView : ComposeDocumentSubView, IWKNavigationDelegate, IUIGestureRecognizerDelegate, IWKScriptMessageHandler
     {
-        //TODO Question for Bartosz, should we remove the saparato at the end of this view (I vote for that)
         UIButton expandButton;
 
         WKWebView newContentWebView;
