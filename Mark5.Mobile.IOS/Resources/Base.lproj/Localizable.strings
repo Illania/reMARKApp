@@ -59,6 +59,8 @@
 "copy_to_clipboard" = "Copy to clipboard";
 "copy_to_folder" = "Copy to folder";
 "copy_to_worktray" = "Copy to worktray";
+"copying_to_own_worktray___" = "Copying to own worktray...";
+"copying_to_worktray___" = "Copying to worktray...";
 "copying___" = "Copying...";
 "creating_system_report___" = "Creating system report...";
 "creator" = "Creator";

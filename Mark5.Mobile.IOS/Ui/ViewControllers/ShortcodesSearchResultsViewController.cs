@@ -562,7 +562,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 tableView.BeginUpdates();
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, count - 1)), UITableViewRowAnimation.Fade);
+
+                if (count > 1)
+                    tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, count - 1)), UITableViewRowAnimation.Fade);
+
                 tableView.EndUpdates();
             }
 

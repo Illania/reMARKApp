@@ -788,19 +788,45 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loading = false;
 
                 var count = contactPreviewsInView.Count;
+                var isInputListPopulated = contactPreviews.Any();
 
-                contactPreviewsInView.Add(contactPreviews);
+                if (isInputListPopulated)
+                    contactPreviewsInView.Add(contactPreviews);
 
                 if (count == 0)
                     tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                else
+                else if (isInputListPopulated)
                     tableView.InsertSections(NSIndexSet.FromIndex(contactPreviewsInView.Count - 1), UITableViewRowAnimation.Fade);
             }
 
             public void RemoveItems(List<int> contactsId)
             {
-                //contactPreviewsInView.RemoveAll(s => contactsId.Contains(s.Id)); //TODO
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+                tableView.BeginUpdates();
+
+                var indexPaths = contactsId.Select(id => FindItemIndexPath(id)).Where(idx => idx != null)
+                                             .OrderByDescending(idx => idx.Section).ThenByDescending(idx => idx.Row).ToList();
+                foreach (var indexPath in indexPaths)
+                {
+                    contactPreviewsInView[indexPath.Section].RemoveAt(indexPath.Row);
+                    if (!contactPreviewsInView[indexPath.Section].Any())
+                    {
+                        contactPreviewsInView.RemoveAt(indexPath.Section);
+                        if (contactPreviewsInView.Count == 0)
+                        {
+                            tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                        }
+                        else
+                        {
+                            tableView.DeleteSections(NSIndexSet.FromIndex(indexPath.Section), UITableViewRowAnimation.Automatic);
+                        }
+                    }
+                    else
+                    {
+                        tableView.DeleteRows(new NSIndexPath[] { indexPath }, UITableViewRowAnimation.Automatic);
+                    }
+                }
+
+                tableView.EndUpdates();
             }
 
             public void Reset()
@@ -813,7 +839,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 tableView.BeginUpdates();
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, count - 1)), UITableViewRowAnimation.Fade);
+
+                if (count > 1)
+                    tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, count - 1)), UITableViewRowAnimation.Fade);
+
                 tableView.EndUpdates();
             }
 
