@@ -199,8 +199,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitStackViews()
         {
-            View.BackgroundColor = UIColor.White;
-
             mainScrollView = new ActionableLayoutScrollView
             {
                 BackgroundColor = UIColor.White,
@@ -224,7 +222,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             stackViewBeforeContent = new UIStackView
             {
-                BackgroundColor = UIColor.White,
                 Axis = UILayoutConstraintAxis.Vertical,
                 Alignment = UIStackViewAlignment.Fill,
                 Distribution = UIStackViewDistribution.Fill,
@@ -251,7 +248,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             stackViewAfterContent = new UIStackView
             {
-                BackgroundColor = UIColor.White,
                 Axis = UILayoutConstraintAxis.Vertical,
                 Alignment = UIStackViewAlignment.Fill,
                 Distribution = UIStackViewDistribution.Fill,
