@@ -64,7 +64,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             ViewControllers = new UIViewController[]
             {
-                searchNavigationController,
+                //searchNavigationController,
                 documentSplitViewController,
                 contactSplitViewController,
                 shortcodeSplitViewController,

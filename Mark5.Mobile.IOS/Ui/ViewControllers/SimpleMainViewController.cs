@@ -74,7 +74,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 ViewControllers = new ITaggedViewController[]
                 {
-                    searchNavigationController,
+                    //searchNavigationController,
                     documentsNavigationController,
                     contactsNavigationController,
                     shortcodesNavigationController,
@@ -90,7 +90,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 ViewControllers = new UIViewController[]
                 {
-                    searchNavigationController,
+                    //searchNavigationController,
                     documentsNavigationController,
                     contactsNavigationController,
                     shortcodesNavigationController,
