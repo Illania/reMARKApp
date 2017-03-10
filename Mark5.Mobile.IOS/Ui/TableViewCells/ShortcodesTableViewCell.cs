@@ -17,7 +17,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
     public partial class ShortcodesTableViewCell : UITableViewCell
     {
         
-        public const float Height = 65f;
+        public const float Height = 68f;
 
         public static readonly UINib Nib = UINib.FromName("ShortcodesTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("ShortcodesTableViewCell");
