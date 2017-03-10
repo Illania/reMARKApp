@@ -15,8 +15,10 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -26,6 +28,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
     public class ShortcodeViewController : AbstractViewController, ISecondaryViewController
     {
+        public bool Modal { get; set; }
 
         public bool Empty { get { return folderId == null && folder == null && shortcodeId == null && shortcodePreview == null && shortcode == null; } }
 
@@ -39,6 +42,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         bool refreshDataOnAppear;
 
         UIBarButtonItem composeButton;
+        UIBarButtonItem doneButtonItem;
+
         UITableView tableView;
         UIToolbar toolbar;
         UIBarButtonItem fileToButton;
@@ -106,10 +111,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            composeButton = new UIBarButtonItem();
-            composeButton.Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"));
-            composeButton.Enabled = false;
-            NavigationItem.SetRightBarButtonItem(composeButton, false);
+            if (Modal)
+            {
+                doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+                NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
+            }
+            else
+            {
+                composeButton = new UIBarButtonItem();
+                composeButton.Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"));
+                composeButton.Enabled = false;
+                NavigationItem.SetRightBarButtonItem(composeButton, false);
+            }
         }
 
         void InitializeView()
@@ -153,7 +166,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 40f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, -49f)
+                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, Modal ? 0 : -49f)
                 });
         }
 
@@ -166,12 +179,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (fileToButton != null)
                 fileToButton.Clicked += FileToButton_Clicked;
+
+            if (composeButton != null)
+                composeButton.Clicked += ComposeButton_Clicked;
+
+            if (doneButtonItem != null)
+                doneButtonItem.Clicked += DoneButtonItem_Clicked;
         }
 
         void DeinitializeHandlers()
         {
             if (fileToButton != null)
                 fileToButton.Clicked -= FileToButton_Clicked;
+
+            if (composeButton != null)
+                composeButton.Clicked -= ComposeButton_Clicked;
+
+            if (doneButtonItem != null)
+                doneButtonItem.Clicked -= DoneButtonItem_Clicked;
         }
 
         void RowLongPressed(UILongPressGestureRecognizer gr)
@@ -189,7 +214,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void DocumentAddressClicked(DocumentAddress documentAddress)
         {
-            // TODO
+            var composeDocumentViewController = new ComposeDocumentViewController
+            {
+                PreconfiguredEmailAddresses = new string[] { documentAddress.FullAddress },
+                CreationModeFlag = DocumentCreationModeFlag.New
+            };
+            var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
+            composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
+            PresentViewController(composeDocumentNavigationController, true, null);
         }
 
         public void CopyToClipboard(UITableView tableView, UITableViewCell cell, string text) => Integration.CopyToClipboard(this, tableView, cell, text);
@@ -198,7 +230,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, null)); // TODO
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
+            {
+                var vc = new CopyToWorktrayViewController { BusinessEntities = new List<IBusinessEntity> { shortcode } };
+                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            }));
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { shortcodePreview });
@@ -217,11 +253,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (folder?.InternalType == FolderInternalType.FilterView
                 || folder?.InternalType == FolderInternalType.Static
                 || folder?.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, null)); // TODO
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, RemoveFromFolder));
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
                 || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, null)); // TODO
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, Delete));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
@@ -229,6 +265,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
             PresentViewController(eas, true, null);
+        }
+
+        void ComposeButton_Clicked(object sender, EventArgs e)
+        {
+            var composeDocumentViewController = new ComposeDocumentViewController
+            {
+                CreationModeFlag = DocumentCreationModeFlag.New,
+                PreConfiguredShortcode = shortcode
+            };
+            var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
+            composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
+            PresentViewController(composeDocumentNavigationController, true, null);
+        }
+
+        void DoneButtonItem_Clicked(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
         }
 
         public void SetData(int folderId, int shortcodeId)
@@ -259,6 +312,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             shortcode = null;
 
             this.shortcodePreview = shortcodePreview;
+        }
+
+        public void SetData(int shortcodeId)
+        {
+            folderId = null;
+            folder = null;
+            shortcode = null;
+            shortcodePreview = null;
+
+            this.shortcodeId = shortcodeId;
+        }
+
+        public bool IsShowingShortcodeWithId(int shortcodeId)
+        {
+            return shortcodePreview?.Id == shortcodeId || this.shortcodeId == shortcodeId;
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -298,6 +366,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (folderId == null && folder == null && shortcodePreview != null)
                 {
                     shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(-1, shortcodePreview.Id);
+                }
+
+                if (folderId == null && folder == null && shortcodePreview == null)
+                {
+                    var swp = await Managers.ShortcodesManager.GetShortcodeWithPreviewAsync(-1, shortcodeId.Value);
+                    shortcodePreview = swp.ShortcodePreview;
+                    shortcode = swp.Shortcode;
                 }
 
                 this.folderId = folderId;
@@ -364,6 +439,88 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var ds = tableView?.Source as DataSource;
             ds?.Clear();
         }
+
+        #region Actions
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void RemoveFromFolder(UIAlertAction a)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_shortcode"));
+
+            if (!result)
+                return;
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting_from_folder___"));
+
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to remove shortcode from folder [shortcodeId={shortcode.Id}, folderId={folder.Id}]");
+
+                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { shortcode }, folder);
+
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Shortcode, folder.Id, new List<int> { shortcode.Id }));
+
+                dismissAction();
+
+                if (SplitViewController != null && !SplitViewController.Collapsed)
+                {
+                    ClearData();
+                }
+                else
+                {
+                    NavigationController.PopViewController(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Error while removing shortcode from folder [shortcodeId={shortcode.Id}, folderId={folder.Id}]", ex);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+        }
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void Delete(UIAlertAction a)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_shortcode"));
+
+            if (!result)
+                return;
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting___"));
+
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to delete shortcode [shortcodeId={shortcode.Id}]");
+
+                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { shortcode });
+
+                PlatformConfig.MessengerHub.Publish(new EntityDeletedMessage(this, ObjectType.Shortcode, new List<int> { shortcode.Id }));
+
+                dismissAction();
+
+                if (SplitViewController != null && !SplitViewController.Collapsed)
+                {
+                    ClearData();
+                }
+                else
+                {
+                    NavigationController.PopViewController(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Error while deleting shortcode [shortcodeId={shortcode.Id}]", ex);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+        }
+
+        #endregion
 
         class DataSource : UITableViewSource, IDisposable
         {

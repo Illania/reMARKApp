@@ -77,7 +77,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             attachmentsDescription.Clear();
             stackView.Subviews.OfType<AttachmentsSubView>().ForEach(v => v.RemoveFromSuperview());
 
-            if (CreationModeFlag == DocumentCreationModeFlag.Forward || CreationModeFlag == DocumentCreationModeFlag.Edit) //TODO Any counter example to this?
+            if (CreationModeFlag == DocumentCreationModeFlag.Forward || CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
                 foreach (var attachmentDescription in PreviousDocument.Attachments)
                 {

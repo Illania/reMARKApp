@@ -8,19 +8,22 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
+using Mark5.Mobile.IOS.Utilities;
 using ObjCRuntime;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    
+
     public class DocumentsSearchResultsViewController : AbstractViewController, IPrimaryViewController, IUIGestureRecognizerDelegate
     {
 
@@ -154,7 +157,39 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void DocumentSelected(DocumentPreview documentPreview)
         {
-            // TODO
+            if (tableView.Editing)
+            {
+                return;
+            }
+
+            if (SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                var ds = (DataSource)tableView.Source;
+
+                var nc = ((UINavigationController)SplitViewController.ViewControllers[1]);
+                nc.PopToViewController(nc.ViewControllers[0], false);
+
+                var vc = (DocumentViewController)nc.ViewControllers[0];
+
+                if (vc.isShowingDocumentWithId(documentPreview.Id))
+                    return;
+
+                vc.HidesBottomBarWhenPushed = false;
+
+                vc.ClearData();
+                vc.SetData(documentPreview, ds.GetNextDocumentPreview, ds.GetPreviousDocumentPreview);
+                vc.RefreshData();
+            }
+            else
+            {
+                var ds = (DataSource)tableView.Source;
+
+                var vc = new DocumentViewController();
+                vc.SetData(documentPreview, ds.GetNextDocumentPreview, ds.GetPreviousDocumentPreview);
+                vc.SetRefreshDataOnAppear();
+
+                NavigationController.PushViewController(vc, true);
+            }
         }
 
         [Export("longPressed:")]
@@ -207,14 +242,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 PresentViewController(new NavigationController(vc), true, null);
             }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, null)); // TODO
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocuments, (UIBarButtonItem)sender)));
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
                 || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed
                 || selectedDocuments.All(dp => dp.Direction == DocumentDirection.Draft))
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, null)); // TODO
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocuments)));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
 
             if (eas.PopoverPresentationController != null)
                 eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
@@ -222,30 +257,38 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(eas, true, null);
         }
 
-        void CopyToWorktray(DocumentPreview documentPreview) => CopyToWorktray(new List<DocumentPreview> { documentPreview });
+        void CopyToWorktray(DocumentPreview selectedDocument) => CopyToWorktray(new List<DocumentPreview> { selectedDocument });
 
-        void CopyToWorktray(List<DocumentPreview> documentPreviews)
+        void CopyToWorktray(List<DocumentPreview> selectedDocuments)
         {
-            var vc = new CopyToWorktrayViewController { BusinessEntities = documentPreviews.Cast<IBusinessEntity>().ToList() };
-            PresentViewController(new NavigationController(vc), true, null);
+            var vc = new CopyToWorktrayViewController { BusinessEntities = selectedDocuments.Cast<IBusinessEntity>().ToList() };
+            NavigationController.PresentViewController(new NavigationController(vc), true, null);
         }
 
-        void MarkAsRead(DocumentPreview documentPreview, NSIndexPath row) => MarkAsRead(new List<DocumentPreview> { documentPreview }, new[] { row });
+        void CopyToFolder(DocumentPreview selectedDocument) => CopyToFolder(new List<DocumentPreview> { selectedDocument });
+
+        void CopyToFolder(List<DocumentPreview> selectedDocument)
+        {
+            var vc = new CopyMoveToFolderListViewController(selectedDocument.Cast<IBusinessEntity>().ToList());
+            NavigationController.PresentViewController(new NavigationController(vc), true, null);
+        }
+
+        void MarkAsRead(DocumentPreview selectedDocument, NSIndexPath row) => MarkAsRead(new List<DocumentPreview> { selectedDocument }, new[] { row });
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        async void MarkAsRead(List<DocumentPreview> documentPreviews, NSIndexPath[] rows)
+        async void MarkAsRead(List<DocumentPreview> selectedDocuments, NSIndexPath[] rows)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            CommonConfig.Logger.Info($"Attempting to mark as read [documentPreviews={documentPreviews.Count}]...");
+            CommonConfig.Logger.Info($"Attempting to mark as read [documentPreviews={selectedDocuments.Count}]...");
 
             try
             {
-                await Managers.DocumentsManager.SetDocumentsReadStatusAsync(documentPreviews, true);
+                await Managers.DocumentsManager.SetDocumentsReadStatusAsync(selectedDocuments, true);
                 tableView.ReloadRows(rows, UITableViewRowAnimation.Fade);
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Marking as read failed [documentPreviews.Count={documentPreviews.Count}]", ex);
+                CommonConfig.Logger.Error($"Marking as read failed [documentPreviews.Count={selectedDocuments.Count}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
@@ -272,6 +315,153 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void ShowPriorityActionSheet(List<DocumentPreview> selectedDocuments, UIBarButtonItem barButtonItem)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            var priorities = new List<Priority> { Priority.Low, Priority.Normal, Priority.Urgent };
+            var priorityStrings = priorities.Select(p => UI.PriorityString(p));
+            var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("select_priority"), priorityStrings.ToArray(), barButtonItem);
+
+            if (result < 0)
+                return;
+
+            var priority = priorities[result];
+
+            await SetPriority(selectedDocuments, priority);
+        }
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void ShowPriorityActionSheet(DocumentPreview selectedDocument, UITableView tv, UITableViewCell cell)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            var priorities = new List<Priority> { Priority.Low, Priority.Normal, Priority.Urgent };
+            var priorityStrings = priorities.Select(p => UI.PriorityString(p));
+            var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("select_priority"), priorityStrings.ToArray(), tv, cell);
+
+            if (result < 0)
+                return;
+
+            var priority = priorities[result];
+
+            await SetPriority(new List<DocumentPreview> { selectedDocument }, priority);
+        }
+
+        async Task SetPriority(List<DocumentPreview> selectedDocuments, Priority priority)
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("setting_priority___"));
+
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to setting priority for documents");
+                await Managers.DocumentsManager.SetDocumentsPriorityAsync(selectedDocuments, priority);
+
+                EndEditing();
+
+                UpdatePriorityForDocument(selectedDocuments.Select(d => d.Id));
+
+                dismissAction();
+            }
+            catch (Exception ex)
+            {
+                EndEditing();
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Error while setting priority for documents]", ex);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+        }
+
+
+        void Delete(DocumentPreview selectedDocument) => Delete(new List<DocumentPreview> { selectedDocument });
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void Delete(List<DocumentPreview> selectedDocuments)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_documents"));
+
+            if (!result)
+            {
+                EndEditing();
+                return;
+            }
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting___"));
+
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to delete documents]");
+
+                await Managers.CommonActionsManager.Delete(selectedDocuments.Cast<IBusinessEntity>().ToList());
+
+                RemoveDocumentsFromList(selectedDocuments.Select(s => s.Id));
+                EndEditing();
+
+                dismissAction();
+            }
+            catch (Exception ex)
+            {
+                EndEditing();
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Error while deleting documents", ex);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+
+        }
+
+        void RemoveDocumentsFromList(IEnumerable<int> ids)
+        {
+            var ds = (DataSource)tableView.Source;
+            ds.RemoveItems(ids.ToList());
+
+            if (SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                var vc = (DocumentViewController)nc.ViewControllers[0];
+                if (ids.Select(id => vc.isShowingDocumentWithId(id)).Any(v => v))
+                {
+                    vc.ClearData();
+                }
+            }
+        }
+
+        void UpdatePriorityForDocument(IEnumerable<int> ids)
+        {
+            if (SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                var vc = (DocumentViewController)nc.ViewControllers[0];
+                if (ids.Select(id => vc.isShowingDocumentWithId(id)).Any(v => v))
+                {
+                    vc.UpdatePriority();
+                }
+            }
+        }
+
+        void DoShowMoreActionSheet(NSIndexPath indexPath, DocumentPreview selectedDocument)
+        {
+            var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a => { CopyToWorktray(selectedDocument); EndEditing(); }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a => { CopyToFolder(selectedDocument); EndEditing(); }));
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocument, tableView, tableView.CellAt(indexPath))));
+
+            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
+                || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed
+                || selectedDocument.Direction == DocumentDirection.Draft)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocument)));
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+
+            if (eas.PopoverPresentationController != null)
+                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(tableView, tableView.CellAt(indexPath));
+
+            PresentViewController(eas, true, null);
+        }
+
         #endregion
 
         #region Refreshing
@@ -283,7 +473,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 CommonConfig.Logger.Info($"Refreshing documents list... [criteria={Criteria}]");
-                
+
                 var results = await Managers.SearchManager.SearchDocumentsAsync(Criteria);
 
                 var ds = (DataSource)tableView.Source;
@@ -403,7 +593,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var documentPreview = documentPreviewsInView[indexPath.Row];
 
-                var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("more"), (a, ip) => { viewController.EndEditing(); }); // TODO
+                var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("more"), (a, ip) => { viewController.DoShowMoreActionSheet(indexPath, documentPreview); });
                 moreAction.BackgroundColor = Theme.Blue;
                 actions.Add(moreAction);
 
@@ -439,6 +629,66 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 documentPreviewsInView.AddRange(documentPreviews);
                 documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+            }
+
+            public void RemoveItems(List<int> documentIds)
+            {
+                var indices = documentPreviewsInView.Select((d, i) => new { d, i }).Where(x => documentIds.Contains(x.d.Id)).Select(x => x.i).ToList();
+                indices.OrderByDescending(i => i).ForEach(documentPreviewsInView.RemoveAt);
+
+                documentsTableView.BeginUpdates();
+
+                if (!documentPreviewsInView.Any())
+                {
+                    documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+                }
+                else
+                {
+                    var indexPaths = indices.Select(i => NSIndexPath.FromRowSection(i, 0)).ToArray();
+                    documentsTableView.DeleteRows(indexPaths, UITableViewRowAnimation.Automatic);
+                }
+
+                documentsTableView.EndUpdates();
+            }
+
+            public DocumentPreview GetNextDocumentPreview(DocumentPreview documentPreview,
+                                              out bool previousDocumentAvailable,
+                                              out bool nextDocumentAvailable,
+                                              bool scrollToDocument = false)
+            {
+                var currentDocumentRow = documentPreviewsInView.IndexOf(d => d.Id == documentPreview.Id);
+                if (currentDocumentRow < 0)
+                {
+                    previousDocumentAvailable = false;
+                    nextDocumentAvailable = false;
+                    return null;
+                }
+
+                var nextDocumentRow = currentDocumentRow + 1;
+                previousDocumentAvailable = true;
+                nextDocumentAvailable = nextDocumentRow < documentPreviewsInView.Count - 1;
+
+                return documentPreviewsInView.ElementAtOrDefault(nextDocumentRow);
+            }
+
+            public DocumentPreview GetPreviousDocumentPreview(DocumentPreview documentPreview,
+                                                              out bool previousDocumentAvailable,
+                                                              out bool nextDocumentAvailable,
+                                                              bool scrollToDocument = false)
+            {
+                var currentDocumentRow = documentPreviewsInView.IndexOf(d => d.Id == documentPreview.Id);
+                if (currentDocumentRow < 0)
+                {
+                    previousDocumentAvailable = false;
+                    nextDocumentAvailable = false;
+                    return null;
+                }
+
+                var previousDocumentRow = currentDocumentRow - 1;
+                previousDocumentAvailable = previousDocumentRow > 0;
+                nextDocumentAvailable = previousDocumentRow < documentPreviewsInView.Count - 1;
+
+                return documentPreviewsInView.ElementAtOrDefault(previousDocumentRow);
             }
 
             public void Reset()

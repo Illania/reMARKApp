@@ -51,7 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #region Event handlers
 
-        protected void HandleScrollToView(object sender, EventArgs e) //TODO check if still valid
+        protected void HandleScrollToView(object sender, EventArgs e)
         {
             var parentScrollView = Superview.Superview as UIScrollView;
             if (parentScrollView != null)

@@ -41,6 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
         public string[] PreconfiguredEmailAddresses { get; set; }
+        public Shortcode PreConfiguredShortcode;
         public Document PreviousDocument { get; set; }
 
         public DocumentPreview PreviousDocumentPreview { get; set; }
@@ -100,8 +101,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.DidShowNotification, OnKeyboardDidShowNotification);
             NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillChangeFrameNotification, OnKeyboardDidShowNotification);
             NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
-
-            NavigationController.HidesBarsOnSwipe = true;
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -299,11 +298,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             attachmentsView.AttachmentClicked -= AttachmentsView_AttachmentClicked;
             attachmentsView.DeleteAttachmentClicked -= AttachmentsView_DeleteAttachmentClicked;
 
-
             if (suggestionsListView != null)
-            {
                 suggestionsListView.ShouldDisappear -= SuggestionsListView_ShouldDisappear;
-            }
         }
 
         #endregion
@@ -379,9 +375,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             OutgoingDocumentInitialAttachments.ForEach(attachmentsView.AddAttachment);
 
-            if (CreationModeFlag == DocumentCreationModeFlag.New && PreconfiguredEmailAddresses != null)
+            if (CreationModeFlag == DocumentCreationModeFlag.New)
             {
-                toView.SetEmails(PreconfiguredEmailAddresses);
+                if (PreconfiguredEmailAddresses != null)
+                {
+                    toView.SetEmails(PreconfiguredEmailAddresses);
+                }
+
+                AddAddressesFromShortcode(PreConfiguredShortcode);
             }
 
             sendButtonItem.Enabled = IsFormValid();
@@ -395,6 +396,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 toView.StartEditing();
             }
+        }
+
+        void AddAddressesFromShortcode(Shortcode shortcode)
+        {
+            if (shortcode == null || shortcode.Addresses == null || !shortcode.Addresses.Any())
+            {
+                return;
+            }
+
+            var addresses = shortcode.Addresses;
+            toView.SetEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.Address));
+            ccView.SetEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.Address));
+            bccView.SetEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.Address));
         }
 
         bool IsFormValid()

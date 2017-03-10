@@ -135,7 +135,71 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void ObjectLinkSelected(ObjectLink link)
         {
-            // TODO
+            ObjectType switchObjectType;
+            int objectId;
+
+            if (businessEntity.ObjectType == link.FromObjectType && businessEntity.Id == link.FromObjectId)
+            {
+                switchObjectType = link.ToObjectType;
+                objectId = link.ToObjectId;
+            }
+            else
+            {
+                switchObjectType = link.FromObjectType;
+                objectId = link.FromObjectId;
+            }
+
+            switch (switchObjectType)
+            {
+                case ObjectType.Document:
+                    PresentDocumentViewController(objectId);
+                    break;
+                case ObjectType.Contact:
+                    PresentContactViewController(objectId);
+                    break;
+                case ObjectType.Shortcode:
+                    PresentShortcodeViewController(objectId);
+                    break;
+            }
+        }
+
+        public void PresentDocumentViewController(int documentId)
+        {
+            var vc = new DocumentViewController();
+            vc.Modal = true;
+            vc.SetRefreshDataOnAppear();
+            vc.SetData(documentId);
+
+            var navigationController = new UINavigationController(vc);
+            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+
+            PresentViewController(navigationController, true, null);
+        }
+
+        public void PresentContactViewController(int contactId)
+        {
+            var vc = new ContactViewController();
+            vc.Modal = true;
+            vc.SetRefreshDataOnAppear();
+            vc.SetData(contactId);
+
+            var navigationController = new UINavigationController(vc);
+            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+
+            PresentViewController(navigationController, true, null);
+        }
+
+        public void PresentShortcodeViewController(int shortcodeId)
+        {
+            var vc = new ShortcodeViewController();
+            vc.Modal = true;
+            vc.SetRefreshDataOnAppear();
+            vc.SetData(shortcodeId);
+
+            var navigationController = new UINavigationController(vc);
+            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+
+            PresentViewController(navigationController, true, null);
         }
 
         async Task RefreshData()
@@ -292,7 +356,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 tableView.BeginUpdates();
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                tableView.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, objectLinksSections.Length - 1)), UITableViewRowAnimation.Fade);
+                if (objectLinksSections.Length > 1)
+                    tableView.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, objectLinksSections.Length - 1)), UITableViewRowAnimation.Fade);
                 tableView.EndUpdates();
             }
 

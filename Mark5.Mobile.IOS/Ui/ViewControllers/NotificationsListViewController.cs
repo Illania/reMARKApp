@@ -209,7 +209,59 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void NotificationSelected(Notification notification)
         {
-            // TODO open notification
+            switch (notification.ObjectType)
+            {
+                case ObjectType.Document:
+                    PresentDocumentViewController(notification.ObjectId);
+                    break;
+                case ObjectType.Contact:
+
+                    PresentContactViewController(notification.ObjectId);
+                    break;
+                case ObjectType.Shortcode:
+
+                    PresentShortcodeViewController(notification.ObjectId);
+                    break;
+            }
+        }
+
+        public void PresentDocumentViewController(int documentId)
+        {
+            var vc = new DocumentViewController();
+            vc.Modal = true;
+            vc.SetRefreshDataOnAppear();
+            vc.SetData(documentId);
+
+            var navigationController = new UINavigationController(vc);
+            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+
+            PresentViewController(navigationController, true, null);
+        }
+
+        public void PresentContactViewController(int contactId)
+        {
+            var vc = new ContactViewController();
+            vc.Modal = true;
+            vc.SetRefreshDataOnAppear();
+            vc.SetData(contactId);
+
+            var navigationController = new UINavigationController(vc);
+            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+
+            PresentViewController(navigationController, true, null);
+        }
+
+        public void PresentShortcodeViewController(int shortcodeId)
+        {
+            var vc = new ShortcodeViewController();
+            vc.Modal = true;
+            vc.SetRefreshDataOnAppear();
+            vc.SetData(shortcodeId);
+
+            var navigationController = new UINavigationController(vc);
+            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+
+            PresentViewController(navigationController, true, null);
         }
 
         class DataSource : UITableViewSource, IDisposable

@@ -16,8 +16,10 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -27,6 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
     public class ContactViewController : AbstractViewController, ISecondaryViewController
     {
+        public bool Modal { get; set; }
 
         public bool Empty { get { return folderId == null && folder == null && contactId == null && contactPreview == null && contact == null; } }
 
@@ -44,6 +47,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem assignCategoryButton;
         UIBarButtonItem fileToButton;
         UIBarButtonItem actionsLinksButton;
+        UIBarButtonItem doneButtonItem;
 
         CancellationTokenSource cts;
 
@@ -58,7 +62,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            InitializeNavigationBarTitle();
+            InitializeNavigationBar();
             InitializeHandlers();
         }
 
@@ -147,7 +151,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 fileToButton,
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                actionsLinksButton,
+                actionsLinksButton
             };
             toolbar.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(toolbar);
@@ -156,8 +160,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 40f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, -49f)
+                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, Modal ? 0 : -49f)
                 });
+        }
+
+        void InitializeNavigationBar()
+        {
+            if (Modal)
+            {
+                doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+                NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
+            }
+
+            InitializeNavigationBarTitle();
         }
 
         void InitializeNavigationBarTitle()
@@ -175,6 +190,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (actionsLinksButton != null)
                 actionsLinksButton.Clicked += ActionsLinksButton_Clicked;
+
+            if (doneButtonItem != null)
+                doneButtonItem.Clicked += DoneButtonItem_Clicked;
         }
 
         void DeinitializeHandlers()
@@ -187,6 +205,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (actionsLinksButton != null)
                 actionsLinksButton.Clicked -= ActionsLinksButton_Clicked;
+
+            if (doneButtonItem != null)
+                doneButtonItem.Clicked -= DoneButtonItem_Clicked;
         }
 
         void RowLongPressed(UILongPressGestureRecognizer gr)
@@ -212,7 +233,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, null)); // TODO
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
+            {
+                var vc = new CopyToWorktrayViewController { BusinessEntities = new List<IBusinessEntity> { contact } };
+                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            }));
+
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { contactPreview });
@@ -231,11 +257,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (folder?.InternalType == FolderInternalType.FilterView
                 || folder?.InternalType == FolderInternalType.Static
                 || folder?.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, null)); // TODO
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, RemoveFromFolder));
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
                 || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, null)); // TODO
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, Delete));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
@@ -245,34 +271,70 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(eas, true, null);
         }
 
-        void ActionsLinksButton_Clicked(object sender, EventArgs e)
+        async void ActionsLinksButton_Clicked(object sender, EventArgs e)
         {
-            // TODO
+            var actionLinksListString = new string[] { Localization.GetString( "actions"),
+                    Localization.GetString("links") };
+
+            var result = await Dialogs.ShowListDialogAsync(this, null, actionLinksListString, actionsLinksButton);
+
+            if (result < 0)
+                return;
+
+            UIViewController vc = null;
+
+            switch (result)
+            {
+                case 0:
+                    vc = new ObjectActionsListViewController(contact);
+                    break;
+                case 1:
+                    vc = new ObjectLinksListViewController(contact);
+                    break;
+            }
+
+            var navigationController = new UINavigationController(vc);
+            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+
+            PresentViewController(navigationController, true, null);
         }
 
-        void CommunicationAddressClicked(UITableView tableView, UITableViewCell cell, CommunicationAddress ca)
+        void DoneButtonItem_Clicked(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
+        }
+
+        void CommunicationAddressClicked(UITableView tv, UITableViewCell cell, CommunicationAddress ca)
         {
             if (ca.Type == CommunicationAddressType.Email)
             {
-                // TODO
+                var composeDocumentViewController = new ComposeDocumentViewController
+                {
+                    PreconfiguredEmailAddresses = new string[] { ca.Address },
+                    CreationModeFlag = DocumentCreationModeFlag.New
+                };
+                var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
+                composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
+                PresentViewController(composeDocumentNavigationController, true, null);
             }
 
             if (ca.Type == CommunicationAddressType.Phone)
             {
-                Integration.Call(this, tableView, cell, ca.Address);
+                Integration.Call(this, tv, cell, ca.Address);
             }
 
             if (ca.Type == CommunicationAddressType.Mobile)
             {
-                Integration.CallOrText(this, tableView, cell, ca.Address);
+                Integration.CallOrText(this, tv, cell, ca.Address);
             }
         }
 
-        void PhysicalAddressClicked(UITableView tableView, UITableViewCell cell, PhysicalAddress pa) => Integration.ShowOnMap(this, tableView, cell, pa);
+        void PhysicalAddressClicked(UITableView tv, UITableViewCell cell, PhysicalAddress pa) => Integration.ShowOnMap(this, tv, cell, pa);
 
         public void LinkedContactClicked(ContactPreview contactPreview)
         {
             var vc = new ContactViewController();
+            vc.Modal = Modal;
             vc.SetData(contactPreview);
             vc.SetRefreshDataOnAppear();
             NavigationController.PushViewController(vc, true);
@@ -312,6 +374,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.contactPreview = contactPreview;
         }
 
+        public void SetData(int contactId)
+        {
+            folderId = null;
+            folder = null;
+            contactPreview = null;
+            contact = null;
+
+            this.contactId = contactId;
+        }
+
+        public bool IsShowingContactWithId(int contactId)
+        {
+            return contactPreview?.Id == contactId || this.contactId == contactId;
+        }
+
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void RefreshData()
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
@@ -348,6 +425,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (folderId == null && folder == null && contactPreview != null)
                 {
                     contact = await Managers.ContactsManager.GetContactAsync(-1, contactPreview.Id);
+                }
+
+                if (folderId == null && folder == null && contactPreview == null)
+                {
+                    var swp = await Managers.ContactsManager.GetContactWithPreviewAsync(-1, contactId.Value);
+                    this.contactPreview = swp.ContactPreview;
+                    contact = swp.Contact;
                 }
 
                 contact.CommunicationAddresses = contact.CommunicationAddresses.OrderBy(ca => ca.Address).ToList();
@@ -411,6 +495,88 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var ds = tableView?.Source as DataSource;
             ds?.Clear();
         }
+
+        #region Actions
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void RemoveFromFolder(UIAlertAction a)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_contact"));
+
+            if (!result)
+                return;
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting_from_folder___"));
+
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to remove contact from folder [contactId={contact.Id}, folderId={folder.Id}]");
+
+                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { contact }, folder);
+
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Contact, folder.Id, new List<int> { contact.Id }));
+
+                dismissAction();
+
+                if (SplitViewController != null && !SplitViewController.Collapsed)
+                {
+                    ClearData();
+                }
+                else
+                {
+                    NavigationController.PopViewController(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Error while removing contact from folder [contactId={contact.Id}, folderId={folder.Id}]", ex);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+        }
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void Delete(UIAlertAction a)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_contact"));
+
+            if (!result)
+                return;
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting___"));
+
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to delete contact [contactId={contact.Id}]");
+
+                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { contact });
+
+                PlatformConfig.MessengerHub.Publish(new EntityDeletedMessage(this, ObjectType.Contact, new List<int> { contact.Id }));
+
+                dismissAction();
+
+                if (SplitViewController != null && !SplitViewController.Collapsed)
+                {
+                    ClearData();
+                }
+                else
+                {
+                    NavigationController.PopViewController(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Error while deleting contact [contactId={contact.Id}]", ex);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+        }
+
+        #endregion
 
         class DataSource : UITableViewSource, IDisposable
         {
