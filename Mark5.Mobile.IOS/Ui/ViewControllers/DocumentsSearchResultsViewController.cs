@@ -171,7 +171,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var vc = (DocumentViewController)nc.ViewControllers[0];
 
-                if (vc.isShowingDocumentWithId(documentPreview.Id))
+                if (vc.IsShowingDocumentWithId(documentPreview.Id))
                     return;
 
                 vc.HidesBottomBarWhenPushed = false;
@@ -420,7 +420,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 var vc = (DocumentViewController)nc.ViewControllers[0];
-                if (ids.Select(id => vc.isShowingDocumentWithId(id)).Any(v => v))
+                if (ids.Select(id => vc.IsShowingDocumentWithId(id)).Any(v => v))
                 {
                     vc.ClearData();
                 }
@@ -433,7 +433,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 var vc = (DocumentViewController)nc.ViewControllers[0];
-                if (ids.Select(id => vc.isShowingDocumentWithId(id)).Any(v => v))
+                if (ids.Select(id => vc.IsShowingDocumentWithId(id)).Any(v => v))
                 {
                     vc.UpdatePriority();
                 }

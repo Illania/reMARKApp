@@ -618,7 +618,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void HandleCategoriesChanged(EntityCategoriesChangedMessage message)
         {
-            InvokeOnMainThread(() =>
+            BeginInvokeOnMainThread(() =>
             {
                 var ds = tableView.Source as DataSource;
                 var indexPath = ds.FindItemIndexPath(message.EntityId);

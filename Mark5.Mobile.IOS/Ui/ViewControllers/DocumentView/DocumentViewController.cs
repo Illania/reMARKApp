@@ -528,7 +528,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             RefreshView();
         }
 
-        public bool isShowingDocumentWithId(int documentId)
+        public bool IsShowingDocumentWithId(int documentId)
         {
             return documentPreview?.Id == documentId || this.documentId == documentId;
         }

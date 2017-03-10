@@ -112,6 +112,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             autoRefreshWorker = null;
         }
 
+        public override void WillMoveToParentViewController(UIViewController parent)
+        {
+            base.WillMoveToParentViewController(parent);
+
+            if (parent == null && SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                nc.PopToRootViewController(false);
+
+                var vc = (DocumentViewController)nc.ViewControllers[0];
+                vc.ClearData();
+            }
+        }
+
         public override void DidReceiveMemoryWarning()
         {
             CommonConfig.Logger.Warning($"{nameof(DocumentsListViewController)} received memory warning!");
@@ -258,7 +272,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var vc = (DocumentViewController)nc.ViewControllers[0];
 
-                if (vc.isShowingDocumentWithId(documentPreview.Id))
+                if (vc.IsShowingDocumentWithId(documentPreview.Id))
                     return;
 
                 vc.HidesBottomBarWhenPushed = false;
@@ -316,6 +330,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void StartEditing()
         {
+            if (SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                nc.PopToRootViewController(false);
+
+                var vc = (DocumentViewController)nc.ViewControllers[0];
+                vc.ClearData();
+            }
+
             tableView.SetEditing(true, true);
             NavigationItem.SetRightBarButtonItem(exitEditItem, true);
             NavigationItem.SetLeftBarButtonItem(editItem, true);
@@ -624,9 +647,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             BeginInvokeOnMainThread(() =>
             {
                 if (searchController.Active)
-                {
                     searchResultsDataSource.RemoveItems(ids.ToList());
-                }
 
                 var ds = (DataSource)tableView.Source;
                 ds.RemoveItems(ids.ToList());
@@ -635,10 +656,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                     var vc = (DocumentViewController)nc.ViewControllers[0];
-                    if (ids.Select(id => vc.isShowingDocumentWithId(id)).Any(v => v))
-                    {
+                    if (ids.Select(id => vc.IsShowingDocumentWithId(id)).Any(v => v))
                         vc.ClearData();
-                    }
                 }
             });
         }
@@ -649,7 +668,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 var vc = (DocumentViewController)nc.ViewControllers[0];
-                if (ids.Select(id => vc.isShowingDocumentWithId(id)).Any(v => v))
+                if (ids.Select(id => vc.IsShowingDocumentWithId(id)).Any(v => v))
                 {
                     vc.UpdatePriority();
                 }
@@ -753,7 +772,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DocumentViewController_ReadStatusUpdated(object sender, ReadStatusUpdatedEventArgs e)
         {
-            InvokeOnMainThread(() =>
+            BeginInvokeOnMainThread(() =>
             {
                 var selectedRow = tableView.IndexPathForSelectedRow;
 
@@ -769,7 +788,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CommentsCountChangedHandler(DocumentPreviewCommentsCountChangedMessage message)
         {
-            InvokeOnMainThread(() =>
+            BeginInvokeOnMainThread(() =>
             {
                 var ds = tableView.Source as DataSource;
                 var index = ds.Items.FindIndex(dp => dp.Id == message.DocumentPreviewId);
@@ -793,7 +812,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CategoriesChangedHandler(EntityCategoriesChangedMessage message)
         {
-            InvokeOnMainThread(() =>
+            BeginInvokeOnMainThread(() =>
             {
                 var ds = tableView.Source as DataSource;
                 var index = ds.Items.FindIndex(dp => dp.Id == message.EntityId);
