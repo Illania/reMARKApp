@@ -225,8 +225,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void AssignCategoryButton_Clicked(object sender, EventArgs e)
         {
-            var vc = new NavigationController(new CategoriesListViewController { BusinessEntityPreview = contactPreview }, UIModalPresentationStyle.PageSheet);
-            PresentViewController(vc, true, null);
+            var vc = new CategoriesListViewController { BusinessEntityPreview = contactPreview };
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void FileToButton_Clicked(object sender, EventArgs e)
@@ -236,13 +236,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyToWorktrayViewController { BusinessEntities = new List<IBusinessEntity> { contact } };
-                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { contactPreview });
-                PresentViewController(new NavigationController(vc), true, null);
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }));
 
             if (folder?.InternalType == FolderInternalType.FilterView
@@ -251,7 +251,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { contactPreview }, folder);
-                PresentViewController(new NavigationController(vc), true, null);
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }));
 
             if (folder?.InternalType == FolderInternalType.FilterView
@@ -293,10 +293,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     break;
             }
 
-            var navigationController = new UINavigationController(vc);
-            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
-
-            PresentViewController(navigationController, true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void DoneButtonItem_Clicked(object sender, EventArgs e)
@@ -308,14 +305,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (ca.Type == CommunicationAddressType.Email)
             {
-                var composeDocumentViewController = new ComposeDocumentViewController
+                var vc = new ComposeDocumentViewController
                 {
                     PreconfiguredEmailAddresses = new string[] { ca.Address },
                     CreationModeFlag = DocumentCreationModeFlag.New
                 };
-                var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
-                composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
-                PresentViewController(composeDocumentNavigationController, true, null);
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }
 
             if (ca.Type == CommunicationAddressType.Phone)

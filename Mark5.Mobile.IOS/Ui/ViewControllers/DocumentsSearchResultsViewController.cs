@@ -239,7 +239,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyMoveToFolderListViewController(selectedDocuments.Cast<IBusinessEntity>().ToList());
-                PresentViewController(new NavigationController(vc), true, null);
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocuments, (UIBarButtonItem)sender)));
@@ -262,7 +262,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void CopyToWorktray(List<DocumentPreview> selectedDocuments)
         {
             var vc = new CopyToWorktrayViewController { BusinessEntities = selectedDocuments.Cast<IBusinessEntity>().ToList() };
-            NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void CopyToFolder(DocumentPreview selectedDocument) => CopyToFolder(new List<DocumentPreview> { selectedDocument });
@@ -270,7 +270,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void CopyToFolder(List<DocumentPreview> selectedDocument)
         {
             var vc = new CopyMoveToFolderListViewController(selectedDocument.Cast<IBusinessEntity>().ToList());
-            NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void MarkAsRead(DocumentPreview selectedDocument, NSIndexPath row) => MarkAsRead(new List<DocumentPreview> { selectedDocument }, new[] { row });

@@ -849,16 +849,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void PresentComposeViewWithPreconfiguredAddresses(string[] preconfiguredEmailAddresses)
         {
-            var composeDocumentViewController = new ComposeDocumentViewController
+            var vc = new ComposeDocumentViewController
             {
                 CreationModeFlag = DocumentCreationModeFlag.New,
                 PreviousDocumentDirection = DocumentDirection.None,
                 PreconfiguredEmailAddresses = preconfiguredEmailAddresses
             };
 
-            var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
-            composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
-            PresentViewController(composeDocumentNavigationController, true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         #endregion
@@ -963,12 +961,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyToWorktrayViewController { BusinessEntities = new List<IBusinessEntity> { document } };
-                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }));
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { document });
-                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }));
 
             if (folder?.InternalType == FolderInternalType.FilterView
@@ -977,7 +975,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
             {
                 var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { document }, folder);
-                NavigationController.PresentViewController(new NavigationController(vc), true, null);
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet((UIBarButtonItem)sender)));
@@ -1064,9 +1062,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 };
             }
 
-            var composeDocumentNavigationController = new UINavigationController(vc);
-            composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
-            PresentViewController(composeDocumentNavigationController, true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void DoneButtonItem_Clicked(object sender, EventArgs e)
@@ -1108,12 +1104,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DoAssignCategory()
         {
-            var categoriesListViewController = new CategoriesListViewController();
-            categoriesListViewController.BusinessEntityPreview = documentPreview;
-            var categoriesListNavigationController = new UINavigationController(categoriesListViewController);
-            categoriesListNavigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+            var vc = new CategoriesListViewController();
+            vc.BusinessEntityPreview = documentPreview;
 
-            PresentViewController(categoriesListNavigationController, true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         async void UserActions_Clicked(object sender, EventArgs e)
@@ -1127,7 +1121,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
 
             UIViewController vc = null;
-
             switch (result)
             {
                 case 0:
@@ -1138,25 +1131,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     break;
             }
 
-            var navigationController = new UINavigationController(vc);
-            navigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
-
-            PresentViewController(navigationController, true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void CommentsButton_TouchUpInside(object sender, EventArgs e)
         {
-            var commentsListViewController = new CommentsListViewController();
-            var commentsListViewNavigationController = new UINavigationController(commentsListViewController);
-            commentsListViewNavigationController.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
-            commentsListViewController.Entity = document;
+            var vc = new CommentsListViewController();
+            vc.Entity = document;
 
-            PresentViewController(commentsListViewNavigationController, true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void DoReply(DocumentCreationModeFlag creationModeFlag)
         {
-            var composeDocumentViewController = new ComposeDocumentViewController
+            var vc = new ComposeDocumentViewController
             {
                 PreviousDocumentId = documentPreview.Id,
                 CreationModeFlag = creationModeFlag,
@@ -1166,15 +1154,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 PreviousDocumentPreview = documentPreview
             };
 
-            var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
-            composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
-            PresentViewController(composeDocumentNavigationController, true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void CopyToWorktray()
         {
             var vc = new CopyToWorktrayViewController { BusinessEntities = new List<IBusinessEntity> { document } };
-            NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void

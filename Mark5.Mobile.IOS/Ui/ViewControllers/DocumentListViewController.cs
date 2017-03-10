@@ -346,15 +346,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void ComposeDocumentItem_Clicked(object sender, EventArgs e)
         {
-            var composeDocumentViewController = new ComposeDocumentViewController
+            var vc = new ComposeDocumentViewController
             {
                 CreationModeFlag = DocumentCreationModeFlag.New,
                 PreviousDocumentDirection = DocumentDirection.None
             };
 
-            var composeDocumentNavigationController = new UINavigationController(composeDocumentViewController);
-            composeDocumentNavigationController.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
-            PresentViewController(composeDocumentNavigationController, true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void ExitEditItem_Clicked(object sender, EventArgs e) => EndEditing();
@@ -546,7 +544,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void CopyToFolder(List<DocumentPreview> selectedDocument)
         {
             var vc = new CopyMoveToFolderListViewController(selectedDocument.Cast<IBusinessEntity>().ToList());
-            NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void MoveToFolder(DocumentPreview selectedDocument) => MoveToFolder(new List<DocumentPreview> { selectedDocument });
@@ -554,7 +552,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void MoveToFolder(List<DocumentPreview> selectedDocument)
         {
             var vc = new CopyMoveToFolderListViewController(selectedDocument.Cast<IBusinessEntity>().ToList(), Folder);
-            NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            vc.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void CopyToWorktray(DocumentPreview selectedDocument) => CopyToWorktray(new List<DocumentPreview> { selectedDocument });
@@ -562,7 +561,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void CopyToWorktray(List<DocumentPreview> selectedDocuments)
         {
             var vc = new CopyToWorktrayViewController { BusinessEntities = selectedDocuments.Cast<IBusinessEntity>().ToList() };
-            NavigationController.PresentViewController(new NavigationController(vc), true, null);
+            vc.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void MarkAsRead(DocumentPreview documentPreview, NSIndexPath row) => MarkAsRead(new List<DocumentPreview> { documentPreview }, new[] { row });

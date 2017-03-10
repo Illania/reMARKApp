@@ -66,9 +66,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var tcs = new TaskCompletionSource<int>();
             var actionSheet = PrepareLisDialogActionSheet(tcs, message, listStrings);
             if (actionSheet.PopoverPresentationController != null)
-            {
                 actionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(anchorView);
-            }
             vc.PresentViewController(actionSheet, true, null);
             return tcs.Task;
         }
@@ -78,9 +76,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var tcs = new TaskCompletionSource<int>();
             var actionSheet = PrepareLisDialogActionSheet(tcs, message, listStrings);
             if (actionSheet.PopoverPresentationController != null)
-            {
                 actionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(anchorBarButtonItem);
-            }
             vc.PresentViewController(actionSheet, true, null);
             return tcs.Task;
         }
@@ -90,9 +86,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var tcs = new TaskCompletionSource<int>();
             var actionSheet = PrepareLisDialogActionSheet(tcs, message, listStrings);
             if (actionSheet.PopoverPresentationController != null)
-            {
                 actionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(tableView, anchorCell);
-            }
             vc.PresentViewController(actionSheet, true, null);
             return tcs.Task;
         }

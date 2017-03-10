@@ -458,9 +458,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void SettingsButton_TouchUpInside(object sender, EventArgs e)
         {
             var sv = new LoginSettingsViewController.SettingsValues { SslMode = sslMode };
-            var loginSettingsViewController = new LoginSettingsViewController(sv);
-            loginSettingsViewController.RestrictedSettingsValuesUpdated += LoginSettingsViewController_RestrictedSettingsValuesUpdated;
-            PresentViewController(new NavigationController(loginSettingsViewController, UIModalPresentationStyle.PageSheet), true, null);
+            var vc = new LoginSettingsViewController(sv);
+            vc.RestrictedSettingsValuesUpdated += LoginSettingsViewController_RestrictedSettingsValuesUpdated;
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void TextField_EditingChanged(object sender, EventArgs e) => ValidateForm();
