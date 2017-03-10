@@ -175,6 +175,9 @@
 "port" = "Port";
 "primary_person" = "Primary person";
 "priority" = "Priority";
+"priority_low" = "Low";
+"priority_normal" = "Normal";
+"priority_urgent" = "High";
 "read_by" = "Read by";
 "reference_number" = "Reference number";
 "remove_from_favorites" = "Remove from\nfavorites";

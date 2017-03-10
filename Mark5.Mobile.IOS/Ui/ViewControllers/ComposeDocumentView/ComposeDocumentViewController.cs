@@ -101,8 +101,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.DidShowNotification, OnKeyboardDidShowNotification);
             NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillChangeFrameNotification, OnKeyboardDidShowNotification);
             NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
-
-            NavigationController.HidesBarsOnSwipe = true;
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -300,11 +298,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             attachmentsView.AttachmentClicked -= AttachmentsView_AttachmentClicked;
             attachmentsView.DeleteAttachmentClicked -= AttachmentsView_DeleteAttachmentClicked;
 
-
             if (suggestionsListView != null)
-            {
                 suggestionsListView.ShouldDisappear -= SuggestionsListView_ShouldDisappear;
-            }
         }
 
         #endregion

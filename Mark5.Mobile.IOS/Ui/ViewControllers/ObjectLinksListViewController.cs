@@ -356,7 +356,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 tableView.BeginUpdates();
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                tableView.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, objectLinksSections.Length - 1)), UITableViewRowAnimation.Fade);
+                if (objectLinksSections.Length > 1)
+                    tableView.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, objectLinksSections.Length - 1)), UITableViewRowAnimation.Fade);
                 tableView.EndUpdates();
             }
 
