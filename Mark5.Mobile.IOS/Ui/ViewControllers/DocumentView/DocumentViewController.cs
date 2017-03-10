@@ -79,7 +79,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         ReadByView readByView;
         ReferenceNumberView referenceNumberView;
 
-        UIView grayBackgroundView;
+        UIView backgroundView;
         UIActivityIndicatorView spinner;
 
         UIBarButtonItem flag;
@@ -115,6 +115,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitStackViews();
             InitSubViews();
             InitToolbar();
+            InitBackgroundView();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -265,30 +266,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f),
                     NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Bottom, 1f, 0f)
                 });
-
-            grayBackgroundView = new UIView();
-            grayBackgroundView.BackgroundColor = UIColor.GroupTableViewBackgroundColor;
-            grayBackgroundView.TranslatesAutoresizingMaskIntoConstraints = false;
-            View.AddSubview(grayBackgroundView);
-            View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(grayBackgroundView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(grayBackgroundView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(grayBackgroundView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(grayBackgroundView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-                });
-            View.BringSubviewToFront(grayBackgroundView);
-
-            spinner = new UIActivityIndicatorView();
-            spinner.Hidden = false;
-            spinner.ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.WhiteLarge;
-            grayBackgroundView.AddSubview(spinner);
-            grayBackgroundView.BringSubviewToFront(spinner);
-            View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(spinner, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, grayBackgroundView, NSLayoutAttribute.CenterX, 1f, 0f),
-                    NSLayoutConstraint.Create(spinner, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, grayBackgroundView, NSLayoutAttribute.CenterY, 1f, 0f)
-                });
         }
 
         void InitSubViews()
@@ -391,6 +368,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, Modal ? 0 : -49f)
+                });
+        }
+
+        void InitBackgroundView()
+        {
+            backgroundView = new UIView();
+            backgroundView.BackgroundColor = UIColor.GroupTableViewBackgroundColor;
+            backgroundView.TranslatesAutoresizingMaskIntoConstraints = false;
+            View.AddSubview(backgroundView);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+                });
+            View.BringSubviewToFront(backgroundView);
+
+            spinner = new UIActivityIndicatorView();
+            spinner.TranslatesAutoresizingMaskIntoConstraints = false;
+            spinner.ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray;
+            backgroundView.AddSubview(spinner);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(spinner, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, backgroundView, NSLayoutAttribute.CenterX, 1f, 0f),
+                    NSLayoutConstraint.Create(spinner, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, backgroundView, NSLayoutAttribute.CenterY, 1f, 0f)
                 });
         }
 
@@ -580,8 +583,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                spinner.StartAnimating();
-                await Task.Delay(4000);
+                StartRefreshing();
 
                 if (notificationGuid != default(Guid))
                 {
@@ -612,14 +614,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (token.IsCancellationRequested) return;
 
                 RefreshView();
-
-                spinner.StopAnimating();
-                View.SendSubviewToBack(grayBackgroundView);
+                EndRefreshing();
 
                 MarkAsReadIfNecessary();
             }
             catch (Exception ex)
             {
+                EndRefreshing(true);
+
                 CommonConfig.Logger.Error($"Downloading document failed [folder.name={folder?.Name}, folder.id={folderId ?? folder?.Id}, documentId={documentId ?? documentPreview?.Id}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
@@ -633,6 +635,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NavigationController.PopViewController(true);
                 }
             }
+        }
+
+        void StartRefreshing()
+        {
+            spinner.StartAnimating();
+
+            View.BringSubviewToFront(backgroundView);
+            UIView.Animate(0.25, () =>
+            {
+                backgroundView.Alpha = 1f;
+                mainScrollView.Alpha = 0f;
+            });
+        }
+
+        void EndRefreshing(bool withError = false)
+        {
+            spinner.StopAnimating();
+
+            if (withError)
+                return;
+
+            View.SendSubviewToBack(backgroundView);
+            UIView.Animate(0.25, () =>
+            {
+                backgroundView.Alpha = 0f;
+                mainScrollView.Alpha = 1f;
+            });
         }
 
         void MarkAsReadIfNecessary()
