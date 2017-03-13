@@ -35,6 +35,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         WKWebView newContentWebView;
         WKWebView oldContentWebView;
 
+        SeparatorSubView separatorBeforeExpand;
+        SeparatorSubView separatorAfterExpand;
+
         string oldContent;
         bool oldContentLoaded;
 
@@ -144,6 +147,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void InitializePreviousContentControls()
         {
+            separatorBeforeExpand = new SeparatorSubView();
+            separatorBeforeExpand.TranslatesAutoresizingMaskIntoConstraints = false;
+            separatorBeforeExpand.Hidden = true;
+            ContainerView.AddSubview(separatorBeforeExpand);
+            AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(separatorBeforeExpand, NSLayoutAttribute.Top, NSLayoutRelation.Equal, newContentWebView, NSLayoutAttribute.Bottom, 1f, 0),
+                NSLayoutConstraint.Create(separatorBeforeExpand, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, 0),
+                NSLayoutConstraint.Create(separatorBeforeExpand, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, 0)
+            });
+
             expandButton = UIButton.FromType(UIButtonType.System);
             expandButton.SetTitle(Localization.GetString("show_original_message"), UIControlState.Normal);
             expandButton.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -156,9 +170,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             ContainerView.AddSubview(expandButton);
             AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(expandButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, newContentWebView, NSLayoutAttribute.Bottom, 1f, 0),
+                NSLayoutConstraint.Create(expandButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, separatorBeforeExpand, NSLayoutAttribute.Bottom, 1f, 0),
                 NSLayoutConstraint.Create(expandButton, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, 2*HorizontalMargin),
                 NSLayoutConstraint.Create(expandButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -2*HorizontalMargin)
+            });
+
+            separatorAfterExpand = new SeparatorSubView();
+            separatorAfterExpand.Hidden = true;
+            separatorAfterExpand.TranslatesAutoresizingMaskIntoConstraints = false;
+            ContainerView.AddSubview(separatorAfterExpand);
+
+            AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(separatorAfterExpand, NSLayoutAttribute.Top, NSLayoutRelation.Equal, expandButton, NSLayoutAttribute.Bottom, 1f, 0),
+                NSLayoutConstraint.Create(separatorAfterExpand, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, 0),
+                NSLayoutConstraint.Create(separatorAfterExpand, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, 0)
             });
 
             var preferences = new WKPreferences();
@@ -187,7 +213,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, expandButton, NSLayoutAttribute.Bottom, 1f, 0),
+                NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, separatorAfterExpand, NSLayoutAttribute.Bottom, 1f, 0),
                 NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
                 NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
                 NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
@@ -213,6 +239,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             else
             {
                 expandButton.Hidden &= PreviousDocument == null;
+                separatorBeforeExpand.Hidden = expandButton.Hidden;
             }
 
         }
@@ -518,6 +545,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             {
                 expandButton.SetTitle(Localization.GetString("hide_original_message"), UIControlState.Normal);
                 oldContentWebView.Hidden = false;
+                separatorAfterExpand.Hidden = false;
 
                 await LoadOldContent();
 
@@ -534,6 +562,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             {
                 expandButton.SetTitle(Localization.GetString("show_original_message"), UIControlState.Normal);
                 oldContentWebView.Hidden = true;
+                separatorAfterExpand.Hidden = true;
 
                 constraintsStash = oldContentWebView.BackupConstaints();
 
