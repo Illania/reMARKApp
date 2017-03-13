@@ -79,6 +79,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         ReadByView readByView;
         ReferenceNumberView referenceNumberView;
 
+        UIView backgroundView;
+        UIActivityIndicatorView spinner;
+
         UIBarButtonItem flag;
         UIBarButtonItem fileTo;
         UIButton commentsButton;
@@ -112,6 +115,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitStackViews();
             InitSubViews();
             InitToolbar();
+            InitBackgroundView();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -367,6 +371,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 });
         }
 
+        void InitBackgroundView()
+        {
+            backgroundView = new UIView();
+            backgroundView.BackgroundColor = UIColor.GroupTableViewBackgroundColor;
+            backgroundView.TranslatesAutoresizingMaskIntoConstraints = false;
+            View.AddSubview(backgroundView);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+                });
+            View.BringSubviewToFront(backgroundView);
+
+            spinner = new UIActivityIndicatorView();
+            spinner.TranslatesAutoresizingMaskIntoConstraints = false;
+            spinner.ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray;
+            backgroundView.AddSubview(spinner);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(spinner, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, backgroundView, NSLayoutAttribute.CenterX, 1f, 0f),
+                    NSLayoutConstraint.Create(spinner, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, backgroundView, NSLayoutAttribute.CenterY, 1f, 0f)
+                });
+        }
+
         void CorrectScrollViewInsets()
         {
             mainScrollView.ContentInset = new UIEdgeInsets(mainScrollView.ContentInset.Top, 0f, mainScrollView.ContentInset.Bottom + toolbar.Frame.Height, 0f);
@@ -553,6 +583,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
+                StartRefreshing();
+
                 if (notificationGuid != default(Guid))
                 {
                     await Managers.NotificationsManager.MarkAsRead(notificationGuid);
@@ -582,10 +614,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (token.IsCancellationRequested) return;
 
                 RefreshView();
+                EndRefreshing();
+
                 MarkAsReadIfNecessary();
             }
             catch (Exception ex)
             {
+                EndRefreshing(true);
+
                 CommonConfig.Logger.Error($"Downloading document failed [folder.name={folder?.Name}, folder.id={folderId ?? folder?.Id}, documentId={documentId ?? documentPreview?.Id}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
@@ -599,6 +635,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NavigationController.PopViewController(true);
                 }
             }
+        }
+
+        void StartRefreshing()
+        {
+            spinner.StartAnimating();
+
+            View.BringSubviewToFront(backgroundView);
+            UIView.Animate(0.25, () =>
+            {
+                backgroundView.Alpha = 1f;
+                mainScrollView.Alpha = 0f;
+            });
+        }
+
+        void EndRefreshing(bool withError = false)
+        {
+            spinner.StopAnimating();
+
+            if (withError)
+                return;
+
+            View.SendSubviewToBack(backgroundView);
+            UIView.Animate(0.25, () =>
+            {
+                backgroundView.Alpha = 0f;
+                mainScrollView.Alpha = 1f;
+            });
         }
 
         void MarkAsReadIfNecessary()
