@@ -100,7 +100,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             CommonConfig.Logger.Info($"{nameof(AbstractFoldersListViewController)} appeared");
 
-            RefreshData();
+            if (IsRootOfFoldersList && ((TableView?.Source as GrouppedDataSource)?.Empty ?? false))
+                RefreshData();
+            else if (!IsRootOfFoldersList && ((TableView?.Source as DataSource)?.Empty ?? false))
+                RefreshData();
         }
 
         public override void ViewWillDisappear(bool animated)
