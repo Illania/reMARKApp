@@ -34,7 +34,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem editModeButtonItem;
         UIBarButtonItem exitEditModeButtonItem;
 
-        UITableView categoriesListView;
+        UITableView tableView;
         UISearchController searchController;
         UITableViewController searchResultsController;
 
@@ -62,15 +62,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeSearchBar();
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        public override async void ViewWillAppear(bool animated)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
 
             InitializeHandlers();
+            
+            ReachabilityBar.Attach(View, tableView, (float)NavigationController.BottomLayoutGuide.Length);
+        }
 
-            await RefreshData();
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        public override async void ViewDidAppear(bool animated)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            base.ViewDidAppear(animated);
+
+            var ds = (DataSource)tableView.Source;
+            if (ds.Empty)
+                await RefreshData();
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -101,21 +110,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             AutomaticallyAdjustsScrollViewInsets = true;
 
-            categoriesListView = new UITableView();
-            categoriesListView.Source = dataSource = new DataSource(categoriesListView, Localization.GetString("no_categories")); ;
-            categoriesListView.AllowsSelection = false;
-            categoriesListView.AllowsSelectionDuringEditing = true;
-            categoriesListView.AllowsMultipleSelection = false;
-            categoriesListView.AllowsMultipleSelectionDuringEditing = true;
-            categoriesListView.ClipsToBounds = false;
-            categoriesListView.TranslatesAutoresizingMaskIntoConstraints = false;
-            View.AddSubview(categoriesListView);
+            tableView = new UITableView();
+            tableView.Source = dataSource = new DataSource(tableView, Localization.GetString("no_categories")); ;
+            tableView.AllowsSelection = false;
+            tableView.AllowsSelectionDuringEditing = true;
+            tableView.AllowsMultipleSelection = false;
+            tableView.AllowsMultipleSelectionDuringEditing = true;
+            tableView.ClipsToBounds = false;
+            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
+            View.AddSubview(tableView);
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(categoriesListView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(categoriesListView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(categoriesListView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(categoriesListView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f),
                 });
         }
 
@@ -230,7 +239,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             dataSource.RefreshAssignedCategories(assignedCategories);
-            categoriesListView.ReloadData();
+            tableView.ReloadData();
         }
 
         #endregion
@@ -246,10 +255,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationItem.SetLeftBarButtonItem(cancelButtonItem, true);
             NavigationItem.SetRightBarButtonItem(exitEditModeButtonItem, true);
 
-            categoriesListView.TableHeaderView = searchController.SearchBar;
+            tableView.TableHeaderView = searchController.SearchBar;
 
             dataSource.EditingWillBegin();
-            categoriesListView.SetEditing(true, true);
+            tableView.SetEditing(true, true);
             searchResultsController.TableView.SetEditing(true, true);
         }
 
@@ -282,7 +291,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
 
                     dataSource.RefreshAssignedCategories(categoriesToAssign);
-                    categoriesListView.ReloadData();
+                    tableView.ReloadData();
 
                     UpdateAfterExitEditMode();
 
@@ -310,10 +319,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationItem.SetLeftBarButtonItem(dismissButtonItem, true);
             NavigationItem.SetRightBarButtonItem(editModeButtonItem, true);
 
-            categoriesListView.TableHeaderView = null;
+            tableView.TableHeaderView = null;
 
             dataSource.EditingWillEnd();
-            categoriesListView.SetEditing(false, true);
+            tableView.SetEditing(false, true);
             searchResultsController.TableView.SetEditing(false, true);
         }
 

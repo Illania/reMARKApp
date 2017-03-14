@@ -17,6 +17,8 @@ namespace Mark5.Mobile.Common.Services
 
         bool IsReachable { get; }
 
+        bool IsCheckingReachability { get; }
+
         event EventHandler RefreshingReachability;
 
         event EventHandler<ReachabilityRefreshedEventArgs> ReachabilityRefreshed;

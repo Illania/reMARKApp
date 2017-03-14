@@ -54,6 +54,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var vc = new ShortcodesSearchResultsViewController { Criteria = new SearchShortcodesCriteria() };
                 NavigationController.PushViewController(vc, true);
             };
+
+            ReachabilityBar.Attach(View, null, (float)NavigationController.BottomLayoutGuide.Length);
         }
     }
 }
