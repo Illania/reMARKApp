@@ -54,6 +54,7 @@
 "confirm_move_to_folder_shortcodes" = "Do you want to move selected shortcodes?";
 "confirm_save_as_draft" = "Do you want to save the document as draft?";
 "confirm_save_modified_document" = "Do you want to save the modified document?";
+"connecting___" = "Connecting...";
 "contacts" = "Contacts";
 "continue" = "Continue";
 "copy_to_clipboard" = "Copy to clipboard";
@@ -75,6 +76,7 @@
 "disable_caching" = "Disable\ncaching";
 "disable_notifications" = "Don't\nnotify";
 "disabled" = "Disabled";
+"disconnected" = "Disconnected";
 "documents" = "Documents";
 "done" = "Done";
 "downloading_attachment___" = "Downloading attachment...";

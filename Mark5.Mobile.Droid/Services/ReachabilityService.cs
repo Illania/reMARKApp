@@ -32,6 +32,12 @@ namespace Mark5.Mobile.Droid.Services
             private set;
         }
 
+        public bool IsCheckingReachability
+        {
+            get;
+            private set;
+        }
+
         public event EventHandler RefreshingReachability = delegate { };
 
         public event EventHandler<ReachabilityRefreshedEventArgs> ReachabilityRefreshed = delegate { };
@@ -43,6 +49,8 @@ namespace Mark5.Mobile.Droid.Services
 
         public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.ServiceConnection, bool testOnly = false)
         {
+            IsCheckingReachability = true;
+
             if (!testOnly)
             {
                 RefreshingReachability(this, EventArgs.Empty);
@@ -66,6 +74,8 @@ namespace Mark5.Mobile.Droid.Services
             {
                 result &= await CheckWithService();
             }
+
+            IsCheckingReachability = false;
 
             if (!testOnly)
             {
