@@ -7,6 +7,7 @@
 //
 using System;
 using System.Linq;
+using System.Text;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -49,7 +50,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             Font = Theme.DefaultFont.WithSize(12f);
 
             AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
-            AddGestureRecognizer(new UILongPressGestureRecognizer(this, new Selector("longPressed:")));
+            AddGestureRecognizer(new UILongPressGestureRecognizer(this, new Selector("longPressed:")) { MinimumPressDuration = 2d });
         }
 
         public override void WillMoveToSuperview(UIView newsuper)
@@ -100,12 +101,59 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 Hide(false);
         }
 
+        public override void ObserveValue(NSString keyPath, NSObject ofObject, NSDictionary change, IntPtr context)
+        {
+            if (keyPath == "frame" && ofObject == Superview)
+                Position();
+        }
+
         [Export("tapped:")]
         public void Tapped(UILongPressGestureRecognizer recognizer) => CommonConfig.ReachabilityService.Refresh();
 
         [Export("longPressed:")]
-        public void LongPressed(UILongPressGestureRecognizer recognizer)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        public async void LongPressed(UILongPressGestureRecognizer recognizer)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
+            UserInteractionEnabled = false;
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("testing_connection___"));
+
+            try
+            {
+                var network = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.NetworkAvailability, true);
+                var google = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.Google, true);
+                var serviceConnection = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.ServiceConnection, true);
+                var service = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.Service, true);
+
+                var title = Localization.GetString("connection_status");
+
+                var messageSb = new StringBuilder();
+                messageSb.Append(Localization.GetString("network_interface"));
+                messageSb.Append(" ");
+                messageSb.AppendLine(network ? Localization.GetString("ok") : Localization.GetString("unavailable"));
+                messageSb.Append(Localization.GetString("internet_access"));
+                messageSb.Append(" ");
+                messageSb.AppendLine(google ? Localization.GetString("ok") : Localization.GetString("unavailable"));
+                messageSb.Append(Localization.GetString("mark5_server_reachability"));
+                messageSb.Append(" ");
+                messageSb.AppendLine(serviceConnection ? Localization.GetString("ok") : Localization.GetString("unavailable"));
+                messageSb.Append(Localization.GetString("mark5_service_reachability"));
+                messageSb.Append(" ");
+                messageSb.AppendLine(service ? Localization.GetString("ok") : Localization.GetString("unavailable"));
+
+                dismissAction();
+
+                await Dialogs.ShowConfirmDialogAsync(ParentViewController(), title, messageSb.ToString());
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                await Dialogs.ShowErrorDialogAsync(ParentViewController(), ex);
+            }
+
+            UserInteractionEnabled = true;
         }
 
         void ShowDisconnected() => ShowDisconnected(true);
@@ -198,17 +246,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 action();
         }
 
-        public override void ObserveValue(NSString keyPath, NSObject ofObject, NSDictionary change, IntPtr context)
-        {
-            if (keyPath == "frame" && ofObject == Superview)
-                Position();
-        }
-
         void Position()
         {
             if (Superview == null)
                 return;
-            
+
             parentFrame = Superview.Frame;
 
             if (Alpha > 0f)
@@ -228,6 +270,21 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 BeginInvokeOnMainThread(Hide);
             else
                 BeginInvokeOnMainThread(ShowDisconnected);
+        }
+
+        UIViewController ParentViewController()
+        {
+            return ParentViewController(this);
+        }
+
+        UIViewController ParentViewController(UIView view)
+        {
+            if (view.NextResponder is UIViewController)
+                return (UIViewController)view.NextResponder;
+            if (view.NextResponder is UIView)
+                return ParentViewController((UIView)view.NextResponder);
+
+            return null;
         }
     }
 }
