@@ -8,7 +8,6 @@
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
-using Android.Util;
 using Android.Views;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Droid.Utilities;
@@ -23,7 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
             : base(context)
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ConversionUtils.ConvertDpToPixels(0.5f));
-            SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightergray)));
+            SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
         }
 
         public Divider(Context context, int leftMargin, int topMargin, int rightMargin, int bottomMargin)
@@ -41,7 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
                     BottomMargin = bottomMargin
                 }
             };
-            inner.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightergray)));
+            inner.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
             AddView(inner);
         }
 

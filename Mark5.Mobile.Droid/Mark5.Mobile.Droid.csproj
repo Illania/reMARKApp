@@ -460,7 +460,6 @@
     <AndroidResource Include="Resources\drawable-hdpi\attachment.png" />
     <AndroidResource Include="Resources\drawable-hdpi\comment.png" />
     <AndroidResource Include="Resources\drawable-hdpi\draft.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\drawable-hdpi\incoming.png" />
     <AndroidResource Include="Resources\drawable-hdpi\logo.png" />
     <AndroidResource Include="Resources\drawable-hdpi\nav_calendar.png" />
@@ -475,7 +474,6 @@
     <AndroidResource Include="Resources\drawable-xhdpi\attachment.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\comment.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\draft.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\incoming.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\logo.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\nav_calendar.png" />
@@ -490,7 +488,6 @@
     <AndroidResource Include="Resources\drawable-xxhdpi\attachment.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\comment.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\draft.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\incoming.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\logo.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\nav_calendar.png" />
@@ -505,7 +502,6 @@
     <AndroidResource Include="Resources\drawable-xxxhdpi\attachment.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\comment.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\draft.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\drawer_header_background.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\incoming.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\logo.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\nav_calendar.png" />

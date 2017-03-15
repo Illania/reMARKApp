@@ -69,7 +69,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             RecyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             RecyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
-            RecyclerView.AddItemDecoration(new DividerItemDecorator(Activity, Resource.Id.list_item_section));
             RecyclerView.SetItemAnimator(new DefaultItemAnimator());
             RecyclerView.HasFixedSize = true;
 
@@ -740,8 +739,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 public const int SectionView = 1;
             }
 
-            static readonly int[] colors = { Resource.Color.darkerblue, Resource.Color.darkblue, Resource.Color.blue };
-
             protected List<Section> sectionsInView = new List<Section>();
             protected Dictionary<Section, List<Folder>> foldersInSection = new Dictionary<Section, List<Folder>>();
 
@@ -828,28 +825,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     fh.ExpandButton.Visibility = (folder.HasSubFolders && sectionForPosition != Section.None) ? ViewStates.Visible : ViewStates.Gone;
 
-                    var color = colors[Math.Abs(folder.Name.GetHashCode() % colors.Length)];
-
-                    var sd = new ShapeDrawable(new OvalShape());
-                    sd.Paint.Color = new Color(ContextCompat.GetColor(context, color));
-                    fh.FolderIcon.Background = sd;
-
                     if (folder.InternalType == FolderInternalType.Worktray)
-                    {
                         fh.FolderIcon.SetImageResource(Resource.Drawable.folder_worktray);
-                    }
                     else if (folder.Type == FolderType.Spam)
-                    {
                         fh.FolderIcon.SetImageResource(Resource.Drawable.folder_spam);
-                    }
                     else if (folder.Type == FolderType.Draft)
-                    {
                         fh.FolderIcon.SetImageResource(Resource.Drawable.folder_draft);
-                    }
                     else
-                    {
                         fh.FolderIcon.SetImageResource(Resource.Drawable.folder);
-                    }
 
                     fh.SelectedOverlay.Visibility = IsItemSelected(position) ? ViewStates.Visible : ViewStates.Gone;
                 }

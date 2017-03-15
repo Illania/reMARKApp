@@ -8,7 +8,7 @@
 		<item name="colorPrimary">@color/darkerblue</item>
 		<item name="colorPrimaryDark">@color/darkerblue</item>
 		<item name="colorAccent">@color/brown</item>
-		<item name="colorButtonNormal">@color/lightergray</item>
+		<item name="colorButtonNormal">@color/white</item>
 		<item name="colorControlHighlight">@color/brown</item>
 		<item name="colorControlActivated">@color/brown</item>
 		<item name="actionBarItemBackground">@color/darkblue</item>
@@ -28,21 +28,28 @@
 	<style name="mark5appbaroverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 	<style name="mark5popupoverlay" parent="ThemeOverlay.AppCompat.Light" />
 	<style name="mark5navheaderoverlay" parent="ThemeOverlay.AppCompat.Dark" />
+	<style name="mark5navview">
+		<item name="android:listDivider">@color/white</item>
+	</style>
 	<style name="mark5preference" parent="PreferenceThemeOverlay.v14.Material" />
 	<style name="mark5dialog" parent="Theme.AppCompat.Light.Dialog.Alert">
 		<item name="colorAccent">@color/brown</item>
 	</style>
 	<style name="hockey" parent="android:Theme.DeviceDefault.Light.DarkActionBar" />
 	<style name="fontListPrimary" parent="TextAppearance.AppCompat.Body1">
+		<item name="android:textColor">@color/darkgray</item>
 		<item name="android:textSize">16sp</item>
 	</style>
 	<style name="fontListPrimaryBold" parent="TextAppearance.AppCompat.Body2">
+		<item name="android:textColor">@color/darkgray</item>
 		<item name="android:textSize">16sp</item>
 	</style>
 	<style name="fontListSmallLight" parent="TextAppearance.AppCompat.Caption">
+		<item name="android:textColor">@color/darkgray</item>
 		<item name="android:textSize">14sp</item>
 	</style>
 	<style name="fontListCircle" parent="TextAppearance.AppCompat.Body1">
+		<item name="android:textColor">@color/darkgray</item>
 		<item name="android:textSize">20sp</item>
 	</style>
 	<style name="fontTitle" parent="TextAppearance.AppCompat.Title" />
