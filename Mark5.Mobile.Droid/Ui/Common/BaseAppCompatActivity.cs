@@ -11,12 +11,20 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Services;
 using System.Text;
 using System;
+using Android.OS;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
 
     public abstract class BaseAppCompatActivity : AppCompatActivity
     {
+
+        public override void OnCreate(Bundle savedInstanceState, PersistableBundle persistentState)
+        {
+            base.OnCreate(savedInstanceState, persistentState);
+
+            Window.DecorView.SystemUiVisibility = (StatusBarVisibility)(SystemUiFlags.LayoutStable | SystemUiFlags.Fullscreen);
+        }
 
         protected override void OnResume()
         {

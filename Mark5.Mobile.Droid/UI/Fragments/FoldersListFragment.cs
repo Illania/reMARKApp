@@ -380,33 +380,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region ActionMode callbacks
 
-        public virtual bool OnActionItemClicked(ActionMode mode, IMenuItem item)
-        {
-            switch (item.ItemId)
-            {
-                case MenuItemActions.AddToFavourites:
-                    SetFolderFavouriteStatusForSelection(true);
-                    break;
-                case MenuItemActions.RemoveFromFavourites:
-                    SetFolderFavouriteStatusForSelection(false);
-                    break;
-                case MenuItemActions.EnableOffline:
-                    SetFolderOfflineStatusForSelection(true);
-                    break;
-                case MenuItemActions.DisableOffline:
-                    SetFolderOfflineStatusForSelection(false);
-                    break;
-                case MenuItemActions.Subscribe:
-                    SetFoldersSubscriptionToSelection(true);
-                    break;
-                case MenuItemActions.Unsubscribe:
-                    SetFoldersSubscriptionToSelection(false);
-                    break;
-            }
-
-            return true;
-        }
-
         static class MenuItemActions
         {
             public const int AddToFavourites = 10;
@@ -422,17 +395,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return true;
         }
 
-        public void OnDestroyActionMode(ActionMode mode)
-        {
-            if (actionMode != null)
-            {
-                CurrentAdapter.ClearSelections();
-                actionMode = null;
-            }
-        }
-
         public virtual bool OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
+            Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightblue)));
+
             var selectedFolders = CurrentAdapter.GetSelectedItems().ToList();
             if (!selectedFolders.Any())
             {
@@ -484,6 +451,42 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
             return true;
+        }
+
+        public virtual bool OnActionItemClicked(ActionMode mode, IMenuItem item)
+        {
+            switch (item.ItemId)
+            {
+                case MenuItemActions.AddToFavourites:
+                    SetFolderFavouriteStatusForSelection(true);
+                    break;
+                case MenuItemActions.RemoveFromFavourites:
+                    SetFolderFavouriteStatusForSelection(false);
+                    break;
+                case MenuItemActions.EnableOffline:
+                    SetFolderOfflineStatusForSelection(true);
+                    break;
+                case MenuItemActions.DisableOffline:
+                    SetFolderOfflineStatusForSelection(false);
+                    break;
+                case MenuItemActions.Subscribe:
+                    SetFoldersSubscriptionToSelection(true);
+                    break;
+                case MenuItemActions.Unsubscribe:
+                    SetFoldersSubscriptionToSelection(false);
+                    break;
+            }
+
+            return true;
+        }
+
+        public void OnDestroyActionMode(ActionMode mode)
+        {
+            Activity.Window.AddFlags(WindowManagerFlags.TranslucentStatus);
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightblue)));
+
+            CurrentAdapter.ClearSelections();
+            actionMode = null;
         }
 
         #endregion

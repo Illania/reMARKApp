@@ -439,8 +439,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int Delete = 61;
         }
 
+        bool ActionMode.ICallback.OnCreateActionMode(ActionMode mode, IMenu menu)
+        {
+            return true;
+        }
+
         bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
+            Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightblue)));
+
             menu.Clear();
 
             if (CurrentAdapter.SelectedItems.Any(dp => !dp.IsReadByCurrent))
@@ -484,11 +492,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
             }
 
-            return true;
-        }
-
-        bool ActionMode.ICallback.OnCreateActionMode(ActionMode mode, IMenu menu)
-        {
             return true;
         }
 
@@ -570,6 +573,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
         {
+            Activity.Window.AddFlags(WindowManagerFlags.TranslucentStatus);
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightblue)));
+
             CurrentAdapter.ClearSelections();
             actionMode = null;
         }

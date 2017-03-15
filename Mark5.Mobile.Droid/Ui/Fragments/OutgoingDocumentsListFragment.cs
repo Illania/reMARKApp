@@ -11,8 +11,10 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Android.Content;
+using Android.Graphics;
 using Android.OS;
 using Android.Support.Design.Widget;
+using Android.Support.V4.Content;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -139,7 +141,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
-            var newItem = menu.Add(Menu.None, 10, 10, "New"); //TODO an icon should be here
+            var newItem = menu.Add(Menu.None, 10, 10, "New");
             newItem.SetShowAsAction(ShowAsAction.Always);
         }
 
@@ -209,15 +211,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Action mode
 
-        bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
-        {
-            return false;
-        }
-
         bool ActionMode.ICallback.OnCreateActionMode(ActionMode mode, IMenu menu)
         {
             menu.Add(Menu.None, 10, 10, Resource.String.delete);
             return true;
+        }
+
+        bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
+        {
+            Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightblue)));
+
+            return false;
         }
 
         bool ActionMode.ICallback.OnActionItemClicked(ActionMode mode, IMenuItem item)
@@ -235,6 +240,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
         {
+            Activity.Window.AddFlags(WindowManagerFlags.TranslucentStatus);
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightblue)));
+
             adapter.ClearSelections();
             actionMode = null;
         }
