@@ -64,7 +64,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var rootView = InflateView(inflater, container);
 
             RefreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
-            RefreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
+            RefreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
             RefreshLayout.Refresh += RefreshLayout_Refresh;
 
             RecyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);

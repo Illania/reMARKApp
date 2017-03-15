@@ -80,7 +80,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             emptyView.SetText(Resource.String.empty_folder);
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
-            refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
+            refreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
             refreshLayout.Refresh += async (sender, e) =>
             {
                 actionMode?.Finish();

@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: EditCategoriesListFragment.cs
 // Author: Ferdinando Papale fp@nordic-it.com
@@ -57,7 +57,7 @@ namespace Mark5.Mobile.Droid
             var rootView = inflater.Inflate(Resource.Layout.list_with_button, container, false);
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
-            refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
+            refreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
             refreshLayout.Enabled = false;
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
