@@ -400,6 +400,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
             Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightblue)));
 
+            (Activity as MainActivity)?.LockDrawer();
+
             var selectedFolders = CurrentAdapter.GetSelectedItems().ToList();
             if (!selectedFolders.Any())
             {
@@ -484,6 +486,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             Activity.Window.AddFlags(WindowManagerFlags.TranslucentStatus);
             Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightblue)));
+
+            (Activity as MainActivity)?.UnlockDrawer();
 
             CurrentAdapter.ClearSelections();
             actionMode = null;

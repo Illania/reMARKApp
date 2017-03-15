@@ -85,7 +85,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     {
                         [Resource.Id.nav_documents] = new ModulesMenuItemContent(ModuleType.Documents),
                         [Resource.Id.nav_contacts] = new ModulesMenuItemContent(ModuleType.Contacts),
-                        [Resource.Id.nav_shortcodes] = new ModulesMenuItemContent(ModuleType.Shortcodes),
+                        [Resource.Id.nav_shortcodes] = new ModulesMenuItemContent(ModuleType.Shortcodes)
                     }
                 };
 
@@ -141,7 +141,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var snackbar = Snackbar.Make(coordinatorLayout, Resource.String.permissions_snackbar_text, Snackbar.LengthIndefinite)
                                        .SetAction(Resource.String.permissions_snackbar_action, v => permissionRequestAction());
 
-                snackbar.SetActionTextColor(ContextCompat.GetColor(this, Resource.Color.brown));
+                snackbar.SetActionTextColor(ContextCompat.GetColor(this, Resource.Color.lightbrown));
                 snackbar.View.SetBackgroundColor(new Android.Graphics.Color(ContextCompat.GetColor(this, Resource.Color.darkerblue)));
                 snackbar.View.Clickable = true;
                 snackbar.View.Click += (sender, e) =>
@@ -203,6 +203,16 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         #endregion
 
         #region Utility methods
+
+        public void LockDrawer()
+        {
+            drawer?.SetDrawerLockMode(DrawerLayout.LockModeLockedClosed);
+        }
+
+        public void UnlockDrawer()
+        {
+            drawer?.SetDrawerLockMode(DrawerLayout.LockModeUnlocked);
+        }
 
         public bool OnNavigationItemSelected(IMenuItem menuItem)
         {
