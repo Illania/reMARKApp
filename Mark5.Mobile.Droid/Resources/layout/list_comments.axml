@@ -12,7 +12,7 @@
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="@color/brown" />
+        android:background="@color/darkerblue" />
     <android.support.v7.widget.LinearLayoutCompat
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -35,6 +35,6 @@
             android:src="@drawable/action_send"
             android:clickable="true"
             android:background="@android:color/transparent"
-            android:tint="@color/brown" />
+            android:tint="@color/darkerblue" />
     </android.support.v7.widget.LinearLayoutCompat>
 </android.support.v7.widget.LinearLayoutCompat>

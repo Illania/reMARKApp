@@ -92,7 +92,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             showOldContentButton.SetBackgroundResource(typedArray.GetResourceId(0, 0));
             typedArray.Recycle();
             showOldContentButton.SetTextAppearanceCompat(context, Resource.Style.fontSmallBold);
-            showOldContentButton.SetTextColor(new Color(ContextCompat.GetColor(context, Resource.Color.brown)));
+            showOldContentButton.SetTextColor(new Color(ContextCompat.GetColor(context, Resource.Color.darkgray)));
             showOldContentButton.SetText(Resource.String.show_previous_message);
             showOldContentButton.Visibility = ViewStates.Gone;
             showOldContentButton.Click += ShowOldContentButton_Click;

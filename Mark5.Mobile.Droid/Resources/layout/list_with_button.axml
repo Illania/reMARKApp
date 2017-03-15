@@ -14,7 +14,7 @@
         android:id="@+id/button_divider"
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="@color/brown"
+        android:background="@color/darkerblue"
         android:layout_above="@id/button" />
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"

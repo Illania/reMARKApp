@@ -27,7 +27,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
     {
 
         LinearLayoutCompat compactLayout;
-        AppCompatTextView letter;
         AppCompatTextView line1;
         AppCompatTextView line2;
         AppCompatTextView line3;
@@ -90,30 +89,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             compactLayout = new LinearLayoutCompat(Context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                Orientation = Horizontal
+                Orientation = Vertical
             };
             compactLayout.Gravity = (int)GravityFlags.CenterVertical;
             AddView(compactLayout);
-
-            var size = ConversionUtils.ConvertDpToPixels(40f);
-            letter = new AppCompatTextView(Context)
-            {
-                LayoutParameters = new ViewGroup.LayoutParams(size, size),
-                Background = ContextCompat.GetDrawable(Context, Resource.Drawable.circle),
-                Gravity = GravityFlags.Center
-            };
-            letter.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
-
-            letter.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.white)));
-            compactLayout.AddView(letter);
-
-            var innerLayout = new LinearLayoutCompat(Context)
-            {
-                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                Orientation = Vertical
-            };
-            innerLayout.SetPadding(DistanceLarge, DistanceNone, DistanceNone, DistanceNone);
-            compactLayout.AddView(innerLayout);
 
             line1 = new AppCompatTextView(Context)
             {
@@ -123,7 +102,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             line1.SetSingleLine(true);
             line1.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
 
-            innerLayout.AddView(line1);
+            compactLayout.AddView(line1);
 
             line2 = new AppCompatTextView(Context)
             {
@@ -133,7 +112,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             line2.SetSingleLine(true);
             line2.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
 
-            innerLayout.AddView(line2);
+            compactLayout.AddView(line2);
 
             line3 = new AppCompatTextView(Context)
             {
@@ -143,7 +122,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             line3.SetSingleLine(true);
             line3.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
 
-            innerLayout.AddView(line3);
+            compactLayout.AddView(line3);
 
             line4 = new AppCompatTextView(Context)
             {
@@ -153,7 +132,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             line4.SetSingleLine(true);
             line4.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
 
-            innerLayout.AddView(line4);
+            compactLayout.AddView(line4);
 
             showButton = new AppCompatButton(Context, null, Resource.Style.Widget_AppCompat_Button_Borderless_Colored)
             {
@@ -162,8 +141,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             };
             showButton.SetTextAppearanceCompat(Context, Resource.Style.fontSmall);
 
-            showButton.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.brown)));
-            innerLayout.AddView(showButton);
+            showButton.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
+            compactLayout.AddView(showButton);
         }
 
         void InitializeExtendedView()
@@ -342,7 +321,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             hideButton.SetTextAppearanceCompat(Context, Resource.Style.fontSmall);
 
             hideButton.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
-            hideButton.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.brown)));
+            hideButton.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
             extendedLayout.AddView(hideButton);
 
             extendedLayout.SetColumnStretchable(1, true);
@@ -379,7 +358,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                     var addressesTo = DocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType);
                     var to = string.Join(", ", addressesTo.Select(at => string.IsNullOrWhiteSpace(at.Name) ? at.Address : at.Name));
 
-                    letter.Text = from?.SafeSubstring(0, 1)?.ToUpper();
                     line1.Text = from;
                     line2.Text = Context.GetString(Resource.String.to_prefix) + " " + to;
 
@@ -393,7 +371,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                     var addressesTo = DocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To);
                     var to = string.Join(", ", addressesTo.Select(at => string.IsNullOrWhiteSpace(at.Name) ? at.Address : at.Name));
 
-                    letter.Text = from?.SafeSubstring(0, 1)?.ToUpper();
                     line1.Text = from;
                     line2.Text = Context.GetString(Resource.String.to_prefix) + " " + to;
 
@@ -420,7 +397,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             }
             else
             {
-                letter.Text = string.Empty;
                 line1.Text = string.Empty;
                 line2.Text = string.Empty;
                 line3.Visibility = ViewStates.Gone;
