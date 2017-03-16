@@ -13,10 +13,10 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    
+
     public partial class ShortcodesTableViewCell : UITableViewCell
     {
-        
+
         public const float Height = 68f;
 
         public static readonly UINib Nib = UINib.FromName("ShortcodesTableViewCell", NSBundle.MainBundle);
@@ -37,7 +37,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public void Initialize(ShortcodePreview shortcodePreview)
         {
             NameLabel.Text = shortcodePreview.Name;
-            DescriptionLabel.Text = shortcodePreview.Description;
         }
     }
 }
