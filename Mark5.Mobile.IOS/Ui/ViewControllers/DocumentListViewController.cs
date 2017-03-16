@@ -541,6 +541,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         }
 
+        void ShowCategories(DocumentPreview selectedDocument)
+        {
+            var vc = new CategoriesListViewController { BusinessEntityPreview = selectedDocument };
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
         void CopyToFolder(DocumentPreview selectedDocument) => CopyToFolder(new List<DocumentPreview> { selectedDocument });
 
         void CopyToFolder(List<DocumentPreview> selectedDocument)
@@ -612,6 +618,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void DoShowMoreActionSheet(NSIndexPath indexPath, DocumentPreview selectedDocument)
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("categories"), UIAlertActionStyle.Default, a => { ShowCategories(selectedDocument); EndEditing(); }));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a => { CopyToFolder(selectedDocument); EndEditing(); }));
 
