@@ -279,7 +279,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var args = new Bundle();
             args.PutString(ArgPreferenceRoot, pref.Key);
             var ft = Activity.SupportFragmentManager.BeginTransaction();
-            ft.SetTransition(FragmentTransaction.TransitFragmentOpen);
+            ft.SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right);
             ft.Replace(Resource.Id.fragment_container, new PreferenceFragment
             {
                 Arguments = args
