@@ -31,6 +31,10 @@
 		<item name="windowActionBar">false</item>
 	</style>
 	<style name="mark5spinner" parent="Widget.AppCompat.Spinner" />
+	<style name="mark5progressbarlight" parent="Widget.AppCompat.ProgressBar">
+		<item name="colorControlHighlight">@color/lightgray</item>
+		<item name="colorControlActivated">@color/lightgray</item>
+	</style>
 	<style name="mark5appbar" parent="ThemeOverlay.AppCompat.ActionBar">
 		<item name="android:textColorPrimary">@color/lightgray</item>
 		<item name="android:textColorSecondary">@color/lightgray</item>

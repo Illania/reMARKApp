@@ -17,5 +17,5 @@
         android:layout_below="@id/anchor"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="100.0dp"
-        android:theme="@style/Widget.AppCompat.ProgressBar" />
+        android:theme="@style/mark5progressbarlight" />
 </RelativeLayout>
