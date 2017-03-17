@@ -21,6 +21,7 @@ using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
+using Android.Support.V7.Widget.Helper;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
@@ -93,6 +94,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
+
             adapter = new DocumentsListAdapter(Activity, recyclerView, async (startId) => await RefreshData(startId));
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
@@ -106,6 +108,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 menu?.FindItem(Resource.Id.action_search)?.SetEnabled(adapter.ItemCount > 0);
             }));
             recyclerView.SetAdapter(adapter);
+            var swipeHelper = new ItemTouchHelper(new SwipeHelperCallback(Context, adapter));
+            swipeHelper.AttachToRecyclerView(recyclerView);
 
             searchAdapter = new DocumentsListAdapter(Activity);
             searchAdapter.ItemClicked += Adapter_ItemClicked;
@@ -1266,6 +1270,117 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int GetPosition(DocumentPreview documentPreview)
             {
                 return GetPosition(documentPreview.Id);
+            }
+        }
+
+        class SwipeHelperCallback : ItemTouchHelper.Callback
+        {
+            Drawable rightIcon;
+            Drawable leftIcon;
+            int iconMargin;
+            DocumentsListAdapter adapter;
+            Drawable leftBackground;
+            Drawable rightBackground;
+            Context context;
+
+
+            public SwipeHelperCallback(Context context, DocumentsListAdapter adapter)
+            {
+                this.adapter = adapter;
+                this.context = context;
+
+                rightIcon = ContextCompat.GetDrawable(context, Resource.Drawable.folder_worktray);
+                leftIcon = ContextCompat.GetDrawable(context, Resource.Drawable.folder_spam);
+
+                leftBackground = new ColorDrawable(Color.DarkBlue);
+                rightBackground = new ColorDrawable(Color.LightBlue);
+
+                iconMargin = 80;
+            }
+
+            public override int GetMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder)
+            {
+                return MakeMovementFlags(ItemTouchHelper.Up | ItemTouchHelper.Down,
+                                ItemTouchHelper.Right | ItemTouchHelper.Left); //TODO should depend on the type of document
+            }
+
+            public override bool OnMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target)
+            {
+                return false;
+            }
+
+            public override void OnSwiped(RecyclerView.ViewHolder viewHolder, int direction)
+            {
+                if (direction == ItemTouchHelper.Left)
+                {
+                }
+                else if (direction == ItemTouchHelper.Right)
+                {
+
+                }
+
+                adapter.NotifyItemChanged(viewHolder.AdapterPosition);
+            }
+
+            public override void OnChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, bool isCurrentlyActive)
+            {
+                if (actionState != ItemTouchHelper.ActionStateSwipe || viewHolder.AdapterPosition == -1)  //Sometimes it gets called for viewHolders that are already gone
+                    return;
+
+                var itemView = viewHolder.ItemView;
+
+                if (dX > 0) //Swiping to right
+                {
+                    leftBackground.SetBounds(itemView.Left, itemView.Top, (int)dX, itemView.Bottom);
+                    leftBackground.Draw(c);
+
+                    var itemViewHeight = itemView.Bottom - itemView.Top;
+                    var iconWidth = leftIcon.IntrinsicWidth;
+                    var iconHeight = leftIcon.IntrinsicHeight;
+
+                    var iconLeft = itemView.Left + iconMargin;
+                    var iconRight = iconLeft + iconWidth;
+                    var iconTop = itemView.Top + (itemViewHeight - iconHeight) / 2;
+                    var iconBottom = iconTop + iconHeight;
+
+                    leftIcon.SetBounds(iconLeft, iconTop, iconRight, iconBottom);
+                    //leftIcon.Draw(c);
+                }
+                else if (dX < 0)
+                {
+                    rightBackground.SetBounds(itemView.Right + (int)dX, itemView.Top, itemView.Right, itemView.Bottom);
+                    rightBackground.Draw(c);
+
+                    var icon = BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.search);
+
+                    var itemViewHeight = itemView.Bottom - itemView.Top;
+                    var iconWidth = icon.Width;
+                    var iconHeight = icon.Height;
+
+                    var iconRight = itemView.Right - iconMargin;
+                    var iconLeft = iconRight - iconWidth;
+                    var iconTop = itemView.Top + (itemViewHeight - iconHeight) / 2;
+                    var iconBottom = iconTop + iconHeight;
+
+
+                    var leftDifference = itemView.Right + (int)dX - iconLeft;
+                    var offset = leftDifference > 0 ? leftDifference : 0;
+
+
+                    //IconImageView.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+
+                    //rightIcon.SetBounds(iconLeft, iconTop, iconRight, iconBottom);
+                    //rightIcon.Draw(c);
+
+
+                    var dest = new Rect(iconLeft + offset, iconTop, iconRight, iconBottom);
+                    var src = new Rect(offset, 0, icon.Width, icon.Height);
+                    c.DrawBitmap(icon, src, dest, null);
+                }
+
+
+                base.OnChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+
             }
         }
 
