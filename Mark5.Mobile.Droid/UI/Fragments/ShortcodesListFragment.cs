@@ -165,6 +165,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             searchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
+
+            var searchItem = menu.Add(Menu.None, 10, Menu.None, Resource.String.search);
+            searchItem.SetIcon(Resource.Drawable.action_search_server);
+            searchItem.SetShowAsAction(ShowAsAction.Always);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == 10)
+            {
+                StartActivity(new Intent(Activity, typeof(SearchActivity)));
+
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
         }
 
         #endregion
@@ -513,6 +529,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
+                menu?.FindItem(10)?.SetVisible(false);
+
                 refreshLayout.Enabled = false;
                 adapter.ClearSelections();
                 recyclerView.SwapAdapter(searchAdapter, true);
@@ -526,6 +544,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
+                menu?.FindItem(10)?.SetVisible(true);
+
                 searchHandler.RemoveCallbacksAndMessages(null);
                 searchAdapter.Clear();
                 searchAdapter.ClearSelections();

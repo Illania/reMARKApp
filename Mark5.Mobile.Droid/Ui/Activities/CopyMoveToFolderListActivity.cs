@@ -5,7 +5,6 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-
 using System.Collections.Generic;
 using Android.App;
 using Android.OS;
@@ -42,6 +41,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.OnCreate(savedInstanceState);
 
             CommonConfig.Logger.Info($"Creating {nameof(DocumentsListActivity)}...");
+
+            OverridePendingTransition(Resource.Animation.slide_up, Resource.Animation.no_change);
 
             SetContentView(Resource.Layout.base_layout);
 
@@ -91,6 +92,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 CommonConfig.Logger.Info($"Restored {nameof(CopyMoveToFolderListActivity)}");
             }
+        }
+
+        public override void OnBackPressed()
+        {
+            base.OnBackPressed();
+
+            OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
         }
     }
 }

@@ -40,6 +40,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Creating {nameof(CopyToUserWorktrayActivity)}...");
 
+            OverridePendingTransition(Resource.Animation.slide_up, Resource.Animation.no_change);
+
             SetTitle(Resource.String.select_users);
             SetContentView(Resource.Layout.base_layout);
 
@@ -65,6 +67,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 CommonConfig.Logger.Info($"Restored {nameof(CopyToUserWorktrayActivity)}");
             }
+        }
+
+        public override void OnBackPressed()
+        {
+            base.OnBackPressed();
+
+            OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
         }
     }
 }

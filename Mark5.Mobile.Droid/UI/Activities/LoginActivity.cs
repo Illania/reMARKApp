@@ -46,6 +46,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Creating {nameof(LoginActivity)}...");
 
+            OverridePendingTransition(Resource.Animation.fade_in, Resource.Animation.fade_out);
+
             SetTitle(Resource.String.app_name);
             SetContentView(Resource.Layout.activity_login);
 

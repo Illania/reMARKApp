@@ -274,7 +274,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
 
-                string path = null; 
+                string path = null;
 
                 var outgoingAttachment = attachment as OutgoingDocumentAttachmentDescription;
                 if (outgoingAttachment != null)
@@ -316,7 +316,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     openFileIntent.SetDataAndType(uri, mimeType);
                     openFileIntent.AddFlags(ActivityFlags.NewTask);
                     openFileIntent.AddFlags(ActivityFlags.GrantReadUriPermission);
-                    Intent chooser = Intent.CreateChooser(openFileIntent, Resources.GetString(Resource.String.choose_application));
+                    var chooser = Intent.CreateChooser(openFileIntent, Resources.GetString(Resource.String.choose_application));
                     Context.StartActivity(chooser);
                 }
                 catch (Exception ex)

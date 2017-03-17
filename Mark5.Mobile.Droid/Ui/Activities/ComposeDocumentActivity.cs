@@ -79,6 +79,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Creating {nameof(ComposeDocumentActivity)}...");
 
+            OverridePendingTransition(Resource.Animation.slide_up, Resource.Animation.no_change);
+
             SetContentView(Resource.Layout.base_layout);
 
             toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
@@ -158,6 +160,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public override void OnBackPressed()
         {
             cdf.AskIfShouldSave();
+        }
+
+        public override void Finish()
+        {
+            base.Finish();
+
+            OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
         }
     }
 }

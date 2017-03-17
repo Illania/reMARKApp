@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.OS;
@@ -38,7 +37,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public Folder RemoteFolder { get; set; }
 
         protected View Container;
-
         protected FolderListAdapter Adapter;
         protected SearchFolderListAdapter SearchAdapter;
         protected SearchView SearchView;
@@ -48,6 +46,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected bool SearchEnabled;
         protected readonly Handler SearchHandler = new Handler();
 
+        IMenu menu;
         ActionMode actionMode;
         List<int> recoveredSelectedItemsPosition;
 
@@ -143,6 +142,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
+            this.menu = menu;
+
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
@@ -150,6 +151,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             SearchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
             SearchView.QueryHint = GetString(Resource.String.filter);
             SearchView.SetOnQueryTextListener(this);
+
+            var searchItem = menu.Add(Menu.None, 10, Menu.None, Resource.String.search);
+            searchItem.SetIcon(Resource.Drawable.action_search_server);
+            searchItem.SetShowAsAction(ShowAsAction.Always);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == 10)
+            {
+                StartActivity(new Intent(Activity, typeof(SearchActivity)));
+
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
         }
 
         #endregion
@@ -641,6 +658,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
+                menu?.FindItem(10)?.SetVisible(false);
+
                 SearchEnabled = true;
                 RefreshLayout.Enabled = false;
                 Adapter.ClearSelections();
@@ -655,6 +674,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
+                menu?.FindItem(10)?.SetVisible(true);
+
                 SearchHandler.RemoveCallbacksAndMessages(null);
                 SearchAdapter.Clear();
                 RecyclerView.SwapAdapter(Adapter, true);
@@ -712,7 +733,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return new FolderListFragmentState
             {
                 Folder = RemoteFolder,
-                SelectedItemPositions = new List<int>(Adapter.SelectedItemPositions),
+                SelectedItemPositions = new List<int>(Adapter.SelectedItemPositions)
             };
         }
 
@@ -883,8 +904,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (viewType == ViewType.FolderView)
                 {
-                    View itemView = LayoutInflater.From(parent.Context).
-                                      Inflate(Resource.Layout.list_item_folder, parent, false);
+                    var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_folder, parent, false);
 
                     var folderViewHolder = new FolderViewHolder(itemView);
                     folderViewHolder.ExpandClicked += (sender, e) =>
@@ -906,8 +926,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 else
                 {
-                    View itemView = LayoutInflater.From(parent.Context).
-                                                  Inflate(Resource.Layout.list_item_section, parent, false);
+                    var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_section, parent, false);
                     return new SectionViewHolder(itemView);
                 }
             }
@@ -1004,7 +1023,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public bool ToggleSelection(int position)
             {
-                bool isItemSelected = IsItemSelected(position);
+                var isItemSelected = IsItemSelected(position);
                 if (isItemSelected)
                 {
                     selectedItemPositions.Remove(position);
@@ -1197,7 +1216,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-
     }
 
     public enum Section
@@ -1207,6 +1225,4 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         Remote,
         Local,
     }
-
 }
-

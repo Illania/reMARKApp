@@ -1,16 +1,14 @@
-//
+﻿//
 // Project: Mark5.Mobile.Droid
-// File: ObjectLinksActivity.cs
+// File: SearchActivity.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
-// Copyright (c) 2016 Nordic IT
+// Copyright (c) 2017 Nordic IT
 //
 using Android.App;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
@@ -18,10 +16,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
     [Activity]
-    public class ObjectLinksActivity : BaseAppCompatActivity
+    public class SearchActivity : BaseAppCompatActivity
     {
-
-        public const string BusinessEntityIntentKey = "BusinessEntity_ef8f3886-1478-4b4c-8bdb-7a6188035674";
 
         Toolbar toolbar;
 
@@ -29,11 +25,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             base.OnCreate(savedInstanceState);
 
-            CommonConfig.Logger.Info($"Creating {nameof(ObjectLinksActivity)}...");
+            CommonConfig.Logger.Info($"Creating {nameof(SearchActivity)}...");
 
             OverridePendingTransition(Resource.Animation.slide_up, Resource.Animation.no_change);
 
-            SetTitle(Resource.String.links);
+            SetTitle(Resource.String.settings);
             SetContentView(Resource.Layout.base_layout);
 
             toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
@@ -42,20 +38,16 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var be = SerializationUtils.Deserialize<IBusinessEntity>(Intent.Extras.GetString(BusinessEntityIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                var olf = new ObjectLinksFragment
-                {
-                    BusinessEntity = be
-                };
-                ft.Replace(Resource.Id.fragment_container, olf, olf.GenerateTag());
+                var paf = new SearchFragment();
+                ft.Replace(Resource.Id.fragment_container, paf, nameof(SearchFragment));
                 ft.Commit();
 
-                CommonConfig.Logger.Info($"Created {nameof(ObjectLinksActivity)}");
+                CommonConfig.Logger.Info($"Created {nameof(SearchActivity)}");
             }
             else
             {
-                CommonConfig.Logger.Info($"Restored {nameof(ObjectLinksActivity)}");
+                CommonConfig.Logger.Info($"Restored {nameof(SearchActivity)}");
             }
         }
 

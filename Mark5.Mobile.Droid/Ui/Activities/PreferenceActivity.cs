@@ -7,7 +7,6 @@
 //
 using Android.App;
 using Android.OS;
-using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -27,6 +26,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.OnCreate(savedInstanceState);
 
             CommonConfig.Logger.Info($"Creating {nameof(PreferenceFragment)}...");
+
+            OverridePendingTransition(Resource.Animation.slide_up, Resource.Animation.no_change);
 
             SetTitle(Resource.String.settings);
             SetContentView(Resource.Layout.base_layout);
@@ -48,6 +49,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 CommonConfig.Logger.Info($"Restored {nameof(PreferenceFragment)}");
             }
+        }
+
+        public override void OnBackPressed()
+        {
+            base.OnBackPressed();
+
+            OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
         }
     }
 }

@@ -36,6 +36,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Creating {nameof(ShortcodeActivity)}...");
 
+            OverridePendingTransition(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left_half);
+
             SetTitle(Resource.String.shortcode);
             SetContentView(Resource.Layout.base_layout);
 
@@ -74,6 +76,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 CommonConfig.Logger.Info($"Restored {nameof(ShortcodeActivity)}");
             }
+        }
+
+        protected override void OnStop()
+        {
+            base.OnStop();
+
+            OverridePendingTransition(Resource.Animation.enter_from_left_half, Resource.Animation.exit_to_right);
         }
     }
 }

@@ -342,6 +342,7 @@
     <Compile Include="Ui\Views\SearchViews\ContactCountrySearchView.cs" />
     <Compile Include="Utilities\LocalNotificationsListener.cs" />
     <Compile Include="Ui\Activities\PreferenceActivity.cs" />
+    <Compile Include="Ui\Activities\SearchActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -588,6 +589,13 @@
     <AndroidResource Include="Resources\drawable-xhdpi\action_filter.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\action_filter.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\action_filter.png" />
+    <AndroidResource Include="Resources\anim\no_change.xml" />
+    <AndroidResource Include="Resources\anim\slide_up.xml" />
+    <AndroidResource Include="Resources\anim\slide_down.xml" />
+    <AndroidResource Include="Resources\anim\fade_in.xml" />
+    <AndroidResource Include="Resources\anim\fade_out.xml" />
+    <AndroidResource Include="Resources\anim\exit_to_left_half.xml" />
+    <AndroidResource Include="Resources\anim\enter_from_left_half.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\anim\" />

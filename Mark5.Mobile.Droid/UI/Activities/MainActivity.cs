@@ -54,6 +54,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Starting {nameof(MainActivity)}...");
 
+            OverridePendingTransition(Resource.Animation.fade_in, Resource.Animation.fade_out);
+
             SetContentView(Resource.Layout.base_layout_nav);
 
             toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);

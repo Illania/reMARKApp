@@ -38,6 +38,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+
             SetContentView(Resource.Layout.activity_splash);
 
             var uiOptions = (int)Window.DecorView.SystemUiVisibility;
