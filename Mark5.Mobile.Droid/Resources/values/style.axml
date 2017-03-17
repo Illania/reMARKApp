@@ -62,7 +62,7 @@
         <item name="android:popupBackground">@color/darkerblue</item>
     </style>
 	<style name="mark5popup" parent="ThemeOverlay.AppCompat">
-		<item name="android:textColorPrimary">@color/darkerblue</item>
+		<item name="android:textColorPrimary">@color/darkblue</item>
 		<item name="android:colorBackground">@color/lightgray</item>
 	</style>
 	<style name="mark5navheader" parent="ThemeOverlay.AppCompat" />
