@@ -1275,7 +1275,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class SwipeHelperCallback : ItemTouchHelper.Callback
         {
-            Drawable rightIcon;
             Drawable leftIcon;
             int iconMargin;
             DocumentsListAdapter adapter;
@@ -1289,7 +1288,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 this.adapter = adapter;
                 this.context = context;
 
-                rightIcon = ContextCompat.GetDrawable(context, Resource.Drawable.folder_worktray);
                 leftIcon = ContextCompat.GetDrawable(context, Resource.Drawable.folder_spam);
 
                 leftBackground = new ColorDrawable(Color.DarkBlue);
@@ -1319,7 +1317,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 }
 
-                adapter.NotifyItemChanged(viewHolder.AdapterPosition);
+                var view = viewHolder.ItemView;
+                ViewCompat.SetTranslationX(view, 0); //TODO wrong
+            }
+
+            public override void ClearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder)
+            {
+                //base.ClearView(recyclerView, viewHolder);
             }
 
             public override void OnChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, bool isCurrentlyActive)
@@ -1357,11 +1361,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     rightBackground.SetBounds(itemView.Right + (int)dX, itemView.Top, itemView.Right, itemView.Bottom);
                     rightBackground.Draw(c);
 
-                    var icon = BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.search);
+                    var text = "COPY TO WORKTRAY";
+
+                    var paint = new Paint();
+                    paint.TextSize = 60;
+                    paint.Color = Color.White;
+                    paint.TextAlign = Paint.Align.Left;
+                    paint.SetTypeface(Typeface.Create(Typeface.Default, TypefaceStyle.Bold));
+                    var baseline = -paint.Ascent();
+                    var iconWidth = (int)(paint.MeasureText(text) + 0.5f);
+                    var iconHeight = (int)(baseline + paint.Descent() + 0.5f);
+                    var textImage = Bitmap.CreateBitmap(iconWidth, iconHeight, Bitmap.Config.Argb8888);
+                    var canvas = new Canvas(textImage);
+                    canvas.DrawText(text, 0, baseline, paint);
+
+                    var icon = textImage;
 
                     var itemViewHeight = itemView.Bottom - itemView.Top;
-                    var iconWidth = icon.Width;
-                    var iconHeight = icon.Height;
 
                     var iconRight = itemView.Right - iconMargin;
                     var iconLeft = iconRight - iconWidth;
@@ -1379,6 +1395,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 base.OnChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
             }
+
+
         }
 
         class DocumentPreviewViewHolder : RecyclerView.ViewHolder
