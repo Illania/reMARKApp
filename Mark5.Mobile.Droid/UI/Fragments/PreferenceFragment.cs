@@ -15,7 +15,6 @@ using Android.Support.V4.App;
 using Android.Support.V7.App;
 using Android.Support.V7.Preferences;
 using Firebase.Iid;
-using HockeyApp.Android;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;

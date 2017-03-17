@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Android;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.Design.Widget;
@@ -36,6 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         DrawerLayout drawer;
         SmoothActionBarDrawerToggle drawerToggle;
         NavigationView navigationView;
+        AppCompatImageView navHeaderSettingsButton;
         AppCompatTextView navHeaderTitleTextView;
         IMenuItem lastSelectedItem;
         CoordinatorLayout coordinatorLayout;
@@ -73,6 +75,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             navigationView.SetNavigationItemSelectedListener(this);
 
             var header = navigationView.GetHeaderView(0);
+
+            navHeaderSettingsButton = header.FindViewById<AppCompatImageView>(Resource.Id.nav_header_settings_button);
+            navHeaderSettingsButton.Clickable = true;
+            navHeaderSettingsButton.Click += NavHeaderSettingsButton_Click;
+
             navHeaderTitleTextView = header.FindViewById<AppCompatTextView>(Resource.Id.nav_header_title);
 
             stateFragment = RetainedFragment<MainActivityState>.FindOrCreate(SupportFragmentManager, nameof(MainActivity));
@@ -212,6 +219,17 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public void UnlockDrawer()
         {
             drawer?.SetDrawerLockMode(DrawerLayout.LockModeUnlocked);
+        }
+
+        void NavHeaderSettingsButton_Click(object sender, EventArgs e)
+        {
+            drawerToggle.RunWhenIdle(() =>
+            {
+                var i = new Intent(this, typeof(PreferenceActivity));
+                StartActivity(i);
+            });
+
+            drawer.CloseDrawer(GravityCompat.Start);
         }
 
         public bool OnNavigationItemSelected(IMenuItem menuItem)
