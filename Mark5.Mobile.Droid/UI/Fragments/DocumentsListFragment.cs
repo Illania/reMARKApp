@@ -1334,6 +1334,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     leftBackground.SetBounds(itemView.Left, itemView.Top, (int)dX, itemView.Bottom);
                     leftBackground.Draw(c);
 
+                    var icon = BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.search);
+
                     var itemViewHeight = itemView.Bottom - itemView.Top;
                     var iconWidth = leftIcon.IntrinsicWidth;
                     var iconHeight = leftIcon.IntrinsicHeight;
@@ -1343,8 +1345,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var iconTop = itemView.Top + (itemViewHeight - iconHeight) / 2;
                     var iconBottom = iconTop + iconHeight;
 
-                    leftIcon.SetBounds(iconLeft, iconTop, iconRight, iconBottom);
-                    //leftIcon.Draw(c);
+                    var rightDifference = iconRight - (int)dX;
+                    var offset = rightDifference > 0 ? rightDifference : 0;
+
+                    var dest = new Rect(iconLeft, iconTop, iconRight - offset, iconBottom);
+                    var src = new Rect(0, 0, icon.Width - offset, icon.Height);
+                    c.DrawBitmap(icon, src, dest, null);
                 }
                 else if (dX < 0)
                 {
@@ -1362,16 +1368,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var iconTop = itemView.Top + (itemViewHeight - iconHeight) / 2;
                     var iconBottom = iconTop + iconHeight;
 
-
                     var leftDifference = itemView.Right + (int)dX - iconLeft;
                     var offset = leftDifference > 0 ? leftDifference : 0;
-
-
-                    //IconImageView.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
-
-                    //rightIcon.SetBounds(iconLeft, iconTop, iconRight, iconBottom);
-                    //rightIcon.Draw(c);
-
 
                     var dest = new Rect(iconLeft + offset, iconTop, iconRight, iconBottom);
                     var src = new Rect(offset, 0, icon.Width, icon.Height);
@@ -1380,7 +1378,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
 
                 base.OnChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-
             }
         }
 
