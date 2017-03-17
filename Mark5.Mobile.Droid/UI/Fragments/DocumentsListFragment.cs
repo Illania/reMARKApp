@@ -61,7 +61,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool shouldNotifyAdapter;
         bool shouldNotifySearchAdapter;
 
-
         readonly Handler searchHandler = new Handler();
 
         AutoRefreshWorker autoRefreshWorker;
@@ -110,6 +109,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             searchAdapter = new DocumentsListAdapter(Activity);
             searchAdapter.ItemClicked += Adapter_ItemClicked;
             searchAdapter.ItemLongClicked += Adapter_ItemLongClicked;
+
+            var fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab.SetImageResource(Resource.Drawable.action_new);
+            fab.SetOnClickListener(new ActionOnClickListener(ComposeDocument));
+            fab.Visibility = ViewStates.Visible;
 
             HasOptionsMenu = true;
 
@@ -162,9 +166,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             autoRefreshWorker.Start();
 
             if (Folder.Type == FolderType.Draft)
-            {
                 Managers.OutgoingDocumentsManager.DocumentSendingSuccessful += OutgoingDocumentsManager_DocumentSendingSuccessful;
-            }
 
             CommonConfig.Logger.Info($"Started automatic refresh");
         }
@@ -182,9 +184,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Stopped automatic refresh");
 
             if (Folder.Type == FolderType.Draft)
-            {
                 Managers.OutgoingDocumentsManager.DocumentSendingSuccessful -= OutgoingDocumentsManager_DocumentSendingSuccessful;
-            }
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -193,33 +193,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
-            var newItem = menu.Add(Menu.None, 10, 10, "New");
-            newItem.SetIcon(Resource.Drawable.action_new);
-            newItem.SetShowAsAction(ShowAsAction.Always);
-
             var searchItem = menu.FindItem(Resource.Id.action_search);
             searchItem.SetIcon(Resource.Drawable.action_search);
             MenuItemCompat.SetOnActionExpandListener(searchItem, this);
             searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
-        }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == 10)
-            {
-                if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
-                {
-                    Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
-                    return true;
-                }
-
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None));
-                return true;
-            }
-
-            return base.OnOptionsItemSelected(item);
         }
 
         #endregion
@@ -263,6 +242,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override string GenerateTag()
         {
             return $"{nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]";
+        }
+
+        #endregion
+
+        #region Actions
+
+        void ComposeDocument()
+        {
+            if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
+            {
+                Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
+                return;
+            }
+
+            StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None));
         }
 
         #endregion

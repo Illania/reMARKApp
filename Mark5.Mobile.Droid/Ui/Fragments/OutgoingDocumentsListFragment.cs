@@ -139,29 +139,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
-        {
-            var newItem = menu.Add(Menu.None, 10, 10, "New");
-            newItem.SetShowAsAction(ShowAsAction.Always);
-        }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == 10)
-            {
-                if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
-                {
-                    Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
-                    return true;
-                }
-
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None));
-                return true;
-            }
-
-            return base.OnOptionsItemSelected(item);
-        }
-
         void Adapter_ItemClicked(object sender, OutgoingDocumentContainer outgoingDocumentContainer)
         {
             if (outgoingDocumentContainer.Info.State == OutgoingDocumentState.Sending)

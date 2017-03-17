@@ -13,6 +13,7 @@ using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.OS;
+using Android.Support.Design.Widget;
 using Android.Support.V4.Content;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
@@ -36,6 +37,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public Folder RemoteFolder { get; set; }
 
+        protected View Container;
+
         protected FolderListAdapter Adapter;
         protected SearchFolderListAdapter SearchAdapter;
         protected SearchView SearchView;
@@ -57,6 +60,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            Container = container;
+
             CommonConfig.Logger.Info($"Creating {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
             var rootView = InflateView(inflater, container);
@@ -107,6 +112,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Resuming {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
+            var fab = ((View)Container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            if (RemoteFolder?.Module == ModuleType.Documents)
+            {
+                fab.SetImageResource(Resource.Drawable.action_new);
+                fab.SetOnClickListener(new ActionOnClickListener(ComposeDocument));
+                fab.Visibility = ViewStates.Visible;
+            }
+            else
+            {
+                fab.Visibility = ViewStates.Gone;
+            }
+
             SetSections();
             RefreshData();
             RestoreSelection();
@@ -128,13 +145,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
-            if (RemoteFolder?.Module == ModuleType.Documents)
-            {
-                var newItem = menu.Add(Menu.None, 10, 10, "New");
-                newItem.SetIcon(Resource.Drawable.action_new);
-                newItem.SetShowAsAction(ShowAsAction.Always);
-            }
-
             var searchItem = menu.FindItem(Resource.Id.action_search);
             searchItem.SetIcon(Resource.Drawable.action_search);
             MenuItemCompat.SetOnActionExpandListener(searchItem, this);
@@ -143,21 +153,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             SearchView.SetOnQueryTextListener(this);
         }
 
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == 10)
-            {
-                if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
-                {
-                    Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
-                    return true;
-                }
+        #endregion
 
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None));
-                return true;
+        #region Actions
+
+        void ComposeDocument()
+        {
+            if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
+            {
+                Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
+                return;
             }
 
-            return base.OnOptionsItemSelected(item);
+            StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None));
         }
 
         #endregion
