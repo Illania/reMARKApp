@@ -12,8 +12,6 @@ using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Graphics;
-using Android.Graphics.Drawables;
-using Android.Graphics.Drawables.Shapes;
 using Android.OS;
 using Android.Support.V4.Content;
 using Android.Support.V4.View;
@@ -103,14 +101,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Created {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]");
         }
 
-        public async override void OnResume()
+        public override void OnResume()
         {
             base.OnResume();
 
             CommonConfig.Logger.Info($"Resuming {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
             SetSections();
-            await RefreshData();
+            RefreshData();
             RestoreSelection();
         }
 
@@ -166,31 +164,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Utility methods
 
-        async Task RefreshData(bool forceRefresh = false)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void RefreshData(bool forceRefresh = false)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             CommonConfig.Logger.Info($"Refreshing...");
 
             if (!RemoteFolder.HasSubFolders)
-            {
                 return;
-            }
 
-            RefreshLayout.Refreshing = true;
+            RefreshLayout.Post(() => RefreshLayout.Refreshing = true);
+
+            await Task.Delay(300); // Let the animation finish
 
             if (AvailableSections.Contains(Section.Remote))
-            {
                 await RefreshRemote(forceRefresh);
-            }
-            if (AvailableSections.Contains(Section.Favourites))
-            {
-                await RefreshFavorites();
-            }
-            if (AvailableSections.Contains(Section.Local))
-            {
-                RefreshLocal();
-            }
 
-            RefreshLayout.Refreshing = false;
+            if (AvailableSections.Contains(Section.Favourites))
+                await RefreshFavorites();
+
+            if (AvailableSections.Contains(Section.Local))
+                RefreshLocal();
+
+            RefreshLayout.Post(() => RefreshLayout.Refreshing = false);
         }
 
         async Task RefreshRemote(bool forceRefresh = false)
@@ -272,11 +268,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
             var foldersListFragment = GetFolderFragment(folder);
             var tag = foldersListFragment.GenerateTag();
-            var ft = fragmentManager.BeginTransaction();
-            ft.SetTransition((int)FragmentTransit.FragmentOpen);
-            ft.Replace(Resource.Id.fragment_container, foldersListFragment, tag);
-            ft.AddToBackStack(tag);
-            ft.Commit();
+
+            fragmentManager.BeginTransaction()
+                           .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
+                           .Replace(Resource.Id.fragment_container, foldersListFragment, tag)
+                           .AddToBackStack(tag)
+                           .Commit();
         }
 
         protected virtual RetainableStateFragment GetFolderFragment(Folder folder)
@@ -627,10 +624,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region SwipeRefresLayout event handlers
 
-        async void RefreshLayout_Refresh(object sender, EventArgs e)
-        {
-            await RefreshData(true);
-        }
+        void RefreshLayout_Refresh(object sender, EventArgs e) => RefreshData(true);
 
         #endregion
 
