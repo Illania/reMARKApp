@@ -517,7 +517,7 @@
     <AndroidResource Include="Resources\drawable-xxxhdpi\pending.png" />
     <AndroidResource Include="Resources\drawable-hdpi\action_attachment.png" />
     <AndroidResource Include="Resources\drawable-hdpi\action_new.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\action_search.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_search_server.png" />
     <AndroidResource Include="Resources\drawable-hdpi\action_send.png" />
     <AndroidResource Include="Resources\drawable-hdpi\contact_fax.png" />
     <AndroidResource Include="Resources\drawable-hdpi\contacts_company.png" />
@@ -533,7 +533,7 @@
     <AndroidResource Include="Resources\drawable-hdpi\sending.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\action_attachment.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\action_new.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\action_search.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_search_server.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\action_send.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\contacts_company.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\contacts_department.png" />
@@ -549,7 +549,7 @@
     <AndroidResource Include="Resources\drawable-xhdpi\sending.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\action_attachment.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\action_new.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\action_search.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_search_server.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\action_send.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\contacts_company.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\contacts_department.png" />
@@ -565,7 +565,7 @@
     <AndroidResource Include="Resources\drawable-xxhdpi\sending.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\action_attachment.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\action_new.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\action_search.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_search_server.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_company.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_department.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_email.png" />
@@ -584,6 +584,10 @@
     <AndroidResource Include="Resources\anim\exit_to_left.xml" />
     <AndroidResource Include="Resources\anim\exit_to_right.xml" />
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_filter.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_filter.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_filter.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_filter.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\anim\" />

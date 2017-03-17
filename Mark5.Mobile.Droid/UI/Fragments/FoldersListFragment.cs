@@ -145,10 +145,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
-            var searchItem = menu.FindItem(Resource.Id.action_search);
-            searchItem.SetIcon(Resource.Drawable.action_search);
-            MenuItemCompat.SetOnActionExpandListener(searchItem, this);
-            SearchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
+            var filterItem = menu.FindItem(Resource.Id.action_filter);
+            MenuItemCompat.SetOnActionExpandListener(filterItem, this);
+            SearchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
             SearchView.QueryHint = GetString(Resource.String.filter);
             SearchView.SetOnQueryTextListener(this);
         }
@@ -640,7 +639,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         virtual public bool OnMenuItemActionExpand(IMenuItem item)
         {
-            if (item.ItemId == Resource.Id.action_search)
+            if (item.ItemId == Resource.Id.action_filter)
             {
                 SearchEnabled = true;
                 RefreshLayout.Enabled = false;
@@ -654,7 +653,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
         {
-            if (item.ItemId == Resource.Id.action_search)
+            if (item.ItemId == Resource.Id.action_filter)
             {
                 SearchHandler.RemoveCallbacksAndMessages(null);
                 SearchAdapter.Clear();
