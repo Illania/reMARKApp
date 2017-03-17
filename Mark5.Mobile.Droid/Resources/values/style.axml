@@ -38,6 +38,7 @@
 	<style name="mark5appbar" parent="ThemeOverlay.AppCompat.ActionBar">
 		<item name="android:textColorPrimary">@color/lightgray</item>
 		<item name="android:textColorSecondary">@color/lightgray</item>
+		<item name="android:textColorHint">@color/lightgray</item>
 		<item name="android:colorControlNormal">@color/lightgray</item>
 	</style>
 	<style name="mark5actionmode" parent="Widget.AppCompat.ActionMode">
