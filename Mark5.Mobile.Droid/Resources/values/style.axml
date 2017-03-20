@@ -1,23 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<!-- Themes -->
 	<style name="mark5Base" parent="Theme.AppCompat.Light.NoActionBar">
 		<item name="android:windowBackground">@color/white</item>
 		<item name="android:windowDrawsSystemBarBackgrounds">true</item>
 	    <item name="android:windowTranslucentStatus">true</item>
+		<item name="android:textColorPrimary">@color/black</item>
+		<item name="android:textColorSecondary">@color/darkgray</item>
+		<item name="android:textColorHint">@color/darkgray</item>
 		<item name="windowActionModeOverlay">true</item>
 		<item name="colorPrimary">@color/darkerblue</item>
 		<item name="colorPrimaryDark">@color/darkerblue</item>
 		<item name="colorAccent">@color/darkerblue</item>
 		<item name="colorButtonNormal">@color/white</item>
+		<item name="colorControlNormal">@color/darkgray</item>
 		<item name="colorControlHighlight">@color/darkblue</item>
 		<item name="colorControlActivated">@color/darkblue</item>
 		<item name="actionBarItemBackground">@color/darkblue</item>
 		<item name="actionMenuTextColor">@color/lightgray</item>
 		<item name="actionModeStyle">@style/mark5actionmode</item>
-		<item name="actionOverflowMenuStyle">@style/mark5actionoverflowmenu</item>
 		<item name="spinnerStyle">@style/mark5spinner</item>
 		<item name="preferenceTheme">@style/mark5preference</item>
 		<item name="alertDialogTheme">@style/mark5dialog</item>
+		<item name="md_title_color">@color/black</item>
+		<item name="md_content_color">@color/black</item>
+		<item name="md_widget_color">@color/darkblue</item>
+		<item name="md_positive_color">@color/darkblue</item>
+		<item name="md_neutral_color">@color/darkblue</item>
+		<item name="md_negative_color">@color/darkblue</item>
 	</style>
 	<style name="mark5" parent="mark5Base">
 	</style>
@@ -28,38 +38,44 @@
 		<item name="windowNoTitle">true</item>
 		<item name="windowActionBar">false</item>
 	</style>
-	<style name="mark5appbar" parent="ThemeOverlay.AppCompat.ActionBar">
+	<style name="mark5appbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
 		<item name="android:textColorPrimary">@color/lightgray</item>
 		<item name="android:textColorSecondary">@color/lightgray</item>
 		<item name="android:textColorHint">@color/lightgray</item>
-		<item name="android:colorControlNormal">@color/lightgray</item>
+		<item name="colorControlNormal">@color/lightgray</item>
 	</style>
-	<style name="mark5navheader" parent="ThemeOverlay.AppCompat" />
+	<style name="mark5navheader" parent="ThemeOverlay.AppCompat.Dark" />
+	<style name="mark5popup" parent="ThemeOverlay.AppCompat">
+		<item name="android:textColorPrimary">@color/darkerblue</item>
+		<item name="android:textColorSecondary">@color/darkerblue</item>
+		<item name="android:textColorHint">@color/darkerblue</item>
+		<item name="android:colorBackground">@color/lightgray</item>
+	</style>
 	<style name="mark5dialog" parent="Theme.AppCompat.Light.Dialog.Alert">
 		<item name="colorAccent">@color/darkblue</item>
 	</style>
 	<style name="mark5preference" parent="PreferenceThemeOverlay.v14.Material" />
 	<style name="hockey" parent="android:Theme.DeviceDefault.Light.DarkActionBar" />
+
+	<!-- Styles -->
+	<style name="mark5actionmode" parent="Widget.AppCompat.ActionMode">
+		<item name="background">@color/darkblue</item>
+	</style>
+	<style name="mark5navview">
+		<item name="android:listDivider">@color/white</item>
+	</style>
 	<style name="mark5spinner" parent="Widget.AppCompat.Spinner" />
 	<style name="mark5progressbarlight" parent="Widget.AppCompat.ProgressBar">
 		<item name="colorControlHighlight">@color/lightgray</item>
 		<item name="colorControlActivated">@color/lightgray</item>
 	</style>
-	<style name="mark5actionmode" parent="Widget.AppCompat.ActionMode">
-		<item name="background">@color/darkblue</item>
-	</style>
-	<style name="mark5actionoverflowmenu" parent="Widget.AppCompat.PopupMenu.Overflow">
-        <item name="android:popupBackground">@color/darkerblue</item>
-    </style>
-	<style name="mark5navview">
-		<item name="android:listDivider">@color/white</item>
-	</style>
+
+	<!-- Fonts -->
 	<style name="fontListPrimary" parent="TextAppearance.AppCompat.Body1">
 		<item name="android:textColor">@color/darkgray</item>
 		<item name="android:textSize">16sp</item>
 	</style>
 	<style name="fontListPrimaryBold" parent="TextAppearance.AppCompat.Body2">
-		<item name="android:textColor">@color/darkgray</item>
 		<item name="android:textSize">16sp</item>
 	</style>
 	<style name="fontListSmallLight" parent="TextAppearance.AppCompat.Caption">
@@ -84,8 +100,8 @@
 		<item name="android:textSize">20sp</item>
 	</style>
 	<style name="fontLargeLight" parent="TextAppearance.AppCompat.Caption">
-		<item name="android:textSize">20sp</item>
 		<item name="android:textColor">@color/darkgray</item>
+		<item name="android:textSize">20sp</item>
 	</style>
 	<style name="fontPrimary" parent="TextAppearance.AppCompat.Body1">
 		<item name="android:textSize">16sp</item>
@@ -94,8 +110,8 @@
 		<item name="android:textSize">16sp</item>
 	</style>
 	<style name="fontPrimaryLight" parent="TextAppearance.AppCompat.Caption">
-		<item name="android:textSize">16sp</item>
 		<item name="android:textColor">@color/darkgray</item>
+		<item name="android:textSize">16sp</item>
 	</style>
 	<style name="fontSmall" parent="TextAppearance.AppCompat.Body1">
 		<item name="android:textSize">14sp</item>
@@ -104,8 +120,8 @@
 		<item name="android:textSize">14sp</item>
 	</style>
 	<style name="fontSmallLight" parent="TextAppearance.AppCompat.Caption">
-		<item name="android:textSize">14sp</item>
 		<item name="android:textColor">@color/darkgray</item>
+		<item name="android:textSize">14sp</item>
 	</style>
 	<style name="fontTiny" parent="TextAppearance.AppCompat.Body1">
 		<item name="android:textSize">12sp</item>
@@ -114,18 +130,16 @@
 		<item name="android:textSize">12sp</item>
 	</style>
 	<style name="fontTinyLight" parent="TextAppearance.AppCompat.Caption">
-		<item name="android:textSize">12sp</item>
 		<item name="android:textColor">@color/darkgray</item>
+		<item name="android:textSize">12sp</item>
 	</style>
 	<style name="contactViewHeaderTitle" parent="TextAppearance.AppCompat.Body2">
 		<item name="android:textSize">18sp</item>
-		<item name="android:textColor">@color/white</item>
 	</style>
 	<style name="contactViewHeaderTitleLarge" parent="contactViewHeaderTitle">
 		<item name="android:textSize">22sp</item>
 	</style>
 	<style name="contactViewHeaderSubtitle" parent="TextAppearance.AppCompat.Body2">
 		<item name="android:textSize">16sp</item>
-		<item name="android:textColor">@color/white</item>
 	</style>
 </resources>
