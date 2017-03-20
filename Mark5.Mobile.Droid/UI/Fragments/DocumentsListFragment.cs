@@ -1067,6 +1067,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return documentPreviewsInView[position].Direction == DocumentDirection.External ? ViewType.ExternalDocumentView : ViewType.DocumentView;
             }
 
+            int? swipedPosition;
+            int swipedDirection;
+
+            public void SetSwipedState(int position, int direction) //TODO position
+            {
+                swipedPosition = position;
+                swipedDirection = direction;
+            }
+
+            public void ResetSwipedState()
+            {
+                swipedPosition = null;
+            }
+
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
                 var dp = documentPreviewsInView[position];
@@ -1074,6 +1088,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (holder is DocumentPreviewViewHolder)
                 {
                     var dpvh = holder as DocumentPreviewViewHolder;
+
+                    dpvh.SwipedDirection = position == swipedPosition ? swipedDirection : 0;
 
                     dpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
                     dpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
@@ -1278,9 +1294,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Drawable leftIcon;
             int iconMargin;
             DocumentsListAdapter adapter;
-            Drawable leftBackground;
-            Drawable rightBackground;
-            Context context;
+            readonly Drawable leftBackground;
+            readonly Drawable rightBackground;
+            readonly Context context;
 
 
             public SwipeHelperCallback(Context context, DocumentsListAdapter adapter)
@@ -1311,19 +1327,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (direction == ItemTouchHelper.Left)
                 {
+
                 }
                 else if (direction == ItemTouchHelper.Right)
                 {
 
                 }
 
+                var position = viewHolder.AdapterPosition;
                 var view = viewHolder.ItemView;
-                ViewCompat.SetTranslationX(view, 0); //TODO wrong
-            }
 
-            public override void ClearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder)
-            {
-                //base.ClearView(recyclerView, viewHolder);
+                viewHolder.ItemView.TranslationX = 0;
+                viewHolder.ItemView.TranslationY = 0;
+
+                adapter.SetSwipedState(position, direction);
+                adapter.NotifyItemChanged(position);
+
+                viewHolder.ItemView.PostDelayed(() =>
+                {
+                    adapter.ResetSwipedState();
+                    adapter.NotifyItemChanged(position);
+                }, 300);
             }
 
             public override void OnChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, bool isCurrentlyActive)
@@ -1527,6 +1551,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
+            public int SwipedDirection
+            {
+                set
+                {
+                    if (value != 0)
+                    {
+                        swipedBackground.Visibility = ViewStates.Visible;
+                        itemContent.Visibility = ViewStates.Invisible;
+
+                        swipedBackground.SetBackgroundColor(value == ItemTouchHelper.Left ? Color.LightBlue : Color.DarkBlue); //TODO rightColor)
+                    }
+                    else
+                    {
+                        swipedBackground.Visibility = ViewStates.Gone;
+                        itemContent.Visibility = ViewStates.Visible;
+                    }
+                }
+            }
+
             readonly AppCompatTextView recipentTextView;
             readonly AppCompatTextView dateTextView;
             readonly AppCompatTextView subjectTextView;
@@ -1538,7 +1581,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly AppCompatImageView unreadImageView;
             readonly AppCompatImageView attachmentImageView;
             readonly AppCompatImageView commentImageView;
+            readonly LinearLayoutCompat itemContent;
             readonly View selectedOverlay;
+            readonly View swipedBackground;
 
             public DocumentPreviewViewHolder(View itemView)
                     : base(itemView)
@@ -1554,7 +1599,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 unreadImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_unread);
                 attachmentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_attachment);
                 commentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_comment);
+                itemContent = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_internal_Layout);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
+                swipedBackground = itemView.FindViewById<View>(Resource.Id.swiped_background);
             }
         }
 
