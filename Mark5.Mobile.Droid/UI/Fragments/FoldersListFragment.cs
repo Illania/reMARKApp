@@ -66,6 +66,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var rootView = InflateView(inflater, container);
 
+            var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
+            emptyView.SetText(Resource.String.empty_folder);
+
             RefreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
             RefreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
             RefreshLayout.Refresh += RefreshLayout_Refresh;
@@ -76,6 +79,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             RecyclerView.HasFixedSize = true;
 
             Adapter = new FolderListAdapter(Context, RecyclerView);
+            Adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
+            {
+                if (RecyclerView.GetAdapter() != Adapter) return;
+
+                emptyView.Visibility = Adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
+                RecyclerView.Visibility = Adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
+                menu?.FindItem(Resource.Id.action_filter)?.SetEnabled(Adapter.ItemCount > 0);
+            }));
             Adapter.ExpandIconClicked += Adapter_ExpandClicked;
             Adapter.ItemClicked += Adapter_ItemClicked;
             Adapter.ItemLongClicked += Adapter_ItemLongClicked;

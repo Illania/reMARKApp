@@ -91,7 +91,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
             {
                 if (recyclerView.GetAdapter() != adapter) return;
-                if (refreshing) return;
 
                 emptyView.Visibility = adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
                 recyclerView.Visibility = adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;

@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: FoldersNotificationsFragment.cs
+// File: FoldersNotificationsListFragment.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -19,7 +19,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
 
-    public class FoldersNotificationsFragment : RetainableStateFragment
+    public class FoldersNotificationsListFragment : RetainableStateFragment
     {
 
         static readonly int[] tabTitles = { Resource.String.folders, Resource.String.notifications };
@@ -84,7 +84,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(FoldersNotificationsFragment)} [FolderId={RemoteFolder?.Id}, ModuleType={RemoteFolder?.Module}]";
+            return $"{nameof(FoldersNotificationsListFragment)} [FolderId={RemoteFolder?.Id}, ModuleType={RemoteFolder?.Module}]";
         }
 
         class FoldersNotificationsRetainableState : IRetainableState
@@ -115,7 +115,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     case 0:
                         return new FoldersListFragment { RemoteFolder = folder };
                     case 1:
-                        return new NotificationsFragment { ObjectTypes = folder.Module.ObjectTypes() };
+                        return new NotificationsListFragment { ObjectTypes = folder.Module.ObjectTypes() };
                     default:
                         return null;
                 }

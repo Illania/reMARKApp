@@ -1,6 +1,6 @@
 //
 // Project: Mark5.Mobile.Droid
-// File: NotificationsFragment.cs
+// File: NotificationsListFragment.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -27,7 +27,7 @@ using Mark5.Mobile.Droid.Utilities;
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
 
-    public class NotificationsFragment : RetainableStateFragment
+    public class NotificationsListFragment : RetainableStateFragment
     {
 
         public ObjectType[] ObjectTypes { get; set; }
@@ -40,9 +40,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(NotificationsFragment)}...");
+            CommonConfig.Logger.Info($"Creating {nameof(NotificationsListFragment)}...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
+
+            var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
+            emptyView.SetText(Resource.String.no_notifications);
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
             refreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
@@ -53,6 +56,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
             adapter = new NotificationsAdapter(Context);
+            adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
+            {
+                if (recyclerView.GetAdapter() != adapter) return;
+
+                emptyView.Visibility = adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
+                recyclerView.Visibility = adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
+            }));
             adapter.ItemClicked += Adapter_ItemClicked;
             recyclerView.SetAdapter(adapter);
 
@@ -71,14 +81,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 ((AppCompatActivity)Activity).SupportActionBar.Subtitle = string.Empty;
             }
 
-            CommonConfig.Logger.Info($"Created {nameof(NotificationsFragment)}");
+            CommonConfig.Logger.Info($"Created {nameof(NotificationsListFragment)}");
         }
 
         public override async void OnResume()
         {
             base.OnResume();
 
-            CommonConfig.Logger.Info($"Resuming {nameof(NotificationsFragment)}...");
+            CommonConfig.Logger.Info($"Resuming {nameof(NotificationsListFragment)}...");
 
             if (adapter.ItemCount < 1)
             {
@@ -92,7 +102,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnPause();
 
-            CommonConfig.Logger.Info($"Pausing {nameof(NotificationsFragment)}...");
+            CommonConfig.Logger.Info($"Pausing {nameof(NotificationsListFragment)}...");
         }
 
         #endregion
@@ -154,7 +164,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(NotificationsFragment)}]";
+            return $"{nameof(NotificationsListFragment)}]";
         }
 
         #endregion

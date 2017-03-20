@@ -53,6 +53,9 @@ namespace Mark5.Mobile.Droid
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
+            var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
+            emptyView.SetText(Resource.String.no_categories);
+
             var refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
             refreshLayout.Enabled = false;
 
@@ -61,6 +64,13 @@ namespace Mark5.Mobile.Droid
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
             adapter = new CategoriesListAdapter();
+            adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
+            {
+                if (recyclerView.GetAdapter() != adapter) return;
+
+                emptyView.Visibility = adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
+                recyclerView.Visibility = adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
+            }));
             recyclerView.SetAdapter(adapter);
 
             searchAdapter = new CategoriesListAdapter();

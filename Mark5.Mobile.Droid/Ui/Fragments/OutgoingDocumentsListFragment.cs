@@ -30,8 +30,10 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
+    
     public class OutgoingDocumentsListFragment : RetainableStateFragment, ActionMode.ICallback
     {
+        
         bool refreshing;
 
         public Action CloseRequest { get; set; }
@@ -46,6 +48,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Creating {nameof(OutgoingDocumentsListFragment)} ...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
+
+            var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
+            emptyView.SetText(Resource.String.empty_folder);
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
             refreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
@@ -62,6 +67,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
             adapter = new OutgoingDocumentsListAdapter(Activity);
+            adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
+            {
+                if (recyclerView.GetAdapter() != adapter) return;
+
+                emptyView.Visibility = adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
+                recyclerView.Visibility = adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
+            }));
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
             recyclerView.SetAdapter(adapter);
