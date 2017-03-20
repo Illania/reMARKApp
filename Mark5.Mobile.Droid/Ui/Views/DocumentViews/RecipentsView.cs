@@ -91,7 +91,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                 Orientation = Vertical
             };
-            compactLayout.Gravity = (int)GravityFlags.CenterVertical;
+            compactLayout.SetGravity((int)GravityFlags.CenterVertical);
             AddView(compactLayout);
 
             line1 = new AppCompatTextView(Context)
