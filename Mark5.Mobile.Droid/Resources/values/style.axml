@@ -4,10 +4,12 @@
 	<style name="mark5Base" parent="Theme.AppCompat.Light.NoActionBar">
 		<item name="android:windowBackground">@color/white</item>
 		<item name="android:windowDrawsSystemBarBackgrounds">true</item>
-	    <item name="android:windowTranslucentStatus">true</item>
+		<item name="android:windowTranslucentStatus">true</item>
 		<item name="android:textColorPrimary">@color/black</item>
 		<item name="android:textColorSecondary">@color/darkgray</item>
 		<item name="android:textColorHint">@color/darkgray</item>
+		<item name="android:textAppearanceLargePopupMenu">@style/popupMenuTextAppearanceLarge</item>
+		<item name="android:textAppearanceSmallPopupMenu">@style/popupMenuTextAppearanceSmall</item>
 		<item name="windowActionModeOverlay">true</item>
 		<item name="colorPrimary">@color/darkerblue</item>
 		<item name="colorPrimaryDark">@color/darkerblue</item>
@@ -19,6 +21,8 @@
 		<item name="actionBarItemBackground">@color/darkblue</item>
 		<item name="actionMenuTextColor">@color/lightgray</item>
 		<item name="actionModeStyle">@style/mark5actionmode</item>
+		<item name="actionOverflowButtonStyle">@style/mark5overflowbutton</item>
+		<item name="actionOverflowMenuStyle">@style/mark5actionoverflowmenu</item>
 		<item name="spinnerStyle">@style/mark5spinner</item>
 		<item name="preferenceTheme">@style/mark5preference</item>
 		<item name="alertDialogTheme">@style/mark5dialog</item>
@@ -56,10 +60,15 @@
 	</style>
 	<style name="mark5preference" parent="PreferenceThemeOverlay.v14.Material" />
 	<style name="hockey" parent="android:Theme.DeviceDefault.Light.DarkActionBar" />
-
 	<!-- Styles -->
 	<style name="mark5actionmode" parent="Widget.AppCompat.ActionMode">
-		<item name="background">@color/darkblue</item>
+		<item name="background">@color/darkgray</item>
+	</style>
+	<style name="mark5overflowbutton" parent="Widget.AppCompat.ActionButton.Overflow">
+		<item name="android:tint">@color/lightgray</item>
+	</style>
+	<style name="mark5actionoverflowmenu" parent="Widget.AppCompat.PopupMenu.Overflow">
+		<item name="android:popupBackground">@color/lightgray</item>
 	</style>
 	<style name="mark5navview">
 		<item name="android:listDivider">@color/white</item>
@@ -69,7 +78,6 @@
 		<item name="colorControlHighlight">@color/lightgray</item>
 		<item name="colorControlActivated">@color/lightgray</item>
 	</style>
-
 	<!-- Fonts -->
 	<style name="fontListPrimary" parent="TextAppearance.AppCompat.Body1">
 		<item name="android:textColor">@color/darkgray</item>
@@ -136,10 +144,16 @@
 	<style name="contactViewHeaderTitle" parent="TextAppearance.AppCompat.Body2">
 		<item name="android:textSize">18sp</item>
 	</style>
-	<style name="contactViewHeaderTitleLarge" parent="contactViewHeaderTitle">
+	<style name="contactViewHeaderTitleLarge" parent="TextAppearance.AppCompat.Body2">
 		<item name="android:textSize">22sp</item>
 	</style>
 	<style name="contactViewHeaderSubtitle" parent="TextAppearance.AppCompat.Body2">
 		<item name="android:textSize">16sp</item>
+	</style>
+	<style name="popupMenuTextAppearanceSmall" parent="TextAppearance.AppCompat.Widget.PopupMenu.Small">
+		<item name="android:textColor">@color/darkerblue</item>
+	</style>
+	<style name="popupMenuTextAppearanceLarge" parent="TextAppearance.AppCompat.Widget.PopupMenu.Large">
+		<item name="android:textColor">@color/darkerblue</item>
 	</style>
 </resources>

@@ -57,6 +57,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         DocumentsListAdapter searchAdapter;
         ActionMode actionMode;
         SearchView searchView;
+        FloatingActionButton fab;
 
         bool shouldNotifyAdapter;
         bool shouldNotifySearchAdapter;
@@ -110,7 +111,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             searchAdapter.ItemClicked += Adapter_ItemClicked;
             searchAdapter.ItemLongClicked += Adapter_ItemLongClicked;
 
-            var fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
             fab.SetImageResource(Resource.Drawable.action_new);
             fab.SetOnClickListener(new ActionOnClickListener(ComposeDocument));
             fab.Visibility = ViewStates.Visible;
@@ -456,7 +457,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
             Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
-            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+
+            fab?.Hide();
 
             menu.Clear();
 
@@ -583,7 +586,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
         {
             Activity.Window.AddFlags(WindowManagerFlags.TranslucentStatus);
-            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+
+            fab?.Show();
 
             CurrentAdapter.ClearSelections();
             actionMode = null;

@@ -340,7 +340,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
             Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
-            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
 
             menu.Clear();
 
@@ -436,7 +436,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
         {
             Activity.Window.AddFlags(WindowManagerFlags.TranslucentStatus);
-            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
 
             CurrentAdapter.ClearSelections();
             actionMode = null;

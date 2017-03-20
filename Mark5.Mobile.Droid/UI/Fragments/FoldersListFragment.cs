@@ -48,6 +48,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         IMenu menu;
         ActionMode actionMode;
+        FloatingActionButton fab;
         List<int> recoveredSelectedItemsPosition;
 
         protected FolderListAdapter CurrentAdapter
@@ -111,7 +112,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Resuming {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
-            var fab = ((View)Container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab = ((View)Container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
             if (RemoteFolder?.Module == ModuleType.Documents)
             {
                 fab.SetImageResource(Resource.Drawable.action_new);
@@ -121,6 +122,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             else
             {
                 fab.Visibility = ViewStates.Gone;
+                fab = null;
             }
 
             SetSections();
@@ -419,7 +421,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public virtual bool OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
             Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
-            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+
+            fab?.Hide();
 
             (Activity as MainActivity)?.LockDrawer();
 
@@ -506,7 +510,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public void OnDestroyActionMode(ActionMode mode)
         {
             Activity.Window.AddFlags(WindowManagerFlags.TranslucentStatus);
-            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+
+            fab?.Show();
 
             (Activity as MainActivity)?.UnlockDrawer();
 
