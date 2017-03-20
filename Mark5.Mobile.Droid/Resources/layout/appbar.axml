@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:theme="@style/mark5appbar">
+    android:theme="@style/mark5appbar"
+    app:elevation="@dimen/appbar_elevation">
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:elevation="@dimen/appbar_elevation"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary" />
 </android.support.design.widget.AppBarLayout>

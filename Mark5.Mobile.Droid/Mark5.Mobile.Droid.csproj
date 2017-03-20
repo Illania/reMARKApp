@@ -459,7 +459,6 @@
     <AndroidResource Include="Resources\values\strings.axml" />
     <AndroidResource Include="Resources\values\style.axml" />
     <AndroidResource Include="Resources\values\values-preferences.axml" />
-    <AndroidResource Include="Resources\values-v21\style.axml" />
     <AndroidResource Include="Resources\xml\filepaths.xml" />
     <AndroidResource Include="Resources\layout\suggestion_dropdown.axml" />
     <AndroidResource Include="Resources\drawable-hdpi\error.png" />
@@ -618,6 +617,7 @@
     <AndroidResource Include="Resources\anim\fade_out.xml" />
     <AndroidResource Include="Resources\anim\exit_to_left_half.xml" />
     <AndroidResource Include="Resources\anim\enter_from_left_half.xml" />
+    <AndroidResource Include="Resources\drawable\tab_background.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\anim\" />
