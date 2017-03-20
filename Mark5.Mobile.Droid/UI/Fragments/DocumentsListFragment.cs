@@ -22,6 +22,7 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Support.V7.Widget.Helper;
+using Android.Text;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
@@ -61,7 +62,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool shouldNotifyAdapter;
         bool shouldNotifySearchAdapter;
-
 
         readonly Handler searchHandler = new Handler();
 
@@ -1133,6 +1133,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     var edpvh = holder as ExternalDocumentPreviewViewHolder;
 
+                    edpvh.SwipedDirection = position == swipedPosition ? swipedDirection : 0;
+
                     edpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
                     edpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
 
@@ -1291,25 +1293,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class SwipeHelperCallback : ItemTouchHelper.Callback
         {
-            Drawable leftIcon;
-            int iconMargin;
-            DocumentsListAdapter adapter;
+            readonly int iconMargin;
+            readonly DocumentsListAdapter adapter;
             readonly Drawable leftBackground;
             readonly Drawable rightBackground;
-            readonly Context context;
 
 
             public SwipeHelperCallback(Context context, DocumentsListAdapter adapter)
             {
                 this.adapter = adapter;
-                this.context = context;
 
-                leftIcon = ContextCompat.GetDrawable(context, Resource.Drawable.folder_spam);
+                leftBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, Resource.Color.brown)));
+                rightBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)));
 
-                leftBackground = new ColorDrawable(Color.DarkBlue);
-                rightBackground = new ColorDrawable(Color.LightBlue);
-
-                iconMargin = 80;
+                iconMargin = 80; //TODO need to decide a value
             }
 
             public override int GetMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder)
@@ -1334,6 +1331,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 }
 
+                ResetViewHolder(viewHolder, direction);
+            }
+
+            void ResetViewHolder(RecyclerView.ViewHolder viewHolder, int direction)
+            {
                 var position = viewHolder.AdapterPosition;
                 var view = viewHolder.ItemView;
 
@@ -1347,7 +1349,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     adapter.ResetSwipedState();
                     adapter.NotifyItemChanged(position);
-                }, 300);
+                }, 400);
             }
 
             public override void OnChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, bool isCurrentlyActive)
@@ -1362,65 +1364,64 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     leftBackground.SetBounds(itemView.Left, itemView.Top, (int)dX, itemView.Bottom);
                     leftBackground.Draw(c);
 
-                    var icon = BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.search);
+                    var text = "CATEGORIES"; //TODO from resources
+
+                    c.Save();
+                    var paint = new TextPaint();
+                    paint.TextSize = 60; //TODO need to decide on a value
+                    paint.Color = Color.White;
+                    paint.TextAlign = Paint.Align.Left;
+                    paint.SetTypeface(Typeface.Create(Typeface.Default, TypefaceStyle.Bold));
+
+                    var textLayout = new StaticLayout(text, paint, c.Width, Layout.Alignment.AlignNormal, 1, 0, false);
+
+                    var baseline = -paint.Ascent();
+                    var iconHeight = (int)(baseline + paint.Descent() + 0.5f);
 
                     var itemViewHeight = itemView.Bottom - itemView.Top;
-                    var iconWidth = leftIcon.IntrinsicWidth;
-                    var iconHeight = leftIcon.IntrinsicHeight;
 
-                    var iconLeft = itemView.Left + iconMargin;
-                    var iconRight = iconLeft + iconWidth;
-                    var iconTop = itemView.Top + (itemViewHeight - iconHeight) / 2;
-                    var iconBottom = iconTop + iconHeight;
+                    var textLeft = itemView.Left + iconMargin;
+                    var textTop = itemView.Top + (itemViewHeight - iconHeight) / 2;
 
-                    var rightDifference = iconRight - (int)dX;
-                    var offset = rightDifference > 0 ? rightDifference : 0;
+                    c.Translate(textLeft, textTop);
+                    textLayout.Draw(c);
 
-                    var dest = new Rect(iconLeft, iconTop, iconRight - offset, iconBottom);
-                    var src = new Rect(0, 0, icon.Width - offset, icon.Height);
-                    c.DrawBitmap(icon, src, dest, null);
+                    c.Restore();
                 }
                 else if (dX < 0)
                 {
                     rightBackground.SetBounds(itemView.Right + (int)dX, itemView.Top, itemView.Right, itemView.Bottom);
                     rightBackground.Draw(c);
 
-                    var text = "COPY TO WORKTRAY";
+                    var text = "COPY TO \n WORKTRAY";
 
-                    var paint = new Paint();
-                    paint.TextSize = 60;
+                    c.Save();
+                    var paint = new TextPaint();
+                    paint.TextSize = 60; //TODO need to decide on a value
                     paint.Color = Color.White;
                     paint.TextAlign = Paint.Align.Left;
                     paint.SetTypeface(Typeface.Create(Typeface.Default, TypefaceStyle.Bold));
+
+                    var textLayout = new StaticLayout(text, paint, c.Width, Layout.Alignment.AlignCenter, 1, 0, false);
+
                     var baseline = -paint.Ascent();
                     var iconWidth = (int)(paint.MeasureText(text) + 0.5f);
                     var iconHeight = (int)(baseline + paint.Descent() + 0.5f);
-                    var textImage = Bitmap.CreateBitmap(iconWidth, iconHeight, Bitmap.Config.Argb8888);
-                    var canvas = new Canvas(textImage);
-                    canvas.DrawText(text, 0, baseline, paint);
-
-                    var icon = textImage;
 
                     var itemViewHeight = itemView.Bottom - itemView.Top;
 
-                    var iconRight = itemView.Right - iconMargin;
-                    var iconLeft = iconRight - iconWidth;
-                    var iconTop = itemView.Top + (itemViewHeight - iconHeight) / 2;
-                    var iconBottom = iconTop + iconHeight;
+                    var textRight = itemView.Right - iconMargin;
+                    var textLeft = textRight - iconWidth;
+                    var textTop = itemView.Top + (itemViewHeight - iconHeight) / 2;
 
-                    var leftDifference = itemView.Right + (int)dX - iconLeft;
-                    var offset = leftDifference > 0 ? leftDifference : 0;
+                    c.Translate(textLeft - iconWidth / 2, textTop - iconHeight / 2);
+                    textLayout.Draw(c);
 
-                    var dest = new Rect(iconLeft + offset, iconTop, iconRight, iconBottom);
-                    var src = new Rect(offset, 0, icon.Width, icon.Height);
-                    c.DrawBitmap(icon, src, dest, null);
+                    c.Restore();
                 }
-
 
                 base.OnChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
             }
-
-
         }
 
         class DocumentPreviewViewHolder : RecyclerView.ViewHolder
@@ -1558,9 +1559,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     if (value != 0)
                     {
                         swipedBackground.Visibility = ViewStates.Visible;
-                        itemContent.Visibility = ViewStates.Invisible;
+                        itemContent.Visibility = ViewStates.Invisible; //Otherwisw the view collapses
 
-                        swipedBackground.SetBackgroundColor(value == ItemTouchHelper.Left ? Color.LightBlue : Color.DarkBlue); //TODO rightColor)
+                        var colorId = value == ItemTouchHelper.Left ? Resource.Color.darkerblue : Resource.Color.brown;
+
+                        swipedBackground.SetBackgroundColor(new Color(ContextCompat.GetColor(ItemView.Context, colorId)));
                     }
                     else
                     {
@@ -1666,12 +1669,35 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
+            public int SwipedDirection
+            {
+                set
+                {
+                    if (value != 0)
+                    {
+                        swipedBackground.Visibility = ViewStates.Visible;
+                        itemContent.Visibility = ViewStates.Invisible;
+
+                        var colorId = value == ItemTouchHelper.Left ? Resource.Color.darkerblue : Resource.Color.brown;
+
+                        swipedBackground.SetBackgroundColor(new Color(ContextCompat.GetColor(ItemView.Context, colorId)));
+                    }
+                    else
+                    {
+                        swipedBackground.Visibility = ViewStates.Gone;
+                        itemContent.Visibility = ViewStates.Visible;
+                    }
+                }
+            }
+
             readonly AppCompatTextView nameTextView;
             readonly AppCompatTextView dateTextView;
             readonly AppCompatTextView previewTextView;
             readonly LinearLayoutCompat categoriesLayout;
             readonly AppCompatImageView commentImageView;
+            readonly LinearLayoutCompat itemContent;
             readonly View selectedOverlay;
+            readonly View swipedBackground;
 
             public ExternalDocumentPreviewViewHolder(View itemView)
                     : base(itemView)
@@ -1681,7 +1707,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 previewTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_external_preview);
                 categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_external_categories);
                 commentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_external_comment);
+                itemContent = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_internal_Layout);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
+                swipedBackground = itemView.FindViewById<View>(Resource.Id.swiped_background);
             }
         }
 
