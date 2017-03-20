@@ -92,9 +92,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
                     MenuItemContents = new Dictionary<int, MenuItemContent>
                     {
-                        [Resource.Id.nav_documents] = new ModulesMenuItemContent(ModuleType.Documents),
-                        [Resource.Id.nav_contacts] = new ModulesMenuItemContent(ModuleType.Contacts),
-                        [Resource.Id.nav_shortcodes] = new ModulesMenuItemContent(ModuleType.Shortcodes)
+                        [Resource.Id.nav_documents] = new MenuItemContent(ModuleType.Documents),
+                        [Resource.Id.nav_contacts] = new MenuItemContent(ModuleType.Contacts),
+                        [Resource.Id.nav_shortcodes] = new MenuItemContent(ModuleType.Shortcodes)
                     }
                 };
 
@@ -243,16 +243,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (lastSelectedItem != menuItem)
                 {
                     if (lastSelectedItem != null)
-                    {
                         stateFragment.State.MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
-                    }
 
                     if (SupportFragmentManager.BackStackEntryCount > 0)
-                    {
                         SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int)Android.App.PopBackStackFlags.Inclusive);
-                    }
 
-                    stateFragment.State.MenuItemContents[menuItem.ItemId].RestoreOrCreate(SupportFragmentManager);
+                    stateFragment.State.MenuItemContents[menuItem.ItemId].CreateOrRestore(SupportFragmentManager);
 
                     lastSelectedItem = menuItem;
                 }
@@ -266,9 +262,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if (drawerToggle.OnOptionsItemSelected(item))
-            {
                 return true;
-            }
 
             return base.OnOptionsItemSelected(item);
         }
@@ -299,28 +293,20 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         #region MenuItemContent classes
 
-        abstract class MenuItemContent
+        class MenuItemContent
         {
 
             protected readonly List<Fragment.SavedState> BackstackStates = new List<Fragment.SavedState>();
             protected readonly List<string> SavedTags = new List<string>();
 
-            public virtual void Save(FragmentManager fm) { }
-
-            public virtual void RestoreOrCreate(FragmentManager fm) { }
-        }
-
-        class ModulesMenuItemContent : MenuItemContent
-        {
-
             protected ModuleType ModuleType { get; private set; }
 
-            public ModulesMenuItemContent(ModuleType moduleType)
+            public MenuItemContent(ModuleType moduleType)
             {
                 ModuleType = moduleType;
             }
 
-            public override void Save(FragmentManager fm)
+            public void Save(FragmentManager fm)
             {
                 BackstackStates.Clear();
                 SavedTags.Clear();
@@ -335,43 +321,58 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 }
             }
 
-            public override void RestoreOrCreate(FragmentManager fm)
+            public void CreateOrRestore(FragmentManager fm)
             {
                 if (BackstackStates == null || !BackstackStates.Any())
-                {
-                    var foldersListFragment = new FoldersListFragment
-                    {
-                        RemoteFolder = Folder.RootForModule(ModuleType)
-                    };
+                    Create(fm);
+                else
+                    Restore(fm);
+            }
 
-                    var tag = foldersListFragment.GenerateTag();
+            void Create(FragmentManager fm)
+            {
+                RetainableStateFragment f = null;
+
+                if (ModuleType == ModuleType.Documents)
+                    f = new FoldersNotificationsFragment { RemoteFolder = Folder.RootForModule(ModuleType) };
+                else if (ModuleType == ModuleType.Contacts || ModuleType == ModuleType.Shortcodes || ModuleType == ModuleType.Calendar)
+                    f = new FoldersListFragment { RemoteFolder = Folder.RootForModule(ModuleType) };
+
+                var tag = f.GenerateTag();
+                var ft = fm.BeginTransaction();
+                ft.SetTransition(FragmentTransaction.TransitFragmentFade);
+                ft.Replace(Resource.Id.fragment_container, f, tag);
+                ft.AddToBackStack(tag);
+                ft.Commit();
+            }
+
+            void Restore(FragmentManager fm)
+            {
+                var backStackStatesAndTags = BackstackStates.Zip(SavedTags, (state, tag) => new { State = state, Tag = tag });
+
+                foreach (var item in backStackStatesAndTags)
+                {
+                    var state = item.State;
+                    var tag = item.Tag;
+
+                    RetainableStateFragment f = null;
+                    
+                    if (tag.StartsWith(nameof(FoldersNotificationsFragment), StringComparison.Ordinal))
+                        f = new FoldersNotificationsFragment();
+                    else if (tag.StartsWith(nameof(FoldersListFragment), StringComparison.Ordinal))
+                        f = new FoldersListFragment();
+                        
+                    f.SetInitialSavedState(state);
+
                     var ft = fm.BeginTransaction();
                     ft.SetTransition(FragmentTransaction.TransitFragmentFade);
-                    ft.Replace(Resource.Id.fragment_container, foldersListFragment, tag);
+                    ft.Replace(Resource.Id.fragment_container, f, tag);
                     ft.AddToBackStack(tag);
                     ft.Commit();
                 }
-                else
-                {
-                    var backStackStatesAndTags = BackstackStates.Zip(SavedTags, (state, tag) => new { State = state, Tag = tag });
 
-                    foreach (var item in backStackStatesAndTags)
-                    {
-                        var state = item.State;
-                        var tag = item.Tag;
-
-                        var ft = fm.BeginTransaction();
-                        var foldersListFragment = new FoldersListFragment();
-                        foldersListFragment.SetInitialSavedState(state);
-                        ft.SetTransition(FragmentTransaction.TransitFragmentFade);
-                        ft.Replace(Resource.Id.fragment_container, foldersListFragment, tag);
-                        ft.AddToBackStack(tag);
-                        ft.Commit();
-                    }
-
-                    BackstackStates.Clear();
-                    SavedTags.Clear();
-                }
+                BackstackStates.Clear();
+                SavedTags.Clear();
             }
         }
 

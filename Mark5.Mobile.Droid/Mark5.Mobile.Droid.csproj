@@ -343,6 +343,8 @@
     <Compile Include="Utilities\LocalNotificationsListener.cs" />
     <Compile Include="Ui\Activities\PreferenceActivity.cs" />
     <Compile Include="Ui\Activities\SearchActivity.cs" />
+    <Compile Include="Ui\Fragments\FoldersNotificationsFragment.cs" />
+    <Compile Include="Extensions\ModuleTypeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -599,6 +601,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\anim\" />
+    <Folder Include="Extensions\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Xamarin.Build.Download.0.4.2\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.2\build\Xamarin.Build.Download.targets')" />

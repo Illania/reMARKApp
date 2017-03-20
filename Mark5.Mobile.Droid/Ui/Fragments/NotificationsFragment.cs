@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.OS;
+using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -28,6 +29,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
     public class NotificationsFragment : RetainableStateFragment
     {
+
+        public ObjectType[] ObjectTypes { get; set; }
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -62,7 +65,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.notifications);
+            if (!(view.Parent is ViewPager))
+            {
+                ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.notifications);
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = string.Empty;
+            }
 
             CommonConfig.Logger.Info($"Created {nameof(NotificationsFragment)}");
         }
@@ -128,6 +135,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             return new NotificationsFragmentState
             {
+                ObjectTypes = ObjectTypes,
                 Notifications = adapter.Items
             };
         }
@@ -139,6 +147,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Restoring state [dlfs.items.count={dlfs.Notifications?.Count}]...");
 
+                ObjectTypes = dlfs.ObjectTypes;
                 adapter.AppendItems(dlfs.Notifications);
             }
         }
@@ -166,6 +175,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
+                notifications = notifications.Where(n => ObjectTypes.Contains(n.ObjectType)).ToList();
                 adapter.AppendItems(notifications);
             }
             catch (Exception ex)
@@ -244,6 +254,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class NotificationsFragmentState : IRetainableState
         {
+
+            public ObjectType[] ObjectTypes { get; set; }
 
             public List<Notification> Notifications { get; set; }
         }

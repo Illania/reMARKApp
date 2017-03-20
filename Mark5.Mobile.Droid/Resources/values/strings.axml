@@ -80,6 +80,7 @@
 	<string name="folder_favorites">Favorites</string>
 	<string name="folder_local">Local folders</string>
 	<string name="folder_remote">Folders</string>
+	<string name="folders">Folders</string>
 	<string name="forward">Forward</string>
 	<string name="from">From</string>
 	<string name="hide_details">Hide details</string>

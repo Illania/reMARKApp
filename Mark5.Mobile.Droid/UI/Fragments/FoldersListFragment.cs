@@ -100,8 +100,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = RemoteFolder.Module.ToString();
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = RemoteFolder.Root ? string.Empty : RemoteFolder.Name;
+            if (!(view.Parent is ViewPager))
+            {
+                ((AppCompatActivity)Activity).SupportActionBar.Title = RemoteFolder.Module.ToString();
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = RemoteFolder.Root ? string.Empty : RemoteFolder.Name;
+            }
 
             CommonConfig.Logger.Info($"Created {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]");
         }
@@ -112,7 +115,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Resuming {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
-            fab = ((View)Container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab = ((View)Container.Parent.Parent.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
             if (RemoteFolder?.Module == ModuleType.Documents)
             {
                 fab.SetImageResource(Resource.Drawable.action_new);
@@ -136,10 +139,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Pausing {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
-            if (actionMode != null)
-            {
-                actionMode.Finish();
-            }
+            actionMode?.Finish();
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
