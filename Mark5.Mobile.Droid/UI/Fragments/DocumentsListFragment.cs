@@ -23,6 +23,7 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Support.V7.Widget.Helper;
 using Android.Text;
+using Android.Util;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
@@ -108,7 +109,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 menu?.FindItem(Resource.Id.action_search)?.SetEnabled(adapter.ItemCount > 0);
             }));
             recyclerView.SetAdapter(adapter);
-            var swipeHelper = new ItemTouchHelper(new SwipeHelperCallback(Context, adapter));
+            var swipeHelper = new ItemTouchHelper(new SwipeHelperCallback(Context, adapter, this));
             swipeHelper.AttachToRecyclerView(recyclerView);
 
             searchAdapter = new DocumentsListAdapter(Activity);
@@ -549,9 +550,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.Categories)
             {
-                var i = new Intent(Activity, typeof(CategoriesListActivity));
-                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(CurrentAdapter.SelectedItems.First()));
-                StartActivity(i);
+                ShowCategories(CurrentAdapter.SelectedItems.First());
 
                 actionMode?.Finish();
                 return true;
@@ -634,31 +633,45 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 0)
             {
-                CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
-
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
-
-                try
-                {
-                    await Managers.CommonActionsManager.CopyToWorktray(CurrentAdapter.SelectedItems.OfType<IBusinessEntity>().ToList());
-
-                    dismissAction();
-                    actionMode?.Finish();
-                }
-                catch (Exception ex)
-                {
-                    dismissAction();
-
-                    CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
-
-                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                }
+                await CopyToOwnWorktray(CurrentAdapter.SelectedItems);
             }
 
             if (option == 1)
             {
                 StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
             }
+        }
+
+        async void CopyToOwnWorktray(DocumentPreview documentPreview) => await CopyToOwnWorktray(new List<DocumentPreview> { documentPreview });
+
+        public async Task CopyToOwnWorktray(List<DocumentPreview> documentPreviews)
+        {
+            CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={documentPreviews.Count}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.CommonActionsManager.CopyToWorktray(documentPreviews.OfType<IBusinessEntity>().ToList());
+
+                dismissAction();
+                actionMode?.Finish();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
+        public void ShowCategories(DocumentPreview documentPreview)
+        {
+            var i = new Intent(Activity, typeof(CategoriesListActivity));
+            i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(documentPreview));
+            StartActivity(i);
         }
 
         async void SetPriority()
@@ -1293,26 +1306,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class SwipeHelperCallback : ItemTouchHelper.Callback
         {
-            readonly int iconMargin;
             readonly DocumentsListAdapter adapter;
+            readonly DocumentsListFragment fragment;
             readonly Drawable leftBackground;
             readonly Drawable rightBackground;
+            readonly Context context;
 
-
-            public SwipeHelperCallback(Context context, DocumentsListAdapter adapter)
+            public SwipeHelperCallback(Context context, DocumentsListAdapter adapter, DocumentsListFragment fragment)
             {
                 this.adapter = adapter;
+                this.context = context;
+                this.fragment = fragment;
 
                 leftBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, Resource.Color.brown)));
                 rightBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)));
-
-                iconMargin = 80; //TODO need to decide a value
             }
 
             public override int GetMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder)
             {
                 return MakeMovementFlags(ItemTouchHelper.Up | ItemTouchHelper.Down,
-                                ItemTouchHelper.Right | ItemTouchHelper.Left); //TODO should depend on the type of document
+                                ItemTouchHelper.Right | ItemTouchHelper.Left);
             }
 
             public override bool OnMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target)
@@ -1324,11 +1337,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (direction == ItemTouchHelper.Left)
                 {
-
+                    fragment.CopyToOwnWorktray(adapter.Items[viewHolder.AdapterPosition]);
                 }
                 else if (direction == ItemTouchHelper.Right)
                 {
-
+                    fragment.ShowCategories(adapter.Items[viewHolder.AdapterPosition]);
                 }
 
                 ResetViewHolder(viewHolder, direction);
@@ -1358,65 +1371,54 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
 
                 var itemView = viewHolder.ItemView;
+                var itemViewHeight = itemView.Bottom - itemView.Top;
+
+                var paint = new TextPaint();
+                paint.TextSize = (int)TypedValue.ApplyDimension(ComplexUnitType.Sp, 16, Android.App.Application.Context.Resources.DisplayMetrics);
+                paint.Color = Color.White;
+                paint.TextAlign = Paint.Align.Left;
+                paint.SetTypeface(Typeface.Create(Typeface.Default, TypefaceStyle.Bold));
+
+                var iconMargin = ConversionUtils.ConvertDpToPixels(30);
+
+                var baseline = -paint.Ascent();
+                var textHeight = (int)(baseline + paint.Descent() + 0.5f);
 
                 if (dX > 0) //Swiping to right
                 {
+                    var text = context.Resources.GetString(Resource.String.categories);
+
                     leftBackground.SetBounds(itemView.Left, itemView.Top, (int)dX, itemView.Bottom);
                     leftBackground.Draw(c);
 
-                    var text = "CATEGORIES"; //TODO from resources
-
-                    c.Save();
-                    var paint = new TextPaint();
-                    paint.TextSize = 60; //TODO need to decide on a value
-                    paint.Color = Color.White;
-                    paint.TextAlign = Paint.Align.Left;
-                    paint.SetTypeface(Typeface.Create(Typeface.Default, TypefaceStyle.Bold));
-
                     var textLayout = new StaticLayout(text, paint, c.Width, Layout.Alignment.AlignNormal, 1, 0, false);
 
-                    var baseline = -paint.Ascent();
-                    var iconHeight = (int)(baseline + paint.Descent() + 0.5f);
-
-                    var itemViewHeight = itemView.Bottom - itemView.Top;
-
                     var textLeft = itemView.Left + iconMargin;
-                    var textTop = itemView.Top + (itemViewHeight - iconHeight) / 2;
+                    var textTop = itemView.Top + (itemViewHeight - textHeight) / 2;
 
+                    c.Save();
                     c.Translate(textLeft, textTop);
                     textLayout.Draw(c);
-
                     c.Restore();
                 }
                 else if (dX < 0)
                 {
+                    var text = context.Resources.GetString(Resource.String.copy_to_worktray_multiline);
+
                     rightBackground.SetBounds(itemView.Right + (int)dX, itemView.Top, itemView.Right, itemView.Bottom);
                     rightBackground.Draw(c);
 
-                    var text = "COPY TO \n WORKTRAY";
+                    var textLayout = new StaticLayout(text, paint, c.Width, Layout.Alignment.AlignNormal, 1, 0, false);
 
-                    c.Save();
-                    var paint = new TextPaint();
-                    paint.TextSize = 60; //TODO need to decide on a value
-                    paint.Color = Color.White;
-                    paint.TextAlign = Paint.Align.Left;
-                    paint.SetTypeface(Typeface.Create(Typeface.Default, TypefaceStyle.Bold));
-
-                    var textLayout = new StaticLayout(text, paint, c.Width, Layout.Alignment.AlignCenter, 1, 0, false);
-
-                    var baseline = -paint.Ascent();
-                    var iconWidth = (int)(paint.MeasureText(text) + 0.5f);
-                    var iconHeight = (int)(baseline + paint.Descent() + 0.5f);
-
-                    var itemViewHeight = itemView.Bottom - itemView.Top;
+                    var iconWidth = text.Split(new string[] { "\n" }, StringSplitOptions.None).Select(s => (int)(paint.MeasureText(s) + 0.5f)).Max();
 
                     var textRight = itemView.Right - iconMargin;
                     var textLeft = textRight - iconWidth;
-                    var textTop = itemView.Top + (itemViewHeight - iconHeight) / 2;
+                    var textTop = itemView.Top + itemViewHeight / 2 - textHeight;
 
-                    c.Translate(textLeft - iconWidth / 2, textTop - iconHeight / 2);
+                    c.Save();
+                    c.Translate(textLeft, textTop);
                     textLayout.Draw(c);
-
                     c.Restore();
                 }
 

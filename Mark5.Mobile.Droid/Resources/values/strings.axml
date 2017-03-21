@@ -46,6 +46,7 @@
 	<string name="copied_to_clipboard">Copied to clipboard</string>
 	<string name="copy_to_folder">Copy to folder</string>
 	<string name="copy_to_worktray">Copy to worktray</string>
+	<string name="copy_to_worktray_multiline">Copy to\nworktray</string>
 	<string name="copying_to_folder">Copying to folder</string>
 	<string name="copying_to_worktray">Copying to worktray</string>
 	<string name="create_new_document">Create new document</string>
