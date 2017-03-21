@@ -41,7 +41,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public LineView(Context context)
             : base(context)
         {
-            Orientation = Horizontal;
             SetPadding(DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall);
 
             var titleTextView = new AppCompatTextView(context)

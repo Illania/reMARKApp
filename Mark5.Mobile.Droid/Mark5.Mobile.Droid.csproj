@@ -429,7 +429,7 @@
     <AndroidResource Include="Resources\layout\drawer_header.axml" />
     <AndroidResource Include="Resources\layout\linear_layout_contact.axml" />
     <AndroidResource Include="Resources\layout\linear_layout_with_button.axml" />
-    <AndroidResource Include="Resources\layout\linear_layout_with_progress.axml" />
+    <AndroidResource Include="Resources\layout\linear_layout_with_buttons_and_progress.axml" />
     <AndroidResource Include="Resources\layout\list.axml" />
     <AndroidResource Include="Resources\layout\list_comments.axml" />
     <AndroidResource Include="Resources\layout\list_item_categories.axml" />
@@ -618,6 +618,19 @@
     <AndroidResource Include="Resources\anim\exit_to_left_half.xml" />
     <AndroidResource Include="Resources\anim\enter_from_left_half.xml" />
     <AndroidResource Include="Resources\drawable\tab_background.axml" />
+    <AndroidResource Include="Resources\layout\linear_layout_with_progress.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\forward.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\reply.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\replyall.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\replyall.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\forward.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\reply.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\replyall.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\forward.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\reply.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\replyall.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\forward.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\reply.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\anim\" />

@@ -41,7 +41,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
             var internalLayout = new LinearLayoutCompat(context);
-            internalLayout.Orientation = Horizontal;
             internalLayout.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             AddView(internalLayout);
 

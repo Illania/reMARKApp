@@ -23,7 +23,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         protected AbstractCheckboxSearchView(Context context)
             : base(context)
         {
-            Orientation = Horizontal;
             SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceLarge);
 
             var rl = new RelativeLayout(context)

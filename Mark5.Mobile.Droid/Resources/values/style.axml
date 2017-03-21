@@ -16,8 +16,8 @@
 		<item name="colorAccent">@color/darkerblue</item>
 		<item name="colorButtonNormal">@color/white</item>
 		<item name="colorControlNormal">@color/darkgray</item>
-		<item name="colorControlHighlight">@color/darkblue</item>
-		<item name="colorControlActivated">@color/darkblue</item>
+		<item name="colorControlHighlight">@color/lightblue</item>
+		<item name="colorControlActivated">@color/lightblue</item>
 		<item name="actionBarItemBackground">@color/darkblue</item>
 		<item name="actionMenuTextColor">@color/lightgray</item>
 		<item name="actionModeStyle">@style/mark5actionmode</item>
@@ -58,7 +58,10 @@
 	<style name="mark5dialog" parent="Theme.AppCompat.Light.Dialog.Alert">
 		<item name="colorAccent">@color/darkblue</item>
 	</style>
-	<style name="mark5preference" parent="PreferenceThemeOverlay.v14.Material" />
+	<style name="mark5preference" parent="PreferenceThemeOverlay.v14.Material">
+		<item name="colorControlHighlight">@color/darkblue</item>
+		<item name="colorControlActivated">@color/darkblue</item>
+	</style>
 	<style name="hockey" parent="android:Theme.DeviceDefault.Light.DarkActionBar" />
 	<!-- Styles -->
 	<style name="mark5actionmode" parent="Widget.AppCompat.ActionMode">
@@ -74,6 +77,10 @@
 		<item name="android:listDivider">@color/white</item>
 	</style>
 	<style name="mark5spinner" parent="Widget.AppCompat.Spinner" />
+	<style name="mark5progressbardark" parent="Widget.AppCompat.ProgressBar">
+		<item name="colorControlHighlight">@color/darkblue</item>
+		<item name="colorControlActivated">@color/darkblue</item>
+	</style>
 	<style name="mark5progressbarlight" parent="Widget.AppCompat.ProgressBar">
 		<item name="colorControlHighlight">@color/lightgray</item>
 		<item name="colorControlActivated">@color/lightgray</item>
@@ -164,7 +171,7 @@
 		<item name="android:textColor">@color/darkerblue</item>
 	</style>
 	<style name="tabTextAppearance" parent="TextAppearance.Design.Tab">
-		<item name="android:textColor">@color/darkblue</item>
+		<item name="android:textColor">@color/blue</item>
 		<item name="textAllCaps">false</item>
 	</style>
 </resources>

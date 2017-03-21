@@ -27,7 +27,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         void InitializeView()
         {
-            Orientation = Horizontal;
             SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceNormal);
 
             fromToModeSpinner = new AppCompatTextView(Context)

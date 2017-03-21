@@ -150,7 +150,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var snackbar = Snackbar.Make(coordinatorLayout, Resource.String.permissions_snackbar_text, Snackbar.LengthIndefinite)
                                        .SetAction(Resource.String.permissions_snackbar_action, v => permissionRequestAction());
 
-                snackbar.SetActionTextColor(ContextCompat.GetColor(this, Resource.Color.lightbrown));
+                snackbar.SetActionTextColor(ContextCompat.GetColor(this, Resource.Color.lightblue));
                 snackbar.View.SetBackgroundColor(new Android.Graphics.Color(ContextCompat.GetColor(this, Resource.Color.darkerblue)));
                 snackbar.View.Clickable = true;
                 snackbar.View.Click += (sender, e) =>
