@@ -58,7 +58,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnViewCreated(view, savedInstanceState);
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = RemoteFolder.Module.ToString();
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = RemoteFolder.Root ? string.Empty : RemoteFolder.Name;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = RemoteFolder.Root ? null : RemoteFolder.Name;
 
             CommonConfig.Logger.Info($"Created {nameof(FoldersNotificationsRetainableState)}");
         }

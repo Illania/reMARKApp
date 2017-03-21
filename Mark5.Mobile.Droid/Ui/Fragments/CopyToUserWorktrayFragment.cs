@@ -108,6 +108,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnViewCreated(view, savedInstanceState);
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(CopyToUserWorktrayFragment)} [[businessEntities.Count={BusinessEntities?.Count}]");
         }
@@ -239,11 +240,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (selectedSystemUsers.Count < 1)
             {
                 ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+
                 copyButton.Enabled = false;
             }
             else
             {
                 ((AppCompatActivity)Activity).SupportActionBar.Title = Resources.GetQuantityString(Resource.Plurals.users_selected, selectedSystemUsers.Count, selectedSystemUsers.Count);
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+
                 copyButton.Enabled = true;
             }
         }

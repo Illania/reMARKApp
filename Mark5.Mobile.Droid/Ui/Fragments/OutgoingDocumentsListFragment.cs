@@ -87,8 +87,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = Folder.DocumentsOutgoingFolder.Name;
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.documents);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder.DocumentsOutgoingFolder.Name;
         }
 
         public override async void OnResume()

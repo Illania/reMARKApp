@@ -54,7 +54,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnViewCreated(view, savedInstanceState);
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = string.Empty;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(SearchFragment)}");
         }

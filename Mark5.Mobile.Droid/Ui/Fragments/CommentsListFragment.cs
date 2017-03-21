@@ -91,7 +91,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = "Comments";
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.comments);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(CommentsListFragment)} [entity.Id={Entity?.Id}]");
         }

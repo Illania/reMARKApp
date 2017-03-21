@@ -98,7 +98,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = string.Empty;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(ContactFragment)} [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}...");
         }
@@ -575,6 +576,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             ((AppCompatActivity)Activity).SupportActionBar.Title = ContactPreview?.Name;
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = ContactPreview?.CompanyName;
+
             descriptionCardTitle.Text = $"About {ContactPreview?.Name}";
         }
 

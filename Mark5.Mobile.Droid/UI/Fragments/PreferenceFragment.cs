@@ -32,19 +32,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int NotificationRingtoneRequest = 1;
         }
 
-        public override Fragment CallbackFragment
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override Fragment CallbackFragment { get { return this; } }
 
         public override void OnResume()
         {
             base.OnResume();
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = PreferenceScreen.Title;
+            var title = GetString(Resource.String.settings);
+            var subtitle = PreferenceScreen.Title == title ? string.Empty : PreferenceScreen.Title;
+
+            ((AppCompatActivity)Activity).SupportActionBar.Title = title;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = subtitle;
 
             PreferenceManager.SharedPreferences.RegisterOnSharedPreferenceChangeListener(this);
         }
@@ -80,7 +78,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (preference.Key == GetString(Resource.String.pref_key_contacts_synchronised) && !PlatformConfig.Preferences.SynchroniseContacts)
             {
-                Dialogs.ShowYesNoDialog(Context, Resource.String.clear_contacts_cache_title, Resource.String.clear_contacts_cache_summary, async () => {
+                Dialogs.ShowYesNoDialog(Context, Resource.String.clear_contacts_cache_title, Resource.String.clear_contacts_cache_summary, async () =>
+                {
 
                     var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.clearing_contacts_cache, Resource.String.please_wait);
 
@@ -122,7 +121,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         CommonConfig.Logger.Error("Could not clear shortcodes cache!", ex);
 
                         await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                    }    
+                    }
                 });
             }
 

@@ -78,7 +78,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (!(view.Parent is ViewPager))
             {
                 ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.notifications);
-                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = string.Empty;
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
             }
 
             CommonConfig.Logger.Info($"Created {nameof(NotificationsListFragment)}");

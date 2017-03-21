@@ -66,6 +66,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnViewCreated(view, savedInstanceState);
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.links);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(ObjectLinksFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity.objectType={BusinessEntity?.ObjectType}]...");
         }

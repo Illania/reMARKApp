@@ -43,7 +43,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
-            SupportActionBar.Title = string.Empty;
 
             if (savedInstanceState == null)
             {

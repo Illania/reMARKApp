@@ -248,6 +248,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void Subview_Edited(object sender, EventArgs e)
         {
             ((AppCompatActivity)Activity).SupportActionBar.Title = !subjectView.Empty ? subjectView.Subject : GetString(Resource.String.new_document);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+
             UpdateSendButtonState();
 
             if (sender is LineView && PlatformConfig.Preferences.RemoveLine && CreationModeFlag == DocumentCreationModeFlag.ReplyAll

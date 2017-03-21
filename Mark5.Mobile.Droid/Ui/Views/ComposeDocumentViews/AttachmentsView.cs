@@ -21,10 +21,10 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
-    
+
     public class AttachmentsView : ComposeDocumentView
     {
-        
+
         LinearLayoutCompat container;
         List<IAttachmentDescription> attachmentsDescription = new List<IAttachmentDescription>();
 
@@ -115,7 +115,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         void Attachment_Click(object sender, EventArgs e)
         {
             var attachmentView = sender as AttachmentView;
-            AttachmentClicked(sender, attachmentView.documentAttachment);
+            AttachmentClicked(sender, attachmentView.AttachmentDescription);
         }
 
         #region State related
@@ -145,11 +145,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         class AttachmentView : LinearLayoutCompat
         {
-            public readonly IAttachmentDescription documentAttachment;
+
+            public IAttachmentDescription AttachmentDescription { get; private set; }
 
             public AttachmentView(Context context, IAttachmentDescription attachmentDescription, int distanceLarge, int distanceNormal)
                 : base(context)
             {
+                AttachmentDescription = attachmentDescription;
+
                 var maximumWidth = ConversionUtils.ConvertDpToPixels(250f);
                 var innerMargin = ConversionUtils.ConvertDpToPixels(4f);
 

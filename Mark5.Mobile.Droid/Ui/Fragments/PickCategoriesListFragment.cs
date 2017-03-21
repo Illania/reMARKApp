@@ -85,6 +85,7 @@ namespace Mark5.Mobile.Droid
             base.OnViewCreated(view, savedInstanceState);
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.categories);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(PickCategoriesListFragment)} [objectType={ObjectType}]");
         }
@@ -201,10 +202,12 @@ namespace Mark5.Mobile.Droid
             if (selectedCategories.Count < 1)
             {
                 ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_categories);
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
             }
             else
             {
                 ((AppCompatActivity)Activity).SupportActionBar.Title = Resources.GetQuantityString(Resource.Plurals.categories_selected, selectedCategories.Count, selectedCategories.Count);
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
             }
         }
 
