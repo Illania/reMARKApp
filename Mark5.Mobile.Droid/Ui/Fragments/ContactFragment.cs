@@ -613,7 +613,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 ContactPreview = cp,
                 Folder = Folder
             };
-            ft.SetTransition((int)FragmentTransit.FragmentOpen);
+            ft.SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right);
             ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
             ft.AddToBackStack(null);
             ft.Commit();

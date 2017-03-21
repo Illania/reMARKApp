@@ -340,7 +340,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 var tag = f.GenerateTag();
                 var ft = fm.BeginTransaction();
-                ft.SetTransition(FragmentTransaction.TransitFragmentFade);
+                ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);
                 ft.Replace(Resource.Id.fragment_container, f, tag);
                 ft.AddToBackStack(tag);
                 ft.Commit();
@@ -365,7 +365,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     f.SetInitialSavedState(state);
 
                     var ft = fm.BeginTransaction();
-                    ft.SetTransition(FragmentTransaction.TransitFragmentFade);
+                    ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);
                     ft.Replace(Resource.Id.fragment_container, f, tag);
                     ft.AddToBackStack(tag);
                     ft.Commit();

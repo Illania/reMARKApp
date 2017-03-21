@@ -5,7 +5,6 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-
 using System;
 using System.Collections.Generic;
 using Android.App;
@@ -19,6 +18,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
+    
     [Activity]
     public class ComposeDocumentActivity : AppCompatActivity
     {
@@ -52,15 +52,15 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             intent.PutExtra(CreationModeFlagIntentKey, (int)creationModeFlag);
             intent.PutExtra(PreviousDocumentDirectionIntentKey, (int)previousDocumentDirection);
 
-            if (outgoingDocumentGuid != default(Guid))
-                intent.PutExtra(OutgoingDocumentGuidIntentKey, outgoingDocumentGuid.ToString());
-
             if (precedingDocumentId != null)
                 intent.PutExtra(PreviousDocumentIdIntentKey, precedingDocumentId.Value);
 
             if (precedingDocumentFolderId != null)
                 intent.PutExtra(PreviousDocumentFolderIdIntentKey, precedingDocumentFolderId.Value);
 
+            if (outgoingDocumentGuid != default(Guid))
+                intent.PutExtra(OutgoingDocumentGuidIntentKey, outgoingDocumentGuid.ToString());
+            
             if (preconfiguredEmailToAddresses != null)
                 intent.PutExtra(PreconfiguredEmailToAddressesIntentKey, preconfiguredEmailToAddresses.ToArray());
 
