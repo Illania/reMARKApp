@@ -87,6 +87,7 @@
 		<item name="tabTextAppearance">@style/tabTextAppearance</item>
 		<item name="tabIndicatorColor">@color/lightblue</item>
 		<item name="tabIndicatorHeight">4dp</item>
+		<item name="tabMaxWidth">0dp</item>
         <item name="tabBackground">@drawable/tab_background</item>
 	</style>
 	<!-- Fonts -->
