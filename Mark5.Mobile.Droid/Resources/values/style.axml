@@ -17,7 +17,7 @@
 		<item name="colorButtonNormal">@color/white</item>
 		<item name="colorControlNormal">@color/darkgray</item>
 		<item name="colorControlHighlight">@color/lightblue</item>
-		<item name="colorControlActivated">@color/lightblue</item>
+		<item name="colorControlActivated">@color/darkblue</item>
 		<item name="actionBarItemBackground">@color/darkblue</item>
 		<item name="actionMenuTextColor">@color/lightgray</item>
 		<item name="actionModeStyle">@style/mark5actionmode</item>
@@ -58,10 +58,7 @@
 	<style name="mark5dialog" parent="Theme.AppCompat.Light.Dialog.Alert">
 		<item name="colorAccent">@color/darkblue</item>
 	</style>
-	<style name="mark5preference" parent="PreferenceThemeOverlay.v14.Material">
-		<item name="colorControlHighlight">@color/darkblue</item>
-		<item name="colorControlActivated">@color/darkblue</item>
-	</style>
+	<style name="mark5preference" parent="PreferenceThemeOverlay.v14.Material" />
 	<style name="hockey" parent="android:Theme.DeviceDefault.Light.DarkActionBar" />
 	<!-- Styles -->
 	<style name="mark5actionmode" parent="Widget.AppCompat.ActionMode">

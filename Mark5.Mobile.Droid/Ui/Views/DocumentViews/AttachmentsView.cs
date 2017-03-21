@@ -6,7 +6,6 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
-using System.Collections.Generic;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
