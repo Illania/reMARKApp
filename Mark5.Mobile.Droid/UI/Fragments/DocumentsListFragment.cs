@@ -1010,7 +1010,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected class DocumentsListAdapter : RecyclerView.Adapter
         {
-
             public static class ViewType
             {
                 public const int DocumentView = 0;
@@ -1063,6 +1062,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             bool unreadIndicatorMe = PlatformConfig.Preferences.UnreadIndicatorMe;
             bool compactList = PlatformConfig.Preferences.CompactDocumentsList;
 
+            int? swipedPosition;
+            int swipedDirection;
+
             public DocumentsListAdapter(Context context)
             {
                 this.context = context;
@@ -1078,20 +1080,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public override int GetItemViewType(int position)
             {
                 return documentPreviewsInView[position].Direction == DocumentDirection.External ? ViewType.ExternalDocumentView : ViewType.DocumentView;
-            }
-
-            int? swipedPosition;
-            int swipedDirection;
-
-            public void SetSwipedState(int position, int direction) //TODO position
-            {
-                swipedPosition = position;
-                swipedDirection = direction;
-            }
-
-            public void ResetSwipedState()
-            {
-                swipedPosition = null;
             }
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
@@ -1302,6 +1290,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 return GetPosition(documentPreview.Id);
             }
+
+            public void SetSwipedState(int position, int direction)
+            {
+                swipedPosition = position;
+                swipedDirection = direction;
+            }
+
+            public void ResetSwipedState()
+            {
+                swipedPosition = null;
+            }
+
         }
 
         class SwipeHelperCallback : ItemTouchHelper.Callback
