@@ -69,24 +69,14 @@ namespace Mark5.Mobile.Droid.Ui.Views
             };
             titleView.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
             titleView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
-            titleView.SetPadding(distanceLarge, 0, distanceNormal, 0);
+            titleView.SetPadding(distanceVeryLarge, 0, distanceNormal, 0);
             innerLayout.AddView(titleView);
 
-            innerLayout.AddView(new Divider(Context));
-
-            for (int i = 0; i < objectLinks.Length; i++)
+            foreach (var objectLink in objectLinks)
             {
-                var ol = objectLinks[i];
-                var isNotLast = i != objectLinks.Length - 1;
-
-                var olv = new ObjectLinkView(Context, ol, distanceVeryLarge, distanceNormal);
-                olv.Click += (sender, e) => ObjectLinkClicked(this, ol);
+                var olv = new ObjectLinkView(Context, objectLink, distanceVeryLarge, distanceNormal);
+                olv.Click += (sender, e) => ObjectLinkClicked(this, objectLink);
                 innerLayout.AddView(olv);
-
-                if (isNotLast)
-                {
-                    innerLayout.AddView(new Divider(Context, distanceVeryLarge, 0, 0, 0));
-                }
             }
         }
 
