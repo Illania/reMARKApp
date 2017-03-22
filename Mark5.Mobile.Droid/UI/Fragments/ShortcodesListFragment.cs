@@ -11,8 +11,6 @@ using System.Linq;
 using System.Threading;
 using Android.Content;
 using Android.Graphics;
-using Android.Graphics.Drawables;
-using Android.Graphics.Drawables.Shapes;
 using Android.OS;
 using Android.Support.V4.Content;
 using Android.Support.V4.View;
