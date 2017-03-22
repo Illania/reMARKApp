@@ -48,10 +48,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
             };
 
             titleView.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
-            titleView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
-            titleView.SetPadding(DistanceLarge, 0, DistanceNormal, 0);
+            titleView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            titleView.SetPadding(DistanceVeryLarge, 0, DistanceNormal, 0);
             InnerLayout.AddView(titleView);
-            InnerLayout.AddView(new Divider(Context));
 
             AddressesLayout = new LinearLayoutCompat(Context)
             {
@@ -70,19 +69,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
 
                 AddressesLayout.RemoveAllViews();
                 var addresses = Shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == type).ToArray();
-                for (int i = 0; i < addresses.Length; i++)
+                foreach (var address in addresses)
                 {
-                    var a = addresses[i];
-                    var isNotLast = i != addresses.Length - 1;
-
-                    var av = new AddressView(Context, a, DistanceVeryLarge, DistanceNormal);
-                    av.Click += (sender, e) => DocumentAddressClicked(this, a);
+                    var av = new AddressView(Context, address, DistanceVeryLarge, DistanceNormal);
+                    av.Click += (sender, e) => DocumentAddressClicked(this, address);
                     AddressesLayout.AddView(av);
-
-                    if (isNotLast)
-                    {
-                        AddressesLayout.AddView(new Divider(Context, DistanceVeryLarge, 0, 0, 0));
-                    }
                 }
             }
         }

@@ -334,15 +334,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 CommonConfig.Logger.Info($"Refresh running...");
 
-                if (forceClear)
-                {
-                    adapter.Clear();
-                }
-
                 var documentPreviews = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, startId, endId);
                 adapter.EnableLoadMore = documentPreviews.Count >= PlatformConfig.Preferences.DocumentsToDownload;
                 CommonConfig.Logger.Info($"Enable load more documents set to {adapter.EnableLoadMore}");
 
+                if (forceClear)
+                    adapter.Clear();
+                
                 Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
                 adapter.AppendItems(documentPreviews);
             }

@@ -252,9 +252,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             cts = new CancellationTokenSource();
 
             if (force)
-            {
                 adapter.Clear();
-            }
 
             Managers.ShortcodesManager.GetAllShortcodePreviews(Folder, cps =>
             {
@@ -728,7 +726,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 cpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, cp)));
 
                 cpvh.Name = cp.Name;
-                cpvh.Description = cp.Description;
 
                 cpvh.Selected = selectedShortcodesInView.ContainsKey(cp.Id);
             }
@@ -847,27 +844,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         class ShortcodePreviewViewHolder : RecyclerView.ViewHolder
         {
 
-            static readonly int[] colors = { Resource.Color.darkerblue, Resource.Color.darkblue, Resource.Color.blue };
-
             public string Name
             {
                 set
                 {
                     nameTextView.Text = value;
-                    letterTextView.Text = value.SafeSubstring(0, 1).ToUpper();
-
-                    var sd = new ShapeDrawable(new OvalShape());
-                    sd.Paint.Color = new Color(ContextCompat.GetColor(ItemView.Context, colors[Math.Abs(value.GetHashCode() % colors.Length)]));
-                    letterTextView.Background = sd;
-                }
-            }
-
-            public string Description
-            {
-                set
-                {
-                    descTextView.Text = value;
-                    descTextView.Visibility = string.IsNullOrWhiteSpace(value) ? ViewStates.Gone : ViewStates.Visible;
                 }
             }
 
@@ -879,17 +860,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            readonly AppCompatTextView letterTextView;
             readonly AppCompatTextView nameTextView;
-            readonly AppCompatTextView descTextView;
             readonly View selectedOverlay;
 
             public ShortcodePreviewViewHolder(View itemView)
                     : base(itemView)
             {
-                letterTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_shortcode_letter);
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_shortcode_name);
-                descTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_shortcode_desc);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
             }
         }

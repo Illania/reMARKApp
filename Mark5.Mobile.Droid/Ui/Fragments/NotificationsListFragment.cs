@@ -179,13 +179,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 refreshLayout.Refreshing = true;
 
-                if (force)
-                {
-                    adapter.Clear();
-                }
-
                 var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
                 notifications = notifications.Where(n => ObjectTypes.Contains(n.ObjectType)).ToList();
+
+                if (force)
+                    adapter.Clear();
+                
                 adapter.AppendItems(notifications);
             }
             catch (Exception ex)

@@ -254,9 +254,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             cts = new CancellationTokenSource();
 
             if (force)
-            {
                 adapter.Clear();
-            }
 
             Managers.ContactsManager.GetAllContactPreviews(Folder, cps =>
             {

@@ -437,7 +437,7 @@
     <AndroidResource Include="Resources\layout\list_item_contacts.axml" />
     <AndroidResource Include="Resources\layout\list_item_documents.axml" />
     <AndroidResource Include="Resources\layout\list_item_documents_external.axml" />
-    <AndroidResource Include="Resources\layout\list_item_folder.axml" />
+    <AndroidResource Include="Resources\layout\list_item_folders.axml" />
     <AndroidResource Include="Resources\layout\list_item_notifications.axml" />
     <AndroidResource Include="Resources\layout\list_item_section.axml" />
     <AndroidResource Include="Resources\layout\list_item_shortcodes.axml" />

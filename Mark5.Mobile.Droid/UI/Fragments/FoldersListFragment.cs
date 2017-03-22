@@ -921,7 +921,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (viewType == ViewType.FolderView)
                 {
-                    var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_folder, parent, false);
+                    var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_folders, parent, false);
 
                     var folderViewHolder = new FolderViewHolder(itemView);
                     folderViewHolder.ExpandClicked += (sender, e) =>
