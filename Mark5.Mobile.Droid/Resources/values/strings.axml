@@ -18,6 +18,7 @@
 	<string name="bcc">Bcc</string>
 	<string name="birthdate">Birthdate</string>
 	<string name="by">by</string>
+	<string name="call">Call</string>
 	<string name="cancel">Cancel</string>
 	<string name="cannot_edit_comment_content">This comment cannot be edited anymore</string>
 	<string name="cannot_edit_comment_title">Cannot edit comment</string>
@@ -69,6 +70,7 @@
 	<string name="edit">Edit</string>
 	<string name="edit_comment_message">Edit comment message</string>
 	<string name="editing_comment">Editing comment</string>
+	<string name="email">Email</string>
 	<string name="empty_folder">This folder is empty</string>
 	<string name="enable_notifications_folder">Enable notifications</string>
 	<string name="enabling_notifications">Enabling notifications...</string>
@@ -105,6 +107,7 @@
 	<string name="log_in_failed_title">Log in failed</string>
 	<string name="logging_in">Logging in</string>
 	<string name="low_priority_document">This document has low priority</string>
+	<string name="map">Map</string>
 	<string name="mark5_server_reachability">MARK5 Server:</string>
 	<string name="mark5_service_reachability">MARK5 App Service:</string>
 	<string name="mark_all_as_read">Mark all as read</string>
@@ -117,6 +120,7 @@
 	<string name="network_interface">Network interface:</string>
 	<string name="new_document">New document</string>
 	<string name="no">No</string>
+	<string name="no_addresses">No addresses</string>
 	<string name="no_categories">There are no categories assigned</string>
 	<string name="no_connection">No connection</string>
 	<string name="no_contacts_found">No contacts found</string>
@@ -125,6 +129,9 @@
 	<string name="no_lines_error_title">No lines set for user</string>
 	<string name="no_lines_error_content">It is not possible to send documents because the user does not have any line set</string>
 	<string name="no_notifications">There are no notifications</string>
+	<string name="no_primary_email">No primary email address set</string>
+	<string name="no_primary_mobile">No primary mobile number set</string>
+	<string name="no_primary_mobile_or_phone">No primary mobile or phone number set</string>
 	<string name="no_subject">No subject</string>
 	<string name="no_results">No results</string>
 	<string name="no_results_contacts">No contacts were found</string>
@@ -240,6 +247,7 @@
 		<item>Another template</item>
 	</string-array>
 	<string name="testing_connection">Testing connection</string>
+	<string name="text">Text</string>
 	<string name="to">To</string>
 	<string name="to_prefix">to</string>
 	<string name="today">Today</string>
