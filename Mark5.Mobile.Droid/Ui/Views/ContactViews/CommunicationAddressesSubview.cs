@@ -66,14 +66,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             public CommunicationAddressesSubSubview(Context context, CommunicationAddress communicationAddress, int distanceSmall, int distanceNormal, int distanceLarge, int distanceVeryLarge)
                 : base(context)
             {
+                Clickable = true;
+
                 var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
                 SetBackgroundResource(typedArray.GetResourceId(0, 0));
                 typedArray.Recycle();
 
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
                 SetPadding(distanceVeryLarge, distanceNormal, distanceNormal, distanceNormal);
-
-                Clickable = true;
 
                 var iconImageView = new AppCompatImageView(context);
                 iconImageView.SetImageResource(GetDrawableIdForAddressType(communicationAddress.Type));
@@ -97,27 +97,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
                 var typeTextView = new AppCompatTextView(context);
                 typeTextView.Text = communicationAddress.Type.ToString().ToLower();
-                var typeTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
                 typeTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimaryLight);
-                innerLayout.AddView(typeTextView, typeTextViewLayoutParams);
+                innerLayout.AddView(typeTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
                 if (!string.IsNullOrWhiteSpace(communicationAddress.Description))
                 {
                     var descriptionTextView = new AppCompatTextView(context);
                     descriptionTextView.Text = communicationAddress.Description;
-                    var descriptionTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-                    descriptionTextViewLayoutParams.TopMargin = distanceSmall / 2;
                     descriptionTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
-                    innerLayout.AddView(descriptionTextView, descriptionTextViewLayoutParams);
+                    innerLayout.AddView(descriptionTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent) { TopMargin = distanceSmall / 2 });
                 }
 
                 LongClickable = true;
                 LongClick += (sender, e) =>
                 {
                     if (!string.IsNullOrWhiteSpace(titleTextView.Text))
-                    {
                         Integration.CopyToClipboard(context, titleTextView.Text);
-                    }
                 };
             }
 

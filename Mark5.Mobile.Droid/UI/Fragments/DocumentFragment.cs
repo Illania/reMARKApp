@@ -56,7 +56,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         ProgressBar progress;
         RelativeLayout relativeLayout;
-        ScrollView scrollView;
         LinearLayoutCompat linearLayout;
         AppCompatImageView button1;
         AppCompatImageView button2;
@@ -72,7 +71,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
             relativeLayout = rootView.FindViewById<RelativeLayout>(Resource.Id.relative_layout);
-            scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
             button1 = rootView.FindViewById<AppCompatImageView>(Resource.Id.button1);
             button2 = rootView.FindViewById<AppCompatImageView>(Resource.Id.button2);

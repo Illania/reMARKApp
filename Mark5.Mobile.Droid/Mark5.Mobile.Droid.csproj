@@ -631,6 +631,10 @@
     <AndroidResource Include="Resources\drawable-xxxhdpi\large_company.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\large_department.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\large_person.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\map.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\map.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\map.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\map.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\anim\" />

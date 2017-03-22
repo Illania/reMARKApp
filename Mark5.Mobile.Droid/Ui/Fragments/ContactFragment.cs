@@ -58,8 +58,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         NestedScrollView scrollView;
         LinearLayoutCompat linearLayout;
 
-        CardView communicationCardView;
-        CardView physicalAddressCardView;
+        CardView addressesCardView;
         CardView relatedCardView;
         CardView descriptionCardView;
 
@@ -80,13 +79,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var paddingLinearLayout = ConversionUtils.ConvertDpToPixels(10);
             linearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, paddingLinearLayout);
 
-            PrepareCommunicationCard();
-            PreparePhysicalAddressesCard();
+            PrepareAddressesCard();
             PrepareRelatedCard();
             PrepareDescriptionCard();
 
-            linearLayout.AddView(communicationCardView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-            linearLayout.AddView(physicalAddressCardView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+            linearLayout.AddView(addressesCardView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
             linearLayout.AddView(relatedCardView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
             linearLayout.AddView(descriptionCardView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
@@ -366,22 +363,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Card preparation
 
-        public void PrepareCommunicationCard()
+        public void PrepareAddressesCard()
         {
-            communicationCardView = new CardView(Context);
-            communicationCardView.Visibility = ViewStates.Gone;
-            communicationCardView.Elevation = CardElevation;
-            communicationCardView.Radius = CardRadius;
-            communicationCardView.UseCompatPadding = true;
+            addressesCardView = new CardView(Context);
+            addressesCardView.Visibility = ViewStates.Gone;
+            addressesCardView.Elevation = CardElevation;
+            addressesCardView.Radius = CardRadius;
+            addressesCardView.UseCompatPadding = true;
 
             var paddingTopBottom = ConversionUtils.ConvertDpToPixels(16f);
-            var communicationCardInternalLayout = new LinearLayoutCompat(Context)
+            var internalLayout = new LinearLayoutCompat(Context)
             {
                 Orientation = LinearLayoutCompat.Vertical,
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
-            communicationCardInternalLayout.SetPadding(0, paddingTopBottom, 0, paddingTopBottom);
-            communicationCardView.AddView(communicationCardInternalLayout);
+            internalLayout.SetPadding(0, paddingTopBottom, 0, paddingTopBottom);
+            addressesCardView.AddView(internalLayout);
 
             var communicationSubviews = new List<ContactView>();
             communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Mobile));
@@ -398,60 +395,53 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Internal));
 
             communicationSubviews.OfType<CommunicationAddressesSubview>().ForEach(rsv => rsv.AddressClicked += AddressClicked);
-            communicationSubviews.ForEach(communicationCardInternalLayout.AddView);
-        }
+            communicationSubviews.ForEach(internalLayout.AddView);
 
-        public void PreparePhysicalAddressesCard()
-        {
             var physicalAddressSubviews = new List<ContactView>();
-
             if (PlatformConfig.Preferences.ContactAddressesEnabled)
                 physicalAddressSubviews.Add(new PhysicalAddressesSubview(Context));
-
-            physicalAddressCardView = new CardView(Context);
-            physicalAddressCardView.Visibility = ViewStates.Gone;
-            physicalAddressCardView.Elevation = CardElevation;
-            physicalAddressCardView.Radius = CardRadius;
-            physicalAddressCardView.UseCompatPadding = true;
-
-            var physicalAddressCardInternalLayout = new LinearLayoutCompat(Context);
-            physicalAddressCardInternalLayout.Orientation = LinearLayoutCompat.Vertical;
-
-            physicalAddressCardView.AddView(physicalAddressCardInternalLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-            physicalAddressSubviews.ForEach(physicalAddressCardInternalLayout.AddView);
             physicalAddressSubviews.OfType<PhysicalAddressesSubview>().ForEach(p => p.PhysicalAddressClicked += PhysicalAddressClicked);
+            physicalAddressSubviews.ForEach(internalLayout.AddView);
         }
 
         public void PrepareRelatedCard()
         {
-            var relatedSubviews = new List<ContactView>();
-            relatedSubviews.Add(new LinkedContactSubview(Context, LinkedContactType.PrimaryPerson));
-            relatedSubviews.Add(new LinkedContactSubview(Context, LinkedContactType.Company));
-            relatedSubviews.Add(new LinkedContactSubview(Context, LinkedContactType.Department));
-            relatedSubviews.Add(new LinkedContactSubview(Context, LinkedContactType.Person));
-
             relatedCardView = new CardView(Context);
             relatedCardView.Visibility = ViewStates.Gone;
             relatedCardView.Elevation = CardElevation;
             relatedCardView.Radius = CardRadius;
             relatedCardView.UseCompatPadding = true;
+            
+            var veryLargeDistance = ConversionUtils.ConvertDpToPixels(24f);
+            var largeDistance = ConversionUtils.ConvertDpToPixels(16f);
+            var normalDistance = ConversionUtils.ConvertDpToPixels(8f);
 
-            var relatedCardInternalLayout = new LinearLayoutCompat(Context);
-            relatedCardInternalLayout.Orientation = LinearLayoutCompat.Vertical;
+            var relatedCardInternalLayout = new LinearLayoutCompat(Context)
+            {
+                Orientation = LinearLayoutCompat.Vertical,
+                LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                {
+                    TopMargin = largeDistance,
+                    BottomMargin = largeDistance
+                }
+            };
+            relatedCardView.AddView(relatedCardInternalLayout);
 
-            var physicalCardTitle = new AppCompatTextView(Context);
-            physicalCardTitle.Text = GetString(Resource.String.related_contacts);
-            physicalCardTitle.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
-            physicalCardTitle.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            var cardTitle = new AppCompatTextView(Context);
+            cardTitle.Text = GetString(Resource.String.related_contacts);
+            cardTitle.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
+            cardTitle.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            cardTitle.SetPadding(veryLargeDistance, 0, veryLargeDistance, normalDistance);
+            relatedCardInternalLayout.AddView(cardTitle);
 
-            var padding = ConversionUtils.ConvertDpToPixels(24f);
-            physicalCardTitle.SetPadding(padding, padding, padding, padding);
+            var subviews = new List<ContactView>();
+            subviews.Add(new LinkedContactSubview(Context, LinkedContactType.PrimaryPerson));
+            subviews.Add(new LinkedContactSubview(Context, LinkedContactType.Person));
+            subviews.Add(new LinkedContactSubview(Context, LinkedContactType.Department));
+            subviews.Add(new LinkedContactSubview(Context, LinkedContactType.Company));
 
-            relatedCardInternalLayout.AddView(physicalCardTitle, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-
-            relatedCardView.AddView(relatedCardInternalLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-            relatedSubviews.ForEach(relatedCardInternalLayout.AddView);
-            relatedSubviews.OfType<LinkedContactSubview>().ForEach(lcs => lcs.ContactClicked += ContactClicked);
+            subviews.ForEach(relatedCardInternalLayout.AddView);
+            subviews.OfType<LinkedContactSubview>().ForEach(lcs => lcs.ContactClicked += ContactClicked);
         }
 
         public void PrepareDescriptionCard()
@@ -532,8 +522,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             progress.Visibility = ViewStates.Gone;
             scrollView.Visibility = ViewStates.Visible;
 
-            RefreshCardView(communicationCardView);
-            RefreshCardView(physicalAddressCardView);
+            RefreshCardView(addressesCardView);
             RefreshCardView(relatedCardView);
             RefreshCardView(descriptionCardView);
 
