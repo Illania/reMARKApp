@@ -36,13 +36,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
     public class ContactFragment : RetainableStateFragment
     {
+        
         static class RequestCodes
         {
             public const int CommentsRequest = 1;
             public const int CategoriesRequest = 2;
         }
 
-        const float CardElevation = 2f;
+        const float CardElevation = 0f;
         const float CardRadius = 2f;
 
         public int? FolderId { get; set; }
@@ -367,29 +368,34 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void PrepareCommunicationCard()
         {
-            var communicationSubviews = new List<ContactView>();
-            communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Email));
-            if (PlatformConfig.Preferences.ContactCommunicationFaxNumbersEnabled)
-                communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Fax));
-            if (PlatformConfig.Preferences.ContactCommunicationImEnabled)
-                communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.IM));
-            if (PlatformConfig.Preferences.ContactCommunicationInternalEnabled)
-                communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Internal));
-            communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Mobile));
-            communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Phone));
-            communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Skype));
-            if (PlatformConfig.Preferences.ContactCommunicationTelexNumbersEnabled)
-                communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Telex));
-
             communicationCardView = new CardView(Context);
             communicationCardView.Visibility = ViewStates.Gone;
             communicationCardView.Elevation = CardElevation;
             communicationCardView.Radius = CardRadius;
             communicationCardView.UseCompatPadding = true;
 
-            var communicationCardInternalLayout = new LinearLayoutCompat(Context);
-            communicationCardInternalLayout.Orientation = LinearLayoutCompat.Vertical;
-            communicationCardView.AddView(communicationCardInternalLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+            var paddingTopBottom = ConversionUtils.ConvertDpToPixels(16f);
+            var communicationCardInternalLayout = new LinearLayoutCompat(Context)
+            {
+                Orientation = LinearLayoutCompat.Vertical,
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
+            communicationCardInternalLayout.SetPadding(0, paddingTopBottom, 0, paddingTopBottom);
+            communicationCardView.AddView(communicationCardInternalLayout);
+
+            var communicationSubviews = new List<ContactView>();
+            communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Mobile));
+            communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Phone));
+            communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Email));
+            communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Skype));
+            if (PlatformConfig.Preferences.ContactCommunicationFaxNumbersEnabled)
+                communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Fax));
+            if (PlatformConfig.Preferences.ContactCommunicationImEnabled)
+                communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.IM));
+            if (PlatformConfig.Preferences.ContactCommunicationTelexNumbersEnabled)
+                communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Telex));
+            if (PlatformConfig.Preferences.ContactCommunicationInternalEnabled)
+                communicationSubviews.Add(new CommunicationAddressesSubview(Context, CommunicationAddressType.Internal));
 
             communicationSubviews.OfType<CommunicationAddressesSubview>().ForEach(rsv => rsv.AddressClicked += AddressClicked);
             communicationSubviews.ForEach(communicationCardInternalLayout.AddView);
@@ -410,17 +416,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var physicalAddressCardInternalLayout = new LinearLayoutCompat(Context);
             physicalAddressCardInternalLayout.Orientation = LinearLayoutCompat.Vertical;
-
-            var physicalCardTitle = new AppCompatTextView(Context);
-            physicalCardTitle.Text = GetString(Resource.String.physical_addresses);
-            physicalCardTitle.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
-            physicalCardTitle.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
-
-            var padding = ConversionUtils.ConvertDpToPixels(16);
-            physicalCardTitle.SetPadding(padding, padding, padding, padding);
-
-            physicalAddressCardInternalLayout.AddView(physicalCardTitle, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-            physicalAddressCardInternalLayout.AddView(new Divider(Context));
 
             physicalAddressCardView.AddView(physicalAddressCardInternalLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
             physicalAddressSubviews.ForEach(physicalAddressCardInternalLayout.AddView);
@@ -449,11 +444,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             physicalCardTitle.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
             physicalCardTitle.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
 
-            var padding = ConversionUtils.ConvertDpToPixels(16);
+            var padding = ConversionUtils.ConvertDpToPixels(24f);
             physicalCardTitle.SetPadding(padding, padding, padding, padding);
 
             relatedCardInternalLayout.AddView(physicalCardTitle, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-            relatedCardInternalLayout.AddView(new Divider(Context));
 
             relatedCardView.AddView(relatedCardInternalLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
             relatedSubviews.ForEach(relatedCardInternalLayout.AddView);
@@ -485,13 +479,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             descriptionCardViewInternalLayout.Orientation = LinearLayoutCompat.Vertical;
             descriptionCardView.AddView(descriptionCardViewInternalLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
-            var padding = ConversionUtils.ConvertDpToPixels(16);
+            var padding = ConversionUtils.ConvertDpToPixels(24f);
             descriptionCardTitle = new AppCompatTextView(Context);
             descriptionCardTitle.SetTextAppearanceCompat(Context, Resource.Style.fontListCircle);
             descriptionCardTitle.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
             descriptionCardTitle.SetPadding(padding, padding, padding, padding);
             descriptionCardViewInternalLayout.AddView(descriptionCardTitle, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-            descriptionCardViewInternalLayout.AddView(new Divider(Context));
 
             descriptionSubviews.ForEach(descriptionCardViewInternalLayout.AddView);
         }
