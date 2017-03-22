@@ -36,7 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
     public class ContactFragment : RetainableStateFragment
     {
-        
+
         static class RequestCodes
         {
             public const int CommentsRequest = 1;
@@ -411,7 +411,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             relatedCardView.Elevation = CardElevation;
             relatedCardView.Radius = CardRadius;
             relatedCardView.UseCompatPadding = true;
-            
+
             var veryLargeDistance = ConversionUtils.ConvertDpToPixels(24f);
             var largeDistance = ConversionUtils.ConvertDpToPixels(16f);
             var normalDistance = ConversionUtils.ConvertDpToPixels(8f);
@@ -446,6 +446,33 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void PrepareDescriptionCard()
         {
+            descriptionCardView = new CardView(Context);
+            descriptionCardView.Visibility = ViewStates.Gone;
+            descriptionCardView.Elevation = CardElevation;
+            descriptionCardView.Radius = CardRadius;
+            descriptionCardView.UseCompatPadding = true;
+
+            var veryLargeDistance = ConversionUtils.ConvertDpToPixels(24f);
+            var largeDistance = ConversionUtils.ConvertDpToPixels(16f);
+            var normalDistance = ConversionUtils.ConvertDpToPixels(8f);
+
+            var descriptionCardViewInternalLayout = new LinearLayoutCompat(Context)
+            {
+                Orientation = LinearLayoutCompat.Vertical,
+                LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                {
+                    TopMargin = largeDistance,
+                    BottomMargin = largeDistance
+                }
+            };
+            descriptionCardView.AddView(descriptionCardViewInternalLayout);
+
+            descriptionCardTitle = new AppCompatTextView(Context);
+            descriptionCardTitle.SetTextAppearanceCompat(Context, Resource.Style.fontListCircle);
+            descriptionCardTitle.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            descriptionCardTitle.SetPadding(veryLargeDistance, 0, veryLargeDistance, normalDistance);
+            descriptionCardViewInternalLayout.AddView(descriptionCardTitle, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+
             var descriptionSubviews = new List<ContactView>();
             descriptionSubviews.Add(new DescriptionSubview(Context));
             descriptionSubviews.Add(new ShortIdSubview(Context));
@@ -458,23 +485,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             descriptionSubviews.Add(new LedgerSubview(Context));
             if (PlatformConfig.Preferences.ContactAccountEnabled)
                 descriptionSubviews.Add(new AccountSubview(Context));
-
-            descriptionCardView = new CardView(Context);
-            descriptionCardView.Visibility = ViewStates.Gone;
-            descriptionCardView.Elevation = CardElevation;
-            descriptionCardView.Radius = CardRadius;
-            descriptionCardView.UseCompatPadding = true;
-
-            var descriptionCardViewInternalLayout = new LinearLayoutCompat(Context);
-            descriptionCardViewInternalLayout.Orientation = LinearLayoutCompat.Vertical;
-            descriptionCardView.AddView(descriptionCardViewInternalLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-
-            var padding = ConversionUtils.ConvertDpToPixels(24f);
-            descriptionCardTitle = new AppCompatTextView(Context);
-            descriptionCardTitle.SetTextAppearanceCompat(Context, Resource.Style.fontListCircle);
-            descriptionCardTitle.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
-            descriptionCardTitle.SetPadding(padding, padding, padding, padding);
-            descriptionCardViewInternalLayout.AddView(descriptionCardTitle, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
             descriptionSubviews.ForEach(descriptionCardViewInternalLayout.AddView);
         }
