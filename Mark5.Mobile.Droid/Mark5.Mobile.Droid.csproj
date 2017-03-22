@@ -603,6 +603,22 @@
     <AndroidResource Include="Resources\drawable-xxxhdpi\replyall.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\sending.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\unread.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_new.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_text.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_call.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_map.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_new.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_text.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_call.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_map.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_new.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_text.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_call.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_map.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_new.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_text.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_call.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_map.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\anim\" />
