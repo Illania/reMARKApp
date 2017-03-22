@@ -59,7 +59,6 @@
 		<item name="colorAccent">@color/darkblue</item>
 	</style>
 	<style name="mark5preference" parent="PreferenceThemeOverlay.v14.Material" />
-	<style name="hockey" parent="android:Theme.DeviceDefault.Light.DarkActionBar" />
 	<!-- Styles -->
 	<style name="mark5actionmode" parent="Widget.AppCompat.ActionMode">
 		<item name="background">@color/darkgray</item>
