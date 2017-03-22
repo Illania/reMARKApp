@@ -873,8 +873,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     if (folder.InternalType == FolderInternalType.Worktray)
                         fh.FolderIcon.SetImageResource(Resource.Drawable.folder_worktray);
-                    else if (folder.Type == FolderType.Spam)
-                        fh.FolderIcon.SetImageResource(Resource.Drawable.folder_spam);
                     else if (folder.Type == FolderType.Draft)
                         fh.FolderIcon.SetImageResource(Resource.Drawable.folder_draft);
                     else
