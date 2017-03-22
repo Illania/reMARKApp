@@ -25,7 +25,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginRight="16dp"
-            android:tint="@color/darkerblue"
+            android:tint="@color/darkblue"
             android:gravity="center_vertical"
             android:id="@+id/list_item_folder_icon" />
         <android.support.v7.widget.LinearLayoutCompat
@@ -55,7 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
-            android:tint="@color/darkerblue"
+            android:tint="@color/darkblue"
             android:src="@drawable/arrow_right"
             android:clickable="false" />
     </android.support.v7.widget.LinearLayoutCompat>

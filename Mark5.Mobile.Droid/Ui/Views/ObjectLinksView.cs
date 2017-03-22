@@ -68,7 +68,7 @@ namespace Mark5.Mobile.Droid.Ui.Views
                 Text = title
             };
             titleView.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
-            titleView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
+            titleView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
             titleView.SetPadding(distanceLarge, 0, distanceNormal, 0);
             innerLayout.AddView(titleView);
 

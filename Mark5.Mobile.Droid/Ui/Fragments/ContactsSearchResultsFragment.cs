@@ -225,7 +225,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 cpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, cp)));
 
                 cpvh.Name = cp.Name;
-                cpvh.Description = cp.Description;
                 cpvh.Categories = cp.Categories;
 
                 cpvh.Selected = selectedContactsInView.ContainsKey(cp.Id);
@@ -248,27 +247,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         class ContactPreviewViewHolder : RecyclerView.ViewHolder
         {
 
-            static readonly int[] colors = { Resource.Color.darkerblue, Resource.Color.darkblue, Resource.Color.blue };
-
             public string Name
             {
                 set
                 {
                     nameTextView.Text = value;
-                    letterTextView.Text = value.SafeSubstring(0, 1).ToUpper();
-
-                    var sd = new ShapeDrawable(new OvalShape());
-                    sd.Paint.Color = new Color(ContextCompat.GetColor(ItemView.Context, colors[Math.Abs(value.GetHashCode() % colors.Length)]));
-                    letterTextView.Background = sd;
-                }
-            }
-
-            public string Description
-            {
-                set
-                {
-                    descTextView.Text = value;
-                    descTextView.Visibility = string.IsNullOrWhiteSpace(value) ? ViewStates.Gone : ViewStates.Visible;
                 }
             }
 
@@ -298,18 +281,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            readonly AppCompatTextView letterTextView;
+            readonly AppCompatImageView iconImageView;
             readonly AppCompatTextView nameTextView;
-            readonly AppCompatTextView descTextView;
             readonly LinearLayoutCompat categoriesLayout;
             readonly View selectedOverlay;
 
             public ContactPreviewViewHolder(View itemView)
                     : base(itemView)
             {
-                letterTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_contact_letter);
+                iconImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_contact_letter);
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_contact_name);
-                descTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_contact_desc);
                 categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_contact_categories);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
             }

@@ -619,6 +619,18 @@
     <AndroidResource Include="Resources\drawable-hdpi\large_text.png" />
     <AndroidResource Include="Resources\drawable-hdpi\large_call.png" />
     <AndroidResource Include="Resources\drawable-hdpi\large_map.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_company.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_person.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_department.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_company.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_department.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_person.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_company.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_department.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_person.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_company.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_department.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_person.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\anim\" />

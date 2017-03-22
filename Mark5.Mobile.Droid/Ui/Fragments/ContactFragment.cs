@@ -414,7 +414,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var physicalCardTitle = new AppCompatTextView(Context);
             physicalCardTitle.Text = GetString(Resource.String.physical_addresses);
             physicalCardTitle.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
-            physicalCardTitle.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
+            physicalCardTitle.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
 
             var padding = ConversionUtils.ConvertDpToPixels(16);
             physicalCardTitle.SetPadding(padding, padding, padding, padding);
@@ -447,7 +447,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var physicalCardTitle = new AppCompatTextView(Context);
             physicalCardTitle.Text = GetString(Resource.String.related_contacts);
             physicalCardTitle.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
-            physicalCardTitle.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
+            physicalCardTitle.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
 
             var padding = ConversionUtils.ConvertDpToPixels(16);
             physicalCardTitle.SetPadding(padding, padding, padding, padding);
@@ -488,7 +488,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var padding = ConversionUtils.ConvertDpToPixels(16);
             descriptionCardTitle = new AppCompatTextView(Context);
             descriptionCardTitle.SetTextAppearanceCompat(Context, Resource.Style.fontListCircle);
-            descriptionCardTitle.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
+            descriptionCardTitle.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
             descriptionCardTitle.SetPadding(padding, padding, padding, padding);
             descriptionCardViewInternalLayout.AddView(descriptionCardTitle, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
             descriptionCardViewInternalLayout.AddView(new Divider(Context));

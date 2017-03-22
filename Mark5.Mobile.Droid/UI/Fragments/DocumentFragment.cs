@@ -79,7 +79,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             button3 = rootView.FindViewById<AppCompatImageView>(Resource.Id.button3);
 
             button1.SetImageResource(Resource.Drawable.reply);
-            button1.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
+            button1.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
             button1.Enabled = false;
             button1.Clickable = true;
             button1.Click += (sender, e) =>
@@ -99,7 +99,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             button1.LongClick += (sender, e) => Toast.MakeText(Context, Resource.String.reply, ToastLength.Short).Show();
 
             button2.SetImageResource(Resource.Drawable.replyall);
-            button2.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
+            button2.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
             button2.Enabled = false;
             button2.Clickable = true;
             button2.Click += (sender, e) =>
@@ -119,7 +119,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             button2.LongClick += (sender, e) => Toast.MakeText(Context, Resource.String.reply_all, ToastLength.Short).Show();
 
             button3.SetImageResource(Resource.Drawable.forward);
-            button3.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
+            button3.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
             button3.Enabled = false;
             button3.Clickable = true;
             button3.Click += (sender, e) =>
