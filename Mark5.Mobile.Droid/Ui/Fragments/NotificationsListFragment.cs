@@ -22,7 +22,9 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Utilities;
+using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -35,6 +37,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         NotificationsAdapter adapter;
+
+        TinyMessageSubscriptionToken newNotificationsToken;
 
         #region Fragment overrides
 
@@ -49,7 +53,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
             refreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
-            refreshLayout.Refresh += async (sender, e) => { await RefreshData(true); };
+            refreshLayout.Refresh += async (sender, e) => { await RefreshData(); };
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
@@ -90,12 +94,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Resuming {nameof(NotificationsListFragment)}...");
 
-            if (adapter.ItemCount < 1)
-            {
-                CommonConfig.Logger.Info($"No elements - will refresh...");
+            await RefreshData();
 
-                await RefreshData();
-            }
+            newNotificationsToken = PlatformConfig.MessengerHub.Subscribe<NewNotificationsReceived>(async m => await RefreshData());
         }
 
         public override void OnPause()
@@ -103,6 +104,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnPause();
 
             CommonConfig.Logger.Info($"Pausing {nameof(NotificationsListFragment)}...");
+
+            if (newNotificationsToken != null)
+                PlatformConfig.MessengerHub.Unsubscribe<NewNotificationsReceived>(newNotificationsToken);
         }
 
         #endregion
@@ -171,7 +175,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Refreshing
 
-        async Task RefreshData(bool force = false)
+        async Task RefreshData()
         {
             try
             {
@@ -182,9 +186,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
                 notifications = notifications.Where(n => ObjectTypes.Contains(n.ObjectType)).ToList();
 
-                if (force)
-                    adapter.Clear();
-                
+                adapter.Clear();
                 adapter.AppendItems(notifications);
             }
             catch (Exception ex)

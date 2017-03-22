@@ -364,6 +364,7 @@
     <Compile Include="Ui\Activities\SearchActivity.cs" />
     <Compile Include="Ui\Fragments\FoldersNotificationsListFragment.cs" />
     <Compile Include="Extensions\ModuleTypeExtensions.cs" />
+    <Compile Include="Ui\Common\HubMessages\NewNotificationsReceived.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

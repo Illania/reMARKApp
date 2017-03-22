@@ -17,6 +17,7 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
+using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 
 namespace Mark5.Mobile.Droid.Utilities.Services
 {
@@ -78,6 +79,8 @@ namespace Mark5.Mobile.Droid.Utilities.Services
                     }
                     var nm = (NotificationManager)GetSystemService(NotificationService);
                     nm.Notify(NotificationIdCounter++, nb.Build());
+
+                    PlatformConfig.MessengerHub.Publish(new NewNotificationsReceived(this));
                 }
             }
             catch (Exception ex)
