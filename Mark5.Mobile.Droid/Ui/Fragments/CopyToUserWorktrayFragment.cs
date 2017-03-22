@@ -418,18 +418,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         class UserViewHolder : RecyclerView.ViewHolder
         {
 
-            static readonly int[] colors = { Resource.Color.darkerblue, Resource.Color.darkblue, Resource.Color.blue };
-
             public string FullName
             {
                 set
                 {
                     fullnameTextView.Text = value;
-                    letterTextView.Text = value.SafeSubstring(0, 1).ToUpper();
-
-                    var sd = new ShapeDrawable(new OvalShape());
-                    sd.Paint.Color = new Color(ContextCompat.GetColor(ItemView.Context, colors[Math.Abs(value.GetHashCode() % colors.Length)]));
-                    letterTextView.Background = sd;
                 }
             }
 
@@ -449,7 +442,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            readonly AppCompatTextView letterTextView;
             readonly AppCompatTextView fullnameTextView;
             readonly AppCompatTextView username;
             readonly View selectedOverlay;
@@ -457,7 +449,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public UserViewHolder(View itemView)
                     : base(itemView)
             {
-                letterTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_system_user_letter);
                 fullnameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_system_user_full_name);
                 username = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_system_user_name);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);

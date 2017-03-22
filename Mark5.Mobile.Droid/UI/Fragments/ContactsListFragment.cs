@@ -972,7 +972,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public ContactPreviewViewHolder(View itemView)
                     : base(itemView)
             {
-                iconImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_contact_letter);
+                iconImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_contact_icon);
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_contact_name);
                 categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_contact_categories);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);

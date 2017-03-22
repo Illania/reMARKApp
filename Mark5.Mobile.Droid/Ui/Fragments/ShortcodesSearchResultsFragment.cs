@@ -261,9 +261,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            readonly AppCompatTextView letterTextView;
             readonly AppCompatTextView nameTextView;
-            readonly AppCompatTextView descTextView;
             readonly View selectedOverlay;
 
             public ShortcodePreviewViewHolder(View itemView)

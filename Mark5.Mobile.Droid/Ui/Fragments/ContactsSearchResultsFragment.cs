@@ -224,6 +224,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 cpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, cp)));
 
+                cpvh.Type = cp.Type;
                 cpvh.Name = cp.Name;
                 cpvh.Categories = cp.Categories;
 
@@ -246,6 +247,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ContactPreviewViewHolder : RecyclerView.ViewHolder
         {
+            
+            public ContactType Type
+            {
+                set
+                {
+                    switch (value)
+                    {
+                        case ContactType.Person:
+                            iconImageView.SetImageResource(Resource.Drawable.large_person);
+                            break;
+                        case ContactType.Department:
+                            iconImageView.SetImageResource(Resource.Drawable.large_department);
+                            break;
+                        case ContactType.Company:
+                            iconImageView.SetImageResource(Resource.Drawable.large_company);
+                            break;
+                        default:
+                            iconImageView.SetImageDrawable(null);
+                            break;
+                    }
+                }
+            }
 
             public string Name
             {
@@ -289,7 +312,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public ContactPreviewViewHolder(View itemView)
                     : base(itemView)
             {
-                iconImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_contact_letter);
+                iconImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_contact_icon);
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_contact_name);
                 categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_contact_categories);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
