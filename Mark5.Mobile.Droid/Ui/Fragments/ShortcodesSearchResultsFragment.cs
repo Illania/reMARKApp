@@ -9,11 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.Content;
-using Android.Graphics;
-using Android.Graphics.Drawables;
-using Android.Graphics.Drawables.Shapes;
 using Android.OS;
-using Android.Support.V4.Content;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -224,7 +220,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 cpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, cp)));
 
                 cpvh.Name = cp.Name;
-                cpvh.Description = cp.Description;
 
                 cpvh.Selected = selectedShortcodesInView.ContainsKey(cp.Id);
             }
@@ -246,27 +241,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         class ShortcodePreviewViewHolder : RecyclerView.ViewHolder
         {
 
-            static readonly int[] colors = { Resource.Color.darkerblue, Resource.Color.darkblue, Resource.Color.blue };
-
             public string Name
             {
                 set
                 {
                     nameTextView.Text = value;
-                    letterTextView.Text = value.SafeSubstring(0, 1).ToUpper();
-
-                    var sd = new ShapeDrawable(new OvalShape());
-                    sd.Paint.Color = new Color(ContextCompat.GetColor(ItemView.Context, colors[Math.Abs(value.GetHashCode() % colors.Length)]));
-                    letterTextView.Background = sd;
-                }
-            }
-
-            public string Description
-            {
-                set
-                {
-                    descTextView.Text = value;
-                    descTextView.Visibility = string.IsNullOrWhiteSpace(value) ? ViewStates.Gone : ViewStates.Visible;
                 }
             }
 
@@ -278,17 +257,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            readonly AppCompatTextView letterTextView;
             readonly AppCompatTextView nameTextView;
-            readonly AppCompatTextView descTextView;
             readonly View selectedOverlay;
 
             public ShortcodePreviewViewHolder(View itemView)
                     : base(itemView)
             {
-                letterTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_shortcode_letter);
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_shortcode_name);
-                descTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_shortcode_desc);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
             }
         }

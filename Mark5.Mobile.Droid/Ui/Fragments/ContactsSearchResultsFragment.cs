@@ -12,9 +12,7 @@ using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
-using Android.Graphics.Drawables.Shapes;
 using Android.OS;
-using Android.Support.V4.Content;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -224,8 +222,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 cpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, cp)));
 
+                cpvh.Type = cp.Type;
                 cpvh.Name = cp.Name;
-                cpvh.Description = cp.Description;
                 cpvh.Categories = cp.Categories;
 
                 cpvh.Selected = selectedContactsInView.ContainsKey(cp.Id);
@@ -247,28 +245,34 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ContactPreviewViewHolder : RecyclerView.ViewHolder
         {
-
-            static readonly int[] colors = { Resource.Color.darkerblue, Resource.Color.darkblue, Resource.Color.blue };
+            
+            public ContactType Type
+            {
+                set
+                {
+                    switch (value)
+                    {
+                        case ContactType.Person:
+                            iconImageView.SetImageResource(Resource.Drawable.large_person);
+                            break;
+                        case ContactType.Department:
+                            iconImageView.SetImageResource(Resource.Drawable.large_department);
+                            break;
+                        case ContactType.Company:
+                            iconImageView.SetImageResource(Resource.Drawable.large_company);
+                            break;
+                        default:
+                            iconImageView.SetImageDrawable(null);
+                            break;
+                    }
+                }
+            }
 
             public string Name
             {
                 set
                 {
                     nameTextView.Text = value;
-                    letterTextView.Text = value.SafeSubstring(0, 1).ToUpper();
-
-                    var sd = new ShapeDrawable(new OvalShape());
-                    sd.Paint.Color = new Color(ContextCompat.GetColor(ItemView.Context, colors[Math.Abs(value.GetHashCode() % colors.Length)]));
-                    letterTextView.Background = sd;
-                }
-            }
-
-            public string Description
-            {
-                set
-                {
-                    descTextView.Text = value;
-                    descTextView.Visibility = string.IsNullOrWhiteSpace(value) ? ViewStates.Gone : ViewStates.Visible;
                 }
             }
 
@@ -298,18 +302,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            readonly AppCompatTextView letterTextView;
+            readonly AppCompatImageView iconImageView;
             readonly AppCompatTextView nameTextView;
-            readonly AppCompatTextView descTextView;
             readonly LinearLayoutCompat categoriesLayout;
             readonly View selectedOverlay;
 
             public ContactPreviewViewHolder(View itemView)
                     : base(itemView)
             {
-                letterTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_contact_letter);
+                iconImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_contact_icon);
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_contact_name);
-                descTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_contact_desc);
                 categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_contact_categories);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
             }

@@ -13,7 +13,6 @@ using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views
@@ -65,24 +64,12 @@ namespace Mark5.Mobile.Droid.Ui.Views
             };
             titleView.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
 
-            titleView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
-            titleView.SetPadding(distanceLarge, 0, distanceNormal, 0);
+            titleView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            titleView.SetPadding(distanceVeryLarge, 0, distanceNormal, 0);
             innerLayout.AddView(titleView);
 
-            innerLayout.AddView(new Divider(Context));
-
-            for (int i = 0; i < objectActions.Length; i++)
-            {
-                var objectAction = objectActions[i];
-                var isNotLast = i != objectActions.Length - 1;
-
+            foreach (var objectAction in objectActions)
                 innerLayout.AddView(new ObjectActionView(Context, objectAction, distanceVeryLarge, distanceNormal));
-
-                if (isNotLast)
-                {
-                    innerLayout.AddView(new Divider(Context, distanceVeryLarge, 0, 0, 0));
-                }
-            }
         }
 
         class ObjectActionView : LinearLayoutCompat

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Android;
 using Android.Content;
 using Android.Content.PM;
+using Android.Graphics;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.App;
@@ -151,7 +152,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                                        .SetAction(Resource.String.permissions_snackbar_action, v => permissionRequestAction());
 
                 snackbar.SetActionTextColor(ContextCompat.GetColor(this, Resource.Color.lightblue));
-                snackbar.View.SetBackgroundColor(new Android.Graphics.Color(ContextCompat.GetColor(this, Resource.Color.darkerblue)));
+                snackbar.View.SetBackgroundColor(new Color(ContextCompat.GetColor(this, Resource.Color.darkblue)));
                 snackbar.View.Clickable = true;
                 snackbar.View.Click += (sender, e) =>
                 {

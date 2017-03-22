@@ -1,5 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string-array name="call_or_text">
+		<item>Call</item>
+		<item>Text</item>
+	</string-array>
 	<string-array name="copy_to_worktray_options">
 		<item>Own</item>
 		<item>Other users\'</item>

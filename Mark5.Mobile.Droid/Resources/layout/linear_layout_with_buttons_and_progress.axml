@@ -50,7 +50,7 @@
             android:id="@+id/button_divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/darkerblue"
+            android:background="@color/darkblue"
             android:layout_above="@id/buttons_linear_layout" />
         <ScrollView
             android:id="@+id/scroll_view"

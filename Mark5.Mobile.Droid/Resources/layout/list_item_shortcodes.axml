@@ -4,48 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="56dp">
+    android:layout_height="wrap_content">
     <include
         layout="@layout/selected_overlay" />
-    <android.support.v7.widget.LinearLayoutCompat
-        android:id="@+id/list_item_shortcode_internal_Layout"
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/list_item_shortcode_name"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:paddingRight="16dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:background="?android:attr/selectableItemBackground">
-        <android.support.v7.widget.AppCompatTextView
-            android:id="@+id/list_item_shortcode_letter"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:background="@drawable/circle"
-            android:textAppearance="@style/fontListCircle"
-            android:textColor="@color/white"
-            android:gravity="center" />
-        <android.support.v7.widget.LinearLayoutCompat
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="vertical">
-            <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/list_item_shortcode_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/fontListPrimary"
-                android:maxLines="1"
-                android:ellipsize="end" />
-            <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/list_item_shortcode_desc"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/fontListSmallLight"
-                android:maxLines="1"
-                android:ellipsize="end" />
-        </android.support.v7.widget.LinearLayoutCompat>
-    </android.support.v7.widget.LinearLayoutCompat>
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:paddingTop="16dp"
+        android:paddingLeft="24dp"
+        android:paddingBottom="16dp"
+        android:paddingRight="8dp"
+        android:textAppearance="@style/fontListPrimary"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:background="?attr/selectableItemBackground" />
 </FrameLayout>

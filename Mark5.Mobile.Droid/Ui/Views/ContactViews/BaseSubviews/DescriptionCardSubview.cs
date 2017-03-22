@@ -40,8 +40,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         protected DescriptionCardSubview(Context context) : base(context)
         {
             Orientation = Vertical;
-            SetPadding(DistanceVeryLarge, 0, 0, 0);
+
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            SetPadding(DistanceVeryLarge, DistanceNormal, DistanceNormal, DistanceNormal);
 
             LongClickable = true;
             LongClick += (sender, e) =>
@@ -54,21 +55,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
             titleTextView = new AppCompatTextView(context);
             titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
-            titleTextView.SetPadding(0, 0, DistanceVeryLarge, 0);
-            var titleTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            titleTextViewLayoutParams.TopMargin = DistanceLarge;
-            AddView(titleTextView, titleTextViewLayoutParams);
+            AddView(titleTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
             contentTextView = new AppCompatTextView(context);
             contentTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
-            contentTextView.SetPadding(0, 0, DistanceVeryLarge, 0);
-            var contentTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            contentTextViewLayoutParams.TopMargin = DistanceSmall;
-            contentTextViewLayoutParams.BottomMargin = DistanceLarge;
-            AddView(contentTextView, contentTextViewLayoutParams);
-
-            var divider = new Divider(Context);
-            AddView(divider);
+            AddView(contentTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
         }
     }
 

@@ -873,8 +873,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     if (folder.InternalType == FolderInternalType.Worktray)
                         fh.FolderIcon.SetImageResource(Resource.Drawable.folder_worktray);
-                    else if (folder.Type == FolderType.Spam)
-                        fh.FolderIcon.SetImageResource(Resource.Drawable.folder_spam);
                     else if (folder.Type == FolderType.Draft)
                         fh.FolderIcon.SetImageResource(Resource.Drawable.folder_draft);
                     else
@@ -921,7 +919,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (viewType == ViewType.FolderView)
                 {
-                    var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_folder, parent, false);
+                    var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_folders, parent, false);
 
                     var folderViewHolder = new FolderViewHolder(itemView);
                     folderViewHolder.ExpandClicked += (sender, e) =>
