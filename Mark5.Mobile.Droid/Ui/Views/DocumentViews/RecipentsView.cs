@@ -64,8 +64,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             Orientation = Vertical;
             SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceLarge);
 
-            LayoutTransition = new LayoutTransition();
-
             var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
             SetBackgroundResource(typedArray.GetResourceId(0, 0));
             typedArray.Recycle();
