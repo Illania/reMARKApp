@@ -5,12 +5,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="60dp">
-    <View
-        android:id="@+id/selected_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        android:background="@color/lightbrown" />
+    <include
+        layout="@layout/selected_overlay" />
     <android.support.v7.widget.LinearLayoutCompat
         android:id="@+id/list_item_category_internal_Layout"
         android:layout_width="match_parent"

@@ -33,6 +33,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Creating {nameof(CommentsListActivity)}...");
 
+            OverridePendingTransition(Resource.Animation.slide_up, Resource.Animation.no_change);
+
             SetTitle(Resource.String.document);
             SetContentView(Resource.Layout.base_layout);
 
@@ -62,11 +64,16 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         public override void OnBackPressed()
         {
-            var intent = new Intent();
-            intent.PutExtra(CommentsResultKey, SerializationUtils.Serialize(cf.Comments));
-            SetResult(Result.Ok, intent);
+            if (cf != null)
+            {
+                var intent = new Intent();
+                intent.PutExtra(CommentsResultKey, SerializationUtils.Serialize(cf.Comments));
+                SetResult(Result.Ok, intent);
+            }
 
             base.OnBackPressed();
+
+            OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
         }
     }
 }

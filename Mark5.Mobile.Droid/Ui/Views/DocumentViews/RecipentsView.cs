@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Android.Animation;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
@@ -26,14 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
     public class RecipentsView : DocumentView
     {
 
-        LinearLayoutCompat compactLayout;
-        AppCompatTextView letter;
-        AppCompatTextView line1;
-        AppCompatTextView line2;
-        AppCompatTextView line3;
-        AppCompatTextView line4;
-        AppCompatButton showButton;
-
+        TableLayout compactLayout;
         TableLayout extendedLayout;
         TableRow tableRowLine;
         TableRow tableRowReferenceNumber;
@@ -55,7 +49,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         AppCompatTextView readByValue;
         AppCompatTextView dateReceivedValue;
         AppCompatTextView creatorValue;
-        AppCompatButton hideButton;
+        AppCompatButton showHideButton;
 
         readonly List<TableRow> extraFieldsTableRows = new List<TableRow>();
 
@@ -77,8 +71,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             Clickable = true;
             Click += (sender, e) =>
             {
-                compactLayout.Visibility = compactLayout.Visibility == ViewStates.Visible ? ViewStates.Gone : ViewStates.Visible;
                 extendedLayout.Visibility = extendedLayout.Visibility == ViewStates.Visible ? ViewStates.Gone : ViewStates.Visible;
+                showHideButton.Text = extendedLayout.Visibility == ViewStates.Visible ? Context.GetString(Resource.String.hide_details) : Context.GetString(Resource.String.show_details);
             };
 
             InitializeCompactView();
@@ -87,83 +81,95 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         void InitializeCompactView()
         {
-            compactLayout = new LinearLayoutCompat(Context)
+            compactLayout = new TableLayout(Context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                Orientation = Horizontal
+                Visibility = ViewStates.Gone
             };
-            compactLayout.Gravity = (int)GravityFlags.CenterVertical;
             AddView(compactLayout);
 
-            var size = ConversionUtils.ConvertDpToPixels(40f);
-            letter = new AppCompatTextView(Context)
+            // From
+            tableRowFrom = new TableRow(Context);
+            tableRowFrom.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+            var fromLabel = new AppCompatTextView(Context)
             {
-                LayoutParameters = new ViewGroup.LayoutParams(size, size),
-                Background = ContextCompat.GetDrawable(Context, Resource.Drawable.circle),
-                Gravity = GravityFlags.Center
+                Text = Context.GetString(Resource.String.from) + ":"
             };
-            letter.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
+            fromLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
 
-            letter.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.white)));
-            compactLayout.AddView(letter);
+            tableRowFrom.AddView(fromLabel);
+            fromValue = new AppCompatTextView(Context);
+            fromValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
 
-            var innerLayout = new LinearLayoutCompat(Context)
+            fromValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+            tableRowFrom.AddView(fromValue);
+            compactLayout.AddView(tableRowFrom);
+
+            // To
+            tableRowTo = new TableRow(Context);
+            tableRowTo.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+            var toLabel = new AppCompatTextView(Context)
             {
-                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                Orientation = Vertical
+                Text = Context.GetString(Resource.String.to) + ":"
             };
-            innerLayout.SetPadding(DistanceLarge, DistanceNone, DistanceNone, DistanceNone);
-            compactLayout.AddView(innerLayout);
+            toLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
 
-            line1 = new AppCompatTextView(Context)
+            tableRowTo.AddView(toLabel);
+            toValue = new AppCompatTextView(Context);
+            toValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+
+            toValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+            tableRowTo.AddView(toValue);
+            compactLayout.AddView(tableRowTo);
+
+            // Date received
+            tableRowDateReceived = new TableRow(Context);
+            tableRowDateReceived.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+            var dateReceivedLabel = new AppCompatTextView(Context)
             {
-                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                Ellipsize = TextUtils.TruncateAt.End
+                Text = Context.GetString(Resource.String.date)
             };
-            line1.SetSingleLine(true);
-            line1.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+            dateReceivedLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
 
-            innerLayout.AddView(line1);
+            tableRowDateReceived.AddView(dateReceivedLabel);
+            dateReceivedValue = new AppCompatTextView(Context);
+            dateReceivedValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
 
-            line2 = new AppCompatTextView(Context)
+            dateReceivedValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+            tableRowDateReceived.AddView(dateReceivedValue);
+            compactLayout.AddView(tableRowDateReceived);
+
+            // Read by
+            tableRowReadBy = new TableRow(Context);
+            tableRowReadBy.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+            var readByLabel = new AppCompatTextView(Context)
             {
-                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                Ellipsize = TextUtils.TruncateAt.End
+                Text = Context.GetString(Resource.String.read_by)
             };
-            line2.SetSingleLine(true);
-            line2.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
+            readByLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
 
-            innerLayout.AddView(line2);
+            tableRowReadBy.AddView(readByLabel);
+            readByValue = new AppCompatTextView(Context);
+            readByValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
 
-            line3 = new AppCompatTextView(Context)
-            {
-                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                Ellipsize = TextUtils.TruncateAt.End
-            };
-            line3.SetSingleLine(true);
-            line3.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
+            readByValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+            tableRowReadBy.AddView(readByValue);
+            compactLayout.AddView(tableRowReadBy);
 
-            innerLayout.AddView(line3);
-
-            line4 = new AppCompatTextView(Context)
-            {
-                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                Ellipsize = TextUtils.TruncateAt.End
-            };
-            line4.SetSingleLine(true);
-            line4.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
-
-            innerLayout.AddView(line4);
-
-            showButton = new AppCompatButton(Context, null, Resource.Style.Widget_AppCompat_Button_Borderless_Colored)
+            // Show button
+            showHideButton = new AppCompatButton(Context, null, Resource.Style.Widget_AppCompat_Button_Borderless_Colored)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                 Text = Context.GetString(Resource.String.show_details)
             };
-            showButton.SetTextAppearanceCompat(Context, Resource.Style.fontSmall);
+            showHideButton.SetTextAppearanceCompat(Context, Resource.Style.fontSmall);
 
-            showButton.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.brown)));
-            innerLayout.AddView(showButton);
+            showHideButton.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+            showHideButton.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            compactLayout.AddView(showHideButton);
+
+            compactLayout.SetColumnStretchable(1, true);
+            compactLayout.SetColumnShrinkable(1, true);
         }
 
         void InitializeExtendedView()
@@ -175,175 +181,106 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             };
             AddView(extendedLayout);
 
-            tableRowLine = new TableRow(Context);
-            var lineLabel = new AppCompatTextView(Context)
-            {
-                Text = Context.GetString(Resource.String.lines)
-            };
-            lineLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
-
-            tableRowLine.AddView(lineLabel);
-            lineValue = new AppCompatTextView(Context);
-            lineValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
-
-            lineValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
-            tableRowLine.AddView(lineValue);
-            extendedLayout.AddView(tableRowLine);
-
-            tableRowReferenceNumber = new TableRow(Context);
-            tableRowReferenceNumber.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
-            var referenceNumberLabel = new AppCompatTextView(Context)
-            {
-                Text = Context.GetString(Resource.String.reference)
-            };
-            referenceNumberLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
-
-            tableRowReferenceNumber.AddView(referenceNumberLabel);
-            referenceNumberValue = new AppCompatTextView(Context);
-            referenceNumberValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
-
-            referenceNumberValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
-            tableRowReferenceNumber.AddView(referenceNumberValue);
-            extendedLayout.AddView(tableRowReferenceNumber);
-
-            tableRowFrom = new TableRow(Context);
-            tableRowFrom.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
-            var fromLabel = new AppCompatTextView(Context)
-            {
-                Text = Context.GetString(Resource.String.from) + ":"
-            };
-            fromLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
-
-            tableRowFrom.AddView(fromLabel);
-            fromValue = new AppCompatTextView(Context);
-            fromValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
-
-            fromValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
-            tableRowFrom.AddView(fromValue);
-            extendedLayout.AddView(tableRowFrom);
-
-            tableRowTo = new TableRow(Context);
-            tableRowTo.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
-            var toLabel = new AppCompatTextView(Context)
-            {
-                Text = Context.GetString(Resource.String.to) + ":"
-            };
-            toLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
-
-            tableRowTo.AddView(toLabel);
-            toValue = new AppCompatTextView(Context);
-            toValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
-
-            toValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
-            tableRowTo.AddView(toValue);
-            extendedLayout.AddView(tableRowTo);
-
+            // Cc
             tableRowCc = new TableRow(Context);
             tableRowCc.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
             var ccLabel = new AppCompatTextView(Context)
             {
                 Text = Context.GetString(Resource.String.cc) + ":"
             };
-            ccLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+            ccLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
 
             tableRowCc.AddView(ccLabel);
             ccValue = new AppCompatTextView(Context);
-            ccValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+            ccValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
 
             ccValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
             tableRowCc.AddView(ccValue);
             extendedLayout.AddView(tableRowCc);
 
+            // Bcc
             tableRowBcc = new TableRow(Context);
             tableRowBcc.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
             var bccLabel = new AppCompatTextView(Context)
             {
                 Text = Context.GetString(Resource.String.bcc) + ":"
             };
-            bccLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+            bccLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
 
             tableRowBcc.AddView(bccLabel);
             bccValue = new AppCompatTextView(Context);
-            bccValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+            bccValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
 
             bccValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
             tableRowBcc.AddView(bccValue);
             extendedLayout.AddView(tableRowBcc);
 
+            // Reply to
             tableRowReplyTo = new TableRow(Context);
             tableRowReplyTo.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
             var replyToLabel = new AppCompatTextView(Context)
             {
                 Text = Context.GetString(Resource.String.reply_to)
             };
-            replyToLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+            replyToLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
 
             tableRowReplyTo.AddView(replyToLabel);
             replyToValue = new AppCompatTextView(Context);
-            replyToValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+            replyToValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
 
             replyToValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
             tableRowReplyTo.AddView(replyToValue);
             extendedLayout.AddView(tableRowReplyTo);
 
-            tableRowReadBy = new TableRow(Context);
-            tableRowReadBy.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
-            var readByLabel = new AppCompatTextView(Context)
+            // Line
+            tableRowLine = new TableRow(Context);
+            var lineLabel = new AppCompatTextView(Context)
             {
-                Text = Context.GetString(Resource.String.read_by)
+                Text = Context.GetString(Resource.String.lines)
             };
-            readByLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+            lineLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
 
-            tableRowReadBy.AddView(readByLabel);
-            readByValue = new AppCompatTextView(Context);
-            readByValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+            tableRowLine.AddView(lineLabel);
+            lineValue = new AppCompatTextView(Context);
+            lineValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
 
-            readByValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
-            tableRowReadBy.AddView(readByValue);
-            extendedLayout.AddView(tableRowReadBy);
+            lineValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+            tableRowLine.AddView(lineValue);
+            extendedLayout.AddView(tableRowLine);
 
-            tableRowDateReceived = new TableRow(Context);
-            tableRowDateReceived.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
-            var dateReceivedLabel = new AppCompatTextView(Context)
+            // Reference number
+            tableRowReferenceNumber = new TableRow(Context);
+            tableRowReferenceNumber.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+            var referenceNumberLabel = new AppCompatTextView(Context)
             {
-                Text = Context.GetString(Resource.String.date)
+                Text = Context.GetString(Resource.String.reference)
             };
-            dateReceivedLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+            referenceNumberLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
 
-            tableRowDateReceived.AddView(dateReceivedLabel);
-            dateReceivedValue = new AppCompatTextView(Context);
-            dateReceivedValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+            tableRowReferenceNumber.AddView(referenceNumberLabel);
+            referenceNumberValue = new AppCompatTextView(Context);
+            referenceNumberValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
 
-            dateReceivedValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
-            tableRowDateReceived.AddView(dateReceivedValue);
-            extendedLayout.AddView(tableRowDateReceived);
+            referenceNumberValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+            tableRowReferenceNumber.AddView(referenceNumberValue);
+            extendedLayout.AddView(tableRowReferenceNumber);
 
+            // Creator
             tableRowCreator = new TableRow(Context);
             tableRowCreator.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
             var creatorLabel = new AppCompatTextView(Context)
             {
                 Text = Context.GetString(Resource.String.creator)
             };
-            creatorLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+            creatorLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
 
             tableRowCreator.AddView(creatorLabel);
             creatorValue = new AppCompatTextView(Context);
-            creatorValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+            creatorValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
 
             creatorValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
             tableRowCreator.AddView(creatorValue);
             extendedLayout.AddView(tableRowCreator);
-
-            hideButton = new AppCompatButton(Context, null, Resource.Style.Widget_AppCompat_Button_Borderless_Colored)
-            {
-                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                Text = Context.GetString(Resource.String.hide_details)
-            };
-            hideButton.SetTextAppearanceCompat(Context, Resource.Style.fontSmall);
-
-            hideButton.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
-            hideButton.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.brown)));
-            extendedLayout.AddView(hideButton);
 
             extendedLayout.SetColumnStretchable(1, true);
             extendedLayout.SetColumnShrinkable(1, true);
@@ -352,84 +289,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         public override void RefreshView()
         {
             if (DocumentPreview != null && Document != null)
-            {
                 Visibility = ViewStates.Visible;
-
-            }
             else
-            {
                 Visibility = ViewStates.Gone;
-            }
 
             compactLayout.Visibility = compactLayout.Visibility = ViewStates.Visible;
             extendedLayout.Visibility = extendedLayout.Visibility = ViewStates.Gone;
 
-            RefreshCompactView();
-            RefreshExtendedView();
+            RefreshViewContent();
         }
 
-        void RefreshCompactView()
-        {
-            if (DocumentPreview != null && Document != null)
-            {
-                if (DocumentPreview.Direction == DocumentDirection.Incoming)
-                {
-                    var addressFrom = DocumentPreview.Addresses.FirstOrDefault(da => da.AddressType == DocumentAddressType.From);
-                    var from = string.IsNullOrWhiteSpace(addressFrom.Name) ? addressFrom.Address : addressFrom.Name;
-                    var addressesTo = DocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType);
-                    var to = string.Join(", ", addressesTo.Select(at => string.IsNullOrWhiteSpace(at.Name) ? at.Address : at.Name));
-
-                    letter.Text = from?.SafeSubstring(0, 1)?.ToUpper();
-                    line1.Text = from;
-                    line2.Text = Context.GetString(Resource.String.to_prefix) + " " + to;
-
-                    line1.Visibility = string.IsNullOrWhiteSpace(from) ? ViewStates.Gone : ViewStates.Visible;
-                    line2.Visibility = string.IsNullOrWhiteSpace(to) ? ViewStates.Gone : ViewStates.Visible;
-                }
-                else
-                {
-                    var from = Document.Lines.FirstOrDefault()?.Name;
-
-                    var addressesTo = DocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To);
-                    var to = string.Join(", ", addressesTo.Select(at => string.IsNullOrWhiteSpace(at.Name) ? at.Address : at.Name));
-
-                    letter.Text = from?.SafeSubstring(0, 1)?.ToUpper();
-                    line1.Text = from;
-                    line2.Text = Context.GetString(Resource.String.to_prefix) + " " + to;
-
-                    line1.Visibility = string.IsNullOrWhiteSpace(from) ? ViewStates.Gone : ViewStates.Visible;
-                    line2.Visibility = string.IsNullOrWhiteSpace(to) ? ViewStates.Gone : ViewStates.Visible;
-                }
-
-                if (Document.ReadByUserNames.Count > 0)
-                {
-                    line3.Visibility = ViewStates.Visible;
-                    line3.Text = $"{Context.GetString(Resource.String.read_by_prefix)} {string.Join(", ", Document.ReadByUserNames.Values.OrderBy(s => s)).ToUpper()}";
-                }
-                else
-                {
-                    line3.Visibility = ViewStates.Gone;
-                    line3.Text = string.Empty;
-                }
-
-                line4.Text = DocumentPreview.DateReceivedTimestamp
-                    .ConvertTimestampMillisecondsToDateTime()
-                    .ConvertUtcToServerTime()
-                    .ConvertDateTimeToTimestampMilliseconds()
-                    .FormatServerTimestampAsCompactLongDateTimeString(Context);
-            }
-            else
-            {
-                letter.Text = string.Empty;
-                line1.Text = string.Empty;
-                line2.Text = string.Empty;
-                line3.Visibility = ViewStates.Gone;
-                line3.Text = string.Empty;
-                line4.Text = string.Empty;
-            }
-        }
-
-        void RefreshExtendedView()
+        void RefreshViewContent()
         {
             if (DocumentPreview != null && Document != null)
             {
@@ -499,26 +369,34 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 extraFieldsTableRows.ForEach(extendedLayout.RemoveView);
                 extraFieldsTableRows.Clear();
 
-                foreach (var extraField in Document.ExtraFields.Where(kv => kv.Key != null && !string.IsNullOrWhiteSpace(kv.Value)).OrderBy(kv => kv.Key.Name))
+                if (Document != null)
                 {
-                    var tableRowExtraField = new TableRow(Context);
-                    tableRowExtraField.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
-                    var extraFieldLabel = new AppCompatTextView(Context)
+                    foreach (var extraField in Document.ExtraFields.Where(kv => kv.Key != null && !string.IsNullOrWhiteSpace(kv.Value)).OrderBy(kv => kv.Key.Name))
                     {
-                        Text = extraField.Key.Name + ":"
-                    };
-                    extraFieldLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+                        var tableRowExtraField = new TableRow(Context);
+                        tableRowExtraField.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+                        var extraFieldLabel = new AppCompatTextView(Context)
+                        {
+                            Text = extraField.Key.Name + ":"
+                        };
+                        extraFieldLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
 
-                    tableRowExtraField.AddView(extraFieldLabel);
-                    var extraFieldValue = new AppCompatTextView(Context)
-                    {
-                        Text = extraField.Value
-                    };
-                    extraFieldValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+                        tableRowExtraField.AddView(extraFieldLabel);
+                        var extraFieldValue = new AppCompatTextView(Context)
+                        {
+                            Text = extraField.Value
+                        };
+                        extraFieldValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
 
-                    extraFieldValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
-                    tableRowExtraField.AddView(extraFieldValue);
-                    extendedLayout.AddView(tableRowExtraField, extendedLayout.ChildCount - 1);
+                        extraFieldValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+                        tableRowExtraField.AddView(extraFieldValue);
+                        extendedLayout.AddView(tableRowExtraField, extendedLayout.ChildCount - 1);
+                    }
+                }
+                else
+                {
+                    extraFieldsTableRows.ForEach(extendedLayout.RemoveView);
+                    extraFieldsTableRows.Clear();
                 }
             }
             else

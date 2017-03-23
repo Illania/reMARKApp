@@ -52,7 +52,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 {
                     TopMargin = DistanceNormal
                 },
-                Orientation = Horizontal
             };
             FromToLayout.Visibility = ViewStates.Gone;
             AddView(FromToLayout);

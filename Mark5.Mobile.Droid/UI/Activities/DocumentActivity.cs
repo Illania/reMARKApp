@@ -5,7 +5,6 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-
 using System;
 using Android.App;
 using Android.OS;
@@ -36,6 +35,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.OnCreate(savedInstanceState);
 
             CommonConfig.Logger.Info($"Creating {nameof(DocumentActivity)}...");
+
+            OverridePendingTransition(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left_half);
 
             SetTitle(Resource.String.document);
             SetContentView(Resource.Layout.base_layout);
@@ -75,6 +76,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 CommonConfig.Logger.Info($"Restored {nameof(DocumentActivity)}");
             }
+        }
+
+        protected override void OnStop()
+        {
+            base.OnStop();
+
+            OverridePendingTransition(Resource.Animation.enter_from_left_half, Resource.Animation.exit_to_right);
         }
     }
 }

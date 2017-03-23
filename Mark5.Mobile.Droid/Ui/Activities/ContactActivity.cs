@@ -36,12 +36,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Creating {nameof(ContactActivity)}...");
 
+            OverridePendingTransition(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left_half);
+
             SetContentView(Resource.Layout.base_layout);
 
             toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
-            SupportActionBar.Title = string.Empty;
 
             if (savedInstanceState == null)
             {
@@ -74,6 +75,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 CommonConfig.Logger.Info($"Restored {nameof(ContactActivity)}");
             }
+        }
+
+        protected override void OnStop()
+        {
+            base.OnStop();
+
+            OverridePendingTransition(Resource.Animation.enter_from_left_half, Resource.Animation.exit_to_right);
         }
     }
 }

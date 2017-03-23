@@ -9,6 +9,8 @@ using System;
 using System.Linq;
 using System.Text;
 using Android.Content;
+using Android.Graphics;
+using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
@@ -28,23 +30,21 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         {
             Orientation = Vertical;
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            SetPadding(DistanceVeryLarge, 0, 0, 0);
         }
 
         public override void RefreshView()
         {
             if (Contact != null && Contact.PhysicalAddresses.Any())
             {
-                Visibility = ViewStates.Visible;
-
                 RemoveAllViews();
-                var lastAddress = Contact.PhysicalAddresses.Last();
                 foreach (var address in Contact.PhysicalAddresses)
                 {
-                    var subview = new PhysicalAddressesSubSubview(Context, address, DistanceSmall, DistanceLarge, DistanceVeryLarge, lastAddress != address);
+                    var subview = new PhysicalAddressesSubSubview(Context, address, DistanceSmall, DistanceNormal, DistanceLarge, DistanceVeryLarge);
                     subview.Click += (sender, e) => PhysicalAddressClicked(this, address);
                     AddView(subview);
                 }
+
+                Visibility = ViewStates.Visible;
             }
             else
             {
@@ -55,49 +55,49 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         class PhysicalAddressesSubSubview : LinearLayoutCompat
         {
 
-            public PhysicalAddressesSubSubview(Context context, PhysicalAddress physicalAddress, int distanceSmall, int distanceLarge, int distanceVeryLarge, bool addDivider = false)
+            public PhysicalAddressesSubSubview(Context context, PhysicalAddress physicalAddress, int distanceSmall, int distanceNormal, int distanceLarge, int distanceVeryLarge)
                 : base(context)
             {
-                Orientation = Vertical;
-                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-
+                Clickable = true;
+                
                 var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
                 SetBackgroundResource(typedArray.GetResourceId(0, 0));
                 typedArray.Recycle();
 
-                Clickable = true;
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+                SetPadding(distanceVeryLarge, distanceNormal, distanceNormal, distanceNormal);
 
-                var typeTextView = new AppCompatTextView(context);
-                typeTextView.SetPadding(0, 0, distanceVeryLarge, 0);
-                typeTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
-                typeTextView.Text = physicalAddress.Type.Name;
-                var typeTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-                typeTextViewLayoutParams.TopMargin = distanceLarge;
-                AddView(typeTextView, typeTextViewLayoutParams);
+                var iconImageView = new AppCompatImageView(context);
+                iconImageView.SetImageResource(Resource.Drawable.map);
+                iconImageView.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+                AddView(iconImageView);
+
+                var innerLayout = new LinearLayoutCompat(Context)
+                {
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                    {
+                        LeftMargin = distanceLarge
+                    },
+                    Orientation = Vertical
+                };
 
                 var addressTextView = new AppCompatTextView(context);
-                addressTextView.SetPadding(0, 0, distanceVeryLarge, 0);
-                addressTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
                 addressTextView.Text = GetAddressText(physicalAddress);
-                var addressTextViewLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-                addressTextViewLayoutParams.TopMargin = distanceSmall;
-                addressTextViewLayoutParams.BottomMargin = distanceLarge;
-                AddView(addressTextView, addressTextViewLayoutParams);
+                addressTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
+                innerLayout.AddView(addressTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+                
+                var typeTextView = new AppCompatTextView(context);
+                typeTextView.Text = physicalAddress.Type.Name;
+                typeTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
+                AddView(innerLayout);
+                innerLayout.AddView(typeTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
                 LongClickable = true;
                 LongClick += (sender, e) =>
                 {
                     if (!string.IsNullOrWhiteSpace(addressTextView.Text))
-                    {
                         Integration.CopyToClipboard(context, addressTextView.Text);
-                    }
                 };
-
-                if (addDivider)
-                {
-                    var divider = new Divider(context);
-                    AddView(divider);
-                }
             }
 
             string GetAddressText(PhysicalAddress address)

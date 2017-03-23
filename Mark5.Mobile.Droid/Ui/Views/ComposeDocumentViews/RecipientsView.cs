@@ -71,7 +71,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             AddressType = type;
 
-            Orientation = Horizontal;
             SetPadding(DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall);
 
             var titleTextView = new AppCompatTextView(context)

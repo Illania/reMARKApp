@@ -42,7 +42,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
             };
             titleView.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
 
-            titleView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
+            titleView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
             InnerLayout.AddView(titleView);
 
             contentView = new AppCompatTextView(Context)

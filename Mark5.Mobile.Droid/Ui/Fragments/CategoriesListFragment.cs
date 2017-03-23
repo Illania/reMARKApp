@@ -53,6 +53,9 @@ namespace Mark5.Mobile.Droid
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
+            var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
+            emptyView.SetText(Resource.String.no_categories);
+
             var refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
             refreshLayout.Enabled = false;
 
@@ -61,6 +64,13 @@ namespace Mark5.Mobile.Droid
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
             adapter = new CategoriesListAdapter();
+            adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
+            {
+                if (recyclerView.GetAdapter() != adapter) return;
+
+                emptyView.Visibility = adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
+                recyclerView.Visibility = adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
+            }));
             recyclerView.SetAdapter(adapter);
 
             searchAdapter = new CategoriesListAdapter();
@@ -75,6 +85,7 @@ namespace Mark5.Mobile.Droid
             base.OnViewCreated(view, savedInstanceState);
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.categories);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
         }
@@ -97,10 +108,9 @@ namespace Mark5.Mobile.Droid
             var item = menu.Add(Menu.None, 10, 10, Resource.String.edit);
             item.SetShowAsAction(ShowAsAction.Always);
 
-            var searchItem = menu.FindItem(Resource.Id.action_search);
-            searchItem.SetIcon(Resource.Drawable.action_search);
-            MenuItemCompat.SetOnActionExpandListener(searchItem, this);
-            searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
+            var filterItem = menu.FindItem(Resource.Id.action_filter);
+            MenuItemCompat.SetOnActionExpandListener(filterItem, this);
+            searchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
         }
@@ -109,12 +119,14 @@ namespace Mark5.Mobile.Droid
         {
             if (item.ItemId == 10)
             {
-                var ft = Activity.SupportFragmentManager.BeginTransaction();
                 var clf = new EditCategoriesListFragment
                 {
                     BusinessEntityPreview = BusinessEntityPreview,
                     CloseRequest = CloseRequest
                 };
+
+                var ft = ((AppCompatActivity)Activity).SupportFragmentManager.BeginTransaction();
+                ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out, Resource.Animation.fade_out, Resource.Animation.fade_in);
                 ft.Replace(Resource.Id.fragment_container, clf, clf.GenerateTag());
                 ft.AddToBackStack(null);
                 ft.Commit();
@@ -146,7 +158,7 @@ namespace Mark5.Mobile.Droid
 
         bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
-            if (item.ItemId == Resource.Id.action_search)
+            if (item.ItemId == Resource.Id.action_filter)
             {
                 recyclerView.SwapAdapter(searchAdapter, true);
                 return true;
@@ -157,7 +169,7 @@ namespace Mark5.Mobile.Droid
 
         bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
         {
-            if (item.ItemId == Resource.Id.action_search)
+            if (item.ItemId == Resource.Id.action_filter)
             {
                 searchHandler.RemoveCallbacksAndMessages(null);
                 searchAdapter.Clear();

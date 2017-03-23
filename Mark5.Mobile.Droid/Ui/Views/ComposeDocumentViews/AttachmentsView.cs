@@ -7,22 +7,24 @@
 //
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.Content;
+using Android.Graphics;
+using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
-using Android.Widget;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
+
     public class AttachmentsView : ComposeDocumentView
     {
+
         LinearLayoutCompat container;
         List<IAttachmentDescription> attachmentsDescription = new List<IAttachmentDescription>();
 
@@ -31,20 +33,28 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public AttachmentsView(Context context)
             : base(context)
         {
-            var scrollView = new HorizontalScrollView(Context)
+            Orientation = Vertical;
+
+            var title = new AppCompatTextView(Context)
             {
-                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                VerticalScrollBarEnabled = false,
-                HorizontalScrollBarEnabled = false
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                {
+                    LeftMargin = DistanceLarge,
+                    TopMargin = DistanceNormal,
+                    RightMargin = DistanceLarge,
+                    BottomMargin = DistanceNormal
+                },
+                Text = Context.GetString(Resource.String.attachments)
             };
-            AddView(scrollView);
+            title.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+            AddView(title);
 
             container = new LinearLayoutCompat(Context)
             {
-                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                Orientation = Horizontal
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                Orientation = Vertical
             };
-            scrollView.AddView(container);
+            AddView(container);
 
             Visibility = ViewStates.Gone;
         }
@@ -61,9 +71,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             if (CreationModeFlag == DocumentCreationModeFlag.Forward)
             {
                 foreach (var attachmentDescription in PreviousDocument.Attachments)
-                {
                     AddAttachment(attachmentDescription);
-                }
             }
 
             return Task.CompletedTask;
@@ -76,7 +84,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             DocumentPreview.AttachmentsCount = attachmentsDescription.Count;
 
             //Nothing to do for local attachments, they're saved on disk
-
             return Task.CompletedTask;
         }
 
@@ -89,7 +96,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             attachmentsDescription.Add(attachment);
 
-            var av = new AttachmentView(Context, attachment);
+            var av = new AttachmentView(Context, attachment, DistanceLarge, DistanceNormal);
             av.Click += Attachment_Click;
             container.AddView(av);
 
@@ -102,15 +109,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             container.RemoveView(senderView as AttachmentView);
 
             if (!attachmentsDescription.Any())
-            {
                 Visibility = ViewStates.Gone;
-            }
         }
 
         void Attachment_Click(object sender, EventArgs e)
         {
             var attachmentView = sender as AttachmentView;
-            AttachmentClicked(sender, attachmentView.documentAttachment);
+            AttachmentClicked(sender, attachmentView.AttachmentDescription);
         }
 
         #region State related
@@ -140,26 +145,23 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         class AttachmentView : LinearLayoutCompat
         {
-            public readonly IAttachmentDescription documentAttachment;
 
-            public AttachmentView(Context context, IAttachmentDescription attachment)
+            public IAttachmentDescription AttachmentDescription { get; private set; }
+
+            public AttachmentView(Context context, IAttachmentDescription attachmentDescription, int distanceLarge, int distanceNormal)
                 : base(context)
             {
-                documentAttachment = attachment;
+                AttachmentDescription = attachmentDescription;
 
-                var minimumWidth = ConversionUtils.ConvertDpToPixels(100f);
-                var maximumWidth = ConversionUtils.ConvertDpToPixels(175f);
-                var margin = ConversionUtils.ConvertDpToPixels(8f);
+                var maximumWidth = ConversionUtils.ConvertDpToPixels(250f);
                 var innerMargin = ConversionUtils.ConvertDpToPixels(4f);
-
-                Orientation = Vertical;
 
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
                 {
-                    LeftMargin = margin,
-                    TopMargin = margin,
-                    RightMargin = margin,
-                    BottomMargin = margin
+                    LeftMargin = distanceLarge,
+                    TopMargin = 0,
+                    RightMargin = distanceLarge,
+                    BottomMargin = distanceNormal
                 };
                 Elevation = ConversionUtils.ConvertDpToPixels(2f);
 
@@ -167,59 +169,44 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 Clickable = true;
 
+                var imageSize = ConversionUtils.ConvertDpToPixels(16f);
+                var image = new AppCompatImageView(Context)
+                {
+                    LayoutParameters = new LayoutParams(imageSize, imageSize)
+                    {
+                        RightMargin = innerMargin,
+                        Gravity = (int)GravityFlags.Center
+                    }
+                };
+                image.SetImageResource(Resource.Drawable.attachment);
+                image.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+                AddView(image);
+
                 var title = new AppCompatTextView(Context)
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                     {
-                        BottomMargin = innerMargin
+                        Gravity = (int)GravityFlags.Center
                     },
-                    Text = attachment.Name,
+                    Text = attachmentDescription.Name,
                     Ellipsize = TextUtils.TruncateAt.End,
-                    Gravity = GravityFlags.Top,
                 };
-                title.SetMinWidth(minimumWidth);
                 title.SetMaxWidth(maximumWidth);
                 title.SetSingleLine(true);
-                title.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
-
+                title.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
                 AddView(title);
-
-                var innerLayout = new LinearLayoutCompat(Context)
-                {
-                    LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                    Orientation = Horizontal
-                };
-                AddView(innerLayout);
-
-                var extensionFromPath = Path.GetExtension(attachment.Name);
-                var extension = new AppCompatTextView(Context)
-                {
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
-                    {
-                        RightMargin = innerMargin,
-                        Weight = 1
-                    },
-                    Text = string.IsNullOrWhiteSpace(extensionFromPath) ? string.Empty : extensionFromPath.Substring(1).ToUpper(),
-                    Gravity = GravityFlags.Start
-                };
-                extension.SetSingleLine(true);
-                extension.SetTextAppearanceCompat(Context, Resource.Style.fontTiny);
-
-                innerLayout.AddView(extension);
 
                 var size = new AppCompatTextView(Context)
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                     {
-                        Weight = 1
+                        Gravity = (int)GravityFlags.Center
                     },
-                    Text = Formatters.FormatFileSize(attachment.SizeInBytes),
-                    Gravity = GravityFlags.End
+                    Text = " (" + Formatters.FormatFileSize(attachmentDescription.SizeInBytes) + ")",
                 };
                 size.SetSingleLine(true);
-                size.SetTextAppearanceCompat(Context, Resource.Style.fontTinyLight);
-
-                innerLayout.AddView(size);
+                size.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
+                AddView(size);
             }
         }
 

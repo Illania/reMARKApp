@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: OutgoingDocumentListFragment.cs
 // Author: Ferdinando Papale fp@nordic-it.com
@@ -11,8 +11,10 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Android.Content;
+using Android.Graphics;
 using Android.OS;
 using Android.Support.Design.Widget;
+using Android.Support.V4.Content;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -28,8 +30,10 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
+    
     public class OutgoingDocumentsListFragment : RetainableStateFragment, ActionMode.ICallback
     {
+        
         bool refreshing;
 
         public Action CloseRequest { get; set; }
@@ -45,8 +49,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
+            var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
+            emptyView.SetText(Resource.String.empty_folder);
+
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
-            refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
+            refreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
             refreshLayout.Refresh += async (sender, e) =>
             {
                 actionMode?.Finish();
@@ -60,6 +67,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
             adapter = new OutgoingDocumentsListAdapter(Activity);
+            adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
+            {
+                if (recyclerView.GetAdapter() != adapter) return;
+
+                emptyView.Visibility = adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
+                recyclerView.Visibility = adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
+            }));
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
             recyclerView.SetAdapter(adapter);
@@ -73,8 +87,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = Folder.DocumentsOutgoingFolder.Name;
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.documents);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder.DocumentsOutgoingFolder.Name;
         }
 
         public override async void OnResume()
@@ -137,29 +151,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
-        {
-            var newItem = menu.Add(Menu.None, 10, 10, "New"); //TODO an icon should be here
-            newItem.SetShowAsAction(ShowAsAction.Always);
-        }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == 10)
-            {
-                if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
-                {
-                    Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
-                    return true;
-                }
-
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None));
-                return true;
-            }
-
-            return base.OnOptionsItemSelected(item);
-        }
-
         void Adapter_ItemClicked(object sender, OutgoingDocumentContainer outgoingDocumentContainer)
         {
             if (outgoingDocumentContainer.Info.State == OutgoingDocumentState.Sending)
@@ -209,15 +200,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Action mode
 
-        bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
-        {
-            return false;
-        }
-
         bool ActionMode.ICallback.OnCreateActionMode(ActionMode mode, IMenu menu)
         {
             menu.Add(Menu.None, 10, 10, Resource.String.delete);
             return true;
+        }
+
+        bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
+        {
+            Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+
+            return false;
         }
 
         bool ActionMode.ICallback.OnActionItemClicked(ActionMode mode, IMenuItem item)
@@ -235,6 +229,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
         {
+            Activity.Window.AddFlags(WindowManagerFlags.TranslucentStatus);
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+
             adapter.ClearSelections();
             actionMode = null;
         }

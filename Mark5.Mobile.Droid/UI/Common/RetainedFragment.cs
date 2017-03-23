@@ -12,8 +12,10 @@ using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
+    
     public class RetainedFragment<Y> : Fragment where Y : class
     {
+    
         public Y State { get; set; }
 
         public override void OnCreate(Bundle savedInstanceState)

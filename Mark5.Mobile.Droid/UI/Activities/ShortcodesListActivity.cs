@@ -38,6 +38,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Creating {nameof(ShortcodesListActivity)}...");
 
+            OverridePendingTransition(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left_half);
+
             SetTitle(Resource.String.shortcodes);
             SetContentView(Resource.Layout.base_layout);
 
@@ -68,6 +70,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             entityMovedFromFolderToken = PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(slf.UpdateMovedEntities, m => slf != null && m.Sender != slf && slf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Shortcode);
             entityRemovedFromFolderToken = PlatformConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(slf.UpdateRemovedFromFolderEntities, m => slf != null && m.Sender != slf && slf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Shortcode);
             entityRemovedToken = PlatformConfig.MessengerHub.Subscribe<EntityRemovedMessage>(slf.UpdateRemovedEntities, m => slf != null && m.Sender != slf && m.ObjectType == ObjectType.Shortcode);
+        }
+
+        protected override void OnStop()
+        {
+            base.OnStop();
+
+            OverridePendingTransition(Resource.Animation.enter_from_left_half, Resource.Animation.exit_to_right);
         }
 
         protected override void OnDestroy()

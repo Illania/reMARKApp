@@ -11,12 +11,22 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Services;
 using System.Text;
 using System;
+using Android.OS;
+using Android.Support.Design.Widget;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
 
     public abstract class BaseAppCompatActivity : AppCompatActivity
     {
+
+        public override void OnCreate(Bundle savedInstanceState, PersistableBundle persistentState)
+        {
+            base.OnCreate(savedInstanceState, persistentState);
+
+            Window.DecorView.SystemUiVisibility = (StatusBarVisibility)(SystemUiFlags.LayoutStable | SystemUiFlags.Fullscreen);
+        }
 
         protected override void OnResume()
         {
@@ -28,6 +38,16 @@ namespace Mark5.Mobile.Droid.Ui.Common
             connectionBar.LongClickable = true;
             connectionBar.LongClick += ConnectionBar_LongClick;
             connectionBar.Visibility = CommonConfig.ReachabilityService.IsReachable ? ViewStates.Gone : ViewStates.Visible;
+
+            var fab = FindViewById<FloatingActionButton>(Resource.Id.fab);
+            var lp = fab?.LayoutParameters as CoordinatorLayout.LayoutParams;
+            if (lp != null)
+            {
+                lp.BottomMargin = (int)Resources.GetDimension(Resource.Dimension.fab_margin);
+                if (!CommonConfig.ReachabilityService.IsReachable)
+                    lp.BottomMargin += (int)Resources.GetDimension(Resource.Dimension.connection_bar_height);
+                fab.RequestLayout();
+            }
 
             CommonConfig.ReachabilityService.ReachabilityRefreshed += ReachabilityService_ReachabilityRefreshed;
         }
@@ -57,6 +77,16 @@ namespace Mark5.Mobile.Droid.Ui.Common
         {
             var connectionBar = FindViewById(Resource.Id.connection_bar);
             connectionBar.Visibility = e.IsReachable ? ViewStates.Gone : ViewStates.Visible;
+
+            var fab = FindViewById<FloatingActionButton>(Resource.Id.fab);
+            var lp = fab?.LayoutParameters as CoordinatorLayout.LayoutParams;
+            if (lp != null)
+            {
+                lp.BottomMargin = (int)Resources.GetDimension(Resource.Dimension.fab_margin);
+                if (!e.IsReachable)
+                    lp.BottomMargin += (int)Resources.GetDimension(Resource.Dimension.connection_bar_height);
+                fab.RequestLayout();
+            }
         }
 
         async void ConnectionBar_Click(object sender, EventArgs e)

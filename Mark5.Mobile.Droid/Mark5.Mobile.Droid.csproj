@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Xamarin.Build.Download.0.4.2\build\Xamarin.Build.Download.props" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.2\build\Xamarin.Build.Download.props')" />
+  <Import Project="..\packages\Xamarin.Build.Download.0.3.0\build\Xamarin.Build.Download.props" Condition="Exists('..\packages\Xamarin.Build.Download.0.3.0\build\Xamarin.Build.Download.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -108,68 +108,88 @@
     <Reference Include="SQLite-net">
       <HintPath>..\packages\sqlite-net-pcl.1.3.1\lib\netstandard1.1\SQLite-net.dll</HintPath>
     </Reference>
-    <Reference Include="Xamarin.GooglePlayServices.Basement">
-      <HintPath>..\packages\Xamarin.GooglePlayServices.Basement.42.1001.0\lib\MonoAndroid70\Xamarin.GooglePlayServices.Basement.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.GooglePlayServices.Tasks">
-      <HintPath>..\packages\Xamarin.GooglePlayServices.Tasks.42.1001.0\lib\MonoAndroid70\Xamarin.GooglePlayServices.Tasks.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Firebase.Common">
-      <HintPath>..\packages\Xamarin.Firebase.Common.42.1001.0\lib\MonoAndroid70\Xamarin.Firebase.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Firebase.Iid">
-      <HintPath>..\packages\Xamarin.Firebase.Iid.42.1001.0\lib\MonoAndroid70\Xamarin.Firebase.Iid.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Firebase.Messaging">
-      <HintPath>..\packages\Xamarin.Firebase.Messaging.42.1001.0\lib\MonoAndroid70\Xamarin.Firebase.Messaging.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.1\lib\netstandard1.3\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Compat">
-      <HintPath>..\packages\Xamarin.Android.Support.Compat.25.1.1\lib\MonoAndroid70\Xamarin.Android.Support.Compat.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.Compat.25.0.1-rc1\lib\MonoAndroid70\Xamarin.Android.Support.Compat.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Core.UI">
-      <HintPath>..\packages\Xamarin.Android.Support.Core.UI.25.1.1\lib\MonoAndroid70\Xamarin.Android.Support.Core.UI.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.Core.UI.25.0.1-rc1\lib\MonoAndroid70\Xamarin.Android.Support.Core.UI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Core.Utils">
-      <HintPath>..\packages\Xamarin.Android.Support.Core.Utils.25.1.1\lib\MonoAndroid70\Xamarin.Android.Support.Core.Utils.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.Core.Utils.25.0.1-rc1\lib\MonoAndroid70\Xamarin.Android.Support.Core.Utils.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Media.Compat">
-      <HintPath>..\packages\Xamarin.Android.Support.Media.Compat.25.1.1\lib\MonoAndroid70\Xamarin.Android.Support.Media.Compat.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.Media.Compat.25.0.1-rc1\lib\MonoAndroid70\Xamarin.Android.Support.Media.Compat.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Fragment">
-      <HintPath>..\packages\Xamarin.Android.Support.Fragment.25.1.1\lib\MonoAndroid70\Xamarin.Android.Support.Fragment.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Android.Support.Transition">
-      <HintPath>..\packages\Xamarin.Android.Support.Transition.25.1.1\lib\MonoAndroid70\Xamarin.Android.Support.Transition.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.Fragment.25.0.1-rc1\lib\MonoAndroid70\Xamarin.Android.Support.Fragment.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v4">
-      <HintPath>..\packages\Xamarin.Android.Support.v4.25.1.1\lib\MonoAndroid70\Xamarin.Android.Support.v4.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Android.Support.v7.CardView">
-      <HintPath>..\packages\Xamarin.Android.Support.v7.CardView.25.1.1\lib\MonoAndroid70\Xamarin.Android.Support.v7.CardView.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.v4.25.0.1-rc1\lib\MonoAndroid70\Xamarin.Android.Support.v4.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v7.RecyclerView">
-      <HintPath>..\packages\Xamarin.Android.Support.v7.RecyclerView.25.1.1\lib\MonoAndroid70\Xamarin.Android.Support.v7.RecyclerView.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.v7.RecyclerView.25.0.1-rc1\lib\MonoAndroid70\Xamarin.Android.Support.v7.RecyclerView.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Vector.Drawable">
-      <HintPath>..\packages\Xamarin.Android.Support.Vector.Drawable.25.1.1\lib\MonoAndroid70\Xamarin.Android.Support.Vector.Drawable.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.Vector.Drawable.25.0.1-rc1\lib\MonoAndroid70\Xamarin.Android.Support.Vector.Drawable.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Animated.Vector.Drawable">
-      <HintPath>..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.25.1.1\lib\MonoAndroid70\Xamarin.Android.Support.Animated.Vector.Drawable.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.25.0.1-rc1\lib\MonoAndroid70\Xamarin.Android.Support.Animated.Vector.Drawable.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v7.AppCompat">
-      <HintPath>..\packages\Xamarin.Android.Support.v7.AppCompat.25.1.1\lib\MonoAndroid70\Xamarin.Android.Support.v7.AppCompat.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.v7.AppCompat.25.0.1-rc1\lib\MonoAndroid70\Xamarin.Android.Support.v7.AppCompat.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Design">
-      <HintPath>..\packages\Xamarin.Android.Support.Design.25.1.1\lib\MonoAndroid70\Xamarin.Android.Support.Design.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.Design.25.0.1-rc1\lib\MonoAndroid70\Xamarin.Android.Support.Design.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v7.Preference">
-      <HintPath>..\packages\Xamarin.Android.Support.v7.Preference.25.1.1\lib\MonoAndroid70\Xamarin.Android.Support.v7.Preference.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.v7.Preference.25.0.1-rc1\lib\MonoAndroid70\Xamarin.Android.Support.v7.Preference.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v14.Preference">
-      <HintPath>..\packages\Xamarin.Android.Support.v14.Preference.25.1.1\lib\MonoAndroid70\Xamarin.Android.Support.v14.Preference.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.v14.Preference.25.0.1-rc1\lib\MonoAndroid70\Xamarin.Android.Support.v14.Preference.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.1-beta1\lib\netstandard1.1\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Xamarin.GooglePlayServices.Basement">
+      <HintPath>..\packages\Xamarin.GooglePlayServices.Basement.42.1001.0-beta2\lib\MonoAndroid70\Xamarin.GooglePlayServices.Basement.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Xamarin.GooglePlayServices.Tasks">
+      <HintPath>..\packages\Xamarin.GooglePlayServices.Tasks.42.1001.0-beta2\lib\MonoAndroid70\Xamarin.GooglePlayServices.Tasks.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Xamarin.Firebase.Common">
+      <HintPath>..\packages\Xamarin.Firebase.Common.42.1001.0-beta2\lib\MonoAndroid70\Xamarin.Firebase.Common.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Xamarin.Firebase.Iid">
+      <HintPath>..\packages\Xamarin.Firebase.Iid.42.1001.0-beta2\lib\MonoAndroid70\Xamarin.Firebase.Iid.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Xamarin.Firebase.Messaging">
+      <HintPath>..\packages\Xamarin.Firebase.Messaging.42.1001.0-beta2\lib\MonoAndroid70\Xamarin.Firebase.Messaging.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.v7.CardView">
+      <HintPath>..\packages\Xamarin.Android.Support.v7.CardView.25.0.1-rc1\lib\MonoAndroid70\Xamarin.Android.Support.v7.CardView.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Transition">
+      <HintPath>..\packages\Xamarin.Android.Support.Transition.25.0.1-rc1\lib\MonoAndroid70\Xamarin.Android.Support.Transition.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -230,7 +250,7 @@
     <Compile Include="Ui\Fragments\DocumentsSearchCriteriaFragment.cs" />
     <Compile Include="Ui\Fragments\DocumentsSearchResultsFragment.cs" />
     <Compile Include="Ui\Fragments\FoldersListFragment.cs" />
-    <Compile Include="Ui\Fragments\NotificationsFragment.cs" />
+    <Compile Include="Ui\Fragments\NotificationsListFragment.cs" />
     <Compile Include="Ui\Fragments\ObjectActionsFragment.cs" />
     <Compile Include="Ui\Fragments\ObjectLinksFragment.cs" />
     <Compile Include="Ui\Fragments\PreferenceFragment.cs" />
@@ -331,7 +351,6 @@
     <Compile Include="Utilities\PhonebookUtilities.cs" />
     <Compile Include="Ui\Fragments\OutgoingDocumentsListFragment.cs" />
     <Compile Include="Utilities\Hockey\CustomCrashManagerListener.cs" />
-    <Compile Include="Utilities\Hockey\CustomFeedbackActivity.cs" />
     <Compile Include="Ui\Common\HubMessages\EntityRemovedMessage.cs" />
     <Compile Include="Ui\Common\HubMessages\EntityRemovedFromFolderMessage.cs" />
     <Compile Include="Ui\Common\HubMessages\DocumentPreviewPriorityChangedMessage.cs" />
@@ -341,6 +360,11 @@
     <Compile Include="Ui\Common\LambdaEmptyAdapterObserver.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactCountrySearchView.cs" />
     <Compile Include="Utilities\LocalNotificationsListener.cs" />
+    <Compile Include="Ui\Activities\PreferenceActivity.cs" />
+    <Compile Include="Ui\Activities\SearchActivity.cs" />
+    <Compile Include="Ui\Fragments\FoldersNotificationsListFragment.cs" />
+    <Compile Include="Extensions\ModuleTypeExtensions.cs" />
+    <Compile Include="Ui\Common\HubMessages\NewNotificationsReceived.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -366,37 +390,8 @@
     <AndroidResource Include="Resources\color\drawer_item.xml" />
     <AndroidResource Include="Resources\color\drawer_item_background.xml" />
     <AndroidResource Include="Resources\color\drawer_item_icon.xml" />
-    <AndroidResource Include="Resources\drawable\circle.axml" />
     <AndroidResource Include="Resources\drawable\line_divider.axml" />
     <AndroidResource Include="Resources\drawable\rounded_background.xml" />
-    <AndroidResource Include="Resources\drawable-hdpi\arrow_right.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\email.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\folder.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\folder_draft.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\folder_outgoing.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\folder_spam.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\folder_worktray.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\arrow_right.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\email.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\folder.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\folder_draft.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\folder_outgoing.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\folder_spam.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\folder_worktray.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\arrow_right.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\email.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\folder.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\folder_draft.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\folder_outgoing.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\folder_spam.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\folder_worktray.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\arrow_right.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\email.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\folder.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_draft.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_outgoing.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_spam.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_worktray.png" />
     <AndroidResource Include="Resources\layout\activity_login.axml" />
     <AndroidResource Include="Resources\layout\activity_splash.axml" />
     <AndroidResource Include="Resources\layout\appbar.axml" />
@@ -405,7 +400,7 @@
     <AndroidResource Include="Resources\layout\drawer_header.axml" />
     <AndroidResource Include="Resources\layout\linear_layout_contact.axml" />
     <AndroidResource Include="Resources\layout\linear_layout_with_button.axml" />
-    <AndroidResource Include="Resources\layout\linear_layout_with_progress.axml" />
+    <AndroidResource Include="Resources\layout\linear_layout_with_buttons_and_progress.axml" />
     <AndroidResource Include="Resources\layout\list.axml" />
     <AndroidResource Include="Resources\layout\list_comments.axml" />
     <AndroidResource Include="Resources\layout\list_item_categories.axml" />
@@ -413,7 +408,7 @@
     <AndroidResource Include="Resources\layout\list_item_contacts.axml" />
     <AndroidResource Include="Resources\layout\list_item_documents.axml" />
     <AndroidResource Include="Resources\layout\list_item_documents_external.axml" />
-    <AndroidResource Include="Resources\layout\list_item_folder.axml" />
+    <AndroidResource Include="Resources\layout\list_item_folders.axml" />
     <AndroidResource Include="Resources\layout\list_item_notifications.axml" />
     <AndroidResource Include="Resources\layout\list_item_section.axml" />
     <AndroidResource Include="Resources\layout\list_item_shortcodes.axml" />
@@ -435,17 +430,8 @@
     <AndroidResource Include="Resources\values\strings.axml" />
     <AndroidResource Include="Resources\values\style.axml" />
     <AndroidResource Include="Resources\values\values-preferences.axml" />
-    <AndroidResource Include="Resources\values-v21\style.axml" />
     <AndroidResource Include="Resources\xml\filepaths.xml" />
     <AndroidResource Include="Resources\layout\suggestion_dropdown.axml" />
-    <AndroidResource Include="Resources\drawable-hdpi\error.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\error.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\error.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\error.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\add_attachment.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\add_attachment.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\add_attachment.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\add_attachment.png" />
     <AndroidResource Include="Resources\layout\list_item_documents_outgoing.axml" />
     <AndroidResource Include="Resources\xml\preferences.axml" />
     <AndroidResource Include="Resources\values\values-googleservices.axml" />
@@ -453,87 +439,33 @@
     <AndroidResource Include="Resources\mipmap-xhdpi\ic_icon_lollipop.png" />
     <AndroidResource Include="Resources\mipmap-xxhdpi\ic_icon_lollipop.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_icon_lollipop.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\search.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\search.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\search.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\search.png" />
+    <AndroidResource Include="Resources\values\strings-arrays.axml" />
+    <AndroidResource Include="Resources\layout\selected_overlay.axml" />
+    <AndroidResource Include="Resources\anim\enter_from_right.xml" />
+    <AndroidResource Include="Resources\anim\exit_to_left.xml" />
+    <AndroidResource Include="Resources\anim\exit_to_right.xml" />
+    <AndroidResource Include="Resources\anim\enter_from_left.xml" />
+    <AndroidResource Include="Resources\anim\no_change.xml" />
+    <AndroidResource Include="Resources\anim\slide_up.xml" />
+    <AndroidResource Include="Resources\anim\slide_down.xml" />
+    <AndroidResource Include="Resources\anim\fade_in.xml" />
+    <AndroidResource Include="Resources\anim\fade_out.xml" />
+    <AndroidResource Include="Resources\anim\exit_to_left_half.xml" />
+    <AndroidResource Include="Resources\anim\enter_from_left_half.xml" />
+    <AndroidResource Include="Resources\drawable\tab_background.axml" />
+    <AndroidResource Include="Resources\layout\linear_layout_with_progress.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_attachment.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_filter.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_new.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_search_server.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_send.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\arrow_right.png" />
     <AndroidResource Include="Resources\drawable-hdpi\attachment.png" />
     <AndroidResource Include="Resources\drawable-hdpi\comment.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\draft.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\drawer_header_background.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\incoming.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\logo.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\nav_calendar.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\nav_contacts.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\nav_documents.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\nav_notifications.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\nav_search.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\nav_settings.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\nav_shortcodes.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\outgoing.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\unread.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\attachment.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\comment.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\draft.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\drawer_header_background.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\incoming.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\logo.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\nav_calendar.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\nav_contacts.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\nav_documents.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\nav_notifications.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\nav_search.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\nav_settings.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\nav_shortcodes.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\outgoing.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\unread.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\attachment.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\comment.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\draft.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\drawer_header_background.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\incoming.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\logo.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\nav_calendar.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\nav_contacts.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\nav_documents.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\nav_notifications.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\nav_search.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\nav_settings.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\nav_shortcodes.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\outgoing.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\unread.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\attachment.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\comment.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\draft.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\drawer_header_background.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\incoming.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\logo.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_calendar.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_contacts.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_documents.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_notifications.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_search.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_settings.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_shortcodes.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\outgoing.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\unread.png" />
-    <AndroidResource Include="Resources\values\strings-arrays.axml" />
-    <AndroidResource Include="Resources\drawable-hdpi\failed.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\pending.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\failed.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\pending.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\failed.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\pending.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\failed.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\pending.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\action_attachment.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\action_new.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\action_search.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\action_send.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\contact_fax.png" />
     <AndroidResource Include="Resources\drawable-hdpi\contacts_company.png" />
     <AndroidResource Include="Resources\drawable-hdpi\contacts_department.png" />
     <AndroidResource Include="Resources\drawable-hdpi\contacts_email.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\contacts_fax.png" />
     <AndroidResource Include="Resources\drawable-hdpi\contacts_im.png" />
     <AndroidResource Include="Resources\drawable-hdpi\contacts_internal.png" />
     <AndroidResource Include="Resources\drawable-hdpi\contacts_mobile.png" />
@@ -541,11 +473,33 @@
     <AndroidResource Include="Resources\drawable-hdpi\contacts_phone.png" />
     <AndroidResource Include="Resources\drawable-hdpi\contacts_skype.png" />
     <AndroidResource Include="Resources\drawable-hdpi\contacts_telex.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\draft.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\failed.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\forward.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\incoming.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\logo.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\nav_contacts.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\nav_documents.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\nav_settings.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\nav_shortcodes.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\outgoing.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\pending.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\reply.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\replyall.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\unread.png" />
     <AndroidResource Include="Resources\drawable-hdpi\sending.png" />
+    <AndroidResource Include="Resources\drawable\circle.axml" />
     <AndroidResource Include="Resources\drawable-xhdpi\action_attachment.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_filter.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\action_new.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\action_search.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_search_server.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\action_send.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\arrow_right.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\attachment.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\comment.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\contacts_company.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\contacts_department.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\contacts_email.png" />
@@ -557,11 +511,32 @@
     <AndroidResource Include="Resources\drawable-xhdpi\contacts_phone.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\contacts_skype.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\contacts_telex.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\draft.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\failed.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\forward.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\incoming.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\logo.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\nav_contacts.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\nav_documents.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\nav_settings.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\nav_shortcodes.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\outgoing.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\pending.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\reply.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\replyall.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\sending.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\unread.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\action_attachment.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_filter.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\action_new.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\action_search.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_search_server.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\action_send.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\arrow_right.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\attachment.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\comment.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\contacts_company.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\contacts_department.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\contacts_email.png" />
@@ -573,10 +548,32 @@
     <AndroidResource Include="Resources\drawable-xxhdpi\contacts_phone.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\contacts_skype.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\contacts_telex.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\draft.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\failed.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\forward.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\incoming.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\logo.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\nav_contacts.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\nav_documents.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\nav_settings.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\nav_shortcodes.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\outgoing.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\pending.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\reply.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\replyall.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\sending.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\unread.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\action_attachment.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_filter.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\action_new.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\action_search.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_search_server.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_send.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\arrow_right.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\attachment.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\comment.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_company.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_department.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_email.png" />
@@ -588,29 +585,85 @@
     <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_phone.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_skype.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_telex.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\draft.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\failed.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\forward.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\incoming.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\logo.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_contacts.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_documents.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_settings.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_shortcodes.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\outgoing.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\pending.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\reply.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\replyall.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\sending.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\action_send.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\unread.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_new.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_text.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_call.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_map.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_new.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_text.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_call.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_map.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_new.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_text.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_call.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_map.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_new.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_text.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_call.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_map.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_company.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_person.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_department.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_company.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_department.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_person.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_company.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_department.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_person.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_company.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_department.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_person.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\map.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\map.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\map.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\map.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\anim\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Resources\drawable-xhdpi\" />
+    <Folder Include="Resources\drawable-xxhdpi\" />
+    <Folder Include="Resources\drawable-xxxhdpi\" />
+    <Folder Include="Resources\drawable-hdpi\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
-  <Import Project="..\packages\Xamarin.Build.Download.0.4.2\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.2\build\Xamarin.Build.Download.targets')" />
-  <Import Project="..\packages\Xamarin.GooglePlayServices.Basement.42.1001.0\build\MonoAndroid70\Xamarin.GooglePlayServices.Basement.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Basement.42.1001.0\build\MonoAndroid70\Xamarin.GooglePlayServices.Basement.targets')" />
-  <Import Project="..\packages\Xamarin.GooglePlayServices.Tasks.42.1001.0\build\MonoAndroid70\Xamarin.GooglePlayServices.Tasks.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Tasks.42.1001.0\build\MonoAndroid70\Xamarin.GooglePlayServices.Tasks.targets')" />
-  <Import Project="..\packages\Xamarin.Firebase.Common.42.1001.0\build\MonoAndroid70\Xamarin.Firebase.Common.targets" Condition="Exists('..\packages\Xamarin.Firebase.Common.42.1001.0\build\MonoAndroid70\Xamarin.Firebase.Common.targets')" />
-  <Import Project="..\packages\Xamarin.Firebase.Iid.42.1001.0\build\MonoAndroid70\Xamarin.Firebase.Iid.targets" Condition="Exists('..\packages\Xamarin.Firebase.Iid.42.1001.0\build\MonoAndroid70\Xamarin.Firebase.Iid.targets')" />
-  <Import Project="..\packages\Xamarin.Firebase.Messaging.42.1001.0\build\MonoAndroid70\Xamarin.Firebase.Messaging.targets" Condition="Exists('..\packages\Xamarin.Firebase.Messaging.42.1001.0\build\MonoAndroid70\Xamarin.Firebase.Messaging.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.Compat.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.Compat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Compat.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.Compat.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.Core.UI.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.Core.UI.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Core.UI.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.Core.UI.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.Core.Utils.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.Core.Utils.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Core.Utils.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.Core.Utils.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.Media.Compat.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.Media.Compat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Media.Compat.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.Media.Compat.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.Fragment.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.Fragment.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Fragment.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.Fragment.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.Transition.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.Transition.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Transition.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.Transition.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.v4.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.v4.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v4.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.v4.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.v7.CardView.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.v7.CardView.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.CardView.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.v7.CardView.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.v7.RecyclerView.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.v7.RecyclerView.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.RecyclerView.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.v7.RecyclerView.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.Vector.Drawable.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.Vector.Drawable.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Vector.Drawable.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.Vector.Drawable.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.Animated.Vector.Drawable.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.Animated.Vector.Drawable.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.v7.AppCompat.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.v7.AppCompat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.AppCompat.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.v7.AppCompat.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.Design.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.Design.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Design.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.Design.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.v7.Preference.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.v7.Preference.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.Preference.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.v7.Preference.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.v14.Preference.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.v14.Preference.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v14.Preference.25.1.1\build\MonoAndroid70\Xamarin.Android.Support.v14.Preference.targets')" />
+  <Import Project="..\packages\Xamarin.Build.Download.0.3.0\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.3.0\build\Xamarin.Build.Download.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Compat.25.0.1-rc1\build\Xamarin.Android.Support.Compat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Compat.25.0.1-rc1\build\Xamarin.Android.Support.Compat.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Core.UI.25.0.1-rc1\build\Xamarin.Android.Support.Core.UI.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Core.UI.25.0.1-rc1\build\Xamarin.Android.Support.Core.UI.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Core.Utils.25.0.1-rc1\build\Xamarin.Android.Support.Core.Utils.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Core.Utils.25.0.1-rc1\build\Xamarin.Android.Support.Core.Utils.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Media.Compat.25.0.1-rc1\build\Xamarin.Android.Support.Media.Compat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Media.Compat.25.0.1-rc1\build\Xamarin.Android.Support.Media.Compat.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Fragment.25.0.1-rc1\build\Xamarin.Android.Support.Fragment.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Fragment.25.0.1-rc1\build\Xamarin.Android.Support.Fragment.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v4.25.0.1-rc1\build\Xamarin.Android.Support.v4.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v4.25.0.1-rc1\build\Xamarin.Android.Support.v4.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v7.RecyclerView.25.0.1-rc1\build\Xamarin.Android.Support.v7.RecyclerView.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.RecyclerView.25.0.1-rc1\build\Xamarin.Android.Support.v7.RecyclerView.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Vector.Drawable.25.0.1-rc1\build\Xamarin.Android.Support.Vector.Drawable.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Vector.Drawable.25.0.1-rc1\build\Xamarin.Android.Support.Vector.Drawable.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.25.0.1-rc1\build\Xamarin.Android.Support.Animated.Vector.Drawable.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.25.0.1-rc1\build\Xamarin.Android.Support.Animated.Vector.Drawable.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v7.AppCompat.25.0.1-rc1\build\Xamarin.Android.Support.v7.AppCompat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.AppCompat.25.0.1-rc1\build\Xamarin.Android.Support.v7.AppCompat.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Design.25.0.1-rc1\build\Xamarin.Android.Support.Design.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Design.25.0.1-rc1\build\Xamarin.Android.Support.Design.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v7.Preference.25.0.1-rc1\build\Xamarin.Android.Support.v7.Preference.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.Preference.25.0.1-rc1\build\Xamarin.Android.Support.v7.Preference.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v14.Preference.25.0.1-rc1\build\Xamarin.Android.Support.v14.Preference.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v14.Preference.25.0.1-rc1\build\Xamarin.Android.Support.v14.Preference.targets')" />
+  <Import Project="..\packages\Xamarin.GooglePlayServices.Basement.42.1001.0-beta2\build\Xamarin.GooglePlayServices.Basement.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Basement.42.1001.0-beta2\build\Xamarin.GooglePlayServices.Basement.targets')" />
+  <Import Project="..\packages\Xamarin.GooglePlayServices.Tasks.42.1001.0-beta2\build\Xamarin.GooglePlayServices.Tasks.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Tasks.42.1001.0-beta2\build\Xamarin.GooglePlayServices.Tasks.targets')" />
+  <Import Project="..\packages\Xamarin.Firebase.Common.42.1001.0-beta2\build\Xamarin.Firebase.Common.targets" Condition="Exists('..\packages\Xamarin.Firebase.Common.42.1001.0-beta2\build\Xamarin.Firebase.Common.targets')" />
+  <Import Project="..\packages\Xamarin.Firebase.Iid.42.1001.0-beta2\build\Xamarin.Firebase.Iid.targets" Condition="Exists('..\packages\Xamarin.Firebase.Iid.42.1001.0-beta2\build\Xamarin.Firebase.Iid.targets')" />
+  <Import Project="..\packages\Xamarin.Firebase.Messaging.42.1001.0-beta2\build\Xamarin.Firebase.Messaging.targets" Condition="Exists('..\packages\Xamarin.Firebase.Messaging.42.1001.0-beta2\build\Xamarin.Firebase.Messaging.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v7.CardView.25.0.1-rc1\build\Xamarin.Android.Support.v7.CardView.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.CardView.25.0.1-rc1\build\Xamarin.Android.Support.v7.CardView.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Transition.25.0.1-rc1\build\Xamarin.Android.Support.Transition.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Transition.25.0.1-rc1\build\Xamarin.Android.Support.Transition.targets')" />
 </Project>

@@ -4,20 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="56dp">
-    <View
-        android:id="@+id/selected_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        android:background="@color/lightbrown" />
+    android:layout_height="wrap_content">
+    <include
+        layout="@layout/selected_overlay" />
     <android.support.v7.widget.LinearLayoutCompat
         android:id="@+id/list_item_contact_internal_Layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:paddingRight="16dp"
+        android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:background="?attr/selectableItemBackground">
@@ -27,34 +20,25 @@
             android:layout_height="match_parent"
             android:layout_marginRight="12dp"
             android:orientation="vertical" />
-        <android.support.v7.widget.AppCompatTextView
-            android:id="@+id/list_item_contact_letter"
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/list_item_contact_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginRight="16dp"
+            android:padding="8dp"
+            android:tint="@color/darkgray"
             android:background="@drawable/circle"
-            android:textAppearance="@style/fontListCircle"
-            android:textColor="@color/white"
             android:gravity="center" />
-        <android.support.v7.widget.LinearLayoutCompat
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/list_item_contact_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:paddingRight="8dp"
             android:gravity="center_vertical"
-            android:orientation="vertical">
-            <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/list_item_contact_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/fontListPrimary"
-                android:maxLines="1"
-                android:ellipsize="end" />
-            <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/list_item_contact_desc"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/fontListSmallLight"
-                android:maxLines="1"
-                android:ellipsize="end" />
-        </android.support.v7.widget.LinearLayoutCompat>
+            android:textAppearance="@style/fontListPrimary"
+            android:maxLines="1"
+            android:ellipsize="end" />
     </android.support.v7.widget.LinearLayoutCompat>
 </FrameLayout>

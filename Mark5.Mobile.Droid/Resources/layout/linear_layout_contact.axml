@@ -10,18 +10,132 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:theme="@style/Widget.AppCompat.ProgressBar" />
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/scroll_view"
+        android:theme="@style/mark5progressbardark" />
+    <RelativeLayout
+        android:id="@+id/relative_layout"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone">
         <android.support.v7.widget.LinearLayoutCompat
-            android:id="@+id/linear_layout"
-            android:orientation="vertical"
+            android:id="@+id/header_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:paddingBottom="16dp"
+            android:background="@color/darkerblue">
+            <android.support.v7.widget.LinearLayoutCompat
+                android:id="@+id/buttons_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+                <android.support.v7.widget.LinearLayoutCompat
+                    android:id="@+id/button1_layout"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginRight="6dp"
+                    android:gravity="center"
+                    android:alpha="0.4"
+                    android:clickable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless">
+                    <android.support.v7.widget.AppCompatImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/large_new"
+                        android:tint="@color/lightgray" />
+                    <android.support.v7.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/email"
+                        android:textAppearance="@style/fontPrimary"
+                        android:textColor="@color/lightgray" />
+                </android.support.v7.widget.LinearLayoutCompat>
+                <android.support.v7.widget.LinearLayoutCompat
+                    android:id="@+id/button2_layout"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginRight="6dp"
+                    android:gravity="center"
+                    android:alpha="0.4"
+                    android:clickable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless">
+                    <android.support.v7.widget.AppCompatImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/large_call"
+                        android:tint="@color/lightgray" />
+                    <android.support.v7.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/call"
+                        android:textAppearance="@style/fontPrimary"
+                        android:textColor="@color/lightgray" />
+                </android.support.v7.widget.LinearLayoutCompat>
+                <android.support.v7.widget.LinearLayoutCompat
+                    android:id="@+id/button3_layout"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginRight="6dp"
+                    android:gravity="center"
+                    android:alpha="0.4"
+                    android:clickable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless">
+                    <android.support.v7.widget.AppCompatImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/large_text"
+                        android:tint="@color/lightgray" />
+                    <android.support.v7.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text"
+                        android:textAppearance="@style/fontPrimary"
+                        android:textColor="@color/lightgray" />
+                </android.support.v7.widget.LinearLayoutCompat>
+                <android.support.v7.widget.LinearLayoutCompat
+                    android:id="@+id/button4_layout"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginRight="6dp"
+                    android:gravity="center"
+                    android:alpha="0.4"
+                    android:clickable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless">
+                    <android.support.v7.widget.AppCompatImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/large_map"
+                        android:tint="@color/lightgray" />
+                    <android.support.v7.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/map"
+                        android:textAppearance="@style/fontPrimary"
+                        android:textColor="@color/lightgray" />
+                </android.support.v7.widget.LinearLayoutCompat>
+            </android.support.v7.widget.LinearLayoutCompat>
+        </android.support.v7.widget.LinearLayoutCompat>
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/scroll_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbars="vertical"
-            android:fadeScrollbars="true" />
-    </android.support.v4.widget.NestedScrollView>
+            android:layout_below="@id/header_view">
+            <android.support.v7.widget.LinearLayoutCompat
+                android:id="@+id/linear_layout"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="vertical"
+                android:fadeScrollbars="true" />
+        </android.support.v4.widget.NestedScrollView>
+    </RelativeLayout>
 </FrameLayout>

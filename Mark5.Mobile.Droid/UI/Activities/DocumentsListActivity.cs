@@ -18,9 +18,11 @@ using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
+    
     [Activity]
     public class DocumentsListActivity : BaseAppCompatActivity
     {
+        
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
 
         Toolbar toolbar;
@@ -47,6 +49,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.OnCreate(savedInstanceState);
 
             CommonConfig.Logger.Info($"Creating {nameof(DocumentsListActivity)}...");
+
+            OverridePendingTransition(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left_half);
 
             SetTitle(Resource.String.documents);
             SetContentView(Resource.Layout.base_layout);
@@ -110,10 +114,18 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
         }
 
+        protected override void OnStop()
+        {
+            base.OnStop();
+
+            OverridePendingTransition(Resource.Animation.enter_from_left_half, Resource.Animation.exit_to_right);
+        }
+
         protected override void OnSaveInstanceState(Bundle outState)
         {
             outState.PutString(dlfFragmentTagKey, dlfFragmentTag);
             outState.PutString(odlfFragmentTagKey, odlfFragmentTag);
+
             base.OnSaveInstanceState(outState);
         }
 

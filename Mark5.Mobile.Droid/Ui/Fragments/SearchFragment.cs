@@ -36,7 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             pager = rootView.FindViewById<ViewPager>(Resource.Id.pager);
             pager.OffscreenPageLimit = 2;
             pager.AddOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-            pager.Adapter = new SearchPagerAdapter(ChildFragmentManager);
+            pager.Adapter = new PagerAdapter(ChildFragmentManager);
 
             tabLayout.TabSelected += (sender, e) => pager.CurrentItem = e.Tab.Position;
 
@@ -54,7 +54,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnViewCreated(view, savedInstanceState);
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = string.Empty;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(SearchFragment)}");
         }
@@ -87,15 +87,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int SelectedTab { get; set; }
         }
 
-        class SearchPagerAdapter : FragmentPagerAdapter
+        class PagerAdapter : FragmentPagerAdapter
         {
 
-            public override int Count
+            public override int Count { get { return 3; } }
+
+            public PagerAdapter(FragmentManager fm)
+                : base(fm)
             {
-                get
-                {
-                    return 3;
-                }
             }
 
             public override Fragment GetItem(int position)
@@ -111,11 +110,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     default:
                         return null;
                 }
-            }
-
-            public SearchPagerAdapter(FragmentManager fm)
-                : base(fm)
-            {
             }
         }
     }

@@ -60,6 +60,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnViewCreated(view, savedInstanceState);
 
             //((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_shortcodes);
+            //((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(ShortcodesSearchCriteriaFragment)}");
         }

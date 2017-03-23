@@ -31,6 +31,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Creating {nameof(ObjectActionsActivity)}...");
 
+            OverridePendingTransition(Resource.Animation.slide_up, Resource.Animation.no_change);
+
             SetTitle(Resource.String.actions);
             SetContentView(Resource.Layout.base_layout);
 
@@ -55,6 +57,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 CommonConfig.Logger.Info($"Restored {nameof(ObjectActionsActivity)}");
             }
+        }
+
+        public override void OnBackPressed()
+        {
+            base.OnBackPressed();
+
+            OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
         }
     }
 }

@@ -14,6 +14,7 @@ using Android.App;
 using Android.Content;
 using Android.Database;
 using Android.Provider;
+using Android.Support.Design.Widget;
 using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -56,6 +57,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         Document Document { get; set; } = new Document();
         DocumentPreview DocumentPreview { get; set; } = new DocumentPreview();
 
+        ProgressBar progress;
+        ScrollView scrollView;
+        LinearLayoutCompat linearLayout;
         ToView toView;
         CcView ccView;
         BccView bccView;
@@ -64,13 +68,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         SubjectView subjectView;
         AttachmentsView attachmentsView;
         ContentView contentView;
+        FloatingActionButton fab;
 
-        IMenu optionsMenu;
         List<ComposeDocumentView> subViews = new List<ComposeDocumentView>();
 
-        ProgressBar progress;
-        ScrollView scrollView;
-        LinearLayoutCompat linearLayout;
         bool documentShown;
         bool templateLoaded;
 
@@ -120,11 +121,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             foreach (var subview in subViews)
             {
                 linearLayout.AddView(subview);
-                if (subview != contentView)
-                {
+                if (subview != attachmentsView && subview != contentView)
                     linearLayout.AddView(new Divider(Context));
-                }
             }
+
+            fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab.SetImageResource(Resource.Drawable.action_send);
+            fab.SetOnClickListener(new ActionOnClickListener(() => SendDocument()));
+            fab.Enabled = false;
+            fab.Alpha = 0.6f;
+            fab.Visibility = ViewStates.Visible;
 
             HasOptionsMenu = true;
 
@@ -136,21 +142,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnResume();
 
             if (OutgoingDocumentGuid == Guid.Empty)
-            {
                 OutgoingDocumentGuid = Guid.NewGuid();
-            }
 
             await LoadDocument();
 
-            Activity.InvalidateOptionsMenu();
+            UpdateSendButtonState();
         }
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
             if (requestCode == AttachmentRequestCode && resultCode == (int)Result.Ok)
-            {
                 HandleLocalAttachment(data);
-            }
         }
 
         async Task LoadDocument()
@@ -174,14 +176,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     PreviousDocumentFolderId = outgoingContainer.Info.PreviousDocumentdFolderId;
                     OutgoingDocumentState = outgoingContainer.Info.State;
                     OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag;
+
                     if (outgoingContainer.Info.State == OutgoingDocumentState.Failed)
-                    {
                         await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(Resource.String.error_while_sending_document)));
-                    }
+
                     if (outgoingContainer.LocalAttachments != null)
-                    {
                         OutgoingDocumentInitialAttachments.AddRange(outgoingContainer.LocalAttachments);
-                    }
                 }
                 else
                 {
@@ -189,10 +189,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, sourceType);
                     PreviousDocument = container.Document;
                     PreviousDocumentPreview = container.DocumentPreview;
+
                     if (CreationModeFlag == DocumentCreationModeFlag.Edit && PreviousDocumentPreview.Direction == DocumentDirection.Draft)
-                    {
                         Document.Id = DocumentPreview.Id = PreviousDocument.Id;
-                    }
                 }
 
                 dismissAction();
@@ -205,16 +204,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null) CloseRequest();
+                if (CloseRequest != null)
+                    CloseRequest();
             }
         }
 
         async Task ShowDocument()
         {
             if (documentShown)
-            {
                 return;
-            }
 
             documentShown = true;
 
@@ -250,6 +248,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void Subview_Edited(object sender, EventArgs e)
         {
             ((AppCompatActivity)Activity).SupportActionBar.Title = !subjectView.Empty ? subjectView.Subject : GetString(Resource.String.new_document);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+
             UpdateSendButtonState();
 
             if (sender is LineView && PlatformConfig.Preferences.RemoveLine && CreationModeFlag == DocumentCreationModeFlag.ReplyAll
@@ -274,7 +274,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
 
-                string path = null; 
+                string path = null;
 
                 var outgoingAttachment = attachment as OutgoingDocumentAttachmentDescription;
                 if (outgoingAttachment != null)
@@ -303,9 +303,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 if (string.IsNullOrWhiteSpace(path))
-                {
                     throw new Exception("Unable to get attachment path.");
-                }
 
                 try
                 {
@@ -316,7 +314,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     openFileIntent.SetDataAndType(uri, mimeType);
                     openFileIntent.AddFlags(ActivityFlags.NewTask);
                     openFileIntent.AddFlags(ActivityFlags.GrantReadUriPermission);
-                    Intent chooser = Intent.CreateChooser(openFileIntent, Resources.GetString(Resource.String.choose_application));
+                    var chooser = Intent.CreateChooser(openFileIntent, Resources.GetString(Resource.String.choose_application));
                     Context.StartActivity(chooser);
                 }
                 catch (Exception ex)
@@ -339,9 +337,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     try
                     {
                         if (!LocalDocument)
-                        {
                             await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, outgoingAttachment.Name);
-                        }
+
                         attachmentsView.RemoveAttachment(sender, outgoingAttachment);
                     }
                     catch (Exception ex)
@@ -362,7 +359,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Actions
 
-        // It would be a good idea to refactor this method to use async/await
         void SendDocument(bool draft = false)
         {
             Action sendAction = () =>
@@ -372,9 +368,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Task.Run(async () =>
                 {
                     foreach (var subView in subViews)
-                    {
                         await subView.UpdateDocument();
-                    }
 
                     DocumentPreview.Direction = draft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
                     if (LocalDocument)
@@ -407,13 +401,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             };
 
             if (new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllEmailsValid))
-            {
                 sendAction();
-            }
             else
-            {
                 Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_title, Resource.String.invalid_emails_content, sendAction, null);
-            }
         }
 
         void SaveModifiedOutgoingDocument()
@@ -426,9 +416,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Task.Run(async () =>
             {
                 foreach (var subView in subViews)
-                {
                     await subView.UpdateDocument();
-                }
 
                 await SynchOutgoingAttachments(false);
                 await Managers.DocumentsManager.SaveOutgoingDocumentAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag,
@@ -442,26 +430,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                    await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
                }
                else
-               {
                    Activity.Finish();
-               }
            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         public void AskIfShouldSave()
         {
             if (LocalDocument)
-            {
                 Dialogs.ShowYesNoDialog(Context, Resource.String.save_modifications, Resource.String.confirm_save_modified_document, SaveModifiedOutgoingDocument, SaveAndCloseComposeActivity);
-            }
             else if (PreviousDocumentDirection == DocumentDirection.Draft)
-            {
                 Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_change_draft, () => SendDocument(true), SaveAndCloseComposeActivity);
-            }
             else
-            {
                 Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft, () => SendDocument(true), SaveAndCloseComposeActivity);
-            }
         }
 
         void SaveAndCloseComposeActivity()
@@ -589,37 +569,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         static class MenuItemActions
         {
             public const int AddAttachment = 10;
-            public const int SendDocument = 20;
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
-            optionsMenu = menu;
-            optionsMenu.Clear();
+            menu.Clear();
 
             var attachmentItem = menu.Add(Menu.None, MenuItemActions.AddAttachment, MenuItemActions.AddAttachment, Resource.String.add_attachment);
             attachmentItem.SetIcon(Resource.Drawable.action_attachment);
             attachmentItem.SetShowAsAction(ShowAsAction.Always);
-
-            if (!LocalDocument || LocalDocument && OutgoingDocumentState == OutgoingDocumentState.Failed)
-            {
-                var sendItem = optionsMenu.Add(Menu.None, MenuItemActions.SendDocument, MenuItemActions.SendDocument, Resource.String.send);
-                sendItem.SetIcon(Resource.Drawable.action_send);
-                sendItem.SetShowAsAction(ShowAsAction.Always);
-                UpdateSendButtonState();
-            }
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            if (item.ItemId == MenuItemActions.SendDocument)
-            {
-                SendDocument();
-            }
             if (item.ItemId == MenuItemActions.AddAttachment)
-            {
                 AddAttachment();
-            }
 
             return true;
         }
@@ -635,37 +599,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void UpdateSendButtonState()
         {
-            if (optionsMenu == null)
-            {
-                return;
-            }
+            var isFormValid = IsFormValid();
 
-            var sendItem = optionsMenu.FindItem(MenuItemActions.SendDocument);
-            if (sendItem != null)
-            {
-                var isFormValid = IsFormValid();
-                sendItem.SetEnabled(isFormValid);
-                sendItem.Icon.Mutate().Alpha = isFormValid ? 255 : 130; //Change of alpha is not done for icons automatically 
-            }
+            fab.Enabled = isFormValid;
+            fab.Alpha = isFormValid ? 1f : 0.6f;
         }
 
         bool IsFormValid()
         {
             var recipientAdded = false;
             foreach (var recipientView in new List<RecipientsView> { toView, ccView, bccView })
-            {
                 recipientAdded |= !recipientView.Empty;
-            }
 
             if (!recipientAdded)
-            {
                 return false;
-            }
 
             if (subjectView.Empty)
-            {
                 return false;
-            }
 
             return !lineView.LineSelectedIsAmbiguous;
         }
@@ -677,9 +627,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         async Task AskIfShouldUseTemplates()
         {
             if (templateLoaded)
-            {
                 return;
-            }
 
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
@@ -689,18 +637,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var useTemplate = PlatformConfig.Preferences.UseTemplate;
             if (useTemplate == Preferences.TemplateUsageMode.DontUse)
-            {
                 return;
-            }
 
             if (useTemplate == Preferences.TemplateUsageMode.Local)
-            {
                 await GetLocalTemplate();
-            }
             else if (useTemplate == Preferences.TemplateUsageMode.Default)
-            {
                 await GetDefaultTemplate();
-            }
             else if (useTemplate == Preferences.TemplateUsageMode.AlwaysAsk)
             {
                 var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, Resource.Array.template_question_options, true);
@@ -803,9 +745,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var template = await Managers.DocumentsManager.GetTemplateAsync(templatePreview.Id);
                 if (template != null)
-                {
                     await ApplyTemplate(template);
-                }
             }
             catch (Exception ex)
             {
@@ -827,9 +767,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             await contentView.InsertTemplate(template);
 
             if (!string.IsNullOrEmpty(template.Subject))
-            {
                 subjectView.SetSubject(template.Subject);
-            }
 
             lineView.SetLineFromGuid(template.LineGuid);
         }
@@ -844,9 +782,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             string fromNameString = string.Empty;
             if (PreviousDocumentPreview != null && PreviousDocumentPreview.Addresses != null)
-            {
                 fromNameString = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Name).FirstOrDefault() ?? string.Empty;
-            }
 
             if (template.ContentType == ContentType.Html)
             {

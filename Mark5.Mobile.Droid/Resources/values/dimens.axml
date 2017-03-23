@@ -2,8 +2,10 @@
 <resources>
 	<dimen name="appbar_elevation">4dp</dimen>
 	<dimen name="nav_header_vertical_spacing">16dp</dimen>
-	<dimen name="nav_header_height">160dp</dimen>
+	<dimen name="nav_header_logo_width">120dp</dimen>
+	<dimen name="nav_header_height">180dp</dimen>
 	<dimen name="activity_horizontal_margin">16dp</dimen>
 	<dimen name="activity_vertical_margin">16dp</dimen>
 	<dimen name="fab_margin">16dp</dimen>
+	<dimen name="connection_bar_height">24dp</dimen>
 </resources>

@@ -22,7 +22,9 @@ namespace Mark5.Mobile.Droid.Ui.Common
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
-            CommonConfig.Logger.Debug($"Creating retainable fragment {Tag}");
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug($"Creating retainable fragment {Tag}");
 
             retainedFragment = RetainedFragment<IRetainableState>.FindOrCreate(Activity.SupportFragmentManager, Tag);
             OnRetainedInstanceStateRestored(retainedFragment.State);
@@ -55,13 +57,9 @@ namespace Mark5.Mobile.Droid.Ui.Common
             base.OnDestroy();
 
             if (destroyedBySystem)
-            {
                 OnDestroyedBySystem();
-            }
             else
-            {
                 OnDestroyedByUser();
-            }
         }
 
         public override void OnSaveInstanceState(Bundle outState)

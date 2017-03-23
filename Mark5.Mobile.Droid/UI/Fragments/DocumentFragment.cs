@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
+using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.App;
 using Android.Support.V4.Content;
@@ -54,8 +55,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public Guid NotificationGuid { get; set; }
 
         ProgressBar progress;
-        ScrollView scrollView;
+        RelativeLayout relativeLayout;
         LinearLayoutCompat linearLayout;
+        AppCompatImageView button1;
+        AppCompatImageView button2;
+        AppCompatImageView button3;
 
         CancellationTokenSource setReadStatusCancellationTokenSource;
 
@@ -63,11 +67,74 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"Creating {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}]...");
 
-            var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
+            var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_buttons_and_progress, container, false);
 
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
-            scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
+            relativeLayout = rootView.FindViewById<RelativeLayout>(Resource.Id.relative_layout);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
+            button1 = rootView.FindViewById<AppCompatImageView>(Resource.Id.button1);
+            button2 = rootView.FindViewById<AppCompatImageView>(Resource.Id.button2);
+            button3 = rootView.FindViewById<AppCompatImageView>(Resource.Id.button3);
+
+            button1.SetImageResource(Resource.Drawable.reply);
+            button1.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            button1.Enabled = false;
+            button1.Clickable = true;
+            button1.Click += (sender, e) =>
+            {
+                if (DocumentPreview == null || Document == null)
+                    return;
+
+                if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
+                {
+                    Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
+                    return;
+                }
+
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Reply, DocumentPreview.Direction, Document.Id, FolderId ?? Folder?.Id));
+            };
+            button1.LongClickable = true;
+            button1.LongClick += (sender, e) => Toast.MakeText(Context, Resource.String.reply, ToastLength.Short).Show();
+
+            button2.SetImageResource(Resource.Drawable.replyall);
+            button2.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            button2.Enabled = false;
+            button2.Clickable = true;
+            button2.Click += (sender, e) =>
+            {
+                if (DocumentPreview == null || Document == null)
+                    return;
+
+                if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
+                {
+                    Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
+                    return;
+                }
+
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.ReplyAll, DocumentPreview.Direction, Document.Id, FolderId ?? Folder?.Id));
+            };
+            button2.LongClickable = true;
+            button2.LongClick += (sender, e) => Toast.MakeText(Context, Resource.String.reply_all, ToastLength.Short).Show();
+
+            button3.SetImageResource(Resource.Drawable.forward);
+            button3.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            button3.Enabled = false;
+            button3.Clickable = true;
+            button3.Click += (sender, e) =>
+            {
+                if (DocumentPreview == null || Document == null)
+                    return;
+
+                if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
+                {
+                    Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
+                    return;
+                }
+
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Forward, DocumentPreview.Direction, Document.Id, FolderId ?? Folder?.Id));
+            };
+            button3.LongClickable = true;
+            button3.LongClick += (sender, e) => Toast.MakeText(Context, Resource.String.forward, ToastLength.Short).Show();
 
             linearLayout.AddView(new SubjectView(Context));
             linearLayout.AddView(new Divider(Context));
@@ -79,7 +146,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             av.AttachmentClicked += AttachmentsView_AttachmentClicked;
             av.AttachmentLongClicked += AttachmentsView_AttachmentLongClicked;
             linearLayout.AddView(av);
-            linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new ContentView(Context));
 
             HasOptionsMenu = true;
@@ -92,6 +158,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnViewCreated(view, savedInstanceState);
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = string.Empty;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}]");
         }
@@ -135,19 +202,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public const int MarkAsRead = 10;
             public const int MarkAsUnread = 11;
-            public const int Reply = 20;
-            public const int ReplyAll = 21;
-            public const int Forward = 22;
-            public const int CopyToWorktray = 30;
-            public const int CopyToFolder = 40;
-            public const int MoveToFolder = 41;
-            public const int SetPriority = 50;
-            public const int Categories = 60;
-            public const int Comments = 70;
-            public const int Actions = 80;
-            public const int Links = 90;
-            public const int DeleteFromFolder = 100;
-            public const int Delete = 101;
+            public const int CopyToWorktray = 20;
+            public const int CopyToFolder = 30;
+            public const int MoveToFolder = 31;
+            public const int SetPriority = 40;
+            public const int Categories = 50;
+            public const int Comments = 60;
+            public const int Actions = 70;
+            public const int Links = 80;
+            public const int DeleteFromFolder = 90;
+            public const int Delete = 91;
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -164,9 +228,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 menu.Add(Menu.None, MenuItemActions.MarkAsUnread, MenuItemActions.MarkAsUnread, Resource.String.marks_as_unread);
             }
 
-            menu.Add(Menu.None, MenuItemActions.Reply, MenuItemActions.Reply, Resource.String.reply);
-            menu.Add(Menu.None, MenuItemActions.ReplyAll, MenuItemActions.ReplyAll, Resource.String.reply_all);
-            menu.Add(Menu.None, MenuItemActions.Forward, MenuItemActions.Forward, Resource.String.forward);
             menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
             menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
 
@@ -207,7 +268,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var isDocumentReady = Document != null;
 
-            var menuItemIds = new List<int> { MenuItemActions.Comments, MenuItemActions.Reply, MenuItemActions.ReplyAll, MenuItemActions.Forward };
+            var menuItemIds = new List<int> { MenuItemActions.Comments };
             foreach (var itemId in menuItemIds)
             {
                 var menuItem = menu.FindItem(itemId);
@@ -226,28 +287,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.MarkAsUnread)
             {
                 MarkAsUnread();
-                return true;
-            }
-
-            if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any() && (item.ItemId == MenuItemActions.Reply || item.ItemId == MenuItemActions.ReplyAll || item.ItemId == MenuItemActions.Forward))
-            {
-                Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
-                return true;
-            }
-
-            if (item.ItemId == MenuItemActions.Reply)
-            {
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Reply, DocumentPreview.Direction, Document.Id, FolderId ?? Folder?.Id));
-                return true;
-            }
-            if (item.ItemId == MenuItemActions.ReplyAll)
-            {
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.ReplyAll, DocumentPreview.Direction, Document.Id, FolderId ?? Folder?.Id));
-                return true;
-            }
-            if (item.ItemId == MenuItemActions.Forward)
-            {
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Forward, DocumentPreview.Direction, Document.Id, FolderId ?? Folder?.Id));
                 return true;
             }
 
@@ -640,8 +679,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void RefreshView()
         {
+            button1.Enabled = true;
+            button2.Enabled = true;
+            button3.Enabled = true;
+
             progress.Visibility = ViewStates.Gone;
-            scrollView.Visibility = ViewStates.Visible;
+            relativeLayout.Visibility = ViewStates.Visible;
 
             for (var i = 0; i < linearLayout.ChildCount; i++)
             {
@@ -670,7 +713,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void RefreshView<T>() where T : DocumentView
         {
             progress.Visibility = ViewStates.Gone;
-            scrollView.Visibility = ViewStates.Visible;
+            relativeLayout.Visibility = ViewStates.Visible;
 
             for (var i = 0; i < linearLayout.ChildCount; i++)
             {

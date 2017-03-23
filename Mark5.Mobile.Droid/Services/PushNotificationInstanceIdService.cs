@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using Android.App;
 using Android.Content;
 using Firebase.Iid;
@@ -22,26 +23,33 @@ namespace Mark5.Mobile.Droid.Services
 
         public override void OnTokenRefresh()
         {
-            var token = FirebaseInstanceId.Instance.Token;
-
-            if (CommonConfig.Logger.IsDebugEnabled())
-                CommonConfig.Logger.Debug($"Received Firebase token: {token}");
-
-            var oldToken = PlatformConfig.Preferences.PushNotificationToken;
-            PlatformConfig.Preferences.PushNotificationToken = token;
-
-            if (Managers.ActiveConnectionInfo != null)
+            try
             {
-                CommonConfig.Logger.Info($"Sending Firebase token to service...");
+                var token = FirebaseInstanceId.Instance.Token;
 
-                if (!string.IsNullOrWhiteSpace(oldToken) && oldToken != token)
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug($"Received Firebase token: {token}");
+
+                var oldToken = PlatformConfig.Preferences.PushNotificationToken;
+                PlatformConfig.Preferences.PushNotificationToken = token;
+
+                if (Managers.ActiveConnectionInfo != null)
                 {
-                    CommonConfig.Logger.Info($"New Firebase token is different, so try to unsubscribe old one...");
+                    CommonConfig.Logger.Info($"Sending Firebase token to service...");
 
-                    Managers.NotificationsManager.UnSubscribe(DeviceType.Android, token).FireAndForget();
+                    if (!string.IsNullOrWhiteSpace(oldToken) && oldToken != token)
+                    {
+                        CommonConfig.Logger.Info($"New Firebase token is different, so try to unsubscribe old one...");
+
+                        Managers.NotificationsManager.UnSubscribe(DeviceType.Android, token).FireAndForget();
+                    }
+
+                    Managers.NotificationsManager.Subscribe(DeviceType.Android, token).FireAndForget();
                 }
-
-                Managers.NotificationsManager.Subscribe(DeviceType.Android, token).FireAndForget();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error(ex);
             }
         }
     }

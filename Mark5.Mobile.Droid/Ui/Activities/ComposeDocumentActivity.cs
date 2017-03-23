@@ -5,7 +5,6 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-
 using System;
 using System.Collections.Generic;
 using Android.App;
@@ -19,6 +18,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
+    
     [Activity]
     public class ComposeDocumentActivity : AppCompatActivity
     {
@@ -52,15 +52,15 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             intent.PutExtra(CreationModeFlagIntentKey, (int)creationModeFlag);
             intent.PutExtra(PreviousDocumentDirectionIntentKey, (int)previousDocumentDirection);
 
-            if (outgoingDocumentGuid != default(Guid))
-                intent.PutExtra(OutgoingDocumentGuidIntentKey, outgoingDocumentGuid.ToString());
-
             if (precedingDocumentId != null)
                 intent.PutExtra(PreviousDocumentIdIntentKey, precedingDocumentId.Value);
 
             if (precedingDocumentFolderId != null)
                 intent.PutExtra(PreviousDocumentFolderIdIntentKey, precedingDocumentFolderId.Value);
 
+            if (outgoingDocumentGuid != default(Guid))
+                intent.PutExtra(OutgoingDocumentGuidIntentKey, outgoingDocumentGuid.ToString());
+            
             if (preconfiguredEmailToAddresses != null)
                 intent.PutExtra(PreconfiguredEmailToAddressesIntentKey, preconfiguredEmailToAddresses.ToArray());
 
@@ -78,6 +78,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.OnCreate(savedInstanceState);
 
             CommonConfig.Logger.Info($"Creating {nameof(ComposeDocumentActivity)}...");
+
+            OverridePendingTransition(Resource.Animation.slide_up, Resource.Animation.no_change);
 
             SetContentView(Resource.Layout.base_layout);
 
@@ -158,6 +160,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public override void OnBackPressed()
         {
             cdf.AskIfShouldSave();
+        }
+
+        public override void Finish()
+        {
+            base.Finish();
+
+            OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
         }
     }
 }

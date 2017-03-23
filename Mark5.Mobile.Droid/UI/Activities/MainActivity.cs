@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Android;
 using Android.Content;
 using Android.Content.PM;
+using Android.Graphics;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.App;
@@ -21,7 +22,6 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -38,8 +38,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         DrawerLayout drawer;
         SmoothActionBarDrawerToggle drawerToggle;
         NavigationView navigationView;
+        AppCompatImageView navHeaderSettingsButton;
         AppCompatTextView navHeaderTitleTextView;
-        AppCompatTextView navHeaderSubtitleTextView;
         IMenuItem lastSelectedItem;
         CoordinatorLayout coordinatorLayout;
 
@@ -54,6 +54,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.OnCreate(savedInstanceState);
 
             CommonConfig.Logger.Info($"Starting {nameof(MainActivity)}...");
+
+            OverridePendingTransition(Resource.Animation.fade_in, Resource.Animation.fade_out);
 
             SetContentView(Resource.Layout.base_layout_nav);
 
@@ -76,8 +78,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             navigationView.SetNavigationItemSelectedListener(this);
 
             var header = navigationView.GetHeaderView(0);
+
+            navHeaderSettingsButton = header.FindViewById<AppCompatImageView>(Resource.Id.nav_header_settings_button);
+            navHeaderSettingsButton.Clickable = true;
+            navHeaderSettingsButton.Click += NavHeaderSettingsButton_Click;
+
             navHeaderTitleTextView = header.FindViewById<AppCompatTextView>(Resource.Id.nav_header_title);
-            navHeaderSubtitleTextView = header.FindViewById<AppCompatTextView>(Resource.Id.nav_header_subtitle);
 
             stateFragment = RetainedFragment<MainActivityState>.FindOrCreate(SupportFragmentManager, nameof(MainActivity));
 
@@ -87,12 +93,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
                     MenuItemContents = new Dictionary<int, MenuItemContent>
                     {
-                        [Resource.Id.nav_search] = new SearchMenuItemContent(),
-                        [Resource.Id.nav_documents] = new ModulesMenuItemContent(ModuleType.Documents),
-                        [Resource.Id.nav_contacts] = new ModulesMenuItemContent(ModuleType.Contacts),
-                        [Resource.Id.nav_shortcodes] = new ModulesMenuItemContent(ModuleType.Shortcodes),
-                        [Resource.Id.nav_notifications] = new NotificationsMenuItemContent(),
-                        [Resource.Id.nav_settings] = new PreferencesMenuItemContent()
+                        [Resource.Id.nav_documents] = new MenuItemContent(ModuleType.Documents),
+                        [Resource.Id.nav_contacts] = new MenuItemContent(ModuleType.Contacts),
+                        [Resource.Id.nav_shortcodes] = new MenuItemContent(ModuleType.Shortcodes)
                     }
                 };
 
@@ -102,16 +105,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 Task.Run(async () =>
                 {
-                    var ci = await AuthenticatorFactory.Create().GetConnectionInfoAsync();
                     var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
-                    return new { ConnectionInfo = ci, SystemSettings = ss };
+                    return ss;
                 }).ContinueWith(t =>
                 {
-                    var ci = t.Result.ConnectionInfo;
-                    var ss = t.Result.SystemSettings;
+                    var ss = t.Result;
 
                     navHeaderTitleTextView.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
-                    navHeaderSubtitleTextView.Text = $"{ci?.Username}@{ci?.Hostname}:{ci?.Port}";
                 }, TaskScheduler.FromCurrentSynchronizationContext());
 
                 CommonConfig.Logger.Info($"Created {nameof(MainActivity)}");
@@ -151,8 +151,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var snackbar = Snackbar.Make(coordinatorLayout, Resource.String.permissions_snackbar_text, Snackbar.LengthIndefinite)
                                        .SetAction(Resource.String.permissions_snackbar_action, v => permissionRequestAction());
 
-                snackbar.SetActionTextColor(ContextCompat.GetColor(this, Resource.Color.brown));
-                snackbar.View.SetBackgroundColor(new Android.Graphics.Color(ContextCompat.GetColor(this, Resource.Color.darkerblue)));
+                snackbar.SetActionTextColor(ContextCompat.GetColor(this, Resource.Color.lightblue));
+                snackbar.View.SetBackgroundColor(new Color(ContextCompat.GetColor(this, Resource.Color.darkblue)));
                 snackbar.View.Clickable = true;
                 snackbar.View.Click += (sender, e) =>
                 {
@@ -186,7 +186,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.OnSaveInstanceState(outState);
 
             stateFragment.State.NavHeaderTitle = navHeaderTitleTextView.Text;
-            stateFragment.State.NavHeaderSubtitle = navHeaderSubtitleTextView.Text;
 
             stateFragment.State.LastSelectedItemId = lastSelectedItem.ItemId;
             stateFragment.State.PermissionsAsked = permissionsAsked;
@@ -197,7 +196,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.OnRestoreInstanceState(savedInstanceState);
 
             navHeaderTitleTextView.Text = stateFragment.State.NavHeaderTitle;
-            navHeaderSubtitleTextView.Text = stateFragment.State.NavHeaderSubtitle;
             permissionsAsked = stateFragment.State.PermissionsAsked;
 
             var menuItemId = stateFragment.State.LastSelectedItemId;
@@ -216,6 +214,27 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         #region Utility methods
 
+        public void LockDrawer()
+        {
+            drawer?.SetDrawerLockMode(DrawerLayout.LockModeLockedClosed);
+        }
+
+        public void UnlockDrawer()
+        {
+            drawer?.SetDrawerLockMode(DrawerLayout.LockModeUnlocked);
+        }
+
+        void NavHeaderSettingsButton_Click(object sender, EventArgs e)
+        {
+            drawerToggle.RunWhenIdle(() =>
+            {
+                var i = new Intent(this, typeof(PreferenceActivity));
+                StartActivity(i);
+            });
+
+            drawer.CloseDrawer(GravityCompat.Start);
+        }
+
         public bool OnNavigationItemSelected(IMenuItem menuItem)
         {
             CommonConfig.Logger.Info($"Switching to {menuItem.TitleFormatted}...");
@@ -225,16 +244,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (lastSelectedItem != menuItem)
                 {
                     if (lastSelectedItem != null)
-                    {
                         stateFragment.State.MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
-                    }
 
                     if (SupportFragmentManager.BackStackEntryCount > 0)
-                    {
                         SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int)Android.App.PopBackStackFlags.Inclusive);
-                    }
 
-                    stateFragment.State.MenuItemContents[menuItem.ItemId].RestoreOrCreate(SupportFragmentManager);
+                    stateFragment.State.MenuItemContents[menuItem.ItemId].CreateOrRestore(SupportFragmentManager);
 
                     lastSelectedItem = menuItem;
                 }
@@ -248,9 +263,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if (drawerToggle.OnOptionsItemSelected(item))
-            {
                 return true;
-            }
 
             return base.OnOptionsItemSelected(item);
         }
@@ -270,8 +283,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             public string NavHeaderTitle { get; set; }
 
-            public string NavHeaderSubtitle { get; set; }
-
             public int LastSelectedItemId { get; set; }
 
             public Dictionary<int, MenuItemContent> MenuItemContents { get; set; }
@@ -283,42 +294,20 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         #region MenuItemContent classes
 
-        abstract class MenuItemContent
+        class MenuItemContent
         {
 
             protected readonly List<Fragment.SavedState> BackstackStates = new List<Fragment.SavedState>();
             protected readonly List<string> SavedTags = new List<string>();
 
-            public virtual void Save(FragmentManager fm) { }
-
-            public virtual void RestoreOrCreate(FragmentManager fm) { }
-        }
-
-        class SearchMenuItemContent : MenuItemContent
-        {
-
-            public override void RestoreOrCreate(FragmentManager fm)
-            {
-                var ft = fm.BeginTransaction();
-                var pf = new SearchFragment();
-                ft.SetTransition(FragmentTransaction.TransitFragmentFade);
-                ft.Replace(Resource.Id.fragment_container, pf, "SearchFragment");
-                ft.AddToBackStack("SearchFragment");
-                ft.Commit();
-            }
-        }
-
-        class ModulesMenuItemContent : MenuItemContent
-        {
-
             protected ModuleType ModuleType { get; private set; }
 
-            public ModulesMenuItemContent(ModuleType moduleType)
+            public MenuItemContent(ModuleType moduleType)
             {
                 ModuleType = moduleType;
             }
 
-            public override void Save(FragmentManager fm)
+            public void Save(FragmentManager fm)
             {
                 BackstackStates.Clear();
                 SavedTags.Clear();
@@ -333,112 +322,58 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 }
             }
 
-            public override void RestoreOrCreate(FragmentManager fm)
+            public void CreateOrRestore(FragmentManager fm)
             {
                 if (BackstackStates == null || !BackstackStates.Any())
-                {
-                    var foldersListFragment = new FoldersListFragment
-                    {
-                        RemoteFolder = Folder.RootForModule(ModuleType)
-                    };
-
-                    var tag = foldersListFragment.GenerateTag();
-                    var ft = fm.BeginTransaction();
-                    ft.SetTransition(FragmentTransaction.TransitFragmentFade);
-                    ft.Replace(Resource.Id.fragment_container, foldersListFragment, tag);
-                    ft.AddToBackStack(tag);
-                    ft.Commit();
-                }
+                    Create(fm);
                 else
-                {
-                    var backStackStatesAndTags = BackstackStates.Zip(SavedTags, (state, tag) => new { State = state, Tag = tag });
-
-                    foreach (var item in backStackStatesAndTags)
-                    {
-                        var state = item.State;
-                        var tag = item.Tag;
-
-                        var ft = fm.BeginTransaction();
-                        var foldersListFragment = new FoldersListFragment();
-                        foldersListFragment.SetInitialSavedState(state);
-                        ft.SetTransition(FragmentTransaction.TransitFragmentFade);
-                        ft.Replace(Resource.Id.fragment_container, foldersListFragment, tag);
-                        ft.AddToBackStack(tag);
-                        ft.Commit();
-                    }
-
-                    BackstackStates.Clear();
-                    SavedTags.Clear();
-                }
-            }
-        }
-
-        class NotificationsMenuItemContent : MenuItemContent
-        {
-
-            public override void Save(FragmentManager fm)
-            {
-                BackstackStates.Clear();
-                SavedTags.Clear();
-
-                for (int i = 0; i < fm.BackStackEntryCount; i++)
-                {
-                    var tag = fm.GetBackStackEntryAt(i).Name;
-                    var fragment = fm.FindFragmentByTag(tag);
-                    var state = fm.SaveFragmentInstanceState(fragment);
-                    SavedTags.Add(tag);
-                    BackstackStates.Add(state);
-                }
+                    Restore(fm);
             }
 
-            public override void RestoreOrCreate(FragmentManager fm)
+            void Create(FragmentManager fm)
             {
-                if (BackstackStates == null || !BackstackStates.Any())
-                {
-                    var notificationsFragment = new NotificationsFragment();
+                RetainableStateFragment f = null;
 
-                    var tag = notificationsFragment.GenerateTag();
-                    var ft = fm.BeginTransaction();
-                    ft.SetTransition(FragmentTransaction.TransitFragmentFade);
-                    ft.Replace(Resource.Id.fragment_container, notificationsFragment, tag);
-                    ft.AddToBackStack(tag);
-                    ft.Commit();
-                }
-                else
-                {
-                    var backStackStatesAndTags = BackstackStates.Zip(SavedTags, (state, tag) => new { State = state, Tag = tag });
+                if (ModuleType == ModuleType.Documents)
+                    f = new FoldersNotificationsListFragment { RemoteFolder = Folder.RootForModule(ModuleType) };
+                else if (ModuleType == ModuleType.Contacts || ModuleType == ModuleType.Shortcodes || ModuleType == ModuleType.Calendar)
+                    f = new FoldersListFragment { RemoteFolder = Folder.RootForModule(ModuleType) };
 
-                    foreach (var item in backStackStatesAndTags)
-                    {
-                        var state = item.State;
-                        var tag = item.Tag;
-
-                        var ft = fm.BeginTransaction();
-                        var notificationsFragment = new NotificationsFragment();
-                        notificationsFragment.SetInitialSavedState(state);
-                        ft.SetTransition(FragmentTransaction.TransitFragmentFade);
-                        ft.Replace(Resource.Id.fragment_container, notificationsFragment, tag);
-                        ft.AddToBackStack(tag);
-                        ft.Commit();
-                    }
-
-                    BackstackStates.Clear();
-                    SavedTags.Clear();
-                }
-            }
-        }
-
-        class PreferencesMenuItemContent : MenuItemContent
-        {
-
-            public override void RestoreOrCreate(FragmentManager fm)
-            {
+                var tag = f.GenerateTag();
                 var ft = fm.BeginTransaction();
-                var pf = new PreferenceFragment();
-                ft.SetTransition(FragmentTransaction.TransitFragmentFade);
-                ft.Replace(Resource.Id.fragment_container, pf, "PreferenceFragment");
-                ft.AddToBackStack("PreferenceFragment");
+                ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);
+                ft.Replace(Resource.Id.fragment_container, f, tag);
+                ft.AddToBackStack(tag);
                 ft.Commit();
+            }
+
+            void Restore(FragmentManager fm)
+            {
+                var backStackStatesAndTags = BackstackStates.Zip(SavedTags, (state, tag) => new { State = state, Tag = tag });
+
+                foreach (var item in backStackStatesAndTags)
+                {
+                    var state = item.State;
+                    var tag = item.Tag;
+
+                    RetainableStateFragment f = null;
+                    
+                    if (tag.StartsWith(nameof(FoldersNotificationsListFragment), StringComparison.Ordinal))
+                        f = new FoldersNotificationsListFragment();
+                    else if (tag.StartsWith(nameof(FoldersListFragment), StringComparison.Ordinal))
+                        f = new FoldersListFragment();
+                        
+                    f.SetInitialSavedState(state);
+
+                    var ft = fm.BeginTransaction();
+                    ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);
+                    ft.Replace(Resource.Id.fragment_container, f, tag);
+                    ft.AddToBackStack(tag);
+                    ft.Commit();
+                }
+
+                BackstackStates.Clear();
+                SavedTags.Clear();
             }
         }
 

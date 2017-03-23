@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: EditCategoriesListFragment.cs
 // Author: Ferdinando Papale fp@nordic-it.com
@@ -57,7 +57,7 @@ namespace Mark5.Mobile.Droid
             var rootView = inflater.Inflate(Resource.Layout.list_with_button, container, false);
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
-            refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
+            refreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
             refreshLayout.Enabled = false;
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
@@ -85,6 +85,7 @@ namespace Mark5.Mobile.Droid
             base.OnViewCreated(view, savedInstanceState);
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.categories);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(EditCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
         }
@@ -106,10 +107,9 @@ namespace Mark5.Mobile.Droid
         {
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
-            var searchItem = menu.FindItem(Resource.Id.action_search);
-            searchItem.SetIcon(Resource.Drawable.action_search);
-            MenuItemCompat.SetOnActionExpandListener(searchItem, this);
-            searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
+            var filterItem = menu.FindItem(Resource.Id.action_filter);
+            MenuItemCompat.SetOnActionExpandListener(filterItem, this);
+            searchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
         }
@@ -246,10 +246,12 @@ namespace Mark5.Mobile.Droid
             if (selectedCategories.Count < 1)
             {
                 ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_categories);
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
             }
             else
             {
                 ((AppCompatActivity)Activity).SupportActionBar.Title = Resources.GetQuantityString(Resource.Plurals.categories_selected, selectedCategories.Count, selectedCategories.Count);
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
             }
         }
 
@@ -259,7 +261,7 @@ namespace Mark5.Mobile.Droid
 
         bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
-            if (item.ItemId == Resource.Id.action_search)
+            if (item.ItemId == Resource.Id.action_filter)
             {
                 recyclerView.SwapAdapter(searchAdapter, true);
                 return true;
@@ -270,7 +272,7 @@ namespace Mark5.Mobile.Droid
 
         bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
         {
-            if (item.ItemId == Resource.Id.action_search)
+            if (item.ItemId == Resource.Id.action_filter)
             {
                 searchHandler.RemoveCallbacksAndMessages(null);
                 searchAdapter.Clear();

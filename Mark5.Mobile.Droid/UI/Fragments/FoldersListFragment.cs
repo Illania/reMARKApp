@@ -9,12 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Android.App;
 using Android.Content;
 using Android.Graphics;
-using Android.Graphics.Drawables;
-using Android.Graphics.Drawables.Shapes;
 using Android.OS;
+using Android.Support.Design.Widget;
 using Android.Support.V4.Content;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
@@ -38,6 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public Folder RemoteFolder { get; set; }
 
+        protected View Container;
         protected FolderListAdapter Adapter;
         protected SearchFolderListAdapter SearchAdapter;
         protected SearchView SearchView;
@@ -47,7 +46,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected bool SearchEnabled;
         protected readonly Handler SearchHandler = new Handler();
 
+        IMenu menu;
         ActionMode actionMode;
+        FloatingActionButton fab;
         List<int> recoveredSelectedItemsPosition;
 
         protected FolderListAdapter CurrentAdapter
@@ -59,21 +60,33 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            Container = container;
+
             CommonConfig.Logger.Info($"Creating {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
             var rootView = InflateView(inflater, container);
 
+            var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
+            emptyView.SetText(Resource.String.empty_folder);
+
             RefreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
-            RefreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
+            RefreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
             RefreshLayout.Refresh += RefreshLayout_Refresh;
 
             RecyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             RecyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
-            RecyclerView.AddItemDecoration(new DividerItemDecorator(Activity, Resource.Id.list_item_section));
             RecyclerView.SetItemAnimator(new DefaultItemAnimator());
             RecyclerView.HasFixedSize = true;
 
             Adapter = new FolderListAdapter(Context, RecyclerView);
+            Adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
+            {
+                if (RecyclerView.GetAdapter() != Adapter) return;
+
+                emptyView.Visibility = Adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
+                RecyclerView.Visibility = Adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
+                menu?.FindItem(Resource.Id.action_filter)?.SetEnabled(Adapter.ItemCount > 0);
+            }));
             Adapter.ExpandIconClicked += Adapter_ExpandClicked;
             Adapter.ItemClicked += Adapter_ItemClicked;
             Adapter.ItemLongClicked += Adapter_ItemLongClicked;
@@ -98,20 +111,36 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = RemoteFolder.Module.ToString();
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = RemoteFolder.Root ? string.Empty : RemoteFolder.Name;
+            if (!(view.Parent is ViewPager))
+            {
+                ((AppCompatActivity)Activity).SupportActionBar.Title = RemoteFolder.Module.ToString();
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = RemoteFolder.Root ? null : RemoteFolder.Name;
+            }
 
             CommonConfig.Logger.Info($"Created {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]");
         }
 
-        public async override void OnResume()
+        public override void OnResume()
         {
             base.OnResume();
 
             CommonConfig.Logger.Info($"Resuming {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
+            fab = ((View)Container.Parent.Parent.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            if (RemoteFolder?.Module == ModuleType.Documents)
+            {
+                fab.SetImageResource(Resource.Drawable.action_new);
+                fab.SetOnClickListener(new ActionOnClickListener(ComposeDocument));
+                fab.Visibility = ViewStates.Visible;
+            }
+            else
+            {
+                fab.Visibility = ViewStates.Gone;
+                fab = null;
+            }
+
             SetSections();
-            await RefreshData();
+            RefreshData();
             RestoreSelection();
         }
 
@@ -121,42 +150,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Pausing {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
-            if (actionMode != null)
-            {
-                actionMode.Finish();
-            }
+            actionMode?.Finish();
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
+            this.menu = menu;
+
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
-            if (RemoteFolder?.Module == ModuleType.Documents)
-            {
-                var newItem = menu.Add(Menu.None, 10, 10, "New");
-                newItem.SetIcon(Resource.Drawable.action_new);
-                newItem.SetShowAsAction(ShowAsAction.Always);
-            }
-
-            var searchItem = menu.FindItem(Resource.Id.action_search);
-            searchItem.SetIcon(Resource.Drawable.action_search);
-            MenuItemCompat.SetOnActionExpandListener(searchItem, this);
-            SearchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
+            var filterItem = menu.FindItem(Resource.Id.action_filter);
+            MenuItemCompat.SetOnActionExpandListener(filterItem, this);
+            SearchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
             SearchView.QueryHint = GetString(Resource.String.filter);
             SearchView.SetOnQueryTextListener(this);
+
+            var searchItem = menu.Add(Menu.None, 10, Menu.None, Resource.String.search);
+            searchItem.SetIcon(Resource.Drawable.action_search_server);
+            searchItem.SetShowAsAction(ShowAsAction.Always);
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if (item.ItemId == 10)
             {
-                if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
-                {
-                    Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
-                    return true;
-                }
+                StartActivity(new Intent(Activity, typeof(SearchActivity)));
 
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None));
                 return true;
             }
 
@@ -165,33 +184,46 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
+        #region Actions
+
+        void ComposeDocument()
+        {
+            if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
+            {
+                Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
+                return;
+            }
+
+            StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None));
+        }
+
+        #endregion
+
         #region Utility methods
 
-        async Task RefreshData(bool forceRefresh = false)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void RefreshData(bool forceRefresh = false)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             CommonConfig.Logger.Info($"Refreshing...");
 
             if (!RemoteFolder.HasSubFolders)
-            {
                 return;
-            }
 
-            RefreshLayout.Refreshing = true;
+            RefreshLayout.Post(() => RefreshLayout.Refreshing = true);
+
+            await Task.Delay(300); // Let the animation finish
 
             if (AvailableSections.Contains(Section.Remote))
-            {
                 await RefreshRemote(forceRefresh);
-            }
-            if (AvailableSections.Contains(Section.Favourites))
-            {
-                await RefreshFavorites();
-            }
-            if (AvailableSections.Contains(Section.Local))
-            {
-                RefreshLocal();
-            }
 
-            RefreshLayout.Refreshing = false;
+            if (AvailableSections.Contains(Section.Favourites))
+                await RefreshFavorites();
+
+            if (AvailableSections.Contains(Section.Local))
+                RefreshLocal();
+
+            RefreshLayout.Post(() => RefreshLayout.Refreshing = false);
         }
 
         async Task RefreshRemote(bool forceRefresh = false)
@@ -273,11 +305,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
             var foldersListFragment = GetFolderFragment(folder);
             var tag = foldersListFragment.GenerateTag();
-            var ft = fragmentManager.BeginTransaction();
-            ft.SetTransition((int)FragmentTransit.FragmentOpen);
-            ft.Replace(Resource.Id.fragment_container, foldersListFragment, tag);
-            ft.AddToBackStack(tag);
-            ft.Commit();
+
+            fragmentManager.BeginTransaction()
+                           .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
+                           .Replace(Resource.Id.fragment_container, foldersListFragment, tag)
+                           .AddToBackStack(tag)
+                           .Commit();
         }
 
         protected virtual RetainableStateFragment GetFolderFragment(Folder folder)
@@ -381,33 +414,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region ActionMode callbacks
 
-        public virtual bool OnActionItemClicked(ActionMode mode, IMenuItem item)
-        {
-            switch (item.ItemId)
-            {
-                case MenuItemActions.AddToFavourites:
-                    SetFolderFavouriteStatusForSelection(true);
-                    break;
-                case MenuItemActions.RemoveFromFavourites:
-                    SetFolderFavouriteStatusForSelection(false);
-                    break;
-                case MenuItemActions.EnableOffline:
-                    SetFolderOfflineStatusForSelection(true);
-                    break;
-                case MenuItemActions.DisableOffline:
-                    SetFolderOfflineStatusForSelection(false);
-                    break;
-                case MenuItemActions.Subscribe:
-                    SetFoldersSubscriptionToSelection(true);
-                    break;
-                case MenuItemActions.Unsubscribe:
-                    SetFoldersSubscriptionToSelection(false);
-                    break;
-            }
-
-            return true;
-        }
-
         static class MenuItemActions
         {
             public const int AddToFavourites = 10;
@@ -423,17 +429,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return true;
         }
 
-        public void OnDestroyActionMode(ActionMode mode)
-        {
-            if (actionMode != null)
-            {
-                CurrentAdapter.ClearSelections();
-                actionMode = null;
-            }
-        }
-
         public virtual bool OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
+            Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+
+            fab?.Hide();
+
+            (Activity as MainActivity)?.LockDrawer();
+
             var selectedFolders = CurrentAdapter.GetSelectedItems().ToList();
             if (!selectedFolders.Any())
             {
@@ -485,6 +489,46 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
             return true;
+        }
+
+        public virtual bool OnActionItemClicked(ActionMode mode, IMenuItem item)
+        {
+            switch (item.ItemId)
+            {
+                case MenuItemActions.AddToFavourites:
+                    SetFolderFavouriteStatusForSelection(true);
+                    break;
+                case MenuItemActions.RemoveFromFavourites:
+                    SetFolderFavouriteStatusForSelection(false);
+                    break;
+                case MenuItemActions.EnableOffline:
+                    SetFolderOfflineStatusForSelection(true);
+                    break;
+                case MenuItemActions.DisableOffline:
+                    SetFolderOfflineStatusForSelection(false);
+                    break;
+                case MenuItemActions.Subscribe:
+                    SetFoldersSubscriptionToSelection(true);
+                    break;
+                case MenuItemActions.Unsubscribe:
+                    SetFoldersSubscriptionToSelection(false);
+                    break;
+            }
+
+            return true;
+        }
+
+        public void OnDestroyActionMode(ActionMode mode)
+        {
+            Activity.Window.AddFlags(WindowManagerFlags.TranslucentStatus);
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+
+            fab?.Show();
+
+            (Activity as MainActivity)?.UnlockDrawer();
+
+            CurrentAdapter.ClearSelections();
+            actionMode = null;
         }
 
         #endregion
@@ -621,10 +665,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region SwipeRefresLayout event handlers
 
-        async void RefreshLayout_Refresh(object sender, EventArgs e)
-        {
-            await RefreshData(true);
-        }
+        void RefreshLayout_Refresh(object sender, EventArgs e) => RefreshData(true);
 
         #endregion
 
@@ -632,8 +673,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         virtual public bool OnMenuItemActionExpand(IMenuItem item)
         {
-            if (item.ItemId == Resource.Id.action_search)
+            if (item.ItemId == Resource.Id.action_filter)
             {
+                menu?.FindItem(10)?.SetVisible(false);
+
                 SearchEnabled = true;
                 RefreshLayout.Enabled = false;
                 Adapter.ClearSelections();
@@ -646,8 +689,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
         {
-            if (item.ItemId == Resource.Id.action_search)
+            if (item.ItemId == Resource.Id.action_filter)
             {
+                menu?.FindItem(10)?.SetVisible(true);
+
                 SearchHandler.RemoveCallbacksAndMessages(null);
                 SearchAdapter.Clear();
                 RecyclerView.SwapAdapter(Adapter, true);
@@ -705,7 +750,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return new FolderListFragmentState
             {
                 Folder = RemoteFolder,
-                SelectedItemPositions = new List<int>(Adapter.SelectedItemPositions),
+                SelectedItemPositions = new List<int>(Adapter.SelectedItemPositions)
             };
         }
 
@@ -739,8 +784,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 public const int FolderView = 0;
                 public const int SectionView = 1;
             }
-
-            static readonly int[] colors = { Resource.Color.darkerblue, Resource.Color.darkblue, Resource.Color.blue };
 
             protected List<Section> sectionsInView = new List<Section>();
             protected Dictionary<Section, List<Folder>> foldersInSection = new Dictionary<Section, List<Folder>>();
@@ -828,28 +871,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     fh.ExpandButton.Visibility = (folder.HasSubFolders && sectionForPosition != Section.None) ? ViewStates.Visible : ViewStates.Gone;
 
-                    var color = colors[Math.Abs(folder.Name.GetHashCode() % colors.Length)];
-
-                    var sd = new ShapeDrawable(new OvalShape());
-                    sd.Paint.Color = new Color(ContextCompat.GetColor(context, color));
-                    fh.FolderIcon.Background = sd;
-
                     if (folder.InternalType == FolderInternalType.Worktray)
-                    {
                         fh.FolderIcon.SetImageResource(Resource.Drawable.folder_worktray);
-                    }
-                    else if (folder.Type == FolderType.Spam)
-                    {
-                        fh.FolderIcon.SetImageResource(Resource.Drawable.folder_spam);
-                    }
                     else if (folder.Type == FolderType.Draft)
-                    {
                         fh.FolderIcon.SetImageResource(Resource.Drawable.folder_draft);
-                    }
                     else
-                    {
                         fh.FolderIcon.SetImageResource(Resource.Drawable.folder);
-                    }
 
                     fh.SelectedOverlay.Visibility = IsItemSelected(position) ? ViewStates.Visible : ViewStates.Gone;
                 }
@@ -892,8 +919,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (viewType == ViewType.FolderView)
                 {
-                    View itemView = LayoutInflater.From(parent.Context).
-                                      Inflate(Resource.Layout.list_item_folder, parent, false);
+                    var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_folders, parent, false);
 
                     var folderViewHolder = new FolderViewHolder(itemView);
                     folderViewHolder.ExpandClicked += (sender, e) =>
@@ -915,8 +941,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 else
                 {
-                    View itemView = LayoutInflater.From(parent.Context).
-                                                  Inflate(Resource.Layout.list_item_section, parent, false);
+                    var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_section, parent, false);
                     return new SectionViewHolder(itemView);
                 }
             }
@@ -1013,7 +1038,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public bool ToggleSelection(int position)
             {
-                bool isItemSelected = IsItemSelected(position);
+                var isItemSelected = IsItemSelected(position);
                 if (isItemSelected)
                 {
                     selectedItemPositions.Remove(position);
@@ -1206,7 +1231,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-
     }
 
     public enum Section
@@ -1216,6 +1240,4 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         Remote,
         Local,
     }
-
 }
-

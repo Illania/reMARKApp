@@ -6,7 +6,6 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
-using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
@@ -14,9 +13,7 @@ using Android.Support.V7.Widget;
 using Android.Util;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Views.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views
 {
@@ -68,25 +65,15 @@ namespace Mark5.Mobile.Droid.Ui.Views
                 Text = title
             };
             titleView.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
-            titleView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
-            titleView.SetPadding(distanceLarge, 0, distanceNormal, 0);
+            titleView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            titleView.SetPadding(distanceVeryLarge, 0, distanceNormal, 0);
             innerLayout.AddView(titleView);
 
-            innerLayout.AddView(new Divider(Context));
-
-            for (int i = 0; i < objectLinks.Length; i++)
+            foreach (var objectLink in objectLinks)
             {
-                var ol = objectLinks[i];
-                var isNotLast = i != objectLinks.Length - 1;
-
-                var olv = new ObjectLinkView(Context, ol, distanceVeryLarge, distanceNormal);
-                olv.Click += (sender, e) => ObjectLinkClicked(this, ol);
+                var olv = new ObjectLinkView(Context, objectLink, distanceVeryLarge, distanceNormal);
+                olv.Click += (sender, e) => ObjectLinkClicked(this, objectLink);
                 innerLayout.AddView(olv);
-
-                if (isNotLast)
-                {
-                    innerLayout.AddView(new Divider(Context, distanceVeryLarge, 0, 0, 0));
-                }
             }
         }
 

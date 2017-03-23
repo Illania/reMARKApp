@@ -34,6 +34,8 @@ namespace Mark5.Mobile.Droid
 
             CommonConfig.Logger.Info($"Creating {nameof(CategoriesListActivity)}...");
 
+            OverridePendingTransition(Resource.Animation.slide_up, Resource.Animation.no_change);
+
             SetTitle(Resource.String.categories);
             SetContentView(Resource.Layout.base_layout);
 
@@ -70,7 +72,10 @@ namespace Mark5.Mobile.Droid
                 intent.PutExtra(CategoriesResultKey, SerializationUtils.Serialize(clf.Categories));
                 SetResult(Result.Ok, intent);
             }
+
             base.OnBackPressed();
+
+            OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
         }
     }
 }

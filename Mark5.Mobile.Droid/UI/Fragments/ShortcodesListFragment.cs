@@ -11,8 +11,6 @@ using System.Linq;
 using System.Threading;
 using Android.Content;
 using Android.Graphics;
-using Android.Graphics.Drawables;
-using Android.Graphics.Drawables.Shapes;
 using Android.OS;
 using Android.Support.V4.Content;
 using Android.Support.V4.View;
@@ -71,7 +69,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             emptyView.SetText(Resource.String.empty_folder);
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
-            refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
+            refreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
             refreshLayout.Refresh += (sender, e) =>
             {
                 actionMode?.Finish();
@@ -91,11 +89,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
             {
                 if (recyclerView.GetAdapter() != adapter) return;
-                if (refreshing) return;
 
                 emptyView.Visibility = adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
                 recyclerView.Visibility = adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
-                menu?.FindItem(Resource.Id.action_search)?.SetEnabled(adapter.ItemCount > 0);
+                menu?.FindItem(Resource.Id.action_filter)?.SetEnabled(adapter.ItemCount > 0);
             }));
             recyclerView.SetAdapter(adapter);
 
@@ -112,8 +109,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = Folder?.Name;
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.shortcodes);
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.shortcodes);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder?.Name;
 
             CommonConfig.Logger.Info($"Created {nameof(ShortcodesListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]");
         }
@@ -160,12 +157,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
-            var searchItem = menu.FindItem(Resource.Id.action_search);
-            searchItem.SetIcon(Resource.Drawable.action_search);
-            MenuItemCompat.SetOnActionExpandListener(searchItem, this);
-            searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
+            var filterItem = menu.FindItem(Resource.Id.action_filter);
+            MenuItemCompat.SetOnActionExpandListener(filterItem, this);
+            searchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
+
+            var searchItem = menu.Add(Menu.None, 10, Menu.None, Resource.String.search);
+            searchItem.SetIcon(Resource.Drawable.action_search_server);
+            searchItem.SetShowAsAction(ShowAsAction.Always);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == 10)
+            {
+                StartActivity(new Intent(Activity, typeof(SearchActivity)));
+
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
         }
 
         #endregion
@@ -238,9 +250,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             cts = new CancellationTokenSource();
 
             if (force)
-            {
                 adapter.Clear();
-            }
 
             Managers.ShortcodesManager.GetAllShortcodePreviews(Folder, cps =>
             {
@@ -316,8 +326,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int Delete = 31;
         }
 
+        public bool OnCreateActionMode(ActionMode mode, IMenu menu)
+        {
+            return true;
+        }
+
         bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
+            Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+
             menu.Clear();
 
             menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
@@ -343,11 +361,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
             }
 
-            return true;
-        }
-
-        public bool OnCreateActionMode(ActionMode mode, IMenu menu)
-        {
             return true;
         }
 
@@ -401,6 +414,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void OnDestroyActionMode(ActionMode mode)
         {
+            Activity.Window.AddFlags(WindowManagerFlags.TranslucentStatus);
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+
             CurrentAdapter.ClearSelections();
             actionMode = null;
         }
@@ -506,8 +522,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
-            if (item.ItemId == Resource.Id.action_search)
+            if (item.ItemId == Resource.Id.action_filter)
             {
+                menu?.FindItem(10)?.SetVisible(false);
+
                 refreshLayout.Enabled = false;
                 adapter.ClearSelections();
                 recyclerView.SwapAdapter(searchAdapter, true);
@@ -519,8 +537,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
         {
-            if (item.ItemId == Resource.Id.action_search)
+            if (item.ItemId == Resource.Id.action_filter)
             {
+                menu?.FindItem(10)?.SetVisible(true);
+
                 searchHandler.RemoveCallbacksAndMessages(null);
                 searchAdapter.Clear();
                 searchAdapter.ClearSelections();
@@ -704,7 +724,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 cpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, cp)));
 
                 cpvh.Name = cp.Name;
-                cpvh.Description = cp.Description;
 
                 cpvh.Selected = selectedShortcodesInView.ContainsKey(cp.Id);
             }
@@ -823,27 +842,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         class ShortcodePreviewViewHolder : RecyclerView.ViewHolder
         {
 
-            static readonly int[] colors = { Resource.Color.darkerblue, Resource.Color.darkblue, Resource.Color.blue };
-
             public string Name
             {
                 set
                 {
                     nameTextView.Text = value;
-                    letterTextView.Text = value.SafeSubstring(0, 1).ToUpper();
-
-                    var sd = new ShapeDrawable(new OvalShape());
-                    sd.Paint.Color = new Color(ContextCompat.GetColor(ItemView.Context, colors[Math.Abs(value.GetHashCode() % colors.Length)]));
-                    letterTextView.Background = sd;
-                }
-            }
-
-            public string Description
-            {
-                set
-                {
-                    descTextView.Text = value;
-                    descTextView.Visibility = string.IsNullOrWhiteSpace(value) ? ViewStates.Gone : ViewStates.Visible;
                 }
             }
 
@@ -855,17 +858,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            readonly AppCompatTextView letterTextView;
             readonly AppCompatTextView nameTextView;
-            readonly AppCompatTextView descTextView;
             readonly View selectedOverlay;
 
             public ShortcodePreviewViewHolder(View itemView)
                     : base(itemView)
             {
-                letterTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_shortcode_letter);
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_shortcode_name);
-                descTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_shortcode_desc);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
             }
         }

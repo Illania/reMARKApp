@@ -9,11 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Android.Graphics;
-using Android.Graphics.Drawables;
-using Android.Graphics.Drawables.Shapes;
 using Android.OS;
-using Android.Support.V4.Content;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
@@ -22,7 +18,6 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -59,7 +54,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var rootView = inflater.Inflate(Resource.Layout.list_with_button, container, false);
 
             refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
-            refreshLayout.SetColorSchemeResources(Resource.Color.lightbrown, Resource.Color.brown);
+            refreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
             refreshLayout.Enabled = false;
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
@@ -108,6 +103,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnViewCreated(view, savedInstanceState);
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(CopyToUserWorktrayFragment)} [[businessEntities.Count={BusinessEntities?.Count}]");
         }
@@ -130,7 +126,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
-            var searchItem = menu.FindItem(Resource.Id.action_search);
+            var searchItem = menu.FindItem(Resource.Id.action_filter);
             MenuItemCompat.SetOnActionExpandListener(searchItem, this);
             searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
             searchView.QueryHint = GetString(Resource.String.filter);
@@ -239,11 +235,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (selectedSystemUsers.Count < 1)
             {
                 ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+
                 copyButton.Enabled = false;
             }
             else
             {
                 ((AppCompatActivity)Activity).SupportActionBar.Title = Resources.GetQuantityString(Resource.Plurals.users_selected, selectedSystemUsers.Count, selectedSystemUsers.Count);
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+
                 copyButton.Enabled = true;
             }
         }
@@ -254,7 +254,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
-            if (item.ItemId == Resource.Id.action_search)
+            if (item.ItemId == Resource.Id.action_filter)
             {
                 recyclerView.SwapAdapter(searchAdapter, true);
                 return true;
@@ -265,7 +265,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
         {
-            if (item.ItemId == Resource.Id.action_search)
+            if (item.ItemId == Resource.Id.action_filter)
             {
                 searchHandler.RemoveCallbacksAndMessages(null);
                 searchAdapter.Clear();
@@ -413,18 +413,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         class UserViewHolder : RecyclerView.ViewHolder
         {
 
-            static readonly int[] colors = { Resource.Color.darkerblue, Resource.Color.darkblue, Resource.Color.blue };
-
             public string FullName
             {
                 set
                 {
                     fullnameTextView.Text = value;
-                    letterTextView.Text = value.SafeSubstring(0, 1).ToUpper();
-
-                    var sd = new ShapeDrawable(new OvalShape());
-                    sd.Paint.Color = new Color(ContextCompat.GetColor(ItemView.Context, colors[Math.Abs(value.GetHashCode() % colors.Length)]));
-                    letterTextView.Background = sd;
                 }
             }
 
@@ -444,7 +437,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            readonly AppCompatTextView letterTextView;
             readonly AppCompatTextView fullnameTextView;
             readonly AppCompatTextView username;
             readonly View selectedOverlay;
@@ -452,7 +444,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public UserViewHolder(View itemView)
                     : base(itemView)
             {
-                letterTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_system_user_letter);
                 fullnameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_system_user_full_name);
                 username = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_system_user_name);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);

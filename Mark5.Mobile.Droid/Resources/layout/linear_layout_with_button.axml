@@ -13,8 +13,8 @@
     <View
         android:id="@+id/button_divider"
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/brown"
+        android:layout_height="1dp"
+        android:background="@color/darkblue"
         android:layout_above="@id/button" />
     <ScrollView
         android:id="@+id/scroll_view"
