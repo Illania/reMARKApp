@@ -56,6 +56,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         CoordinatorLayout coordinatorLayout;
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
+        SwipeHelperCallback swipeHelperCallback;
+        ItemTouchHelper itemTouchHelper;
         DocumentsListAdapter adapter;
         DocumentsListAdapter searchAdapter;
         ActionMode actionMode;
@@ -109,8 +111,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 menu?.FindItem(Resource.Id.action_filter)?.SetEnabled(adapter.ItemCount > 0);
             }));
             recyclerView.SetAdapter(adapter);
-            var swipeHelper = new ItemTouchHelper(new SwipeHelperCallback(Context, adapter, this, refreshLayout));
-            swipeHelper.AttachToRecyclerView(recyclerView);
+
+            swipeHelperCallback = new SwipeHelperCallback(Context, this, adapter, refreshLayout);
+            itemTouchHelper = new ItemTouchHelper(swipeHelperCallback);
+            itemTouchHelper.AttachToRecyclerView(recyclerView);
 
             searchAdapter = new DocumentsListAdapter(Activity);
             searchAdapter.ItemClicked += Adapter_ItemClicked;
@@ -374,13 +378,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void OutgoingDocumentsManager_DocumentSendingSuccessful(object sender, OutgoingDocumentContainer e)
         {
             if (e.DocumentPreview.Id >= 0)
-            {
-                Activity.RunOnUiThread(async () =>
-                   {
-                       await RefreshData(forceClear: true);
-                   });
-            }
-
+                Activity.RunOnUiThread(async () => await RefreshData(forceClear: true));
         }
 
         #endregion
@@ -428,9 +426,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void Adapter_ItemLongClicked(object sender, DocumentPreview documentPreview)
         {
             if (actionMode == null)
-            {
                 actionMode = Activity.StartActionMode(this);
-            }
 
             Adapter_ItemClicked(sender, documentPreview);
         }
@@ -462,6 +458,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
             Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
 
+            swipeHelperCallback.Enabled = false;
             fab?.Hide();
 
             menu.Clear();
@@ -589,6 +586,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Activity.Window.AddFlags(WindowManagerFlags.TranslucentStatus);
             Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
 
+            swipeHelperCallback.Enabled = true;
             fab?.Show();
 
             CurrentAdapter.ClearSelections();
@@ -1328,7 +1326,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class SwipeHelperCallback : ItemTouchHelper.Callback
         {
-            
+
+            public bool Enabled { get; set; } = true;
+
             readonly Context context;
             readonly DocumentsListAdapter adapter;
             readonly DocumentsListFragment fragment;
@@ -1337,12 +1337,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly Drawable leftBackground;
             readonly Drawable rightBackground;
 
-            public SwipeHelperCallback(Context context, DocumentsListAdapter adapter, DocumentsListFragment fragment, SwipeRefreshLayout refreshLayout)
+            public SwipeHelperCallback(Context context, DocumentsListFragment fragment, DocumentsListAdapter adapter, SwipeRefreshLayout refreshLayout)
             {
-                this.refreshLayout = refreshLayout;
-                this.adapter = adapter;
                 this.context = context;
                 this.fragment = fragment;
+                this.adapter = adapter;
+                this.refreshLayout = refreshLayout;
 
                 leftBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, Resource.Color.brown)));
                 rightBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, Resource.Color.darkblue)));
@@ -1350,7 +1350,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public override int GetMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder)
             {
-                return MakeMovementFlags(0, ItemTouchHelper.Right | ItemTouchHelper.Left);
+                if (!Enabled)
+                    return MakeMovementFlags(0, 0);
+
+                if (fragment.Folder?.InternalType == FolderInternalType.Worktray)
+                    return MakeMovementFlags(0, ItemTouchHelper.Right);
+
+                return MakeMovementFlags(0, ItemTouchHelper.Left | ItemTouchHelper.Right);
             }
 
             public override bool OnMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target)
@@ -1402,10 +1408,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var itemViewHeight = itemView.Bottom - itemView.Top;
 
                 var paint = new TextPaint();
-                paint.TextSize = (int)TypedValue.ApplyDimension(ComplexUnitType.Sp, 16, Android.App.Application.Context.Resources.DisplayMetrics);
+                paint.TextSize = (int)TypedValue.ApplyDimension(ComplexUnitType.Sp, 14, Android.App.Application.Context.Resources.DisplayMetrics);
                 paint.Color = Color.White;
                 paint.TextAlign = Paint.Align.Left;
-                paint.SetTypeface(Typeface.Create(Typeface.Default, TypefaceStyle.Bold));
+                paint.SetTypeface(Typeface.Create(Typeface.Default, TypefaceStyle.Normal));
 
                 var iconMargin = ConversionUtils.ConvertDpToPixels(30);
 
