@@ -21,6 +21,9 @@ using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
+using Android.Support.V7.Widget.Helper;
+using Android.Text;
+using Android.Util;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
@@ -53,6 +56,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         CoordinatorLayout coordinatorLayout;
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
+        SwipeHelperCallback swipeHelperCallback;
+        ItemTouchHelper itemTouchHelper;
         DocumentsListAdapter adapter;
         DocumentsListAdapter searchAdapter;
         ActionMode actionMode;
@@ -93,6 +98,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
+
             adapter = new DocumentsListAdapter(Activity, recyclerView, async (startId) => await RefreshData(startId));
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
@@ -105,6 +111,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 menu?.FindItem(Resource.Id.action_filter)?.SetEnabled(adapter.ItemCount > 0);
             }));
             recyclerView.SetAdapter(adapter);
+
+            swipeHelperCallback = new SwipeHelperCallback(Context, this, adapter, refreshLayout);
+            itemTouchHelper = new ItemTouchHelper(swipeHelperCallback);
+            itemTouchHelper.AttachToRecyclerView(recyclerView);
 
             searchAdapter = new DocumentsListAdapter(Activity);
             searchAdapter.ItemClicked += Adapter_ItemClicked;
@@ -340,7 +350,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (forceClear)
                     adapter.Clear();
-                
+
                 Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
                 adapter.AppendItems(documentPreviews);
             }
@@ -368,13 +378,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void OutgoingDocumentsManager_DocumentSendingSuccessful(object sender, OutgoingDocumentContainer e)
         {
             if (e.DocumentPreview.Id >= 0)
-            {
-                Activity.RunOnUiThread(async () =>
-                   {
-                       await RefreshData(forceClear: true);
-                   });
-            }
-
+                Activity.RunOnUiThread(async () => await RefreshData(forceClear: true));
         }
 
         #endregion
@@ -422,9 +426,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void Adapter_ItemLongClicked(object sender, DocumentPreview documentPreview)
         {
             if (actionMode == null)
-            {
                 actionMode = Activity.StartActionMode(this);
-            }
 
             Adapter_ItemClicked(sender, documentPreview);
         }
@@ -456,6 +458,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
             Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
 
+            swipeHelperCallback.Enabled = false;
             fab?.Hide();
 
             menu.Clear();
@@ -557,9 +560,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.Categories)
             {
-                var i = new Intent(Activity, typeof(CategoriesListActivity));
-                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(CurrentAdapter.SelectedItems.First()));
-                StartActivity(i);
+                ShowCategories(CurrentAdapter.SelectedItems.First());
 
                 actionMode?.Finish();
                 return true;
@@ -585,6 +586,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Activity.Window.AddFlags(WindowManagerFlags.TranslucentStatus);
             Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
 
+            swipeHelperCallback.Enabled = true;
             fab?.Show();
 
             CurrentAdapter.ClearSelections();
@@ -647,31 +649,45 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 0)
             {
-                CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
-
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
-
-                try
-                {
-                    await Managers.CommonActionsManager.CopyToWorktray(CurrentAdapter.SelectedItems.OfType<IBusinessEntity>().ToList());
-
-                    dismissAction();
-                    actionMode?.Finish();
-                }
-                catch (Exception ex)
-                {
-                    dismissAction();
-
-                    CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
-
-                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                }
+                await CopyToOwnWorktray(CurrentAdapter.SelectedItems);
             }
 
             if (option == 1)
             {
                 StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
             }
+        }
+
+        async void CopyToOwnWorktray(DocumentPreview documentPreview) => await CopyToOwnWorktray(new List<DocumentPreview> { documentPreview });
+
+        public async Task CopyToOwnWorktray(List<DocumentPreview> documentPreviews)
+        {
+            CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={documentPreviews.Count}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.CommonActionsManager.CopyToWorktray(documentPreviews.OfType<IBusinessEntity>().ToList());
+
+                dismissAction();
+                actionMode?.Finish();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
+        public void ShowCategories(DocumentPreview documentPreview)
+        {
+            var i = new Intent(Activity, typeof(CategoriesListActivity));
+            i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(documentPreview));
+            StartActivity(i);
         }
 
         async void SetPriority()
@@ -1014,7 +1030,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected class DocumentsListAdapter : RecyclerView.Adapter
         {
-
             public static class ViewType
             {
                 public const int DocumentView = 0;
@@ -1067,6 +1082,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             bool unreadIndicatorMe = PlatformConfig.Preferences.UnreadIndicatorMe;
             bool compactList = PlatformConfig.Preferences.CompactDocumentsList;
 
+            int? swipedPosition;
+            int swipedDirection;
+
             public DocumentsListAdapter(Context context)
             {
                 this.context = context;
@@ -1091,6 +1109,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (holder is DocumentPreviewViewHolder)
                 {
                     var dpvh = holder as DocumentPreviewViewHolder;
+
+                    dpvh.SwipedDirection = position == swipedPosition ? swipedDirection : 0;
 
                     dpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
                     dpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
@@ -1133,6 +1153,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 else if (holder is ExternalDocumentPreviewViewHolder)
                 {
                     var edpvh = holder as ExternalDocumentPreviewViewHolder;
+
+                    edpvh.SwipedDirection = position == swipedPosition ? swipedDirection : 0;
 
                     edpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
                     edpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
@@ -1288,6 +1310,154 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 return GetPosition(documentPreview.Id);
             }
+
+            public void SetSwipedState(int position, int direction)
+            {
+                swipedPosition = position;
+                swipedDirection = direction;
+            }
+
+            public void ResetSwipedState()
+            {
+                swipedPosition = null;
+            }
+
+        }
+
+        class SwipeHelperCallback : ItemTouchHelper.Callback
+        {
+
+            public bool Enabled { get; set; } = true;
+
+            readonly Context context;
+            readonly DocumentsListAdapter adapter;
+            readonly DocumentsListFragment fragment;
+            readonly SwipeRefreshLayout refreshLayout;
+
+            readonly Drawable leftBackground;
+            readonly Drawable rightBackground;
+
+            public SwipeHelperCallback(Context context, DocumentsListFragment fragment, DocumentsListAdapter adapter, SwipeRefreshLayout refreshLayout)
+            {
+                this.context = context;
+                this.fragment = fragment;
+                this.adapter = adapter;
+                this.refreshLayout = refreshLayout;
+
+                leftBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, Resource.Color.brown)));
+                rightBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, Resource.Color.darkblue)));
+            }
+
+            public override int GetMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder)
+            {
+                if (!Enabled)
+                    return MakeMovementFlags(0, 0);
+
+                if (fragment.Folder?.InternalType == FolderInternalType.Worktray)
+                    return MakeMovementFlags(0, ItemTouchHelper.Right);
+
+                return MakeMovementFlags(0, ItemTouchHelper.Left | ItemTouchHelper.Right);
+            }
+
+            public override bool OnMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target)
+            {
+                return false;
+            }
+
+            public override void OnSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState)
+            {
+                base.OnSelectedChanged(viewHolder, actionState);
+
+                refreshLayout.Enabled = actionState == ItemTouchHelper.ActionStateIdle;
+            }
+
+            public override void OnSwiped(RecyclerView.ViewHolder viewHolder, int direction)
+            {
+                if (direction == ItemTouchHelper.Left)
+                    fragment.CopyToOwnWorktray(adapter.Items[viewHolder.AdapterPosition]);
+                else if (direction == ItemTouchHelper.Right)
+                    fragment.ShowCategories(adapter.Items[viewHolder.AdapterPosition]);
+
+                ResetViewHolder(viewHolder, direction);
+            }
+
+            void ResetViewHolder(RecyclerView.ViewHolder viewHolder, int direction)
+            {
+                var position = viewHolder.AdapterPosition;
+                var view = viewHolder.ItemView;
+
+                viewHolder.ItemView.TranslationX = 0;
+                viewHolder.ItemView.TranslationY = 0;
+
+                adapter.SetSwipedState(position, direction);
+                adapter.NotifyItemChanged(position);
+
+                viewHolder.ItemView.PostDelayed(() =>
+                {
+                    adapter.ResetSwipedState();
+                    adapter.NotifyItemChanged(position);
+                }, 400);
+            }
+
+            public override void OnChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, bool isCurrentlyActive)
+            {
+                if (actionState != ItemTouchHelper.ActionStateSwipe || viewHolder.AdapterPosition == -1)  //Sometimes it gets called for viewHolders that are already gone
+                    return;
+
+                var itemView = viewHolder.ItemView;
+                var itemViewHeight = itemView.Bottom - itemView.Top;
+
+                var paint = new TextPaint();
+                paint.TextSize = (int)TypedValue.ApplyDimension(ComplexUnitType.Sp, 14, Android.App.Application.Context.Resources.DisplayMetrics);
+                paint.Color = Color.White;
+                paint.TextAlign = Paint.Align.Left;
+                paint.SetTypeface(Typeface.Create(Typeface.Default, TypefaceStyle.Normal));
+
+                var iconMargin = ConversionUtils.ConvertDpToPixels(30);
+
+                var baseline = -paint.Ascent();
+                var textHeight = (int)(baseline + paint.Descent() + 0.5f);
+
+                if (dX > 0) //Swiping to right
+                {
+                    var text = context.Resources.GetString(Resource.String.categories);
+
+                    leftBackground.SetBounds(itemView.Left, itemView.Top, (int)dX, itemView.Bottom);
+                    leftBackground.Draw(c);
+
+                    var textLayout = new StaticLayout(text, paint, c.Width, Layout.Alignment.AlignNormal, 1, 0, false);
+
+                    var textLeft = itemView.Left + iconMargin;
+                    var textTop = itemView.Top + (itemViewHeight - textHeight) / 2;
+
+                    c.Save();
+                    c.Translate(textLeft, textTop);
+                    textLayout.Draw(c);
+                    c.Restore();
+                }
+                else if (dX < 0)
+                {
+                    var text = context.Resources.GetString(Resource.String.copy_to_worktray_multiline);
+
+                    rightBackground.SetBounds(itemView.Right + (int)dX, itemView.Top, itemView.Right, itemView.Bottom);
+                    rightBackground.Draw(c);
+
+                    var textLayout = new StaticLayout(text, paint, c.Width, Layout.Alignment.AlignNormal, 1, 0, false);
+
+                    var iconWidth = text.Split(new string[] { "\n" }, StringSplitOptions.None).Select(s => (int)(paint.MeasureText(s) + 0.5f)).Max();
+
+                    var textRight = itemView.Right - iconMargin;
+                    var textLeft = textRight - iconWidth;
+                    var textTop = itemView.Top + itemViewHeight / 2 - textHeight;
+
+                    c.Save();
+                    c.Translate(textLeft, textTop);
+                    textLayout.Draw(c);
+                    c.Restore();
+                }
+
+                base.OnChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
         }
 
         class DocumentPreviewViewHolder : RecyclerView.ViewHolder
@@ -1418,6 +1588,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
+            public int SwipedDirection
+            {
+                set
+                {
+                    if (value != 0)
+                    {
+                        swipedBackground.Visibility = ViewStates.Visible;
+                        itemContent.Visibility = ViewStates.Invisible; //Otherwisw the view collapses
+
+                        var colorId = value == ItemTouchHelper.Left ? Resource.Color.darkerblue : Resource.Color.brown;
+
+                        swipedBackground.SetBackgroundColor(new Color(ContextCompat.GetColor(ItemView.Context, colorId)));
+                    }
+                    else
+                    {
+                        swipedBackground.Visibility = ViewStates.Gone;
+                        itemContent.Visibility = ViewStates.Visible;
+                    }
+                }
+            }
+
             readonly AppCompatTextView recipentTextView;
             readonly AppCompatTextView dateTextView;
             readonly AppCompatTextView subjectTextView;
@@ -1429,7 +1620,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly AppCompatImageView unreadImageView;
             readonly AppCompatImageView attachmentImageView;
             readonly AppCompatImageView commentImageView;
+            readonly LinearLayoutCompat itemContent;
             readonly View selectedOverlay;
+            readonly View swipedBackground;
 
             public DocumentPreviewViewHolder(View itemView)
                     : base(itemView)
@@ -1445,7 +1638,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 unreadImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_unread);
                 attachmentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_attachment);
                 commentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_comment);
+                itemContent = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_internal_Layout);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
+                swipedBackground = itemView.FindViewById<View>(Resource.Id.swiped_background);
             }
         }
 
@@ -1510,12 +1705,35 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
+            public int SwipedDirection
+            {
+                set
+                {
+                    if (value != 0)
+                    {
+                        swipedBackground.Visibility = ViewStates.Visible;
+                        itemContent.Visibility = ViewStates.Invisible;
+
+                        var colorId = value == ItemTouchHelper.Left ? Resource.Color.darkerblue : Resource.Color.brown;
+
+                        swipedBackground.SetBackgroundColor(new Color(ContextCompat.GetColor(ItemView.Context, colorId)));
+                    }
+                    else
+                    {
+                        swipedBackground.Visibility = ViewStates.Gone;
+                        itemContent.Visibility = ViewStates.Visible;
+                    }
+                }
+            }
+
             readonly AppCompatTextView nameTextView;
             readonly AppCompatTextView dateTextView;
             readonly AppCompatTextView previewTextView;
             readonly LinearLayoutCompat categoriesLayout;
             readonly AppCompatImageView commentImageView;
+            readonly LinearLayoutCompat itemContent;
             readonly View selectedOverlay;
+            readonly View swipedBackground;
 
             public ExternalDocumentPreviewViewHolder(View itemView)
                     : base(itemView)
@@ -1525,7 +1743,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 previewTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_external_preview);
                 categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_external_categories);
                 commentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_external_comment);
+                itemContent = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_internal_Layout);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
+                swipedBackground = itemView.FindViewById<View>(Resource.Id.swiped_background);
             }
         }
 
