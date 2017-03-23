@@ -253,8 +253,43 @@ namespace FastScrollRecycler
 
         void CancelAutoHide() => recyclerView?.RemoveCallbacks(hideAction);
 
+        public void SetThumbColor(int color)
+        {
+            thumb.Color = new Color(color);
+            recyclerView?.Invalidate(invalidateRect);
+        }
 
+        public void SetTrackColor(int color)
+        {
+            track.Color = new Color(color);
+            recyclerView?.Invalidate(invalidateRect);
+        }
 
+        public void SetPopupBackgroundColor(int color) => popup.SetBackgroundColor(color);
+
+        public void SetPopupTextColor(int color) => popup.SetTextColor(color);
+
+        public void SetPopupTypeface(Typeface typeface) => popup.SetTypeFace(typeface);
+
+        public void SetAutoHideDelay(int autoHideDelay)
+        {
+            this.autoHideDelay = autoHideDelay;
+
+            if (autoHideEnabled)
+                PostAutoHideDelayed();
+        }
+
+        public void SetAutoHideEnabled(bool autoHideEnabled)
+        {
+            this.autoHideEnabled = autoHideEnabled;
+
+            if (autoHideEnabled)
+                PostAutoHideDelayed();
+            else
+                CancelAutoHide();
+        }
+
+        public void SetPopupPosition(FastScrollerPosition position) => popup.SetPopupPosition(position);
 
         class ActionOnScrollListener : RecyclerView.OnScrollListener
         {
