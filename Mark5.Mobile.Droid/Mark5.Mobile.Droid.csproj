@@ -320,7 +320,7 @@
     <Compile Include="Ui\Fragments\FoldersNotificationsListFragment.cs" />
     <Compile Include="Extensions\ModuleTypeExtensions.cs" />
     <Compile Include="Ui\Common\HubMessages\NewNotificationsReceived.cs" />
-    <Compile Include="Ui\Views\SearchViews\DateRangeView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentDateRangeSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\AbstractViews\AbstractDropdownSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\AbstractViews\AbstractEditableTextSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\AbstractViews\AbstractMultiSearchView.cs" />
@@ -329,6 +329,9 @@
     <Compile Include="Ui\Views\SearchViews\DocumentDirectionsSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentFromToSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentSubjectMessageSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentHandledSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentAttachmentUnreadSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentReferenceNumberSearchView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

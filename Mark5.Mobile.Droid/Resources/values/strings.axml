@@ -189,7 +189,7 @@
 	<string name="search_contact_vat">VAT</string>
 	<string name="search_contacts">Search contacts</string>
 	<string name="search_contacts_result">Results</string>
-	<string name="search_document_attachment_names">Attachment names</string>
+	<string name="search_document_attachment">Attachment</string>
 	<string name="search_document_comments">Comments</string>
 	<string name="search_document_direction_inbox">Inbox</string>
 	<string name="search_document_direction_outbox">Outbox</string>
@@ -197,6 +197,7 @@
 	<string name="search_document_date_from">From date</string>
 	<string name="search_document_date_to">To date</string>
 	<string name="search_document_extra_fields">Extra Fields</string>
+	<string name="search_document_editable_empty">___</string>
 	<string name="search_document_handled">Handled</string>
 	<string name="search_document_handled_false">Unhandled</string>
 	<string name="search_document_handled_none_selected">All</string>
@@ -207,11 +208,11 @@
 	<string name="search_document_partial">Partial words search</string>
 	<string name="search_document_priorities">Priority</string>
 	<string name="search_document_priorities_none_selected">Any priority</string>
-	<string name="search_document_reference_number">Reference number</string>
+	<string name="search_document_reference_number">Reference no.</string>
 	<string name="search_document_search_for">Search for email addresses in:</string>
 	<string name="search_document_search_for_hint">Enter address</string>
-	<string name="search_document_unread_only">Unread documents only</string>
-	<string name="search_document_with_attachments_only">Only documents with attachments</string>
+	<string name="search_document_unread">Unread documents</string>
+	<string name="search_document_with_attachments">With attachments</string>
 	<string name="search_document_where">Where:</string>
 	<string name="search_document_where_hint">Enter search text</string>
 	<string name="search_documents">Search documents</string>

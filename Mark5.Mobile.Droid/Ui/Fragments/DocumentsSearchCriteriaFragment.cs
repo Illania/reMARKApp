@@ -46,11 +46,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new DocumentDirectionsSearchView(Context));
             linearLayout.AddView(new DocumentSubjectMessageSearchView(Context));
             linearLayout.AddView(new DocumentFromToSearchView(Context));
+            linearLayout.AddView(new DocumentDateRangeSearchView(Context));
+
+            linearLayout.AddView(new DocumentAttachmentUnreadSearchView(Context));
+            linearLayout.AddView(new DocumentHandledSearchView(Context));
 
             //linearLayout.AddView(new AbstractMultiSearchView(Context));
             //PrepareDropdownRow();
             //linearLayout.AddView(new AbstractEditableTextSearchView(Context));
-            //linearLayout.AddView(new DateRangeView(Context));
 
             return rootView;
         }

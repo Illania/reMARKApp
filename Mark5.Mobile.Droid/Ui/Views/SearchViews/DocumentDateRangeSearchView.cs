@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: DateView.cs
+// File: DocumentDateRangeSearchView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
 //
 // Copyright (c) 2017 Nordic IT
@@ -16,7 +16,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
-    public class DateRangeView : AbstractSearchView<SearchDocumentsCriteria>
+    public class DocumentDateRangeSearchView : AbstractSearchView<SearchDocumentsCriteria>
     {
         long fromTimestamp = -1;
         long toTimestamp = -1;
@@ -24,7 +24,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         readonly AppCompatTextView dateRangeFromTextView;
         readonly AppCompatTextView dateRangeToTextView;
 
-        public DateRangeView(Context context) : base(context)
+        public DocumentDateRangeSearchView(Context context) : base(context)
         {
             Orientation = Horizontal;
             SetBackgroundColor(BackgroundColorNormalState);

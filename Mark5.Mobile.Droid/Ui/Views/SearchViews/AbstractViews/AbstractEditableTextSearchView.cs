@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         string EmptyText = "Enter text:";
         bool empty = true;
 
-        protected AbstractEditableTextSearchView(Context context) : base(context)
+        protected AbstractEditableTextSearchView(Context context, int topTextResId) : base(context)
         {
             Orientation = Vertical;
             SetBackgroundColor(BackgroundColorNormalState);
@@ -31,7 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                 Gravity = GravityFlags.CenterHorizontal
             };
-            TopTextView.Text = "TEST TEXT";
+            TopTextView.Text = context.GetString(topTextResId);
             TopTextView.SetTextAppearanceCompat(context, TextStyleTopLineResourceId);
             AddView(TopTextView);
 
