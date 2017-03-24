@@ -25,6 +25,7 @@ using Android.Support.V7.Widget.Helper;
 using Android.Text;
 using Android.Util;
 using Android.Views;
+using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
@@ -1028,8 +1029,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region RecyclerView Adapter/ViewHolder
 
-        protected class DocumentsListAdapter : RecyclerView.Adapter
+        protected class DocumentsListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
+
             public static class ViewType
             {
                 public const int DocumentView = 0;
@@ -1127,11 +1129,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
 
                     dpvh.Subject = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
-                    dpvh.Date = dp.DateReceivedTimestamp
-                        .ConvertTimestampMillisecondsToDateTime()
-                        .ConvertUtcToServerTime()
-                        .ConvertDateTimeToTimestampMilliseconds()
-                        .FormatServerTimestampAsCompactShortDateTimeString(context);
+                    var d = dp.DateReceivedTimestamp
+                                .ConvertTimestampMillisecondsToDateTime()
+                                .ConvertUtcToServerTime()
+                                .ConvertDateTimeToTimestampMilliseconds();
+                    dpvh.Date = d.FormatServerTimestampAsCompactShortDateTimeString(context);
+                    dpvh.BubbleDate = d.FormatServerTimestampAsCompactLongDateTimeString(context);
                     dpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                     dpvh.Categories = dp.Categories;
                     dpvh.IncomingIndicator = dp.Direction == DocumentDirection.Incoming;
@@ -1159,11 +1162,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     edpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
                     edpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
 
-                    edpvh.Date = dp.DateReceivedTimestamp
-                         .ConvertTimestampMillisecondsToDateTime()
-                         .ConvertUtcToServerTime()
-                         .ConvertDateTimeToTimestampMilliseconds()
-                         .FormatServerTimestampAsCompactShortDateTimeString(context);
+                    var d = dp.DateReceivedTimestamp
+                                .ConvertTimestampMillisecondsToDateTime()
+                                .ConvertUtcToServerTime()
+                                .ConvertDateTimeToTimestampMilliseconds();
+                    edpvh.Date = d.FormatServerTimestampAsCompactShortDateTimeString(context);
+                    edpvh.BubbleDate = d.FormatServerTimestampAsCompactLongDateTimeString(context);
                     edpvh.Name = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
                     edpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                     edpvh.Categories = dp.Categories;
@@ -1322,6 +1326,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 swipedPosition = null;
             }
 
+            string ISectionedAdapter.GetSectionName(int position)
+            {
+                var vh = recyclerView.FindViewHolderForAdapterPosition(position);
+
+                var dpvh = vh as DocumentPreviewViewHolder;
+                if (dpvh != null)
+                {
+                    return dpvh.BubbleDate;
+                }
+
+                var edpvh = vh as ExternalDocumentPreviewViewHolder;
+                if (edpvh != null)
+                {
+                    return edpvh.BubbleDate;
+                }
+
+                return string.Empty;
+            }
         }
 
         class SwipeHelperCallback : ItemTouchHelper.Callback
@@ -1478,6 +1500,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dateTextView.Text = value;
                 }
             }
+
+            public string BubbleDate { get; set; }
 
             public string Subject
             {
@@ -1662,6 +1686,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dateTextView.Text = value;
                 }
             }
+
+            public string BubbleDate { get; set; }
 
             public string Preview
             {

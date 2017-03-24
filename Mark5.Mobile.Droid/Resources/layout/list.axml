@@ -15,12 +15,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:fastScrollPopupBackgroundColor="@color/darkblue"
+            app:fastScrollPopupBackgroundSize="60dp"
             app:fastScrollPopupTextColor="@color/lightgray"
+            app:fastScrollPopupTextSize="28dp"
             app:fastScrollThumbColor="@color/darkblue"
-            app:fastScrollTrackColor="@color/lightgray"
-            app:fastScrollAutoHideDelay="1000"
-            app:fastScrollAutoHide="true"
-            app:fastScrollPopupPosition="center" />
+            app:fastScrollTrackColor="@color/lightgray" />
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/empty_view"
             android:layout_width="match_parent"
