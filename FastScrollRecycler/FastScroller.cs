@@ -56,7 +56,6 @@ namespace FastScrollRecycler
             this.recyclerView = recyclerView;
             popup = new FastScrollPopup(resources, recyclerView);
 
-            thumbHeight = Utils.ToPixels(resources, 48f);
             width = Utils.ToPixels(resources, 8f);
 
             touchInset = Utils.ToPixels(resources, -48f);
@@ -77,6 +76,7 @@ namespace FastScrollRecycler
 
                 var trackColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollTrackColor, color1f000000);
                 var thumbColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollThumbColor, color1f000000);
+                var thumbSize = typedArray.GetDimensionPixelSize(Resource.Styleable.FastScrollRecyclerView_fastScrollThumbHeight, Utils.ToPixels(resources, 48f));
                 var popupBackgroundColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupBackgroundColor, colorff000000);
                 var popupTextColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupTextColor, colorffffffff);
                 var popupTextSize = typedArray.GetDimensionPixelSize(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupTextSize, Utils.ToPixels(resources, 56f));
@@ -85,6 +85,7 @@ namespace FastScrollRecycler
 
                 track.Color = trackColor;
                 thumb.Color = thumbColor;
+                thumbHeight = thumbSize;
                 popup.SetBackgroundColor(popupBackgroundColor);
                 popup.SetTextColor(popupTextColor);
                 popup.SetTextSize(popupTextSize);

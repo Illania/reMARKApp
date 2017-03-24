@@ -19,6 +19,7 @@
             app:fastScrollPopupTextColor="@color/lightgray"
             app:fastScrollPopupTextSize="28dp"
             app:fastScrollThumbColor="@color/darkblue"
+            app:fastScrollThumbHeight="60dp"
             app:fastScrollTrackColor="@color/lightgray" />
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/empty_view"

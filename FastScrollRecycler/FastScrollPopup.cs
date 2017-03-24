@@ -10,7 +10,6 @@ using Android.Animation;
 using Android.Content.Res;
 using Android.Graphics;
 using Android.Text;
-using Android.Util;
 using Java.Interop;
 
 namespace FastScrollRecycler

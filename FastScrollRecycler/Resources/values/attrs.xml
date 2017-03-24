@@ -2,6 +2,7 @@
 <resources>
     <declare-styleable name="FastScrollRecyclerView">
         <attr name="fastScrollThumbColor" format="reference|color" />
+		<attr name="fastScrollThumbHeight" format="reference|dimension" />
         <attr name="fastScrollTrackColor" format="reference|color" />
         <attr name="fastScrollPopupBackgroundColor" format="reference|color" />
         <attr name="fastScrollPopupTextColor" format="reference|color" />
