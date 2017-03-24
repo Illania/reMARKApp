@@ -9,13 +9,18 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <android.support.v7.widget.RecyclerView
+        <FastScrollRecycler.FastScrollRecyclerView
             android:id="@+id/recycler_view"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbars="vertical"
-            android:fadeScrollbars="true" />
+            app:fastScrollPopupBackgroundColor="@color/darkblue"
+            app:fastScrollPopupTextColor="@color/lightgray"
+            app:fastScrollThumbColor="@color/darkblue"
+            app:fastScrollTrackColor="@color/lightgray"
+            app:fastScrollAutoHideDelay="1000"
+            app:fastScrollAutoHide="true"
+            app:fastScrollPopupPosition="center" />
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/empty_view"
             android:layout_width="match_parent"
