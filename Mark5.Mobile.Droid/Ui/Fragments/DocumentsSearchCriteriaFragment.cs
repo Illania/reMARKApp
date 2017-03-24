@@ -1,176 +1,90 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: DocumentsSearchCriteriaFragment.cs
+// File: SearchFragment.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System.Linq;
-using Android.App;
-using Android.Content;
+using Android.Graphics;
 using Android.OS;
+using Android.Support.V4.Content;
+using Android.Support.V4.Widget;
+using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
+using Android.Widget;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.SearchViews;
-using System.Collections.Generic;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-
-    public class DocumentsSearchCriteriaFragment : RetainableStateFragment
+    public class DocumentSearchCriteriaFragment : RetainableStateFragment
     {
 
         LinearLayoutCompat linearLayout;
-        AppCompatButton searchButton;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(DocumentsSearchCriteriaFragment)}...");
+            CommonConfig.Logger.Info($"Creating {nameof(DocumentSearchCriteriaFragment)}...");
 
-            var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_button, container, false);
+            var rootView = inflater.Inflate(Resource.Layout.linear_layout_base, container, false);
+
+            var scrollView = rootView.FindViewById<NestedScrollView>(Resource.Id.scroll_view);
+            scrollView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
 
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
-            searchButton = rootView.FindViewById<AppCompatButton>(Resource.Id.button);
+            linearLayout.SetBackgroundColor(Color.Transparent);
 
-            linearLayout.AddView(new DocumentReferenceNumberSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new DocumentFromToSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new DocumentSubjectMessageSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new DocumentReceivedDateRangeSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new DocumentUnreadOnlySearchView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new DocumentDirectionsSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new DocumentPrioritiesSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new DocumentLinesSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new DocumentCommentsSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new DocumentAttachmentNamesSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.AttachmentSearchEnabled)
-            {
-                linearLayout.AddView(new DocumentSearchInAttachmentsSearchView(Context));
-                linearLayout.AddView(new Divider(Context));
-            }
-            linearLayout.AddView(new DocumentWithAttachmentsOnlySearchView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new DocumentCategoriesSearchView(Context, this));
-            linearLayout.AddView(new Divider(Context));
+            linearLayout.DividerDrawable = ContextCompat.GetDrawable(Context, Resource.Drawable.search_divider_horizontal);
+            linearLayout.ShowDividers = LinearLayoutCompat.ShowDividerMiddle;
 
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
-            {
-                linearLayout.AddView(new DocumentHandledSearchView(Context));
-                linearLayout.AddView(new Divider(Context));
-            }
+            var paddingLinearLayout = ConversionUtils.ConvertDpToPixels(12);
+            linearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, paddingLinearLayout);
 
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.ExtraFieldInfos.Any())
-            {
-                linearLayout.AddView(new DocumentExtraFieldsSearchView(Context));
-                linearLayout.AddView(new Divider(Context));
-            }
-
-            linearLayout.AddView(new DocumentPartialWordsSearchView(Context));
-            linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new MaxDocumentsSearchView(Context));
-
-            searchButton.Text = GetString(Resource.String.search);
-            searchButton.Click += (sender, e) =>
-            {
-                var i = new Intent(Activity, typeof(SearchResultsActivity));
-                i.PutExtra(SearchResultsActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
-                i.PutExtra(SearchResultsActivity.CriteriaIntentKey, SerializationUtils.Serialize(GetCriteria()));
-                StartActivity(i);
-            };
+            linearLayout.AddView(new AbstractButtonsView(Context));
+            linearLayout.AddView(new AbstractMultiView(Context));
+            PrepareDropdownRow();
+            linearLayout.AddView(new AbstractEditableTextView(Context));
+            linearLayout.AddView(new DateRangeView(Context));
 
             return rootView;
+        }
+
+        public void PrepareDropdownRow()
+        {
+            var ll = new LinearLayoutCompat(Context)
+            {
+                LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
+
+            var lp = new LinearLayoutCompat.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1);
+
+            var a = new AbstractDropdownView(Context);
+            var b = new AbstractDropdownView(Context);
+            var c = new AbstractDropdownView(Context);
+
+            ll.AddView(a, lp);
+            ll.AddView(b, lp);
+            ll.AddView(c, lp);
+
+            linearLayout.AddView(ll);
         }
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            //((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_documents);
-            //((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
 
-            CommonConfig.Logger.Info($"Created {nameof(DocumentFragment)}");
-        }
-
-        public override void OnActivityResult(int requestCode, int resultCode, Intent data)
-        {
-            if (resultCode == (int)Result.Ok && requestCode == AbstractCategoriesSearchView<SearchDocumentsCriteria>.RequestCodes.CategoriesRequest)
-            {
-                var ccsv = View.FindViewById<DocumentCategoriesSearchView>(AbstractCategoriesSearchView<SearchDocumentsCriteria>.ViewId);
-                if (ccsv != null)
-                {
-                    var categories = SerializationUtils.Deserialize<List<Category>>(data.Extras.GetString(PickCategoriesListActivity.CategoriesResultKey));
-                    ccsv.SetSelectedCategoryIds(categories.Select(c => c.Id).ToList());
-                }
-            }
-        }
-
-        SearchDocumentsCriteria GetCriteria()
-        {
-            var criteria = new SearchDocumentsCriteria();
-
-            for (var i = 0; i < linearLayout.ChildCount; i++)
-            {
-                var dsv = linearLayout.GetChildAt(i) as AbstractSearchView<SearchDocumentsCriteria>;
-                if (dsv != null)
-                {
-                    dsv.ToCriteria(criteria);
-                }
-            }
-
-            return criteria;
-        }
-
-        void SetCriteria(SearchDocumentsCriteria criteria)
-        {
-            for (var i = 0; i < linearLayout.ChildCount; i++)
-            {
-                var dsv = linearLayout.GetChildAt(i) as AbstractSearchView<SearchDocumentsCriteria>;
-                if (dsv != null)
-                {
-                    dsv.FromCriteria(criteria);
-                }
-            }
-        }
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new DocumentsSearchFragmentState { Criteria = GetCriteria() };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var dsfs = restoredState as DocumentsSearchFragmentState;
-            if (dsfs != null)
-            {
-                SetCriteria(dsfs.Criteria);
-            }
+            CommonConfig.Logger.Info($"Created {nameof(DocumentSearchFragment)}");
         }
 
         public override string GenerateTag()
         {
-            return $"{nameof(DocumentsSearchCriteriaFragment)}";
-        }
-
-        class DocumentsSearchFragmentState : IRetainableState
-        {
-
-            public SearchDocumentsCriteria Criteria { get; set; }
+            return $"{nameof(DocumentSearchFragment)}";
         }
     }
 }
-
