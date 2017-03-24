@@ -19,7 +19,8 @@
             app:fastScrollThumbColor="@color/darkblue"
             app:fastScrollTrackColor="@color/lightgray"
             app:fastScrollAutoHideDelay="1000"
-            app:fastScrollAutoHide="true" />
+            app:fastScrollAutoHide="true"
+            app:fastScrollPopupPosition="center" />
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/empty_view"
             android:layout_width="match_parent"
