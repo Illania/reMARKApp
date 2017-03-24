@@ -332,6 +332,8 @@
     <Compile Include="Ui\Views\SearchViews\DocumentHandledSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentAttachmentUnreadSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentReferenceNumberSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentCommentsSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentAttachmentSearchView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

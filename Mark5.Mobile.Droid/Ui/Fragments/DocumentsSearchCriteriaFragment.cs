@@ -47,33 +47,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new DocumentSubjectMessageSearchView(Context));
             linearLayout.AddView(new DocumentFromToSearchView(Context));
             linearLayout.AddView(new DocumentDateRangeSearchView(Context));
-
+            PrepareEditableTextRow();
             linearLayout.AddView(new DocumentAttachmentUnreadSearchView(Context));
             linearLayout.AddView(new DocumentHandledSearchView(Context));
-
-            //linearLayout.AddView(new AbstractMultiSearchView(Context));
-            //PrepareDropdownRow();
-            //linearLayout.AddView(new AbstractEditableTextSearchView(Context));
 
             return rootView;
         }
 
-        public void PrepareDropdownRow()
+        public void PrepareEditableTextRow()
         {
             var ll = new LinearLayoutCompat(Context)
             {
                 LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
 
+            ll.DividerDrawable = ContextCompat.GetDrawable(Context, Resource.Drawable.search_divider_vertical);
+            ll.ShowDividers = LinearLayoutCompat.ShowDividerMiddle;
+
             var lp = new LinearLayoutCompat.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1);
 
-            //var a = new AbstractDropdownSearchView(Context);
-            //var b = new AbstractDropdownSearchView(Context);
-            //var c = new AbstractDropdownSearchView(Context);
-
-            //ll.AddView(a, lp);
-            //ll.AddView(b, lp);
-            //ll.AddView(c, lp);
+            ll.AddView(new DocumentReferenceNumberSearchView(Context), lp);
+            ll.AddView(new DocumentCommentsSearchView(Context), lp);
+            ll.AddView(new DocumentAttachmentSearchView(Context), lp);
 
             linearLayout.AddView(ll);
         }

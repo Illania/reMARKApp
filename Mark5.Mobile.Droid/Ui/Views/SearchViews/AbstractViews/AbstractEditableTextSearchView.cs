@@ -41,6 +41,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 Gravity = GravityFlags.CenterHorizontal
             };
             BottomTextView.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId);
+            BottomTextView.Text = context.GetString(Resource.String.search_editable_empty);
             BottomTextView.Click += BottomTextView_Click;
             AddView(BottomTextView);
 
