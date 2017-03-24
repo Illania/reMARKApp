@@ -253,7 +253,6 @@
     <Compile Include="Ui\Fragments\ObjectActionsFragment.cs" />
     <Compile Include="Ui\Fragments\ObjectLinksFragment.cs" />
     <Compile Include="Ui\Fragments\PreferenceFragment.cs" />
-    <Compile Include="Ui\Fragments\SearchFragment.cs" />
     <Compile Include="Ui\Fragments\ShortcodeFragment.cs" />
     <Compile Include="Ui\Fragments\ShortcodesListFragment.cs" />
     <Compile Include="Ui\Fragments\ShortcodesSearchResultsFragment.cs" />
@@ -321,6 +320,12 @@
     <Compile Include="Ui\Fragments\FoldersNotificationsListFragment.cs" />
     <Compile Include="Extensions\ModuleTypeExtensions.cs" />
     <Compile Include="Ui\Common\HubMessages\NewNotificationsReceived.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractDropdownView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractTabButtonsView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractEditableTextView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractMultiView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DateRangeView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -592,11 +597,11 @@
     <AndroidResource Include="Resources\drawable-xxhdpi\map.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\map.png" />
     <AndroidResource Include="Resources\layout\linear_layout_base.axml" />
-    <AndroidResource Include="Resources\layout\search_edit_text.axml" />
     <AndroidResource Include="Resources\layout\search_spinner_item_dropdown.axml" />
     <AndroidResource Include="Resources\layout\search_spinner_item_multi.axml" />
     <AndroidResource Include="Resources\drawable\search_divider_horizontal.axml" />
     <AndroidResource Include="Resources\drawable\search_divider_vertical.axml" />
+    <AndroidResource Include="Resources\layout\search_edit_text_layout.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\anim\" />

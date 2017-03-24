@@ -39,8 +39,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var ft = SupportFragmentManager.BeginTransaction();
-                var paf = new SearchFragment();
-                ft.Replace(Resource.Id.fragment_container, paf, nameof(SearchFragment));
+                var paf = new DocumentSearchCriteriaFragment();
+                ft.Replace(Resource.Id.fragment_container, paf, paf.GenerateTag());
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(SearchActivity)}");

@@ -198,7 +198,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             if (maxTimestamp >= 0) datePicker.MaxDate = maxTimestamp;
             var builder = new MaterialDialog.Builder(context);
             builder.CustomView(datePicker, false);
-            builder.PositiveText(Resource.String.ok);  
+            builder.PositiveText(Resource.String.ok);
             builder.OnPositive(new SingleButtonCallback(() =>
             {
                 tcs.SetResult(datePicker.DateTime.ConvertDateTimeToTimestampMilliseconds());
@@ -273,6 +273,35 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Cancelable(false);
             var dialog = builder.Show();
             return dialog.Dismiss;
+        }
+
+        public static void ShowMultiSelectDialog<T>(Context context, int titleId, List<T> values, Action<List<T>> positiveAction, Action negativeAction = null,
+                                            List<T> selected = null, IEqualityComparer<T> equalityComparer = null, Func<T, string> displayText = null)
+        {
+            var result = new List<T>();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(titleId);
+            builder.Items(values.Select(t => { return displayText == null ? t.ToString() : displayText(t); }).ToArray());
+            builder.ItemsCallbackMultiChoice(null, new MultiChoiceCallback(si =>
+            {
+                foreach (var i in si)
+                    result.Add(values[i]);
+                positiveAction(result);
+            }));
+            builder.PositiveText(Resource.String.ok);
+            builder.NegativeText(Resource.String.cancel);
+            builder.OnNegative(new SingleButtonCallback(negativeAction));
+            var md = builder.Build();
+            if (selected != null)
+            {
+                var selectedIndexes = new List<int>();
+                for (var i = 0; i < values.Count; i++)
+                    if (equalityComparer == null ? selected.Contains(values[i]) : selected.Contains(values[i], equalityComparer))
+                        selectedIndexes.Add(i);
+                md.SetSelectedIndices(selectedIndexes.Select(i => new Java.Lang.Integer(i)).ToArray());
+            }
+            builder.Cancelable(false);
+            md.Show();
         }
 
         #endregion

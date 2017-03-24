@@ -79,12 +79,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
 
-            CommonConfig.Logger.Info($"Created {nameof(DocumentSearchFragment)}");
+            CommonConfig.Logger.Info($"Created {nameof(DocumentSearchCriteriaFragment)}");
         }
 
         public override string GenerateTag()
         {
-            return $"{nameof(DocumentSearchFragment)}";
+            return $"{nameof(DocumentSearchCriteriaFragment)}";
         }
     }
 }

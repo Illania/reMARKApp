@@ -192,6 +192,8 @@
 	<string name="search_document_attachment_names">Attachment names</string>
 	<string name="search_document_comments">Comments</string>
 	<string name="search_document_directions">Direction</string>
+	<string name="search_document_date_from">From date</string>
+	<string name="search_document_date_to">To date</string>
 	<string name="search_document_directions_none_selected">Any direction</string>
 	<string name="search_document_extra_fields">Extra Fields</string>
 	<string name="search_document_handled">Handled</string>
