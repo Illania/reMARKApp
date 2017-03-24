@@ -17,6 +17,14 @@ namespace Mark5.Mobile.Droid.Ui.Common
     public class CustomArrayAdapter : ArrayAdapter
     {
 
+        public static ArrayAdapter Create(Context context, int textArrayResId, int textViewResId, int dropDownViewResId)
+        {
+            var strings = context.Resources.GetStringArray(textArrayResId);
+            var adapter = new CustomArrayAdapter(context, textViewResId, strings, -1);
+            adapter.SetDropDownViewResource(dropDownViewResId);
+            return adapter;
+        }
+
         public static ArrayAdapter CreateWithoutLeftPadding(Context context, int textArrayResId, int textViewResId, int dropDownViewResId)
         {
             var strings = context.Resources.GetStringArray(textArrayResId);
@@ -35,7 +43,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         readonly int leftPadding;
 
-        public CustomArrayAdapter(Context context, int textViewResId, IList objects, int leftPadding)
+        public CustomArrayAdapter(Context context, int textViewResId, IList objects, int leftPadding = -1)
             : base(context, textViewResId, objects)
         {
             this.leftPadding = leftPadding;
@@ -44,7 +52,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
         public override View GetView(int position, View convertView, ViewGroup parent)
         {
             var view = base.GetView(position, convertView, parent);
-            view.SetPadding(leftPadding, view.PaddingTop, view.PaddingRight, view.PaddingBottom);
+            view.SetPadding(leftPadding < 0 ? view.PaddingLeft : leftPadding, view.PaddingTop, view.PaddingRight, view.PaddingBottom);
             return view;
         }
     }

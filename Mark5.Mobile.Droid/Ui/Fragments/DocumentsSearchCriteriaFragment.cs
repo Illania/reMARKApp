@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: SearchFragment.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -43,11 +43,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var paddingLinearLayout = ConversionUtils.ConvertDpToPixels(12);
             linearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, paddingLinearLayout);
 
-            linearLayout.AddView(new AbstractButtonsView(Context));
-            linearLayout.AddView(new AbstractMultiView(Context));
-            PrepareDropdownRow();
-            linearLayout.AddView(new AbstractEditableTextView(Context));
-            linearLayout.AddView(new DateRangeView(Context));
+            linearLayout.AddView(new DocumentDirectionsSearchView(Context));
+            linearLayout.AddView(new DocumentSubjectMessageSearchView(Context));
+            linearLayout.AddView(new DocumentFromToSearchView(Context));
+
+            //linearLayout.AddView(new AbstractMultiSearchView(Context));
+            //PrepareDropdownRow();
+            //linearLayout.AddView(new AbstractEditableTextSearchView(Context));
+            //linearLayout.AddView(new DateRangeView(Context));
 
             return rootView;
         }
@@ -61,13 +64,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var lp = new LinearLayoutCompat.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1);
 
-            var a = new AbstractDropdownView(Context);
-            var b = new AbstractDropdownView(Context);
-            var c = new AbstractDropdownView(Context);
+            //var a = new AbstractDropdownSearchView(Context);
+            //var b = new AbstractDropdownSearchView(Context);
+            //var c = new AbstractDropdownSearchView(Context);
 
-            ll.AddView(a, lp);
-            ll.AddView(b, lp);
-            ll.AddView(c, lp);
+            //ll.AddView(a, lp);
+            //ll.AddView(b, lp);
+            //ll.AddView(c, lp);
 
             linearLayout.AddView(ll);
         }

@@ -1,6 +1,6 @@
 ﻿//
-// Project: ${Project}
-// File: AbstractTabButtonsView.cs
+// Project: Mark5.Mobile.Droid
+// File: AbstractButtonsSearchView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
 //
 // Copyright (c) 2017 Nordic IT
@@ -15,33 +15,27 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
-    public class AbstractButtonsView : AbstractSearchView
+    public abstract class AbstractButtonsSearchView<T> : AbstractSearchView<T>
     {
-        public int value;
+        LayoutParams buttonsLayoutParams;
 
-        public AbstractButtonsView(Context context) : base(context)
+        protected AbstractButtonsSearchView(Context context) : base(context)
         {
             Orientation = Horizontal;
             SetPadding(0, 0, 0, 0);
 
-            var lp = new LayoutParams(0, ViewGroup.LayoutParams.MatchParent);
-            lp.Weight = 1.0f;
+            buttonsLayoutParams = new LayoutParams(0, ViewGroup.LayoutParams.MatchParent, 1);
 
             DividerDrawable = ContextCompat.GetDrawable(Context, Resource.Drawable.search_divider_vertical);
             ShowDividers = ShowDividerMiddle;
+        }
 
-            var button1 = new StyledButton(context);
-            button1.Text = "INBOX";
-
-            var button2 = new StyledButton(context);
-            button2.Text = "OUTBOX";
-
-            var button3 = new StyledButton(context);
-            button3.Text = "DRAFT";
-
-            AddView(button1, lp);
-            AddView(button2, lp);
-            AddView(button3, lp);
+        protected void AddButtons(params StyledButton[] buttons)
+        {
+            foreach (var button in buttons)
+            {
+                AddView(button, buttonsLayoutParams);
+            }
         }
 
         public class StyledButton : AppCompatButton
@@ -52,25 +46,29 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             bool selected;
             readonly Context context;
 
-            public StyledButton(Context context)
+            public StyledButton(Context context, int stringResourceId)
                 : base(context)
             {
                 this.context = context;
-                this.SetTextAppearanceCompat(context, buttonTextStyleNormalResourceId);
+                Text = context.GetString(stringResourceId);
 
                 //var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
                 //SetBackgroundResource(typedArray.GetResourceId(0, 0));
                 //typedArray.Recycle(); //TODO add ripple effect
 
-                SetBackgroundColor(BackgroundColorNormalState);
-
                 Click += StyledButton_Click;
+
+                UpdateStyle();
             }
 
             void StyledButton_Click(object sender, EventArgs e)
             {
                 selected = !selected;
+                UpdateStyle();
+            }
 
+            void UpdateStyle()
+            {
                 SetBackgroundColor(selected ? BackgroundColorSelectedState : BackgroundColorNormalState);
                 this.SetTextAppearanceCompat(context, selected ? buttonTextStyleSelectedResourceId : buttonTextStyleNormalResourceId);
             }

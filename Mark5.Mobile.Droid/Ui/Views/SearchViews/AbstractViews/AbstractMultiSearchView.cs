@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: AbstractMultiView.cs
+// File: AbstractMultiSearchView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
 //
 // Copyright (c) 2017 Nordic IT
@@ -17,13 +17,16 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
-    public class AbstractMultiView : AbstractSearchView
+    public abstract class AbstractMultiSearchView<T> : AbstractSearchView<T>
     {
         readonly protected AppCompatSpinner Spinner;
         readonly protected AppCompatTextView TopTextView;
         readonly protected AppCompatEditText BottomEditText;
 
-        public AbstractMultiView(Android.Content.Context context) : base(context)
+        protected AbstractMultiSearchView(Android.Content.Context context,
+                                         int topTextResId,
+                                         int bottomEditResId,
+                                         int textArrayResId) : base(context)
         {
             Orientation = Horizontal;
             SetBackgroundColor(BackgroundColorNormalState);
@@ -70,7 +73,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                     Gravity = (int)GravityFlags.Start,
                 }
             };
-            TopTextView.Text = "Where:";
+            TopTextView.Text = context.GetString(topTextResId);
             TopTextView.Gravity = GravityFlags.CenterVertical;
             TopTextView.SetTextAppearanceCompat(context, TextStyleTopLineResourceId);
             topRightLayout.AddView(TopTextView);
@@ -84,11 +87,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                     LeftMargin = ConversionUtils.ConvertDpToPixels(2),
                 }
             };
-
-            var priorities = new List<string> { "A", "B", "C" }; //TODO for testing 
-            var adapter = new ArrayAdapter(context, Resource.Layout.search_spinner_item_multi, priorities);
-            adapter.SetDropDownViewResource(Resource.Layout.support_simple_spinner_dropdown_item);
-            Spinner.Adapter = adapter;
+            Spinner.Adapter = CustomArrayAdapter.Create(context, textArrayResId,
+                                                        Resource.Layout.search_spinner_item_multi,
+                                                        Resource.Layout.support_simple_spinner_dropdown_item);
 
             topRightLayout.AddView(Spinner);
 
@@ -99,10 +100,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             {
                 Gravity = (int)GravityFlags.End,
             };
-            BottomEditText.Hint = "Enter search text";
             BottomEditText.SetPadding(0, 0, 0, 0); //EditText has a default padding
             BottomEditText.SetBackgroundColor(Color.Transparent);
             BottomEditText.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId); //TODO eventually we need to change the color of the hint ?
+            BottomEditText.Hint = context.GetString(bottomEditResId);
             BottomEditText.EditorAction += (sender, e) =>
             {
                 if (e.ActionId == ImeAction.Done)

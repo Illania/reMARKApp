@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: AbstractDropdownView.cs
+// File: AbstractDropdownSearchView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
 //
 // Copyright (c) 2017 Nordic IT
@@ -15,12 +15,12 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
-    public class AbstractDropdownView : AbstractSearchView
+    public abstract class AbstractDropdownSearchView<T> : AbstractSearchView<T>
     {
         readonly protected MultiSelectSpinner Spinner;
         readonly protected AppCompatTextView TextView;
 
-        public AbstractDropdownView(Context context) : base(context)
+        protected AbstractDropdownSearchView(Context context) : base(context)
         {
             Orientation = Vertical;
             SetBackgroundColor(BackgroundColorNormalState);

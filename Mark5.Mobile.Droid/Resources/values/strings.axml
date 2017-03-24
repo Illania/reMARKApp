@@ -191,10 +191,11 @@
 	<string name="search_contacts_result">Results</string>
 	<string name="search_document_attachment_names">Attachment names</string>
 	<string name="search_document_comments">Comments</string>
-	<string name="search_document_directions">Direction</string>
+	<string name="search_document_direction_inbox">Inbox</string>
+	<string name="search_document_direction_outbox">Outbox</string>
+	<string name="search_document_direction_draft">Draft</string>
 	<string name="search_document_date_from">From date</string>
 	<string name="search_document_date_to">To date</string>
-	<string name="search_document_directions_none_selected">Any direction</string>
 	<string name="search_document_extra_fields">Extra Fields</string>
 	<string name="search_document_handled">Handled</string>
 	<string name="search_document_handled_false">Unhandled</string>
@@ -207,8 +208,12 @@
 	<string name="search_document_priorities">Priority</string>
 	<string name="search_document_priorities_none_selected">Any priority</string>
 	<string name="search_document_reference_number">Reference number</string>
+	<string name="search_document_search_for">Search for email addresses in:</string>
+	<string name="search_document_search_for_hint">Enter address</string>
 	<string name="search_document_unread_only">Unread documents only</string>
 	<string name="search_document_with_attachments_only">Only documents with attachments</string>
+	<string name="search_document_where">Where:</string>
+	<string name="search_document_where_hint">Enter search text</string>
 	<string name="search_documents">Search documents</string>
 	<string name="search_documents_result">Results</string>
 	<string name="search_max_contacts">Maximum contacts in results</string>

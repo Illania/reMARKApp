@@ -15,12 +15,12 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
-    public class AbstractSearchView : LinearLayoutCompat
+    public abstract class AbstractSearchView<T> : LinearLayoutCompat
     {
-        protected static int DistanceNone;
-        protected static int DistanceLarge;
-        protected static int DistanceNormal;
-        protected static int DistanceSmall;
+        protected int DistanceNone;
+        protected int DistanceLarge;
+        protected int DistanceNormal;
+        protected int DistanceSmall;
 
         protected static Color BackgroundColorNormalState;
         protected static Color BackgroundColorSelectedState;
@@ -43,8 +43,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
             BackgroundColorNormalState = new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue));
             BackgroundColorSelectedState = new Color(ContextCompat.GetColor(Context, Resource.Color.lightblue));
-
         }
 
+        public abstract void FromCriteria(T criteria);
+
+        public abstract void ToCriteria(T criteria);
     }
 }

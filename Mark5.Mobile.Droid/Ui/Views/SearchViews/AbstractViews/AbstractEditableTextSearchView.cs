@@ -13,7 +13,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
-    public class AbstractEditableTextView : AbstractSearchView
+    public abstract class AbstractEditableTextSearchView<T> : AbstractSearchView<T>
     {
         readonly protected AppCompatTextView TopTextView;
         readonly protected AppCompatTextView BottomTextView;
@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         string EmptyText = "Enter text:";
         bool empty = true;
 
-        public AbstractEditableTextView(Context context) : base(context)
+        protected AbstractEditableTextSearchView(Context context) : base(context)
         {
             Orientation = Vertical;
             SetBackgroundColor(BackgroundColorNormalState);

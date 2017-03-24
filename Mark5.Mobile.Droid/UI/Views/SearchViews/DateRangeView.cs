@@ -9,13 +9,14 @@ using System;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
-    public class DateRangeView : AbstractSearchView
+    public class DateRangeView : AbstractSearchView<SearchDocumentsCriteria>
     {
         long fromTimestamp = -1;
         long toTimestamp = -1;
@@ -119,6 +120,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         {
             dateRangeFromTextView.Text = fromTimestamp == -1 ? "-" : fromTimestamp.FormatServerTimestampAsDateString(Context);
             dateRangeToTextView.Text = toTimestamp == -1 ? "-" : toTimestamp.FormatServerTimestampAsDateString(Context);
+        }
+
+        public override void FromCriteria(SearchDocumentsCriteria criteria)
+        {
+            //TODo
+        }
+
+        public override void ToCriteria(SearchDocumentsCriteria criteria)
+        {
+            //TODO
         }
     }
 }
