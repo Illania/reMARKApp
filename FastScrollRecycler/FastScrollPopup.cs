@@ -25,7 +25,7 @@ namespace FastScrollRecycler
         Path backgroundPath;
         RectF backgroundRect;
         Paint backgroundPaint;
-        int backgroundColor;
+        Color backgroundColor;
 
         Rect invalidateRect;
         Rect tmpRect;
@@ -66,16 +66,16 @@ namespace FastScrollRecycler
             SetBackgroundSize(Utils.ToPixels(resources, 88f));
         }
 
-        public void SetBackgroundColor(int color)
+        public void SetBackgroundColor(Color color)
         {
             backgroundColor = color;
-            backgroundPaint.Color = new Color(color);
+            backgroundPaint.Color = color;
             recyclerView.Invalidate(backgroundBounds);
         }
 
-        public void SetTextColor(int color)
+        public void SetTextColor(Color color)
         {
-            textPaint.Color = new Color(color);
+            textPaint.Color = color;
             recyclerView.Invalidate(backgroundBounds);
         }
 

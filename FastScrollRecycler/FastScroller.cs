@@ -72,10 +72,13 @@ namespace FastScrollRecycler
                 autoHideEnabled = typedArray.GetBoolean(Resource.Styleable.FastScrollRecyclerView_fastScrollAutoHide, true);
                 autoHideDelay = typedArray.GetInteger(Resource.Styleable.FastScrollRecyclerView_fastScrollAutoHideDelay, DefaultAutoHideDelay);
 
-                var trackColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollTrackColor, 0x1f000000);
-                var thumbColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollThumbColor, 0x1f000000);
-                var popupBackgroundColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupBackgroundColor, 0x1f000000);
-                var popupTextColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupTextColor, 0xffffff);
+                var color1f000000 = Color.Argb(0x1f, 0x00, 0x00, 0x00);
+                var colorffffffff = Color.Argb(0xff, 0xff, 0xff, 0xff);
+
+                var trackColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollTrackColor, color1f000000);
+                var thumbColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollThumbColor, color1f000000);
+                var popupBackgroundColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupBackgroundColor, color1f000000);
+                var popupTextColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupTextColor, colorffffffff);
                 var popupTextSize = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupTextSize, Utils.ToPixels(resources, 56f));
                 var popupBackgroundSize = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupBackgroundSize, Utils.ToPixels(resources, 88f));
                 var popupPosition = (FastScrollerPosition)typedArray.GetInteger(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupPosition, (int)FastScrollerPosition.Adjacent);
@@ -106,10 +109,7 @@ namespace FastScrollRecycler
                 autoHideAnimator.Start();
             };
 
-            recyclerView.AddOnScrollListener(new ActionOnScrollListener((rv, dx, dy) =>
-            {
-                Show();
-            }));
+            recyclerView.AddOnScrollListener(new ActionOnScrollListener((rv, dx, dy) => Show()));
 
             if (autoHideEnabled)
                 PostAutoHideDelayed();
@@ -130,7 +130,7 @@ namespace FastScrollRecycler
             return isDragging;
         }
 
-        public void HandleTouchEvent(MotionEvent ev, int downX, int downY, int lastY, OnFastScrollStateChangeListener stateChangedListener)
+        public void HandleTouchEvent(MotionEvent ev, int downX, int downY, int lastY, IOnFastScrollStateChangeListener stateChangedListener)
         {
 
             var config = ViewConfiguration.Get(recyclerView.Context);
@@ -253,21 +253,23 @@ namespace FastScrollRecycler
 
         void CancelAutoHide() => recyclerView?.RemoveCallbacks(hideAction);
 
-        public void SetThumbColor(int color)
+        public void SetThumbColor(Color color)
         {
-            thumb.Color = new Color(color);
+            thumb.Color = color;
             recyclerView?.Invalidate(invalidateRect);
         }
 
-        public void SetTrackColor(int color)
+        public void SetTrackColor(Color color)
         {
-            track.Color = new Color(color);
+            track.Color = color;
             recyclerView?.Invalidate(invalidateRect);
         }
 
-        public void SetPopupBackgroundColor(int color) => popup.SetBackgroundColor(color);
+        public void SetPopupBackgroundColor(Color color) => popup.SetBackgroundColor(color);
 
-        public void SetPopupTextColor(int color) => popup.SetTextColor(color);
+        public void SetPopupTextColor(Color color) => popup.SetTextColor(color);
+
+        public void SetPopupTextSize(int size) => popup.SetTextSize(size);
 
         public void SetPopupTypeface(Typeface typeface) => popup.SetTypeFace(typeface);
 
@@ -314,7 +316,7 @@ namespace FastScrollRecycler
             readonly Action actionCancel;
             readonly Action actionEnd;
 
-            public ActionAnimatorListenerAdapter(Action actionCancel, Action actionEnd)
+            public ActionAnimatorListenerAdapter(Action actionCancel = null, Action actionEnd = null)
             {
                 this.actionCancel = actionCancel;
                 this.actionEnd = actionEnd;
@@ -332,11 +334,5 @@ namespace FastScrollRecycler
                 actionEnd();
             }
         }
-    }
-
-    enum FastScrollerPosition
-    {
-        Adjacent = 0,
-        Center = 1
     }
 }

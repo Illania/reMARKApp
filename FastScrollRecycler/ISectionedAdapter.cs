@@ -1,6 +1,6 @@
 ﻿//
 // Project: FastScrollRecycler
-// File: OnFastScrollStateChangeListener.cs
+// File: ISectionedAdapter.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2017 Nordic IT
@@ -9,11 +9,9 @@
 namespace FastScrollRecycler
 {
 
-    public interface OnFastScrollStateChangeListener
+    public interface ISectionedAdapter
     {
 
-        void OnFastScrollStart();
-
-        void OnFastScrollStop();
+        string GetSectionName(int position);
     }
 }

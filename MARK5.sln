@@ -112,13 +112,9 @@ Global
 		{F545C743-A4B6-47A6-BE22-A03529942A47}.Release|x86.ActiveCfg = Release|Any CPU
 		{F545C743-A4B6-47A6-BE22-A03529942A47}.Release|x86.Build.0 = Release|Any CPU
 		{F545C743-A4B6-47A6-BE22-A03529942A47}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
-		{F545C743-A4B6-47A6-BE22-A03529942A47}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
 		{F545C743-A4B6-47A6-BE22-A03529942A47}.Release|iPhone.ActiveCfg = Release|Any CPU
-		{F545C743-A4B6-47A6-BE22-A03529942A47}.Release|iPhone.Build.0 = Release|Any CPU
 		{F545C743-A4B6-47A6-BE22-A03529942A47}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
-		{F545C743-A4B6-47A6-BE22-A03529942A47}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 		{F545C743-A4B6-47A6-BE22-A03529942A47}.Debug|iPhone.ActiveCfg = Debug|Any CPU
-		{F545C743-A4B6-47A6-BE22-A03529942A47}.Debug|iPhone.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6C099FEF-30C6-4D04-917A-FB0C3E561D93} = {568A965C-A051-444B-B396-251AA5E00F99}
