@@ -10,9 +10,9 @@ using Android.Animation;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.View.Animation;
-using Android.Support.V7.Widget;
 using Android.Util;
 using Android.Views;
+using Java.Interop;
 
 namespace FastScrollRecycler
 {
@@ -47,7 +47,6 @@ namespace FastScrollRecycler
         bool animatingShow;
         int autoHideDelay = DefaultAutoHideDelay;
         bool autoHideEnabled = true;
-
         readonly Action hideAction;
 
         public FastScroller(Context ctx, FastScrollRecyclerView recyclerView, IAttributeSet attrs)
@@ -60,7 +59,7 @@ namespace FastScrollRecycler
             thumbHeight = Utils.ToPixels(resources, 48f);
             width = Utils.ToPixels(resources, 8f);
 
-            touchInset = Utils.ToPixels(resources, -24f);
+            touchInset = Utils.ToPixels(resources, -48f);
 
             thumb = new Paint(PaintFlags.AntiAlias);
             track = new Paint(PaintFlags.AntiAlias);
@@ -73,11 +72,12 @@ namespace FastScrollRecycler
                 autoHideDelay = typedArray.GetInteger(Resource.Styleable.FastScrollRecyclerView_fastScrollAutoHideDelay, DefaultAutoHideDelay);
 
                 var color1f000000 = Color.Argb(0x1f, 0x00, 0x00, 0x00);
+                var colorff000000 = Color.Argb(0xff, 0x00, 0x00, 0x00);
                 var colorffffffff = Color.Argb(0xff, 0xff, 0xff, 0xff);
 
                 var trackColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollTrackColor, color1f000000);
                 var thumbColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollThumbColor, color1f000000);
-                var popupBackgroundColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupBackgroundColor, color1f000000);
+                var popupBackgroundColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupBackgroundColor, colorff000000);
                 var popupTextColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupTextColor, colorffffffff);
                 var popupTextSize = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupTextSize, Utils.ToPixels(resources, 56f));
                 var popupBackgroundSize = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupBackgroundSize, Utils.ToPixels(resources, 88f));
@@ -109,7 +109,10 @@ namespace FastScrollRecycler
                 autoHideAnimator.Start();
             };
 
-            recyclerView.AddOnScrollListener(new ActionOnScrollListener((rv, dx, dy) => Show()));
+            recyclerView.AddOnScrollListener(new ActionOnScrollListener((rv, dx, dy, objects) =>
+            {
+                Show();
+            }));
 
             if (autoHideEnabled)
                 PostAutoHideDelayed();
@@ -183,7 +186,7 @@ namespace FastScrollRecycler
             if (thumbPosition.X < 0 || thumbPosition.Y < 0)
                 return;
 
-            canvas.DrawRect(thumbPosition.X + offset.X, thumbHeight / 2 + offset.Y, thumbPosition.X - offset.X + width, recyclerView.Height + offset.Y - thumbHeight / 2, track);
+            canvas.DrawRect(thumbPosition.X + offset.X, thumbHeight / 2 + offset.Y, thumbPosition.X + offset.X + width, recyclerView.Height + offset.Y - thumbHeight / 2, track);
             canvas.DrawRect(thumbPosition.X + offset.X, thumbPosition.Y + offset.Y, thumbPosition.X + offset.X + width, thumbPosition.Y + offset.Y + thumbHeight, thumb);
             popup.Draw(canvas);
         }
@@ -220,9 +223,14 @@ namespace FastScrollRecycler
             recyclerView.Invalidate(invalidateRect);
         }
 
+        [Export("setOffsetX")]
         public void SetOffsetX(int x) => SetOffset(x, offset.Y);
 
-        public void SetOffsetY(int y) => SetOffset(offset.X, y);
+        [Export("getOffsetX")]
+        public int GetOffsetX()
+        {
+            return offset.X;
+        }
 
         public void Show()
         {
@@ -231,6 +239,7 @@ namespace FastScrollRecycler
                 autoHideAnimator?.Cancel();
                 autoHideAnimator = ObjectAnimator.OfInt(this, "offsetX", 0);
                 autoHideAnimator.SetInterpolator(new LinearOutSlowInInterpolator());
+                autoHideAnimator.SetDuration(150L);
                 autoHideAnimator.AddListener(new ActionAnimatorListenerAdapter(() => animatingShow = false, () => animatingShow = false));
                 animatingShow = true;
                 autoHideAnimator.Start();
@@ -292,47 +301,5 @@ namespace FastScrollRecycler
         }
 
         public void SetPopupPosition(FastScrollerPosition position) => popup.SetPopupPosition(position);
-
-        class ActionOnScrollListener : RecyclerView.OnScrollListener
-        {
-
-            readonly Action<RecyclerView, int, int> action;
-
-            public ActionOnScrollListener(Action<RecyclerView, int, int> action)
-            {
-                this.action = action;
-            }
-
-            public override void OnScrolled(RecyclerView recyclerView, int dx, int dy)
-            {
-                base.OnScrolled(recyclerView, dx, dy);
-                action(recyclerView, dx, dy);
-            }
-        }
-
-        class ActionAnimatorListenerAdapter : AnimatorListenerAdapter
-        {
-
-            readonly Action actionCancel;
-            readonly Action actionEnd;
-
-            public ActionAnimatorListenerAdapter(Action actionCancel = null, Action actionEnd = null)
-            {
-                this.actionCancel = actionCancel;
-                this.actionEnd = actionEnd;
-            }
-
-            public override void OnAnimationCancel(Animator animation)
-            {
-                base.OnAnimationCancel(animation);
-                actionCancel();
-            }
-
-            public override void OnAnimationEnd(Animator animation)
-            {
-                base.OnAnimationEnd(animation);
-                actionEnd();
-            }
-        }
     }
 }

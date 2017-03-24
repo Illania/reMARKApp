@@ -8,6 +8,7 @@
 using System;
 using Android.Content;
 using Android.Graphics;
+using Android.Support.V4.Widget;
 using Android.Support.V7.Widget;
 using Android.Util;
 using Android.Views;
@@ -20,7 +21,7 @@ namespace FastScrollRecycler
 
         readonly FastScroller scrollbar;
 
-        struct FastScrollPositionState
+        class FastScrollPositionState
         {
 
             public int RowIndex { get; set; }
@@ -37,6 +38,8 @@ namespace FastScrollRecycler
         int lastY;
 
         IOnFastScrollStateChangeListener stateChangeListener;
+
+        ActionOnScrollListener disableRefreshLayoutListener;
 
         public FastScrollRecyclerView(Context context, IAttributeSet attrs)
             : base(context, attrs)
@@ -58,6 +61,51 @@ namespace FastScrollRecycler
         internal int GetScrollBarThumbHeight()
         {
             return scrollbar.GetThumbHeight();
+        }
+
+        protected override void OnAttachedToWindow()
+        {
+            base.OnAttachedToWindow();
+
+            var refreshLayout = Utils.FindRefreshLayout(this);
+            if (refreshLayout != null)
+            {
+                if (disableRefreshLayoutListener != null)
+                {
+                    RemoveOnScrollListener(disableRefreshLayoutListener);
+                    disableRefreshLayoutListener = null;
+                }
+
+                disableRefreshLayoutListener = new ActionOnScrollListener((rv, dx, dy, objects) =>
+                {
+                    var rl = (SwipeRefreshLayout)objects[0];
+
+                    if (scrollbar?.IsDragging() ?? false)
+                    {
+                        rl.Enabled = false;
+                        return;
+                    }
+
+                    var llm = rv.GetLayoutManager() as LinearLayoutManager;
+                    if (llm != null)
+                    {
+                        llm = (LinearLayoutManager)rv.GetLayoutManager();
+                        rl.Enabled = llm.FindFirstCompletelyVisibleItemPosition() == 0;
+                    }
+                }, refreshLayout);
+                AddOnScrollListener(disableRefreshLayoutListener);
+            }
+        }
+
+        protected override void OnDetachedFromWindow()
+        {
+            base.OnDetachedFromWindow();
+
+            if (disableRefreshLayoutListener != null)
+            {
+                RemoveOnScrollListener(disableRefreshLayoutListener);
+                disableRefreshLayoutListener = null;
+            }
         }
 
         protected override void OnFinishInflate()
@@ -119,9 +167,9 @@ namespace FastScrollRecycler
             return Height - scrollbar.GetThumbHeight();
         }
 
-        public override void OnDraw(Canvas c)
+        public override void Draw(Canvas c)
         {
-            base.OnDraw(c);
+            base.Draw(c);
             OnUpdateScrollbar();
             scrollbar.Draw(c);
         }
@@ -203,6 +251,7 @@ namespace FastScrollRecycler
                 return;
             }
 
+            GetCurScrollState(scrollPositionState);
             if (scrollPositionState.RowIndex < 0)
             {
                 scrollbar.SetThumbPosition(-1, -1);

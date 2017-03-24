@@ -6,7 +6,9 @@
 // Copyright (c) 2017 Nordic IT
 //
 using Android.Content.Res;
+using Android.Support.V4.Widget;
 using Android.Util;
+using Android.Views;
 
 namespace FastScrollRecycler
 {
@@ -27,6 +29,17 @@ namespace FastScrollRecycler
         public static bool IsRtl(Resources res)
         {
             return res.Configuration.LayoutDirection == Android.Views.LayoutDirection.Rtl;
+        }
+
+        public static SwipeRefreshLayout FindRefreshLayout(IViewParent rv)
+        {
+            if (rv.Parent == null)
+                return null;
+
+            if (rv.Parent is SwipeRefreshLayout)
+                return (SwipeRefreshLayout)rv.Parent;
+
+            return FindRefreshLayout(rv.Parent);
         }
     }
 }

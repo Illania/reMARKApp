@@ -385,6 +385,10 @@
       <Project>{26873336-60F0-4734-8286-A1ECC902AB95}</Project>
       <Name>TinyMessenger</Name>
     </ProjectReference>
+    <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
+      <Project>{F545C743-A4B6-47A6-BE22-A03529942A47}</Project>
+      <Name>FastScrollRecycler</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\color\drawer_item.xml" />

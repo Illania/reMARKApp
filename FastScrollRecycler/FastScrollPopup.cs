@@ -9,6 +9,9 @@ using System;
 using Android.Animation;
 using Android.Content.Res;
 using Android.Graphics;
+using Android.Text;
+using Android.Util;
+using Java.Interop;
 
 namespace FastScrollRecycler
 {
@@ -22,20 +25,20 @@ namespace FastScrollRecycler
         int backgroundSize;
         int cornerRadius;
 
-        Path backgroundPath;
-        RectF backgroundRect;
+        Path backgroundPath = new Path();
+        RectF backgroundRect = new RectF();
         Paint backgroundPaint;
-        Color backgroundColor;
+        Color backgroundColor = Color.Argb(0xff, 0x00, 0x00, 0x00);
 
-        Rect invalidateRect;
-        Rect tmpRect;
+        Rect invalidateRect = new Rect();
+        Rect tmpRect = new Rect();
 
-        Rect backgroundBounds;
+        Rect backgroundBounds = new Rect();
 
         string sectionName;
 
         Paint textPaint;
-        Rect textBounds;
+        Rect textBounds = new Rect();
 
         float alpha = 1f;
 
@@ -49,18 +52,10 @@ namespace FastScrollRecycler
             this.resources = resources;
             this.recyclerView = recyclerView;
 
-            backgroundPath = new Path();
-            backgroundRect = new RectF();
             backgroundPaint = new Paint(PaintFlags.AntiAlias);
-
-            invalidateRect = new Rect();
-            tmpRect = new Rect();
-
-            backgroundBounds = new Rect();
 
             textPaint = new Paint(PaintFlags.AntiAlias);
             textPaint.Alpha = 0;
-            textBounds = new Rect();
 
             SetTextSize(Utils.ToScreenPixels(resources, 56f));
             SetBackgroundSize(Utils.ToPixels(resources, 88f));
@@ -100,33 +95,32 @@ namespace FastScrollRecycler
 
         public void AnimateVisibility(bool visible)
         {
-            if (this.visible == visible)
-                return;
+            if (this.visible != visible)
+            {
+                this.visible = visible;
 
-            this.visible = visible;
+                alphaAnimator?.Cancel();
 
-            alphaAnimator?.Cancel();
-
-            alphaAnimator = ObjectAnimator.OfFloat(this, "alpha", visible ? 1f : 0f);
-            alphaAnimator.SetDuration(visible ? 200L : 150L);
-            alphaAnimator.Start();
+                alphaAnimator = ObjectAnimator.OfFloat(this, "alpha", visible ? 1f : 0f);
+                alphaAnimator.SetDuration(visible ? 200L : 150L);
+                alphaAnimator.Start();
+            }
         }
 
+        [Export("setAlpha")]
         public void SetAlpha(float alpha)
         {
             this.alpha = alpha;
             recyclerView.Invalidate(backgroundBounds);
         }
 
+        [Export("getAlpha")]
         public float GetAlpha()
         {
             return alpha;
         }
 
-        public void SetPopupPosition(FastScrollerPosition position)
-        {
-            this.position = position;
-        }
+        public void SetPopupPosition(FastScrollerPosition position) => this.position = position;
 
         public FastScrollerPosition GetPopupPosition()
         {
@@ -146,38 +140,38 @@ namespace FastScrollRecycler
 
         public void Draw(Canvas canvas)
         {
-            if (!IsVisible())
-                return;
+            if (IsVisible())
+            {
+                var restoreCount = canvas.Save(SaveFlags.Matrix);
+                canvas.Translate(backgroundBounds.Left, backgroundBounds.Top);
+                tmpRect.Set(backgroundBounds);
+                tmpRect.OffsetTo(0, 0);
 
-            var restoreCount = canvas.Save(SaveFlags.Matrix);
-            canvas.Translate(backgroundBounds.Left, backgroundBounds.Top);
-            tmpRect.Set(backgroundBounds);
-            tmpRect.Offset(0, 0);
+                backgroundPath.Reset();
+                backgroundRect.Set(tmpRect);
 
-            backgroundPath.Reset();
-            backgroundRect.Set(tmpRect);
+                var radii = CreateRadii();
 
-            var radii = CreateRadii();
+                backgroundPath.AddRoundRect(backgroundRect, radii, Path.Direction.Cw);
 
-            backgroundPath.AddRoundRect(backgroundRect, radii, Path.Direction.Cw);
-
-            backgroundPaint.Alpha = (int)(Color.GetAlphaComponent(backgroundColor) * alpha);
-            textPaint.Alpha = (int)(alpha * 255);
-            canvas.DrawPath(backgroundPath, backgroundPaint);
-            canvas.DrawText(sectionName, (backgroundBounds.Width() - textBounds.Width()) / 2,
-                            backgroundBounds.Height() - (backgroundBounds.Height() - textBounds.Height()) / 2,
-                            textPaint);
-            canvas.RestoreToCount(restoreCount);
+                backgroundPaint.Alpha = (int)(Color.GetAlphaComponent(backgroundColor) * alpha);
+                textPaint.Alpha = (int)(alpha * 255);
+                canvas.DrawPath(backgroundPath, backgroundPaint);
+                canvas.DrawText(sectionName, (backgroundBounds.Width() - textBounds.Width()) / 2,
+                                backgroundBounds.Height() - (backgroundBounds.Height() - textBounds.Height()) / 2,
+                                textPaint);
+                canvas.RestoreToCount(restoreCount);
+            }
         }
 
         public void SetSectionName(string sectionName)
         {
-            if (this.sectionName == sectionName)
-                return;
-
-            this.sectionName = sectionName;
-            textPaint.GetTextBounds(sectionName, 0, sectionName.Length, textBounds);
-            textBounds.Right = (int)(textBounds.Left + textPaint.MeasureText(sectionName));
+            if (this.sectionName != sectionName)
+            {
+                this.sectionName = sectionName;
+                textPaint.GetTextBounds(sectionName, 0, sectionName.Length, textBounds);
+                textBounds.Right = (int)(textBounds.Left + textPaint.MeasureText(sectionName));
+            }
         }
 
         public Rect UpdateFastScrollerBounds(FastScrollRecyclerView recyclerView, int thumbOffsetY)
@@ -218,13 +212,15 @@ namespace FastScrollRecycler
                 backgroundBounds.SetEmpty();
             }
 
+            Log.Info("FS", thumbOffsetY + " " + backgroundBounds.ToString());
+
             invalidateRect.Union(backgroundBounds);
             return invalidateRect;
         }
 
         public bool IsVisible()
         {
-            return alpha > 0f && !string.IsNullOrEmpty(sectionName);
+            return alpha > 0f && !TextUtils.IsEmpty(sectionName);
         }
     }
 }
