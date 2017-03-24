@@ -17,8 +17,10 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
+using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -251,7 +253,7 @@ namespace Mark5.Mobile.Droid
 
         #region RecyclerView Adapter/ViewHolder
 
-        class CategoriesListAdapter : RecyclerView.Adapter
+        class CategoriesListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
             readonly List<Category> categoriesInView = new List<Category>();
 
@@ -292,6 +294,11 @@ namespace Mark5.Mobile.Droid
             {
                 Clear();
                 SetItems(items);
+            }
+
+            string ISectionedAdapter.GetSectionName(int position)
+            {
+                return categoriesInView[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
         }
 

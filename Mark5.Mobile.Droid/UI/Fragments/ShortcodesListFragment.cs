@@ -18,6 +18,7 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
+using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
@@ -672,7 +673,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region RecyclerView Adapter/ViewHolder
 
-        class ShortcodesListAdapter : RecyclerView.Adapter
+        class ShortcodesListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
 
             public List<ShortcodePreview> Items
@@ -836,6 +837,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
                 }
                 return position;
+            }
+
+            string ISectionedAdapter.GetSectionName(int position)
+            {
+                return shortcodePreviewsInView[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
         }
 
