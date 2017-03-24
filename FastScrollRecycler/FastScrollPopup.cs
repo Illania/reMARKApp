@@ -202,8 +202,8 @@ namespace FastScrollRecycler
                         backgroundBounds.Right = recyclerView.Width - (2 * recyclerView.GetScrollBarWidth());
                         backgroundBounds.Left = backgroundBounds.Right - backgroundWidth;
                     }
-                    backgroundRect.Top = thumbOffsetY - backgroundHeight + recyclerView.GetScrollBarThumbHeight() / 2;
-                    backgroundRect.Top = Math.Max(edgePadding, Math.Min(backgroundBounds.Top, recyclerView.Height - edgePadding - backgroundHeight));
+                    backgroundBounds.Top = thumbOffsetY - backgroundHeight + recyclerView.GetScrollBarThumbHeight() / 2;
+                    backgroundBounds.Top = Math.Max(edgePadding, Math.Min(backgroundBounds.Top, recyclerView.Height - edgePadding - backgroundHeight));
                 }
                 backgroundBounds.Bottom = backgroundBounds.Top + backgroundHeight;
             }
@@ -211,8 +211,6 @@ namespace FastScrollRecycler
             {
                 backgroundBounds.SetEmpty();
             }
-
-            Log.Info("FS", thumbOffsetY + " " + backgroundBounds.ToString());
 
             invalidateRect.Union(backgroundBounds);
             return invalidateRect;
