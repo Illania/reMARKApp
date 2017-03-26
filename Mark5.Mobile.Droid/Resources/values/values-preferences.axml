@@ -1,16 +1,18 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <resources>
 	<string-array name="pref_documents_to_load_entries">
+		<item>100</item>
 		<item>250</item>
 		<item>500</item>
 		<item>1000</item>
 	</string-array>
 	<string-array name="pref_documents_to_load_entryvalues">
+		<item>100</item>
 		<item>250</item>
 		<item>500</item>
 		<item>1000</item>
 	</string-array>
-	<string name="pref_documents_to_load_default">500</string>
+	<string name="pref_documents_to_load_default">250</string>
 	<string-array name="pref_documents_mark_as_read_entries">
 		<item>Never</item>
 		<item>Immediately</item>
