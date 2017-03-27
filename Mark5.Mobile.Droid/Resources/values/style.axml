@@ -38,7 +38,7 @@
 	<style name="mark5Splash" parent="mark5">
 		<item name="android:windowFullscreen">true</item>
 		<item name="android:windowContentOverlay">@null</item>
-		<item name="android:windowBackground">@mipmap/background</item>
+		<item name="android:windowBackground">@drawable/background</item>
 		<item name="windowNoTitle">true</item>
 		<item name="windowActionBar">false</item>
 	</style>

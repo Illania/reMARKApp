@@ -95,9 +95,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
         }
 
-        public override void OnBackPressed()
+        public override void Finish()
         {
-            base.OnBackPressed();
+            base.Finish();
 
             OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
         }

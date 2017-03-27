@@ -73,9 +73,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             entityRemovedToken = PlatformConfig.MessengerHub.Subscribe<EntityRemovedMessage>(slf.UpdateRemovedEntities, m => slf != null && m.Sender != slf && m.ObjectType == ObjectType.Shortcode);
         }
 
-        protected override void OnStop()
+        public override void Finish()
         {
-            base.OnStop();
+            base.Finish();
 
             OverridePendingTransition(Resource.Animation.enter_from_left_half, Resource.Animation.exit_to_right);
         }

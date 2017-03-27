@@ -1662,7 +1662,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 unreadImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_unread);
                 attachmentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_attachment);
                 commentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_comment);
-                itemContent = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_internal_Layout);
+                itemContent = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_internal_layout);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
                 swipedBackground = itemView.FindViewById<View>(Resource.Id.swiped_background);
             }
@@ -1769,7 +1769,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 previewTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_external_preview);
                 categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_external_categories);
                 commentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_external_comment);
-                itemContent = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_internal_Layout);
+                itemContent = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_external_internal_layout);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
                 swipedBackground = itemView.FindViewById<View>(Resource.Id.swiped_background);
             }

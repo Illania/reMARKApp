@@ -239,7 +239,6 @@
     <Compile Include="Ui\Fragments\EditCategoriesListFragment.cs" />
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
     <Compile Include="Ui\Fragments\CommentsListFragment.cs" />
-    <Compile Include="Ui\Fragments\ContactFragment.cs" />
     <Compile Include="Ui\Fragments\ContactsListFragment.cs" />
     <Compile Include="Ui\Fragments\ContactsSearchCriteriaFragment.cs" />
     <Compile Include="Ui\Fragments\ContactsSearchResultsFragment.cs" />
@@ -365,6 +364,7 @@
     <Compile Include="Ui\Fragments\FoldersNotificationsListFragment.cs" />
     <Compile Include="Extensions\ModuleTypeExtensions.cs" />
     <Compile Include="Ui\Common\HubMessages\NewNotificationsReceived.cs" />
+    <Compile Include="Ui\Fragments\ContactFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -421,7 +421,6 @@
     <AndroidResource Include="Resources\layout\pager.axml" />
     <AndroidResource Include="Resources\menu\menu_drawer.axml" />
     <AndroidResource Include="Resources\menu\menu_main.axml" />
-    <AndroidResource Include="Resources\mipmap\background.png" />
     <AndroidResource Include="Resources\mipmap-hdpi\ic_icon.png" />
     <AndroidResource Include="Resources\mipmap-xhdpi\ic_icon.png" />
     <AndroidResource Include="Resources\mipmap-xxhdpi\ic_icon.png" />
@@ -639,6 +638,7 @@
     <AndroidResource Include="Resources\drawable-xhdpi\map.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\map.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\map.png" />
+    <AndroidResource Include="Resources\drawable\background.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\anim\" />
@@ -647,6 +647,7 @@
     <Folder Include="Resources\drawable-xxhdpi\" />
     <Folder Include="Resources\drawable-xxxhdpi\" />
     <Folder Include="Resources\drawable-hdpi\" />
+    <Folder Include="Resources\mipmap\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Xamarin.Build.Download.0.3.0\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.3.0\build\Xamarin.Build.Download.targets')" />
