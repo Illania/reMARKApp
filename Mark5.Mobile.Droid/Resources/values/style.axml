@@ -61,7 +61,7 @@
 	<style name="mark5preference" parent="PreferenceThemeOverlay.v14.Material" />
 	<!-- Styles -->
 	<style name="mark5actionmode" parent="Widget.AppCompat.ActionMode">
-		<item name="background">@color/darkgray</item>
+		<item name="background">@color/darkblue</item>
 	</style>
 	<style name="mark5overflowbutton" parent="Widget.AppCompat.ActionButton.Overflow">
 		<item name="android:tint">@color/lightgray</item>
