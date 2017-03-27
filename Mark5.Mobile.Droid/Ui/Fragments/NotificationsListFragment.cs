@@ -96,7 +96,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             await RefreshData();
 
-            newNotificationsToken = PlatformConfig.MessengerHub.Subscribe<NewNotificationsReceived>(async m => await RefreshData());
+            newNotificationsToken = PlatformConfig.MessengerHub.Subscribe<NewNotificationsReceived>(m => Activity.RunOnUiThread(async () => await RefreshData()));
         }
 
         public override void OnPause()
