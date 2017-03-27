@@ -14,7 +14,6 @@ using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
 using Android.Support.V4.Content;
-using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -59,7 +58,6 @@ namespace Mark5.Mobile.Droid
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
-            //recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
             recyclerView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
 
             adapter = new CategoriesListAdapter(selectedCategories);
@@ -75,8 +73,7 @@ namespace Mark5.Mobile.Droid
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.categories);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.categories);
 
             CommonConfig.Logger.Info($"Created {nameof(PickCategoriesListFragment)} [objectType={ObjectType}]");
         }
@@ -90,14 +87,10 @@ namespace Mark5.Mobile.Droid
                 CommonConfig.Logger.Info($"Refreshing {nameof(PickCategoriesListFragment)} [objectType={ObjectType}]");
                 await RefreshData();
             }
-
-            UpdateControls();
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
-            inflater.Inflate(Resource.Menu.menu_main, menu);
-
             var item = menu.Add(Menu.None, 10, 10, Resource.String.done);
             item.SetShowAsAction(ShowAsAction.Always);
         }
@@ -115,7 +108,6 @@ namespace Mark5.Mobile.Droid
         void Adapter_ItemClicked(object sender, Category e)
         {
             ToggleSelected(e);
-            UpdateControls();
         }
 
         void CloseFragment()
@@ -194,13 +186,6 @@ namespace Mark5.Mobile.Droid
             }
         }
 
-        void UpdateControls()
-        {
-            if (!IsAdded || IsDetached || IsRemoving) return;
-
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.categories);
-        }
-
         #endregion
 
         #region Retained State
@@ -268,10 +253,10 @@ namespace Mark5.Mobile.Droid
 
                 cvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, c)));
 
-                cvh.Name = c.Name;
-                cvh.HexColor = c.HexColor;
-
                 cvh.Selected = selectedCategoriesInView.ContainsKey(c.Id);
+                cvh.Name = c.Name;
+                cvh.Description = c.Description;
+                cvh.HexColor = c.HexColor;
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -308,12 +293,31 @@ namespace Mark5.Mobile.Droid
 
         class CategoryViewHolder : RecyclerView.ViewHolder
         {
+            bool selected;
 
             public string Name
             {
                 set
                 {
                     nameTextView.Text = value;
+                    nameTextView.SetTextAppearanceCompat(nameTextView.Context, Selected ? Resource.Style.searchCategorySelected : Resource.Style.searchCategory);
+                }
+            }
+
+            public string Description
+            {
+                set
+                {
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        descriptionTextView.Visibility = ViewStates.Gone;
+                    }
+                    else
+                    {
+                        descriptionTextView.Visibility = ViewStates.Visible;
+                        descriptionTextView.Text = value;
+                        nameTextView.SetTextAppearanceCompat(nameTextView.Context, Selected ? Resource.Style.searchCategorySelected : Resource.Style.searchCategory);
+                    }
                 }
             }
 
@@ -323,7 +327,7 @@ namespace Mark5.Mobile.Droid
                 {
                     var gd = new GradientDrawable();
                     gd.SetShape(ShapeType.Oval);
-                    gd.SetStroke(ConversionUtils.ConvertDpToPixels(1), new Color(ContextCompat.GetColor(nameTextView.Context, Resource.Color.lightgray)));
+                    gd.SetStroke(ConversionUtils.ConvertDpToPixels(1), new Color(ContextCompat.GetColor(nameTextView.Context, Selected ? Resource.Color.lightblue : Resource.Color.lightgray)));
                     gd.SetColor(Color.ParseColor(value));
 
                     colorImageView.Background = gd;
@@ -334,18 +338,25 @@ namespace Mark5.Mobile.Droid
             {
                 set
                 {
+                    selected = value;
                     selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                    nameTextView.SetTextAppearanceCompat(nameTextView.Context, value ? Resource.Style.searchCategorySelected : Resource.Style.searchCategory);
+                }
+                get
+                {
+                    return selected;
                 }
             }
 
             readonly View colorImageView;
             readonly AppCompatTextView nameTextView;
+            readonly AppCompatTextView descriptionTextView;
+
             readonly View selectedOverlay;
 
             public CategoryViewHolder(View itemView) : base(itemView)
             {
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_category_name);
+                descriptionTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_categoty_description);
                 colorImageView = itemView.FindViewById<View>(Resource.Id.list_item_category_color);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
             }

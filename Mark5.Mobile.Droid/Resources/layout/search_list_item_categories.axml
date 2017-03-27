@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="50dp">
+    android:layout_height="60dp">
     <include
         layout="@layout/selected_overlay" />
     <android.support.v7.widget.LinearLayoutCompat
@@ -32,7 +32,12 @@
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/list_item_category_name"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp" />
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/list_item_categoty_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
         </android.support.v7.widget.LinearLayoutCompat>
     </android.support.v7.widget.LinearLayoutCompat>
 </FrameLayout>
