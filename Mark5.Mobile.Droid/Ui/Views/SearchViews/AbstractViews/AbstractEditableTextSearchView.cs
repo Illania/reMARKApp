@@ -75,7 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             {
                 LayoutParameters = new LayoutParams(cancelIconSize, cancelIconSize)
             };
-            cancelIconView.SetImageResource(Resource.Drawable.failed);
+            cancelIconView.SetImageResource(Resource.Drawable.failed); //TODO new icon?
             cancelIconView.SetColorFilter(Color.White);
             cancelIconLayout.AddView(cancelIconView);
             cancelIconLayout.Clickable = true;
@@ -90,6 +90,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         // - What about ellipsize?
         // - What happens when the user presses back?
         // - What happens when we click on something else in the search?
+        // - What about elevation?
 
         void BottomEditText_FocusChange(object sender, FocusChangeEventArgs e)
         {
@@ -101,6 +102,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             {
                 PrepareViewsExpansion();
             }
+
+            //TODO remove underline
         }
 
         void CancelIconLayout_Click(object sender, EventArgs e)

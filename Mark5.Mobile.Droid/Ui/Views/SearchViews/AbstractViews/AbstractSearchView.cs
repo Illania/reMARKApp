@@ -28,6 +28,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         protected int TextStyleTopLineResourceId = Resource.Style.searchViewTopLine;
         protected int TextStyleBottomLineResourceId = Resource.Style.searchViewBottomLine;
 
+        protected AbstractSearchView(IntPtr javaReference, Android.Runtime.JniHandleOwnership transfer) : base(javaReference, transfer)
+        {
+            //TODO remember to do for all of them
+        }
+
         protected AbstractSearchView(Context context)
             : base(context)
         {
