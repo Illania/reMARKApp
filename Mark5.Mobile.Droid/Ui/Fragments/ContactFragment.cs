@@ -41,7 +41,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int CategoriesRequest = 2;
         }
 
-        const float CardElevation = 0f;
+        const int CardElevation = 0;
         const float CardRadius = 2f;
 
         public int? FolderId { get; set; }
@@ -429,11 +429,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 Orientation = LinearLayoutCompat.Vertical,
                 LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
-                {
-                    TopMargin = largeDistance,
-                    BottomMargin = largeDistance
-                }
             };
+            relatedCardInternalLayout.SetPadding(0, largeDistance, 0, largeDistance);
             relatedCardView.AddView(relatedCardInternalLayout);
 
             var cardTitle = new AppCompatTextView(Context);
@@ -471,11 +468,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 Orientation = LinearLayoutCompat.Vertical,
                 LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
-                {
-                    TopMargin = largeDistance,
-                    BottomMargin = largeDistance
-                }
             };
+            descriptionCardViewInternalLayout.SetPadding(0, largeDistance, 0, largeDistance);
             descriptionCardView.AddView(descriptionCardViewInternalLayout);
 
             descriptionCardTitle = new AppCompatTextView(Context);
@@ -597,9 +591,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     if (subview.Visibility == ViewStates.Visible)
                         cardView.Visibility = ViewStates.Visible;
-
-                    if (i == internalLayout.ChildCount - 1)
-                        subview.HideSeparator();
                 }
             }
         }

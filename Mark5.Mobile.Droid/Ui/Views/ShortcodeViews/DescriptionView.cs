@@ -30,8 +30,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
 
         void Initialize()
         {
-            InnerLayout.SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceLarge);
-
             titleView = new AppCompatTextView(Context)
             {
                 LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
@@ -40,8 +38,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
                 },
                 Text = Context.GetString(Resource.String.description)
             };
+            titleView.SetPadding(DistanceVeryLarge, 0, DistanceNormal, 0);
             titleView.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
-
             titleView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
             InnerLayout.AddView(titleView);
 
@@ -50,7 +48,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
             contentView.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
-
+            contentView.SetPadding(DistanceVeryLarge, 0, DistanceNormal, 0);
             InnerLayout.AddView(contentView);
 
             LongClickable = true;

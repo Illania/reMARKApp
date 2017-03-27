@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
             : base(context)
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            Elevation = ConversionUtils.ConvertDpToPixels(2f);
+            Elevation = 0;
             Radius = ConversionUtils.ConvertDpToPixels(2f);
             UseCompatPadding = true;
 
