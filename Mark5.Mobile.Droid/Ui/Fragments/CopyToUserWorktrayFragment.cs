@@ -259,6 +259,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == Resource.Id.action_filter)
             {
                 recyclerView.SwapAdapter(searchAdapter, true);
+                (this as SearchView.IOnQueryTextListener).OnQueryTextChange(string.Empty);
                 return true;
             }
 
@@ -284,13 +285,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             searchHandler.PostDelayed(() =>
             {
                 if (string.IsNullOrWhiteSpace(newText))
-                {
-                    searchAdapter.Clear();
-                }
+                    searchAdapter.ReplaceItems(adapter.Items);
                 else
-                {
                     searchAdapter.ReplaceItems(adapter.Items.Where(su => MatchesQuery(su, newText)).ToList());
-                }
             }, 500);
             return false;
         }

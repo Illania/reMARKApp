@@ -681,6 +681,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 RefreshLayout.Enabled = false;
                 Adapter.ClearSelections();
                 RecyclerView.SwapAdapter(SearchAdapter, true);
+                (this as SearchView.IOnQueryTextListener).OnQueryTextChange(string.Empty);
                 return true;
             }
 
@@ -711,11 +712,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (string.IsNullOrWhiteSpace(newText))
                 {
-                    SearchAdapter.Clear();
+                    var folder = Folder.RootForModule(RemoteFolder.Module);
+                    var matchingFolders = folder.SubFolders.Flatten(f => f.SubFolders).OrderBy(f => f.Name).ToList();
+                    SearchAdapter.RefreshSearch(matchingFolders);
                 }
                 else
                 {
-                    var matchingFolders = GetMatchingFolders(newText);
+                    var folder = Folder.RootForModule(RemoteFolder.Module);
+                    var flattenedFolders = folder.SubFolders.Flatten(f => f.SubFolders);
+                    var matchingFolders = flattenedFolders.Where(f => f.Name.IndexOf(newText, StringComparison.CurrentCultureIgnoreCase) >= 0).OrderBy(f => f.Name).ToList();
                     SearchAdapter.RefreshSearch(matchingFolders);
                 }
             }, 500);
@@ -725,13 +730,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public bool OnQueryTextSubmit(string query)
         {
             return false;
-        }
-
-        protected List<Folder> GetMatchingFolders(string query)
-        {
-            var folder = Folder.RootForModule(RemoteFolder.Module);
-            var flattenedFolders = folder.SubFolders.Flatten(f => f.SubFolders);
-            return flattenedFolders.Where(f => f.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0).ToList();
         }
 
         #endregion

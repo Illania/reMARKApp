@@ -530,6 +530,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 refreshLayout.Enabled = false;
                 adapter.ClearSelections();
                 recyclerView.SwapAdapter(searchAdapter, true);
+                (this as SearchView.IOnQueryTextListener).OnQueryTextChange(string.Empty);
                 return true;
             }
 
@@ -559,13 +560,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             searchHandler.PostDelayed(() =>
             {
                 if (string.IsNullOrWhiteSpace(newText))
-                {
-                    searchAdapter.Clear();
-                }
+                    searchAdapter.ReplaceItems(adapter.Items);
                 else
-                {
                     searchAdapter.ReplaceItems(adapter.Items.Where(dp => MatchesQuery(dp, newText)).ToList());
-                }
             }, 500);
             return false;
         }
