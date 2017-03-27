@@ -335,7 +335,6 @@
     <Compile Include="Ui\Views\SearchViews\DocumentCommentsSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentAttachmentSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentPrioritySearchView.cs" />
-    <Compile Include="Ui\Common\OnFocusChangeListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

@@ -70,14 +70,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 return true;
             }
 
-            //void HandleAction(List<T> selectedItems)
-            //{
-            //    selected = selectedItems;
-
-            //    adapter.Clear();
-            //    adapter.Add($"{selectedItems.Count} selected");
-            //}
-
             public void SetSpinnerText(string text)
             {
                 adapter.Clear();

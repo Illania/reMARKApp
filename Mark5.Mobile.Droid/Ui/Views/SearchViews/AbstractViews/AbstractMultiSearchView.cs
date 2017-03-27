@@ -93,16 +93,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
             topRightLayout.AddView(Spinner);
 
-            var inflater = LayoutInflater.From(context);
             //Cannot define cursor color programmatically otherwise
-            BottomEditText = inflater.Inflate(Resource.Layout.search_edit_text_layout, null).FindViewById<AppCompatEditText>(Resource.Id.search_edit_text);
+            BottomEditText = LayoutInflater.From(context).Inflate(Resource.Layout.search_edit_text_layout, null).FindViewById<AppCompatEditText>(Resource.Id.search_edit_text);
             BottomEditText.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             {
                 Gravity = (int)GravityFlags.End,
             };
-            BottomEditText.SetPadding(0, 0, 0, 0); //EditText has a default padding
+            BottomEditText.SetPadding(0, 0, 0, 0);
             BottomEditText.SetBackgroundColor(Color.Transparent);
-            BottomEditText.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId); //TODO eventually we need to change the color of the hint ?
+            BottomEditText.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId);
             BottomEditText.Hint = context.GetString(bottomEditResId);
             BottomEditText.EditorAction += (sender, e) =>
             {
