@@ -7,6 +7,7 @@
 //
 using Android.Graphics;
 using Android.OS;
+using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
@@ -14,6 +15,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.SearchViews;
 using Mark5.Mobile.Droid.Utilities;
@@ -48,11 +50,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(new DocumentFromToSearchView(Context));
             linearLayout.AddView(new DocumentDateRangeSearchView(Context));
             PrepareEditableTextRow();
+            PrepareDropdownTextRow();
             linearLayout.AddView(new DocumentAttachmentUnreadSearchView(Context));
             linearLayout.AddView(new DocumentHandledSearchView(Context));
 
             return rootView;
         }
+
+        DocumentReferenceNumberSearchView drf;
+        DocumentCommentsSearchView dcs;
+        DocumentAttachmentSearchView das;
 
         public void PrepareEditableTextRow()
         {
@@ -66,11 +73,44 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var lp = new LinearLayoutCompat.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1);
 
-            ll.AddView(new DocumentReferenceNumberSearchView(Context), lp);
-            ll.AddView(new DocumentCommentsSearchView(Context), lp);
-            ll.AddView(new DocumentAttachmentSearchView(Context), lp);
+            dcs = new DocumentCommentsSearchView(Context, ll);
+            das = new DocumentAttachmentSearchView(Context, ll);
+            drf = new DocumentReferenceNumberSearchView(Context, ll);
+
+            ll.AddView(drf, lp);
+            ll.AddView(dcs, lp);
+            ll.AddView(das, lp);
+            ll.LayoutTransition = new Android.Animation.LayoutTransition();
 
             linearLayout.AddView(ll);
+        }
+
+        public void PrepareDropdownTextRow()
+        {
+            var ll = new LinearLayoutCompat(Context)
+            {
+                LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
+
+            ll.DividerDrawable = ContextCompat.GetDrawable(Context, Resource.Drawable.search_divider_vertical);
+            ll.ShowDividers = LinearLayoutCompat.ShowDividerMiddle;
+
+            var lp = new LinearLayoutCompat.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1);
+
+            ll.AddView(new DocumentCategoriesSearchView(Context, this), lp);
+
+            linearLayout.AddView(ll);
+        }
+
+        public void PushDropdownViewFragment(Fragment foldersListFragment, string tag)
+        {
+            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
+
+            fragmentManager.BeginTransaction()
+                                       .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
+                                       .Replace(Resource.Id.fragment_container, foldersListFragment, tag)
+                                       .AddToBackStack(tag)
+                                       .Commit();
         }
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)

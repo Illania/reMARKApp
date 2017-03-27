@@ -311,7 +311,6 @@
     <Compile Include="Ui\Common\HubMessages\EntityRemovedFromFolderMessage.cs" />
     <Compile Include="Ui\Common\HubMessages\DocumentPreviewPriorityChangedMessage.cs" />
     <Compile Include="Ui\Fragments\PickCategoriesListFragment.cs" />
-    <Compile Include="Ui\Activities\PIckCategoriesListActivity.cs" />
     <Compile Include="Ui\Views\ContactViews\BirthdateSubview.cs" />
     <Compile Include="Ui\Common\LambdaEmptyAdapterObserver.cs" />
     <Compile Include="Utilities\LocalNotificationsListener.cs" />
@@ -335,6 +334,7 @@
     <Compile Include="Ui\Views\SearchViews\DocumentCommentsSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentAttachmentSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentPrioritySearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentCategoriesSearchView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -611,6 +611,7 @@
     <AndroidResource Include="Resources\drawable\search_divider_horizontal.axml" />
     <AndroidResource Include="Resources\drawable\search_divider_vertical.axml" />
     <AndroidResource Include="Resources\layout\search_edit_text_layout.axml" />
+    <AndroidResource Include="Resources\layout\search_list_item_categories.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\anim\" />
