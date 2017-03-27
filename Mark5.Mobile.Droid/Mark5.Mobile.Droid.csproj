@@ -639,6 +639,7 @@
     <AndroidResource Include="Resources\drawable-xxhdpi\map.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\map.png" />
     <AndroidResource Include="Resources\drawable-nodpi\background.png" />
+    <AndroidResource Include="Resources\drawable\circle_dark.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\anim\" />
