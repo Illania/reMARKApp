@@ -15,12 +15,15 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
-    public abstract class AbstractDropdownSearchView<T> : AbstractSearchView<T>
+    public abstract class AbstractDropdownSearchView<T, Y> : AbstractSearchView<T>
     {
         readonly protected MultiSelectSpinner Spinner;
         readonly protected AppCompatTextView TextView;
 
-        protected AbstractDropdownSearchView(Context context) : base(context)
+        protected List<Y> Values;
+        protected List<Y> SelectedValues;
+
+        protected AbstractDropdownSearchView(Context context, int titleResId, int emptyResId) : base(context)
         {
             Orientation = Vertical;
             SetBackgroundColor(BackgroundColorNormalState);
@@ -30,11 +33,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                 Gravity = GravityFlags.Center
             };
-            TextView.Text = "TEST";
+            TextView.Text = context.GetString(titleResId);
             TextView.SetTextAppearanceCompat(context, TextStyleTopLineResourceId);
             AddView(TextView);
 
-            Spinner = new MultiSelectSpinner(context)
+            Spinner = new MultiSelectSpinner(context, context.GetString(emptyResId), ClickAction)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
                 {
@@ -45,12 +48,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             AddView(Spinner);
         }
 
+        protected abstract void ClickAction();
+
         protected class MultiSelectSpinner : AppCompatSpinner
         {
             readonly ArrayAdapter adapter;
-            public MultiSelectSpinner(Context context) : base(context)
+            readonly Action clickAction;
+
+            public MultiSelectSpinner(Context context, string initialText, Action clickAction) : base(context)
             {
-                var initialText = "BlaBla";
+                this.clickAction = clickAction;
+
                 adapter = new ArrayAdapter(context, Resource.Layout.search_spinner_item_dropdown, new List<string> { initialText });
                 adapter.SetDropDownViewResource(Resource.Layout.support_simple_spinner_dropdown_item);
                 SetAdapter(adapter);
@@ -58,15 +66,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
             public override bool PerformClick()
             {
-                var choices = new List<string> { "val1", "val2", "val3" };
-                Dialogs.ShowMultiSelectDialog(Context, Resource.String.search, choices, HandleAction);
+                clickAction();
                 return true;
             }
 
-            void HandleAction(List<string> selectedItems)
+            //void HandleAction(List<T> selectedItems)
+            //{
+            //    selected = selectedItems;
+
+            //    adapter.Clear();
+            //    adapter.Add($"{selectedItems.Count} selected");
+            //}
+
+            public void SetSpinnerText(string text)
             {
                 adapter.Clear();
-                adapter.Add($"{selectedItems.Count} selected");
+                adapter.Add(text);
             }
         }
     }
