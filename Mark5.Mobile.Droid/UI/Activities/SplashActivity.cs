@@ -86,6 +86,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var ci = await authenticator.GetConnectionInfoAsync();
 
                 CommonConfig.Logger.Info($"Current connection info: {ci}");
+                CommonConfig.Logger.Info($"Push token: {PlatformConfig.Preferences.PushNotificationToken}");
 
                 switch (ci.SslMode)
                 {
