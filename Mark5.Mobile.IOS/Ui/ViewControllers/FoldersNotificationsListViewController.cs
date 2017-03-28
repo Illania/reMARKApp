@@ -37,7 +37,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.LoadView();
 
-            AutomaticallyAdjustsScrollViewInsets = false;
+            AutomaticallyAdjustsScrollViewInsets = true;
 
             segmentedControl = new UISegmentedControl(new[] { Localization.GetString("folders"), Localization.GetString("notifications") });
             segmentedControl.SetTitleTextAttributes(new UITextAttributes { Font = Theme.DefaultFont.WithRelativeSize(-3f), TextColor = Theme.White }, UIControlState.Normal);
@@ -61,6 +61,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+            
+            ExtendedLayoutIncludesOpaqueBars = true;
 
             var vc = viewControllers[0];
             vc.WillMoveToParentViewController(this);
@@ -124,9 +126,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (scrollView == null)
                 return;
 
-            //scrollView.ContentInset = new UIEdgeInsets(ParentViewController.TopLayoutGuide.Length + NavigationController.NavigationBar.Frame.Height, 0f, ParentViewController.BottomLayoutGuide.Length, 0f);
-            //scrollView.ScrollIndicatorInsets = new UIEdgeInsets(ParentViewController.TopLayoutGuide.Length + NavigationController.NavigationBar.Frame.Height, 0f, ParentViewController.BottomLayoutGuide.Length, 0f);
-            //scrollView.LayoutIfNeeded();
+            scrollView.ContentInset = new UIEdgeInsets(ParentViewController.TopLayoutGuide.Length + NavigationController.NavigationBar.Frame.Height, 0f, ParentViewController.BottomLayoutGuide.Length, 0f);
+            scrollView.ScrollIndicatorInsets = new UIEdgeInsets(ParentViewController.TopLayoutGuide.Length + NavigationController.NavigationBar.Frame.Height, 0f, ParentViewController.BottomLayoutGuide.Length, 0f);
+            scrollView.LayoutIfNeeded();
         }
 
         static string GetTitleForModule(ModuleType moduleType)

@@ -59,6 +59,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeView();
         }
 
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            ExtendedLayoutIncludesOpaqueBars = true;
+        }
+
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
@@ -72,6 +79,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewDidAppear(animated);
 
             CommonConfig.Logger.Info($"{nameof(ShortcodeViewController)} appeared");
+            
+            tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+            tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
 
             if (refreshDataOnAppear)
             {
@@ -105,8 +115,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 if (tableView == null) return;
 
-                tableView.ContentInset = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
-                tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
+                tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+                tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
             });
         }
 
@@ -136,8 +146,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
             tableView.RowHeight = UITableView.AutomaticDimension;
             tableView.EstimatedRowHeight = 60f;
-            tableView.ContentInset = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
-            tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
+            tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+            tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
             tableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed) { MinimumPressDuration = 1f });
             View.AddSubview(tableView);
             View.AddConstraints(new[]

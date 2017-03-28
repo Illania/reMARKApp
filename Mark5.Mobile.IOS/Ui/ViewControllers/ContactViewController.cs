@@ -58,6 +58,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeView();
         }
 
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            ExtendedLayoutIncludesOpaqueBars = true;
+        }
+
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
@@ -71,6 +78,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewDidAppear(animated);
 
             CommonConfig.Logger.Info($"{nameof(ContactViewController)} appeared");
+
+            tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+            tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
 
             if (refreshDataOnAppear)
             {
@@ -104,26 +114,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 if (tableView == null) return;
 
-                tableView.ContentInset = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
-                tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
+                tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+                tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
             });
         }
 
         void InitializeView()
         {
             AutomaticallyAdjustsScrollViewInsets = false;
-
-            var headerView = new UIView();
-            headerView.BackgroundColor = Theme.DarkerBlue;
-            headerView.TranslatesAutoresizingMaskIntoConstraints = false;
-            View.AddSubview(headerView);
-            View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, -1f),
-                    NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 100f)
-                });
 
             tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
             tableView.BackgroundColor = Theme.LightGray;
@@ -132,19 +130,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
             tableView.RowHeight = UITableView.AutomaticDimension;
             tableView.EstimatedRowHeight = 60f;
-            tableView.ContentInset = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
-            tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
+            tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+            tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
             tableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed) { MinimumPressDuration = 1f });
             View.AddSubview(tableView);
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
                 });
-
-            View.BringSubviewToFront(headerView);
 
             assignCategoryButton = new UIBarButtonItem();
             assignCategoryButton.Image = UIImage.FromBundle(Path.Combine("icons", "flag.png"));

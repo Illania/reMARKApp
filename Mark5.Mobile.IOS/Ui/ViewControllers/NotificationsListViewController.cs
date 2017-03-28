@@ -74,6 +74,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"{nameof(NotificationsListViewController)} appeared");
 
+            tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+            tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+
             if (newNotificationsMessageToken != null)
             {
                 PlatformConfig.MessengerHub.Unsubscribe<NewNotificationsMessage>(newNotificationsMessageToken);
