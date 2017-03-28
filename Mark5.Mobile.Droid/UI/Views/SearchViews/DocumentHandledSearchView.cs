@@ -6,6 +6,7 @@
 // Copyright (c) 2017 Nordic IT
 //
 using System;
+using System.Collections.Generic;
 using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
@@ -18,11 +19,29 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         public DocumentHandledSearchView(Android.Content.Context context) : base(context)
         {
-            allButton = new StyledButton(context, Resource.String.search_document_handled_none_selected);
-            handledButton = new StyledButton(context, Resource.String.search_document_handled);
-            unHandledButton = new StyledButton(context, Resource.String.search_document_handled_false);
+            allButton = new StyledButton(context, Resource.String.search_document_handled_none_selected, ButtonAction);
+            handledButton = new StyledButton(context, Resource.String.search_document_handled, ButtonAction);
+            unHandledButton = new StyledButton(context, Resource.String.search_document_handled_false, ButtonAction);
+
+            allButton.UpdateSelectedState(true);
 
             AddButtons(allButton, handledButton, unHandledButton);
+        }
+
+        bool ButtonAction(StyledButton button)
+        {
+            if (button.Selected)
+                return false;
+
+            var buttonsList = new List<StyledButton> { allButton, handledButton, unHandledButton };
+            buttonsList.Remove(button);
+
+            foreach (var otherButton in buttonsList)
+            {
+                otherButton.UpdateSelectedState(false);
+            }
+
+            return true;
         }
 
         public override void FromCriteria(SearchDocumentsCriteria criteria)
