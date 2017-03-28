@@ -40,7 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                     RightMargin = DistanceLarge,
                 }
             };
-            searchIconView.SetImageResource(Resource.Drawable.action_search_server); //TODO put the right one
+            searchIconView.SetImageResource(Resource.Drawable.action_search_server);
             AddView(searchIconView);
 
             var rightLayout = new LinearLayoutCompat(context)
