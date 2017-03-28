@@ -49,6 +49,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeView();
         }
 
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            ExtendedLayoutIncludesOpaqueBars = true;
+        }
+
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
@@ -73,9 +80,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewDidAppear(animated);
 
             CommonConfig.Logger.Info($"{nameof(NotificationsListViewController)} appeared");
-
-            tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
-            tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
 
             if (newNotificationsMessageToken != null)
             {
