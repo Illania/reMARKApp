@@ -7,6 +7,7 @@
 //
 using CoreGraphics;
 using Foundation;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -51,7 +52,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             viewControllers = new UIViewController[]
             {
                 new BrowseFoldersListViewController(moduleType),
-                new NotificationsListViewController(moduleType)
+                new NotificationsListViewController(moduleType.ObjectTypes())
             };
         }
 

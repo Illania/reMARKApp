@@ -1,5 +1,5 @@
 ﻿//
-// Project: Mark5.Mobile.Droid
+// Project: Mark5.Mobile.Common
 // File: ModuleTypeExtensions.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
@@ -7,7 +7,7 @@
 //
 using Mark5.Mobile.Common.Model;
 
-namespace Mark5.Mobile.Droid.Extensions
+namespace Mark5.Mobile.Common.Extensions
 {
 
     public static class ModuleTypeExtensions

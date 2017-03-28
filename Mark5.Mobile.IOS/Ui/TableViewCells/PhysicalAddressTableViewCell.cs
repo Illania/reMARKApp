@@ -17,6 +17,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
+    
     public partial class PhysicalAddressTableViewCell : UITableViewCell
     {
 

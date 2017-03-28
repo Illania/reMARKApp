@@ -17,7 +17,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         protected override NavigationController CreatePrimaryNavigationController()
         {
-            return new NavigationController(new BrowseFoldersListViewController(ModuleType.Documents));
+            return new NavigationController(new FoldersNotificationsListViewController(ModuleType.Documents));
         }
 
         protected override NavigationController CreateSecondaryNavigationController()

@@ -362,7 +362,6 @@
     <Compile Include="Ui\Activities\PreferenceActivity.cs" />
     <Compile Include="Ui\Activities\SearchActivity.cs" />
     <Compile Include="Ui\Fragments\FoldersNotificationsListFragment.cs" />
-    <Compile Include="Extensions\ModuleTypeExtensions.cs" />
     <Compile Include="Ui\Common\HubMessages\NewNotificationsReceived.cs" />
     <Compile Include="Ui\Fragments\ContactFragment.cs" />
   </ItemGroup>
