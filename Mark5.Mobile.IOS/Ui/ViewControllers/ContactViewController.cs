@@ -113,6 +113,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             AutomaticallyAdjustsScrollViewInsets = false;
 
+            var headerView = new UIView();
+            headerView.BackgroundColor = Theme.DarkerBlue;
+            headerView.TranslatesAutoresizingMaskIntoConstraints = false;
+            View.AddSubview(headerView);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, -1f),
+                    NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 150f)
+                });
+
             tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
             tableView.BackgroundColor = Theme.LightGray;
             tableView.ClipsToBounds = false;
@@ -126,11 +138,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             View.AddSubview(tableView);
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Bottom, 1f, 0f),
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
                 });
+
+            View.BringSubviewToFront(headerView);
 
             assignCategoryButton = new UIBarButtonItem();
             assignCategoryButton.Image = UIImage.FromBundle(Path.Combine("icons", "flag.png"));
