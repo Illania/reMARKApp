@@ -198,6 +198,7 @@
 	<string name="search_contacts_result">Results</string>
 	<string name="search_document_attachment">Attachment</string>
 	<string name="search_document_comments">Comments</string>
+	<string name="search_document_direction_all">All</string>
 	<string name="search_document_direction_inbox">Inbox</string>
 	<string name="search_document_direction_outbox">Outbox</string>
 	<string name="search_document_direction_draft">Draft</string>

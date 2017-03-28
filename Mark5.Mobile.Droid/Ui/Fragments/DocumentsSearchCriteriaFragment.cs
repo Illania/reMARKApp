@@ -110,7 +110,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             fragmentManager.BeginTransaction()
                                        .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
-                                       .Add(Resource.Id.fragment_container, foldersListFragment, tag)
+                                       .Add(Resource.Id.fragment_container, foldersListFragment, tag) //TODO this needs to be replace, but we need to do something about the criteria
                                        .AddToBackStack(tag)
                                        .Commit();
         }

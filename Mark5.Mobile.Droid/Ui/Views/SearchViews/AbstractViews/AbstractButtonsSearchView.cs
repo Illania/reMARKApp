@@ -43,18 +43,20 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             int buttonTextStyleNormalResourceId = Resource.Style.searchViewButtonNormal;
             int buttonTextStyleSelectedResourceId = Resource.Style.searchViewButtonSelected;
 
-            bool selected;
             readonly Context context;
+            readonly Func<StyledButton, bool> clickedAction; //Returns true if the button should change state
 
-            public StyledButton(Context context, int stringResourceId)
+            public StyledButton(Context context, int stringResourceId, Func<StyledButton, bool> clickedAction = null)
                 : base(context)
             {
                 this.context = context;
+                this.clickedAction = clickedAction;
+
                 Text = context.GetString(stringResourceId);
 
-                //var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
-                //SetBackgroundResource(typedArray.GetResourceId(0, 0));
-                //typedArray.Recycle(); //TODO add ripple effect
+                var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
+                SetBackgroundResource(typedArray.GetResourceId(0, 0));
+                typedArray.Recycle();
 
                 Click += StyledButton_Click;
 
@@ -63,15 +65,25 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
             void StyledButton_Click(object sender, EventArgs e)
             {
-                selected = !selected;
+                if (clickedAction == null || clickedAction(this))
+                {
+                    Selected = !Selected;
+                }
                 UpdateStyle();
             }
 
             void UpdateStyle()
             {
-                SetBackgroundColor(selected ? BackgroundColorSelectedState : BackgroundColorNormalState);
-                this.SetTextAppearanceCompat(context, selected ? buttonTextStyleSelectedResourceId : buttonTextStyleNormalResourceId);
+                SetBackgroundColor(Selected ? BackgroundColorSelectedState : BackgroundColorNormalState);
+                this.SetTextAppearanceCompat(context, Selected ? buttonTextStyleSelectedResourceId : buttonTextStyleNormalResourceId);
             }
+
+            public void UpdateSelectedState(bool selected)
+            {
+                Selected = selected;
+                UpdateStyle();
+            }
+
         }
     }
 
