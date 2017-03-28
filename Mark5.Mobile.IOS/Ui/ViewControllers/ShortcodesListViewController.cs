@@ -189,7 +189,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBarTitle()
         {
+            UIView.AnimationsEnabled = false;
             NavigationItem.Title = Folder.Name;
+            NavigationItem.Prompt = Localization.GetString("shortcodes");
+            UIView.AnimationsEnabled = true;
         }
 
         void InitializeHandlers()

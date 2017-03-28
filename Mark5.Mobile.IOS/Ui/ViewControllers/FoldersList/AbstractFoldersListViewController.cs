@@ -143,22 +143,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         return Localization.GetString("contacts");
                     case ModuleType.Shortcodes:
                         return Localization.GetString("shortcodes");
-                    case ModuleType.Calendar:
-                        return Localization.GetString("contacts");
                     default:
-                        return string.Empty;
+                        return " ";
                 }
             };
 
+            UIView.AnimationsEnabled = false;
             if (IsRootOfFoldersList)
             {
                 NavigationItem.Title = getTitle();
+                NavigationItem.Prompt = " ";
             }
             else
             {
                 NavigationItem.Title = ParentFolder.Name;
                 NavigationItem.Prompt = getTitle();
             }
+            UIView.AnimationsEnabled = true;
         }
 
         protected virtual void ClearNavigationBarTitle()

@@ -211,7 +211,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBarTitle()
         {
+            UIView.AnimationsEnabled = false;
             NavigationItem.Title = Folder.Name;
+            NavigationItem.Prompt = Localization.GetString("documents");
+            UIView.AnimationsEnabled = true;
         }
 
         void SubscribeToMessages()
