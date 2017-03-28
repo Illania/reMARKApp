@@ -610,7 +610,6 @@
     <AndroidResource Include="Resources\drawable-xxhdpi\map.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\map.png" />
     <AndroidResource Include="Resources\layout\linear_layout_base.axml" />
-    <AndroidResource Include="Resources\layout\search_spinner_item_dropdown.axml" />
     <AndroidResource Include="Resources\layout\search_spinner_item_multi.axml" />
     <AndroidResource Include="Resources\drawable\search_divider_horizontal.axml" />
     <AndroidResource Include="Resources\drawable\search_divider_vertical.axml" />
