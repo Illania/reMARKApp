@@ -10,6 +10,7 @@ using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
+using Mark5.Mobile.IOS.Utilities.Extensions;
 using ObjCRuntime;
 using UIKit;
 
@@ -31,15 +32,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.moduleType = moduleType;
         }
 
-        public override void ViewDidLoad()
+        public override void LoadView()
         {
-            base.ViewDidLoad();
+            base.LoadView();
 
             AutomaticallyAdjustsScrollViewInsets = false;
 
             segmentedControl = new UISegmentedControl(new[] { Localization.GetString("folders"), Localization.GetString("notifications") });
+            segmentedControl.SetTitleTextAttributes(new UITextAttributes { Font = Theme.DefaultFont.WithRelativeSize(-3f), TextColor = Theme.White }, UIControlState.Normal);
+            segmentedControl.SetTitleTextAttributes(new UITextAttributes { Font = Theme.DefaultFont.WithRelativeSize(-3f), TextColor = Theme.White }, UIControlState.Selected);
+            segmentedControl.TintColor = Theme.DarkBlue;
             segmentedControl.SelectedSegment = 0;
             segmentedControl.AddTarget(this, new Selector("segmentedControlHasChangedValue:"), UIControlEvent.ValueChanged);
+
+            NavigationItem.Prompt = GetTitleForModule(moduleType);
             NavigationItem.TitleView = segmentedControl;
 
             viewControllers = new UIViewController[]
@@ -47,6 +53,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 new BrowseFoldersListViewController(moduleType),
                 new NotificationsListViewController(moduleType)
             };
+        }
+
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
 
             var vc = viewControllers[0];
             vc.WillMoveToParentViewController(this);
@@ -110,9 +121,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (scrollView == null)
                 return;
 
-            scrollView.ContentInset = new UIEdgeInsets(ParentViewController.TopLayoutGuide.Length + NavigationController.NavigationBar.Frame.Height, 0f, ParentViewController.BottomLayoutGuide.Length, 0f);
-            scrollView.ScrollIndicatorInsets = new UIEdgeInsets(ParentViewController.TopLayoutGuide.Length + NavigationController.NavigationBar.Frame.Height, 0f, ParentViewController.BottomLayoutGuide.Length, 0f);
-            scrollView.LayoutIfNeeded();
+            //scrollView.ContentInset = new UIEdgeInsets(ParentViewController.TopLayoutGuide.Length + NavigationController.NavigationBar.Frame.Height, 0f, ParentViewController.BottomLayoutGuide.Length, 0f);
+            //scrollView.ScrollIndicatorInsets = new UIEdgeInsets(ParentViewController.TopLayoutGuide.Length + NavigationController.NavigationBar.Frame.Height, 0f, ParentViewController.BottomLayoutGuide.Length, 0f);
+            //scrollView.LayoutIfNeeded();
+        }
+
+        static string GetTitleForModule(ModuleType moduleType)
+        {
+            switch (moduleType)
+            {
+                case ModuleType.Documents:
+                    return Localization.GetString("documents");
+                case ModuleType.Contacts:
+                    return Localization.GetString("contacts");
+                case ModuleType.Shortcodes:
+                    return Localization.GetString("shortcodes");
+                case ModuleType.Calendar:
+                    return Localization.GetString("contacts");
+                default:
+                    return string.Empty;
+            }
         }
     }
 }

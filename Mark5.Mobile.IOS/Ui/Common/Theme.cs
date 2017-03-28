@@ -66,8 +66,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
             window.TintColor = TintColor;
 
             // UINavigationBar
+            UINavigationBar.Appearance.Translucent = false;
             UINavigationBar.Appearance.TintColor = LightGray;
-            UINavigationBar.Appearance.BarTintColor = DarkBlue;
+            UINavigationBar.Appearance.BarTintColor = DarkerBlue;
 
             // UIToolBar
             UIToolbar.Appearance.BarTintColor = LightGray;
