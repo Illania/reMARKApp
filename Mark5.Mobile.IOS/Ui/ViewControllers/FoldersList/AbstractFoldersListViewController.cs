@@ -77,13 +77,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             InitializeNavigationBar();
             InitializeView();
             InitializeSearchBar();
+            InitializeNavigationBarTitle();
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
 
-            InitializeNavigationBarTitle();
             InitializeHandlers();
 
             if (TableView?.IndexPathForSelectedRow != null)

@@ -203,6 +203,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitStackViews()
         {
+            AutomaticallyAdjustsScrollViewInsets = false;
+
             mainScrollView = new ActionableLayoutScrollView
             {
                 BackgroundColor = UIColor.White,
@@ -214,6 +216,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ClipsToBounds = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
+            mainScrollView.ContentInset = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
+            mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
             mainScrollView.LayoutSubviewsAction = HandleScrollViewLayoutSubviewsAction;
             View.AddSubview(mainScrollView);
             View.AddConstraints(new[]
@@ -459,7 +463,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 previousDocumentButtonItem.Clicked -= PreviousDocumentButton_Clicked;
             }
         }
-
 
         public void SetData(Folder folder, DocumentPreview documentPreview,
                             GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)

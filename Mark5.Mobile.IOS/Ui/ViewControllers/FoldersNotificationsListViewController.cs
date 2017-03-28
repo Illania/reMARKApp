@@ -46,8 +46,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             segmentedControl.SelectedSegment = 0;
             segmentedControl.AddTarget(this, new Selector("segmentedControlHasChangedValue:"), UIControlEvent.ValueChanged);
 
+            UIView.AnimationsEnabled = false;
             NavigationItem.Prompt = GetTitleForModule(moduleType);
             NavigationItem.TitleView = segmentedControl;
+            UIView.AnimationsEnabled = true;
 
             viewControllers = new UIViewController[]
             {

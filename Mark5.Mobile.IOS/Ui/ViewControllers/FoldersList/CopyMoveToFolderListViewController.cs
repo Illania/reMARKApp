@@ -59,6 +59,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 }
             };
 
+            UIView.AnimationsEnabled = false;
             if (IsRootOfFoldersList)
             {
                 NavigationItem.Title = fromFolder == null ? Localization.GetString("copy_to_folder") : Localization.GetString("move_to_folder");
@@ -69,6 +70,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 NavigationItem.Title = ParentFolder.Name;
                 NavigationItem.Prompt = getTitle();
             }
+            UIView.AnimationsEnabled = true;
         }
 
         protected override void InitializeNavigationBar()
