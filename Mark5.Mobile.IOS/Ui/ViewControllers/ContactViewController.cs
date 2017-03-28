@@ -124,7 +124,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             AutomaticallyAdjustsScrollViewInsets = false;
 
             tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
-            tableView.BackgroundColor = Theme.LightGray;
             tableView.ClipsToBounds = false;
             tableView.Source = new DataSource(this, tableView);
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
