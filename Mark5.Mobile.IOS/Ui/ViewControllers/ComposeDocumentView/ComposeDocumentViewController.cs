@@ -92,6 +92,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             InitSubViews();
         }
 
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            ExtendedLayoutIncludesOpaqueBars = true;
+        }
+
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
@@ -140,6 +147,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void Initialize()
         {
+            AutomaticallyAdjustsScrollViewInsets = true;
+
             View.BackgroundColor = UIColor.White;
 
             scrollView = new ActionableLayoutScrollView
