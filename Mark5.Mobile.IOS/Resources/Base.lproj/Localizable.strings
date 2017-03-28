@@ -28,7 +28,7 @@
 "clearing_contacts_cache___" = "Clearing cache...";
 "clearing_shortcodes_cache___" = "Clearing cache...";
 "comments" = "Comments";
-"companies" = "Companies";
+"company" = "Company";
 "confirm" = "Confirm";
 "confirm_copy_to_folder" = "Copy";
 "confirm_copy_to_folder" = "Copy";
@@ -71,7 +71,7 @@
 "deleting___" = "Deleting...";
 "deleting_comment___" = "Deleting comment...";
 "deleting_from_folder___" = "Deleting from folder...";
-"departments" = "Departments";
+"department" = "Department";
 "description" = "Description";
 "disable_caching" = "Disable\ncaching";
 "disable_notifications" = "Don't\nnotify";
@@ -116,6 +116,7 @@
 "incorrect_email_addresses" = "There are email addresses who do not appear to be correct. Do you want to send anyway?";
 "internal" = "Internal";
 "internet_access" = "Internet access: ";
+"ledger" = "Ledger";
 "line" = "Line";
 "links" = "Links";
 "loading_document___" = "Loading document...";
@@ -174,7 +175,7 @@
 "originator" = "Originator";
 "own_worktray" = "My worktray";
 "password" = "Password";
-"persons" = "Persons";
+"person" = "Person";
 "phone" = "Phone";
 "please_restart" = "Please restart MARK5 app";
 "please_wait___" = "Please wait...";

@@ -202,6 +202,7 @@
     <InterfaceDefinition Include="Ui\TableViewCells\CommunicationAddressTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\CommunicationAddressCompactTableViewCell.xib" />
     <InterfaceDefinition Include="Ui\TableViewCells\PhysicalAddressTableViewCell.xib" />
+    <InterfaceDefinition Include="Ui\TableViewCells\ContactInfoTableViewCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -402,6 +403,10 @@
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsListView.cs" />
     <Compile Include="Ui\Common\ReachabilityBar.cs" />
     <Compile Include="Ui\ViewControllers\FoldersNotificationsListViewController.cs" />
+    <Compile Include="Ui\TableViewCells\ContactInfoTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\ContactInfoTableViewCell.designer.cs">
+      <DependentUpon>ContactInfoTableViewCell.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

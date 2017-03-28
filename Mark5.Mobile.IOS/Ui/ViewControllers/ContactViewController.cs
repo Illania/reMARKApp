@@ -947,12 +947,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Contact = contact;
                 }
 
-                public virtual string Key { get { return "default"; } }
+                public virtual string Key { get { return ContactInfoTableViewCell.Key; } }
 
                 public virtual UITableViewCell CreateCell()
                 {
-                    var cell = new UITableViewCell(UITableViewCellStyle.Default, Key);
-                    cell.TextLabel.Font = Theme.DefaultFont;
+                    var cell = ContactInfoTableViewCell.Create();
                     cell.Accessory = UITableViewCellAccessory.None;
                     cell.SelectionStyle = UITableViewCellSelectionStyle.None;
                     return cell;
@@ -974,17 +973,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                public override string Key { get { return DescriptionTableViewCell.Key; } }
-
-                public override UITableViewCell CreateCell()
-                {
-                    return DescriptionTableViewCell.Create();
-                }
-
                 public override void Bind(UITableViewCell cell)
                 {
-                    var dtvc = (DescriptionTableViewCell)cell;
-                    dtvc.Initialize(ContactPreview.Description);
+                    var cic = (ContactInfoTableViewCell)cell;
+                    cic.Initialize(Localization.GetString("description").ToUpper(), ContactPreview.Description);
                 }
 
                 public override void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
@@ -1131,7 +1123,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     ContactPreview cp;
                     weakLinkedContactPreview.TryGetTarget(out cp);
 
-                    cell.TextLabel.Text = cp.Name;
+                    string type;
+                    if (Contact?.PrimaryPerson?.Id == cp.Id)
+                        type = Localization.GetString("primary_person");
+                    else if (cp.Type == ContactType.Person)
+                        type = Localization.GetString("person");
+                    else if (cp.Type == ContactType.Department)
+                        type = Localization.GetString("department");
+                    else
+                        type = Localization.GetString("company");
+
+                    var cic = (ContactInfoTableViewCell)cell;
+                    cic.Initialize(type.ToUpper(), cp.Name);
                 }
 
                 public override void OnClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
@@ -1157,13 +1160,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var cell = base.CreateCell();
                     cell.SelectionStyle = UITableViewCellSelectionStyle.Default;
-                    cell.TextLabel.TextColor = Theme.DarkBlue;
                     return cell;
                 }
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    cell.TextLabel.AttributedText = new NSAttributedString(Contact.WebPageAddress, underlineStyle: NSUnderlineStyle.Single);
+                    var cic = (ContactInfoTableViewCell)cell;
+                    cic.Initialize(Localization.GetString("webpage").ToUpper(), new NSAttributedString(Contact.WebPageAddress, foregroundColor: Theme.DarkBlue, underlineStyle: NSUnderlineStyle.Single));
                 }
 
                 public override void OnClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
@@ -1187,11 +1190,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    cell.TextLabel.Text = Contact.BirthDateTimestamp
-                         .ConvertTimestampMillisecondsToDateTime()
-                         .ConvertUtcToServerTime()
-                         .ConvertDateTimeToTimestampMilliseconds()
-                         .FormatServerTimestampAsLongDateString();
+                    var cic = (ContactInfoTableViewCell)cell;
+                    cic.Initialize(Localization.GetString("birthdate").ToUpper(), Contact.BirthDateTimestamp
+                                                                                     .ConvertTimestampMillisecondsToDateTime()
+                                                                                     .ConvertUtcToServerTime()
+                                                                                     .ConvertDateTimeToTimestampMilliseconds()
+                                                                                     .FormatServerTimestampAsLongDateString());
                 }
             }
 
@@ -1205,7 +1209,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    cell.TextLabel.Text = Contact.Account;
+                    var cic = (ContactInfoTableViewCell)cell;
+                    cic.Initialize(Localization.GetString("account").ToUpper(), Contact.Account);
                 }
 
                 public override void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
@@ -1224,7 +1229,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    cell.TextLabel.Text = Contact.Ledger;
+                    var cic = (ContactInfoTableViewCell)cell;
+                    cic.Initialize(Localization.GetString("ledger").ToUpper(), Contact.Ledger);
                 }
 
                 public override void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
@@ -1243,7 +1249,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    cell.TextLabel.Text = Contact.Vat;
+                    var cic = (ContactInfoTableViewCell)cell;
+                    cic.Initialize(Localization.GetString("vat").ToUpper(), Contact.Vat);
                 }
 
                 public override void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
@@ -1262,7 +1269,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    cell.TextLabel.Text = string.Join(", ", Contact.ResponsibleUsers.Values.OrderBy(s => s));
+                    var cic = (ContactInfoTableViewCell)cell;
+                    cic.Initialize(Localization.GetString("responsible_users").ToUpper(), string.Join(", ", Contact.ResponsibleUsers.Values.OrderBy(s => s)));
                 }
             }
 
@@ -1276,7 +1284,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    cell.TextLabel.Text = ContactPreview.ShortId;
+                    var cic = (ContactInfoTableViewCell)cell;
+                    cic.Initialize(Localization.GetString("short_id").ToUpper(), ContactPreview.ShortId);
                 }
             }
 
