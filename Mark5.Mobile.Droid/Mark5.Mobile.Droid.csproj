@@ -617,6 +617,7 @@
     <AndroidResource Include="Resources\layout\search_list_item_categories.axml" />
     <AndroidResource Include="Resources\layout\search_list_item_lines.axml" />
     <AndroidResource Include="Resources\layout\search_list_item_priority.axml" />
+    <AndroidResource Include="Resources\drawable\search_button_background.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\anim\" />

@@ -54,9 +54,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
                 Text = context.GetString(stringResourceId);
 
-                var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
-                SetBackgroundResource(typedArray.GetResourceId(0, 0));
-                typedArray.Recycle();
+                Background = ContextCompat.GetDrawable(Context, Resource.Drawable.search_button_background);
 
                 Click += StyledButton_Click;
 
@@ -74,7 +72,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
             void UpdateStyle()
             {
-                SetBackgroundColor(Selected ? BackgroundColorSelectedState : BackgroundColorNormalState);
+                //SetBackgroundColor(Selected ? BackgroundColorSelectedState : BackgroundColorNormalState);
                 this.SetTextAppearanceCompat(context, Selected ? buttonTextStyleSelectedResourceId : buttonTextStyleNormalResourceId);
             }
 
