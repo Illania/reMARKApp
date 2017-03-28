@@ -55,10 +55,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public static UIFont DefaultLightFont { get { return UIFont.FromName(DefaultLightFontName, DefaultFontSize); } }
 
-        public static UIFont DefaultDocumentFont { get { return UIFont.SystemFontOfSize(16f); } }
-
-        public static UIFont DefaultOutgoingDocumentFont { get { return UIFont.SystemFontOfSize(12f); } }
-
         #endregion
 
         #region Apply theme methods
@@ -66,7 +62,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public static void ApplyTheme(UIWindow window)
         {
             // Color customizations
-            // ////////////////////
 
             window.TintColor = TintColor;
 
@@ -84,7 +79,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
             UITableViewHeaderFooterView.Appearance.TintColor = LightGray;
 
             // Font customizations
-            // ///////////////////
 
             // UINavigationBar
             var uiNavigationBarTitleTextAttributes = UINavigationBar.Appearance.GetTitleTextAttributes();
