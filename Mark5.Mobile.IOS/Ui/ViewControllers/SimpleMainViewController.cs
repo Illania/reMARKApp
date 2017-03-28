@@ -20,24 +20,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class SimpleMainViewController : AbstractMainViewController, IUITabBarControllerDelegate
     {
 
-        NavigationController searchNavigationController;
         NavigationController documentsNavigationController;
         NavigationController contactsNavigationController;
         NavigationController shortcodesNavigationController;
-        NavigationController notificationsNavigationController;
         NavigationController settingsNavigationController;
 
         public override void LoadView()
         {
             base.LoadView();
 
-            searchNavigationController = new NavigationController(new SearchViewController());
-            searchNavigationController.TabBarItem.Title = Localization.GetString("search");
-            searchNavigationController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "documents.png")); // TODO ICON put correct icon
-            searchNavigationController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "documents-filled.png")); // TODO ICON put correct icon
-            searchNavigationController.Tag = SearchTag;
-
-            documentsNavigationController = new NavigationController(new BrowseFoldersListViewController(ModuleType.Documents));
+            documentsNavigationController = new NavigationController(new FoldersNotificationsListViewController(ModuleType.Documents));
             documentsNavigationController.TabBarItem.Title = Localization.GetString("documents");
             documentsNavigationController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "documents.png"));
             documentsNavigationController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "documents-filled.png"));
@@ -55,12 +47,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             shortcodesNavigationController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "shortcodes-filled.png"));
             shortcodesNavigationController.Tag = ShortcodeTag;
 
-            notificationsNavigationController = new NavigationController(new NotificationsListViewController());
-            notificationsNavigationController.TabBarItem.Title = Localization.GetString("notifications");
-            notificationsNavigationController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "notifications.png"));
-            notificationsNavigationController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "notifications-filled.png"));
-            notificationsNavigationController.Tag = NotificationsTag;
-
             settingsNavigationController = new NavigationController(new SettingsViewController());
             settingsNavigationController.TabBarItem.Title = Localization.GetString("settings");
             settingsNavigationController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "settings.png"));
@@ -74,11 +60,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 ViewControllers = new ITaggedViewController[]
                 {
-                    //searchNavigationController,
                     documentsNavigationController,
                     contactsNavigationController,
                     shortcodesNavigationController,
-                    notificationsNavigationController,
                     settingsNavigationController
                 }.OrderBy(vc => Array.IndexOf(tabsOrder, vc.Tag)).OfType<UIViewController>().ToArray();
 
@@ -90,11 +74,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 ViewControllers = new UIViewController[]
                 {
-                    //searchNavigationController,
                     documentsNavigationController,
                     contactsNavigationController,
                     shortcodesNavigationController,
-                    notificationsNavigationController,
                     settingsNavigationController
                 };
 

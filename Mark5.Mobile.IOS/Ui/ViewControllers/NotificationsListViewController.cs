@@ -24,6 +24,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
     public class NotificationsListViewController : AbstractViewController
     {
+        
+        readonly ModuleType moduleType;
 
         UIBarButtonItem markAsReadItem;
 
@@ -33,6 +35,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         bool refreshing;
 
         TinyMessageSubscriptionToken newNotificationsMessageToken;
+
+        public NotificationsListViewController(ModuleType moduleType)
+        {
+            this.moduleType = moduleType;
+        }
 
         public override void LoadView()
         {

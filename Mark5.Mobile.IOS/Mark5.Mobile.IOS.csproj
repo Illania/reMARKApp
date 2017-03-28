@@ -401,6 +401,7 @@
     <Compile Include="Utilities\Extensions\UIFontExtensions.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsListView.cs" />
     <Compile Include="Ui\Common\ReachabilityBar.cs" />
+    <Compile Include="Ui\ViewControllers\FoldersNotificationsListViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
