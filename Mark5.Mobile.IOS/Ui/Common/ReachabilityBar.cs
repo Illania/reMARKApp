@@ -33,6 +33,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public static void Attach(UIView parent, UIScrollView scrollView = null, float offset = 0f)
         {
+            if (parent == null)
+                return;
+            
             if (parent.Subviews.Any(v => v is ReachabilityBar))
                 return;
 
