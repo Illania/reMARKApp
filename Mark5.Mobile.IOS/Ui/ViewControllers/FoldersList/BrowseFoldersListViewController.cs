@@ -31,15 +31,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (folder.Module == ModuleType.Documents)
             {
                 UIViewController vc;
-
                 if (folder.Local)
-                {
                     vc = new OutgoingDocumentListViewController();
-                }
                 else
-                {
                     vc = new DocumentsListViewController { Folder = folder };
-                }
 
                 NavigationController.PushViewController(vc, true);
             }
