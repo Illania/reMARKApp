@@ -122,7 +122,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, -1f),
                     NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 150f)
+                    NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 100f)
                 });
 
             tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
