@@ -53,7 +53,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             var remainingButtonsList = new List<StyledButton> { inboxButton, outboxButton, draftButton };
             remainingButtonsList.Remove(button);
 
-            if (remainingButtonsList.All(b => b.Selected == true) && !button.Selected)
+            if ((remainingButtonsList.All(b => b.Selected == true) && !button.Selected) || (remainingButtonsList.All(b => b.Selected == false) && button.Selected))
             {
                 ResetOtherButtons();
                 allButton.UpdateSelectedState(true);
