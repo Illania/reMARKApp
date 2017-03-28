@@ -83,12 +83,6 @@
     <Reference Include="PreMailer.Net">
       <HintPath>..\lib\PreMailer.Net.dll</HintPath>
     </Reference>
-    <Reference Include="HockeySDK.AndroidBindings">
-      <HintPath>..\packages\HockeySDK.Xamarin.4.1.1\lib\MonoAndroid403\HockeySDK.AndroidBindings.dll</HintPath>
-    </Reference>
-    <Reference Include="HockeySDK">
-      <HintPath>..\packages\HockeySDK.Xamarin.4.1.1\lib\MonoAndroid403\HockeySDK.dll</HintPath>
-    </Reference>
     <Reference Include="SQLitePCLRaw.core">
       <HintPath>..\packages\SQLitePCLRaw.core.1.1.2\lib\MonoAndroid\SQLitePCLRaw.core.dll</HintPath>
     </Reference>
@@ -190,6 +184,12 @@
     <Reference Include="Xamarin.Android.Support.Transition">
       <HintPath>..\packages\Xamarin.Android.Support.Transition.25.0.1-rc1\lib\MonoAndroid70\Xamarin.Android.Support.Transition.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="HockeySDK.AndroidBindings">
+      <HintPath>..\packages\HockeySDK.Xamarin.4.1.2\lib\MonoAndroid403\HockeySDK.AndroidBindings.dll</HintPath>
+    </Reference>
+    <Reference Include="HockeySDK">
+      <HintPath>..\packages\HockeySDK.Xamarin.4.1.2\lib\MonoAndroid403\HockeySDK.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
