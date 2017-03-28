@@ -867,13 +867,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     if (f.Subscribed)
                     {
                         var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_notifications"), (a, ip) => { viewController.DisableNotifications(foldersInView[ip.Row]); tableView.SetEditing(false, true); });
-                        action.BackgroundColor = Theme.Blue;
+                        action.BackgroundColor = Theme.DarkerBlue;
                         actions.Add(action);
                     }
                     else
                     {
                         var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_notifications"), (a, ip) => { viewController.EnableNotifications(foldersInView[ip.Row]); tableView.SetEditing(false, true); });
-                        action.BackgroundColor = Theme.Blue;
+                        action.BackgroundColor = Theme.DarkerBlue;
                         actions.Add(action);
                     }
                 }
@@ -1144,13 +1144,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         if (f.Subscribed)
                         {
                             var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("disable_notifications"), (a, ip) => { viewController.DisableNotifications(foldersInView[ip.LongSection][ip.Row]); tableView.SetEditing(false, true); });
-                            action.BackgroundColor = Theme.Blue;
+                            action.BackgroundColor = Theme.DarkerBlue;
                             actions.Add(action);
                         }
                         else
                         {
                             var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("enable_notifications"), (a, ip) => { viewController.EnableNotifications(foldersInView[ip.LongSection][ip.Row]); tableView.SetEditing(false, true); });
-                            action.BackgroundColor = Theme.Blue;
+                            action.BackgroundColor = Theme.DarkerBlue;
                             actions.Add(action);
                         }
                     }

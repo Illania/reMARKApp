@@ -113,7 +113,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         void InitializeListView()
         {
             suggestionsTableView = new UITableView();
-            suggestionsTableView.BackgroundColor = Theme.LighterGray;
+            suggestionsTableView.BackgroundColor = Theme.Gray;
             suggestionsTableView.RowHeight = UITableView.AutomaticDimension;
             suggestionsTableView.EstimatedRowHeight = 44f;
             suggestionsTableView.TableFooterView = new UIView(CGRect.Empty); //Used to avoid showing empty rows at the bottom

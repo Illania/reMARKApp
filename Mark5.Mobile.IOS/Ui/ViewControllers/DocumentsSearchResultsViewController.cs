@@ -596,7 +596,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var documentPreview = documentPreviewsInView[indexPath.Row];
 
                 var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("more"), (a, ip) => { viewController.DoShowMoreActionSheet(indexPath, documentPreview); });
-                moreAction.BackgroundColor = Theme.Blue;
+                moreAction.BackgroundColor = Theme.DarkerBlue;
                 actions.Add(moreAction);
 
                 var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("copy_to_worktray"), (a, ip) => { viewController.CopyToWorktray(documentPreview); viewController.EndEditing(); });

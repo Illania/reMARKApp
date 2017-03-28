@@ -42,9 +42,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public void Disable()
         {
-            FolderNameLabel.TextColor = Theme.Gray;
-            FolderPathLabel.TextColor = Theme.Gray;
-            FolderIconImage.TintColor = Theme.Gray;
+            FolderNameLabel.TextColor = Theme.DarkGray;
+            FolderPathLabel.TextColor = Theme.DarkGray;
+            FolderIconImage.TintColor = Theme.DarkGray;
 
             SelectionStyle = UITableViewCellSelectionStyle.None;
             UserInteractionEnabled = false;
