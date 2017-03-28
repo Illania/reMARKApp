@@ -114,6 +114,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             AutomaticallyAdjustsScrollViewInsets = false;
 
             tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
+            tableView.BackgroundColor = Theme.LightGray;
             tableView.ClipsToBounds = false;
             tableView.Source = new DataSource(this, tableView);
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -628,10 +629,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override string TitleForHeader(UITableView tableView, nint section)
             {
-                if (empty) return string.Empty;
-                if (loading) return string.Empty;
-
-                return sections[(int)section].Title;
+                return string.Empty;
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
@@ -656,27 +654,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public void EndRefresh(ContactPreview contactPreview, Contact contact)
             {
                 var allSections = new AbstractSection[] {
-                    new NameSection(),
-                    new DescriptionSection(),
-                    new CommunicationAddressSection(CommunicationAddressType.Email),
-                    new CommunicationAddressSection(CommunicationAddressType.Mobile),
-                    new CommunicationAddressSection(CommunicationAddressType.Phone),
-                    new CommunicationAddressSection(CommunicationAddressType.Skype),
-                    new CommunicationAddressSection(CommunicationAddressType.Fax),
-                    new CommunicationAddressSection(CommunicationAddressType.IM),
-                    new CommunicationAddressSection(CommunicationAddressType.Telex),
-                    new CommunicationAddressSection(CommunicationAddressType.Internal),
+                    new CommunicationAddressSection(),
                     new PhysicalAddressSection(),
-                    new LinkedContactSection(LinkedContactSection.LinkedContactSectionMode.PrimaryPerson),
-                    new LinkedContactSection(LinkedContactSection.LinkedContactSectionMode.Persons),
-                    new LinkedContactSection(LinkedContactSection.LinkedContactSectionMode.Departments),
-                    new LinkedContactSection(LinkedContactSection.LinkedContactSectionMode.Companies),
-                    new WebPageSection(),
-                    new BirthdateSection(),
-                    new AccountSection(),
-                    new VatSection(),
-                    new ResponsibleUsersSection(),
-                    new ShortIdSection()
+                    new LinkedContactSection(),
+                    new ExtraSection()
                 };
 
                 foreach (var section in allSections)
@@ -788,102 +769,58 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public abstract bool Empty { get; }
 
-                public abstract string Title { get; }
-
                 public RowCollection Rows { get; } = new RowCollection();
 
                 public abstract void InitializeRows();
             }
 
-            public class NameSection : AbstractSection
-            {
-
-                public override bool Empty
-                {
-                    get
-                    {
-                        if (ContactPreview?.Type == ContactType.Person)
-                            return string.IsNullOrWhiteSpace(Contact?.Position) && string.IsNullOrWhiteSpace(ContactPreview?.CompanyName);
-                        if (ContactPreview?.Type == ContactType.Department)
-                            return string.IsNullOrWhiteSpace(ContactPreview?.CompanyName);
-
-                        return true;
-                    }
-                }
-
-                public override string Title { get { return string.Empty; } }
-
-                public override void InitializeRows()
-                {
-                    if (Empty) return;
-
-                    Rows.Add(new NameRow(ContactPreview, Contact));
-                }
-            }
-
-            public class DescriptionSection : AbstractSection
-            {
-
-                public override bool Empty { get { return string.IsNullOrWhiteSpace(ContactPreview?.Description); } }
-
-                public override string Title { get { return Localization.GetString("description"); } }
-
-                public override void InitializeRows()
-                {
-                    if (Empty) return;
-
-                    Rows.Add(new DescriptionRow(ContactPreview, Contact));
-                }
-            }
-
             public class CommunicationAddressSection : AbstractSection
             {
 
-                public override bool Empty { get { return !Contact?.CommunicationAddresses?.Any(ca => ca.Type == type) ?? true; } }
+                readonly CommunicationAddressType[] supportedSections = {
+                    CommunicationAddressType.Mobile,
+                    CommunicationAddressType.Phone,
+                    CommunicationAddressType.Email,
+                    CommunicationAddressType.Fax,
+                    CommunicationAddressType.IM,
+                    CommunicationAddressType.Telex,
+                    CommunicationAddressType.Internal
+                };
 
-                public override string Title
-                {
-                    get
-                    {
-                        if (type == CommunicationAddressType.Email)
-                            return Localization.GetString("email");
-                        if (type == CommunicationAddressType.Fax)
-                            return Localization.GetString("fax");
-                        if (type == CommunicationAddressType.IM)
-                            return Localization.GetString("im");
-                        if (type == CommunicationAddressType.Internal)
-                            return Localization.GetString("internal");
-                        if (type == CommunicationAddressType.Mobile)
-                            return Localization.GetString("mobile");
-                        if (type == CommunicationAddressType.Phone)
-                            return Localization.GetString("phone");
-                        if (type == CommunicationAddressType.Skype)
-                            return Localization.GetString("skype");
-                        if (type == CommunicationAddressType.System)
-                            return Localization.GetString("system");
-                        if (type == CommunicationAddressType.Telex)
-                            return Localization.GetString("telex");
 
-                        return string.Empty;
-                    }
-                }
-
-                readonly CommunicationAddressType type;
-
-                public CommunicationAddressSection(CommunicationAddressType type)
-                {
-                    this.type = type;
-                }
+                public override bool Empty { get { return !Contact?.CommunicationAddresses?.Any(ca => supportedSections.Contains(ca.Type)) ?? true; } }
 
                 public override void InitializeRows()
                 {
                     if (Empty) return;
 
-                    var cas = Contact.CommunicationAddresses.Where(ca => ca.Type == type).ToArray();
+                    var cas = Contact.CommunicationAddresses.Where(ca => ca.Type == CommunicationAddressType.Mobile);
                     foreach (var ca in cas)
-                    {
                         Rows.Add(new CommunicationAddressRow(ContactPreview, Contact, ca));
-                    }
+
+                    cas = Contact.CommunicationAddresses.Where(ca => ca.Type == CommunicationAddressType.Phone);
+                    foreach (var ca in cas)
+                        Rows.Add(new CommunicationAddressRow(ContactPreview, Contact, ca));
+
+                    cas = Contact.CommunicationAddresses.Where(ca => ca.Type == CommunicationAddressType.Email);
+                    foreach (var ca in cas)
+                        Rows.Add(new CommunicationAddressRow(ContactPreview, Contact, ca));
+
+                    cas = Contact.CommunicationAddresses.Where(ca => ca.Type == CommunicationAddressType.Fax);
+                    foreach (var ca in cas)
+                        Rows.Add(new CommunicationAddressRow(ContactPreview, Contact, ca));
+
+                    cas = Contact.CommunicationAddresses.Where(ca => ca.Type == CommunicationAddressType.IM);
+                    foreach (var ca in cas)
+                        Rows.Add(new CommunicationAddressRow(ContactPreview, Contact, ca));
+
+                    cas = Contact.CommunicationAddresses.Where(ca => ca.Type == CommunicationAddressType.Telex);
+                    foreach (var ca in cas)
+                        Rows.Add(new CommunicationAddressRow(ContactPreview, Contact, ca));
+
+                    cas = Contact.CommunicationAddresses.Where(ca => ca.Type == CommunicationAddressType.Internal);
+                    foreach (var ca in cas)
+                        Rows.Add(new CommunicationAddressRow(ContactPreview, Contact, ca));
                 }
             }
 
@@ -891,8 +828,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
 
                 public override bool Empty { get { return !Contact?.PhysicalAddresses?.Any() ?? true; } }
-
-                public override string Title { get { return Localization.GetString("address"); } }
 
                 public override void InitializeRows()
                 {
@@ -909,181 +844,64 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public class LinkedContactSection : AbstractSection
             {
 
-                public enum LinkedContactSectionMode
+                public override bool Empty { get { return Contact?.PrimaryPerson == null && (!Contact?.Children?.Any() ?? true); } }
+
+                public override void InitializeRows()
                 {
-                    None,
-                    PrimaryPerson,
-                    Persons,
-                    Departments,
-                    Companies
+                    if (Empty) return;
+
+                    if (Contact.PrimaryPerson != null)
+                        Rows.Add(new LinkedContactRow(ContactPreview, Contact, Contact.PrimaryPerson));
+
+                    var cps = Contact.Children.Where(cp => cp.Type == ContactType.Person);
+                    foreach (var cp in cps)
+                        Rows.Add(new LinkedContactRow(ContactPreview, Contact, cp));
+
+                    cps = Contact.Children.Where(cp => cp.Type == ContactType.Department);
+                    foreach (var cp in cps)
+                        Rows.Add(new LinkedContactRow(ContactPreview, Contact, cp));
+
+                    cps = Contact.Children.Where(cp => cp.Type == ContactType.Company);
+                    foreach (var cp in cps)
+                        Rows.Add(new LinkedContactRow(ContactPreview, Contact, cp));
                 }
+            }
 
-                readonly LinkedContactSectionMode mode;
-
+            public class ExtraSection : AbstractSection
+            {
                 public override bool Empty
                 {
                     get
                     {
-                        if (mode == LinkedContactSectionMode.PrimaryPerson)
-                            return Contact?.PrimaryPerson == null;
-                        if (mode == LinkedContactSectionMode.Persons)
-                            return !Contact?.Children?.Any(cp => cp.Type == ContactType.Person) ?? true;
-                        if (mode == LinkedContactSectionMode.Departments)
-                            return !Contact?.Children?.Any(cp => cp.Type == ContactType.Department) ?? true;
-                        if (mode == LinkedContactSectionMode.Companies)
-                            return !Contact?.Children?.Any(cp => cp.Type == ContactType.Company) ?? true;
-
-                        return true;
+                        return string.IsNullOrWhiteSpace(ContactPreview?.Description)
+                                     && string.IsNullOrWhiteSpace(ContactPreview?.ShortId)
+                                     && (!Contact?.ResponsibleUsers?.Any() ?? true)
+                                     && (Contact?.BirthDateTimestamp == -6847804800000 || Contact?.BirthDateTimestamp == -1)
+                                     && string.IsNullOrWhiteSpace(Contact?.WebPageAddress)
+                                     && string.IsNullOrWhiteSpace(Contact?.Vat)
+                                     && string.IsNullOrWhiteSpace(Contact?.Ledger)
+                                     && string.IsNullOrWhiteSpace(Contact?.Account);
                     }
                 }
 
-                public override string Title
-                {
-                    get
-                    {
-                        if (mode == LinkedContactSectionMode.PrimaryPerson)
-                            return Localization.GetString("primary_person");
-                        if (mode == LinkedContactSectionMode.Persons)
-                            return Localization.GetString("persons");
-                        if (mode == LinkedContactSectionMode.Departments)
-                            return Localization.GetString("departments");
-                        if (mode == LinkedContactSectionMode.Companies)
-                            return Localization.GetString("companies");
-
-                        return string.Empty;
-                    }
-                }
-
-                public LinkedContactSection(LinkedContactSectionMode mode)
-                {
-                    this.mode = mode;
-                }
-
                 public override void InitializeRows()
                 {
-                    if (Empty) return;
-
-                    if (mode == LinkedContactSectionMode.PrimaryPerson)
-                    {
-                        Rows.Add(new LinkedContactRow(ContactPreview, Contact, Contact.PrimaryPerson));
-                    }
-
-                    if (mode == LinkedContactSectionMode.Persons)
-                    {
-                        var cps = Contact.Children.Where(cp => cp.Type == ContactType.Person).ToArray();
-                        foreach (var cp in cps)
-                        {
-                            Rows.Add(new LinkedContactRow(ContactPreview, Contact, cp));
-                        }
-                    }
-
-                    if (mode == LinkedContactSectionMode.Departments)
-                    {
-                        var cps = Contact.Children.Where(cp => cp.Type == ContactType.Department).ToArray();
-                        foreach (var cp in cps)
-                        {
-                            Rows.Add(new LinkedContactRow(ContactPreview, Contact, cp));
-                        }
-                    }
-
-                    if (mode == LinkedContactSectionMode.Companies)
-                    {
-                        var cps = Contact.Children.Where(cp => cp.Type == ContactType.Company).ToArray();
-                        foreach (var cp in cps)
-                        {
-                            Rows.Add(new LinkedContactRow(ContactPreview, Contact, cp));
-                        }
-                    }
-                }
-            }
-
-            public class WebPageSection : AbstractSection
-            {
-
-                public override bool Empty { get { return string.IsNullOrWhiteSpace(Contact?.WebPageAddress); } }
-
-                public override string Title { get { return Localization.GetString("webpage"); } }
-
-                public override void InitializeRows()
-                {
-                    if (Empty) return;
-
-                    Rows.Add(new WebPageRow(ContactPreview, Contact));
-                }
-            }
-
-            public class BirthdateSection : AbstractSection
-            {
-
-                public override bool Empty { get { return Contact?.BirthDateTimestamp == -6847804800000 || Contact?.BirthDateTimestamp == -1; } } // SQL null date, aka 1/1/1753
-
-                public override string Title { get { return Localization.GetString("birthdate"); } }
-
-                public override void InitializeRows()
-                {
-                    if (Empty) return;
-
-                    Rows.Add(new BirthdateRow(ContactPreview, Contact));
-                }
-            }
-
-            public class AccountSection : AbstractSection
-            {
-
-                public override bool Empty { get { return string.IsNullOrWhiteSpace(Contact?.Account); } }
-
-                public override string Title { get { return Localization.GetString("account"); } }
-
-                public override void InitializeRows()
-                {
-                    if (Empty) return;
-
-                    Rows.Add(new AccountRow(ContactPreview, Contact));
-                }
-            }
-
-            public class VatSection : AbstractSection
-            {
-
-                public override bool Empty { get { return string.IsNullOrWhiteSpace(Contact?.Vat); } }
-
-                public override string Title { get { return Localization.GetString("vat"); } }
-
-                public override void InitializeRows()
-                {
-                    if (Empty) return;
-
-                    Rows.Add(new VatRow(ContactPreview, Contact));
-                }
-            }
-
-            public class ResponsibleUsersSection : AbstractSection
-            {
-
-                public override bool Empty { get { return !Contact?.ResponsibleUsers?.Any() ?? true; } }
-
-                public override string Title { get { return Localization.GetString("responsible_users"); } }
-
-                public override void InitializeRows()
-                {
-                    if (Empty) return;
-
-                    Rows.Add(new ResponsibleUsersRow(ContactPreview, Contact));
-                }
-            }
-
-            public class ShortIdSection : AbstractSection
-            {
-
-                public override bool Empty { get { return string.IsNullOrWhiteSpace(ContactPreview?.ShortId); } }
-
-                public override string Title { get { return Localization.GetString("short_id"); } }
-
-                public override void InitializeRows()
-                {
-                    if (Empty) return;
-
-                    Rows.Add(new ShortIdRow(ContactPreview, Contact));
+                    if (!string.IsNullOrWhiteSpace(ContactPreview?.Description))
+                        Rows.Add(new DescriptionRow(ContactPreview, Contact));
+                    if (!string.IsNullOrWhiteSpace(ContactPreview?.ShortId))
+                        Rows.Add(new ShortIdRow(ContactPreview, Contact));
+                    if (!(!Contact?.ResponsibleUsers?.Any() ?? true))
+                        Rows.Add(new ResponsibleUsersRow(ContactPreview, Contact));
+                    if (!(Contact?.BirthDateTimestamp == -6847804800000 || Contact?.BirthDateTimestamp == -1))
+                        Rows.Add(new BirthdateRow(ContactPreview, Contact));
+                    if (!string.IsNullOrWhiteSpace(Contact?.WebPageAddress))
+                        Rows.Add(new WebPageRow(ContactPreview, Contact));
+                    if (!string.IsNullOrWhiteSpace(Contact?.Vat))
+                        Rows.Add(new VatRow(ContactPreview, Contact));
+                    if (!string.IsNullOrWhiteSpace(Contact?.Ledger))
+                        Rows.Add(new LedgerRow(ContactPreview, Contact));
+                    if (!string.IsNullOrWhiteSpace(Contact?.Account))
+                        Rows.Add(new AccountRow(ContactPreview, Contact));
                 }
             }
 
@@ -1146,28 +964,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public virtual void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath) { }
 
-            }
-
-            public class NameRow : AbstractRow
-            {
-
-                public NameRow(ContactPreview contactPreview, Contact contact)
-                    : base(contactPreview, contact)
-                {
-                }
-
-                public override void Bind(UITableViewCell cell)
-                {
-                    if (ContactPreview?.Type == ContactType.Person)
-                        cell.TextLabel.Text = string.Join(", ", new[] { Contact.Position, ContactPreview.CompanyName }.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray());
-                    if (ContactPreview?.Type == ContactType.Department)
-                        cell.TextLabel.Text = ContactPreview.CompanyName;
-                }
-
-                public override void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
-                {
-                    viewController.CopyToClipboard(tableView, cell, cell.TextLabel.Text);
-                }
             }
 
             public class DescriptionRow : AbstractRow
@@ -1415,6 +1211,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public override void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
                     viewController.CopyToClipboard(tableView, cell, Contact.Account);
+                }
+            }
+
+            public class LedgerRow : AbstractRow
+            {
+
+                public LedgerRow(ContactPreview contactPreview, Contact contact)
+                    : base(contactPreview, contact)
+                {
+                }
+
+                public override void Bind(UITableViewCell cell)
+                {
+                    cell.TextLabel.Text = Contact.Ledger;
+                }
+
+                public override void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                {
+                    viewController.CopyToClipboard(tableView, cell, Contact.Ledger);
                 }
             }
 
