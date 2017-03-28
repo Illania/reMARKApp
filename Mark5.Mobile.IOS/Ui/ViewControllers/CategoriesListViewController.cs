@@ -495,6 +495,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return Empty ? string.Empty : sectionIndexes[(int)section];
             }
 
+            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section)
+            {
+                var v = headerView as UITableViewHeaderFooterView;
+                if (v == null)
+                    return;
+
+                v.TextLabel.TextColor = Theme.DarkerBlue;
+            }
+
             public override nint SectionFor(UITableView tableView, string title, nint atIndex)
             {
                 return atIndex;
@@ -743,6 +752,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override string TitleForHeader(UITableView tableView, nint section)
             {
                 return Empty ? string.Empty : sectionIndexes[(int)section];
+            }
+
+            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section)
+            {
+                var v = headerView as UITableViewHeaderFooterView;
+                if (v == null)
+                    return;
+
+                v.TextLabel.TextColor = Theme.DarkerBlue;
             }
 
             public override nint SectionFor(UITableView tableView, string title, nint atIndex)

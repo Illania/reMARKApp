@@ -627,11 +627,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return sections.Count;
             }
 
-            public override string TitleForHeader(UITableView tableView, nint section)
-            {
-                return string.Empty;
-            }
-
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
