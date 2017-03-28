@@ -31,13 +31,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static CommunicationAddressTableViewCell Create()
         {
             var cell = (CommunicationAddressTableViewCell)Nib.Instantiate(null, null)[0];
-            cell.AddressLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
+            cell.TypeLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-3f);
+            cell.NameLabel.Font = Theme.DefaultFont;
+            cell.AddressLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-1f);
             return cell;
         }
 
         public void Initialize(CommunicationAddress communicationAddress)
         {
-            NameLabel.Font = communicationAddress.IsPrimary ? Theme.DefaultBoldFont : Theme.DefaultFont;
+            TypeLabel.Text = GetTypeText(communicationAddress.Type).ToUpper();
             NameLabel.Text = communicationAddress.Description;
 
             switch (communicationAddress.Type)
@@ -65,7 +67,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             }
         }
 
-        string GetAddressFormatted(CommunicationAddress ca)
+        static string GetAddressFormatted(CommunicationAddress ca)
         {
             if (ca.Address.Contains("|"))
                 if (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone || ca.Type == CommunicationAddressType.Fax)
@@ -80,6 +82,30 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 }
 
             return ca.Address;
+        }
+
+        static string GetTypeText(CommunicationAddressType type)
+        {
+            if (type == CommunicationAddressType.Email)
+                return Localization.GetString("email");
+            if (type == CommunicationAddressType.Fax)
+                return Localization.GetString("fax");
+            if (type == CommunicationAddressType.IM)
+                return Localization.GetString("im");
+            if (type == CommunicationAddressType.Internal)
+                return Localization.GetString("internal");
+            if (type == CommunicationAddressType.Mobile)
+                return Localization.GetString("mobile");
+            if (type == CommunicationAddressType.Phone)
+                return Localization.GetString("phone");
+            if (type == CommunicationAddressType.Skype)
+                return Localization.GetString("skype");
+            if (type == CommunicationAddressType.System)
+                return Localization.GetString("system");
+            if (type == CommunicationAddressType.Telex)
+                return Localization.GetString("telex");
+
+            return string.Empty;
         }
     }
 }

@@ -20,12 +20,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
 		[Outlet]
 		UIKit.UILabel NameLabel { get; set; }
+
+		[Outlet]
+		UIKit.UILabel TypeLabel { get; set; }
 		
 		void ReleaseDesignerOutlets ()
 		{
-			if (NameLabel != null) {
-				NameLabel.Dispose ();
-				NameLabel = null;
+			if (TypeLabel != null) {
+				TypeLabel.Dispose ();
+				TypeLabel = null;
 			}
 
 			if (AddressLabel != null) {
@@ -36,6 +39,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 			if (IconImage != null) {
 				IconImage.Dispose ();
 				IconImage = null;
+			}
+
+			if (NameLabel != null) {
+				NameLabel.Dispose ();
+				NameLabel = null;
 			}
 		}
 	}
