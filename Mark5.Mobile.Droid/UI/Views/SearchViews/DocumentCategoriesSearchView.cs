@@ -5,25 +5,21 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
-using System;
+using System.Collections.Generic;
+using System.Linq;
 using Android.Content;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
-    public class DocumentCategoriesSearchView : AbstractDropdownSearchView<SearchDocumentsCriteria, Category>
+    public class DocumentCategoriesSearchView : AbstractDropdownSearchView<SearchDocumentsCriteria>
     {
-        DocumentSearchCriteriaFragment documentSearchCriteriaFragment;
+        List<int> SelectedCategoryIds = new List<int>();
 
-        DocumentCategoriesSearchView(Context context)
-            : base(context, Resource.String.search_categories, Resource.String.search_categories_none)
+        public DocumentCategoriesSearchView(Context context, DocumentSearchCriteriaFragment documentSearchCriteriaFragment)
+            : base(context, Resource.String.search_categories, Resource.String.search_categories_none, documentSearchCriteriaFragment)
         {
-        }
-
-        public DocumentCategoriesSearchView(Context context, DocumentSearchCriteriaFragment documentSearchCriteriaFragment) : this(context)
-        {
-            this.documentSearchCriteriaFragment = documentSearchCriteriaFragment;
         }
 
         protected override void ClickAction()
@@ -31,24 +27,29 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             var pclf = new PickCategoriesListFragment
             {
                 ObjectType = ObjectType.Document,
-                PreselectedCategoryIds = new int[] { },
-                CloseRequest = categories =>
-                {
-                    //TODO
-                }
+                PreselectedCategoryIds = SelectedCategoryIds.ToArray(),
+                CloseRequest = UpdateCategories
             };
 
-            documentSearchCriteriaFragment.PushDropdownViewFragment(pclf, pclf.GenerateTag());
+            ParentFragment.PushDropdownViewFragment(pclf, pclf.GenerateTag());
+        }
+
+        void UpdateCategories(List<Category> categories) => UpdateCategories(categories.Select(c => c.Id).ToList());
+
+        void UpdateCategories(List<int> categoriesId)
+        {
+            SelectedCategoryIds = categoriesId;
+            UpdateSpinnerText(categoriesId.Count);
         }
 
         public override void FromCriteria(SearchDocumentsCriteria criteria)
         {
-            //TODO
+            UpdateCategories(criteria.CategoryIds);
         }
 
         public override void ToCriteria(SearchDocumentsCriteria criteria)
         {
-            //TODO
+            criteria.CategoryIds = SelectedCategoryIds;
         }
     }
 

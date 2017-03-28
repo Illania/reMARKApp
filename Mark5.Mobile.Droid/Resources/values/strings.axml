@@ -156,6 +156,10 @@
 	<string name="port">Port</string>
 	<string name="port_invalid">Port is not valid</string>
 	<string name="priority">Priority</string>
+	<string name="priority">Priorities</string>
+	<string name="priority_low">Low</string>
+	<string name="priority_normal">Normal</string>
+	<string name="priority_urgent">Urgent</string>
 	<string name="read_by">Read by:</string>
 	<string name="read_by_prefix">read by</string>
 	<string name="reference">Ref.:</string>
@@ -173,6 +177,8 @@
 	<string name="search">Search</string>
 	<string name="search_editable_empty">___</string>
 	<string name="search_categories">Categories</string>
+	<string name="search_lines">Lines</string>
+	<string name="search_priorities">Priorities</string>
 	<string name="search_categories_none">Any</string>
 	<string name="search_contact_com_address">Communication address</string>
 	<string name="search_contact_comment">Comment</string>
@@ -204,10 +210,10 @@
 	<string name="search_document_handled_true">Handled</string>
 	<string name="search_document_in_attachments">Search inside attachments</string>
 	<string name="search_document_lines">Lines</string>
-	<string name="search_document_lines_none_selected">Any line</string>
+	<string name="search_document_lines_none_selected">Any</string>
 	<string name="search_document_partial">Partial words search</string>
 	<string name="search_document_priorities">Priority</string>
-	<string name="search_document_priorities_none_selected">Any priority</string>
+	<string name="search_document_priorities_none_selected">Any</string>
 	<string name="search_document_reference_number">Reference no.</string>
 	<string name="search_document_search_for">Search for email addresses in:</string>
 	<string name="search_document_search_for_hint">Enter address</string>

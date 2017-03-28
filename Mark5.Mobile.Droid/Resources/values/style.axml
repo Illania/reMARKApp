@@ -177,21 +177,21 @@
 		<item name="android:textSize">15sp</item>
 		<item name="android:textColor">@color/lightgray</item>
 	</style>
-	<style name="searchCategory" parent="TextAppearance.AppCompat.Body2">
+	<style name="searchListTitle" parent="TextAppearance.AppCompat.Body2">
 		<item name="android:textSize">16sp</item>
 		<item name="android:textColor">@color/lightgray</item>
 	</style>
-	<style name="searchCategorySelected" parent="TextAppearance.AppCompat.Body2">
+	<style name="searchListTitleSelected" parent="TextAppearance.AppCompat.Body2">
 		<item name="android:textSize">16sp</item>
 		<item name="android:textColor">@color/darkerblue</item>
 	</style>
-	<style name="searchCategorySubtitle" parent="TextAppearance.AppCompat.Body2">
-		<item name="android:textSize">14sp</item>
-		<item name="android:textColor">@color/darkgray</item>
-	</style>
-	<style name="searchCategorySubtitleSelected" parent="TextAppearance.AppCompat.Body2">
+	<style name="searchListSubtitle" parent="TextAppearance.AppCompat.Caption">
 		<item name="android:textSize">14sp</item>
 		<item name="android:textColor">@color/lightgray</item>
+	</style>
+	<style name="searchListSubtitleSelected" parent="TextAppearance.AppCompat.Caption">
+		<item name="android:textSize">14sp</item>
+		<item name="android:textColor">@color/darkgray</item>
 	</style>
 	<style name="popupMenuTextAppearanceSmall" parent="TextAppearance.AppCompat.Widget.PopupMenu.Small">
 		<item name="android:textColor">@color/darkerblue</item>

@@ -36,9 +36,9 @@
 		<item quantity="one">%1$d new document received.</item>
 		<item quantity="other">%1$d new documents received.</item>
 	</plurals>
-	<plurals name="search_categories_selected">
-		<item quantity="one">%1$d category selected</item>
-		<item quantity="other">Any of %1$d selected categories</item>
+	<plurals name="search_dropdown_selected">
+		<item quantity="one">%1$d selected</item>
+		<item quantity="other">%1$d selected</item>
 	</plurals>
 	<plurals name="users_selected">
 		<item quantity="one">%1$d user selected</item>

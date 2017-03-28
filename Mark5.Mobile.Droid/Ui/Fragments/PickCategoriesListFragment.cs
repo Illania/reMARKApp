@@ -99,7 +99,7 @@ namespace Mark5.Mobile.Droid
         {
             if (item.ItemId == 10)
             {
-                //TODO close and do stuff
+                CloseFragment();
             }
 
             return base.OnOptionsItemSelected(item);
@@ -299,7 +299,7 @@ namespace Mark5.Mobile.Droid
                 set
                 {
                     nameTextView.Text = value;
-                    nameTextView.SetTextAppearanceCompat(nameTextView.Context, Selected ? Resource.Style.searchCategorySelected : Resource.Style.searchCategory);
+                    nameTextView.SetTextAppearanceCompat(nameTextView.Context, Selected ? Resource.Style.searchListTitleSelected : Resource.Style.searchListTitle);
                 }
             }
 
@@ -315,7 +315,7 @@ namespace Mark5.Mobile.Droid
                     {
                         descriptionTextView.Visibility = ViewStates.Visible;
                         descriptionTextView.Text = value;
-                        descriptionTextView.SetTextAppearanceCompat(nameTextView.Context, Selected ? Resource.Style.searchCategorySubtitleSelected : Resource.Style.searchCategorySubtitle);
+                        descriptionTextView.SetTextAppearanceCompat(nameTextView.Context, Selected ? Resource.Style.searchListSubtitleSelected : Resource.Style.searchListSubtitle);
                     }
                 }
             }

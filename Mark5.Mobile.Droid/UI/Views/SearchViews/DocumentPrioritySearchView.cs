@@ -7,29 +7,44 @@
 //
 using System.Collections.Generic;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
-    public class DocumentPrioritySearchView : AbstractDropdownSearchView<SearchDocumentsCriteria, Priority>
+    public class DocumentPrioritySearchView : AbstractDropdownSearchView<SearchDocumentsCriteria>
     {
-        public DocumentPrioritySearchView(Android.Content.Context context)
-            : base(context, Resource.String.search_document_priorities, Resource.String.search_document_priorities_none_selected)
+        List<Priority> SelectedPriorities = new List<Priority>();
+
+        public DocumentPrioritySearchView(Android.Content.Context context, DocumentSearchCriteriaFragment f)
+            : base(context, Resource.String.search_document_priorities, Resource.String.search_document_priorities_none_selected, f)
         {
-            Values = new List<Priority> { Priority.Urgent, Priority.Normal, Priority.Low };
         }
 
         protected override void ClickAction()
         {
+            var pllf = new PickPrioritiesListFragment
+            {
+                SelectedPriorities = SelectedPriorities,
+                CloseRequest = UpdatePriorities
+            };
+
+            ParentFragment.PushDropdownViewFragment(pllf, pllf.GenerateTag());
+        }
+
+        void UpdatePriorities(List<Priority> priorities)
+        {
+            SelectedPriorities = priorities;
+            UpdateSpinnerText(priorities.Count);
         }
 
         public override void FromCriteria(SearchDocumentsCriteria criteria)
         {
-            //TODO
+            UpdatePriorities(criteria.Priorities);
         }
 
         public override void ToCriteria(SearchDocumentsCriteria criteria)
         {
-            //TODO
+            criteria.Priorities = SelectedPriorities;
         }
     }
 }

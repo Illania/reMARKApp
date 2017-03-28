@@ -98,6 +98,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var lp = new LinearLayoutCompat.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1);
 
             ll.AddView(new DocumentCategoriesSearchView(Context, this), lp);
+            ll.AddView(new DocumentLinesSearchView(Context, this), lp);
+            ll.AddView(new DocumentPrioritySearchView(Context, this), lp);
 
             linearLayout.AddView(ll);
         }
@@ -108,7 +110,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             fragmentManager.BeginTransaction()
                                        .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
-                                       .Replace(Resource.Id.fragment_container, foldersListFragment, tag)
+                                       .Add(Resource.Id.fragment_container, foldersListFragment, tag)
                                        .AddToBackStack(tag)
                                        .Commit();
         }
