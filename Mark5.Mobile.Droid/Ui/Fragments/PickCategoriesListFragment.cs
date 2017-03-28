@@ -232,7 +232,6 @@ namespace Mark5.Mobile.Droid
 
         class CategoriesListAdapter : RecyclerView.Adapter
         {
-
             readonly List<Category> categoriesInView = new List<Category>(200);
             readonly Dictionary<int, Category> selectedCategoriesInView;
 
@@ -316,7 +315,7 @@ namespace Mark5.Mobile.Droid
                     {
                         descriptionTextView.Visibility = ViewStates.Visible;
                         descriptionTextView.Text = value;
-                        nameTextView.SetTextAppearanceCompat(nameTextView.Context, Selected ? Resource.Style.searchCategorySelected : Resource.Style.searchCategory);
+                        descriptionTextView.SetTextAppearanceCompat(nameTextView.Context, Selected ? Resource.Style.searchCategorySubtitleSelected : Resource.Style.searchCategorySubtitle);
                     }
                 }
             }

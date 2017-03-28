@@ -335,6 +335,7 @@
     <Compile Include="Ui\Views\SearchViews\DocumentAttachmentSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentPrioritySearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentCategoriesSearchView.cs" />
+    <Compile Include="Ui\Fragments\PickLineListFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
