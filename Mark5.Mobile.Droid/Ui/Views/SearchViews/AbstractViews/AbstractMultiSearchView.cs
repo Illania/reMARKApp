@@ -5,13 +5,11 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
-using System;
-using System.Collections.Generic;
 using Android.Graphics;
+using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Views.InputMethods;
-using Android.Widget;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -23,6 +21,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         readonly protected AppCompatTextView TopTextView;
         readonly protected AppCompatEditText BottomEditText;
 
+
         protected AbstractMultiSearchView(Android.Content.Context context,
                                          int topTextResId,
                                          int bottomEditResId,
@@ -30,6 +29,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         {
             Orientation = Horizontal;
             SetBackgroundColor(BackgroundColorNormalState);
+            var lightGrayColor = new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray));
 
             var searchIconSize = ConversionUtils.ConvertDpToPixels(16f);
             var searchIconView = new AppCompatImageView(context)
@@ -40,7 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                     RightMargin = DistanceLarge,
                 }
             };
-            searchIconView.SetImageResource(Resource.Drawable.draft); //TODO put the right one
+            searchIconView.SetImageResource(Resource.Drawable.action_search_server); //TODO put the right one
             AddView(searchIconView);
 
             var rightLayout = new LinearLayoutCompat(context)
@@ -87,6 +87,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                     LeftMargin = ConversionUtils.ConvertDpToPixels(2),
                 }
             };
+            var drawable = Spinner.Background.GetConstantState().NewDrawable();
+            drawable.SetColorFilter(lightGrayColor, PorterDuff.Mode.SrcAtop);
+            Spinner.Background = drawable;
             Spinner.Adapter = CustomArrayAdapter.Create(context, textArrayResId,
                                                         Resource.Layout.search_spinner_item_multi,
                                                         Resource.Layout.support_simple_spinner_dropdown_item);
@@ -103,6 +106,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             BottomEditText.SetBackgroundColor(Color.Transparent);
             BottomEditText.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId);
             BottomEditText.Hint = context.GetString(bottomEditResId);
+            BottomEditText.SetHintTextColor(lightGrayColor);
             BottomEditText.EditorAction += (sender, e) =>
             {
                 if (e.ActionId == ImeAction.Done)
