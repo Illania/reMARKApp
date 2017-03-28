@@ -39,7 +39,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         void UpdateCategories(List<int> categoriesId)
         {
             SelectedCategoryIds = categoriesId;
-            UpdateSpinnerText(categoriesId.Count);
+            UpdateBottomTextView(categoriesId.Count);
         }
 
         public override void FromCriteria(SearchDocumentsCriteria criteria)

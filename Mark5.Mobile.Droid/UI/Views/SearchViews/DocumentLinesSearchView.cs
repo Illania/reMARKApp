@@ -36,7 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         void UpdateLines(List<Guid> lineGuids)
         {
             SelectedLineGuids = lineGuids;
-            UpdateSpinnerText(lineGuids.Count);
+            UpdateBottomTextView(lineGuids.Count);
         }
 
         public override void FromCriteria(SearchDocumentsCriteria criteria)

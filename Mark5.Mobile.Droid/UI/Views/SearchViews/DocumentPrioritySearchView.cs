@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         void UpdatePriorities(List<Priority> priorities)
         {
             SelectedPriorities = priorities;
-            UpdateSpinnerText(priorities.Count);
+            UpdateBottomTextView(priorities.Count);
         }
 
         public override void FromCriteria(SearchDocumentsCriteria criteria)
