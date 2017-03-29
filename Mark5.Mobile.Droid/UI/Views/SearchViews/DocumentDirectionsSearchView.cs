@@ -26,11 +26,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             outboxButton = new CustomButton(context, Resource.String.search_document_direction_outbox, OtherButtonsAction);
             draftButton = new CustomButton(context, Resource.String.search_document_direction_draft, OtherButtonsAction);
 
-            allButton.UpdateSelectedState(true);
-
             AddButtons(allButton, inboxButton, outboxButton, draftButton);
         }
-
 
         bool AllButtonAction(CustomButton button)
         {
@@ -74,12 +71,50 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         public override void Refresh()
         {
-            //TODO
+            var directions = new List<DocumentDirection> { DocumentDirection.Incoming, DocumentDirection.Outgoing, DocumentDirection.Draft };
+
+            if (Criteria.Directions == null || !Criteria.Directions.Any() || directions.Intersect(Criteria.Directions).Count() == directions.Count)
+            {
+                allButton.UpdateSelectedState(true);
+                return;
+            }
+
+            if (Criteria.Directions.Contains(DocumentDirection.Draft))
+            {
+                draftButton.UpdateSelectedState(true);
+            }
+
+            if (Criteria.Directions.Contains(DocumentDirection.Incoming))
+            {
+                inboxButton.UpdateSelectedState(true);
+            }
+
+            if (Criteria.Directions.Contains(DocumentDirection.Outgoing))
+            {
+                outboxButton.UpdateSelectedState(true);
+            }
         }
 
         public override void UpdateCriteria()
         {
-            //TODO
+            var selectedDirections = new List<DocumentDirection>();
+
+            if (draftButton.Selected || allButton.Selected)
+            {
+                selectedDirections.Add(DocumentDirection.Draft);
+            }
+
+            if (inboxButton.Selected || allButton.Selected)
+            {
+                selectedDirections.Add(DocumentDirection.Incoming);
+            }
+
+            if (outboxButton.Selected || allButton.Selected)
+            {
+                selectedDirections.Add(DocumentDirection.Outgoing);
+            }
+
+            Criteria.Directions = selectedDirections;
         }
     }
 }

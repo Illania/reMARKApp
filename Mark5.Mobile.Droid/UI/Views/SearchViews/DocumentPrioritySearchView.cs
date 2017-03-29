@@ -39,23 +39,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         public override void Refresh()
         {
-            //TODO
+            UpdatePriorities(Criteria.Priorities);
         }
 
         public override void UpdateCriteria()
         {
-            //TODO
+            Criteria.Priorities.Clear();
+            Criteria.Priorities.AddRange(SelectedPriorities);
         }
-
-        //public override void FromCriteria(SearchDocumentsCriteria criteria)
-        //{
-        //    UpdatePriorities(criteria.Priorities);
-        //}
-
-        //public override void ToCriteria(SearchDocumentsCriteria criteria)
-        //{
-        //    criteria.Priorities = SelectedPriorities;
-        //}
-
     }
 }

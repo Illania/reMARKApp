@@ -20,12 +20,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         public override void Refresh()
         {
-            //TODO
+            SetText(Criteria.Reference);
         }
 
         public override void UpdateCriteria()
         {
-            //TODO
+            Criteria.Reference = GetText();
         }
     }
 }

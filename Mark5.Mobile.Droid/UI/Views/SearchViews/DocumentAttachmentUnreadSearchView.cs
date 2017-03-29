@@ -12,8 +12,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public class DocumentAttachmentUnreadSearchView : AbstractButtonsSearchView<SearchDocumentsCriteria>
     {
-        CustomButton withAttachmentsButton;
-        CustomButton unreadEmailsButton;
+        readonly CustomButton withAttachmentsButton;
+        readonly CustomButton unreadEmailsButton;
 
         public DocumentAttachmentUnreadSearchView(Android.Content.Context context) : base(context)
         {
@@ -25,12 +25,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         public override void Refresh()
         {
-            //TODO
+            withAttachmentsButton.UpdateSelectedState(Criteria.SearchInAttachments);
+            unreadEmailsButton.UpdateSelectedState(Criteria.UnreadOnly);
         }
 
         public override void UpdateCriteria()
         {
-            //TODO
+            Criteria.SearchInAttachments = withAttachmentsButton.Selected;
+            Criteria.UnreadOnly = unreadEmailsButton.Selected;
         }
     }
 }

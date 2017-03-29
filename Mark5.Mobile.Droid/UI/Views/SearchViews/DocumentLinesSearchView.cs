@@ -41,12 +41,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         public override void Refresh()
         {
-            //TODO
+            UpdateLines(Criteria.LineGuids);
         }
 
         public override void UpdateCriteria()
         {
-            //TODO
+            Criteria.LineGuids.Clear();
+            Criteria.LineGuids.AddRange(SelectedLineGuids);
         }
     }
 }

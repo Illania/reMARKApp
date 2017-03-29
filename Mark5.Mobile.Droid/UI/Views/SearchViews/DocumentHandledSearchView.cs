@@ -23,8 +23,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             handledButton = new CustomButton(context, Resource.String.search_document_handled, ButtonAction);
             unHandledButton = new CustomButton(context, Resource.String.search_document_handled_false, ButtonAction);
 
-            allButton.UpdateSelectedState(true);
-
             AddButtons(allButton, handledButton, unHandledButton);
         }
 
@@ -46,12 +44,35 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         public override void Refresh()
         {
-            //TODO
+            if (Criteria.Handled == null)
+                allButton.UpdateSelectedState(true);
+
+            if (Criteria.Handled == true)
+                handledButton.UpdateSelectedState(true);
+
+            if (Criteria.Handled == false)
+                unHandledButton.UpdateSelectedState(true);
         }
 
         public override void UpdateCriteria()
         {
-            //TODO
+            if (allButton.Selected)
+            {
+                Criteria.Handled = null;
+                return;
+            }
+
+            if (handledButton.Selected)
+            {
+                Criteria.Handled = true;
+                return;
+            }
+
+            if (unHandledButton.Selected)
+            {
+                Criteria.Handled = false;
+                return;
+            }
         }
     }
 }
