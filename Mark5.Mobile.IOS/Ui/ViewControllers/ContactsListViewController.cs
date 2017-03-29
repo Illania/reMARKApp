@@ -574,6 +574,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
+        void ShowCategories(ContactPreview selectedContact)
+        {
+            var vc = new CategoriesListViewController { BusinessEntityPreview = selectedContact };
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
         void MoveToFolder(ContactPreview selectedContact) => MoveToFolder(new List<ContactPreview> { selectedContact });
 
         void MoveToFolder(List<ContactPreview> selectedContacts)
@@ -585,6 +591,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void DoShowMoreActionSheet(NSIndexPath indexPath, ContactPreview selectedContact)
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("categories"), UIAlertActionStyle.Default, a =>
+            {
+                ShowCategories(selectedContact);
+                EndEditing();
+            }));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
             {
