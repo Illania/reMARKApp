@@ -12,7 +12,7 @@ using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Utilities;
+using Mark5.Mobile.IOS.Utilities.Extensions;
 using ObjCRuntime;
 using UIKit;
 
@@ -86,6 +86,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
 
             stackView.AddArrangedSubview(new DocumentDirectionSearchView());
+            stackView.AddArrangedSubview(new MessageSubjectView());
+            stackView.AddArrangedSubview(new FromToView());
             stackView.AddArrangedSubview(new DateRangeView());
             stackView.AddArrangedSubview(new LineCategoriesPriorityNameView());
             stackView.AddArrangedSubview(new ReferenceCommentsAttachmentNameView());
@@ -135,15 +137,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             protected const float CorderRadius = 4f;
             protected const float InnerMargin = 2f;
-            protected const float RowHeight = 50f;
             protected const float AnimationLength = .1f;
+
+            public virtual float RowHeight { get { return 50f; } }
 
             protected static readonly UIColor LabelTextColor = Theme.LightBlue;
             protected static readonly UIColor InactiveTextColor = Theme.LightGray;
             protected static readonly UIColor ActiveTextColor = Theme.DarkerBlue;
             protected static readonly UIColor InactiveBackgroundColor = Theme.DarkBlue;
             protected static readonly UIColor ActiveBackgroundColor = Theme.LightBlue;
-            protected static readonly UIFont Font = Theme.DefaultFont;
+            protected static readonly UIFont Font = Theme.DefaultFont.WithRelativeSize(-2f);
 
             protected SearchDocumentsCriteria Criteria;
 
@@ -178,6 +181,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         class DocumentDirectionSearchView : AbstractSearchView
         {
 
+            public override float RowHeight { get { return 40f; } }
+
             readonly UILabel allView;
             readonly UILabel inboxView;
             readonly UILabel outboxView;
@@ -192,7 +197,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     BackgroundColor = InactiveBackgroundColor,
-                    UserInteractionEnabled = true
+                    UserInteractionEnabled = true,
+                    Lines = 1,
+                    MinimumFontSize = 8f,
+                    AdjustsFontSizeToFitWidth = true
                 };
                 allView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 allView.Layer.CornerRadius = CorderRadius;
@@ -206,7 +214,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     BackgroundColor = InactiveBackgroundColor,
-                    UserInteractionEnabled = true
+                    UserInteractionEnabled = true,
+                    Lines = 1,
+                    MinimumFontSize = 8f,
+                    AdjustsFontSizeToFitWidth = true
                 };
                 inboxView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 inboxView.Layer.CornerRadius = CorderRadius;
@@ -220,7 +231,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     BackgroundColor = InactiveBackgroundColor,
-                    UserInteractionEnabled = true
+                    UserInteractionEnabled = true,
+                    Lines = 1,
+                    MinimumFontSize = 8f,
+                    AdjustsFontSizeToFitWidth = true
                 };
                 outboxView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 outboxView.Layer.CornerRadius = CorderRadius;
@@ -234,7 +248,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     BackgroundColor = InactiveBackgroundColor,
-                    UserInteractionEnabled = true
+                    UserInteractionEnabled = true,
+                    Lines = 1,
+                    MinimumFontSize = 8f,
+                    AdjustsFontSizeToFitWidth = true
                 };
                 draftView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 draftView.Layer.CornerRadius = CorderRadius;
@@ -287,6 +304,178 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 UpdateRow();
+            }
+        }
+
+        class MessageSubjectView : AbstractSearchView
+        {
+
+            readonly UILabel titleLabel;
+            readonly UITextField valueTextField;
+
+            public MessageSubjectView()
+            {
+                var mainView = new UIView
+                {
+                    BackgroundColor = InactiveBackgroundColor
+                };
+                mainView.Layer.CornerRadius = CorderRadius;
+                mainView.Layer.MasksToBounds = true;
+
+                titleLabel = new UILabel
+                {
+                    TextColor = LabelTextColor,
+                    Font = Font,
+                    TextAlignment = UITextAlignment.Left,
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    UserInteractionEnabled = true
+                };
+                titleLabel.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
+
+                valueTextField = new UITextField
+                {
+                    AttributedPlaceholder = new NSAttributedString("Enter search text...", new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    TextColor = InactiveTextColor,
+                    Font = Font,
+                    TintColor = Theme.LightGray,
+                    TextAlignment = UITextAlignment.Left,
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    WeakDelegate = this
+                };
+                valueTextField.AddTarget(this, new Selector("textFieldDidChange:"), UIControlEvent.EditingChanged);
+                mainView.Add(titleLabel);
+                mainView.Add(valueTextField);
+                mainView.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Top, 1f, 4f),
+                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Left, 1f, 8f),
+                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Right, 1f, -8f),
+                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, 2f),
+                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Left, 1f, 8f),
+                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Right, 1f, -8f),
+                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Bottom, 1f, -4f)
+                });
+
+                AddArrangedSubview(mainView);
+            }
+
+            protected override void UpdateRow()
+            {
+                titleLabel.Text = "Where: " + Criteria.SubjectMessageClause;
+                valueTextField.Text = Criteria.SubjectMessageField;
+            }
+
+            [Export("tapped:")]
+            async void Tapped(UITapGestureRecognizer recognizer)
+            {
+                var vc = (UIViewController)NextResponder.NextResponder.NextResponder.NextResponder;
+
+                var item = await Dialogs.ShowListDialogAsync(vc, null, new[] { "All", "Subject", "Message" }, titleLabel);
+                if (item < 0)
+                    return;
+
+                Criteria.SubjectMessageClause = (SubjectMessageClause)item;
+
+                UpdateRow();
+            }
+
+            [Export("textFieldDidChange:")]
+            void TextFieldDidChange(UITextField textField)
+            {
+                Criteria.SubjectMessageField = textField.Text;
+            }
+
+            [Export("textFieldShouldReturn:")]
+            bool TextFieldShouldReturn(UITextField textField)
+            {
+                textField.ResignFirstResponder();
+                return true;
+            }
+        }
+
+        class FromToView : AbstractSearchView
+        {
+
+            readonly UILabel titleLabel;
+            readonly UITextField valueTextField;
+
+            public FromToView()
+            {
+                var mainView = new UIView
+                {
+                    BackgroundColor = InactiveBackgroundColor
+                };
+                mainView.Layer.CornerRadius = CorderRadius;
+                mainView.Layer.MasksToBounds = true;
+
+                titleLabel = new UILabel
+                {
+                    TextColor = LabelTextColor,
+                    Font = Font,
+                    TextAlignment = UITextAlignment.Left,
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    UserInteractionEnabled = true
+                };
+                titleLabel.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
+
+                valueTextField = new UITextField
+                {
+                    AttributedPlaceholder = new NSAttributedString("Enter address...", new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    TextColor = InactiveTextColor,
+                    Font = Font,
+                    TintColor = Theme.LightGray,
+                    TextAlignment = UITextAlignment.Left,
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    WeakDelegate = this
+                };
+                valueTextField.AddTarget(this, new Selector("textFieldDidChange:"), UIControlEvent.EditingChanged);
+                mainView.Add(titleLabel);
+                mainView.Add(valueTextField);
+                mainView.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Top, 1f, 4f),
+                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Left, 1f, 8f),
+                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Right, 1f, -8f),
+                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, 2f),
+                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Left, 1f, 8f),
+                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Right, 1f, -8f),
+                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Bottom, 1f, -4f)
+                });
+
+                AddArrangedSubview(mainView);
+            }
+
+            protected override void UpdateRow()
+            {
+                titleLabel.Text = "Search addresses in: " + Criteria.FromToClause;
+                valueTextField.Text = Criteria.FromToField;
+            }
+
+            [Export("tapped:")]
+            async void Tapped(UITapGestureRecognizer recognizer)
+            {
+                var vc = (UIViewController)NextResponder.NextResponder.NextResponder.NextResponder;
+
+                var item = await Dialogs.ShowListDialogAsync(vc, null, new[] { "From and To", "From", "To" }, titleLabel);
+                if (item < 0)
+                    return;
+
+                Criteria.FromToClause = (FromToClause)item;
+
+                UpdateRow();
+            }
+
+            [Export("textFieldDidChange:")]
+            void TextFieldDidChange(UITextField textField)
+            {
+                Criteria.FromToField = textField.Text;
+            }
+
+            [Export("textFieldShouldReturn:")]
+            bool TextFieldShouldReturn(UITextField textField)
+            {
+                textField.ResignFirstResponder();
+                return true;
             }
         }
 
@@ -347,7 +536,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 fromDatePicker = new UIDatePicker
                 {
-                    Mode = UIDatePickerMode.Date,
+                    Mode = UIDatePickerMode.Date
                 };
 
                 fromValue = new UITextField
@@ -409,7 +598,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 toDatePicker = new UIDatePicker
                 {
-                    Mode = UIDatePickerMode.Date,
+                    Mode = UIDatePickerMode.Date
                 };
 
                 toValue = new UITextField
@@ -590,8 +779,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (sender == fromDateCancelButton)
                     fromValue.UserInteractionEnabled = false;
 
-                if (sender == toDateCancelButton)
-                    toValue.UserInteractionEnabled = false;
+                toValue.UserInteractionEnabled &= sender != toDateCancelButton;
             }
         }
 
@@ -1032,6 +1220,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class AttachmentsUnreadSearchView : AbstractSearchView
         {
+            
+            public override float RowHeight { get { return 40f; } }
 
             readonly UILabel attachmentsView;
             readonly UILabel unreadView;
@@ -1045,7 +1235,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     BackgroundColor = InactiveBackgroundColor,
-                    UserInteractionEnabled = true
+                    UserInteractionEnabled = true,
+                    Lines = 1,
+                    MinimumFontSize = 8f,
+                    AdjustsFontSizeToFitWidth = true
                 };
                 attachmentsView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 attachmentsView.Layer.CornerRadius = CorderRadius;
@@ -1059,7 +1252,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     BackgroundColor = InactiveBackgroundColor,
-                    UserInteractionEnabled = true
+                    UserInteractionEnabled = true,
+                    Lines = 1,
+                    MinimumFontSize = 8f,
+                    AdjustsFontSizeToFitWidth = true
                 };
                 unreadView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 unreadView.Layer.CornerRadius = CorderRadius;
@@ -1089,6 +1285,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         class HandledSearchView : AbstractSearchView
         {
 
+            public override float RowHeight { get { return 40f; } }
+
             readonly UILabel allView;
             readonly UILabel handledView;
             readonly UILabel unhadledView;
@@ -1102,7 +1300,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     BackgroundColor = InactiveBackgroundColor,
-                    UserInteractionEnabled = true
+                    UserInteractionEnabled = true,
+                    Lines = 1,
+                    MinimumFontSize = 8f,
+                    AdjustsFontSizeToFitWidth = true
                 };
                 allView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 allView.Layer.CornerRadius = CorderRadius;
@@ -1116,7 +1317,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     BackgroundColor = InactiveBackgroundColor,
-                    UserInteractionEnabled = true
+                    UserInteractionEnabled = true,
+                    Lines = 1,
+                    MinimumFontSize = 8f,
+                    AdjustsFontSizeToFitWidth = true
                 };
                 handledView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 handledView.Layer.CornerRadius = CorderRadius;
@@ -1130,7 +1334,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     BackgroundColor = InactiveBackgroundColor,
-                    UserInteractionEnabled = true
+                    UserInteractionEnabled = true,
+                    Lines = 1,
+                    MinimumFontSize = 8f,
+                    AdjustsFontSizeToFitWidth = true
                 };
                 unhadledView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 unhadledView.Layer.CornerRadius = CorderRadius;
