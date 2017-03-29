@@ -7,9 +7,12 @@
 //
 using System;
 using System.Linq;
+using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities;
 using ObjCRuntime;
 using UIKit;
 
@@ -83,8 +86,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
 
             stackView.AddArrangedSubview(new DocumentDirectionSearchView());
-            stackView.AddArrangedSubview(new LineCategoriesPriorityName());
-            stackView.AddArrangedSubview(new ReferenceCommentsAttachmentName());
+            stackView.AddArrangedSubview(new DateRangeView());
+            stackView.AddArrangedSubview(new LineCategoriesPriorityNameView());
+            stackView.AddArrangedSubview(new ReferenceCommentsAttachmentNameView());
             stackView.AddArrangedSubview(new AttachmentsUnreadSearchView());
             // TODO if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
             stackView.AddArrangedSubview(new HandledSearchView());
@@ -286,7 +290,312 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        class LineCategoriesPriorityName : AbstractSearchView
+        class DateRangeView : AbstractSearchView
+        {
+
+            readonly UIView fromView;
+            readonly UILabel fromLabel;
+            readonly UITextField fromValue;
+            readonly UIView toView;
+            readonly UILabel toLabel;
+            readonly UITextField toValue;
+
+            readonly UIToolbar fromDatePickerToolbar;
+            readonly UIBarButtonItem fromDateCancelButton;
+            readonly UIBarButtonItem fromDateDoneButton;
+            readonly UIDatePicker fromDatePicker;
+
+            readonly UIToolbar toDatePickerToolbar;
+            readonly UIBarButtonItem toDateCancelButton;
+            readonly UIBarButtonItem toDateDoneButton;
+            readonly UIDatePicker toDatePicker;
+
+            public DateRangeView()
+            {
+                var mainView = new UIView
+                {
+                    BackgroundColor = InactiveBackgroundColor
+                };
+                mainView.Layer.CornerRadius = CorderRadius;
+                mainView.Layer.MasksToBounds = true;
+
+                fromView = new UIView
+                {
+                    UserInteractionEnabled = true,
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+                fromView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
+
+                fromLabel = new UILabel
+                {
+                    Text = "From date",
+                    TextColor = LabelTextColor,
+                    Font = Font,
+                    TextAlignment = UITextAlignment.Center,
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+
+                fromDatePickerToolbar = new UIToolbar(new CGRect(0f, 0f, 0f, 44f))
+                {
+                    Items = new[]
+                    {
+                        fromDateCancelButton = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, this, new Selector("cancelTapped:")),
+                        new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                        fromDateDoneButton = new UIBarButtonItem(UIBarButtonSystemItem.Done, this, new Selector("doneTapped:"))
+                    }
+                };
+
+                fromDatePicker = new UIDatePicker
+                {
+                    Mode = UIDatePickerMode.Date,
+                };
+
+                fromValue = new UITextField
+                {
+                    TextColor = InactiveTextColor,
+                    Font = Font,
+                    TintColor = UIColor.Clear,
+                    TextAlignment = UITextAlignment.Center,
+                    InputView = fromDatePicker,
+                    InputAccessoryView = fromDatePickerToolbar,
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    UserInteractionEnabled = false
+                };
+
+                fromView.Add(fromLabel);
+                fromView.Add(fromValue);
+                fromView.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(fromLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Top, 1f, 4f),
+                    NSLayoutConstraint.Create(fromLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Left, 1f, 4f),
+                    NSLayoutConstraint.Create(fromLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Right, 1f, -4f),
+                    NSLayoutConstraint.Create(fromValue, NSLayoutAttribute.Top, NSLayoutRelation.Equal, fromLabel, NSLayoutAttribute.Bottom, 1f, 2f),
+                    NSLayoutConstraint.Create(fromValue, NSLayoutAttribute.Left, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Left, 1f, 4f),
+                    NSLayoutConstraint.Create(fromValue, NSLayoutAttribute.Right, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Right, 1f, -4f),
+                    NSLayoutConstraint.Create(fromValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Bottom, 1f, -4f)
+                });
+
+                var lineView = new UIView
+                {
+                    BackgroundColor = Theme.LightGray,
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+
+                toView = new UIView
+                {
+                    UserInteractionEnabled = true,
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+                toView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
+
+                toLabel = new UILabel
+                {
+                    Text = "To date",
+                    TextColor = LabelTextColor,
+                    Font = Font,
+                    TextAlignment = UITextAlignment.Center,
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+
+                toDatePickerToolbar = new UIToolbar(new CGRect(0f, 0f, 0f, 44f))
+                {
+                    Items = new[]
+                    {
+                        toDateCancelButton = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, this, new Selector("cancelTapped:")),
+                        new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                        toDateDoneButton = new UIBarButtonItem(UIBarButtonSystemItem.Done, this, new Selector("doneTapped:"))
+                    }
+                };
+
+                toDatePicker = new UIDatePicker
+                {
+                    Mode = UIDatePickerMode.Date,
+                };
+
+                toValue = new UITextField
+                {
+                    TextColor = InactiveTextColor,
+                    Font = Font,
+                    TintColor = UIColor.Clear,
+                    TextAlignment = UITextAlignment.Center,
+                    InputView = toDatePicker,
+                    InputAccessoryView = toDatePickerToolbar,
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    UserInteractionEnabled = false
+                };
+
+                toView.Add(toLabel);
+                toView.Add(toValue);
+                toView.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(toLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, toView, NSLayoutAttribute.Top, 1f, 4f),
+                    NSLayoutConstraint.Create(toLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, toView, NSLayoutAttribute.Left, 1f, 4f),
+                    NSLayoutConstraint.Create(toLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, toView, NSLayoutAttribute.Right, 1f, -4f),
+                    NSLayoutConstraint.Create(toValue, NSLayoutAttribute.Top, NSLayoutRelation.Equal, toLabel, NSLayoutAttribute.Bottom, 1f, 2f),
+                    NSLayoutConstraint.Create(toValue, NSLayoutAttribute.Left, NSLayoutRelation.Equal, toView, NSLayoutAttribute.Left, 1f, 4f),
+                    NSLayoutConstraint.Create(toValue, NSLayoutAttribute.Right, NSLayoutRelation.Equal, toView, NSLayoutAttribute.Right, 1f, -4f),
+                    NSLayoutConstraint.Create(toValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, toView, NSLayoutAttribute.Bottom, 1f, -4f)
+                });
+
+                mainView.AddSubview(fromView);
+                mainView.AddSubview(lineView);
+                mainView.AddSubview(toView);
+                mainView.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(fromView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(fromView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(fromView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(lineView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Right, 1f, 10f),
+                    NSLayoutConstraint.Create(lineView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 15f),
+                    NSLayoutConstraint.Create(lineView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 1f),
+                    NSLayoutConstraint.Create(lineView, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.CenterY, 1f, 0f),
+                    NSLayoutConstraint.Create(toView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(toView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, lineView, NSLayoutAttribute.Right, 1f, 10f),
+                    NSLayoutConstraint.Create(toView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(toView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(toView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Width, 1f, 0f)
+                });
+
+                AddArrangedSubview(mainView);
+            }
+
+            protected override void UpdateRow()
+            {
+                if (Criteria.DateRange == null)
+                    Criteria.DateRange = new DateRange();
+
+                var dateRange = Criteria.DateRange;
+
+                if (!dateRange.Enabled)
+                {
+                    fromValue.Text = "-";
+                    toValue.Text = "Today";
+
+                    fromDatePicker.MinimumDate = null;
+                    fromDatePicker.MaximumDate = NSDate.Now;
+                    fromDatePicker.SetDate(NSDate.Now, false);
+
+                    toDatePicker.MinimumDate = null;
+                    toDatePicker.MaximumDate = NSDate.Now;
+                    toDatePicker.SetDate(NSDate.Now, false);
+                }
+                else
+                {
+                    if (dateRange.StartTimestamp == -1)
+                    {
+                        fromDatePicker.MinimumDate = null;
+                        fromDatePicker.MaximumDate = NSDate.Now;
+                        fromValue.Text = "-";
+
+                        fromDatePicker.SetDate(NSDate.Now, false);
+                    }
+                    else
+                    {
+                        var fromDate = dateRange.StartTimestamp.ConvertTimestampMillisecondsToDateTime();
+                        var fromComponents = new NSDateComponents
+                        {
+                            Day = fromDate.Day,
+                            Month = fromDate.Month,
+                            Year = fromDate.Year,
+                            TimeZone = NSTimeZone.FromName("UTC")
+                        };
+
+                        var fromNSDate = NSCalendar.CurrentCalendar.DateFromComponents(fromComponents);
+                        fromValue.Text = Utilities.DateTimeUtils.DateFormatter.StringFor(fromNSDate);
+
+                        toDatePicker.MinimumDate = fromNSDate;
+                        fromDatePicker.SetDate(fromNSDate, false);
+                    }
+
+                    if (dateRange.EndTimestamp == -1)
+                    {
+                        toValue.Text = "Today";
+
+                        toDatePicker.MaximumDate = NSDate.Now;
+                        toDatePicker.SetDate(NSDate.Now, false);
+                    }
+                    else
+                    {
+                        var toDate = dateRange.EndTimestamp.ConvertTimestampMillisecondsToDateTime();
+                        var toComponents = new NSDateComponents
+                        {
+                            Day = toDate.Day,
+                            Month = toDate.Month,
+                            Year = toDate.Year,
+                            TimeZone = NSTimeZone.FromName("UTC")
+                        };
+
+                        var toNSDate = NSCalendar.CurrentCalendar.DateFromComponents(toComponents);
+                        toValue.Text = Utilities.DateTimeUtils.DateFormatter.StringFor(toNSDate);
+
+                        fromDatePicker.MaximumDate = toNSDate;
+                        toDatePicker.SetDate(toNSDate, false);
+                    }
+                }
+            }
+
+            [Export("tapped:")]
+            void Tapped(UITapGestureRecognizer recognizer)
+            {
+                if (recognizer.View == fromView)
+                {
+                    fromValue.UserInteractionEnabled = true;
+                    fromValue.BecomeFirstResponder();
+                }
+
+                if (recognizer.View == toView)
+                {
+                    toValue.UserInteractionEnabled = true;
+                    toValue.BecomeFirstResponder();
+                }
+            }
+
+            [Export("doneTapped:")]
+            void DoneTapped(UIBarButtonItem sender)
+            {
+                var dateRange = Criteria.DateRange;
+
+                if (sender == fromDateDoneButton)
+                {
+                    fromValue.UserInteractionEnabled = false;
+
+                    var selectedDate = fromDatePicker.Date;
+                    var selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year, selectedDate);
+                    var fromDate = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, 0, 0, 0, DateTimeKind.Utc);
+
+                    dateRange.Enabled = true;
+                    dateRange.StartTimestamp = fromDate.ConvertDateTimeToTimestampMilliseconds();
+                }
+
+                if (sender == toDateDoneButton)
+                {
+                    toValue.UserInteractionEnabled = false;
+
+                    var selectedDate = toDatePicker.Date;
+                    var selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year, selectedDate);
+                    var toDate = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, 23, 59, 59, DateTimeKind.Utc);
+
+                    dateRange.Enabled = true;
+                    dateRange.EndTimestamp = toDate.ConvertDateTimeToTimestampMilliseconds();
+                }
+
+                UpdateRow();
+            }
+
+            [Export("cancelTapped:")]
+            void CancelTapped(UIBarButtonItem sender)
+            {
+                var dateRange = Criteria.DateRange;
+
+                if (sender == fromDateCancelButton)
+                    fromValue.UserInteractionEnabled = false;
+
+                if (sender == toDateCancelButton)
+                    toValue.UserInteractionEnabled = false;
+            }
+        }
+
+        class LineCategoriesPriorityNameView : AbstractSearchView
         {
 
             readonly UIView lineView;
@@ -299,7 +608,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             readonly UILabel priorityLabel;
             readonly UILabel priorityValue;
 
-            public LineCategoriesPriorityName()
+            public LineCategoriesPriorityNameView()
             {
                 lineView = new UIView
                 {
@@ -458,7 +767,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        class ReferenceCommentsAttachmentName : AbstractSearchView
+        class ReferenceCommentsAttachmentNameView : AbstractSearchView
         {
 
             readonly UIView referenceView;
@@ -471,7 +780,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             readonly UILabel attachmentNameLabel;
             readonly UITextField attachmentNameTextField;
 
-            public ReferenceCommentsAttachmentName()
+            public ReferenceCommentsAttachmentNameView()
             {
                 referenceView = new UIView
                 {
