@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: DocumentAttachmentUnreadSearchView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
@@ -12,13 +12,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public class DocumentAttachmentUnreadSearchView : AbstractButtonsSearchView<SearchDocumentsCriteria>
     {
-        StyledButton withAttachmentsButton;
-        StyledButton unreadEmailsButton;
+        CustomButton withAttachmentsButton;
+        CustomButton unreadEmailsButton;
 
         public DocumentAttachmentUnreadSearchView(Android.Content.Context context) : base(context)
         {
-            withAttachmentsButton = new StyledButton(context, Resource.String.search_document_with_attachments);
-            unreadEmailsButton = new StyledButton(context, Resource.String.search_document_unread);
+            withAttachmentsButton = new CustomButton(context, Resource.String.search_document_with_attachments);
+            unreadEmailsButton = new CustomButton(context, Resource.String.search_document_unread);
 
             AddButtons(withAttachmentsButton, unreadEmailsButton);
         }

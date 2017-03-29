@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: DocumentHandledSearchView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
@@ -13,27 +13,27 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public class DocumentHandledSearchView : AbstractButtonsSearchView<SearchDocumentsCriteria>
     {
-        StyledButton allButton;
-        StyledButton handledButton;
-        StyledButton unHandledButton;
+        CustomButton allButton;
+        CustomButton handledButton;
+        CustomButton unHandledButton;
 
         public DocumentHandledSearchView(Android.Content.Context context) : base(context)
         {
-            allButton = new StyledButton(context, Resource.String.search_document_handled_none_selected, ButtonAction);
-            handledButton = new StyledButton(context, Resource.String.search_document_handled, ButtonAction);
-            unHandledButton = new StyledButton(context, Resource.String.search_document_handled_false, ButtonAction);
+            allButton = new CustomButton(context, Resource.String.search_document_handled_none_selected, ButtonAction);
+            handledButton = new CustomButton(context, Resource.String.search_document_handled, ButtonAction);
+            unHandledButton = new CustomButton(context, Resource.String.search_document_handled_false, ButtonAction);
 
             allButton.UpdateSelectedState(true);
 
             AddButtons(allButton, handledButton, unHandledButton);
         }
 
-        bool ButtonAction(StyledButton button)
+        bool ButtonAction(CustomButton button)
         {
             if (button.Selected)
                 return false;
 
-            var buttonsList = new List<StyledButton> { allButton, handledButton, unHandledButton };
+            var buttonsList = new List<CustomButton> { allButton, handledButton, unHandledButton };
             buttonsList.Remove(button);
 
             foreach (var otherButton in buttonsList)

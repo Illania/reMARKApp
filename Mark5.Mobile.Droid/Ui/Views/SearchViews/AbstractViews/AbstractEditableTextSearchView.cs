@@ -52,8 +52,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             leftLayout.AddView(TopTextView);
 
             BottomEditText = LayoutInflater.From(context).Inflate(Resource.Layout.search_edit_text_layout, null).FindViewById<AppCompatEditText>(Resource.Id.search_edit_text);
-            BottomEditText.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            BottomEditText.Gravity = GravityFlags.CenterHorizontal;
+            BottomEditText.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+            {
+                Gravity = (int)GravityFlags.CenterHorizontal,
+            };
             BottomEditText.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId);
             BottomEditText.SetBackgroundColor(Color.Transparent);
             BottomEditText.SetPadding(0, 0, 0, 0);
@@ -90,7 +92,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         // - What about ellipsize?
         // - What happens when the user presses back?
         // - What happens when we click on something else in the search?
-        // - What about elevation?
 
         void BottomEditText_FocusChange(object sender, FocusChangeEventArgs e)
         {
@@ -102,8 +103,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             {
                 PrepareViewsExpansion();
             }
-
-            //TODO remove underline
         }
 
         void CancelIconLayout_Click(object sender, EventArgs e)

@@ -17,36 +17,33 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public abstract class AbstractButtonsSearchView<T> : AbstractSearchView<T>
     {
-        LayoutParams buttonsLayoutParams;
 
         protected AbstractButtonsSearchView(Context context) : base(context)
         {
             Orientation = Horizontal;
             SetPadding(0, 0, 0, 0);
 
-            buttonsLayoutParams = new LayoutParams(0, ViewGroup.LayoutParams.MatchParent, 1);
-
             DividerDrawable = ContextCompat.GetDrawable(Context, Resource.Drawable.search_divider_vertical);
             ShowDividers = ShowDividerMiddle;
         }
 
-        protected void AddButtons(params StyledButton[] buttons)
+        protected void AddButtons(params CustomButton[] buttons)
         {
             foreach (var button in buttons)
             {
-                AddView(button, buttonsLayoutParams);
+                AddView(button, new LayoutParams(0, ViewGroup.LayoutParams.MatchParent, 1));
             }
         }
 
-        public class StyledButton : AppCompatButton
+        public class CustomButton : AppCompatButton
         {
             int buttonTextStyleNormalResourceId = Resource.Style.searchViewButtonNormal;
             int buttonTextStyleSelectedResourceId = Resource.Style.searchViewButtonSelected;
 
             readonly Context context;
-            readonly Func<StyledButton, bool> clickedAction; //Returns true if the button should change state
+            readonly Func<CustomButton, bool> clickedAction; //Returns true if the button should change state
 
-            public StyledButton(Context context, int stringResourceId, Func<StyledButton, bool> clickedAction = null)
+            public CustomButton(Context context, int stringResourceId, Func<CustomButton, bool> clickedAction = null)
                 : base(context)
             {
                 this.context = context;
@@ -56,12 +53,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
                 Background = ContextCompat.GetDrawable(Context, Resource.Drawable.search_button_background);
 
-                Click += StyledButton_Click;
+                Click += CustomButton_Click;
 
                 UpdateStyle();
             }
 
-            void StyledButton_Click(object sender, EventArgs e)
+            void CustomButton_Click(object sender, EventArgs e)
             {
                 if (clickedAction == null || clickedAction(this))
                 {
@@ -72,7 +69,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
             void UpdateStyle()
             {
-                //SetBackgroundColor(Selected ? BackgroundColorSelectedState : BackgroundColorNormalState);
                 this.SetTextAppearanceCompat(context, Selected ? buttonTextStyleSelectedResourceId : buttonTextStyleNormalResourceId);
             }
 

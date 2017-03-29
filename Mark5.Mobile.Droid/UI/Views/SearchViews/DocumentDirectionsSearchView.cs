@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: DocumentDirectionsSearchView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
@@ -14,17 +14,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public class DocumentDirectionsSearchView : AbstractButtonsSearchView<SearchDocumentsCriteria>
     {
-        StyledButton allButton;
-        StyledButton inboxButton;
-        StyledButton outboxButton;
-        StyledButton draftButton;
+        CustomButton allButton;
+        CustomButton inboxButton;
+        CustomButton outboxButton;
+        CustomButton draftButton;
 
         public DocumentDirectionsSearchView(Android.Content.Context context) : base(context)
         {
-            allButton = new StyledButton(context, Resource.String.search_document_direction_all, AllButtonAction);
-            inboxButton = new StyledButton(context, Resource.String.search_document_direction_inbox, OtherButtonsAction);
-            outboxButton = new StyledButton(context, Resource.String.search_document_direction_outbox, OtherButtonsAction);
-            draftButton = new StyledButton(context, Resource.String.search_document_direction_draft, OtherButtonsAction);
+            allButton = new CustomButton(context, Resource.String.search_document_direction_all, AllButtonAction);
+            inboxButton = new CustomButton(context, Resource.String.search_document_direction_inbox, OtherButtonsAction);
+            outboxButton = new CustomButton(context, Resource.String.search_document_direction_outbox, OtherButtonsAction);
+            draftButton = new CustomButton(context, Resource.String.search_document_direction_draft, OtherButtonsAction);
 
             allButton.UpdateSelectedState(true);
 
@@ -32,7 +32,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         }
 
 
-        bool AllButtonAction(StyledButton button)
+        bool AllButtonAction(CustomButton button)
         {
             if (allButton.Selected)
                 return false;
@@ -42,7 +42,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             return true;
         }
 
-        bool OtherButtonsAction(StyledButton button)
+        bool OtherButtonsAction(CustomButton button)
         {
             if (allButton.Selected)
             {
@@ -50,7 +50,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 return true;
             }
 
-            var remainingButtonsList = new List<StyledButton> { inboxButton, outboxButton, draftButton };
+            var remainingButtonsList = new List<CustomButton> { inboxButton, outboxButton, draftButton };
             remainingButtonsList.Remove(button);
 
             if ((remainingButtonsList.All(b => b.Selected == true) && !button.Selected) || (remainingButtonsList.All(b => b.Selected == false) && button.Selected))
@@ -65,7 +65,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         void ResetOtherButtons()
         {
-            var otherButtonsList = new List<StyledButton> { inboxButton, outboxButton, draftButton };
+            var otherButtonsList = new List<CustomButton> { inboxButton, outboxButton, draftButton };
             foreach (var button in otherButtonsList)
             {
                 button.UpdateSelectedState(false);
