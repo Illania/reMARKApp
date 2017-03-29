@@ -8,7 +8,6 @@
 using System;
 using Android.Content;
 using Android.Graphics;
-using Android.Support.Transitions;
 using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
@@ -20,12 +19,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public abstract class AbstractEditableTextSearchView<T> : AbstractSearchView<T>
     {
-        readonly protected AppCompatTextView TopTextView;
-        readonly protected AppCompatTextView BottomTextView;
-
-        readonly protected AppCompatEditText BottomEditText;
-        readonly protected LinearLayoutCompat containerLayout;
-        readonly protected LinearLayoutCompat cancelIconLayout;
+        readonly AppCompatTextView bottomTextView;
+        readonly AppCompatEditText bottomEditText;
+        readonly LinearLayoutCompat containerLayout;
+        readonly LinearLayoutCompat cancelIconLayout;
 
         readonly string emptyText;
 
@@ -49,37 +46,37 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 }
             };
 
-            TopTextView = new AppCompatTextView(context)
+            var topTextView = new AppCompatTextView(context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                 Gravity = GravityFlags.CenterHorizontal
             };
-            TopTextView.Text = context.GetString(topTextResId);
-            TopTextView.SetTextAppearanceCompat(context, TextStyleTopLineResourceId);
-            leftLayout.AddView(TopTextView);
+            topTextView.Text = context.GetString(topTextResId);
+            topTextView.SetTextAppearanceCompat(context, TextStyleTopLineResourceId);
+            leftLayout.AddView(topTextView);
 
-            BottomEditText = LayoutInflater.From(context).Inflate(Resource.Layout.search_edit_text_layout, null).FindViewById<AppCompatEditText>(Resource.Id.search_edit_text);
-            BottomEditText.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            BottomEditText.Gravity = GravityFlags.CenterHorizontal;
-            BottomEditText.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId);
-            BottomEditText.SetBackgroundColor(Color.Transparent);
-            BottomEditText.SetPadding(0, 0, 0, 0);
-            BottomEditText.Hint = context.GetString(Resource.String.search_editable_empty);
-            BottomEditText.SetHintTextColor(ViewUtilities.GetColorStateList(context, Resource.Drawable.search_edit_text_selector));
-            BottomEditText.FocusChange += BottomEditText_FocusChange;
-            BottomEditText.Visibility = ViewStates.Gone;
+            bottomEditText = LayoutInflater.From(context).Inflate(Resource.Layout.search_edit_text_layout, null).FindViewById<AppCompatEditText>(Resource.Id.search_edit_text);
+            bottomEditText.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            bottomEditText.Gravity = GravityFlags.CenterHorizontal;
+            bottomEditText.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId);
+            bottomEditText.SetBackgroundColor(Color.Transparent);
+            bottomEditText.SetPadding(0, 0, 0, 0);
+            bottomEditText.Hint = context.GetString(Resource.String.search_editable_empty);
+            bottomEditText.SetHintTextColor(ViewUtilities.GetColorStateList(context, Resource.Drawable.search_edit_text_selector));
+            bottomEditText.FocusChange += BottomEditText_FocusChange;
+            bottomEditText.Visibility = ViewStates.Gone;
 
-            leftLayout.AddView(BottomEditText);
+            leftLayout.AddView(bottomEditText);
 
-            BottomTextView = new AppCompatTextView(context);
-            BottomTextView.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            BottomTextView.Gravity = GravityFlags.CenterHorizontal;
-            BottomTextView.Text = emptyText;
-            BottomTextView.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId);
-            BottomTextView.Visibility = ViewStates.Visible;
-            BottomTextView.Ellipsize = TextUtils.TruncateAt.End;
-            BottomTextView.SetLines(1);
-            leftLayout.AddView(BottomTextView);
+            bottomTextView = new AppCompatTextView(context);
+            bottomTextView.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            bottomTextView.Gravity = GravityFlags.CenterHorizontal;
+            bottomTextView.Text = emptyText;
+            bottomTextView.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId);
+            bottomTextView.Visibility = ViewStates.Visible;
+            bottomTextView.Ellipsize = TextUtils.TruncateAt.End;
+            bottomTextView.SetLines(1);
+            leftLayout.AddView(bottomTextView);
 
             cancelIconLayout = new LinearLayoutCompat(context)
             {
@@ -136,12 +133,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         void PrepareViewsExpansion()
         {
-            BottomEditText.Visibility = ViewStates.Visible;
-            BottomTextView.Visibility = ViewStates.Gone;
+            bottomEditText.Visibility = ViewStates.Visible;
+            bottomTextView.Visibility = ViewStates.Gone;
 
-            if (BottomTextView.Text != emptyText)
+            if (bottomTextView.Text != emptyText)
             {
-                BottomEditText.Text = BottomTextView.Text;
+                bottomEditText.Text = bottomTextView.Text;
             }
 
             for (int i = 0; i < containerLayout.ChildCount; i++)
@@ -164,10 +161,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         public void Expand()
         {
-            BottomEditText.RequestFocus();
-            BottomEditText.SetSelection(BottomEditText.Text.Length);
+            bottomEditText.RequestFocus();
+            bottomEditText.SetSelection(bottomEditText.Text.Length);
 
-            ((InputMethodManager)Context.GetSystemService(Context.InputMethodService)).ShowSoftInput(BottomEditText, ShowFlags.Implicit);
+            ((InputMethodManager)Context.GetSystemService(Context.InputMethodService)).ShowSoftInput(bottomEditText, ShowFlags.Implicit);
 
             cancelIconLayout.Visibility = ViewStates.Visible;
         }
@@ -176,12 +173,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         {
             cancelIconLayout.Visibility = ViewStates.Gone;
 
-            BottomEditText.Visibility = ViewStates.Gone;
-            BottomTextView.Visibility = ViewStates.Visible;
+            bottomEditText.Visibility = ViewStates.Gone;
+            bottomTextView.Visibility = ViewStates.Visible;
 
-            BottomTextView.Text = string.IsNullOrWhiteSpace(BottomEditText.Text) ? emptyText : BottomEditText.Text;
+            bottomTextView.Text = string.IsNullOrWhiteSpace(bottomEditText.Text) ? emptyText : bottomEditText.Text;
 
-            BottomEditText.ClearFocus();
+            bottomEditText.ClearFocus();
+        }
+
+        public void SetText(string text)
+        {
+            bottomTextView.Text = string.IsNullOrWhiteSpace(text) ? emptyText : text;
+        }
+
+        public string GetText()
+        {
+            return bottomEditText.Text ?? string.Empty;
         }
     }
 }
