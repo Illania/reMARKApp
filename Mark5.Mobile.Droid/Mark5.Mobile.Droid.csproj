@@ -625,7 +625,6 @@
     <AndroidResource Include="Resources\drawable-xhdpi\cross.png" />
     <AndroidResource Include="Resources\drawable-hdpi\cross.png" />
     <AndroidResource Include="Resources\transition\search_date_transition.axml" />
-    <AndroidResource Include="Resources\layout\search_date_picker_layout.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\anim\" />

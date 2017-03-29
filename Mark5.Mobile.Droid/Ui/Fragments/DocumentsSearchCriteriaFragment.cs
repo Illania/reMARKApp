@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System.Collections.Generic;
+using Android.Animation;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.App;
@@ -24,6 +25,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class DocumentSearchCriteriaFragment : RetainableStateFragment
     {
+        SearchDocumentsCriteria searchCriteria;
+
         LinearLayoutCompat containerLinearLayout;
         List<AbstractSearchView<SearchDocumentsCriteria>> criteriaViews = new List<AbstractSearchView<SearchDocumentsCriteria>>();
 
@@ -73,6 +76,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return rootView;
         }
 
+
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        {
+            base.OnViewCreated(view, savedInstanceState);
+
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
+
+            CommonConfig.Logger.Info($"Created {nameof(DocumentSearchCriteriaFragment)}");
+        }
+
+        public override void OnResume()
+        {
+            base.OnResume();
+        }
+
         public void PrepareEditableTextRow()
         {
             var ll = new LinearLayoutCompat(Context)
@@ -97,7 +116,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ll.AddView(referenceNumberCriteria, lp);
             ll.AddView(commentCriteria, lp);
             ll.AddView(attachmentCriteria, lp);
-            ll.LayoutTransition = new Android.Animation.LayoutTransition();
+            ll.LayoutTransition = new LayoutTransition();
 
             containerLinearLayout.AddView(ll);
         }
@@ -141,15 +160,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                        .Commit();
         }
 
-        public override void OnViewCreated(View view, Bundle savedInstanceState)
-        {
-            base.OnViewCreated(view, savedInstanceState);
-
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
-
-            CommonConfig.Logger.Info($"Created {nameof(DocumentSearchCriteriaFragment)}");
-        }
 
         #region Retained State
 
