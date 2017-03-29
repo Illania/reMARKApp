@@ -12,7 +12,6 @@ using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Utilities.Extensions;
 using ObjCRuntime;
 using UIKit;
 
@@ -146,7 +145,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             protected static readonly UIColor ActiveTextColor = Theme.DarkerBlue;
             protected static readonly UIColor InactiveBackgroundColor = Theme.DarkBlue;
             protected static readonly UIColor ActiveBackgroundColor = Theme.LightBlue;
-            protected static readonly UIFont Font = Theme.DefaultFont.WithRelativeSize(-2f);
+            protected static readonly UIFont Font = Theme.DefaultFont;
 
             protected SearchDocumentsCriteria Criteria;
 
