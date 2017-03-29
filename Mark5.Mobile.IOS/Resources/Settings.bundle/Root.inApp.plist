@@ -136,16 +136,6 @@
 		</dict>
 		<dict>
 			<key>Type</key>
-			<string>PSChildPaneSpecifier</string>
-			<key>Title</key>
-			<string>contact_section_visibility</string>
-			<key>Key</key>
-			<string>contactSectionVisibility</string>
-			<key>File</key>
-			<string>ContactSectionsVisibility.inApp</string>
-		</dict>
-		<dict>
-			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
 			<string>synchronise_contacts</string>

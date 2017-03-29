@@ -35,15 +35,6 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string LargeAttachmentWarningKey = "LargeAttachmentWarning";
             public const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
 
-            public const string ContactCommunicationFaxNumbersEnabledKey = "ContactCommunicationFaxNumbersEnabled";
-            public const string ContactCommunicationTelexNumbersEnabledKey = "ContactCommunicationTelexNumbersEnabled";
-            public const string ContactCommunicationImEnabledKey = "ContactCommunicationImEnabled";
-            public const string ContactCommunicationInternalEnabledKey = "ContactCommunicationInternalEnabled";
-            public const string ContactCommunicationOtherEnabledKey = "ContactCommunicationOtherEnabled";
-            public const string ContactAddressesEnabledKey = "ContactAddressesEnabled";
-            public const string ContactBirthdateEnabledKey = "ContactBirthdateEnabled";
-            public const string ContactAccountEnabledKey = "ContactAccountEnabled";
-            public const string ContactVatEnabledKey = "ContactVatEnabled";
             public const string SynchroniseContactsKey = "SynchroniseContacts";
 
             public const string SynchroniseShortcodesKey = "SynchroniseShortcodes";
@@ -82,15 +73,6 @@ namespace Mark5.Mobile.IOS.Utilities
             defaultsDictionary.Add(new NSString(Keys.LargeAttachmentWarningKey), NSNumber.FromBoolean(true));
             defaultsDictionary.Add(new NSString(Keys.DocumentBodyRequestTypeKey), NSNumber.FromBoolean(false));
 
-            defaultsDictionary.Add(new NSString(Keys.ContactCommunicationFaxNumbersEnabledKey), NSNumber.FromBoolean(true));
-            defaultsDictionary.Add(new NSString(Keys.ContactCommunicationTelexNumbersEnabledKey), NSNumber.FromBoolean(true));
-            defaultsDictionary.Add(new NSString(Keys.ContactCommunicationImEnabledKey), NSNumber.FromBoolean(true));
-            defaultsDictionary.Add(new NSString(Keys.ContactCommunicationInternalEnabledKey), NSNumber.FromBoolean(true));
-            defaultsDictionary.Add(new NSString(Keys.ContactCommunicationOtherEnabledKey), NSNumber.FromBoolean(true));
-            defaultsDictionary.Add(new NSString(Keys.ContactAddressesEnabledKey), NSNumber.FromBoolean(true));
-            defaultsDictionary.Add(new NSString(Keys.ContactBirthdateEnabledKey), NSNumber.FromBoolean(true));
-            defaultsDictionary.Add(new NSString(Keys.ContactAccountEnabledKey), NSNumber.FromBoolean(true));
-            defaultsDictionary.Add(new NSString(Keys.ContactVatEnabledKey), NSNumber.FromBoolean(true));
             defaultsDictionary.Add(new NSString(Keys.SynchroniseContactsKey), NSNumber.FromBoolean(true));
 
             defaultsDictionary.Add(new NSString(Keys.SynchroniseShortcodesKey), NSNumber.FromBoolean(false));
@@ -192,79 +174,6 @@ namespace Mark5.Mobile.IOS.Utilities
         #endregion
 
         #region Contacts
-
-        public bool ContactCommunicationFaxNumbersEnabled
-        {
-            get
-            {
-                return ud.BoolForKey(Keys.ContactCommunicationFaxNumbersEnabledKey);
-            }
-        }
-
-        public bool ContactCommunicationTelexNumbersEnabled
-        {
-            get
-            {
-                return ud.BoolForKey(Keys.ContactCommunicationTelexNumbersEnabledKey);
-            }
-        }
-
-        public bool ContactCommunicationImEnabled
-        {
-            get
-            {
-                return ud.BoolForKey(Keys.ContactCommunicationImEnabledKey);
-            }
-        }
-
-        public bool ContactCommunicationInternalEnabled
-        {
-            get
-            {
-                return ud.BoolForKey(Keys.ContactCommunicationInternalEnabledKey);
-            }
-        }
-
-        public bool ContactCommunicationOtherEnabled
-        {
-            get
-            {
-                return ud.BoolForKey(Keys.ContactCommunicationOtherEnabledKey);
-            }
-        }
-
-        public bool ContactAddressesEnabled
-        {
-            get
-            {
-                return ud.BoolForKey(Keys.ContactAddressesEnabledKey);
-            }
-        }
-
-        public bool ContactBirthdateEnabled
-        {
-            get
-            {
-                return ud.BoolForKey(Keys.ContactBirthdateEnabledKey);
-            }
-        }
-
-        public bool ContactAccountEnabled
-        {
-            get
-            {
-                return ud.BoolForKey(Keys.ContactAccountEnabledKey);
-            }
-        }
-
-        public bool ContactVatEnabled
-        {
-            get
-            {
-                return ud.BoolForKey(Keys.ContactVatEnabledKey);
-            }
-        }
-
 
         public bool SynchroniseContacts
         {

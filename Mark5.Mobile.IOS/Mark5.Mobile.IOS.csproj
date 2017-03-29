@@ -567,8 +567,6 @@
     <BundleResource Include="Resources\icons\folderslist\worktray%402x.png" />
     <BundleResource Include="Resources\icons\folderslist\worktray%403x.png" />
     <BundleResource Include="Resources\Settings.bundle\Root.inApp.plist" />
-    <BundleResource Include="Resources\Settings.bundle\ContactSectionsVisibility.inApp.plist" />
-    <BundleResource Include="Resources\Settings.bundle\en.lproj\ContactSectionsVisibility.strings" />
     <BundleResource Include="Resources\icons\large_map%403x.png" />
     <BundleResource Include="Resources\icons\large_email%403x.png" />
     <BundleResource Include="Resources\icons\large_mobile%403x.png" />
