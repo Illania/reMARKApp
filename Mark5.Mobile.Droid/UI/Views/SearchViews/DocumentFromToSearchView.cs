@@ -19,12 +19,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         {
         }
 
-        public override void FromCriteria(SearchDocumentsCriteria criteria)
+        public override void Refresh()
         {
             //TODO
         }
 
-        public override void ToCriteria(SearchDocumentsCriteria criteria)
+        public override void UpdateCriteria()
         {
             //TODO
         }

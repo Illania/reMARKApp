@@ -44,14 +44,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             return true;
         }
 
-        public override void FromCriteria(SearchDocumentsCriteria criteria)
+        public override void Refresh()
         {
-            //TODO       
+            //TODO
         }
 
-        public override void ToCriteria(SearchDocumentsCriteria criteria)
+        public override void UpdateCriteria()
         {
-            //TODO       
+            //TODO
         }
     }
 }

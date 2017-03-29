@@ -17,6 +17,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public abstract class AbstractSearchView<T> : LinearLayoutCompat
     {
+        public T Criteria
+        {
+            get;
+            set;
+        }
+
         protected int DistanceNone;
         protected int DistanceLarge;
         protected int DistanceNormal;
@@ -50,8 +56,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             BackgroundColorSelectedState = new Color(ContextCompat.GetColor(Context, Resource.Color.lightblue));
         }
 
-        public abstract void FromCriteria(T criteria);
+        public abstract void Refresh();
 
-        public abstract void ToCriteria(T criteria);
+        public abstract void UpdateCriteria();
     }
 }

@@ -12,7 +12,6 @@ using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
-
     public abstract class RetainableStateFragment : Fragment
     {
 

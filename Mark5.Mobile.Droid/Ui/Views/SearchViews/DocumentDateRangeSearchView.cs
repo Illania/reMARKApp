@@ -165,12 +165,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             dateRangeToTextView.Text = timestamp == -1 ? "-" : timestamp.FormatServerTimestampAsDateString(Context);
         }
 
-        public override void FromCriteria(SearchDocumentsCriteria criteria)
+        public override void Refresh()
         {
             //TODO
         }
 
-        public override void ToCriteria(SearchDocumentsCriteria criteria)
+        public override void UpdateCriteria()
         {
             //TODO
         }

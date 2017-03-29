@@ -42,16 +42,25 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             UpdateBottomTextView(categoriesId.Count);
         }
 
-        public override void FromCriteria(SearchDocumentsCriteria criteria)
+        //public override void FromCriteria(SearchDocumentsCriteria criteria)
+        //{
+        //    UpdateCategories(criteria.CategoryIds);
+        //}
+
+        //public override void ToCriteria(SearchDocumentsCriteria criteria)
+        //{
+        //    criteria.CategoryIds = SelectedCategoryIds;
+        //}
+
+        public override void Refresh()
         {
-            UpdateCategories(criteria.CategoryIds);
+            //TODO
         }
 
-        public override void ToCriteria(SearchDocumentsCriteria criteria)
+        public override void UpdateCriteria()
         {
-            criteria.CategoryIds = SelectedCategoryIds;
+            //TODO
         }
     }
-
 
 }

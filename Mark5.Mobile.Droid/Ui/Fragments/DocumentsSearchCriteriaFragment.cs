@@ -61,8 +61,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             criteriaViews.Add(fromToCriteria);
 
             var attUnreadCriteria = new DocumentAttachmentUnreadSearchView(Context);
+            criteriaViews.Add(attUnreadCriteria);
 
             var handledCriteria = new DocumentHandledSearchView(Context);
+            criteriaViews.Add(handledCriteria);
 
             containerLinearLayout.AddView(directionCriteria);
             containerLinearLayout.AddView(subjectMessageCriteria);
@@ -71,11 +73,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             PrepareEditableTextRow();
             PrepareDropdownTextRow();
             containerLinearLayout.AddView(attUnreadCriteria);
-            containerLinearLayout.AddView(handledCriteria);
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
+                containerLinearLayout.AddView(handledCriteria);
 
             return rootView;
         }
-
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
@@ -90,6 +92,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnResume()
         {
             base.OnResume();
+
+            searchCriteria = searchCriteria ?? new SearchDocumentsCriteria();
         }
 
         public void PrepareEditableTextRow()

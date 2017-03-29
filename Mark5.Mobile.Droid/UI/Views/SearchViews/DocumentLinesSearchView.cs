@@ -39,14 +39,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             UpdateBottomTextView(lineGuids.Count);
         }
 
-        public override void FromCriteria(SearchDocumentsCriteria criteria)
+        public override void Refresh()
         {
-            UpdateLines(criteria.LineGuids);
+            //TODO
         }
 
-        public override void ToCriteria(SearchDocumentsCriteria criteria)
+        public override void UpdateCriteria()
         {
-            criteria.LineGuids = SelectedLineGuids;
+            //TODO
         }
     }
 }
