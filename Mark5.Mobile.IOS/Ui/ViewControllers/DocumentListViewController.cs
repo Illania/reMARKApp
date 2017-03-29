@@ -541,6 +541,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         }
 
+        void Reply(DocumentPreview documentPreview, DocumentCreationModeFlag creationModeFlag)
+        {
+            var vc = new ComposeDocumentViewController
+            {
+                PreviousDocumentId = documentPreview.Id,
+                CreationModeFlag = creationModeFlag,
+                PreviousDocumentFolderId = Folder.Id,
+                PreviousDocumentDirection = documentPreview.Direction,
+                PreviousDocumentPreview = documentPreview
+            };
+
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
+        void ShowCategories(DocumentPreview selectedDocument)
+        {
+            var vc = new CategoriesListViewController { BusinessEntityPreview = selectedDocument };
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
         void CopyToFolder(DocumentPreview selectedDocument) => CopyToFolder(new List<DocumentPreview> { selectedDocument });
 
         void CopyToFolder(List<DocumentPreview> selectedDocument)
@@ -612,6 +632,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void DoShowMoreActionSheet(NSIndexPath indexPath, DocumentPreview selectedDocument)
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("categories"), UIAlertActionStyle.Default, a => { ShowCategories(selectedDocument); EndEditing(); }));
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("reply"), UIAlertActionStyle.Default, a => { Reply(selectedDocument, DocumentCreationModeFlag.Reply); EndEditing(); }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("reply_all"), UIAlertActionStyle.Default, a => { Reply(selectedDocument, DocumentCreationModeFlag.ReplyAll); EndEditing(); }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("forward"), UIAlertActionStyle.Default, a => { Reply(selectedDocument, DocumentCreationModeFlag.Forward); EndEditing(); }));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a => { CopyToFolder(selectedDocument); EndEditing(); }));
 
