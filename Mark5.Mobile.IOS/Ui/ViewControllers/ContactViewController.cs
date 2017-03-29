@@ -202,7 +202,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             headerView.AddConstraints(new[]
                 {
                     NSLayoutConstraint.Create(buttonsView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, nameSubLabel, NSLayoutAttribute.Bottom, 1f, 10f),
-                    NSLayoutConstraint.Create(buttonsView, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.CenterX, 1f, 0f),
+                    NSLayoutConstraint.Create(buttonsView, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.CenterX, 1f, 0f)
                 });
 
             button1 = new UIButton();
