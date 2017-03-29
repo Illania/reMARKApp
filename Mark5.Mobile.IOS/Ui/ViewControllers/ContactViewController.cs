@@ -207,6 +207,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             button1 = new UIButton();
             button1.Enabled = false;
+            button1.Alpha = 0f;
             button1.SetImage(UIImage.FromBundle(Path.Combine("icons", "large_email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             button1.TintColor = Theme.LightGray;
             button1.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -222,6 +223,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             button2 = new UIButton();
             button2.Enabled = false;
+            button2.Alpha = 0f;
             button2.SetImage(UIImage.FromBundle(Path.Combine("icons", "large_mobile.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             button2.TintColor = Theme.LightGray;
             button2.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -237,6 +239,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             button3 = new UIButton();
             button3.Enabled = false;
+            button3.Alpha = 0f;
             button3.SetImage(UIImage.FromBundle(Path.Combine("icons", "large_sms.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             button3.TintColor = Theme.LightGray;
             button3.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -252,6 +255,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             button4 = new UIButton();
             button4.Enabled = false;
+            button4.Alpha = 0f;
             button4.SetImage(UIImage.FromBundle(Path.Combine("icons", "large_map.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             button4.TintColor = Theme.LightGray;
             button4.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -666,6 +670,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 button3.Enabled = contact.CommunicationAddresses.Any(ca => ca.Type == CommunicationAddressType.Mobile && ca.IsPrimary);
                 button4.Enabled = contact.PhysicalAddresses.Any();
 
+                button1.Alpha = 1f;
+                button2.Alpha = 1f;
+                button3.Alpha = 1f;
+                button4.Alpha = 1f;
+
                 if (assignCategoryButton != null)
                     assignCategoryButton.Enabled = true;
 
@@ -709,6 +718,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             nameLabel.Text = string.Empty;
             nameSubLabel.Text = string.Empty;
+
+            button1.Alpha = 0f;
+            button2.Alpha = 0f;
+            button3.Alpha = 0f;
+            button4.Alpha = 0f;
             button1.Enabled = false;
             button2.Enabled = false;
             button3.Enabled = false;
