@@ -37,6 +37,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public Folder Folder { get; set; }
 
         UIBarButtonItem composeDocumentItem;
+        UIBarButtonItem searchItem;
         UIBarButtonItem exitEditItem;
         UIBarButtonItem editItem;
 
@@ -153,7 +154,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             composeDocumentItem = new UIBarButtonItem();
             composeDocumentItem.Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"));
-            NavigationItem.SetRightBarButtonItem(composeDocumentItem, false);
+            searchItem = new UIBarButtonItem();
+            searchItem.Title = "SEARCH"; // TODO icon
+            NavigationItem.SetRightBarButtonItems(new[] { searchItem, composeDocumentItem }, false);
 
             exitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             editItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
@@ -239,6 +242,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (composeDocumentItem != null)
                 composeDocumentItem.Clicked += ComposeDocumentItem_Clicked;
 
+            if (searchItem != null)
+                searchItem.Clicked += SearchItem_Clicked;
+
             if (exitEditItem != null)
                 exitEditItem.Clicked += ExitEditItem_Clicked;
 
@@ -253,6 +259,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (composeDocumentItem != null)
                 composeDocumentItem.Clicked -= ComposeDocumentItem_Clicked;
+
+            if (searchItem != null)
+                searchItem.Clicked -= SearchItem_Clicked;
 
             if (exitEditItem != null)
                 exitEditItem.Clicked -= ExitEditItem_Clicked;
@@ -271,9 +280,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void DocumentSelected(DocumentPreview documentPreview)
         {
             if (tableView.Editing)
-            {
                 return;
-            }
 
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
@@ -356,6 +363,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationItem.SetLeftBarButtonItem(editItem, true);
         }
 
+        void SearchItem_Clicked(object sender, EventArgs e) => PresentViewController(new NavigationController(new SearchDocumentsViewController(), UIModalPresentationStyle.PageSheet), true, null);
+
         void ComposeDocumentItem_Clicked(object sender, EventArgs e)
         {
             var vc = new ComposeDocumentViewController
@@ -372,7 +381,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void EndEditing()
         {
             tableView.SetEditing(false, true);
-            NavigationItem.SetRightBarButtonItem(composeDocumentItem, true);
+            NavigationItem.SetRightBarButtonItems(new[] { searchItem, composeDocumentItem }, false);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
         }
 

@@ -27,6 +27,7 @@
 "clear_shortcodes_cache_title" = "Clear shortcodes cache";
 "clearing_contacts_cache___" = "Clearing cache...";
 "clearing_shortcodes_cache___" = "Clearing cache...";
+"close" = "Close";
 "comments" = "Comments";
 "company" = "Company";
 "confirm" = "Confirm";
@@ -191,6 +192,7 @@
 "reply" = "Reply";
 "reply_all" = "Reply all";
 "report" = "Report";
+"reset" = "Reset";
 "responsible_users" = "Responsible users";
 "safari" = "Open in Safari";
 "save_draft" = "Save draft";

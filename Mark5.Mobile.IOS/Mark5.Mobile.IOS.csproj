@@ -233,7 +233,6 @@
     <Compile Include="Ui\ViewControllers\LoginSettingsViewController.cs" />
     <Compile Include="Ui\Common\Localization.cs" />
     <Compile Include="Utilities\SystemReportCollector.cs" />
-    <Compile Include="Ui\ViewControllers\SearchViewController.cs" />
     <Compile Include="Ui\ViewControllers\DocumentsSplitViewController.cs" />
     <Compile Include="Ui\ViewControllers\ContactsSplitViewController.cs" />
     <Compile Include="Ui\ViewControllers\ShortcodesSplitViewController.cs" />
@@ -407,6 +406,7 @@
     <Compile Include="Ui\TableViewCells\ContactInfoTableViewCell.designer.cs">
       <DependentUpon>ContactInfoTableViewCell.cs</DependentUpon>
     </Compile>
+    <Compile Include="Ui\ViewControllers\SearchDocumentsViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
