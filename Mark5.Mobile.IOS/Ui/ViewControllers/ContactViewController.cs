@@ -22,6 +22,7 @@ using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
+using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -46,6 +47,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         bool refreshDataOnAppear;
 
         UIView headerView;
+        UILabel nameLabel;
+        UILabel nameSubLabel;
         UITableView tableView;
         UIToolbar toolbar;
         UIBarButtonItem assignCategoryButton;
@@ -85,7 +88,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             CommonConfig.Logger.Info($"{nameof(ContactViewController)} appeared");
 
             headerViewOffset.Constant = NavigationController.NavigationBar.Frame.Bottom;
-            UIView.AnimateNotify(0.1f, () => View.LayoutIfNeeded(), null);
+            View.LayoutIfNeeded();
             tableView.ContentInset = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
             tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
 
@@ -153,7 +156,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             View.AddConstraints(new[]
                 {
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Bottom, 1f, 0f),
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f),
@@ -161,6 +164,36 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
                     NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, HeaderViewHeight)
+                });
+
+            nameLabel = new UILabel();
+            nameLabel.Font = Theme.DefaultFont.WithRelativeSize(6f);
+            nameLabel.TextColor = Theme.LightGray;
+            nameLabel.TextAlignment = UITextAlignment.Center;
+            nameLabel.Lines = 1;
+            nameLabel.TranslatesAutoresizingMaskIntoConstraints = false;
+            headerView.AddSubview(nameLabel);
+            headerView.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Top, 1f, 10f),
+                    NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 26f)
+                });
+
+            nameSubLabel = new UILabel();
+            nameSubLabel.Font = Theme.DefaultFont.WithRelativeSize(-2f);
+            nameSubLabel.TextColor = Theme.LightGray;
+            nameSubLabel.TextAlignment = UITextAlignment.Center;
+            nameSubLabel.Lines = 1;
+            nameSubLabel.TranslatesAutoresizingMaskIntoConstraints = false;
+            headerView.AddSubview(nameSubLabel);
+            headerView.AddConstraints(new[]
+                {
+                NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, nameLabel, NSLayoutAttribute.Bottom, 1f, 4f),
+                    NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 20f)
                 });
 
 
@@ -459,6 +492,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (token.IsCancellationRequested) return;
 
+                if (this.contactPreview.Type == ContactType.Person || this.contactPreview.Type == ContactType.Department)
+                {
+                    nameLabel.Text = this.contactPreview.Name;
+                    nameSubLabel.Text = this.contactPreview.CompanyName;
+                }
+                else
+                {
+                    nameLabel.Text = this.contactPreview.Name;
+                    nameSubLabel.Text = string.Empty;
+                }
+
                 if (assignCategoryButton != null)
                     assignCategoryButton.Enabled = true;
 
@@ -499,6 +543,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             contactId = null;
             contactPreview = null;
             contact = null;
+
+            nameLabel.Text = string.Empty;
+            nameSubLabel.Text = string.Empty;
 
             if (assignCategoryButton != null)
                 assignCategoryButton.Enabled = false;
