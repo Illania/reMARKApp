@@ -7,11 +7,13 @@
 //
 using System;
 using Android.Content;
+using Android.Graphics;
+using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Fragments;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
@@ -24,10 +26,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         readonly AppCompatTextView dateRangeFromTextView;
         readonly AppCompatTextView dateRangeToTextView;
 
-        public DocumentDateRangeSearchView(Context context) : base(context)
+        readonly DocumentSearchCriteriaFragment parentFragment;
+        bool inFragment;
+
+        public DocumentDateRangeSearchView(Context context, DocumentSearchCriteriaFragment f, bool inFragment = false) : base(context)
         {
             Orientation = Horizontal;
-            SetBackgroundColor(BackgroundColorNormalState);
+            SetBackgroundColor(inFragment ? new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)) : BackgroundColorNormalState);
+
+            parentFragment = f;
+            this.inFragment = inFragment;
+
+            Clickable = true;
+            Click += DocumentDateRangeSearchView_Click;
 
             var leftLayout = new LinearLayoutCompat(context)
             {
@@ -99,21 +110,42 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             UpdateText();
         }
 
-        async void DateRangeFromTextView_Click(object sender, EventArgs e)
+        void DocumentDateRangeSearchView_Click(object sender, EventArgs e)
         {
-            var todayTimeStamp = DateTime.UtcNow.Date.ConvertDateTimeToTimestampMilliseconds();
-            var maxTimestamp = toTimestamp == -1 ? todayTimeStamp : toTimestamp;
-            fromTimestamp = await Dialogs.ShowDatePicker(Context, fromTimestamp, maxTimestamp: maxTimestamp);
+            if (inFragment)
+                return;
 
-            UpdateText();
+            OpenDateRangeFragment();
         }
 
-        async void DateRangeToTextView_Click(object sender, EventArgs e)
+        void OpenDateRangeFragment()
         {
-            var todayTimeStamp = DateTime.UtcNow.Date.ConvertDateTimeToTimestampMilliseconds();
-            toTimestamp = await Dialogs.ShowDatePicker(Context, toTimestamp, fromTimestamp, todayTimeStamp); //TODO need to check which timestamp we get when we select today (the hour)
+            var f = new PickDateRangeFragment();
+            //TODO complete
+            parentFragment.PushDropdownViewFragment(f, f.GenerateTag());
+        }
 
-            UpdateText();
+        void DateRangeFromTextView_Click(object sender, EventArgs e)
+        {
+            if (!inFragment)
+                OpenDateRangeFragment();
+
+
+            //var todayTimeStamp = DateTime.UtcNow.Date.ConvertDateTimeToTimestampMilliseconds();
+            //var maxTimestamp = toTimestamp == -1 ? todayTimeStamp : toTimestamp;
+            //fromTimestamp = await Dialogs.ShowDatePicker(Context, fromTimestamp, maxTimestamp: maxTimestamp);
+
+            //UpdateText();
+        }
+
+        void DateRangeToTextView_Click(object sender, EventArgs e)
+        {
+            if (!inFragment)
+                OpenDateRangeFragment();
+            //var todayTimeStamp = DateTime.UtcNow.Date.ConvertDateTimeToTimestampMilliseconds();
+            //toTimestamp = await Dialogs.ShowDatePicker(Context, toTimestamp, fromTimestamp, todayTimeStamp); //TODO need to check which timestamp we get when we select today (the hour)
+
+            //UpdateText();
         }
 
         void UpdateText()
@@ -124,7 +156,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         public override void FromCriteria(SearchDocumentsCriteria criteria)
         {
-            //TODo
+            //TODO
         }
 
         public override void ToCriteria(SearchDocumentsCriteria criteria)

@@ -60,6 +60,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
             BottomEditText = LayoutInflater.From(context).Inflate(Resource.Layout.search_edit_text_layout, null).FindViewById<AppCompatEditText>(Resource.Id.search_edit_text);
             BottomEditText.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            BottomEditText.Gravity = GravityFlags.CenterHorizontal;
             BottomEditText.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId);
             BottomEditText.SetBackgroundColor(Color.Transparent);
             BottomEditText.SetPadding(0, 0, 0, 0);
@@ -93,7 +94,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             {
                 LayoutParameters = new LayoutParams(cancelIconSize, cancelIconSize)
             };
-            cancelIconView.SetImageResource(Resource.Drawable.cross);
+            cancelIconView.SetImageResource(Resource.Drawable.cross); //TODO new icon?
             cancelIconView.SetColorFilter(Color.White);
             cancelIconLayout.AddView(cancelIconView);
             cancelIconLayout.Clickable = true;

@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System.Collections.Generic;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.App;
@@ -14,6 +15,7 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.SearchViews;
 using Mark5.Mobile.Droid.Utilities;
@@ -22,8 +24,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class DocumentSearchCriteriaFragment : RetainableStateFragment
     {
-
-        LinearLayoutCompat linearLayout;
+        LinearLayoutCompat containerLinearLayout;
+        List<AbstractSearchView<SearchDocumentsCriteria>> criteriaViews = new List<AbstractSearchView<SearchDocumentsCriteria>>();
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -34,33 +36,42 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var scrollView = rootView.FindViewById<NestedScrollView>(Resource.Id.scroll_view);
             scrollView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
 
-            linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
-            linearLayout.SetBackgroundColor(Color.Transparent);
+            containerLinearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
+            containerLinearLayout.SetBackgroundColor(Color.Transparent);
 
-            linearLayout.DividerDrawable = ContextCompat.GetDrawable(Context, Resource.Drawable.search_divider_horizontal);
-            linearLayout.ShowDividers = LinearLayoutCompat.ShowDividerMiddle;
+            containerLinearLayout.DividerDrawable = ContextCompat.GetDrawable(Context, Resource.Drawable.search_divider_horizontal);
+            containerLinearLayout.ShowDividers = LinearLayoutCompat.ShowDividerMiddle;
 
             var paddingLinearLayout = ConversionUtils.ConvertDpToPixels(12);
-            linearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, paddingLinearLayout);
+            containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, paddingLinearLayout);
 
-            var dsv = new DocumentDateRangeSearchView(Context);
-            dsv.TransitionName = "prova";
+            var directionCriteria = new DocumentDirectionsSearchView(Context);
+            criteriaViews.Add(directionCriteria);
 
-            linearLayout.AddView(new DocumentDirectionsSearchView(Context));
-            linearLayout.AddView(new DocumentSubjectMessageSearchView(Context));
-            linearLayout.AddView(new DocumentFromToSearchView(Context));
-            linearLayout.AddView(dsv);
+            var daterangeCriteria = new DocumentDateRangeSearchView(Context, this);
+            criteriaViews.Add(daterangeCriteria);
+
+            var subjectMessageCriteria = new DocumentSubjectMessageSearchView(Context);
+            criteriaViews.Add(subjectMessageCriteria);
+
+            var fromToCriteria = new DocumentFromToSearchView(Context);
+            criteriaViews.Add(fromToCriteria);
+
+            var attUnreadCriteria = new DocumentAttachmentUnreadSearchView(Context);
+
+            var handledCriteria = new DocumentHandledSearchView(Context);
+
+            containerLinearLayout.AddView(directionCriteria);
+            containerLinearLayout.AddView(subjectMessageCriteria);
+            containerLinearLayout.AddView(fromToCriteria);
+            containerLinearLayout.AddView(daterangeCriteria);
             PrepareEditableTextRow();
             PrepareDropdownTextRow();
-            linearLayout.AddView(new DocumentAttachmentUnreadSearchView(Context));
-            linearLayout.AddView(new DocumentHandledSearchView(Context));
+            containerLinearLayout.AddView(attUnreadCriteria);
+            containerLinearLayout.AddView(handledCriteria);
 
             return rootView;
         }
-
-        DocumentReferenceNumberSearchView drf;
-        DocumentCommentsSearchView dcs;
-        DocumentAttachmentSearchView das;
 
         public void PrepareEditableTextRow()
         {
@@ -74,16 +85,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var lp = new LinearLayoutCompat.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1);
 
-            dcs = new DocumentCommentsSearchView(Context, ll);
-            das = new DocumentAttachmentSearchView(Context, ll);
-            drf = new DocumentReferenceNumberSearchView(Context, ll);
+            var commentCriteria = new DocumentCommentsSearchView(Context, ll);
+            criteriaViews.Add(commentCriteria);
 
-            ll.AddView(drf, lp);
-            ll.AddView(dcs, lp);
-            ll.AddView(das, lp);
+            var attachmentCriteria = new DocumentAttachmentSearchView(Context, ll);
+            criteriaViews.Add(attachmentCriteria);
+
+            var referenceNumberCriteria = new DocumentReferenceNumberSearchView(Context, ll);
+            criteriaViews.Add(referenceNumberCriteria);
+
+            ll.AddView(referenceNumberCriteria, lp);
+            ll.AddView(commentCriteria, lp);
+            ll.AddView(attachmentCriteria, lp);
             ll.LayoutTransition = new Android.Animation.LayoutTransition();
 
-            linearLayout.AddView(ll);
+            containerLinearLayout.AddView(ll);
         }
 
         public void PrepareDropdownTextRow()
@@ -98,20 +114,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var lp = new LinearLayoutCompat.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1);
 
-            ll.AddView(new DocumentCategoriesSearchView(Context, this), lp);
-            ll.AddView(new DocumentLinesSearchView(Context, this), lp);
-            ll.AddView(new DocumentPrioritySearchView(Context, this), lp);
+            var categoriesCriteria = new DocumentCategoriesSearchView(Context, this);
+            criteriaViews.Add(categoriesCriteria);
 
-            linearLayout.AddView(ll);
+            var linesCriteria = new DocumentLinesSearchView(Context, this);
+            criteriaViews.Add(linesCriteria);
+
+            var priorityCriteria = new DocumentPrioritySearchView(Context, this);
+            criteriaViews.Add(priorityCriteria);
+
+            ll.AddView(categoriesCriteria, lp);
+            ll.AddView(linesCriteria, lp);
+            ll.AddView(priorityCriteria, lp);
+
+            containerLinearLayout.AddView(ll);
         }
 
-        public void PushDropdownViewFragment(Fragment foldersListFragment, string tag)
+        public void PushDropdownViewFragment(Fragment f, string tag)
         {
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
 
             fragmentManager.BeginTransaction()
                                        .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
-                                       .Add(Resource.Id.fragment_container, foldersListFragment, tag) //TODO this needs to be replace, but we need to do something about the criteria
+                                       .Add(Resource.Id.fragment_container, f, tag) //TODO this needs to be replace, but we need to do something about the criteria
                                        .AddToBackStack(tag)
                                        .Commit();
         }
@@ -126,9 +151,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Created {nameof(DocumentSearchCriteriaFragment)}");
         }
 
+        #region Retained State
+
+        public override IRetainableState OnRetainInstanceState()
+        {
+            return new DocumentSearchCriteriaFragmentState
+            {
+            };
+        }
+
+        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
+        {
+            var df = restoredState as DocumentSearchCriteriaFragmentState;
+            if (df != null)
+            {
+            }
+        }
+
         public override string GenerateTag()
         {
             return $"{nameof(DocumentSearchCriteriaFragment)}";
         }
+
+
+        class DocumentSearchCriteriaFragmentState : IRetainableState
+        {
+        }
+        #endregion
     }
 }
