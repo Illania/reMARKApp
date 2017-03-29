@@ -31,8 +31,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class ContactViewController : AbstractViewController, ISecondaryViewController
     {
 
-        const float HeaderViewHeight = 125f;
-
         public bool Modal { get; set; }
 
         public bool Empty { get { return folderId == null && folder == null && contactId == null && contactPreview == null && contact == null; } }
@@ -47,6 +45,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         bool refreshDataOnAppear;
 
         UIView headerView;
+        UIButton button1;
+        UIButton button2;
+        UIButton button3;
+        UIButton button4;
         UILabel nameLabel;
         UILabel nameSubLabel;
         UITableView tableView;
@@ -163,7 +165,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     headerViewOffset = NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, NavigationController.NavigationBar.Frame.Bottom),
                     NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, HeaderViewHeight)
+                    NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 140f)
                 });
 
             nameLabel = new UILabel();
@@ -178,7 +180,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Top, 1f, 10f),
                     NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 26f)
+                    NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 25f)
                 });
 
             nameSubLabel = new UILabel();
@@ -190,10 +192,80 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             headerView.AddSubview(nameSubLabel);
             headerView.AddConstraints(new[]
                 {
-                NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, nameLabel, NSLayoutAttribute.Bottom, 1f, 4f),
+                    NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, nameLabel, NSLayoutAttribute.Bottom, 1f, 5f),
                     NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Right, 1f, 0f),
                     NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 20f)
+                });
+
+            var buttonsView = new UIView();
+            buttonsView.TranslatesAutoresizingMaskIntoConstraints = false;
+            headerView.AddSubview(buttonsView);
+            headerView.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(buttonsView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, nameSubLabel, NSLayoutAttribute.Bottom, 1f, 10f),
+                    NSLayoutConstraint.Create(buttonsView, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.CenterX, 1f, 0f),
+                });
+
+            button1 = new UIButton();
+            button1.Enabled = false;
+            button1.SetImage(UIImage.FromBundle(Path.Combine("icons", "large_email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            button1.TintColor = Theme.LightGray;
+            button1.TranslatesAutoresizingMaskIntoConstraints = false;
+            buttonsView.AddSubview(button1);
+            buttonsView.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(button1, NSLayoutAttribute.Top, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(button1, NSLayoutAttribute.Left, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(button1, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(button1, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60),
+                    NSLayoutConstraint.Create(button1, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 40f)
+                });
+
+            button2 = new UIButton();
+            button2.Enabled = false;
+            button2.SetImage(UIImage.FromBundle(Path.Combine("icons", "large_mobile.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            button2.TintColor = Theme.LightGray;
+            button2.TranslatesAutoresizingMaskIntoConstraints = false;
+            buttonsView.AddSubview(button2);
+            buttonsView.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(button2, NSLayoutAttribute.Top, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(button2, NSLayoutAttribute.Left, NSLayoutRelation.Equal, button1, NSLayoutAttribute.Right, 1f, 15f),
+                    NSLayoutConstraint.Create(button2, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(button2, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60f),
+                    NSLayoutConstraint.Create(button2, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 40f)
+                });
+
+            button3 = new UIButton();
+            button3.Enabled = false;
+            button3.SetImage(UIImage.FromBundle(Path.Combine("icons", "large_sms.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            button3.TintColor = Theme.LightGray;
+            button3.TranslatesAutoresizingMaskIntoConstraints = false;
+            buttonsView.AddSubview(button3);
+            buttonsView.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(button3, NSLayoutAttribute.Top, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(button3, NSLayoutAttribute.Left, NSLayoutRelation.Equal, button2, NSLayoutAttribute.Right, 1f, 15f),
+                    NSLayoutConstraint.Create(button3, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(button3, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60f),
+                    NSLayoutConstraint.Create(button3, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 40f)
+                });
+
+            button4 = new UIButton();
+            button4.Enabled = false;
+            button4.SetImage(UIImage.FromBundle(Path.Combine("icons", "large_map.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            button4.TintColor = Theme.LightGray;
+            button4.TranslatesAutoresizingMaskIntoConstraints = false;
+            buttonsView.AddSubview(button4);
+            buttonsView.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(button4, NSLayoutAttribute.Top, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(button4, NSLayoutAttribute.Left, NSLayoutRelation.Equal, button3, NSLayoutAttribute.Right, 1f, 15f),
+                    NSLayoutConstraint.Create(button4, NSLayoutAttribute.Right, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(button4, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(button4, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60f),
+                    NSLayoutConstraint.Create(button4, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 40f)
                 });
 
 
@@ -241,6 +313,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeHandlers()
         {
+            if (button1 != null)
+                button1.TouchUpInside += Button1_TouchUpInside;
+
+            if (button2 != null)
+                button2.TouchUpInside += Button2_TouchUpInside;
+
+            if (button3 != null)
+                button3.TouchUpInside += Button3_TouchUpInside;
+
+            if (button4 != null)
+                button4.TouchUpInside += Button4_TouchUpInside;
+
             if (assignCategoryButton != null)
                 assignCategoryButton.Clicked += AssignCategoryButton_Clicked;
 
@@ -256,6 +340,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DeinitializeHandlers()
         {
+            if (button1 != null)
+                button1.TouchUpInside -= Button1_TouchUpInside;
+
+            if (button2 != null)
+                button2.TouchUpInside -= Button2_TouchUpInside;
+
+            if (button3 != null)
+                button3.TouchUpInside -= Button3_TouchUpInside;
+
+            if (button4 != null)
+                button4.TouchUpInside -= Button4_TouchUpInside;
+
             if (assignCategoryButton != null)
                 assignCategoryButton.Clicked -= AssignCategoryButton_Clicked;
 
@@ -280,6 +376,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var row = dataSource?.RowAt(indexPath);
             if (cell != null && row != null)
                 row.OnLongClicked(this, tableView, cell, indexPath);
+        }
+
+        void Button1_TouchUpInside(object sender, EventArgs e)
+        {
+
+        }
+
+
+        void Button2_TouchUpInside(object sender, EventArgs e)
+        {
+
+        }
+
+        void Button3_TouchUpInside(object sender, EventArgs e)
+        {
+
+        }
+
+        void Button4_TouchUpInside(object sender, EventArgs e)
+        {
+
         }
 
         void AssignCategoryButton_Clicked(object sender, EventArgs e)
@@ -503,6 +620,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     nameSubLabel.Text = string.Empty;
                 }
 
+                button1.Enabled = contact.CommunicationAddresses.Any(ca => ca.Type == CommunicationAddressType.Email && ca.IsPrimary);
+                button2.Enabled = contact.CommunicationAddresses.Any(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary);
+                button3.Enabled = contact.CommunicationAddresses.Any(ca => ca.Type == CommunicationAddressType.Mobile && ca.IsPrimary);
+                button4.Enabled = contact.PhysicalAddresses.Any();
+
                 if (assignCategoryButton != null)
                     assignCategoryButton.Enabled = true;
 
@@ -546,6 +668,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             nameLabel.Text = string.Empty;
             nameSubLabel.Text = string.Empty;
+            button1.Enabled = false;
+            button2.Enabled = false;
+            button3.Enabled = false;
+            button4.Enabled = false;
 
             if (assignCategoryButton != null)
                 assignCategoryButton.Enabled = false;
