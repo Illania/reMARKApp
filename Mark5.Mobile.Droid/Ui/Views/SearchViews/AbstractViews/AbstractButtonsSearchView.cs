@@ -17,7 +17,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public abstract class AbstractButtonsSearchView<T> : AbstractSearchView<T>
     {
-
         protected AbstractButtonsSearchView(Context context) : base(context)
         {
             Orientation = Horizontal;
@@ -41,7 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             int buttonTextStyleSelectedResourceId = Resource.Style.searchViewButtonSelected;
 
             readonly Context context;
-            readonly Func<CustomButton, bool> clickedAction; //Returns true if the button should change state
+            readonly Func<CustomButton, bool> clickedAction; //Returns true if the button should change selected state
 
             public CustomButton(Context context, int stringResourceId, Func<CustomButton, bool> clickedAction = null)
                 : base(context)
@@ -55,7 +54,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
                 Click += CustomButton_Click;
 
-                UpdateStyle();
+                UpdateTextAppearance();
             }
 
             void CustomButton_Click(object sender, EventArgs e)
@@ -64,10 +63,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 {
                     Selected = !Selected;
                 }
-                UpdateStyle();
+                UpdateTextAppearance();
             }
 
-            void UpdateStyle()
+            void UpdateTextAppearance()
             {
                 this.SetTextAppearanceCompat(context, Selected ? buttonTextStyleSelectedResourceId : buttonTextStyleNormalResourceId);
             }
@@ -75,7 +74,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             public void UpdateSelectedState(bool selected)
             {
                 Selected = selected;
-                UpdateStyle();
+                UpdateTextAppearance();
             }
 
         }

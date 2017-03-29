@@ -13,9 +13,7 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
-using Android.Widget;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.SearchViews;
 using Mark5.Mobile.Droid.Utilities;
@@ -45,10 +43,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var paddingLinearLayout = ConversionUtils.ConvertDpToPixels(12);
             linearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, paddingLinearLayout);
 
+            var dsv = new DocumentDateRangeSearchView(Context);
+            dsv.TransitionName = "prova";
+
             linearLayout.AddView(new DocumentDirectionsSearchView(Context));
             linearLayout.AddView(new DocumentSubjectMessageSearchView(Context));
             linearLayout.AddView(new DocumentFromToSearchView(Context));
-            linearLayout.AddView(new DocumentDateRangeSearchView(Context));
+            linearLayout.AddView(dsv);
             PrepareEditableTextRow();
             PrepareDropdownTextRow();
             linearLayout.AddView(new DocumentAttachmentUnreadSearchView(Context));

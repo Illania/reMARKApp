@@ -18,8 +18,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity]
     public class SearchActivity : BaseAppCompatActivity
     {
-
         Toolbar toolbar;
+        DocumentSearchCriteriaFragment dscf;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -39,8 +39,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var ft = SupportFragmentManager.BeginTransaction();
-                var paf = new DocumentSearchCriteriaFragment();
-                ft.Replace(Resource.Id.fragment_container, paf, paf.GenerateTag());
+                dscf = new DocumentSearchCriteriaFragment();
+                ft.Replace(Resource.Id.fragment_container, dscf, dscf.GenerateTag());
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(SearchActivity)}");

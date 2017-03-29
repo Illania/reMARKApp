@@ -339,6 +339,7 @@
     <Compile Include="Ui\Views\SearchViews\DocumentLinesSearchView.cs" />
     <Compile Include="Ui\Fragments\PickPrioritiesListFragment.cs" />
     <Compile Include="Utilities\UI.cs" />
+    <Compile Include="Ui\Fragments\PickDateRangeFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -618,6 +619,11 @@
     <AndroidResource Include="Resources\layout\search_list_item_lines.axml" />
     <AndroidResource Include="Resources\layout\search_list_item_priority.axml" />
     <AndroidResource Include="Resources\drawable\search_button_background.axml" />
+    <AndroidResource Include="Resources\drawable\search_edit_text_selector.axml" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\cross.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\cross.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\cross.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\cross.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\anim\" />

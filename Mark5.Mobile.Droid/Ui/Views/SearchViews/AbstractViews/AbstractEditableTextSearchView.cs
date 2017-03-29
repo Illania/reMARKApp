@@ -8,7 +8,9 @@
 using System;
 using Android.Content;
 using Android.Graphics;
+using Android.Support.Transitions;
 using Android.Support.V7.Widget;
+using Android.Text;
 using Android.Views;
 using Android.Views.InputMethods;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -19,13 +21,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
     public abstract class AbstractEditableTextSearchView<T> : AbstractSearchView<T>
     {
         readonly protected AppCompatTextView TopTextView;
+        readonly protected AppCompatTextView BottomTextView;
+
         readonly protected AppCompatEditText BottomEditText;
         readonly protected LinearLayoutCompat containerLayout;
         readonly protected LinearLayoutCompat cancelIconLayout;
 
+        readonly string emptyText;
+
         protected AbstractEditableTextSearchView(Context context, int topTextResId, LinearLayoutCompat containerLayout) : base(context)
         {
             this.containerLayout = containerLayout;
+            emptyText = context.GetString(Resource.String.search_editable_empty);
 
             Orientation = Horizontal;
             SetBackgroundColor(BackgroundColorNormalState);
@@ -52,17 +59,26 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             leftLayout.AddView(TopTextView);
 
             BottomEditText = LayoutInflater.From(context).Inflate(Resource.Layout.search_edit_text_layout, null).FindViewById<AppCompatEditText>(Resource.Id.search_edit_text);
-            BottomEditText.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
-            {
-                Gravity = (int)GravityFlags.CenterHorizontal,
-            };
+            BottomEditText.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             BottomEditText.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId);
             BottomEditText.SetBackgroundColor(Color.Transparent);
             BottomEditText.SetPadding(0, 0, 0, 0);
             BottomEditText.Hint = context.GetString(Resource.String.search_editable_empty);
+            BottomEditText.SetHintTextColor(ViewUtilities.GetColorStateList(context, Resource.Drawable.search_edit_text_selector));
             BottomEditText.FocusChange += BottomEditText_FocusChange;
+            BottomEditText.Visibility = ViewStates.Gone;
 
             leftLayout.AddView(BottomEditText);
+
+            BottomTextView = new AppCompatTextView(context);
+            BottomTextView.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            BottomTextView.Gravity = GravityFlags.CenterHorizontal;
+            BottomTextView.Text = emptyText;
+            BottomTextView.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId);
+            BottomTextView.Visibility = ViewStates.Visible;
+            BottomTextView.Ellipsize = TextUtils.TruncateAt.End;
+            BottomTextView.SetLines(1);
+            leftLayout.AddView(BottomTextView);
 
             cancelIconLayout = new LinearLayoutCompat(context)
             {
@@ -77,7 +93,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             {
                 LayoutParameters = new LayoutParams(cancelIconSize, cancelIconSize)
             };
-            cancelIconView.SetImageResource(Resource.Drawable.failed); //TODO new icon?
+            cancelIconView.SetImageResource(Resource.Drawable.cross);
             cancelIconView.SetColorFilter(Color.White);
             cancelIconLayout.AddView(cancelIconView);
             cancelIconLayout.Clickable = true;
@@ -88,10 +104,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             AddView(cancelIconLayout);
         }
 
-        //TODO Open questions (more or less)
-        // - What about ellipsize?
-        // - What happens when the user presses back?
-        // - What happens when we click on something else in the search?
+        //TODO 
+        // - What to do with the back button?
 
         void BottomEditText_FocusChange(object sender, FocusChangeEventArgs e)
         {
@@ -121,6 +135,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         void PrepareViewsExpansion()
         {
+            BottomEditText.Visibility = ViewStates.Visible;
+            BottomTextView.Visibility = ViewStates.Gone;
+
+            if (BottomTextView.Text != emptyText)
+            {
+                BottomEditText.Text = BottomTextView.Text;
+            }
+
             for (int i = 0; i < containerLayout.ChildCount; i++)
             {
                 var view = containerLayout.GetChildAt(i) as AbstractEditableTextSearchView<T>;
@@ -152,6 +174,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         public void Collapse()
         {
             cancelIconLayout.Visibility = ViewStates.Gone;
+
+            BottomEditText.Visibility = ViewStates.Gone;
+            BottomTextView.Visibility = ViewStates.Visible;
+
+            BottomTextView.Text = string.IsNullOrWhiteSpace(BottomEditText.Text) ? emptyText : BottomEditText.Text;
+
             BottomEditText.ClearFocus();
         }
     }

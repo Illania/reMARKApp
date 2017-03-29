@@ -29,7 +29,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         {
             Orientation = Horizontal;
             SetBackgroundColor(BackgroundColorNormalState);
-            var lightGrayColor = new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray));
 
             var searchIconSize = ConversionUtils.ConvertDpToPixels(16f);
             var searchIconView = new AppCompatImageView(context)
@@ -88,7 +87,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 }
             };
             var drawable = Spinner.Background.GetConstantState().NewDrawable();
-            drawable.SetColorFilter(lightGrayColor, PorterDuff.Mode.SrcAtop);
+            drawable.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)), PorterDuff.Mode.SrcAtop);
             Spinner.Background = drawable;
             Spinner.Adapter = CustomArrayAdapter.Create(context, textArrayResId,
                                                         Resource.Layout.search_spinner_item_multi,
@@ -105,8 +104,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             BottomEditText.SetPadding(0, 0, 0, 0);
             BottomEditText.SetBackgroundColor(Color.Transparent);
             BottomEditText.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId);
+            BottomEditText.SetHintTextColor(ViewUtilities.GetColorStateList(context, Resource.Drawable.search_edit_text_selector));
             BottomEditText.Hint = context.GetString(bottomEditResId);
-            BottomEditText.SetHintTextColor(lightGrayColor);
             BottomEditText.EditorAction += (sender, e) =>
             {
                 if (e.ActionId == ImeAction.Done)
