@@ -29,6 +29,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
     public class ContactViewController : AbstractViewController, ISecondaryViewController
     {
+
+        const float HeaderViewHeight = 125f;
+
         public bool Modal { get; set; }
 
         public bool Empty { get { return folderId == null && folder == null && contactId == null && contactPreview == null && contact == null; } }
@@ -42,12 +45,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         bool refreshDataOnAppear;
 
+        UIView headerView;
         UITableView tableView;
         UIToolbar toolbar;
         UIBarButtonItem assignCategoryButton;
         UIBarButtonItem fileToButton;
         UIBarButtonItem actionsLinksButton;
         UIBarButtonItem doneButtonItem;
+        NSLayoutConstraint headerViewOffset;
 
         CancellationTokenSource cts;
 
@@ -79,8 +84,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"{nameof(ContactViewController)} appeared");
 
-            tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
-            tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+            headerViewOffset.Constant = NavigationController.NavigationBar.Frame.Bottom;
+            UIView.AnimateNotify(0.1f, () => View.LayoutIfNeeded(), null);
+            tableView.ContentInset = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
+            tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
 
             if (refreshDataOnAppear)
             {
@@ -114,8 +121,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 if (tableView == null) return;
 
-                tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
-                tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+                headerViewOffset.Constant = NavigationController.NavigationBar.Frame.Bottom;
+                UIView.AnimateNotify(0.2f, () => View.LayoutIfNeeded(), null);
+                tableView.ContentInset = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
+                tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
             });
         }
 
@@ -123,23 +132,37 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             AutomaticallyAdjustsScrollViewInsets = false;
 
+            View.BackgroundColor = Theme.DarkerBlue;
+
+            headerView = new UIView();
+            headerView.BackgroundColor = Theme.DarkerBlue;
+            headerView.TranslatesAutoresizingMaskIntoConstraints = false;
+
             tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
             tableView.ClipsToBounds = false;
             tableView.Source = new DataSource(this, tableView);
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
             tableView.RowHeight = UITableView.AutomaticDimension;
             tableView.EstimatedRowHeight = 60f;
-            tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
-            tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+            tableView.ContentInset = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
+            tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
             tableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed) { MinimumPressDuration = 1f });
+
             View.AddSubview(tableView);
+            View.AddSubview(headerView);
+
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Bottom, 1f, 0f),
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f),
+                    headerViewOffset = NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, NavigationController.NavigationBar.Frame.Bottom),
+                    NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, HeaderViewHeight)
                 });
+
 
             assignCategoryButton = new UIBarButtonItem();
             assignCategoryButton.Image = UIImage.FromBundle(Path.Combine("icons", "flag.png"));
@@ -181,13 +204,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
                 NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
             }
-
-            InitializeNavigationBarTitle();
-        }
-
-        void InitializeNavigationBarTitle()
-        {
-            NavigationItem.Title = contactPreview?.Name;
         }
 
         void InitializeHandlers()
@@ -443,8 +459,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (token.IsCancellationRequested) return;
 
-                InitializeNavigationBarTitle();
-
                 if (assignCategoryButton != null)
                     assignCategoryButton.Enabled = true;
 
@@ -485,8 +499,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             contactId = null;
             contactPreview = null;
             contact = null;
-
-            InitializeNavigationBarTitle();
 
             if (assignCategoryButton != null)
                 assignCategoryButton.Enabled = false;

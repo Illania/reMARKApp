@@ -736,8 +736,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void RefreshView()
         {
-            Title = documentPreview?.Subject;
-
             subViews.ForEach(v =>
             {
                 v.Document = document;
