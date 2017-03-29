@@ -90,7 +90,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             CommonConfig.Logger.Info($"{nameof(ContactViewController)} appeared");
 
             headerViewOffset.Constant = NavigationController.NavigationBar.Frame.Bottom;
-            View.LayoutIfNeeded();
             tableView.ContentInset = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
             tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
 
@@ -127,7 +126,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (tableView == null) return;
 
                 headerViewOffset.Constant = NavigationController.NavigationBar.Frame.Bottom;
-                UIView.AnimateNotify(0.2f, () => View.LayoutIfNeeded(), null);
                 tableView.ContentInset = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
                 tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
             });
@@ -380,23 +378,66 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void Button1_TouchUpInside(object sender, EventArgs e)
         {
+            var communicationAddress = contact.CommunicationAddresses.FirstOrDefault(ca => ca.Type == CommunicationAddressType.Email && ca.IsPrimary);
+            if (communicationAddress == null)
+                return;
 
+            var vc = new ComposeDocumentViewController
+            {
+                PreconfiguredEmailAddresses = new string[] { communicationAddress.Address },
+                CreationModeFlag = DocumentCreationModeFlag.New
+            };
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-
-        void Button2_TouchUpInside(object sender, EventArgs e)
+        async void Button2_TouchUpInside(object sender, EventArgs e)
         {
+            var formattedNumbers = contact.CommunicationAddresses
+                                 .Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary)
+                                 .Select(ca => AddressUtilities.FormatCommunicationAddress(ca))
+                                 .ToArray();
+            if (formattedNumbers.Length == 0)
+                return;
 
+            if (formattedNumbers.Length == 1)
+            {
+                Integration.Call(this, (UIButton)sender, formattedNumbers[0]);
+                return;
+            }
+
+            var selectedItem = await Dialogs.ShowListDialogAsync(this, Localization.GetString("call"), formattedNumbers, (UIButton)sender);
+            if (selectedItem < 0)
+                return;
+
+            Integration.Call(this, (UIButton)sender, formattedNumbers[selectedItem]);
         }
 
         void Button3_TouchUpInside(object sender, EventArgs e)
         {
+            var communicationAddresses = contact.CommunicationAddresses.FirstOrDefault(ca => ca.Type == CommunicationAddressType.Mobile && ca.IsPrimary);
+            if (communicationAddresses == null)
+                return;
 
+            Integration.Text(this, (UIButton)sender, AddressUtilities.FormatCommunicationAddress(communicationAddresses));
         }
 
-        void Button4_TouchUpInside(object sender, EventArgs e)
+        async void Button4_TouchUpInside(object sender, EventArgs e)
         {
+            var physicalAddress = contact.PhysicalAddresses.ToArray();
+            if (physicalAddress.Length == 0)
+                return;
 
+            if (physicalAddress.Length == 1)
+            {
+                Integration.ShowOnMap(this, (UIButton)sender, physicalAddress[0]);
+                return;
+            }
+
+            var selectedItem = await Dialogs.ShowListDialogAsync(this, Localization.GetString("show_on_map"), physicalAddress.Select(pa => pa.Type.Name).ToArray(), (UIButton)sender);
+            if (selectedItem < 0)
+                return;
+
+            Integration.ShowOnMap(this, (UIButton)sender, physicalAddress[selectedItem]);
         }
 
         void AssignCategoryButton_Clicked(object sender, EventArgs e)
