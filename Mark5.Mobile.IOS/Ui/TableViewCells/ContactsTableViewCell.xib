@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
@@ -12,26 +12,26 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="ContactsTableViewCell" rowHeight="68" id="2" customClass="ContactsTableViewCell">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="68"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="ContactsTableViewCell" rowHeight="50" id="2" customClass="ContactsTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" layoutMarginsFollowReadableWidth="YES" tableViewCell="2" id="4yj-Dm-ife">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="67"/>
+                <rect key="frame" x="0.0" y="0.0" width="286" height="49.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lgO-rg-Y2X" misplaced="YES">
-                        <rect key="frame" x="2" y="2" width="6" height="64"/>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lgO-rg-Y2X">
+                        <rect key="frame" x="2" y="2" width="6" height="45.5"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="6" id="YfT-WB-0pf"/>
                         </constraints>
                     </view>
-                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name of contact" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nZL-LM-VbB" misplaced="YES">
-                        <rect key="frame" x="18" y="24" width="261" height="21"/>
+                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name of contact" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nZL-LM-VbB">
+                        <rect key="frame" x="18" y="14.5" width="261" height="21"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="IKq-LK-9hA"/>
                         </constraints>
-                        <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                         <nil key="highlightedColor"/>
                     </label>
@@ -50,6 +50,7 @@
                 <outlet property="LeadingConstraint" destination="vJK-ac-C9R" id="TNO-Ki-Ec9"/>
                 <outlet property="NameLabel" destination="nZL-LM-VbB" id="In7-Km-eTy"/>
             </connections>
+            <point key="canvasLocation" x="25" y="43"/>
         </tableViewCell>
     </objects>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
@@ -57,83 +58,4 @@
         <simulatedOrientationMetrics key="orientation"/>
         <simulatedScreenMetrics key="destination" type="retina4_7.fullscreen"/>
     </simulatedMetricsContainer>
-    <resources>
-        <image name="startscreens/start-screen-bg-ipad-landscape.png" width="1024" height="768"/>
-        <image name="startscreens/start-screen-bg-ipad-portrait.png" width="768" height="1024"/>
-        <image name="startscreens/start-screen-bg-ipadretina-landscape.png" width="2048" height="1536"/>
-        <image name="startscreens/start-screen-bg-ipadretina-portrait.png" width="1536" height="2048"/>
-        <image name="startscreens/start-screen-bg-retina35.png" width="640" height="960"/>
-        <image name="startscreens/start-screen-bg-retina4.png" width="640" height="1136"/>
-        <image name="startscreens/start-screen-bg-retinahd47.png" width="750" height="1334"/>
-        <image name="startscreens/start-screen-bg-retinahd55-landscape.png" width="2208" height="1242"/>
-        <image name="startscreens/start-screen-bg-retinahd55.png" width="1242" height="2208"/>
-        <image name="startscreens/start-screen-logo-ipad-landscape.png" width="1024" height="768"/>
-        <image name="startscreens/start-screen-logo-ipad-portrait.png" width="768" height="1024"/>
-        <image name="startscreens/start-screen-logo-ipadretina-landscape.png" width="2048" height="1536"/>
-        <image name="startscreens/start-screen-logo-ipadretina-portrait.png" width="1536" height="2048"/>
-        <image name="startscreens/start-screen-logo-retina35.png" width="640" height="960"/>
-        <image name="startscreens/start-screen-logo-retina4.png" width="640" height="1136"/>
-        <image name="startscreens/start-screen-logo-retinahd47.png" width="750" height="1334"/>
-        <image name="startscreens/start-screen-logo-retinahd55-landscape.png" width="2208" height="1242"/>
-        <image name="startscreens/start-screen-logo-retinahd55.png" width="1242" height="2208"/>
-        <image name="icons/actions.png" width="20" height="20"/>
-        <image name="icons/add.png" width="20" height="20"/>
-        <image name="icons/arrow-down.png" width="20" height="20"/>
-        <image name="icons/arrow-up.png" width="20" height="20"/>
-        <image name="icons/attachment.png" width="15" height="15"/>
-        <image name="icons/checkmark.png" width="13.333333" height="13.333333"/>
-        <image name="icons/comments.png" width="20" height="20"/>
-        <image name="icons/company.png" width="15" height="15"/>
-        <image name="icons/compose.png" width="20" height="20"/>
-        <image name="icons/contacts-cp.png" width="20" height="20"/>
-        <image name="icons/contacts-filled.png" width="30" height="30"/>
-        <image name="icons/contacts-small.png" width="15" height="15"/>
-        <image name="icons/contacts.png" width="30" height="30"/>
-        <image name="icons/department.png" width="15" height="15"/>
-        <image name="icons/detail-disclosure.png" width="20" height="20"/>
-        <image name="icons/documents-filled.png" width="30" height="30"/>
-        <image name="icons/documents-small.png" width="15" height="15"/>
-        <image name="icons/documents.png" width="30" height="30"/>
-        <image name="icons/drafts.png" width="20" height="20"/>
-        <image name="icons/email.png" width="20" height="20"/>
-        <image name="icons/empty-dot.png" width="15" height="15"/>
-        <image name="icons/expand.png" width="20" height="20"/>
-        <image name="icons/failed.png" width="15" height="15"/>
-        <image name="icons/favorite.png" width="10" height="10"/>
-        <image name="icons/flag.png" width="20" height="20"/>
-        <image name="icons/folder.png" width="20" height="20"/>
-        <image name="icons/full-dot.png" width="15" height="15"/>
-        <image name="icons/incoming.png" width="15" height="15"/>
-        <image name="icons/map.png" width="20" height="20"/>
-        <image name="icons/mark5Contacts.png" width="20" height="20"/>
-        <image name="icons/message.png" width="20" height="20"/>
-        <image name="icons/notifications-filled.png" width="30" height="30"/>
-        <image name="icons/notifications-small.png" width="15" height="15"/>
-        <image name="icons/notifications.png" width="30" height="30"/>
-        <image name="icons/offline.png" width="20" height="20"/>
-        <image name="icons/okay.png" width="20" height="20"/>
-        <image name="icons/outgoing.png" width="15" height="15"/>
-        <image name="icons/pencil.png" width="15" height="15"/>
-        <image name="icons/pending.png" width="15" height="15"/>
-        <image name="icons/phone.png" width="20" height="20"/>
-        <image name="icons/phonebook.png" width="20" height="20"/>
-        <image name="icons/recent.png" width="20" height="20"/>
-        <image name="icons/reply.png" width="20" height="20"/>
-        <image name="icons/search.png" width="30" height="30"/>
-        <image name="icons/settings-filled.png" width="30" height="30"/>
-        <image name="icons/settings.png" width="30" height="30"/>
-        <image name="icons/shortcodes-filled.png" width="30" height="30"/>
-        <image name="icons/shortcodes-small.png" width="20" height="20"/>
-        <image name="icons/shortcodes.png" width="30" height="30"/>
-        <image name="icons/trash.png" width="20" height="20"/>
-        <image name="icons/view.png" width="20" height="20"/>
-        <image name="icons/worktray.png" width="20" height="20"/>
-        <image name="icons/folderslist/draft.png" width="20" height="20"/>
-        <image name="icons/folderslist/folder.png" width="20" height="20"/>
-        <image name="icons/folderslist/inbox.png" width="20" height="20"/>
-        <image name="icons/folderslist/outbox.png" width="20" height="20"/>
-        <image name="icons/folderslist/outgoing.png" width="15" height="15"/>
-        <image name="icons/folderslist/spam.png" width="20" height="20"/>
-        <image name="icons/folderslist/worktray.png" width="20" height="20"/>
-    </resources>
 </document>

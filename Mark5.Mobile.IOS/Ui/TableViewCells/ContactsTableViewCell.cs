@@ -20,7 +20,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
     public partial class ContactsTableViewCell : UITableViewCell
     {
 
-        public const float Height = 68f;
+        public const float Height = 50f;
 
         public static readonly UINib Nib = UINib.FromName("ContactsTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("ContactsTableViewCell");
@@ -35,7 +35,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static ContactsTableViewCell Create()
         {
             var cell = (ContactsTableViewCell)Nib.Instantiate(null, null)[0];
-            cell.NameLabel.Font = Theme.DefaultBoldFont;
+            cell.NameLabel.Font = Theme.DefaultFont;
             return cell;
         }
 
