@@ -28,7 +28,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         SearchDocumentsCriteria searchCriteria;
 
         LinearLayoutCompat containerLinearLayout;
-        List<AbstractSearchView<SearchDocumentsCriteria>> criteriaViews = new List<AbstractSearchView<SearchDocumentsCriteria>>();
+        List<AbstractSearchView<SearchDocumentsCriteria>> subviews = new List<AbstractSearchView<SearchDocumentsCriteria>>();
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -49,22 +49,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, paddingLinearLayout);
 
             var directionCriteria = new DocumentDirectionsSearchView(Context);
-            criteriaViews.Add(directionCriteria);
+            subviews.Add(directionCriteria);
 
             var daterangeCriteria = new DocumentDateRangeSearchView(Context, this);
-            criteriaViews.Add(daterangeCriteria);
+            subviews.Add(daterangeCriteria);
 
             var subjectMessageCriteria = new DocumentSubjectMessageSearchView(Context);
-            criteriaViews.Add(subjectMessageCriteria);
+            subviews.Add(subjectMessageCriteria);
 
             var fromToCriteria = new DocumentFromToSearchView(Context);
-            criteriaViews.Add(fromToCriteria);
+            subviews.Add(fromToCriteria);
 
             var attUnreadCriteria = new DocumentAttachmentUnreadSearchView(Context);
-            criteriaViews.Add(attUnreadCriteria);
+            subviews.Add(attUnreadCriteria);
 
             var handledCriteria = new DocumentHandledSearchView(Context);
-            criteriaViews.Add(handledCriteria);
+            subviews.Add(handledCriteria);
 
             containerLinearLayout.AddView(directionCriteria);
             containerLinearLayout.AddView(subjectMessageCriteria);
@@ -76,25 +76,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
                 containerLinearLayout.AddView(handledCriteria);
 
+            HasOptionsMenu = true;
+
             return rootView;
         }
 
-        public override void OnViewCreated(View view, Bundle savedInstanceState)
-        {
-            base.OnViewCreated(view, savedInstanceState);
-
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
-
-            CommonConfig.Logger.Info($"Created {nameof(DocumentSearchCriteriaFragment)}");
-        }
-
-        public override void OnResume()
-        {
-            base.OnResume();
-
-            searchCriteria = searchCriteria ?? new SearchDocumentsCriteria();
-        }
 
         public void PrepareEditableTextRow()
         {
@@ -109,13 +95,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var lp = new LinearLayoutCompat.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1);
 
             var commentCriteria = new DocumentCommentsSearchView(Context, ll);
-            criteriaViews.Add(commentCriteria);
+            subviews.Add(commentCriteria);
 
             var attachmentCriteria = new DocumentAttachmentSearchView(Context, ll);
-            criteriaViews.Add(attachmentCriteria);
+            subviews.Add(attachmentCriteria);
 
             var referenceNumberCriteria = new DocumentReferenceNumberSearchView(Context, ll);
-            criteriaViews.Add(referenceNumberCriteria);
+            subviews.Add(referenceNumberCriteria);
 
             ll.AddView(referenceNumberCriteria, lp);
             ll.AddView(commentCriteria, lp);
@@ -138,13 +124,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var lp = new LinearLayoutCompat.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1);
 
             var categoriesCriteria = new DocumentCategoriesSearchView(Context, this);
-            criteriaViews.Add(categoriesCriteria);
+            subviews.Add(categoriesCriteria);
 
             var linesCriteria = new DocumentLinesSearchView(Context, this);
-            criteriaViews.Add(linesCriteria);
+            subviews.Add(linesCriteria);
 
             var priorityCriteria = new DocumentPrioritySearchView(Context, this);
-            criteriaViews.Add(priorityCriteria);
+            subviews.Add(priorityCriteria);
 
             ll.AddView(categoriesCriteria, lp);
             ll.AddView(linesCriteria, lp);
@@ -152,6 +138,44 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             containerLinearLayout.AddView(ll);
         }
+
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        {
+            base.OnViewCreated(view, savedInstanceState);
+
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
+
+            CommonConfig.Logger.Info($"Created {nameof(DocumentSearchCriteriaFragment)}");
+        }
+
+        public override void OnResume()
+        {
+            base.OnResume();
+
+            searchCriteria = searchCriteria ?? new SearchDocumentsCriteria();
+            RefreshViews();
+        }
+
+        void RefreshViews()
+        {
+            subviews.ForEach(c =>
+            {
+                c.Criteria = searchCriteria;
+                c.Refresh();
+            });
+        }
+
+        void Reset()
+        {
+            searchCriteria = new SearchDocumentsCriteria();
+            RefreshViews();
+        }
+
+        //TODO search button
+        //TODO reset button
+        //TODO save/restore instance state
+        //TODO reset while doing something, like editing
 
         public void PushDropdownViewFragment(Fragment f, string tag)
         {
@@ -164,6 +188,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                        .Commit();
         }
 
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            var item = menu.Add(Menu.None, 10, 10, Resource.String.done);
+            item.SetShowAsAction(ShowAsAction.Always);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == 10)
+            {
+                Reset();
+            }
+
+            return base.OnOptionsItemSelected(item);
+        }
 
         #region Retained State
 
