@@ -83,8 +83,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
 
             stackView.AddArrangedSubview(new DocumentDirectionSearchView());
-            stackView.AddArrangedSubview(new AttachmentsUnreadSearchView());
+            stackView.AddArrangedSubview(new LineCategoriesPriorityName());
             stackView.AddArrangedSubview(new ReferenceCommentsAttachmentName());
+            stackView.AddArrangedSubview(new AttachmentsUnreadSearchView());
             // TODO if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
             stackView.AddArrangedSubview(new HandledSearchView());
 
@@ -187,7 +188,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     BackgroundColor = InactiveBackgroundColor,
-                    UserInteractionEnabled = true,
+                    UserInteractionEnabled = true
                 };
                 allView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 allView.Layer.CornerRadius = CorderRadius;
@@ -201,7 +202,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     BackgroundColor = InactiveBackgroundColor,
-                    UserInteractionEnabled = true,
+                    UserInteractionEnabled = true
                 };
                 inboxView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 inboxView.Layer.CornerRadius = CorderRadius;
@@ -215,7 +216,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     BackgroundColor = InactiveBackgroundColor,
-                    UserInteractionEnabled = true,
+                    UserInteractionEnabled = true
                 };
                 outboxView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 outboxView.Layer.CornerRadius = CorderRadius;
@@ -229,7 +230,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     BackgroundColor = InactiveBackgroundColor,
-                    UserInteractionEnabled = true,
+                    UserInteractionEnabled = true
                 };
                 draftView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 draftView.Layer.CornerRadius = CorderRadius;
@@ -279,6 +280,178 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         directions.Add(DocumentDirection.Outgoing);
                     else if (recognizer.View == draftView)
                         directions.Add(DocumentDirection.Draft);
+                }
+
+                UpdateRow();
+            }
+        }
+
+        class LineCategoriesPriorityName : AbstractSearchView
+        {
+
+            readonly UIView lineView;
+            readonly UILabel lineLabel;
+            readonly UILabel lineValue;
+            readonly UIView categoriesView;
+            readonly UILabel categoriesLabel;
+            readonly UILabel categoriesValue;
+            readonly UIView priorityView;
+            readonly UILabel priorityLabel;
+            readonly UILabel priorityValue;
+
+            public LineCategoriesPriorityName()
+            {
+                lineView = new UIView
+                {
+                    BackgroundColor = InactiveBackgroundColor,
+                    UserInteractionEnabled = true
+                };
+                lineView.Layer.CornerRadius = CorderRadius;
+                lineView.Layer.MasksToBounds = true;
+                lineView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
+
+                lineLabel = new UILabel
+                {
+                    Text = "Mailbox",
+                    TextColor = LabelTextColor,
+                    Font = Font,
+                    TextAlignment = UITextAlignment.Center,
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+
+                lineValue = new UILabel
+                {
+                    TextColor = InactiveTextColor,
+                    Font = Font,
+                    TintColor = Theme.LightGray,
+                    TextAlignment = UITextAlignment.Center,
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+                lineView.Add(lineLabel);
+                lineView.Add(lineValue);
+                lineView.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(lineLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, lineView, NSLayoutAttribute.Top, 1f, 4f),
+                    NSLayoutConstraint.Create(lineLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, lineView, NSLayoutAttribute.Left, 1f, 4f),
+                    NSLayoutConstraint.Create(lineLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, lineView, NSLayoutAttribute.Right, 1f, -4f),
+                    NSLayoutConstraint.Create(lineValue, NSLayoutAttribute.Top, NSLayoutRelation.Equal, lineLabel, NSLayoutAttribute.Bottom, 1f, 2f),
+                    NSLayoutConstraint.Create(lineValue, NSLayoutAttribute.Left, NSLayoutRelation.Equal, lineView, NSLayoutAttribute.Left, 1f, 4f),
+                    NSLayoutConstraint.Create(lineValue, NSLayoutAttribute.Right, NSLayoutRelation.Equal, lineView, NSLayoutAttribute.Right, 1f, -4f),
+                    NSLayoutConstraint.Create(lineValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, lineView, NSLayoutAttribute.Bottom, 1f, -4f)
+                });
+
+                AddArrangedSubview(lineView);
+
+                categoriesView = new UIView
+                {
+                    BackgroundColor = InactiveBackgroundColor,
+                    UserInteractionEnabled = true
+                };
+                categoriesView.Layer.CornerRadius = CorderRadius;
+                categoriesView.Layer.MasksToBounds = true;
+                categoriesView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
+
+                categoriesLabel = new UILabel
+                {
+                    Text = "Categories",
+                    TextColor = LabelTextColor,
+                    Font = Font,
+                    TextAlignment = UITextAlignment.Center,
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    UserInteractionEnabled = false
+                };
+
+                categoriesValue = new UILabel
+                {
+                    TextColor = InactiveTextColor,
+                    Font = Font,
+                    TintColor = Theme.LightGray,
+                    TextAlignment = UITextAlignment.Center,
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    UserInteractionEnabled = false
+                };
+                categoriesView.Add(categoriesLabel);
+                categoriesView.Add(categoriesValue);
+                categoriesView.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(categoriesLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, categoriesView, NSLayoutAttribute.Top, 1f, 4f),
+                    NSLayoutConstraint.Create(categoriesLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, categoriesView, NSLayoutAttribute.Left, 1f, 4f),
+                    NSLayoutConstraint.Create(categoriesLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, categoriesView, NSLayoutAttribute.Right, 1f, -4f),
+                    NSLayoutConstraint.Create(categoriesValue, NSLayoutAttribute.Top, NSLayoutRelation.Equal, categoriesLabel, NSLayoutAttribute.Bottom, 1f, 2f),
+                    NSLayoutConstraint.Create(categoriesValue, NSLayoutAttribute.Left, NSLayoutRelation.Equal, categoriesView, NSLayoutAttribute.Left, 1f, 4f),
+                    NSLayoutConstraint.Create(categoriesValue, NSLayoutAttribute.Right, NSLayoutRelation.Equal, categoriesView, NSLayoutAttribute.Right, 1f, -4f),
+                    NSLayoutConstraint.Create(categoriesValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, categoriesView, NSLayoutAttribute.Bottom, 1f, -4f)
+                });
+
+                AddArrangedSubview(categoriesView);
+
+                priorityView = new UIView
+                {
+                    BackgroundColor = InactiveBackgroundColor,
+                    UserInteractionEnabled = true
+                };
+                priorityView.Layer.CornerRadius = CorderRadius;
+                priorityView.Layer.MasksToBounds = true;
+                priorityView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
+
+                priorityLabel = new UILabel
+                {
+                    Text = "Priority",
+                    TextColor = LabelTextColor,
+                    Font = Font,
+                    TextAlignment = UITextAlignment.Center,
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    UserInteractionEnabled = false
+                };
+
+                priorityValue = new UILabel
+                {
+                    TextColor = InactiveTextColor,
+                    Font = Font,
+                    TintColor = Theme.LightGray,
+                    TextAlignment = UITextAlignment.Center,
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    UserInteractionEnabled = false
+                };
+                priorityView.Add(priorityLabel);
+                priorityView.Add(priorityValue);
+                priorityView.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(priorityLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, priorityView, NSLayoutAttribute.Top, 1f, 4f),
+                    NSLayoutConstraint.Create(priorityLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, priorityView, NSLayoutAttribute.Left, 1f, 4f),
+                    NSLayoutConstraint.Create(priorityLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, priorityView, NSLayoutAttribute.Right, 1f, -4f),
+                    NSLayoutConstraint.Create(priorityValue, NSLayoutAttribute.Top, NSLayoutRelation.Equal, priorityLabel, NSLayoutAttribute.Bottom, 1f, 2f),
+                    NSLayoutConstraint.Create(priorityValue, NSLayoutAttribute.Left, NSLayoutRelation.Equal, priorityView, NSLayoutAttribute.Left, 1f, 4f),
+                    NSLayoutConstraint.Create(priorityValue, NSLayoutAttribute.Right, NSLayoutRelation.Equal, priorityView, NSLayoutAttribute.Right, 1f, -4f),
+                    NSLayoutConstraint.Create(priorityValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, priorityView, NSLayoutAttribute.Bottom, 1f, -4f)
+                });
+
+                AddArrangedSubview(priorityView);
+            }
+
+            protected override void UpdateRow()
+            {
+                lineValue.Text = Criteria.LineGuids.Count < 1 ? "Any" : Criteria.LineGuids.Count.ToString();
+                categoriesValue.Text = Criteria.CategoryIds.Count < 1 ? "Any" : Criteria.CategoryIds.Count.ToString();
+                priorityValue.Text = Criteria.Priorities.Count < 1 ? "Any" : Criteria.Priorities.Count.ToString();
+            }
+
+            [Export("tapped:")]
+            void Tapped(UITapGestureRecognizer recognizer)
+            {
+                if (recognizer.View == lineView)
+                {
+                    // TODO
+                }
+
+                if (recognizer.View == categoriesView)
+                {
+                    // TODO
+                }
+
+                if (recognizer.View == priorityView)
+                {
+                    // TODO
                 }
 
                 UpdateRow();
@@ -563,7 +736,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     BackgroundColor = InactiveBackgroundColor,
-                    UserInteractionEnabled = true,
+                    UserInteractionEnabled = true
                 };
                 attachmentsView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 attachmentsView.Layer.CornerRadius = CorderRadius;
@@ -577,7 +750,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     BackgroundColor = InactiveBackgroundColor,
-                    UserInteractionEnabled = true,
+                    UserInteractionEnabled = true
                 };
                 unreadView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 unreadView.Layer.CornerRadius = CorderRadius;
@@ -620,7 +793,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     BackgroundColor = InactiveBackgroundColor,
-                    UserInteractionEnabled = true,
+                    UserInteractionEnabled = true
                 };
                 allView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 allView.Layer.CornerRadius = CorderRadius;
@@ -634,7 +807,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     BackgroundColor = InactiveBackgroundColor,
-                    UserInteractionEnabled = true,
+                    UserInteractionEnabled = true
                 };
                 handledView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 handledView.Layer.CornerRadius = CorderRadius;
@@ -648,7 +821,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     BackgroundColor = InactiveBackgroundColor,
-                    UserInteractionEnabled = true,
+                    UserInteractionEnabled = true
                 };
                 unhadledView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 unhadledView.Layer.CornerRadius = CorderRadius;
