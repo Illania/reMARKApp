@@ -16,6 +16,7 @@
 "compose_priority_enabled" = "Show priority field";
 "contact_section_visibility" = "Sections";
 "contacts" = "Contacts";
+"contacts_to_search" = "Contacts search results";
 "create_report" = "Create system report";
 "create_system_report" = "Create system report";
 "default_template" = "Default MARK5 template";
@@ -23,6 +24,7 @@
 "document_body_request_type" = "Viewing format";
 "documents" = "Documents";
 "documents_to_download" = "Documents to download";
+"documents_to_search" = "Documents search results";
 "dont_use" = "Don't use";
 "dont_use_short" = "Don't use";
 "enable_reporting" = "Share diagnostic information";
@@ -38,11 +40,13 @@
 "open_settings_app" = "Open Settings app";
 "plain" = "Plain Text";
 "remove_line" = "Remove line address";
+"search" = "Search";
 "security" = "Security";
 "security_footer" = "SSL should remain enabled to provide secure communication. Otherwise, communication between MARK5 on your iOS device and MARK5 server can be intercepted.";
 "send_feedback" = "Send feedback";
 "server" = "Server";
 "shortcodes" = "Shortcodes";
+"shortcodes_to_search" = "Shortcodes search results";
 "ssl" = "SSL";
 "synchronise_contacts" = "Synchronise contacts";
 "synchronise_shortcodes" = "Synchronise shortcodes";

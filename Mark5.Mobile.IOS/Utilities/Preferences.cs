@@ -44,7 +44,10 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string UseTemplateKey = "UseTemplate";
             public const string LocalTemplateKey = "LocalTemplate";
 
-            public const string NotificationsRingtoneKey = "NotificationsRingtone";
+            public const string DocumentsToSearchKey = "DocumentsToSearch";
+            public const string ContactsToSearchKey = "ContactsToSearch";
+            public const string ShortcodesToSearchKey = "ShortcodesToSearch";
+
             public const string CleanCacheIntervalDaysKey = "CleanCacheIntervalDays";
             public const string ClearCacheKey = "ClearCache";
             public const string EnableReportingKey = "EnableReporting";
@@ -80,6 +83,10 @@ namespace Mark5.Mobile.IOS.Utilities
             defaultsDictionary.Add(new NSString(Keys.ComposePriorityEnabledKey), NSNumber.FromBoolean(false));
             defaultsDictionary.Add(new NSString(Keys.RemoveLineKey), NSNumber.FromBoolean(true));
             defaultsDictionary.Add(new NSString(Keys.UseTemplateKey), NSNumber.FromInt16(1));
+
+            defaultsDictionary.Add(new NSString(Keys.DocumentsToSearchKey), NSNumber.FromInt16(250));
+            defaultsDictionary.Add(new NSString(Keys.ContactsToSearchKey), NSNumber.FromInt16(250));
+            defaultsDictionary.Add(new NSString(Keys.ShortcodesToSearchKey), NSNumber.FromInt16(250));
 
             defaultsDictionary.Add(new NSString(Keys.CleanCacheIntervalDaysKey), NSNumber.FromInt16(7));
             defaultsDictionary.Add(new NSString(Keys.ClearCacheKey), NSNumber.FromBoolean(false));
@@ -238,16 +245,27 @@ namespace Mark5.Mobile.IOS.Utilities
 
         #endregion
 
-        public string NotificationsRingtone
+        public int DocumentsToSearch
         {
             get
             {
-                return ud.StringForKey(Keys.NotificationsRingtoneKey);
+                return (int)ud.IntForKey(Keys.DocumentsToSearchKey);
             }
-            set
+        }
+
+        public int ContactsToSearch
+        {
+            get
             {
-                ud.SetString(value, Keys.NotificationsRingtoneKey);
-                ud.Synchronize();
+                return (int)ud.IntForKey(Keys.ContactsToSearchKey);
+            }
+        }
+
+        public int ShortcodesToSearch
+        {
+            get
+            {
+                return (int)ud.IntForKey(Keys.ShortcodesToSearchKey);
             }
         }
 

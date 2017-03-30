@@ -138,8 +138,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"{nameof(DocumentViewController)} appeared");
 
-            mainScrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
-            mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+            mainScrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+            mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
 
             if (refreshDataOnAppear)
             {
@@ -174,8 +174,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 if (mainScrollView == null) return;
 
-                mainScrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
-                mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+                mainScrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+                mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
             });
         }
 
@@ -239,8 +239,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ClipsToBounds = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            mainScrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
-            mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + 49f, 0f);
+            mainScrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+            mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
             mainScrollView.LayoutSubviewsAction = HandleScrollViewLayoutSubviewsAction;
             View.AddSubview(mainScrollView);
             View.AddConstraints(new[]
@@ -394,7 +394,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 40f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, Modal ? 0 : -49f)
+                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, -(TabBarController?.TabBar?.Frame.Height ?? 0f))
                 });
         }
 
@@ -686,10 +686,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void MarkAsReadIfNecessary()
         {
-            if (outgoingDocumentIdentifier != default(Guid) || document == null || documentPreview == null)
-            {
+            if (outgoingDocumentIdentifier != default(Guid) || folder == null || document == null || documentPreview == null)
                 return;
-            }
 
             readStatusCts?.Cancel();
             readStatusCts = new CancellationTokenSource();
@@ -724,7 +722,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         readByView.RefreshView();
                         readByView.UpdateVisibility();
 
-                        ReadStatusUpdated(this, new ReadStatusUpdatedEventArgs(dp));
+                        if (ReadStatusUpdated != null)
+                            ReadStatusUpdated(this, new ReadStatusUpdatedEventArgs(dp));
                     });
                 }
                 catch (Exception ex)
@@ -1169,7 +1168,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 readByView.RefreshView();
 
-                ReadStatusUpdated(this, new ReadStatusUpdatedEventArgs(documentPreview));
+                if (ReadStatusUpdated != null)
+                    ReadStatusUpdated(this, new ReadStatusUpdatedEventArgs(documentPreview));
 
                 dismissAction();
             }

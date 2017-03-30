@@ -8,7 +8,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using CoreAnimation;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common.Model;
@@ -32,6 +31,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIView bottomView;
         UIScrollView scrollView;
         UIStackView stackView;
+        UIButton searchButton;
 
         NSObject didShowNotificationObserver;
         NSObject willChangeFrameNotificationObserver;
@@ -116,7 +116,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NSLayoutConstraint.Create(bottomView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
             });
 
-            var searchButton = new UIButton
+            searchButton = new UIButton
             {
                 TintColor = Theme.DarkerBlue,
                 BackgroundColor = Theme.LightBlue,
@@ -167,6 +167,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             closeItem.Clicked += CloseItem_Clicked;
             resetItem.Clicked += ResetItem_Clicked;
+            searchButton.TouchUpInside += SearchButton_TouchUpInside;
 
             didShowNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.DidShowNotification, OnKeyboardDidShowNotification);
             willChangeFrameNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillChangeFrameNotification, OnKeyboardWillChangeFrameNotification);
@@ -187,6 +188,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             closeItem.Clicked -= CloseItem_Clicked;
             resetItem.Clicked -= ResetItem_Clicked;
+            searchButton.TouchUpInside -= SearchButton_TouchUpInside;
 
             NSNotificationCenter.DefaultCenter.RemoveObservers(new[] { didShowNotificationObserver, willChangeFrameNotificationObserver, willHideNotification });
         }
@@ -212,6 +214,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             foreach (var view in stackView.Subviews.OfType<AbstractSearchView>())
                 view.SetCriteria(criteria);
+        }
+
+        void SearchButton_TouchUpInside(object sender, EventArgs e)
+        {
+            searchButton.TouchUpInside -= SearchButton_TouchUpInside;
+
+            criteria.MaxToFetch = PlatformConfig.Preferences.DocumentsToSearch;
+
+            NavigationController.PushViewController(new DocumentsSearchResultsViewController { Criteria = criteria }, true);
         }
 
         void OnKeyboardDidShowNotification(NSNotification notification) => AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification);

@@ -90,8 +90,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             CommonConfig.Logger.Info($"{nameof(ContactViewController)} appeared");
 
             headerViewOffset.Constant = NavigationController.NavigationBar.Frame.Bottom;
-            tableView.ContentInset = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
-            tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
+            tableView.ContentInset = new UIEdgeInsets(0f, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+            tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
 
             if (refreshDataOnAppear)
             {
@@ -126,8 +126,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (tableView == null) return;
 
                 headerViewOffset.Constant = NavigationController.NavigationBar.Frame.Bottom;
-                tableView.ContentInset = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
-                tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
+                tableView.ContentInset = new UIEdgeInsets(0f, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+                tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
             });
         }
 
@@ -147,8 +147,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
             tableView.RowHeight = UITableView.AutomaticDimension;
             tableView.EstimatedRowHeight = 60f;
-            tableView.ContentInset = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
-            tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 40f + 49f, 0f);
+            tableView.ContentInset = new UIEdgeInsets(0f, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+            tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
             tableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed) { MinimumPressDuration = 1f });
 
             View.AddSubview(tableView);
@@ -300,7 +300,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 40f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, Modal ? 0 : -49f)
+                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, -(TabBarController?.TabBar?.Frame.Height ?? 0f))
                 });
         }
 
