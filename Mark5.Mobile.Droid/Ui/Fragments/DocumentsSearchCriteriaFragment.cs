@@ -6,7 +6,9 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System.Collections.Generic;
+using System.Linq;
 using Android.Animation;
+using Android.Content.Res;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.Design.Widget;
@@ -47,22 +49,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.DividerDrawable = ContextCompat.GetDrawable(Context, Resource.Drawable.search_divider_horizontal);
             containerLinearLayout.ShowDividers = LinearLayoutCompat.ShowDividerMiddle;
 
+            var paddingLinearLayout = ConversionUtils.ConvertDpToPixels(12);
+            var bottomPadding = ConversionUtils.ConvertDpToPixels(56) + (Resources.GetDimension(Resource.Dimension.fab_margin) + 2) * 2;
+            containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, (int)bottomPadding);
+
             fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
 
-            var fabIcon = Resources.GetDrawable(Resource.Drawable.action_search_server, null).GetConstantState().NewDrawable();
-            fabIcon.Mutate().SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)), PorterDuff.Mode.Multiply);
+            var fabIcon = Resources.GetDrawable(Resource.Drawable.action_search_server, null).GetConstantState().NewDrawable().Mutate();
+            fabIcon.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)), PorterDuff.Mode.Multiply);
 
             fab.SetImageDrawable(fabIcon);
             fab.SetOnClickListener(new ActionOnClickListener(HandleSearchButtonClicked));
-            fab.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightblue)));
+            fab.BackgroundTintList = ColorStateList.ValueOf(new Color(ContextCompat.GetColor(Context, Resource.Color.lightblue)));
+            fab.RippleColor = new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)).ToArgb();
             fab.Visibility = ViewStates.Visible;
 
             var p = (CoordinatorLayout.LayoutParams)fab.LayoutParameters;
-            p.AnchorGravity = (int)(GravityFlags.CenterHorizontal);
+            p.Gravity = (int)(GravityFlags.Bottom | GravityFlags.CenterHorizontal);
             fab.LayoutParameters = p;
-
-            var paddingLinearLayout = ConversionUtils.ConvertDpToPixels(12);
-            containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, paddingLinearLayout);
 
             var directionCriteria = new DocumentDirectionsSearchView(Context);
             subviews.Add(directionCriteria);
@@ -91,7 +95,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.AddView(daterangeCriteria);
             PrepareEditableTextRow();
             PrepareDropdownTextRow();
-            containerLinearLayout.AddView(extraFieldsCriteria); //TODO need to add conditional
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.ExtraFieldInfos.Any())
+                containerLinearLayout.AddView(extraFieldsCriteria);
             containerLinearLayout.AddView(attUnreadCriteria);
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
                 containerLinearLayout.AddView(handledCriteria);

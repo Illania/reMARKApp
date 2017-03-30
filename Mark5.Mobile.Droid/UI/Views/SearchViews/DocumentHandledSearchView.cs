@@ -5,7 +5,6 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
-using System;
 using System.Collections.Generic;
 using Mark5.Mobile.Common.Model;
 
@@ -13,9 +12,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public class DocumentHandledSearchView : AbstractButtonsSearchView<SearchDocumentsCriteria>
     {
-        CustomButton allButton;
-        CustomButton handledButton;
-        CustomButton unHandledButton;
+        readonly CustomButton allButton;
+        readonly CustomButton handledButton;
+        readonly CustomButton unHandledButton;
 
         public DocumentHandledSearchView(Android.Content.Context context) : base(context)
         {
