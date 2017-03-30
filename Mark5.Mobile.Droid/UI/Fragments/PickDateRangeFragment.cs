@@ -94,6 +94,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fromDatePicker.Date = FromTimestamp == -1 ? todayTimeStamp : FromTimestamp;
             toDatePicker.Date = ToTimestamp == -1 ? todayTimeStamp : ToTimestamp;
 
+            UpdateDatePickersLimits();
+
             UpdateText();
 
             if (StartWithToDate)

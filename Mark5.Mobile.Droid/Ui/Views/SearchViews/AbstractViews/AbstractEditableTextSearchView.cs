@@ -187,6 +187,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         public void SetText(string text)
         {
             bottomTextView.Text = string.IsNullOrWhiteSpace(text) ? emptyText : text;
+            bottomEditText.Text = text;
         }
 
         public string GetText()

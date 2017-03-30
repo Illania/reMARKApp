@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.Animation;
@@ -18,6 +19,7 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
+using Android.Views.InputMethods;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -26,7 +28,12 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class DocumentSearchCriteriaFragment : RetainableStateFragment
+    public interface ISearchCriteriaFragment
+    {
+        void ReplaceFragment(Fragment f, string tag);
+    }
+
+    public class DocumentSearchCriteriaFragment : RetainableStateFragment, ISearchCriteriaFragment
     {
         SearchDocumentsCriteria searchCriteria;
 
@@ -48,6 +55,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.SetBackgroundColor(Color.Transparent);
             containerLinearLayout.DividerDrawable = ContextCompat.GetDrawable(Context, Resource.Drawable.search_divider_horizontal);
             containerLinearLayout.ShowDividers = LinearLayoutCompat.ShowDividerMiddle;
+            containerLinearLayout.Focusable = true;
+            containerLinearLayout.FocusableInTouchMode = true;
+            containerLinearLayout.RequestFocus();
+            containerLinearLayout.FocusChange += ContainerLinearLayout_FocusChange;
 
             var paddingLinearLayout = ConversionUtils.ConvertDpToPixels(12);
             var bottomPadding = ConversionUtils.ConvertDpToPixels(56) + (Resources.GetDimension(Resource.Dimension.fab_margin) + 2) * 2;
@@ -75,6 +86,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             subviews.Add(daterangeCriteria);
 
             var subjectMessageCriteria = new DocumentSubjectMessageSearchView(Context);
+            subjectMessageCriteria.BackPressed += EditorText_BackPressed;
             subviews.Add(subjectMessageCriteria);
 
             var fromToCriteria = new DocumentFromToSearchView(Context);
@@ -106,10 +118,44 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return rootView;
         }
 
+        void EditorText_BackPressed(object sender, EventArgs e)
+        {
+            //TODO to be completed
+        }
+
+        void ContainerLinearLayout_FocusChange(object sender, View.FocusChangeEventArgs e)
+        {
+            CommonConfig.Logger.Error($" --- STATUS ---- : {e.HasFocus} ");
+
+            UpdateFabVisibility();
+        }
+
+        public void OnBackButtonPressed()
+        {
+            containerLinearLayout.RequestFocus();
+            UpdateFabVisibility();
+        }
+
+        void UpdateFabVisibility()
+        {
+            if (containerLinearLayout.HasFocus)
+            {
+                fab.Visibility = ViewStates.Visible;
+            }
+            else
+            {
+                fab.Visibility = ViewStates.Gone;
+            }
+        }
+
         void HandleSearchButtonClicked()
         {
-            subviews.ForEach(v => v.UpdateCriteria());
+            CollectCriterias();
+        }
 
+        void CollectCriterias()
+        {
+            subviews.ForEach(v => v.UpdateCriteria());
         }
 
         public void PrepareEditableTextRow()
@@ -199,6 +245,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void Reset()
         {
             searchCriteria = new SearchDocumentsCriteria();
+            containerLinearLayout.RequestFocus();
+            ((InputMethodManager)Context.GetSystemService(Android.Content.Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
             RefreshViews();
         }
 
@@ -237,6 +285,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
+            CollectCriterias();
+
             return new DocumentSearchCriteriaFragmentState
             {
                 Criteria = searchCriteria,

@@ -12,6 +12,7 @@ using Android.Views;
 using Android.Views.InputMethods;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
+using System;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
@@ -20,6 +21,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         readonly protected AppCompatSpinner Spinner;
         readonly protected AppCompatTextView TopTextView;
         readonly protected AppCompatEditText BottomEditText;
+
+        public event EventHandler BackPressed = delegate { };
 
         protected AbstractMultiSearchView(Android.Content.Context context,
                                          int topTextResId,
@@ -113,6 +116,26 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 }
             };
             rightLayout.AddView(BottomEditText);
+        }
+
+        class CustomEditText : AppCompatEditText
+        {
+            public event EventHandler BackPressed = delegate { };
+
+
+            public CustomEditText(Android.Content.Context context) : base(context)
+            {
+            }
+
+            public override bool OnKeyPreIme(Keycode keyCode, KeyEvent e)
+            {
+                if ((keyCode == Keycode.Back) && (e.Action == KeyEventActions.Up))
+                {
+                    BackPressed(this, EventArgs.Empty);
+                }
+
+                return base.OnKeyPreIme(keyCode, e);
+            }
         }
     }
 }

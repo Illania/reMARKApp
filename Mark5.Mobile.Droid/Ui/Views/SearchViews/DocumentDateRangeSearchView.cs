@@ -155,6 +155,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 fromTimestamp = Criteria.DateRange.StartTimestamp;
                 toTimestamp = Criteria.DateRange.EndTimestamp;
             }
+            else
+            {
+                fromTimestamp = -1;
+                toTimestamp = -1;
+            }
 
             UpdateText();
         }
@@ -163,7 +168,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         {
             Criteria.DateRange = new DateRange
             {
-                Enabled = fromTimestamp != -1 && toTimestamp != -1,
+                Enabled = fromTimestamp != -1 || toTimestamp != -1,
                 StartTimestamp = fromTimestamp,
                 EndTimestamp = toTimestamp
             };

@@ -13,36 +13,15 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
-    public class DocumentCategoriesSearchView : AbstractDropdownSearchView<SearchDocumentsCriteria>
+    public class DocumentCategoriesSearchView : AbstractCategoriesSearchView<SearchDocumentsCriteria>
     {
         readonly List<int> selectedCategoryIds = new List<int>();
 
-        public DocumentCategoriesSearchView(Context context, DocumentSearchCriteriaFragment documentSearchCriteriaFragment)
-            : base(context, Resource.String.search_categories, Resource.String.search_categories_none, documentSearchCriteriaFragment)
+        public DocumentCategoriesSearchView(Context context, ISearchCriteriaFragment fragment)
+            : base(context, fragment, ObjectType.Document)
         {
         }
 
-        protected override void ClickAction()
-        {
-            var pclf = new PickCategoriesListFragment
-            {
-                ObjectType = ObjectType.Document,
-                PreselectedCategoryIds = selectedCategoryIds.ToArray(),
-                CloseRequest = UpdateCategories
-            };
-
-            ParentFragment.ReplaceFragment(pclf, pclf.GenerateTag());
-        }
-
-        void UpdateCategories(List<Category> categories) => UpdateCategories(categories.Select(c => c.Id).ToList());
-
-        void UpdateCategories(List<int> categoriesId)
-        {
-            selectedCategoryIds.Clear();
-            selectedCategoryIds.AddRange(categoriesId);
-            UpdateBottomTextView(categoriesId.Count);
-            UpdateCriteria();
-        }
 
         public override void Refresh()
         {

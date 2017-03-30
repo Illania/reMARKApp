@@ -17,11 +17,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
     {
         readonly protected AppCompatTextView BottomTextView;
         readonly protected AppCompatTextView TextView;
-        readonly protected DocumentSearchCriteriaFragment ParentFragment;
+        readonly protected ISearchCriteriaFragment ParentFragment;
 
         readonly string emptyText;
 
-        protected AbstractDropdownSearchView(Context context, int titleResId, int emptyResId, DocumentSearchCriteriaFragment f) : base(context)
+        protected AbstractDropdownSearchView(Context context, int titleResId, int emptyResId, ISearchCriteriaFragment f) : base(context)
         {
             ParentFragment = f;
             emptyText = context.GetString(emptyResId);

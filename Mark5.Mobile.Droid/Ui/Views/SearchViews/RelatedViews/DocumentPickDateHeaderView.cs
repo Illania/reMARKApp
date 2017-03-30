@@ -60,7 +60,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 },
             };
             fromLayout.Clickable = true;
-            fromLayout.Click += FromClicked;
+            fromLayout.Click += FromClicked; //TODO for now they don't work, so the flow is one directional
             fromLayout.SetPadding(0, mediumPaddingValue, 0, mediumPaddingValue);
             AddView(fromLayout);
 
