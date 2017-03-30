@@ -52,6 +52,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 documentSplitViewController,
                 contactSplitViewController,
+                Dummy,
                 shortcodeSplitViewController,
                 settingsNavigationController
             };

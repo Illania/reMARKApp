@@ -22,7 +22,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class ShortcodesSearchCriteriaViewController : AbstractViewController
     {
 
-        const float BottomViewSize = 80f;
+        const float BottomViewSize = 64f;
 
         UIBarButtonItem closeItem;
         UIBarButtonItem resetItem;
@@ -89,7 +89,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             scrollView.AddSubview(stackView);
 
             var const1 = NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1f, 0f);
-            const1.Priority = 500f;
+            const1.Priority = 999f;
             var const2 = NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Width, NSLayoutRelation.LessThanOrEqual, 1f, 500f);
             const2.Priority = 1000f;
 
@@ -121,15 +121,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 BackgroundColor = Theme.LightBlue,
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 ClipsToBounds = true,
-                ContentEdgeInsets = new UIEdgeInsets(15f, 15f, 15f, 15f)
+                ContentEdgeInsets = new UIEdgeInsets(12f, 12f, 12f, 12f)
             };
             searchButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "search_large.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-            searchButton.Layer.CornerRadius = 30f;
+            searchButton.Layer.CornerRadius = 25f;
             bottomView.AddSubview(searchButton);
             bottomView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60f),
-                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 60f),
+                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 50f),
+                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 50f),
                 NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, bottomView, NSLayoutAttribute.CenterX, 1f, 0f),
                 NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, bottomView, NSLayoutAttribute.CenterY, 1f, 0f)
             });

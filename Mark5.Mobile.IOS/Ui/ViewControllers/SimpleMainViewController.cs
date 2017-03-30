@@ -5,10 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
 using System.IO;
-using System.Linq;
-using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -17,7 +14,7 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
 
-    public class SimpleMainViewController : AbstractMainViewController, IUITabBarControllerDelegate
+    public class SimpleMainViewController : AbstractMainViewController
     {
 
         NavigationController documentsNavigationController;
@@ -53,43 +50,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             settingsNavigationController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "settings-filled.png"));
             settingsNavigationController.Tag = SettingsTag;
 
-            Delegate = this;
-
-            var tabsOrder = PlatformConfig.Preferences.MainTabsOrder;
-            if (tabsOrder != null && tabsOrder.Length == 6)
+            ViewControllers = new UIViewController[]
             {
-                ViewControllers = new ITaggedViewController[]
-                {
                     documentsNavigationController,
                     contactsNavigationController,
+                    Dummy,
                     shortcodesNavigationController,
                     settingsNavigationController
-                }.OrderBy(vc => Array.IndexOf(tabsOrder, vc.Tag)).OfType<UIViewController>().ToArray();
+            };
 
-                var indexOfDocuments = Array.IndexOf(ViewControllers, documentsNavigationController);
-                if (indexOfDocuments < 0) indexOfDocuments = 0;
-                SelectedIndex = indexOfDocuments;
-            }
-            else
-            {
-                ViewControllers = new UIViewController[]
-                {
-                    documentsNavigationController,
-                    contactsNavigationController,
-                    shortcodesNavigationController,
-                    settingsNavigationController
-                };
-
-                SelectedIndex = 0;
-            }
-        }
-
-        [Export("tabBarController:didEndCustomizingViewControllers:changed:")]
-        public void FinishedCustomizingViewControllers2(UITabBarController tbc, UIViewController[] vcs, bool changed)
-        {
-            if (!changed) return;
-
-            PlatformConfig.Preferences.MainTabsOrder = vcs.OfType<ITaggedViewController>().Select(vc => vc.Tag).ToArray();
+            SelectedIndex = 0;
         }
     }
 }

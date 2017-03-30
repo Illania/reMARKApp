@@ -205,13 +205,13 @@
 "search_categories" = "Categories";
 "search_comments" = "Comments";
 "search_company" = "Company";
-"search_contact_name" = "Search name";
 "search_country" = "Country";
 "search_dash" = "-";
 "search_department" = "Department";
 "search_description" = "Description";
 "search_draft" = "Draft";
 "search_email_number_etc" = "Search emails, phone numers etc.";
+"search_emails" = "Search emails";
 "search_enter_address" = "Enter address...";
 "search_enter_search_text" = "Enter search text...";
 "search_extra_fields" = "Extra fields";
@@ -222,9 +222,10 @@
 "search_incoming" = "Inbox";
 "search_lines" = "Mailbox";
 "search_message" = "Message";
+"search_name" = "Search name";
 "search_outgoing" = "Outbox";
 "search_person" = "Person";
-"search_physical_address" = "Address";
+"search_physical_address" = "Post address";
 "search_priority" = "Priority";
 "search_ref" = "Reference no.";
 "search_results" = "Search results";
