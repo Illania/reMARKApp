@@ -250,7 +250,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         abstract class AbstractSearchView : UIStackView
         {
 
-            protected const float CorderRadius = 4f;
+            protected const float CornerRadius = 4f;
             protected const float InnerMargin = 2f;
             protected const float AnimationLength = .1f;
 
@@ -314,7 +314,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     AdjustsFontSizeToFitWidth = true
                 };
                 allView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
-                allView.Layer.CornerRadius = CorderRadius;
+                allView.Layer.CornerRadius = CornerRadius;
                 allView.Layer.MasksToBounds = true;
                 AddArrangedSubview(allView);
 
@@ -331,7 +331,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     AdjustsFontSizeToFitWidth = true
                 };
                 inboxView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
-                inboxView.Layer.CornerRadius = CorderRadius;
+                inboxView.Layer.CornerRadius = CornerRadius;
                 inboxView.Layer.MasksToBounds = true;
                 AddArrangedSubview(inboxView);
 
@@ -348,7 +348,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     AdjustsFontSizeToFitWidth = true
                 };
                 outboxView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
-                outboxView.Layer.CornerRadius = CorderRadius;
+                outboxView.Layer.CornerRadius = CornerRadius;
                 outboxView.Layer.MasksToBounds = true;
                 AddArrangedSubview(outboxView);
 
@@ -365,7 +365,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     AdjustsFontSizeToFitWidth = true
                 };
                 draftView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
-                draftView.Layer.CornerRadius = CorderRadius;
+                draftView.Layer.CornerRadius = CornerRadius;
                 draftView.Layer.MasksToBounds = true;
                 AddArrangedSubview(draftView);
             }
@@ -430,7 +430,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     BackgroundColor = InactiveBackgroundColor
                 };
-                mainView.Layer.CornerRadius = CorderRadius;
+                mainView.Layer.CornerRadius = CornerRadius;
                 mainView.Layer.MasksToBounds = true;
 
                 var icon = new UIImageView
@@ -545,7 +545,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     BackgroundColor = InactiveBackgroundColor
                 };
-                mainView.Layer.CornerRadius = CorderRadius;
+                mainView.Layer.CornerRadius = CornerRadius;
                 mainView.Layer.MasksToBounds = true;
 
                 var icon = new UIImageView
@@ -673,7 +673,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     BackgroundColor = InactiveBackgroundColor
                 };
-                mainView.Layer.CornerRadius = CorderRadius;
+                mainView.Layer.CornerRadius = CornerRadius;
                 mainView.Layer.MasksToBounds = true;
 
                 fromView = new UIView
@@ -973,7 +973,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     BackgroundColor = InactiveBackgroundColor,
                     UserInteractionEnabled = true
                 };
-                lineView.Layer.CornerRadius = CorderRadius;
+                lineView.Layer.CornerRadius = CornerRadius;
                 lineView.Layer.MasksToBounds = true;
                 lineView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
@@ -1021,7 +1021,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     BackgroundColor = InactiveBackgroundColor,
                     UserInteractionEnabled = true
                 };
-                categoriesView.Layer.CornerRadius = CorderRadius;
+                categoriesView.Layer.CornerRadius = CornerRadius;
                 categoriesView.Layer.MasksToBounds = true;
                 categoriesView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
@@ -1071,7 +1071,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     BackgroundColor = InactiveBackgroundColor,
                     UserInteractionEnabled = true
                 };
-                priorityView.Layer.CornerRadius = CorderRadius;
+                priorityView.Layer.CornerRadius = CornerRadius;
                 priorityView.Layer.MasksToBounds = true;
                 priorityView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
@@ -1166,7 +1166,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     BackgroundColor = InactiveBackgroundColor,
                     UserInteractionEnabled = true
                 };
-                referenceView.Layer.CornerRadius = CorderRadius;
+                referenceView.Layer.CornerRadius = CornerRadius;
                 referenceView.Layer.MasksToBounds = true;
                 referenceView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
@@ -1216,7 +1216,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     BackgroundColor = InactiveBackgroundColor,
                     UserInteractionEnabled = true
                 };
-                commentView.Layer.CornerRadius = CorderRadius;
+                commentView.Layer.CornerRadius = CornerRadius;
                 commentView.Layer.MasksToBounds = true;
                 commentView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
@@ -1266,7 +1266,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     BackgroundColor = InactiveBackgroundColor,
                     UserInteractionEnabled = true
                 };
-                attachmentNameView.Layer.CornerRadius = CorderRadius;
+                attachmentNameView.Layer.CornerRadius = CornerRadius;
                 attachmentNameView.Layer.MasksToBounds = true;
                 attachmentNameView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
@@ -1430,22 +1430,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         class ExtraFieldsView : AbstractSearchView
         {
 
-            readonly UIView referenceView;
-            readonly UILabel referenceLabel;
-            readonly UITextField referenceTextField;
+            readonly UIView view;
+            readonly UILabel label;
+            readonly UITextField text;
 
             public ExtraFieldsView()
             {
-                referenceView = new UIView
+                view = new UIView
                 {
                     BackgroundColor = InactiveBackgroundColor,
                     UserInteractionEnabled = true
                 };
-                referenceView.Layer.CornerRadius = CorderRadius;
-                referenceView.Layer.MasksToBounds = true;
-                referenceView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
+                view.Layer.CornerRadius = CornerRadius;
+                view.Layer.MasksToBounds = true;
+                view.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                referenceLabel = new UILabel
+                label = new UILabel
                 {
                     Text = Localization.GetString("search_extra_fields"),
                     TextColor = LabelTextColor,
@@ -1458,7 +1458,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                referenceTextField = new UITextField
+                text = new UITextField
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
                     TextColor = InactiveTextColor,
@@ -1469,34 +1469,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     UserInteractionEnabled = false,
                     WeakDelegate = this
                 };
-                referenceTextField.AddTarget(this, new Selector("textFieldDidChange:"), UIControlEvent.EditingChanged);
-                referenceView.Add(referenceLabel);
-                referenceView.Add(referenceTextField);
-                referenceView.AddConstraints(new[]
+                text.AddTarget(this, new Selector("textFieldDidChange:"), UIControlEvent.EditingChanged);
+                view.Add(label);
+                view.Add(text);
+                view.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(referenceLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Top, 1f, 4f),
-                    NSLayoutConstraint.Create(referenceLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(referenceLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(referenceTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, referenceLabel, NSLayoutAttribute.Bottom, 1f, 2f),
-                    NSLayoutConstraint.Create(referenceTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(referenceTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(referenceTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Bottom, 1f, -4f),
-                    NSLayoutConstraint.Create(referenceLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, referenceTextField, NSLayoutAttribute.Height, 1f, 0f)
+                    NSLayoutConstraint.Create(label, NSLayoutAttribute.Top, NSLayoutRelation.Equal, view, NSLayoutAttribute.Top, 1f, 4f),
+                    NSLayoutConstraint.Create(label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, view, NSLayoutAttribute.Left, 1f, 4f),
+                    NSLayoutConstraint.Create(label, NSLayoutAttribute.Right, NSLayoutRelation.Equal, view, NSLayoutAttribute.Right, 1f, -4f),
+                    NSLayoutConstraint.Create(text, NSLayoutAttribute.Top, NSLayoutRelation.Equal, label, NSLayoutAttribute.Bottom, 1f, 2f),
+                    NSLayoutConstraint.Create(text, NSLayoutAttribute.Left, NSLayoutRelation.Equal, view, NSLayoutAttribute.Left, 1f, 4f),
+                    NSLayoutConstraint.Create(text, NSLayoutAttribute.Right, NSLayoutRelation.Equal, view, NSLayoutAttribute.Right, 1f, -4f),
+                    NSLayoutConstraint.Create(text, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, view, NSLayoutAttribute.Bottom, 1f, -4f),
+                    NSLayoutConstraint.Create(label, NSLayoutAttribute.Height, NSLayoutRelation.Equal, text, NSLayoutAttribute.Height, 1f, 0f)
                 });
 
-                AddArrangedSubview(referenceView);
+                AddArrangedSubview(view);
             }
 
             protected override void UpdateRow()
             {
-                referenceTextField.Text = Criteria.ExtraFields;
+                text.Text = Criteria.ExtraFields;
             }
 
             [Export("tapped:")]
             void Tapped(UITapGestureRecognizer recognizer)
             {
-                referenceTextField.UserInteractionEnabled = true;
-                referenceTextField.BecomeFirstResponder();
+                text.UserInteractionEnabled = true;
+                text.BecomeFirstResponder();
 
                 UpdateRow();
             }
@@ -1518,8 +1518,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             [Export("textFieldDidEndEditing:")]
             void TextFieldDidEndEditing(UITextField textField)
             {
-                referenceTextField.ResignFirstResponder();
-                referenceTextField.UserInteractionEnabled = false;
+                text.ResignFirstResponder();
+                text.UserInteractionEnabled = false;
             }
         }
 
@@ -1544,7 +1544,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     AdjustsFontSizeToFitWidth = true
                 };
                 attachmentsView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
-                attachmentsView.Layer.CornerRadius = CorderRadius;
+                attachmentsView.Layer.CornerRadius = CornerRadius;
                 attachmentsView.Layer.MasksToBounds = true;
                 AddArrangedSubview(attachmentsView);
 
@@ -1561,7 +1561,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     AdjustsFontSizeToFitWidth = true
                 };
                 unreadView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
-                unreadView.Layer.CornerRadius = CorderRadius;
+                unreadView.Layer.CornerRadius = CornerRadius;
                 unreadView.Layer.MasksToBounds = true;
                 AddArrangedSubview(unreadView);
             }
@@ -1607,7 +1607,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     AdjustsFontSizeToFitWidth = true
                 };
                 allView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
-                allView.Layer.CornerRadius = CorderRadius;
+                allView.Layer.CornerRadius = CornerRadius;
                 allView.Layer.MasksToBounds = true;
                 AddArrangedSubview(allView);
 
@@ -1624,7 +1624,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     AdjustsFontSizeToFitWidth = true
                 };
                 handledView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
-                handledView.Layer.CornerRadius = CorderRadius;
+                handledView.Layer.CornerRadius = CornerRadius;
                 handledView.Layer.MasksToBounds = true;
                 AddArrangedSubview(handledView);
 
@@ -1641,7 +1641,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     AdjustsFontSizeToFitWidth = true
                 };
                 unhadledView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
-                unhadledView.Layer.CornerRadius = CorderRadius;
+                unhadledView.Layer.CornerRadius = CornerRadius;
                 unhadledView.Layer.MasksToBounds = true;
                 AddArrangedSubview(unhadledView);
             }
