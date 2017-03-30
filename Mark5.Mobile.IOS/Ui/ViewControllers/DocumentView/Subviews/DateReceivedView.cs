@@ -14,7 +14,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
     public class DateReceivedView : TextSubView
     {
         public DateReceivedView()
-            : base(Localization.GetString("date_received"))
+            : base(Localization.GetString("date"))
         {
         }
 
