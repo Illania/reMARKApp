@@ -9,19 +9,18 @@ using Mark5.Mobile.IOS.Ui.Common;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 {
-    public class SubjectView : TextSubView
+    
+    public class SubjectView : LargeTextSubView
     {
+        
         public SubjectView()
-            : base(Localization.GetString("subject"))
         {
         }
 
         public override void RefreshView()
         {
             if (DocumentPreview != null)
-            {
                 TextView.Text = DocumentPreview.Subject;
-            }
         }
 
         public override void UpdateVisibility()

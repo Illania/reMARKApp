@@ -299,6 +299,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var viewsBeforeContent = new List<DocumentSubView>();
             var viewsAfterContent = new List<DocumentSubView>();
+            
+            subjectView = new SubjectView();
+            viewsBeforeContent.Add(subjectView);
 
             fromView = new FromView();
             viewsBeforeContent.Add(fromView);
@@ -311,9 +314,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             bccView = new BccView();
             viewsBeforeContent.Add(bccView);
-
-            subjectView = new SubjectView();
-            viewsBeforeContent.Add(subjectView);
 
             dateReceivedView = new DateReceivedView();
             viewsBeforeContent.Add(dateReceivedView);
