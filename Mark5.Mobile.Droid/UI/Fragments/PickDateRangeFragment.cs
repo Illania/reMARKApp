@@ -25,7 +25,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickDateRangeFragment : RetainableStateFragment
     {
-        DocumentPickDateHeaderView dateView;
+        DocumentPickDateHeaderView dateHeaderView;
 
         CalendarView fromDatePicker;
         CalendarView toDatePicker;
@@ -46,8 +46,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.SetBackgroundColor(Color.Transparent);
             containerLinearLayout.LayoutTransition = new LayoutTransition();
 
-            dateView = new DocumentPickDateHeaderView(Context);
-            containerLinearLayout.AddView(dateView);
+            dateHeaderView = new DocumentPickDateHeaderView(Context);
+            dateHeaderView.FromClicked += DateView_FromClicked;
+            dateHeaderView.ToClicked += DateView_ToClicked;
+            containerLinearLayout.AddView(dateHeaderView);
 
             fromDatePicker = new CalendarView(Context);
             fromDatePicker.LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
@@ -104,12 +106,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        void DateView_FromClicked(object sender, EventArgs e)
+        {
+            if (fromDatePicker.Visibility == ViewStates.Visible)
+                return;
+
+            SelectFrom();
+        }
+
+        void DateView_ToClicked(object sender, EventArgs e)
+        {
+            if (toDatePicker.Visibility == ViewStates.Visible)
+                return;
+
+            SelectTo();
+        }
+
         void SelectFrom()
         {
             fromDatePicker.Visibility = ViewStates.Visible;
             toDatePicker.Visibility = ViewStates.Gone;
 
-            dateView.PickFrom();
+            dateHeaderView.PickFrom();
         }
 
         void SelectTo()
@@ -117,7 +135,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fromDatePicker.Visibility = ViewStates.Gone;
             toDatePicker.Visibility = ViewStates.Visible;
 
-            dateView.PickTo();
+            dateHeaderView.PickTo();
         }
 
         void FromDatePicker_DateChange(object sender, CalendarView.DateChangeEventArgs e)
@@ -140,8 +158,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void UpdateText()
         {
-            dateView.SetToText(ToTimestamp);
-            dateView.SetFromText(FromTimestamp);
+            dateHeaderView.SetToText(ToTimestamp);
+            dateHeaderView.SetFromText(FromTimestamp);
         }
 
         void UpdateDatePickersLimits()

@@ -48,8 +48,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.ShowDividers = LinearLayoutCompat.ShowDividerMiddle;
 
             fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
-            fab.SetImageResource(Resource.Drawable.action_search_server);
-            fab.SetOnClickListener(new ActionOnClickListener(HandleAction));
+
+            var fabIcon = Resources.GetDrawable(Resource.Drawable.action_search_server, null).GetConstantState().NewDrawable();
+            fabIcon.Mutate().SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)), PorterDuff.Mode.Multiply);
+
+            fab.SetImageDrawable(fabIcon);
+            fab.SetOnClickListener(new ActionOnClickListener(HandleSearchButtonClicked));
+            fab.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightblue)));
             fab.Visibility = ViewStates.Visible;
 
             var p = (CoordinatorLayout.LayoutParams)fab.LayoutParameters;
@@ -71,6 +76,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var fromToCriteria = new DocumentFromToSearchView(Context);
             subviews.Add(fromToCriteria);
 
+            var extraFieldsCriteria = new DocumentExtraFieldsSearchView(Context);
+            subviews.Add(extraFieldsCriteria);
+
             var attUnreadCriteria = new DocumentAttachmentUnreadSearchView(Context);
             subviews.Add(attUnreadCriteria);
 
@@ -83,6 +91,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.AddView(daterangeCriteria);
             PrepareEditableTextRow();
             PrepareDropdownTextRow();
+            containerLinearLayout.AddView(extraFieldsCriteria); //TODO need to add conditional
             containerLinearLayout.AddView(attUnreadCriteria);
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
                 containerLinearLayout.AddView(handledCriteria);
@@ -92,8 +101,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return rootView;
         }
 
-        void HandleAction()
+        void HandleSearchButtonClicked()
         {
+            subviews.ForEach(v => v.UpdateCriteria());
 
         }
 
@@ -187,21 +197,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             RefreshViews();
         }
 
-        public void PushDropdownViewFragment(Fragment f, string tag)
-        {
-            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
-
-            fragmentManager.BeginTransaction()
-                                       .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
-                                       .Replace(Resource.Id.fragment_container, f, tag)
-                                       .AddToBackStack(tag)
-                                       .Commit();
-        }
-
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Clear();
-            var item = menu.Add(Menu.None, 10, 10, Resource.String.done);
+            var item = menu.Add(Menu.None, 10, 10, Resource.String.reset);
             item.SetShowAsAction(ShowAsAction.Always);
         }
 
@@ -215,6 +214,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             return base.OnOptionsItemSelected(item);
         }
+
+
+        public void ReplaceFragment(Fragment f, string tag)
+        {
+            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
+
+            fragmentManager.BeginTransaction()
+                                       .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
+                                       .Replace(Resource.Id.fragment_container, f, tag)
+                                       .AddToBackStack(tag)
+                                       .Commit();
+        }
+
 
         #region Retained State
 
@@ -240,15 +252,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return $"{nameof(DocumentSearchCriteriaFragment)}";
         }
 
-
         class DocumentSearchCriteriaFragmentState : IRetainableState
         {
             public SearchDocumentsCriteria Criteria { get; set; }
         }
+
         #endregion
     }
-
-
-
-
 }

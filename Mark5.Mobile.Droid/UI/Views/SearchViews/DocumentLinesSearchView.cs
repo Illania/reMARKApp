@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Common
 // File: DocumentLinesSearchView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
@@ -29,7 +29,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 CloseRequest = UpdateLines,
             };
 
-            ParentFragment.PushDropdownViewFragment(pllf, pllf.GenerateTag());
+            ParentFragment.ReplaceFragment(pllf, pllf.GenerateTag());
         }
 
         void UpdateLines(List<Guid> lineGuids)

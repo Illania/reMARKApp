@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: DocumentCategoriesSearchView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
@@ -31,7 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 CloseRequest = UpdateCategories
             };
 
-            ParentFragment.PushDropdownViewFragment(pclf, pclf.GenerateTag());
+            ParentFragment.ReplaceFragment(pclf, pclf.GenerateTag());
         }
 
         void UpdateCategories(List<Category> categories) => UpdateCategories(categories.Select(c => c.Id).ToList());

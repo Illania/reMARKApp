@@ -42,8 +42,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             return true;
         }
 
+        void ResetButtonsState()
+        {
+            allButton.UpdateSelectedState(false);
+            handledButton.UpdateSelectedState(false);
+            unHandledButton.UpdateSelectedState(false);
+        }
+
         public override void Refresh()
         {
+            ResetButtonsState();
+
             if (Criteria.Handled == null)
                 allButton.UpdateSelectedState(true);
 

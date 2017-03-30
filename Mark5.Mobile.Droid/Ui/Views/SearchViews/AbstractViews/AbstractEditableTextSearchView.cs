@@ -26,7 +26,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         readonly string emptyText;
 
-        protected AbstractEditableTextSearchView(Context context, int topTextResId, LinearLayoutCompat containerLayout) : base(context)
+        protected AbstractEditableTextSearchView(Context context, int topTextResId, LinearLayoutCompat containerLayout = null) : base(context)
         {
             this.containerLayout = containerLayout;
             emptyText = context.GetString(Resource.String.search_editable_empty);
@@ -90,6 +90,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             var cancelIconView = new AppCompatImageView(context)
             {
                 LayoutParameters = new LayoutParams(cancelIconSize, cancelIconSize)
+                {
+                    RightMargin = ConversionUtils.ConvertDpToPixels(4),
+                }
             };
             cancelIconView.SetImageResource(Resource.Drawable.cross); //TODO new icon?
             cancelIconView.SetColorFilter(Color.White);
@@ -119,6 +122,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         void CancelIconLayout_Click(object sender, EventArgs e)
         {
+            Collapse();
+
+            if (containerLayout == null)
+                return;
+
             for (int i = 0; i < containerLayout.ChildCount; i++)
             {
                 var view = containerLayout.GetChildAt(i) as AbstractEditableTextSearchView<T>;
@@ -127,8 +135,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                     view.Visibility = ViewStates.Visible;
                 }
             }
-
-            Collapse();
         }
 
         void PrepareViewsExpansion()
@@ -141,20 +147,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 bottomEditText.Text = bottomTextView.Text;
             }
 
+            Expand();
+
+            if (containerLayout == null)
+                return;
+
             for (int i = 0; i < containerLayout.ChildCount; i++)
             {
                 var view = containerLayout.GetChildAt(i) as AbstractEditableTextSearchView<T>;
-                if (view != null)
+                if (view != this)
                 {
-                    if (view == this)
-
-                    {
-                        view.Expand();
-                    }
-                    else
-                    {
-                        view.Visibility = ViewStates.Gone;
-                    }
+                    view.Visibility = ViewStates.Gone;
                 }
             }
         }

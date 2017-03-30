@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: DocumentDateRangeSearchView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
@@ -111,7 +111,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 StartWithToDate = startWithTo,
                 CloseRequest = UpdateTimestamps,
             };
-            parentFragment.PushDropdownViewFragment(f, f.GenerateTag());
+            parentFragment.ReplaceFragment(f, f.GenerateTag());
         }
 
         void UpdateTimestamps(long fromT, long toT)

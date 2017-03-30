@@ -341,6 +341,7 @@
     <Compile Include="Utilities\UI.cs" />
     <Compile Include="Ui\Fragments\PickDateRangeFragment.cs" />
     <Compile Include="Ui\Views\SearchViews\RelatedViews\DocumentPickDateHeaderView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentExtraFieldsSearchView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

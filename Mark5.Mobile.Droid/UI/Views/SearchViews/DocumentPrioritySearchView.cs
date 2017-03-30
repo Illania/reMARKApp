@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: DocumentPrioritySearchView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
@@ -28,7 +28,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 CloseRequest = UpdatePriorities
             };
 
-            ParentFragment.PushDropdownViewFragment(pllf, pllf.GenerateTag());
+            ParentFragment.ReplaceFragment(pllf, pllf.GenerateTag());
         }
 
         void UpdatePriorities(List<Priority> priorities)
