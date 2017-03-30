@@ -15,13 +15,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public class DocumentCategoriesSearchView : AbstractCategoriesSearchView<SearchDocumentsCriteria>
     {
-        readonly List<int> selectedCategoryIds = new List<int>();
-
         public DocumentCategoriesSearchView(Context context, ISearchCriteriaFragment fragment)
             : base(context, fragment, ObjectType.Document)
         {
         }
-
 
         public override void Refresh()
         {

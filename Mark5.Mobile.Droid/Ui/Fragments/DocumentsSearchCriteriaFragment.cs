@@ -28,11 +28,6 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public interface ISearchCriteriaFragment
-    {
-        void ReplaceFragment(Fragment f, string tag);
-    }
-
     public class DocumentSearchCriteriaFragment : RetainableStateFragment, ISearchCriteriaFragment
     {
         SearchDocumentsCriteria searchCriteria;
@@ -57,8 +52,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.ShowDividers = LinearLayoutCompat.ShowDividerMiddle;
             containerLinearLayout.Focusable = true;
             containerLinearLayout.FocusableInTouchMode = true;
-            containerLinearLayout.RequestFocus();
-            containerLinearLayout.FocusChange += ContainerLinearLayout_FocusChange;
+            containerLinearLayout.RequestFocus(); //TODO
+            containerLinearLayout.FocusChange += ContainerLinearLayout_FocusChange; //TODO
 
             var paddingLinearLayout = ConversionUtils.ConvertDpToPixels(12);
             var bottomPadding = ConversionUtils.ConvertDpToPixels(56) + (Resources.GetDimension(Resource.Dimension.fab_margin) + 2) * 2;
@@ -314,4 +309,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
     }
+
+    public interface ISearchCriteriaFragment
+    {
+        void ReplaceFragment(Fragment f, string tag);
+    }
+
 }

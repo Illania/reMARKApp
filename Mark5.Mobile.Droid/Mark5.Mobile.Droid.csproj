@@ -343,6 +343,10 @@
     <Compile Include="Ui\Views\SearchViews\RelatedViews\DocumentPickDateHeaderView.cs" />
     <Compile Include="Ui\Views\SearchViews\DocumentExtraFieldsSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\AbstractViews\AbstractCategoriesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactTypeSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactShortIdSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactDescriptionSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactPostAddressSearchView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

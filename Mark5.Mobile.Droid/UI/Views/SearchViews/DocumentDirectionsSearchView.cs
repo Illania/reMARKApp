@@ -14,10 +14,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public class DocumentDirectionsSearchView : AbstractButtonsSearchView<SearchDocumentsCriteria>
     {
-        CustomButton allButton;
-        CustomButton inboxButton;
-        CustomButton outboxButton;
-        CustomButton draftButton;
+        readonly CustomButton allButton;
+        readonly CustomButton inboxButton;
+        readonly CustomButton outboxButton;
+        readonly CustomButton draftButton;
 
         public DocumentDirectionsSearchView(Android.Content.Context context) : base(context)
         {

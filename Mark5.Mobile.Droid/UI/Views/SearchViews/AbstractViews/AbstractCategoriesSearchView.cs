@@ -15,7 +15,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public abstract class AbstractCategoriesSearchView<T> : AbstractDropdownSearchView<T>
     {
-        readonly List<int> selectedCategoryIds = new List<int>();
+        protected readonly List<int> selectedCategoryIds = new List<int>();
         readonly ObjectType objectType;
 
         public AbstractCategoriesSearchView(Context context, ISearchCriteriaFragment fragment, ObjectType type)

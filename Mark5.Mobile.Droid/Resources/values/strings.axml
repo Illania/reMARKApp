@@ -181,6 +181,9 @@
 	<string name="search_lines">Lines</string>
 	<string name="search_priorities">Priorities</string>
 	<string name="search_categories_none">Any</string>
+	<string name="search_contact_person">Person</string>
+	<string name="search_contact_department">Department</string>
+	<string name="search_contact_company">Company</string>
 	<string name="search_contact_com_address">Communication address</string>
 	<string name="search_contact_comment">Comment</string>
 	<string name="search_contact_country">Country</string>
