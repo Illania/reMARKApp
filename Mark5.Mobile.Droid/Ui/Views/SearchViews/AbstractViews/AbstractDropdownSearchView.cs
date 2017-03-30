@@ -62,6 +62,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             }
         }
 
+        public void UpdateBottomTextView(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                Reset();
+            }
+            else
+            {
+                BottomTextView.Text = text;
+            }
+        }
+
         void Reset()
         {
             BottomTextView.Text = emptyText;

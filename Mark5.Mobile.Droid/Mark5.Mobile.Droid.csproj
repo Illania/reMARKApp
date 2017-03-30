@@ -347,6 +347,9 @@
     <Compile Include="Ui\Views\SearchViews\ContactShortIdSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactDescriptionSearchView.cs" />
     <Compile Include="Ui\Views\SearchViews\ContactPostAddressSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactCategoriesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactCountrySearchView.cs" />
+    <Compile Include="Ui\Fragments\PickCountryFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -632,6 +635,7 @@
     <AndroidResource Include="Resources\drawable-xhdpi\cross.png" />
     <AndroidResource Include="Resources\drawable-hdpi\cross.png" />
     <AndroidResource Include="Resources\transition\search_date_transition.axml" />
+    <AndroidResource Include="Resources\layout\search_list_item_country.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\anim\" />
