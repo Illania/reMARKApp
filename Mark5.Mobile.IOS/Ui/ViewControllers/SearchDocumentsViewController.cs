@@ -6,6 +6,7 @@
 // Copyright (c) 2017 Nordic IT
 //
 using System;
+using System.IO;
 using System.Linq;
 using CoreGraphics;
 using Foundation;
@@ -90,6 +91,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             stackView.AddArrangedSubview(new DateRangeView());
             stackView.AddArrangedSubview(new LineCategoriesPriorityNameView());
             stackView.AddArrangedSubview(new ReferenceCommentsAttachmentNameView());
+            // TODO if (ServerConfig.SystemSettings.DocumentsModuleInfo.ExtraFieldInfos.Any())
+            stackView.AddArrangedSubview(new ExtraFieldsView());
             stackView.AddArrangedSubview(new AttachmentsUnreadSearchView());
             // TODO if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
             stackView.AddArrangedSubview(new HandledSearchView());
@@ -138,8 +141,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             protected const float InnerMargin = 2f;
             protected const float AnimationLength = .1f;
 
-            public virtual float RowHeight { get { return 50f; } }
-
             protected static readonly UIColor LabelTextColor = Theme.LightBlue;
             protected static readonly UIColor InactiveTextColor = Theme.LightGray;
             protected static readonly UIColor ActiveTextColor = Theme.DarkerBlue;
@@ -151,7 +152,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             protected AbstractSearchView()
             {
-                AddConstraint(NSLayoutConstraint.Create(this, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, RowHeight));
+                AddConstraint(NSLayoutConstraint.Create(this, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 50f));
 
                 Axis = UILayoutConstraintAxis.Horizontal;
                 Alignment = UIStackViewAlignment.Fill;
@@ -180,8 +181,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         class DocumentDirectionSearchView : AbstractSearchView
         {
 
-            public override float RowHeight { get { return 40f; } }
-
             readonly UILabel allView;
             readonly UILabel inboxView;
             readonly UILabel outboxView;
@@ -191,7 +190,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 allView = new UILabel
                 {
-                    Text = "ALL",
+                    Text = Localization.GetString("search_all").ToUpper(),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
@@ -208,7 +207,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 inboxView = new UILabel
                 {
-                    Text = "INBOX",
+                    Text = Localization.GetString("search_incoming").ToUpper(),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
@@ -225,7 +224,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 outboxView = new UILabel
                 {
-                    Text = "OUTBOX",
+                    Text = Localization.GetString("search_outgoing").ToUpper(),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
@@ -242,7 +241,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 draftView = new UILabel
                 {
-                    Text = "DRAFT",
+                    Text = Localization.GetString("search_draft").ToUpper(),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
@@ -321,6 +320,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 mainView.Layer.CornerRadius = CorderRadius;
                 mainView.Layer.MasksToBounds = true;
 
+                var icon = new UIImageView
+                {
+                    Image = UIImage.FromBundle(Path.Combine("icons", "search_small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                    TintColor = Theme.LightGray,
+                    TranslatesAutoresizingMaskIntoConstraints = false  
+                };
+
                 titleLabel = new UILabel
                 {
                     TextColor = LabelTextColor,
@@ -333,7 +339,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 valueTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString("Enter search text...", new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -342,17 +348,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     WeakDelegate = this
                 };
                 valueTextField.AddTarget(this, new Selector("textFieldDidChange:"), UIControlEvent.EditingChanged);
+                mainView.Add(icon);
                 mainView.Add(titleLabel);
                 mainView.Add(valueTextField);
                 mainView.AddConstraints(new[]
                 {
+                    NSLayoutConstraint.Create(icon, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Bottom, 1f, -8f),
+                    NSLayoutConstraint.Create(icon, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Left, 1f, 8f),
+                    NSLayoutConstraint.Create(icon, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 15f),
+                    NSLayoutConstraint.Create(icon, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 15f),
                     NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Top, 1f, 4f),
-                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Left, 1f, 8f),
+                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, icon, NSLayoutAttribute.Right, 1f, 8f),
                     NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Right, 1f, -8f),
                     NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, 2f),
-                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Left, 1f, 8f),
+                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Right, 1f, -8f),
-                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Bottom, 1f, -4f)
+                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Bottom, 1f, -4f),
+                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, valueTextField, NSLayoutAttribute.Height, 1f, 0f)
                 });
 
                 AddArrangedSubview(mainView);
@@ -360,7 +372,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             protected override void UpdateRow()
             {
-                titleLabel.Text = "Where: " + Criteria.SubjectMessageClause;
+                titleLabel.Text = Localization.GetString("search_where");
+
+                switch (Criteria.SubjectMessageClause)
+                {
+                    case SubjectMessageClause.SubjectOnly:
+                        titleLabel.Text += Localization.GetString("search_subject");
+                        break;
+                    case SubjectMessageClause.MessageOnly:
+                        titleLabel.Text += Localization.GetString("search_message");
+                        break;
+                    default:
+                        titleLabel.Text += Localization.GetString("search_subject_or_message");
+                        break;
+
+                }
                 valueTextField.Text = Criteria.SubjectMessageField;
             }
 
@@ -369,7 +395,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var vc = (UIViewController)NextResponder.NextResponder.NextResponder.NextResponder;
 
-                var item = await Dialogs.ShowListDialogAsync(vc, null, new[] { "All", "Subject", "Message" }, titleLabel);
+                var item = await Dialogs.ShowListDialogAsync(vc, null, new[] { Localization.GetString("search_subject_or_message"), Localization.GetString("search_subject"), Localization.GetString("search_message") }, titleLabel);
                 if (item < 0)
                     return;
 
@@ -407,6 +433,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 mainView.Layer.CornerRadius = CorderRadius;
                 mainView.Layer.MasksToBounds = true;
 
+                var icon = new UIImageView
+                {
+                    Image = UIImage.FromBundle(Path.Combine("icons", "search_small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                    TintColor = Theme.LightGray,
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+
                 titleLabel = new UILabel
                 {
                     TextColor = LabelTextColor,
@@ -419,7 +452,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 valueTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString("Enter address...", new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_address"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -428,17 +461,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     WeakDelegate = this
                 };
                 valueTextField.AddTarget(this, new Selector("textFieldDidChange:"), UIControlEvent.EditingChanged);
+                mainView.Add(icon);
                 mainView.Add(titleLabel);
                 mainView.Add(valueTextField);
                 mainView.AddConstraints(new[]
                 {
+                    NSLayoutConstraint.Create(icon, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Bottom, 1f, -8f),
+                    NSLayoutConstraint.Create(icon, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Left, 1f, 8f),
+                    NSLayoutConstraint.Create(icon, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 15f),
+                    NSLayoutConstraint.Create(icon, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 15f),
                     NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Top, 1f, 4f),
-                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Left, 1f, 8f),
+                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, icon, NSLayoutAttribute.Right, 1f, 8f),
                     NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Right, 1f, -8f),
                     NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, 2f),
-                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Left, 1f, 8f),
+                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Right, 1f, -8f),
-                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Bottom, 1f, -4f)
+                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Bottom, 1f, -4f),
+                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, valueTextField, NSLayoutAttribute.Height, 1f, 0f)
                 });
 
                 AddArrangedSubview(mainView);
@@ -446,7 +485,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             protected override void UpdateRow()
             {
-                titleLabel.Text = "Search addresses in: " + Criteria.FromToClause;
+                titleLabel.Text = Localization.GetString("search_search_addresses");
+                switch (Criteria.FromToClause)
+                {
+                    case FromToClause.FromOnly:
+                        titleLabel.Text += Localization.GetString("search_from");
+                        break;
+                    case FromToClause.ToOnly:
+                        titleLabel.Text += Localization.GetString("search_to");
+                        break;
+                    default:
+                        titleLabel.Text += Localization.GetString("search_from_or_to");
+                        break;
+                }
+
                 valueTextField.Text = Criteria.FromToField;
             }
 
@@ -455,7 +507,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var vc = (UIViewController)NextResponder.NextResponder.NextResponder.NextResponder;
 
-                var item = await Dialogs.ShowListDialogAsync(vc, null, new[] { "From and To", "From", "To" }, titleLabel);
+                var item = await Dialogs.ShowListDialogAsync(vc, null, new[] { Localization.GetString("search_from_or_to"), Localization.GetString("search_from"), Localization.GetString("search_to") }, titleLabel);
                 if (item < 0)
                     return;
 
@@ -516,7 +568,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 fromLabel = new UILabel
                 {
-                    Text = "From date",
+                    Text = Localization.GetString("search_from_date"),
                     TextColor = LabelTextColor,
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
@@ -560,7 +612,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(fromValue, NSLayoutAttribute.Top, NSLayoutRelation.Equal, fromLabel, NSLayoutAttribute.Bottom, 1f, 2f),
                     NSLayoutConstraint.Create(fromValue, NSLayoutAttribute.Left, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Left, 1f, 4f),
                     NSLayoutConstraint.Create(fromValue, NSLayoutAttribute.Right, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(fromValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Bottom, 1f, -4f)
+                    NSLayoutConstraint.Create(fromValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Bottom, 1f, -4f),
+                    NSLayoutConstraint.Create(fromLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, fromValue, NSLayoutAttribute.Height, 1f, 0f)
                 });
 
                 var lineView = new UIView
@@ -578,7 +631,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 toLabel = new UILabel
                 {
-                    Text = "To date",
+                    Text = Localization.GetString("search_to_date"),
                     TextColor = LabelTextColor,
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
@@ -622,7 +675,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(toValue, NSLayoutAttribute.Top, NSLayoutRelation.Equal, toLabel, NSLayoutAttribute.Bottom, 1f, 2f),
                     NSLayoutConstraint.Create(toValue, NSLayoutAttribute.Left, NSLayoutRelation.Equal, toView, NSLayoutAttribute.Left, 1f, 4f),
                     NSLayoutConstraint.Create(toValue, NSLayoutAttribute.Right, NSLayoutRelation.Equal, toView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(toValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, toView, NSLayoutAttribute.Bottom, 1f, -4f)
+                    NSLayoutConstraint.Create(toValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, toView, NSLayoutAttribute.Bottom, 1f, -4f),
+                    NSLayoutConstraint.Create(toLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, toValue, NSLayoutAttribute.Height, 1f, 0f)
                 });
 
                 mainView.AddSubview(fromView);
@@ -656,8 +710,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (!dateRange.Enabled)
                 {
-                    fromValue.Text = "-";
-                    toValue.Text = "Today";
+                    fromValue.Text = Localization.GetString("search_dash");
+                    toValue.Text = Localization.GetString("search_today");
 
                     fromDatePicker.MinimumDate = null;
                     fromDatePicker.MaximumDate = NSDate.Now;
@@ -673,7 +727,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     {
                         fromDatePicker.MinimumDate = null;
                         fromDatePicker.MaximumDate = NSDate.Now;
-                        fromValue.Text = "-";
+                        fromValue.Text = Localization.GetString("search_dash");
 
                         fromDatePicker.SetDate(NSDate.Now, false);
                     }
@@ -697,7 +751,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     if (dateRange.EndTimestamp == -1)
                     {
-                        toValue.Text = "Today";
+                        toValue.Text = Localization.GetString("search_today");
 
                         toDatePicker.MaximumDate = NSDate.Now;
                         toDatePicker.SetDate(NSDate.Now, false);
@@ -808,11 +862,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 lineLabel = new UILabel
                 {
-                    Text = "Mailbox",
+                    Text = Localization.GetString("search_lines"),
                     TextColor = LabelTextColor,
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
-                    TranslatesAutoresizingMaskIntoConstraints = false
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    Lines = 1,
+                    MinimumFontSize = 8f,
+                    AdjustsFontSizeToFitWidth = true
                 };
 
                 lineValue = new UILabel
@@ -821,7 +878,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TintColor = Theme.LightGray,
                     TextAlignment = UITextAlignment.Center,
-                    TranslatesAutoresizingMaskIntoConstraints = false
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    Lines = 1,
+                    MinimumFontSize = 8f,
+                    AdjustsFontSizeToFitWidth = true
                 };
                 lineView.Add(lineLabel);
                 lineView.Add(lineValue);
@@ -833,7 +893,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(lineValue, NSLayoutAttribute.Top, NSLayoutRelation.Equal, lineLabel, NSLayoutAttribute.Bottom, 1f, 2f),
                     NSLayoutConstraint.Create(lineValue, NSLayoutAttribute.Left, NSLayoutRelation.Equal, lineView, NSLayoutAttribute.Left, 1f, 4f),
                     NSLayoutConstraint.Create(lineValue, NSLayoutAttribute.Right, NSLayoutRelation.Equal, lineView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(lineValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, lineView, NSLayoutAttribute.Bottom, 1f, -4f)
+                    NSLayoutConstraint.Create(lineValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, lineView, NSLayoutAttribute.Bottom, 1f, -4f),
+                    NSLayoutConstraint.Create(lineLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, lineValue, NSLayoutAttribute.Height, 1f, 0f)
                 });
 
                 AddArrangedSubview(lineView);
@@ -849,12 +910,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 categoriesLabel = new UILabel
                 {
-                    Text = "Categories",
+                    Text = Localization.GetString("search_categories"),
                     TextColor = LabelTextColor,
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     TranslatesAutoresizingMaskIntoConstraints = false,
-                    UserInteractionEnabled = false
+                    UserInteractionEnabled = false,
+                    Lines = 1,
+                    MinimumFontSize = 8f,
+                    AdjustsFontSizeToFitWidth = true
                 };
 
                 categoriesValue = new UILabel
@@ -864,7 +928,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     TintColor = Theme.LightGray,
                     TextAlignment = UITextAlignment.Center,
                     TranslatesAutoresizingMaskIntoConstraints = false,
-                    UserInteractionEnabled = false
+                    UserInteractionEnabled = false,
+                    Lines = 1,
+                    MinimumFontSize = 8f,
+                    AdjustsFontSizeToFitWidth = true
                 };
                 categoriesView.Add(categoriesLabel);
                 categoriesView.Add(categoriesValue);
@@ -876,7 +943,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(categoriesValue, NSLayoutAttribute.Top, NSLayoutRelation.Equal, categoriesLabel, NSLayoutAttribute.Bottom, 1f, 2f),
                     NSLayoutConstraint.Create(categoriesValue, NSLayoutAttribute.Left, NSLayoutRelation.Equal, categoriesView, NSLayoutAttribute.Left, 1f, 4f),
                     NSLayoutConstraint.Create(categoriesValue, NSLayoutAttribute.Right, NSLayoutRelation.Equal, categoriesView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(categoriesValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, categoriesView, NSLayoutAttribute.Bottom, 1f, -4f)
+                    NSLayoutConstraint.Create(categoriesValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, categoriesView, NSLayoutAttribute.Bottom, 1f, -4f),
+                    NSLayoutConstraint.Create(categoriesLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, categoriesValue, NSLayoutAttribute.Height, 1f, 0f)
                 });
 
                 AddArrangedSubview(categoriesView);
@@ -892,12 +960,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 priorityLabel = new UILabel
                 {
-                    Text = "Priority",
+                    Text = Localization.GetString("search_priority"),
                     TextColor = LabelTextColor,
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     TranslatesAutoresizingMaskIntoConstraints = false,
-                    UserInteractionEnabled = false
+                    UserInteractionEnabled = false,
+                    Lines = 1,
+                    MinimumFontSize = 8f,
+                    AdjustsFontSizeToFitWidth = true
                 };
 
                 priorityValue = new UILabel
@@ -907,7 +978,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     TintColor = Theme.LightGray,
                     TextAlignment = UITextAlignment.Center,
                     TranslatesAutoresizingMaskIntoConstraints = false,
-                    UserInteractionEnabled = false
+                    UserInteractionEnabled = false,
+                    Lines = 1,
+                    MinimumFontSize = 8f,
+                    AdjustsFontSizeToFitWidth = true
                 };
                 priorityView.Add(priorityLabel);
                 priorityView.Add(priorityValue);
@@ -919,7 +993,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(priorityValue, NSLayoutAttribute.Top, NSLayoutRelation.Equal, priorityLabel, NSLayoutAttribute.Bottom, 1f, 2f),
                     NSLayoutConstraint.Create(priorityValue, NSLayoutAttribute.Left, NSLayoutRelation.Equal, priorityView, NSLayoutAttribute.Left, 1f, 4f),
                     NSLayoutConstraint.Create(priorityValue, NSLayoutAttribute.Right, NSLayoutRelation.Equal, priorityView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(priorityValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, priorityView, NSLayoutAttribute.Bottom, 1f, -4f)
+                    NSLayoutConstraint.Create(priorityValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, priorityView, NSLayoutAttribute.Bottom, 1f, -4f),
+                    NSLayoutConstraint.Create(priorityLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, priorityValue, NSLayoutAttribute.Height, 1f, 0f)
                 });
 
                 AddArrangedSubview(priorityView);
@@ -927,9 +1002,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             protected override void UpdateRow()
             {
-                lineValue.Text = Criteria.LineGuids.Count < 1 ? "Any" : Criteria.LineGuids.Count.ToString();
-                categoriesValue.Text = Criteria.CategoryIds.Count < 1 ? "Any" : Criteria.CategoryIds.Count.ToString();
-                priorityValue.Text = Criteria.Priorities.Count < 1 ? "Any" : Criteria.Priorities.Count.ToString();
+                lineValue.Text = Criteria.LineGuids.Count < 1 ? Localization.GetString("search_any") : Criteria.LineGuids.Count.ToString();
+                categoriesValue.Text = Criteria.CategoryIds.Count < 1 ? Localization.GetString("search_any") : Criteria.CategoryIds.Count.ToString();
+                priorityValue.Text = Criteria.Priorities.Count < 1 ? Localization.GetString("search_any") : Criteria.Priorities.Count.ToString();
             }
 
             [Export("tapped:")]
@@ -980,17 +1055,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 referenceLabel = new UILabel
                 {
-                    Text = "Reference no.",
+                    Text = Localization.GetString("search_ref"),
                     TextColor = LabelTextColor,
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     TranslatesAutoresizingMaskIntoConstraints = false,
-                    UserInteractionEnabled = false
+                    UserInteractionEnabled = false,
+                    Lines = 1,
+                    MinimumFontSize = 8f,
+                    AdjustsFontSizeToFitWidth = true
                 };
 
                 referenceTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString("Type...", new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -1010,7 +1088,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(referenceTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, referenceLabel, NSLayoutAttribute.Bottom, 1f, 2f),
                     NSLayoutConstraint.Create(referenceTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Left, 1f, 4f),
                     NSLayoutConstraint.Create(referenceTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(referenceTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Bottom, 1f, -4f)
+                    NSLayoutConstraint.Create(referenceTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Bottom, 1f, -4f),
+                    NSLayoutConstraint.Create(referenceLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, referenceTextField, NSLayoutAttribute.Height, 1f, 0f)
                 });
 
                 AddArrangedSubview(referenceView);
@@ -1026,17 +1105,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 commentLabel = new UILabel
                 {
-                    Text = "Comments",
+                    Text = Localization.GetString("search_comments"),
                     TextColor = LabelTextColor,
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     TranslatesAutoresizingMaskIntoConstraints = false,
-                    UserInteractionEnabled = false
+                    UserInteractionEnabled = false,
+                    Lines = 1,
+                    MinimumFontSize = 8f,
+                    AdjustsFontSizeToFitWidth = true
                 };
 
                 commentTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString("Type...", new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -1056,7 +1138,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(commentTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, commentLabel, NSLayoutAttribute.Bottom, 1f, 2f),
                     NSLayoutConstraint.Create(commentTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Left, 1f, 4f),
                     NSLayoutConstraint.Create(commentTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(commentTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Bottom, 1f, -4f)
+                    NSLayoutConstraint.Create(commentTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Bottom, 1f, -4f),
+                    NSLayoutConstraint.Create(commentLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, commentTextField, NSLayoutAttribute.Height, 1f, 0f)
                 });
 
                 AddArrangedSubview(commentView);
@@ -1072,17 +1155,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 attachmentNameLabel = new UILabel
                 {
-                    Text = "Attachment",
+                    Text = Localization.GetString("search_attachments"),
                     TextColor = LabelTextColor,
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
                     TranslatesAutoresizingMaskIntoConstraints = false,
-                    UserInteractionEnabled = false
+                    UserInteractionEnabled = false,
+                    Lines = 1,
+                    MinimumFontSize = 8f,
+                    AdjustsFontSizeToFitWidth = true
                 };
 
                 attachmentNameTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString("Type...", new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -1102,7 +1188,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(attachmentNameTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, attachmentNameLabel, NSLayoutAttribute.Bottom, 1f, 2f),
                     NSLayoutConstraint.Create(attachmentNameTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, attachmentNameView, NSLayoutAttribute.Left, 1f, 4f),
                     NSLayoutConstraint.Create(attachmentNameTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, attachmentNameView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(attachmentNameTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, attachmentNameView, NSLayoutAttribute.Bottom, 1f, -4f)
+                    NSLayoutConstraint.Create(attachmentNameTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, attachmentNameView, NSLayoutAttribute.Bottom, 1f, -4f),
+                    NSLayoutConstraint.Create(attachmentNameLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, attachmentNameTextField, NSLayoutAttribute.Height, 1f, 0f)
                 });
 
                 AddArrangedSubview(attachmentNameView);
@@ -1217,10 +1304,98 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
+        class ExtraFieldsView : AbstractSearchView
+        {
+
+            readonly UIView referenceView;
+            readonly UILabel referenceLabel;
+            readonly UITextField referenceTextField;
+
+            public ExtraFieldsView()
+            {
+                referenceView = new UIView
+                {
+                    BackgroundColor = InactiveBackgroundColor,
+                    UserInteractionEnabled = true
+                };
+                referenceView.Layer.CornerRadius = CorderRadius;
+                referenceView.Layer.MasksToBounds = true;
+                referenceView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
+
+                referenceLabel = new UILabel
+                {
+                    Text = Localization.GetString("search_extra_fields"),
+                    TextColor = LabelTextColor,
+                    Font = Font,
+                    TextAlignment = UITextAlignment.Center,
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    UserInteractionEnabled = false,
+                    Lines = 1,
+                    MinimumFontSize = 8f,
+                    AdjustsFontSizeToFitWidth = true
+                };
+
+                referenceTextField = new UITextField
+                {
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    TextColor = InactiveTextColor,
+                    Font = Font,
+                    TintColor = Theme.LightGray,
+                    TextAlignment = UITextAlignment.Center,
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    UserInteractionEnabled = false,
+                    WeakDelegate = this
+                };
+                referenceTextField.AddTarget(this, new Selector("textFieldDidChange:"), UIControlEvent.EditingChanged);
+                referenceView.Add(referenceLabel);
+                referenceView.Add(referenceTextField);
+                referenceView.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(referenceLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Top, 1f, 4f),
+                    NSLayoutConstraint.Create(referenceLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Left, 1f, 4f),
+                    NSLayoutConstraint.Create(referenceLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Right, 1f, -4f),
+                    NSLayoutConstraint.Create(referenceTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, referenceLabel, NSLayoutAttribute.Bottom, 1f, 2f),
+                    NSLayoutConstraint.Create(referenceTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Left, 1f, 4f),
+                    NSLayoutConstraint.Create(referenceTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Right, 1f, -4f),
+                    NSLayoutConstraint.Create(referenceTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Bottom, 1f, -4f),
+                    NSLayoutConstraint.Create(referenceLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, referenceTextField, NSLayoutAttribute.Height, 1f, 0f)
+                });
+
+                AddArrangedSubview(referenceView);
+            }
+
+            protected override void UpdateRow()
+            {
+                referenceTextField.Text = Criteria.ExtraFields;
+            }
+
+            [Export("tapped:")]
+            void Tapped(UITapGestureRecognizer recognizer)
+            {
+                referenceTextField.UserInteractionEnabled = true;
+                referenceTextField.BecomeFirstResponder();
+
+                UpdateRow();
+            }
+
+            [Export("textFieldDidChange:")]
+            void TextFieldDidChange(UITextField textField)
+            {
+                Criteria.ExtraFields = textField.Text;
+            }
+
+            [Export("textFieldShouldReturn:")]
+            bool TextFieldShouldReturn(UITextField textField)
+            {
+                referenceTextField.ResignFirstResponder();
+                referenceTextField.UserInteractionEnabled = false;
+
+                return true;
+            }
+        }
+
         class AttachmentsUnreadSearchView : AbstractSearchView
         {
-            
-            public override float RowHeight { get { return 40f; } }
 
             readonly UILabel attachmentsView;
             readonly UILabel unreadView;
@@ -1229,7 +1404,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 attachmentsView = new UILabel
                 {
-                    Text = "WITH ATTACHMENTS",
+                    Text = Localization.GetString("search_with_attachments").ToUpper(),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
@@ -1246,7 +1421,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 unreadView = new UILabel
                 {
-                    Text = "UNREAD EMAILS",
+                    Text = Localization.GetString("search_unread").ToUpper(),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
@@ -1284,8 +1459,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         class HandledSearchView : AbstractSearchView
         {
 
-            public override float RowHeight { get { return 40f; } }
-
             readonly UILabel allView;
             readonly UILabel handledView;
             readonly UILabel unhadledView;
@@ -1294,7 +1467,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 allView = new UILabel
                 {
-                    Text = "ALL",
+                    Text = Localization.GetString("search_all").ToUpper(),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
@@ -1311,7 +1484,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 handledView = new UILabel
                 {
-                    Text = "HANDLED",
+                    Text = Localization.GetString("search_handled").ToUpper(),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,
@@ -1328,7 +1501,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 unhadledView = new UILabel
                 {
-                    Text = "UNHANDLED",
+                    Text = Localization.GetString("search_unhandled").ToUpper(),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TextAlignment = UITextAlignment.Center,

@@ -575,6 +575,10 @@
     <BundleResource Include="Resources\icons\large_map%402x.png" />
     <BundleResource Include="Resources\icons\large_mobile%402x.png" />
     <BundleResource Include="Resources\icons\large_sms%402x.png" />
+    <BundleResource Include="Resources\icons\search_large%402x.png" />
+    <BundleResource Include="Resources\icons\search_large%403x.png" />
+    <BundleResource Include="Resources\icons\search_small%402x.png" />
+    <BundleResource Include="Resources\icons\search_small%403x.png" />
   </ItemGroup>
   <ItemGroup>
     <XamarinComponentReference Include="InAppSettingsKit">
