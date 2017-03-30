@@ -363,7 +363,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationItem.SetLeftBarButtonItem(editItem, true);
         }
 
-        void SearchItem_Clicked(object sender, EventArgs e) => PresentViewController(new NavigationController(new SearchDocumentsViewController(), UIModalPresentationStyle.FormSheet), true, null);
+        void SearchItem_Clicked(object sender, EventArgs e) => PresentViewController(new NavigationController(new DocumentsSearchCriteriaViewController(), UIModalPresentationStyle.FullScreen, UIModalPresentationStyle.PageSheet), true, null);
 
         void ComposeDocumentItem_Clicked(object sender, EventArgs e)
         {

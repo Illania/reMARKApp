@@ -406,7 +406,8 @@
     <Compile Include="Ui\TableViewCells\ContactInfoTableViewCell.designer.cs">
       <DependentUpon>ContactInfoTableViewCell.cs</DependentUpon>
     </Compile>
-    <Compile Include="Ui\ViewControllers\SearchDocumentsViewController.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentsSearchCriteriaViewController.cs" />
+    <Compile Include="Ui\Common\TouchTransparentView.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

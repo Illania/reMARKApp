@@ -1,6 +1,6 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
-// File: SearchDocumentsViewController.cs
+// File: DocumentsSearchCriteriaViewController.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2017 Nordic IT
@@ -8,24 +8,34 @@
 using System;
 using System.IO;
 using System.Linq;
+using CoreAnimation;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities;
 using ObjCRuntime;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
 
-    public class SearchDocumentsViewController : AbstractViewController
+    public class DocumentsSearchCriteriaViewController : AbstractViewController
     {
+
+        const float BottomViewSize = 80f;
 
         UIBarButtonItem closeItem;
         UIBarButtonItem resetItem;
+        
+        UIView bottomView;
         UIScrollView scrollView;
         UIStackView stackView;
+
+        NSObject didShowNotificationObserver;
+        NSObject willChangeFrameNotificationObserver;
+        NSObject willHideNotification;
 
         SearchDocumentsCriteria criteria = new SearchDocumentsCriteria();
 
@@ -33,7 +43,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.LoadView();
 
-            AutomaticallyAdjustsScrollViewInsets = true;
+            AutomaticallyAdjustsScrollViewInsets = false;
 
             Title = Localization.GetString("search");
 
@@ -54,7 +64,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ShowsVerticalScrollIndicator = false,
                 ShowsHorizontalScrollIndicator = false,
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                BackgroundColor = Theme.DarkerBlue
+                BackgroundColor = Theme.DarkerBlue,
+                ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f),
+                ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f)
             };
             View.AddSubview(scrollView);
             View.AddConstraints(new[]
@@ -76,13 +88,51 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             scrollView.AddSubview(stackView);
+
+            var const1 = NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1f, 0f);
+            const1.Priority = 500f;
+            var const2 = NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Width, NSLayoutRelation.LessThanOrEqual, 1f, 500f);
+            const2.Priority = 1000f;
+
             scrollView.AddConstraints(new[]
             {
                 NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.CenterX, 1f, 0f),
                 NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1f, 0f)
+                const1,
+                const2
+            });
+
+            bottomView = new TouchTransparentView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+            };
+            View.AddSubview(bottomView);
+            View.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(bottomView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, BottomViewSize),
+                NSLayoutConstraint.Create(bottomView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, BottomViewSize),
+                NSLayoutConstraint.Create(bottomView, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f),
+                NSLayoutConstraint.Create(bottomView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+            });
+
+            var searchButton = new UIButton
+            {
+                TintColor = Theme.DarkerBlue,
+                BackgroundColor = Theme.LightBlue,
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                ClipsToBounds = true,
+                ContentEdgeInsets = new UIEdgeInsets(15f, 15f, 15f, 15f)
+            };
+            searchButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "search_large.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            searchButton.Layer.CornerRadius = 30f;
+            bottomView.AddSubview(searchButton);
+            bottomView.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60f),
+                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 60f),
+                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, bottomView, NSLayoutAttribute.CenterX, 1f, 0f),
+                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, bottomView, NSLayoutAttribute.CenterY, 1f, 0f)
             });
 
             stackView.AddArrangedSubview(new DocumentDirectionSearchView());
@@ -91,11 +141,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             stackView.AddArrangedSubview(new DateRangeView());
             stackView.AddArrangedSubview(new LineCategoriesPriorityNameView());
             stackView.AddArrangedSubview(new ReferenceCommentsAttachmentNameView());
-            // TODO if (ServerConfig.SystemSettings.DocumentsModuleInfo.ExtraFieldInfos.Any())
-            stackView.AddArrangedSubview(new ExtraFieldsView());
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.ExtraFieldInfos.Any())
+                stackView.AddArrangedSubview(new ExtraFieldsView());
             stackView.AddArrangedSubview(new AttachmentsUnreadSearchView());
-            // TODO if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
-            stackView.AddArrangedSubview(new HandledSearchView());
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
+                stackView.AddArrangedSubview(new HandledSearchView());
 
             foreach (var view in stackView.Subviews.OfType<AbstractSearchView>())
                 view.SetCriteria(criteria);
@@ -112,8 +162,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
+            scrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f);
+            scrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f);
+
             closeItem.Clicked += CloseItem_Clicked;
             resetItem.Clicked += ResetItem_Clicked;
+
+            didShowNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.DidShowNotification, OnKeyboardDidShowNotification);
+            willChangeFrameNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillChangeFrameNotification, OnKeyboardWillChangeFrameNotification);
+            willHideNotification = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
+        }
+
+        public override void ViewDidAppear(bool animated)
+        {
+            base.ViewDidAppear(animated);
+
+            scrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f);
+            scrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f);
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -122,6 +187,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             closeItem.Clicked -= CloseItem_Clicked;
             resetItem.Clicked -= ResetItem_Clicked;
+
+            NSNotificationCenter.DefaultCenter.RemoveObservers(new[] { didShowNotificationObserver, willChangeFrameNotificationObserver, willHideNotification });
+        }
+
+        public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
+        {
+            base.ViewWillTransitionToSize(toSize, coordinator);
+
+            coordinator.AnimateAlongsideTransition(ctx => { }, ctx =>
+            {
+                if (scrollView == null) return;
+
+                scrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f);
+                scrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f);
+            });
         }
 
         void CloseItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
@@ -132,6 +212,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             foreach (var view in stackView.Subviews.OfType<AbstractSearchView>())
                 view.SetCriteria(criteria);
+        }
+
+        void OnKeyboardDidShowNotification(NSNotification notification) => AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification);
+
+        void OnKeyboardWillChangeFrameNotification(NSNotification notification) => AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification);
+
+        void OnKeyboardWillHideNotification(NSNotification notification) => AdjustViewToKeyboard(0f, notification);
+
+        void AdjustViewToKeyboard(float keyboardHeight, NSNotification notification)
+        {
+            scrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize + keyboardHeight, 0f);
+            scrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize + keyboardHeight, 0f);
+
+            if (notification == null)
+            {
+                View.LayoutIfNeeded();
+                return;
+            }
+
+            var duration = UI.KeyboardAnimationDurationFromNotification(notification);
+            var options = UI.KeyboardAnimationOptionsFromNotification(notification);
+            UIView.AnimateNotify(duration, 0.0d, options, View.LayoutIfNeeded, null);
         }
 
         abstract class AbstractSearchView : UIStackView
@@ -197,7 +299,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     BackgroundColor = InactiveBackgroundColor,
                     UserInteractionEnabled = true,
                     Lines = 1,
-                    MinimumFontSize = 8f,
+                    MinimumScaleFactor = .8f,
                     AdjustsFontSizeToFitWidth = true
                 };
                 allView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
@@ -214,7 +316,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     BackgroundColor = InactiveBackgroundColor,
                     UserInteractionEnabled = true,
                     Lines = 1,
-                    MinimumFontSize = 8f,
+                    MinimumScaleFactor = .8f,
                     AdjustsFontSizeToFitWidth = true
                 };
                 inboxView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
@@ -231,7 +333,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     BackgroundColor = InactiveBackgroundColor,
                     UserInteractionEnabled = true,
                     Lines = 1,
-                    MinimumFontSize = 8f,
+                    MinimumScaleFactor = .8f,
                     AdjustsFontSizeToFitWidth = true
                 };
                 outboxView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
@@ -248,7 +350,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     BackgroundColor = InactiveBackgroundColor,
                     UserInteractionEnabled = true,
                     Lines = 1,
-                    MinimumFontSize = 8f,
+                    MinimumScaleFactor = .8f,
                     AdjustsFontSizeToFitWidth = true
                 };
                 draftView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
@@ -324,7 +426,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     Image = UIImage.FromBundle(Path.Combine("icons", "search_small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                     TintColor = Theme.LightGray,
-                    TranslatesAutoresizingMaskIntoConstraints = false  
+                    TranslatesAutoresizingMaskIntoConstraints = false
                 };
 
                 titleLabel = new UILabel
@@ -391,7 +493,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             [Export("tapped:")]
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
             async void Tapped(UITapGestureRecognizer recognizer)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
             {
                 var vc = (UIViewController)NextResponder.NextResponder.NextResponder.NextResponder;
 
@@ -503,7 +607,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             [Export("tapped:")]
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
             async void Tapped(UITapGestureRecognizer recognizer)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
             {
                 var vc = (UIViewController)NextResponder.NextResponder.NextResponder.NextResponder;
 
@@ -868,7 +974,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     TextAlignment = UITextAlignment.Center,
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     Lines = 1,
-                    MinimumFontSize = 8f,
+                    MinimumScaleFactor = .8f,
                     AdjustsFontSizeToFitWidth = true
                 };
 
@@ -880,7 +986,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     TextAlignment = UITextAlignment.Center,
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     Lines = 1,
-                    MinimumFontSize = 8f,
+                    MinimumScaleFactor = .8f,
                     AdjustsFontSizeToFitWidth = true
                 };
                 lineView.Add(lineLabel);
@@ -917,7 +1023,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     UserInteractionEnabled = false,
                     Lines = 1,
-                    MinimumFontSize = 8f,
+                    MinimumScaleFactor = .8f,
                     AdjustsFontSizeToFitWidth = true
                 };
 
@@ -930,7 +1036,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     UserInteractionEnabled = false,
                     Lines = 1,
-                    MinimumFontSize = 8f,
+                    MinimumScaleFactor = .8f,
                     AdjustsFontSizeToFitWidth = true
                 };
                 categoriesView.Add(categoriesLabel);
@@ -967,7 +1073,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     UserInteractionEnabled = false,
                     Lines = 1,
-                    MinimumFontSize = 8f,
+                    MinimumScaleFactor = .8f,
                     AdjustsFontSizeToFitWidth = true
                 };
 
@@ -980,7 +1086,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     UserInteractionEnabled = false,
                     Lines = 1,
-                    MinimumFontSize = 8f,
+                    MinimumScaleFactor = .8f,
                     AdjustsFontSizeToFitWidth = true
                 };
                 priorityView.Add(priorityLabel);
@@ -1062,7 +1168,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     UserInteractionEnabled = false,
                     Lines = 1,
-                    MinimumFontSize = 8f,
+                    MinimumScaleFactor = .8f,
                     AdjustsFontSizeToFitWidth = true
                 };
 
@@ -1112,7 +1218,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     UserInteractionEnabled = false,
                     Lines = 1,
-                    MinimumFontSize = 8f,
+                    MinimumScaleFactor = .8f,
                     AdjustsFontSizeToFitWidth = true
                 };
 
@@ -1162,7 +1268,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     UserInteractionEnabled = false,
                     Lines = 1,
-                    MinimumFontSize = 8f,
+                    MinimumScaleFactor = .8f,
                     AdjustsFontSizeToFitWidth = true
                 };
 
@@ -1261,6 +1367,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             [Export("textFieldShouldReturn:")]
             bool TextFieldShouldReturn(UITextField textField)
             {
+                textField.ResignFirstResponder();
+                return true;
+            }
+
+
+            [Export("textFieldDidEndEditing:")]
+            void TextFieldDidEndEditing(UITextField textField)
+            {
                 if (textField == referenceTextField)
                 {
                     AnimateNotify(AnimationLength, () =>
@@ -1299,8 +1413,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         attachmentNameTextField.UserInteractionEnabled = false;
                     });
                 }
-
-                return true;
             }
         }
 
@@ -1331,7 +1443,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     UserInteractionEnabled = false,
                     Lines = 1,
-                    MinimumFontSize = 8f,
+                    MinimumScaleFactor = .8f,
                     AdjustsFontSizeToFitWidth = true
                 };
 
@@ -1384,13 +1496,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Criteria.ExtraFields = textField.Text;
             }
 
+
             [Export("textFieldShouldReturn:")]
             bool TextFieldShouldReturn(UITextField textField)
             {
+                textField.ResignFirstResponder();
+                return true;
+            }
+
+            [Export("textFieldDidEndEditing:")]
+            void TextFieldDidEndEditing(UITextField textField)
+            {
                 referenceTextField.ResignFirstResponder();
                 referenceTextField.UserInteractionEnabled = false;
-
-                return true;
             }
         }
 
@@ -1411,7 +1529,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     BackgroundColor = InactiveBackgroundColor,
                     UserInteractionEnabled = true,
                     Lines = 1,
-                    MinimumFontSize = 8f,
+                    MinimumScaleFactor = .8f,
                     AdjustsFontSizeToFitWidth = true
                 };
                 attachmentsView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
@@ -1428,7 +1546,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     BackgroundColor = InactiveBackgroundColor,
                     UserInteractionEnabled = true,
                     Lines = 1,
-                    MinimumFontSize = 8f,
+                    MinimumScaleFactor = .8f,
                     AdjustsFontSizeToFitWidth = true
                 };
                 unreadView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
@@ -1474,7 +1592,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     BackgroundColor = InactiveBackgroundColor,
                     UserInteractionEnabled = true,
                     Lines = 1,
-                    MinimumFontSize = 8f,
+                    MinimumScaleFactor = .8f,
                     AdjustsFontSizeToFitWidth = true
                 };
                 allView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
@@ -1491,7 +1609,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     BackgroundColor = InactiveBackgroundColor,
                     UserInteractionEnabled = true,
                     Lines = 1,
-                    MinimumFontSize = 8f,
+                    MinimumScaleFactor = .8f,
                     AdjustsFontSizeToFitWidth = true
                 };
                 handledView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
@@ -1508,7 +1626,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     BackgroundColor = InactiveBackgroundColor,
                     UserInteractionEnabled = true,
                     Lines = 1,
-                    MinimumFontSize = 8f,
+                    MinimumScaleFactor = .8f,
                     AdjustsFontSizeToFitWidth = true
                 };
                 unhadledView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
