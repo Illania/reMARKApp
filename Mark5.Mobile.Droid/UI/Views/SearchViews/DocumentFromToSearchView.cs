@@ -5,10 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
-using System;
-using Android.Widget;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
@@ -21,12 +18,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         public override void Refresh()
         {
-            //TODO
+            Spinner.SetSelection((int)Criteria.FromToClause);
+            BottomEditText.Text = Criteria.FromToField;
         }
 
         public override void UpdateCriteria()
         {
-            //TODO
+            Criteria.FromToClause = (FromToClause)Spinner.SelectedItemPosition;
+            Criteria.FromToField = BottomEditText.Text;
         }
     }
 }

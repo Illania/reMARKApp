@@ -17,11 +17,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public abstract class AbstractSearchView<T> : LinearLayoutCompat
     {
-        public T Criteria
-        {
-            get;
-            set;
-        }
+        public T Criteria { get; set; }
 
         protected int DistanceNone;
         protected int DistanceLarge;
@@ -40,7 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         }
 
         protected AbstractSearchView(Context context)
-            : base(context)
+                : base(context)
         {
             LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 

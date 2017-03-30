@@ -21,7 +21,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         readonly protected AppCompatTextView TopTextView;
         readonly protected AppCompatEditText BottomEditText;
 
-
         protected AbstractMultiSearchView(Android.Content.Context context,
                                          int topTextResId,
                                          int bottomEditResId,

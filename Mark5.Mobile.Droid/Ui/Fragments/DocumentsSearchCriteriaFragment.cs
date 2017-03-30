@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Android.Animation;
 using Android.Graphics;
 using Android.OS;
+using Android.Support.Design.Widget;
 using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using Android.Support.V4.Widget;
@@ -28,6 +29,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         SearchDocumentsCriteria searchCriteria;
 
         LinearLayoutCompat containerLinearLayout;
+        FloatingActionButton fab;
+
         List<AbstractSearchView<SearchDocumentsCriteria>> subviews = new List<AbstractSearchView<SearchDocumentsCriteria>>();
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -41,9 +44,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             containerLinearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
             containerLinearLayout.SetBackgroundColor(Color.Transparent);
-
             containerLinearLayout.DividerDrawable = ContextCompat.GetDrawable(Context, Resource.Drawable.search_divider_horizontal);
             containerLinearLayout.ShowDividers = LinearLayoutCompat.ShowDividerMiddle;
+
+            fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab.SetImageResource(Resource.Drawable.action_search_server);
+            fab.SetOnClickListener(new ActionOnClickListener(HandleAction));
+            fab.Visibility = ViewStates.Visible;
+
+            var p = (CoordinatorLayout.LayoutParams)fab.LayoutParameters;
+            p.AnchorGravity = (int)(GravityFlags.CenterHorizontal);
+            fab.LayoutParameters = p;
 
             var paddingLinearLayout = ConversionUtils.ConvertDpToPixels(12);
             containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, paddingLinearLayout);
@@ -81,6 +92,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return rootView;
         }
 
+        void HandleAction()
+        {
+
+        }
 
         public void PrepareEditableTextRow()
         {
@@ -172,11 +187,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             RefreshViews();
         }
 
-        //TODO search button
-        //TODO reset button
-        //TODO save/restore instance state
-        //TODO reset while doing something, like editing
-
         public void PushDropdownViewFragment(Fragment f, string tag)
         {
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
@@ -210,6 +220,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             return new DocumentSearchCriteriaFragmentState
             {
+                Criteria = searchCriteria,
             };
         }
 
@@ -218,6 +229,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var df = restoredState as DocumentSearchCriteriaFragmentState;
             if (df != null)
             {
+                searchCriteria = df.Criteria;
             }
         }
 
@@ -229,7 +241,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class DocumentSearchCriteriaFragmentState : IRetainableState
         {
+            public SearchDocumentsCriteria Criteria { get; set; }
         }
         #endregion
     }
+
+
+
+
 }

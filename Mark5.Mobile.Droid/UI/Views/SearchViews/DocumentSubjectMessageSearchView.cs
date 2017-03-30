@@ -18,12 +18,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         public override void Refresh()
         {
-            //TODO
+            Spinner.SetSelection((int)Criteria.SubjectMessageClause);
+            BottomEditText.Text = Criteria.SubjectMessageField;
         }
 
         public override void UpdateCriteria()
         {
-            //TODO
+            Criteria.SubjectMessageClause = (SubjectMessageClause)Spinner.SelectedItemPosition;
+            Criteria.SubjectMessageField = BottomEditText.Text;
         }
     }
 }

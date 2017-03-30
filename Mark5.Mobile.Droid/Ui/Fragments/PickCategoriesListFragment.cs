@@ -91,6 +91,7 @@ namespace Mark5.Mobile.Droid
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
+            menu.Clear();
             var item = menu.Add(Menu.None, 10, 10, Resource.String.done);
             item.SetShowAsAction(ShowAsAction.Always);
         }

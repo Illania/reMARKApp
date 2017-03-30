@@ -35,6 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         {
             SelectedPriorities = priorities;
             UpdateBottomTextView(priorities.Count);
+            UpdateCriteria();
         }
 
         public override void Refresh()

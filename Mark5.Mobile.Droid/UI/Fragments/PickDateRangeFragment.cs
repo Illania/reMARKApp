@@ -25,13 +25,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickDateRangeFragment : RetainableStateFragment
     {
-        long fromTimestamp = -1;
-        long toTimestamp = -1;
-
-        DocumentDateRangeSearchView dateView;
+        DocumentPickDateHeaderView dateView;
 
         CalendarView fromDatePicker;
         CalendarView toDatePicker;
+
+        public bool StartFromTo { get; set; }
+        public long FromTimestamp { get; set; }
+        public long ToTimestamp { get; set; }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -44,12 +45,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.SetBackgroundColor(Color.Transparent);
             containerLinearLayout.LayoutTransition = new LayoutTransition();
 
-            dateView = new DocumentDateRangeSearchView(Context, null, true);
+            dateView = new DocumentPickDateHeaderView(Context);
             containerLinearLayout.AddView(dateView);
 
             fromDatePicker = new CalendarView(Context);
             fromDatePicker.LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             fromDatePicker.Date = DateTime.UtcNow.Date.ConvertDateTimeToTimestampMilliseconds();
+            fromDatePicker.Visibility = ViewStates.Gone;
             fromDatePicker.DateChange += FromDatePicker_DateChange;
             containerLinearLayout.AddView(fromDatePicker);
 
@@ -58,6 +60,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             toDatePicker.Visibility = ViewStates.Gone;
             toDatePicker.DateChange += ToDatePicker_DateChange;
             containerLinearLayout.AddView(toDatePicker);
+
+            HasOptionsMenu = false;
 
             return rootView;
         }
@@ -74,7 +78,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnResume()
         {
             base.OnResume();
-
             Initialize();
         }
 
@@ -85,28 +88,51 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fromDatePicker.MaxDate = todayTimeStamp;
             toDatePicker.MaxDate = todayTimeStamp;
 
-            fromDatePicker.Date = fromTimestamp == -1 ? todayTimeStamp : fromTimestamp;
-            toDatePicker.Date = toTimestamp == -1 ? todayTimeStamp : toTimestamp;
+            fromDatePicker.Date = FromTimestamp == -1 ? todayTimeStamp : FromTimestamp;
+            toDatePicker.Date = ToTimestamp == -1 ? todayTimeStamp : ToTimestamp;
 
             UpdateText();
+
+            if (StartFromTo)
+            {
+                SelectTo();
+            }
+            else
+            {
+                SelectFrom();
+            }
+        }
+
+        void SelectFrom()
+        {
+            fromDatePicker.Visibility = ViewStates.Visible;
+            toDatePicker.Visibility = ViewStates.Gone;
+
+            dateView.PickFrom();
+        }
+
+        void SelectTo()
+        {
+            fromDatePicker.Visibility = ViewStates.Gone;
+            toDatePicker.Visibility = ViewStates.Visible;
+
+            dateView.PickTo();
         }
 
         void FromDatePicker_DateChange(object sender, CalendarView.DateChangeEventArgs e)
         {
-            CommonConfig.Logger.Error($"{e.DayOfMonth} - {e.Month} - {e.Year}");
-
-            fromTimestamp = fromDatePicker.Date;
+            FromTimestamp = fromDatePicker.Date;
 
             UpdateText();
             UpdateDatePickersLimits();
 
-            fromDatePicker.Visibility = ViewStates.Gone;
-            toDatePicker.Visibility = ViewStates.Visible;
+            SelectTo();
         }
 
         void ToDatePicker_DateChange(object sender, CalendarView.DateChangeEventArgs e)
         {
-            toTimestamp = toDatePicker.Date;
+            ToTimestamp = toDatePicker.Date;
+
             UpdateText();
 
             //TODO should close? need to ask linnea
@@ -114,15 +140,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void UpdateText()
         {
-            dateView.SetToText(toTimestamp);
-            dateView.SetFromText(fromTimestamp);
+            dateView.SetToText(ToTimestamp);
+            dateView.SetFromText(FromTimestamp);
         }
 
         void UpdateDatePickersLimits()
         {
-            if (fromTimestamp != -1)
+            if (FromTimestamp != -1)
             {
-                toDatePicker.MinDate = fromTimestamp;
+                toDatePicker.MinDate = FromTimestamp;
             }
         }
 
@@ -154,5 +180,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
+
     }
 }

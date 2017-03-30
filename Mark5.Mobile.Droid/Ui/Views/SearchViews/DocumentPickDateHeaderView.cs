@@ -1,22 +1,22 @@
 ﻿//
 // Project: Mark5.Mobile.Droid
-// File: DocumentDateRangeSearchView.cs
+// File: DocumentPickDateSearchView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
 //
 // Copyright (c) 2017 Nordic IT
 //
 using System;
 using Android.Content;
+using Android.Graphics;
+using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
-using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Fragments;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
-    public class DocumentDateRangeSearchView : AbstractSearchView<SearchDocumentsCriteria>
+    public class DocumentPickDateHeaderView : LinearLayoutCompat
     {
         long fromTimestamp = -1;
         long toTimestamp = -1;
@@ -24,33 +24,45 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         readonly AppCompatTextView dateRangeFromTextView;
         readonly AppCompatTextView dateRangeToTextView;
 
-        readonly DocumentSearchCriteriaFragment parentFragment;
+        AppCompatTextView fromTitleTextView;
+        AppCompatTextView toTitleTextView;
 
-        public DocumentDateRangeSearchView(Context context, DocumentSearchCriteriaFragment f) : base(context)
+        readonly LinearLayoutCompat leftLayout;
+        readonly LinearLayoutCompat rightLayout;
+
+        int textStyleTopLineResourceId = Resource.Style.searchViewDateTopLine;
+        int textStyleBottomLineResourceId = Resource.Style.searchViewDateBottomLine;
+
+        int textStyleTopLineSelectedResourceId = Resource.Style.searchViewDateTopLineSelected;
+        int textStyleBottomLineSelectedResourceId = Resource.Style.searchViewDateBottomLineSelected;
+
+        public DocumentPickDateHeaderView(Context context) : base(context)
         {
             Orientation = Horizontal;
-            SetBackgroundColor(BackgroundColorNormalState);
+            SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
+            LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
-            parentFragment = f;
+            var bigPaddingValue = ConversionUtils.ConvertDpToPixels(16f);
+            var mediumPaddingValue = ConversionUtils.ConvertDpToPixels(8f);
+            SetPadding(bigPaddingValue, bigPaddingValue, bigPaddingValue, 0);
 
-            var leftLayout = new LinearLayoutCompat(context)
+            leftLayout = new LinearLayoutCompat(context)
             {
                 Orientation = Vertical,
                 LayoutParameters = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent)
                 {
-                    Weight = 1.0f
-                }
+                    Weight = 1.0f,
+                },
             };
-            leftLayout.Click += From_Click;
+            leftLayout.SetPadding(0, mediumPaddingValue, 0, mediumPaddingValue);
             AddView(leftLayout);
 
-            var fromTitleTextView = new AppCompatTextView(context)
+            fromTitleTextView = new AppCompatTextView(context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                 Gravity = GravityFlags.Center
             };
             fromTitleTextView.Text = Context.GetString(Resource.String.search_document_date_from);
-            fromTitleTextView.SetTextAppearanceCompat(context, TextStyleTopLineResourceId);
             leftLayout.AddView(fromTitleTextView);
 
             dateRangeFromTextView = new AppCompatTextView(context)
@@ -58,19 +70,23 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                 Gravity = GravityFlags.Center
             };
-            dateRangeFromTextView.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId);
             leftLayout.AddView(dateRangeFromTextView);
 
+            var marginValue = ConversionUtils.ConvertDpToPixels(16);
             var separator = new AppCompatTextView(context)
             {
-                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent),
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent)
+                {
+                    LeftMargin = marginValue,
+                    RightMargin = marginValue
+                },
                 Gravity = GravityFlags.Center
             };
             separator.Text = "\u2014";
-            separator.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId);
+            separator.SetTextAppearanceCompat(context, textStyleBottomLineResourceId);
             AddView(separator);
 
-            var rightLayout = new LinearLayoutCompat(context)
+            rightLayout = new LinearLayoutCompat(context)
             {
                 Orientation = Vertical,
                 LayoutParameters = new LayoutParams(0, ViewGroup.LayoutParams.MatchParent)
@@ -78,17 +94,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                     Weight = 1.0f
                 }
             };
-            rightLayout.Click += To_Click;
+            rightLayout.SetPadding(0, mediumPaddingValue, 0, mediumPaddingValue);
             AddView(rightLayout);
 
-            var toTitleTextView = new AppCompatTextView(context)
+            toTitleTextView = new AppCompatTextView(context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                 Gravity = GravityFlags.Center
             };
             toTitleTextView.Text = Context.GetString(Resource.String.search_document_date_to);
 
-            toTitleTextView.SetTextAppearanceCompat(context, TextStyleTopLineResourceId);
             rightLayout.AddView(toTitleTextView);
 
             dateRangeToTextView = new AppCompatTextView(context)
@@ -97,31 +112,31 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 Gravity = GravityFlags.Center
             };
 
-            dateRangeToTextView.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId);
             rightLayout.AddView(dateRangeToTextView);
 
             UpdateText();
         }
 
-        void OpenDateRangeFragment(bool startFromTo)
+        public void PickFrom()
         {
-            var f = new PickDateRangeFragment()
-            {
-                FromTimestamp = fromTimestamp,
-                ToTimestamp = toTimestamp,
-                StartFromTo = startFromTo
-            };
-            parentFragment.PushDropdownViewFragment(f, f.GenerateTag());
+            leftLayout.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightblue)));
+            fromTitleTextView.SetTextAppearanceCompat(Context, textStyleTopLineSelectedResourceId);
+            dateRangeFromTextView.SetTextAppearanceCompat(Context, textStyleBottomLineSelectedResourceId);
+
+            rightLayout.SetBackgroundColor(Color.Transparent);
+            toTitleTextView.SetTextAppearanceCompat(Context, textStyleTopLineResourceId);
+            dateRangeToTextView.SetTextAppearanceCompat(Context, textStyleBottomLineResourceId);
         }
 
-        void From_Click(object sender, EventArgs e)
+        public void PickTo()
         {
-            OpenDateRangeFragment(false);
-        }
+            leftLayout.SetBackgroundColor(Color.Transparent);
+            fromTitleTextView.SetTextAppearanceCompat(Context, textStyleTopLineResourceId);
+            dateRangeFromTextView.SetTextAppearanceCompat(Context, textStyleBottomLineResourceId);
 
-        void To_Click(object sender, EventArgs e)
-        {
-            OpenDateRangeFragment(true);
+            rightLayout.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightblue)));
+            toTitleTextView.SetTextAppearanceCompat(Context, textStyleTopLineSelectedResourceId);
+            dateRangeToTextView.SetTextAppearanceCompat(Context, textStyleBottomLineSelectedResourceId);
         }
 
         void UpdateText()
@@ -139,27 +154,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         public void SetToText(long timestamp)
         {
             dateRangeToTextView.Text = timestamp == -1 ? "-" : timestamp.FormatServerTimestampAsDateString(Context);
-        }
-
-        public override void Refresh()
-        {
-            if (Criteria.DateRange != null && Criteria.DateRange.Enabled)
-            {
-                fromTimestamp = Criteria.DateRange.StartTimestamp;
-                toTimestamp = Criteria.DateRange.EndTimestamp;
-            }
-
-            UpdateText();
-        }
-
-        public override void UpdateCriteria()
-        {
-            Criteria.DateRange = new DateRange
-            {
-                Enabled = fromTimestamp != -1 && toTimestamp != -1,
-                StartTimestamp = fromTimestamp,
-                EndTimestamp = toTimestamp
-            };
         }
     }
 }
