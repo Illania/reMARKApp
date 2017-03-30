@@ -7,7 +7,6 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
@@ -15,7 +14,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public class DocumentLinesSearchView : AbstractDropdownSearchView<SearchDocumentsCriteria>
     {
-        List<Guid> SelectedLineGuids = new List<Guid>();
+        readonly List<Guid> selectedLineGuids = new List<Guid>();
 
         public DocumentLinesSearchView(Android.Content.Context context, DocumentSearchCriteriaFragment f)
             : base(context, Resource.String.search_document_lines, Resource.String.search_document_lines_none_selected, f)
@@ -26,7 +25,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         {
             var pllf = new PickLinesListFragment
             {
-                SelectedLinesGuid = SelectedLineGuids,
+                SelectedLinesGuid = selectedLineGuids,
                 CloseRequest = UpdateLines,
             };
 
@@ -35,8 +34,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         void UpdateLines(List<Guid> lineGuids)
         {
-            SelectedLineGuids = lineGuids;
+            selectedLineGuids.Clear();
+            selectedLineGuids.AddRange(lineGuids);
             UpdateBottomTextView(lineGuids.Count);
+            UpdateCriteria();
         }
 
         public override void Refresh()
@@ -47,7 +48,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         public override void UpdateCriteria()
         {
             Criteria.LineGuids.Clear();
-            Criteria.LineGuids.AddRange(SelectedLineGuids);
+            Criteria.LineGuids.AddRange(selectedLineGuids);
         }
     }
 }

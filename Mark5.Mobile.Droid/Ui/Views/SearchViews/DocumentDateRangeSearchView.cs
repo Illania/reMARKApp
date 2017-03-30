@@ -102,16 +102,24 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
             UpdateText();
         }
-
-        void OpenDateRangeFragment(bool startFromTo)
+        void OpenDateRangeFragment(bool startWithTo)
         {
-            var f = new PickDateRangeFragment()
+            var f = new PickDateRangeFragment
             {
                 FromTimestamp = fromTimestamp,
                 ToTimestamp = toTimestamp,
-                StartFromTo = startFromTo
+                StartWithToDate = startWithTo,
+                CloseRequest = UpdateTimestamps,
             };
             parentFragment.PushDropdownViewFragment(f, f.GenerateTag());
+        }
+
+        void UpdateTimestamps(long fromT, long toT)
+        {
+            fromTimestamp = fromT;
+            toTimestamp = toT;
+            UpdateText();
+            UpdateCriteria();
         }
 
         void From_Click(object sender, EventArgs e)
@@ -133,7 +141,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         public void SetFromText(long timestamp)
         {
             dateRangeFromTextView.Text = timestamp == -1 ? "-" : timestamp.FormatServerTimestampAsDateString(Context);
-
         }
 
         public void SetToText(long timestamp)

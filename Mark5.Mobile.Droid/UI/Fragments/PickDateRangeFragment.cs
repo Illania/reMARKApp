@@ -30,7 +30,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         CalendarView fromDatePicker;
         CalendarView toDatePicker;
 
-        public bool StartFromTo { get; set; }
+        public Action<long, long> CloseRequest { get; set; }
+        public bool StartWithToDate { get; set; }
         public long FromTimestamp { get; set; }
         public long ToTimestamp { get; set; }
 
@@ -93,7 +94,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             UpdateText();
 
-            if (StartFromTo)
+            if (StartWithToDate)
             {
                 SelectTo();
             }
@@ -134,8 +135,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ToTimestamp = toDatePicker.Date;
 
             UpdateText();
-
-            //TODO should close? need to ask linnea
+            CloseFragment();
         }
 
         void UpdateText()
@@ -152,20 +152,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        void CloseFragment()
+        {
+            if (CloseRequest != null) CloseRequest(FromTimestamp, ToTimestamp);
+            ((AppCompatActivity)Activity).OnBackPressed();
+        }
+
         #region Retained State
 
         public override IRetainableState OnRetainInstanceState()
         {
             return new PickDateRangeFragmentState
             {
+                FromTimestamp = FromTimestamp,
+                ToTimestamp = ToTimestamp,
+                StartWithToDate = toDatePicker.Visibility == ViewStates.Visible,
             };
         }
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var clfs = restoredState as PickDateRangeFragmentState;
-            if (clfs != null)
+            var fs = restoredState as PickDateRangeFragmentState;
+            if (fs != null)
             {
+                FromTimestamp = fs.FromTimestamp;
+                ToTimestamp = fs.ToTimestamp;
+                StartWithToDate = fs.StartWithToDate;
             }
         }
 
@@ -176,7 +188,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class PickDateRangeFragmentState : IRetainableState
         {
-
+            public long FromTimestamp { get; set; }
+            public long ToTimestamp { get; set; }
+            public bool StartWithToDate { get; set; }
         }
 
         #endregion

@@ -101,6 +101,7 @@ namespace Mark5.Mobile.Droid
             if (item.ItemId == 10)
             {
                 CloseFragment();
+                return true;
             }
 
             return base.OnOptionsItemSelected(item);

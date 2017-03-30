@@ -193,13 +193,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             fragmentManager.BeginTransaction()
                                        .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
-                                       .Add(Resource.Id.fragment_container, f, tag) //TODO this needs to be replace, but we need to do something about the criteria
+                                       .Replace(Resource.Id.fragment_container, f, tag)
                                        .AddToBackStack(tag)
                                        .Commit();
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
+            menu.Clear();
             var item = menu.Add(Menu.None, 10, 10, Resource.String.done);
             item.SetShowAsAction(ShowAsAction.Always);
         }
@@ -209,6 +210,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == 10)
             {
                 Reset();
+                return true;
             }
 
             return base.OnOptionsItemSelected(item);

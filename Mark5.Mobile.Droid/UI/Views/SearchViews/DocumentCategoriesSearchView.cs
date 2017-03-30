@@ -15,7 +15,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public class DocumentCategoriesSearchView : AbstractDropdownSearchView<SearchDocumentsCriteria>
     {
-        List<int> SelectedCategoryIds = new List<int>();
+        readonly List<int> selectedCategoryIds = new List<int>();
 
         public DocumentCategoriesSearchView(Context context, DocumentSearchCriteriaFragment documentSearchCriteriaFragment)
             : base(context, Resource.String.search_categories, Resource.String.search_categories_none, documentSearchCriteriaFragment)
@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             var pclf = new PickCategoriesListFragment
             {
                 ObjectType = ObjectType.Document,
-                PreselectedCategoryIds = SelectedCategoryIds.ToArray(),
+                PreselectedCategoryIds = selectedCategoryIds.ToArray(),
                 CloseRequest = UpdateCategories
             };
 
@@ -38,8 +38,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         void UpdateCategories(List<int> categoriesId)
         {
-            SelectedCategoryIds = categoriesId;
+            selectedCategoryIds.Clear();
+            selectedCategoryIds.AddRange(categoriesId);
             UpdateBottomTextView(categoriesId.Count);
+            UpdateCriteria();
         }
 
         public override void Refresh()
@@ -50,7 +52,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         public override void UpdateCriteria()
         {
             Criteria.CategoryIds.Clear();
-            Criteria.CategoryIds.AddRange(SelectedCategoryIds);
+            Criteria.CategoryIds.AddRange(selectedCategoryIds);
         }
     }
 

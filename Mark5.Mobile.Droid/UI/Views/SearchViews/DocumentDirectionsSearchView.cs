@@ -63,14 +63,21 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         void ResetOtherButtons()
         {
             var otherButtonsList = new List<CustomButton> { inboxButton, outboxButton, draftButton };
-            foreach (var button in otherButtonsList)
-            {
-                button.UpdateSelectedState(false);
-            }
+            otherButtonsList.ForEach(b => b.UpdateSelectedState(false));
+        }
+
+        void ResetButtons()
+        {
+            allButton.UpdateSelectedState(false);
         }
 
         public override void Refresh()
         {
+            allButton.UpdateSelectedState(false);
+            inboxButton.UpdateSelectedState(false);
+            outboxButton.UpdateSelectedState(false);
+            draftButton.UpdateSelectedState(false);
+
             var directions = new List<DocumentDirection> { DocumentDirection.Incoming, DocumentDirection.Outgoing, DocumentDirection.Draft };
 
             if (Criteria.Directions == null || !Criteria.Directions.Any() || directions.Intersect(Criteria.Directions).Count() == directions.Count)

@@ -340,7 +340,7 @@
     <Compile Include="Ui\Fragments\PickPrioritiesListFragment.cs" />
     <Compile Include="Utilities\UI.cs" />
     <Compile Include="Ui\Fragments\PickDateRangeFragment.cs" />
-    <Compile Include="Ui\Views\SearchViews\DocumentPickDateHeaderView.cs" />
+    <Compile Include="Ui\Views\SearchViews\RelatedViews\DocumentPickDateHeaderView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -637,6 +637,7 @@
     <Folder Include="Ui\Views\SearchViews\" />
     <Folder Include="Ui\Views\SearchViews\AbstractViews\" />
     <Folder Include="Resources\transition\" />
+    <Folder Include="Ui\Views\SearchViews\RelatedViews\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Xamarin.Build.Download.0.3.0\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.3.0\build\Xamarin.Build.Download.targets')" />

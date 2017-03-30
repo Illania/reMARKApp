@@ -85,6 +85,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == 10)
             {
                 CloseFragment();
+                return true;
             }
 
             return base.OnOptionsItemSelected(item);

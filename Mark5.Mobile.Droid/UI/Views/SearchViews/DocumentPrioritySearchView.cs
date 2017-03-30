@@ -13,7 +13,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public class DocumentPrioritySearchView : AbstractDropdownSearchView<SearchDocumentsCriteria>
     {
-        List<Priority> SelectedPriorities = new List<Priority>();
+        readonly List<Priority> selectedPriorities = new List<Priority>();
 
         public DocumentPrioritySearchView(Android.Content.Context context, DocumentSearchCriteriaFragment f)
             : base(context, Resource.String.search_document_priorities, Resource.String.search_document_priorities_none_selected, f)
@@ -24,7 +24,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         {
             var pllf = new PickPrioritiesListFragment
             {
-                SelectedPriorities = SelectedPriorities,
+                SelectedPriorities = selectedPriorities,
                 CloseRequest = UpdatePriorities
             };
 
@@ -33,7 +33,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         void UpdatePriorities(List<Priority> priorities)
         {
-            SelectedPriorities = priorities;
+            selectedPriorities.Clear();
+            selectedPriorities.AddRange(priorities);
             UpdateBottomTextView(priorities.Count);
             UpdateCriteria();
         }
@@ -46,7 +47,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         public override void UpdateCriteria()
         {
             Criteria.Priorities.Clear();
-            Criteria.Priorities.AddRange(SelectedPriorities);
+            Criteria.Priorities.AddRange(selectedPriorities);
         }
     }
 }
