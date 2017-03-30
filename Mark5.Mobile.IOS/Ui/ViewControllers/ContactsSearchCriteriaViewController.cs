@@ -11,7 +11,6 @@ using System.Linq;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using ObjCRuntime;
@@ -136,7 +135,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
 
             stackView.AddArrangedSubview(new ContactTypesSearchView());
-            stackView.AddArrangedSubview(new ContactNameSearchView());
+            stackView.AddArrangedSubview(new NameSearchView());
             stackView.AddArrangedSubview(new AddressSearchView());
             stackView.AddArrangedSubview(new ShortIdDescriptionPhysicalAddressView());
             stackView.AddArrangedSubview(new CountryCategoriesView());
@@ -214,7 +213,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             searchButton.TouchUpInside -= SearchButton_TouchUpInside;
 
-            criteria.MaxToFetch = PlatformConfig.Preferences.DocumentsToSearch;
+            criteria.MaxToFetch = PlatformConfig.Preferences.ContactsToSearch;
 
             NavigationController.PushViewController(new ContactsSearchResultsViewController { Criteria = criteria }, true);
         }
@@ -390,14 +389,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        class ContactNameSearchView : AbstractSearchView
+        class NameSearchView : AbstractSearchView
         {
 
             readonly UIView view;
             readonly UILabel label;
             readonly UITextField text;
 
-            public ContactNameSearchView()
+            public NameSearchView()
             {
                 view = new UIView
                 {
@@ -410,7 +409,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 label = new UILabel
                 {
-                    Text = Localization.GetString("search_contact_name"),
+                    Text = Localization.GetString("search_name"),
                     TextColor = LabelTextColor,
                     Font = Font,
                     TextAlignment = UITextAlignment.Left,

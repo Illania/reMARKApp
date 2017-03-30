@@ -30,7 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.LoadView();
 
-            AutomaticallyAdjustsScrollViewInsets = false;
+            AutomaticallyAdjustsScrollViewInsets = true;
 
             segmentedControl = new UISegmentedControl(new[] { Localization.GetString("documents"), Localization.GetString("contacts"), Localization.GetString("shortcodes") });
             segmentedControl.Frame = new CGRect(0f, 0f, 0f, 26f);
@@ -48,7 +48,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             viewControllers = new UIViewController[]
             {
                 new DocumentsSearchCriteriaViewController(),
-                new ContactsSearchCriteriaViewController()
+                new ContactsSearchCriteriaViewController(),
+                new ShortcodesSearchCriteriaViewController()
             };
         }
 
