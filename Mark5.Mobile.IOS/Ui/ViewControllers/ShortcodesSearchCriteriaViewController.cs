@@ -121,17 +121,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 BackgroundColor = Theme.LightBlue,
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 ClipsToBounds = true,
-                ContentEdgeInsets = new UIEdgeInsets(12f, 12f, 12f, 12f)
+                ContentEdgeInsets = new UIEdgeInsets(14f, 14f, 14f, 14f)
             };
             searchButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "search_large.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-            searchButton.Layer.CornerRadius = 25f;
+            searchButton.Layer.CornerRadius = 27.5f;
             bottomView.AddSubview(searchButton);
             bottomView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 50f),
-                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 50f),
+                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 55f),
+                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 55f),
                 NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, bottomView, NSLayoutAttribute.CenterX, 1f, 0f),
-                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, bottomView, NSLayoutAttribute.CenterY, 1f, 0f)
+                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, bottomView, NSLayoutAttribute.Bottom, 1f, -12f)
             });
 
             stackView.AddArrangedSubview(new NameSearchView());
