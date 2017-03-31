@@ -160,8 +160,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnResume();
 
+            fab.Visibility = ViewStates.Visible;
             searchCriteria = searchCriteria ?? new SearchContactsCriteria();
             RefreshViews();
+        }
+
+        public override void OnPause()
+        {
+            fab.Visibility = ViewStates.Gone;
+            base.OnPause();
         }
 
         void RefreshViews()

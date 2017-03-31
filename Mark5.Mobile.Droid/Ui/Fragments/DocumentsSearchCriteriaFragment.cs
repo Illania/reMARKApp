@@ -68,7 +68,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fab.SetOnClickListener(new ActionOnClickListener(HandleSearchButtonClicked));
             fab.BackgroundTintList = ColorStateList.ValueOf(new Color(ContextCompat.GetColor(Context, Resource.Color.lightblue)));
             fab.RippleColor = new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)).ToArgb();
-            fab.Visibility = ViewStates.Visible;
 
             var p = (CoordinatorLayout.LayoutParams)fab.LayoutParameters;
             p.Gravity = (int)(GravityFlags.Bottom | GravityFlags.CenterHorizontal);
@@ -183,8 +182,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnResume();
 
+            fab.Visibility = ViewStates.Visible;
+
             searchCriteria = searchCriteria ?? new SearchDocumentsCriteria();
             RefreshViews();
+        }
+
+        public override void OnPause()
+        {
+            fab.Visibility = ViewStates.Gone;
+            base.OnPause();
         }
 
         void RefreshViews()
