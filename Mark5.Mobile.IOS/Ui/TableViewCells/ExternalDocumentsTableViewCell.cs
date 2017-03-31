@@ -47,7 +47,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public void Initialize(DocumentPreview documentPreview)
         {
             NameLabel.Text = documentPreview.Subject;
-            PreviewLabel.Text = !string.IsNullOrWhiteSpace(documentPreview.Preview) ? Regex.Replace(documentPreview.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline) : Localization.GetString("no_content"); ;
+            PreviewLabel.Text = !string.IsNullOrWhiteSpace(documentPreview.Preview) ? Regex.Replace(documentPreview.Preview, @"^\s+$[\r\n]*", string.Empty, RegexOptions.Multiline) : Localization.GetString("no_content");
             DateReceivedLabel.Text = documentPreview.DateReceivedTimestamp
                          .ConvertTimestampMillisecondsToDateTime()
                          .ConvertUtcToServerTime()

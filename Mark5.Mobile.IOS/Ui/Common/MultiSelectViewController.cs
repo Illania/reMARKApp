@@ -1,0 +1,160 @@
+﻿//
+// Project: Mark5.Mobile.IOS
+// File: MultiSelectViewController.cs
+// Author: Bartosz Cichecki <bgc@nordic-it.com>
+//
+// Copyright (c) 2017 Nordic IT
+//
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Foundation;
+using UIKit;
+
+namespace Mark5.Mobile.IOS.Ui.Common
+{
+
+    public class MultiSelectViewController<T> : UITableViewController
+    {
+        
+        UIBarButtonItem cancelItem;
+        UIBarButtonItem doneItem;
+
+        string title;
+        T[] data;
+        T[] preselected;
+        Func<T, string> description;
+        IEqualityComparer<T> equalityComparer;
+        Action<T[]> onResult;
+
+        HashSet<T> selectedItems;
+
+        public MultiSelectViewController(string title, T[] data, T[] preselected, Func<T, string> description, IEqualityComparer<T> equalityComparer, Action<T[]> onResult)
+            : base(UITableViewStyle.Grouped)
+        {
+            this.title = title;
+            this.data = data;
+            this.preselected = preselected;
+            this.description = description;
+            this.equalityComparer = equalityComparer;
+            this.onResult = onResult;
+
+            selectedItems = new HashSet<T>(equalityComparer);
+        }
+
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            Title = title;
+
+            cancelItem = new UIBarButtonItem
+            {
+                Title = Localization.GetString("cancel")
+            };
+            NavigationItem.SetLeftBarButtonItem(cancelItem, false);
+
+            doneItem = new UIBarButtonItem
+            {
+                Title = Localization.GetString("done")
+            };
+            NavigationItem.SetRightBarButtonItem(doneItem, false);
+
+            TableView.AllowsSelection = true;
+            TableView.AllowsMultipleSelection = true;
+            TableView.DataSource = this;
+            TableView.Delegate = this;
+
+            TableView.ReloadData();
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                var d = data[i];
+                if (preselected.Contains(d, equalityComparer))
+                {
+                    selectedItems.Add(d);
+                    TableView.SelectRow(NSIndexPath.FromRowSection(i, 0), false, UITableViewScrollPosition.None);
+                }
+            }
+
+            preselected = null;
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+
+            cancelItem.Clicked += CancelItem_Clicked;
+            doneItem.Clicked += DoneItem_Clicked;
+        }
+
+        public override void ViewWillDisappear(bool animated)
+        {
+            base.ViewWillDisappear(animated);
+
+            cancelItem.Clicked -= CancelItem_Clicked;
+            doneItem.Clicked -= DoneItem_Clicked;
+        }
+
+        void CancelItem_Clicked(object sender, EventArgs e)
+        {
+            onResult(null);
+
+            title = null;
+            data = null;
+            description = null;
+            onResult = null;
+            selectedItems = null;
+
+            DismissViewController(true, null);
+        }
+
+        void DoneItem_Clicked(object sender, EventArgs e)
+        {
+            onResult(selectedItems.ToArray());
+
+            title = null;
+            data = null;
+            description = null;
+            onResult = null;
+            selectedItems = null;
+
+            DismissViewController(true, null);
+        }
+
+        public override nint RowsInSection(UITableView tableView, nint section)
+        {
+            return data.Length;
+        }
+
+        public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+        {
+            var cell = tableView.DequeueReusableCell("cell");
+
+            if (cell == null)
+            {
+                cell = new UITableViewCell(UITableViewCellStyle.Default, "cell");
+                cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+            }
+
+            var d = data[indexPath.Row];
+
+            cell.TextLabel.Text = description(d);
+            cell.Accessory = selectedItems.Contains(d) ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
+
+            return cell;
+        }
+
+        public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+        {
+            tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.Checkmark;
+            selectedItems.Add(data[indexPath.Row]);
+        }
+
+        public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
+        {
+            tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.None;
+            selectedItems.Remove(data[indexPath.Row]);
+        }
+    }
+}

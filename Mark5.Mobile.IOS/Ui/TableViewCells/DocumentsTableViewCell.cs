@@ -61,7 +61,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             }
 
             SubjectLabel.Text = documentPreview.Subject;
-            MessagePreviewLabel.Text = !string.IsNullOrWhiteSpace(documentPreview.Preview) ? Regex.Replace(documentPreview.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline) : Localization.GetString("no_content"); ;
+            MessagePreviewLabel.Text = !string.IsNullOrWhiteSpace(documentPreview.Preview) ? Regex.Replace(documentPreview.Preview, @"^\s+$[\r\n]*", string.Empty, RegexOptions.Multiline) : Localization.GetString("no_content");
             DateReceivedLabel.Text = documentPreview.DateReceivedTimestamp
                          .ConvertTimestampMillisecondsToDateTime()
                          .ConvertUtcToServerTime()
@@ -102,7 +102,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             SenderNameLabel.Text = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
 
             SubjectLabel.Text = string.IsNullOrWhiteSpace(documentPreview.Subject) ? Localization.GetString("no_subject") : documentPreview.Subject;
-            MessagePreviewLabel.Text = !string.IsNullOrWhiteSpace(documentPreview.Preview) ? Regex.Replace(documentPreview.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline) : Localization.GetString("no_content"); ;
+            MessagePreviewLabel.Text = !string.IsNullOrWhiteSpace(documentPreview.Preview) ? Regex.Replace(documentPreview.Preview, @"^\s+$[\r\n]*", string.Empty, RegexOptions.Multiline) : Localization.GetString("no_content");
             DateReceivedLabel.Text = container.Info.DateLastSavedTimestamp
                          .ConvertTimestampMillisecondsToDateTime()
                          .ConvertUtcToServerTime()

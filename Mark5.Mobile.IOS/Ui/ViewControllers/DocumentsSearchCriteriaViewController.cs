@@ -139,7 +139,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             stackView.AddArrangedSubview(new MessageSubjectView());
             stackView.AddArrangedSubview(new FromToView());
             stackView.AddArrangedSubview(new DateRangeView());
-            stackView.AddArrangedSubview(new LineCategoriesPriorityNameView());
+            stackView.AddArrangedSubview(new LineCategoriesPriorityNameView(this));
             stackView.AddArrangedSubview(new ReferenceCommentsAttachmentNameView());
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.ExtraFieldInfos.Any())
                 stackView.AddArrangedSubview(new ExtraFieldsView());
@@ -956,6 +956,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         class LineCategoriesPriorityNameView : AbstractSearchView
         {
 
+            readonly UIViewController parent;
+
             readonly UIView lineView;
             readonly UILabel lineLabel;
             readonly UILabel lineValue;
@@ -966,8 +968,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             readonly UILabel priorityLabel;
             readonly UILabel priorityValue;
 
-            public LineCategoriesPriorityNameView()
+            public LineCategoriesPriorityNameView(UIViewController parent)
             {
+                this.parent = parent;
+
                 lineView = new UIView
                 {
                     BackgroundColor = InactiveBackgroundColor,
@@ -1125,11 +1129,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             [Export("tapped:")]
-            void Tapped(UITapGestureRecognizer recognizer)
+            async void Tapped(UITapGestureRecognizer recognizer)
             {
                 if (recognizer.View == lineView)
                 {
-                    // TODO
+                    var data = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.ToArray();
+                    var preselected = data.Where(l => Criteria.LineGuids.Contains(l.Guid)).ToArray();
+
+                    var result = await Dialogs.ShowMultiSelectDialogAsync(parent,
+                                                                          Localization.GetString("search_lines"),
+                                                                          data,
+                                                                          preselected,
+                                                                          l => l.Name,
+                                                                          LambdaEqualityComparer<Line>.Create(l => l.Guid));
+
+                    if (result == null)
+                        return;
+
+                    Criteria.LineGuids = result.Select(l => l.Guid).ToList();
                 }
 
                 if (recognizer.View == categoriesView)
@@ -1139,7 +1156,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (recognizer.View == priorityView)
                 {
-                    // TODO
+                    var data = new[] { Priority.Urgent, Priority.Normal, Priority.Low };
+                    var preselected = data.Where(p => Criteria.Priorities.Contains(p)).ToArray();
+
+                    Func<Priority, string> description = p =>
+                    {
+                        switch (p)
+                        {
+                            case Priority.Urgent:
+                                return Localization.GetString("priority_urgent");
+                            case Priority.Normal:
+                                return Localization.GetString("priority_normal");
+                            case Priority.Low:
+                                return Localization.GetString("priority_low");
+                            default:
+                                return string.Empty;
+                        }
+                    };
+
+                    var result = await Dialogs.ShowMultiSelectDialogAsync(parent,
+                                                                          Localization.GetString("priority"),
+                                                                          data,
+                                                                          preselected,
+                                                                          description,
+                                                                          LambdaEqualityComparer<Priority>.Create(p => p));
+
+                    if (result == null)
+                        return;
+
+                    Criteria.Priorities = result.ToList();
                 }
 
                 UpdateRow();
