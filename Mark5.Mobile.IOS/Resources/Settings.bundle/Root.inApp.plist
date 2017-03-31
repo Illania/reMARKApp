@@ -136,16 +136,6 @@
 		</dict>
 		<dict>
 			<key>Type</key>
-			<string>PSChildPaneSpecifier</string>
-			<key>Title</key>
-			<string>contact_section_visibility</string>
-			<key>Key</key>
-			<string>contactSectionVisibility</string>
-			<key>File</key>
-			<string>ContactSectionsVisibility.inApp</string>
-		</dict>
-		<dict>
-			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
 			<string>synchronise_contacts</string>
@@ -232,6 +222,84 @@
 			<string>IASKCustomViewSpecifier</string>
 			<key>Key</key>
 			<string>localTemplate</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>search</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Title</key>
+			<string>documents_to_search</string>
+			<key>Key</key>
+			<string>DocumentsToSearch</string>
+			<key>DefaultValue</key>
+			<integer>250</integer>
+			<key>Titles</key>
+			<array>
+				<string>100</string>
+				<string>250</string>
+				<string>500</string>
+				<string>1000</string>
+			</array>
+			<key>Values</key>
+			<array>
+				<integer>100</integer>
+				<integer>250</integer>
+				<integer>500</integer>
+				<integer>1000</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Title</key>
+			<string>contacts_to_search</string>
+			<key>Key</key>
+			<string>ContactsToSearch</string>
+			<key>DefaultValue</key>
+			<integer>250</integer>
+			<key>Titles</key>
+			<array>
+				<string>100</string>
+				<string>250</string>
+				<string>500</string>
+				<string>1000</string>
+			</array>
+			<key>Values</key>
+			<array>
+				<integer>100</integer>
+				<integer>250</integer>
+				<integer>500</integer>
+				<integer>1000</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Title</key>
+			<string>shortcodes_to_search</string>
+			<key>Key</key>
+			<string>ShortcodesToSearch</string>
+			<key>DefaultValue</key>
+			<integer>250</integer>
+			<key>Titles</key>
+			<array>
+				<string>100</string>
+				<string>250</string>
+				<string>500</string>
+				<string>1000</string>
+			</array>
+			<key>Values</key>
+			<array>
+				<integer>100</integer>
+				<integer>250</integer>
+				<integer>500</integer>
+				<integer>1000</integer>
+			</array>
 		</dict>
 		<dict>
 			<key>Type</key>

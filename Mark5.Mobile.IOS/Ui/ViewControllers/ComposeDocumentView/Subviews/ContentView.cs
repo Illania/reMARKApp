@@ -382,7 +382,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 return textWriter.ToString();
             }
-            return "";
+            return string.Empty;
         }
 
         async Task<string> RetrieveCombinedText()
@@ -479,7 +479,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var elementClasses = new[]
             {
-                EditableContentClass,
+                EditableContentClass
             };
 
             foreach (var elementClass in elementClasses)

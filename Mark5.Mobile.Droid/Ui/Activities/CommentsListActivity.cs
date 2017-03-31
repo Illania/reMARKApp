@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: 
 // File: CommentsActivity.cs
 // Author: Ferdinando Papale fp@nordic-it.com
@@ -7,6 +7,7 @@
 //
 using Android.App;
 using Android.Content;
+using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
@@ -18,7 +19,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
-    [Activity]
+    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class CommentsListActivity : BaseAppCompatActivity
     {
 
@@ -72,6 +73,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
 
             base.OnBackPressed();
+        }
+
+        public override void Finish()
+        {
+            base.Finish();
 
             OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
         }

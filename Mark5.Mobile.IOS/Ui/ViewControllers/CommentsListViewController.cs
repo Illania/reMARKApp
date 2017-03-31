@@ -60,6 +60,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeEditView();
         }
 
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            ExtendedLayoutIncludesOpaqueBars = true;
+        }
+
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
@@ -542,7 +549,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (comment.UserId == ServerConfig.SystemSettings.UserInfo.User.Id)
                 {
                     var deleteAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive, Localization.GetString("delete"), (a, ip) => viewController.DeleteComment(comment));
-                    deleteAction.BackgroundColor = Theme.Blue;
+                    deleteAction.BackgroundColor = Theme.DarkerBlue;
                     actions.Add(deleteAction);
 
                     var isEditable = DateTime.Now.ToUniversalTime().Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= SecondsToEdit;

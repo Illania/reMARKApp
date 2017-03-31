@@ -47,6 +47,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeView();
         }
 
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            ExtendedLayoutIncludesOpaqueBars = true;
+        }
+
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
@@ -147,7 +154,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBarTitle()
         {
+            UIView.AnimationsEnabled = false;
             NavigationItem.Title = outgoingFolder.Name;
+            NavigationItem.Prompt = Localization.GetString("documents");
+            UIView.AnimationsEnabled = true;
         }
 
         void InitializeHandlers()

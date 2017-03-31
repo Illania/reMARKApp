@@ -30,7 +30,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
-    [Android.App.Activity]
+    [Android.App.Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FragmentManager.IOnBackStackChangedListener
     {
 

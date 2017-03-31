@@ -18,6 +18,7 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
+using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
@@ -55,7 +56,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
-            adapter = new DocumentSearchResultsAdapter(Activity);
+            adapter = new DocumentSearchResultsAdapter(Activity, recyclerView);
             adapter.ItemClicked += Adapter_ItemClicked;
             recyclerView.SetAdapter(adapter);
 
@@ -191,7 +192,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region RecyclerView Adapter/ViewHolder
 
-        class DocumentSearchResultsAdapter : RecyclerView.Adapter
+        class DocumentSearchResultsAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
 
             public static class ViewType
@@ -218,12 +219,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             readonly List<DocumentPreview> documentPreviewsInView = new List<DocumentPreview>(1000);
             readonly Context context;
+            readonly RecyclerView recyclerView;
 
             public event EventHandler<DocumentPreview> ItemClicked = delegate { };
 
-            public DocumentSearchResultsAdapter(Context context)
+            public DocumentSearchResultsAdapter(Context context, RecyclerView recyclerView)
             {
                 this.context = context;
+                this.recyclerView = recyclerView;
             }
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
@@ -247,11 +250,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
 
                     dpvh.Subject = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
-                    dpvh.Date = dp.DateReceivedTimestamp
-                        .ConvertTimestampMillisecondsToDateTime()
-                        .ConvertUtcToServerTime()
-                        .ConvertDateTimeToTimestampMilliseconds()
-                        .FormatServerTimestampAsCompactShortDateTimeString(context);
+                    var d = dp.DateReceivedTimestamp
+                                .ConvertTimestampMillisecondsToDateTime()
+                                .ConvertUtcToServerTime()
+                                .ConvertDateTimeToTimestampMilliseconds();
+                    dpvh.Date = d.FormatServerTimestampAsCompactShortDateTimeString(context);
+                    dpvh.BubbleDate = d.FormatServerTimestampAsCompactLongDateTimeString(context);
                     dpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                     dpvh.Categories = dp.Categories;
                     dpvh.IncomingIndicator = dp.Direction == DocumentDirection.Incoming;
@@ -268,11 +272,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     edpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
 
-                    edpvh.Date = dp.DateReceivedTimestamp
-                    .ConvertTimestampMillisecondsToDateTime()
-                    .ConvertUtcToServerTime()
-                    .ConvertDateTimeToTimestampMilliseconds()
-                    .FormatServerTimestampAsCompactShortDateTimeString(context);
+                    var d = dp.DateReceivedTimestamp
+                                .ConvertTimestampMillisecondsToDateTime()
+                                .ConvertUtcToServerTime()
+                                .ConvertDateTimeToTimestampMilliseconds();
+                    edpvh.Date = d.FormatServerTimestampAsCompactShortDateTimeString(context);
+                    edpvh.BubbleDate = d.FormatServerTimestampAsCompactLongDateTimeString(context);
                     edpvh.Name = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
                     edpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                     edpvh.Categories = dp.Categories;
@@ -303,6 +308,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 documentPreviewsInView.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
+
+            string ISectionedAdapter.GetSectionName(int position)
+            {
+                var vh = recyclerView.FindViewHolderForAdapterPosition(position);
+
+                var dpvh = vh as DocumentPreviewViewHolder;
+                if (dpvh != null)
+                {
+                    return dpvh.BubbleDate;
+                }
+
+                var edpvh = vh as ExternalDocumentPreviewViewHolder;
+                if (edpvh != null)
+                {
+                    return edpvh.BubbleDate;
+                }
+
+                return string.Empty;
+            }
         }
 
         class DocumentPreviewViewHolder : RecyclerView.ViewHolder
@@ -323,6 +347,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dateTextView.Text = value;
                 }
             }
+
+            public string BubbleDate { get; set; }
 
             public string Subject
             {
@@ -463,6 +489,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dateTextView.Text = value;
                 }
             }
+
+            public string BubbleDate { get; set; }
 
             public string Preview
             {

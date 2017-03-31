@@ -58,6 +58,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             SubscribeToMessages();
         }
 
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            ExtendedLayoutIncludesOpaqueBars = true;
+        }
+
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
@@ -190,7 +197,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBarTitle()
         {
+            UIView.AnimationsEnabled = false;
             NavigationItem.Title = Folder.Name;
+            NavigationItem.Prompt = Localization.GetString("contacts");
+            UIView.AnimationsEnabled = true;
         }
 
         void InitializeHandlers()
@@ -564,6 +574,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
+        void ShowCategories(ContactPreview selectedContact)
+        {
+            var vc = new CategoriesListViewController { BusinessEntityPreview = selectedContact };
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
         void MoveToFolder(ContactPreview selectedContact) => MoveToFolder(new List<ContactPreview> { selectedContact });
 
         void MoveToFolder(List<ContactPreview> selectedContacts)
@@ -575,6 +591,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void DoShowMoreActionSheet(NSIndexPath indexPath, ContactPreview selectedContact)
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("categories"), UIAlertActionStyle.Default, a =>
+            {
+                ShowCategories(selectedContact);
+                EndEditing();
+            }));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
             {
@@ -767,7 +790,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var contactPreview = contactPreviewsInView[indexPath.Section][indexPath.Row];
 
                 var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("more"), (a, ip) => { viewController.DoShowMoreActionSheet(indexPath, contactPreview); });
-                moreAction.BackgroundColor = Theme.Blue;
+                moreAction.BackgroundColor = Theme.DarkerBlue;
                 actions.Add(moreAction);
 
                 var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("copy_to_worktray"), (a, ip) => { viewController.CopyToWorktray(contactPreview); viewController.EndEditing(); });

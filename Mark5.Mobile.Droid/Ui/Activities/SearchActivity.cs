@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: SearchActivity.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -6,6 +6,7 @@
 // Copyright (c) 2017 Nordic IT
 //
 using Android.App;
+using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
@@ -17,7 +18,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
-    [Activity]
+    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class SearchActivity : BaseAppCompatActivity
     {
         public const string ModuleIntentKey = "Module_0775cdc7-e733-4dea-a291-19c719bfb546";
@@ -73,9 +74,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
         }
 
-        public override void OnBackPressed()
+        public override void Finish()
         {
-            base.OnBackPressed();
+            base.Finish();
 
             OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
         }

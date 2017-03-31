@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: CopyToUserWorktrayActivity.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using Android.App;
 using Android.Content;
+using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
@@ -19,7 +20,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
-    [Activity]
+    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class CopyToUserWorktrayActivity : BaseAppCompatActivity
     {
 
@@ -69,9 +70,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
         }
 
-        public override void OnBackPressed()
+        public override void Finish()
         {
-            base.OnBackPressed();
+            base.Finish();
 
             OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
         }

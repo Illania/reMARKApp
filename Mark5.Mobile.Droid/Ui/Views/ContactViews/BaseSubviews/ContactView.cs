@@ -7,7 +7,6 @@
 //
 using Android.Content;
 using Android.Support.V7.Widget;
-using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -22,29 +21,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         protected int DistanceNormal;
         protected int DistanceSmall;
 
-        protected View Divider;
-
         public ContactPreview ContactPreview { get; set; }
         public Contact Contact { get; set; }
 
-        protected ContactView(Context context) : base(context)
+        protected ContactView(Context context)
+            : base(context)
         {
             DistanceVeryLarge = ConversionUtils.ConvertDpToPixels(24);
             DistanceLarge = ConversionUtils.ConvertDpToPixels(16);
             DistanceNormal = ConversionUtils.ConvertDpToPixels(8);
             DistanceSmall = ConversionUtils.ConvertDpToPixels(4);
-        }
-
-        public void HideSeparator()
-        {
-            if (Divider != null)
-                Divider.Visibility = ViewStates.Gone;
-        }
-
-        public void ShowSeparator()
-        {
-            if (Divider != null)
-                Divider.Visibility = ViewStates.Visible;
         }
 
         public abstract void RefreshView();

@@ -14,6 +14,7 @@ using Android.Util;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views
 {
@@ -39,14 +40,14 @@ namespace Mark5.Mobile.Droid.Ui.Views
         void InitializeView(string title, ObjectLink[] objectLinks)
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            Elevation = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 2f, Resources.DisplayMetrics) + 0.5f);
-            Radius = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 2f, Resources.DisplayMetrics) + 0.5f);
+            Elevation = 0;
+            Radius = ConversionUtils.ConvertDpToPixels(2f);
             UseCompatPadding = true;
 
-            distanceVeryLarge = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 24f, Resources.DisplayMetrics) + 0.5f);
-            distanceLarge = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 16f, Resources.DisplayMetrics) + 0.5f);
-            distanceNormal = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 8f, Resources.DisplayMetrics) + 0.5f);
-            distanceSmall = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 4f, Resources.DisplayMetrics) + 0.5f);
+            distanceVeryLarge = ConversionUtils.ConvertDpToPixels(24f);
+            distanceLarge = ConversionUtils.ConvertDpToPixels(16f);
+            distanceNormal = ConversionUtils.ConvertDpToPixels(8f);
+            distanceSmall = ConversionUtils.ConvertDpToPixels(4f);
 
             innerLayout = new LinearLayoutCompat(Context)
             {

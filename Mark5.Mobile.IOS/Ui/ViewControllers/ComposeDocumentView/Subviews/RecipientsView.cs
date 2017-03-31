@@ -7,7 +7,6 @@
 //
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -23,6 +22,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
+    
     public class RecipientsView : ComposeDocumentSubView
     {
         protected const string EmailSeparator = ", ";
@@ -38,12 +38,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public DocumentAddressType AddressType { get; protected set; }
 
         protected UILabel Label;
-        protected UIButton AddButton;
         protected CustomUITextView TextView;
         UITapGestureRecognizer textViewTapGestureRecognizer;
 
         public event EventHandler Edited = delegate { };
-        public event EventHandler<AddButtonTappedEventArgs> AddButtonTapped = delegate { };
         public event EventHandler<RecipentTappedEventArgs> RecipentTapped = delegate { };
         public event EventHandler<string> SearchRequested = delegate { };
         public event EventHandler CommaOrEnterPressed = delegate { };
@@ -64,7 +62,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             Initialize();
         }
 
-        void Initialize(bool hideAdd = false)
+        void Initialize()
         {
             Label = new UILabel();
             Label.Text = GetTitleFromAddressType();
@@ -81,26 +79,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     NSLayoutConstraint.Create(Label, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
                     NSLayoutConstraint.Create(Label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
                 });
-
-            if (!hideAdd)
-            {
-                var addButtonIcon = UIImage.FromBundle(Path.Combine("icons", "add.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-                AddButton = new UIButton();
-                AddButton.SetImage(addButtonIcon, UIControlState.Normal);
-                AddButton.BackgroundColor = UIColor.Clear;
-                AddButton.TouchUpInside += HandleAddButtonTapped;
-                AddButton.TranslatesAutoresizingMaskIntoConstraints = false;
-                AddButton.ContentEdgeInsets = new UIEdgeInsets(5f, 5f, 5f, 5f);
-                AddButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-                AddButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-                AddButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-                ContainerView.AddSubview(AddButton);
-                ContainerView.AddConstraints(new[]
-                    {
-                        NSLayoutConstraint.Create(AddButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin - AddButton.ContentEdgeInsets.Top),
-                        NSLayoutConstraint.Create(AddButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin - AddButton.ContentEdgeInsets.Right)
-                    });
-            }
 
             var textStorage = new NSTextStorage();
             textStorage.AddAttribute(UIStringAttributeKey.Font, Theme.DefaultFont, new NSRange(0, 0));
@@ -136,7 +114,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
                     NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, Label, NSLayoutAttribute.Right, 1f, InnerMargin),
                     NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
-                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, !hideAdd ? (UIView)AddButton : this, !hideAdd ? NSLayoutAttribute.Left : NSLayoutAttribute.Right, 1f, !hideAdd ? -InnerMargin : -HorizontalMargin)
+                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
                 });
 
             textViewTapGestureRecognizer = new UITapGestureRecognizer();
@@ -391,11 +369,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             CorrectMarkup();
 
             CollapseView();
-        }
-
-        void HandleAddButtonTapped(object sender, EventArgs e)
-        {
-            AddButtonTapped(sender, new AddButtonTappedEventArgs(this));
         }
 
         string GetStringToSearch()

@@ -19,6 +19,7 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
+using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
@@ -338,7 +339,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
             Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
-            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
 
             menu.Clear();
 
@@ -434,7 +435,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
         {
             Activity.Window.AddFlags(WindowManagerFlags.TranslucentStatus);
-            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
 
             CurrentAdapter.ClearSelections();
             actionMode = null;
@@ -548,6 +549,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 refreshLayout.Enabled = false;
                 adapter.ClearSelections();
                 recyclerView.SwapAdapter(searchAdapter, true);
+                (this as SearchView.IOnQueryTextListener).OnQueryTextChange(string.Empty);
                 return true;
             }
 
@@ -577,13 +579,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             searchHandler.PostDelayed(() =>
             {
                 if (string.IsNullOrWhiteSpace(newText))
-                {
-                    searchAdapter.Clear();
-                }
+                    searchAdapter.ReplaceItems(adapter.Items);
                 else
-                {
                     searchAdapter.ReplaceItems(adapter.Items.Where(dp => MatchesQuery(dp, newText)).ToList());
-                }
             }, 500);
             return false;
         }
@@ -728,7 +726,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region RecyclerView Adapter/ViewHolder
 
-        class ContactsListAdapter : RecyclerView.Adapter
+        class ContactsListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
 
             public List<ContactPreview> Items
@@ -903,6 +901,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
                 }
                 return position;
+            }
+
+            string ISectionedAdapter.GetSectionName(int position)
+            {
+                return contactPreviewsInView[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
         }
 

@@ -8,7 +8,7 @@
     <include
         layout="@layout/selected_overlay" />
     <android.support.v7.widget.LinearLayoutCompat
-        android:id="@+id/list_item_document_internal_Layout"
+        android:id="@+id/list_item_document_internal_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="8dp"

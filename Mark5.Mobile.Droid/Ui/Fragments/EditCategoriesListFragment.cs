@@ -18,9 +18,11 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
+using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Utilities;
@@ -264,6 +266,7 @@ namespace Mark5.Mobile.Droid
             if (item.ItemId == Resource.Id.action_filter)
             {
                 recyclerView.SwapAdapter(searchAdapter, true);
+                (this as SearchView.IOnQueryTextListener).OnQueryTextChange(string.Empty);
                 return true;
             }
 
@@ -289,13 +292,9 @@ namespace Mark5.Mobile.Droid
             searchHandler.PostDelayed(() =>
             {
                 if (string.IsNullOrWhiteSpace(newText))
-                {
-                    searchAdapter.Clear();
-                }
+                    searchAdapter.ReplaceItems(adapter.Items);
                 else
-                {
                     searchAdapter.ReplaceItems(adapter.Items.Where(dp => MatchesQuery(dp, newText)).ToList());
-                }
             }, 500);
             return false;
         }
@@ -367,7 +366,7 @@ namespace Mark5.Mobile.Droid
 
         #region RecyclerView Adapter/ViewHolder
 
-        class CategoriesListAdapter : RecyclerView.Adapter
+        class CategoriesListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
 
             readonly List<Category> categoriesInView = new List<Category>();
@@ -426,6 +425,11 @@ namespace Mark5.Mobile.Droid
             public int GetPosition(Category category)
             {
                 return categoriesInView.FindIndex(c => c.Id == category.Id);
+            }
+
+            string ISectionedAdapter.GetSectionName(int position)
+            {
+                return categoriesInView[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
         }
 

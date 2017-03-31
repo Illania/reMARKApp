@@ -118,6 +118,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitBackgroundView();
         }
 
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            ExtendedLayoutIncludesOpaqueBars = true;
+        }
+
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
@@ -129,13 +136,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
+            CommonConfig.Logger.Info($"{nameof(DocumentViewController)} appeared");
+
+            mainScrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+            mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+
             if (refreshDataOnAppear)
             {
                 refreshDataOnAppear = false;
                 RefreshData();
             }
-
-            CorrectScrollViewInsets();
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -154,6 +164,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             DeInitializeHandlers();
+        }
+
+        public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
+        {
+            base.ViewWillTransitionToSize(toSize, coordinator);
+
+            coordinator.AnimateAlongsideTransition(ctx => { }, ctx =>
+            {
+                if (mainScrollView == null) return;
+
+                mainScrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+                mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+            });
         }
 
         #endregion
@@ -203,6 +226,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitStackViews()
         {
+            AutomaticallyAdjustsScrollViewInsets = false;
+
             mainScrollView = new ActionableLayoutScrollView
             {
                 BackgroundColor = UIColor.White,
@@ -214,6 +239,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ClipsToBounds = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
+            mainScrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+            mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
             mainScrollView.LayoutSubviewsAction = HandleScrollViewLayoutSubviewsAction;
             View.AddSubview(mainScrollView);
             View.AddConstraints(new[]
@@ -272,6 +299,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var viewsBeforeContent = new List<DocumentSubView>();
             var viewsAfterContent = new List<DocumentSubView>();
+            
+            subjectView = new SubjectView();
+            viewsBeforeContent.Add(subjectView);
 
             fromView = new FromView();
             viewsBeforeContent.Add(fromView);
@@ -284,9 +314,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             bccView = new BccView();
             viewsBeforeContent.Add(bccView);
-
-            subjectView = new SubjectView();
-            viewsBeforeContent.Add(subjectView);
 
             dateReceivedView = new DateReceivedView();
             viewsBeforeContent.Add(dateReceivedView);
@@ -367,7 +394,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 40f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, Modal ? 0 : -49f)
+                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, -(TabBarController?.TabBar?.Frame.Height ?? 0f))
                 });
         }
 
@@ -395,12 +422,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(spinner, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, backgroundView, NSLayoutAttribute.CenterX, 1f, 0f),
                     NSLayoutConstraint.Create(spinner, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, backgroundView, NSLayoutAttribute.CenterY, 1f, 0f)
                 });
-        }
-
-        void CorrectScrollViewInsets()
-        {
-            mainScrollView.ContentInset = new UIEdgeInsets(mainScrollView.ContentInset.Top, 0f, mainScrollView.ContentInset.Bottom + toolbar.Frame.Height, 0f);
-            mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(mainScrollView.ScrollIndicatorInsets.Top, 0f, mainScrollView.ScrollIndicatorInsets.Bottom + toolbar.Frame.Height, 0f);
         }
 
         void InitializeHandlers()
@@ -459,7 +480,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 previousDocumentButtonItem.Clicked -= PreviousDocumentButton_Clicked;
             }
         }
-
 
         public void SetData(Folder folder, DocumentPreview documentPreview,
                             GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
@@ -666,10 +686,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void MarkAsReadIfNecessary()
         {
-            if (outgoingDocumentIdentifier != default(Guid) || document == null || documentPreview == null)
-            {
+            if (outgoingDocumentIdentifier != default(Guid) || folder == null || document == null || documentPreview == null)
                 return;
-            }
 
             readStatusCts?.Cancel();
             readStatusCts = new CancellationTokenSource();
@@ -704,7 +722,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         readByView.RefreshView();
                         readByView.UpdateVisibility();
 
-                        ReadStatusUpdated(this, new ReadStatusUpdatedEventArgs(dp));
+                        if (ReadStatusUpdated != null)
+                            ReadStatusUpdated(this, new ReadStatusUpdatedEventArgs(dp));
                     });
                 }
                 catch (Exception ex)
@@ -716,8 +735,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void RefreshView()
         {
-            Title = documentPreview?.Subject;
-
             subViews.ForEach(v =>
             {
                 v.Document = document;
@@ -1151,7 +1168,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 readByView.RefreshView();
 
-                ReadStatusUpdated(this, new ReadStatusUpdatedEventArgs(documentPreview));
+                if (ReadStatusUpdated != null)
+                    ReadStatusUpdated(this, new ReadStatusUpdatedEventArgs(documentPreview));
 
                 dismissAction();
             }

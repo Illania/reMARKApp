@@ -15,22 +15,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class SplitMainViewController : AbstractMainViewController
     {
 
-        NavigationController searchNavigationController;
         DocumentsSplitViewController documentSplitViewController;
         ContactsSplitViewController contactSplitViewController;
         ShortcodesSplitViewController shortcodeSplitViewController;
-        NavigationController notificationsNavigationController;
         NavigationController settingsNavigationController;
 
         public override void LoadView()
         {
             base.LoadView();
-
-            searchNavigationController = new NavigationController(new SearchViewController());
-            searchNavigationController.TabBarItem.Title = Localization.GetString("search");
-            searchNavigationController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "documents.png")); // TODO ICON put correct icon
-            searchNavigationController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "documents-filled.png")); // TODO ICON put correct icon
-            searchNavigationController.Tag = SearchTag;
 
             documentSplitViewController = new DocumentsSplitViewController();
             documentSplitViewController.TabBarItem.Title = Localization.GetString("documents");
@@ -50,12 +42,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             shortcodeSplitViewController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "shortcodes-filled.png"));
             shortcodeSplitViewController.Tag = ShortcodeTag;
 
-            notificationsNavigationController = new NavigationController(new NotificationsListViewController());
-            notificationsNavigationController.TabBarItem.Title = Localization.GetString("notifications");
-            notificationsNavigationController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "notifications.png"));
-            notificationsNavigationController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "notifications-filled.png"));
-            notificationsNavigationController.Tag = NotificationsTag;
-
             settingsNavigationController = new NavigationController(new SettingsViewController());
             settingsNavigationController.TabBarItem.Title = Localization.GetString("settings");
             settingsNavigationController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "settings.png"));
@@ -64,15 +50,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             ViewControllers = new UIViewController[]
             {
-                //searchNavigationController,
                 documentSplitViewController,
                 contactSplitViewController,
+                Dummy,
                 shortcodeSplitViewController,
-                notificationsNavigationController,
                 settingsNavigationController
             };
 
-            SelectedIndex = 1;
+            SelectedIndex = 0;
         }
     }
 }

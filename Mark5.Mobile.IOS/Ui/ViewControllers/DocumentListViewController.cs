@@ -66,6 +66,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             SubscribeToMessages();
         }
 
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            ExtendedLayoutIncludesOpaqueBars = true;
+        }
+
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
@@ -211,7 +218,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBarTitle()
         {
+            UIView.AnimationsEnabled = false;
             NavigationItem.Title = Folder.Name;
+            NavigationItem.Prompt = Localization.GetString("documents");
+            UIView.AnimationsEnabled = true;
         }
 
         void SubscribeToMessages()
@@ -261,9 +271,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void DocumentSelected(DocumentPreview documentPreview)
         {
             if (tableView.Editing)
-            {
                 return;
-            }
 
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
@@ -362,7 +370,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void EndEditing()
         {
             tableView.SetEditing(false, true);
-            NavigationItem.SetRightBarButtonItem(composeDocumentItem, true);
+            NavigationItem.SetRightBarButtonItem(composeDocumentItem, false);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
         }
 
@@ -541,6 +549,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         }
 
+        void Reply(DocumentPreview documentPreview, DocumentCreationModeFlag creationModeFlag)
+        {
+            var vc = new ComposeDocumentViewController
+            {
+                PreviousDocumentId = documentPreview.Id,
+                CreationModeFlag = creationModeFlag,
+                PreviousDocumentFolderId = Folder.Id,
+                PreviousDocumentDirection = documentPreview.Direction,
+                PreviousDocumentPreview = documentPreview
+            };
+
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
+        void ShowCategories(DocumentPreview selectedDocument)
+        {
+            var vc = new CategoriesListViewController { BusinessEntityPreview = selectedDocument };
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
         void CopyToFolder(DocumentPreview selectedDocument) => CopyToFolder(new List<DocumentPreview> { selectedDocument });
 
         void CopyToFolder(List<DocumentPreview> selectedDocument)
@@ -612,6 +640,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void DoShowMoreActionSheet(NSIndexPath indexPath, DocumentPreview selectedDocument)
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("categories"), UIAlertActionStyle.Default, a => { ShowCategories(selectedDocument); EndEditing(); }));
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("reply"), UIAlertActionStyle.Default, a => { Reply(selectedDocument, DocumentCreationModeFlag.Reply); EndEditing(); }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("reply_all"), UIAlertActionStyle.Default, a => { Reply(selectedDocument, DocumentCreationModeFlag.ReplyAll); EndEditing(); }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("forward"), UIAlertActionStyle.Default, a => { Reply(selectedDocument, DocumentCreationModeFlag.Forward); EndEditing(); }));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a => { CopyToFolder(selectedDocument); EndEditing(); }));
 
@@ -1028,7 +1062,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var documentPreview = documentPreviewsInView[indexPath.Row];
 
                 var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("more"), (a, ip) => { viewController.DoShowMoreActionSheet(indexPath, documentPreview); });
-                moreAction.BackgroundColor = Theme.Blue;
+                moreAction.BackgroundColor = Theme.DarkerBlue;
                 actions.Add(moreAction);
 
                 var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("copy_to_worktray"), (a, ip) => { viewController.CopyToWorktray(documentPreview); viewController.EndEditing(); });
@@ -1087,7 +1121,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
                 else
                 {
-                    var indexPaths = indices.Select(i => NSIndexPath.FromRowSection(i, 0)).ToArray(); //TODO need to understand why we have a strange behaviour with slide deletion
+                    var indexPaths = indices.Select(i => NSIndexPath.FromRowSection(i, 0)).ToArray();
                     documentsTableView.DeleteRows(indexPaths, UITableViewRowAnimation.Automatic);
                 }
 

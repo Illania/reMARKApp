@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: SearchResultsDocumentsActivity.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using Android.App;
+using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
@@ -17,7 +18,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
-    [Activity]
+    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class SearchResultsActivity : BaseAppCompatActivity
     {
 
@@ -95,9 +96,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
         }
 
-        protected override void OnStop()
+        public override void Finish()
         {
-            base.OnStop();
+            base.Finish();
 
             OverridePendingTransition(Resource.Animation.enter_from_left_half, Resource.Animation.exit_to_right);
         }

@@ -62,6 +62,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeSearchBar();
         }
 
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            ExtendedLayoutIncludesOpaqueBars = true;
+        }
+
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
@@ -111,7 +118,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             AutomaticallyAdjustsScrollViewInsets = true;
 
             tableView = new UITableView();
-            tableView.Source = dataSource = new DataSource(tableView, Localization.GetString("no_categories")); ;
+            tableView.Source = dataSource = new DataSource(tableView, Localization.GetString("no_categories"));
             tableView.AllowsSelection = false;
             tableView.AllowsSelectionDuringEditing = true;
             tableView.AllowsMultipleSelection = false;
@@ -124,7 +131,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
                 });
         }
 
@@ -495,6 +502,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return Empty ? string.Empty : sectionIndexes[(int)section];
             }
 
+            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section)
+            {
+                var v = headerView as UITableViewHeaderFooterView;
+                if (v == null)
+                    return;
+
+                v.TextLabel.TextColor = Theme.DarkerBlue;
+            }
+
             public override nint SectionFor(UITableView tableView, string title, nint atIndex)
             {
                 return atIndex;
@@ -743,6 +759,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override string TitleForHeader(UITableView tableView, nint section)
             {
                 return Empty ? string.Empty : sectionIndexes[(int)section];
+            }
+
+            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section)
+            {
+                var v = headerView as UITableViewHeaderFooterView;
+                if (v == null)
+                    return;
+
+                v.TextLabel.TextColor = Theme.DarkerBlue;
             }
 
             public override nint SectionFor(UITableView tableView, string title, nint atIndex)

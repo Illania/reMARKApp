@@ -12,8 +12,8 @@ using Android.Support.V4.View;
 using Android.Support.V7.App;
 using Android.Views;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Extensions;
 using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments

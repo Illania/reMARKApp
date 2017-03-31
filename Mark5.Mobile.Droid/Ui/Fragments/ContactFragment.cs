@@ -41,7 +41,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int CategoriesRequest = 2;
         }
 
-        const float CardElevation = 0f;
+        const int CardElevation = 0;
         const float CardRadius = 2f;
 
         public int? FolderId { get; set; }
@@ -54,6 +54,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         ProgressBar progress;
         RelativeLayout relativeLayout;
+        AppCompatImageView typeIndicator;
         LinearLayoutCompat button1Layout;
         LinearLayoutCompat button2Layout;
         LinearLayoutCompat button3Layout;
@@ -75,6 +76,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
             relativeLayout = rootView.FindViewById<RelativeLayout>(Resource.Id.relative_layout);
+            typeIndicator = rootView.FindViewById<AppCompatImageView>(Resource.Id.type_indicator);
             button1Layout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.button1_layout);
             button2Layout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.button2_layout);
             button3Layout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.button3_layout);
@@ -82,7 +84,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
             var paddingLinearLayout = ConversionUtils.ConvertDpToPixels(10);
-            linearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, paddingLinearLayout);
+            linearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout * 3, paddingLinearLayout, paddingLinearLayout);
             linearLayout.SetClipToPadding(false);
 
             button1Layout.Click += Button1Layout_Click;
@@ -429,11 +431,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 Orientation = LinearLayoutCompat.Vertical,
                 LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
-                {
-                    TopMargin = largeDistance,
-                    BottomMargin = largeDistance
-                }
             };
+            relatedCardInternalLayout.SetPadding(0, largeDistance, 0, largeDistance);
             relatedCardView.AddView(relatedCardInternalLayout);
 
             var cardTitle = new AppCompatTextView(Context);
@@ -471,11 +470,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 Orientation = LinearLayoutCompat.Vertical,
                 LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
-                {
-                    TopMargin = largeDistance,
-                    BottomMargin = largeDistance
-                }
             };
+            descriptionCardViewInternalLayout.SetPadding(0, largeDistance, 0, largeDistance);
             descriptionCardView.AddView(descriptionCardViewInternalLayout);
 
             descriptionCardTitle = new AppCompatTextView(Context);
@@ -511,9 +507,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 if (NotificationGuid != default(Guid))
-                {
                     await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
-                }
 
                 if (ContactId.HasValue && ContactPreview == null && Contact == null)
                 {
@@ -523,9 +517,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 if (ContactPreview != null && Contact == null)
-                {
                     Contact = await Managers.ContactsManager.GetContactAsync(FolderId ?? Folder?.Id, ContactPreview.Id);
-                }
 
                 RefreshView();
             }
@@ -535,7 +527,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null) CloseRequest();
+                if (CloseRequest != null)
+                    CloseRequest();
             }
         }
 
@@ -566,6 +559,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void RefreshHeaderButtons()
         {
+            switch (ContactPreview.Type)
+            {
+                case ContactType.Person:
+                    typeIndicator.SetImageResource(Resource.Drawable.large_person);
+                    break;
+                case ContactType.Department:
+                    typeIndicator.SetImageResource(Resource.Drawable.large_department);
+                    break;
+                case ContactType.Company:
+                    typeIndicator.SetImageResource(Resource.Drawable.large_company);
+                    break;
+            }
+
             if (Contact == null)
                 return;
 
@@ -597,9 +603,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     if (subview.Visibility == ViewStates.Visible)
                         cardView.Visibility = ViewStates.Visible;
-
-                    if (i == internalLayout.ChildCount - 1)
-                        subview.HideSeparator();
                 }
             }
         }

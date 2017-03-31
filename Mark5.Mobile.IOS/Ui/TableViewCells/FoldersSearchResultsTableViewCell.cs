@@ -42,9 +42,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public void Disable()
         {
-            FolderNameLabel.TextColor = Theme.Gray;
-            FolderPathLabel.TextColor = Theme.Gray;
-            FolderIconImage.TintColor = Theme.Gray;
+            FolderNameLabel.TextColor = Theme.DarkGray;
+            FolderPathLabel.TextColor = Theme.DarkGray;
+            FolderIconImage.TintColor = Theme.DarkGray;
 
             SelectionStyle = UITableViewCellSelectionStyle.None;
             UserInteractionEnabled = false;
@@ -60,21 +60,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             if (folder.InternalType == FolderInternalType.Worktray)
             {
                 return UIImage.FromBundle(Path.Combine("icons", "folderslist", "worktray.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            }
-
-            if (folder.Type == FolderType.Inbox)
-            {
-                return UIImage.FromBundle(Path.Combine("icons", "folderslist", "inbox.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            }
-
-            if (folder.Type == FolderType.Outbox)
-            {
-                return UIImage.FromBundle(Path.Combine("icons", "folderslist", "outbox.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            }
-
-            if (folder.Type == FolderType.Spam)
-            {
-                return UIImage.FromBundle(Path.Combine("icons", "folderslist", "spam.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             }
 
             if (folder.Type == FolderType.Draft)

@@ -38,7 +38,7 @@
 	<style name="mark5Splash" parent="mark5">
 		<item name="android:windowFullscreen">true</item>
 		<item name="android:windowContentOverlay">@null</item>
-		<item name="android:windowBackground">@mipmap/background</item>
+		<item name="android:windowBackground">@drawable/background</item>
 		<item name="windowNoTitle">true</item>
 		<item name="windowActionBar">false</item>
 	</style>
@@ -61,7 +61,7 @@
 	<style name="mark5preference" parent="PreferenceThemeOverlay.v14.Material" />
 	<!-- Styles -->
 	<style name="mark5actionmode" parent="Widget.AppCompat.ActionMode">
-		<item name="background">@color/darkgray</item>
+		<item name="background">@color/darkblue</item>
 	</style>
 	<style name="mark5overflowbutton" parent="Widget.AppCompat.ActionButton.Overflow">
 		<item name="android:tint">@color/lightgray</item>
@@ -219,7 +219,7 @@
 		<item name="android:textColor">@color/darkerblue</item>
 	</style>
 	<style name="tabTextAppearance" parent="TextAppearance.Design.Tab">
-		<item name="android:textColor">@color/blue</item>
+		<item name="android:textColor">@color/darkblue</item>
 		<item name="textAllCaps">false</item>
 	</style>
 </resources>

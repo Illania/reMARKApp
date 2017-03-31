@@ -42,6 +42,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeView();
         }
 
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            ExtendedLayoutIncludesOpaqueBars = true;
+        }
+
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
@@ -489,7 +496,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var contactPreview = contactPreviewsInView[indexPath.Section][indexPath.Row];
 
                 var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("more"), (a, ip) => { viewController.DoShowMoreActionSheet(indexPath, contactPreview); });
-                moreAction.BackgroundColor = Theme.Blue;
+                moreAction.BackgroundColor = Theme.DarkerBlue;
                 actions.Add(moreAction);
 
                 var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("copy_to_worktray"), (a, ip) => { viewController.CopyToWorktray(contactPreview); viewController.EndEditing(); });

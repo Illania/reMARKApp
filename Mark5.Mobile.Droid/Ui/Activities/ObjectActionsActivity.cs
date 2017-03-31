@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using Android.App;
+using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
@@ -17,7 +18,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
-    [Activity]
+    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class ObjectActionsActivity : BaseAppCompatActivity
     {
 
@@ -59,9 +60,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
         }
 
-        public override void OnBackPressed()
+        public override void Finish()
         {
-            base.OnBackPressed();
+            base.Finish();
 
             OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
         }

@@ -209,7 +209,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
             Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
-            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
 
             return false;
         }
@@ -230,7 +230,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
         {
             Activity.Window.AddFlags(WindowManagerFlags.TranslucentStatus);
-            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
 
             adapter.ClearSelections();
             actionMode = null;
@@ -602,7 +602,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public OutgoingDocumentPreviewViewHolder(View itemView)
                     : base(itemView)
             {
-                recipentTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_outgoing_recipent); //TODO need to correct the icons for the states
+                recipentTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_outgoing_recipent);
                 subjectTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_outgoing_subject);
                 dateTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_outgoing_date);
                 previewTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_outgoing_preview);
@@ -613,7 +613,5 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
             }
         }
-
-
     }
 }

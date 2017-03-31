@@ -7,13 +7,14 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Model.Exceptions;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.ServiceReference.Exceptions;
-using UIKit;
 using SVProgressHUD;
+using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
@@ -89,6 +90,13 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 actionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(tableView, anchorCell);
             vc.PresentViewController(actionSheet, true, null);
             return tcs.Task;
+        }
+
+        public static Task<T[]> ShowMultiSelectDialogAsync<T>(UIViewController vc, string title, T[] data, T[] preselected, Func<T, string> description, IEqualityComparer<T> equalityComparer)
+        {
+            var msvc = new MultiSelectViewController<T>(title, data, preselected, description, equalityComparer);
+            vc.PresentViewController(new NavigationController(msvc, UIModalPresentationStyle.FormSheet), true, null);
+            return msvc.Task;
         }
 
         static UIAlertController PrepareLisDialogActionSheet(TaskCompletionSource<int> tcs, string message, string[] listStrings)

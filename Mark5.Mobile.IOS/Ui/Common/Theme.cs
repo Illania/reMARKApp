@@ -13,103 +13,31 @@ namespace Mark5.Mobile.IOS.Ui.Common
     public static class Theme
     {
 
-        public static UIColor TintColor
-        {
-            get
-            {
-                return Blue;
-            }
-        }
+        public static UIColor TintColor { get { return DarkerBlue; } }
 
         #region Nordic IT Colors
 
-        public static UIColor DarkBlue
-        {
-            get
-            {
-                return UIColor.FromRGB(8f / 255f, 51f / 255f, 77f / 255f);
-            }
-        }
+        public static UIColor LightBlue { get { return UIColor.FromRGB(199f / 255f, 222f / 255f, 232f / 255f); } }
 
-        public static UIColor Blue
-        {
-            get
-            {
-                return UIColor.FromRGB(18f / 255f, 61f / 255f, 87f / 255f);
-            }
-        }
+        public static UIColor Blue { get { return UIColor.FromRGB(69f / 255f, 133f / 255f, 176f / 255f); } }
 
-        public static UIColor LightBlue
-        {
-            get
-            {
-                return UIColor.FromRGB(69f / 255f, 133f / 255f, 176f / 255f);
-            }
-        }
+        public static UIColor DarkBlue { get { return UIColor.FromRGB(23f / 255f, 79f / 255f, 107f / 255f); } }
 
-        public static UIColor Brown
-        {
-            get
-            {
-                return UIColor.FromRGB(153f / 255f, 135f / 255f, 107f / 255f);
-            }
-        }
+        public static UIColor DarkerBlue { get { return UIColor.FromRGB(18f / 255f, 61f / 255f, 87f / 255f); } }
 
-        public static UIColor LightBrown
-        {
-            get
-            {
-                return UIColor.FromRGB(204f / 255f, 192f / 255f, 178f / 255f);
-            }
-        }
+        public static UIColor LightBrown { get { return UIColor.FromRGB(204f / 255f, 192f / 255f, 178f / 255f); } }
+        
+        public static UIColor Brown { get { return UIColor.FromRGB(153f / 255f, 135f / 255f, 107f / 255f); } }
 
-        public static UIColor White
-        {
-            get
-            {
-                return UIColor.White;
-            }
-        }
+        public static UIColor White { get { return UIColor.White; } }
 
-        public static UIColor LightGray
-        {
-            get
-            {
-                return UIColor.FromRGB(227f / 255f, 227f / 255f, 227f / 255f);
-            }
-        }
+        public static UIColor LightGray { get { return UIColor.FromRGB(227f / 255f, 227f / 255f, 227f / 255f); } }
 
-        public static UIColor LighterGray
-        {
-            get
-            {
-                return UIColor.FromRGB(245f / 255f, 245f / 255f, 245f / 255f);
-            }
-        }
+        public static UIColor Gray { get { return UIColor.FromRGB(245f / 255f, 245f / 255f, 245f / 255f); } }
 
-        public static UIColor Black
-        {
-            get
-            {
-                return UIColor.Black;
-            }
-        }
+        public static UIColor DarkGray { get { return UIColor.FromRGB(153f / 255f, 153f / 255f, 153f / 255f); } }
 
-        public static UIColor Gray
-        {
-            get
-            {
-                return UIColor.FromRGB(150f / 255f, 150f / 255f, 150f / 255f);
-            }
-        }
-
-        public static UIColor Red
-        {
-            get
-            {
-                return UIColor.Red;
-            }
-        }
+        public static UIColor Black { get { return UIColor.Black; } }
 
         #endregion
 
@@ -121,45 +49,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         const float DefaultFontSize = 16f;
 
-        public static UIFont DefaultFont
-        {
-            get
-            {
-                return UIFont.FromName(DefaultFontName, DefaultFontSize);
-            }
-        }
+        public static UIFont DefaultFont { get { return UIFont.FromName(DefaultFontName, DefaultFontSize); } }
 
-        public static UIFont DefaultBoldFont
-        {
-            get
-            {
-                return UIFont.FromName(DefaultBoldFontName, DefaultFontSize);
-            }
-        }
+        public static UIFont DefaultBoldFont { get { return UIFont.FromName(DefaultBoldFontName, DefaultFontSize); } }
 
-        public static UIFont DefaultLightFont
-        {
-            get
-            {
-                return UIFont.FromName(DefaultLightFontName, DefaultFontSize);
-            }
-        }
-
-        public static UIFont DefaultDocumentFont
-        {
-            get
-            {
-                return UIFont.SystemFontOfSize(16f);
-            }
-        }
-
-        public static UIFont DefaultOutgoingDocumentFont
-        {
-            get
-            {
-                return UIFont.SystemFontOfSize(12f);
-            }
-        }
+        public static UIFont DefaultLightFont { get { return UIFont.FromName(DefaultLightFontName, DefaultFontSize); } }
 
         #endregion
 
@@ -168,13 +62,13 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public static void ApplyTheme(UIWindow window)
         {
             // Color customizations
-            // ////////////////////
 
             window.TintColor = TintColor;
 
             // UINavigationBar
+            UINavigationBar.Appearance.Translucent = false;
             UINavigationBar.Appearance.TintColor = LightGray;
-            UINavigationBar.Appearance.BarTintColor = DarkBlue;
+            UINavigationBar.Appearance.BarTintColor = DarkerBlue;
 
             // UIToolBar
             UIToolbar.Appearance.BarTintColor = LightGray;
@@ -186,7 +80,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
             UITableViewHeaderFooterView.Appearance.TintColor = LightGray;
 
             // Font customizations
-            // ///////////////////
 
             // UINavigationBar
             var uiNavigationBarTitleTextAttributes = UINavigationBar.Appearance.GetTitleTextAttributes();
@@ -218,6 +111,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var uiSegmentControlTitleTextAttributes = UISegmentedControl.Appearance.GetTitleTextAttributes(UIControlState.Normal);
             uiSegmentControlTitleTextAttributes.Font = DefaultFont;
             UISegmentedControl.Appearance.SetTitleTextAttributes(uiSegmentControlTitleTextAttributes, UIControlState.Normal);
+
+            UISwitch.Appearance.OnTintColor = Theme.DarkBlue;
         }
 
         #endregion

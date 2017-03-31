@@ -58,6 +58,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             SubscribeToMessages();
         }
 
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            ExtendedLayoutIncludesOpaqueBars = true;
+        }
+
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
@@ -189,7 +196,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBarTitle()
         {
+            UIView.AnimationsEnabled = false;
             NavigationItem.Title = Folder.Name;
+            NavigationItem.Prompt = Localization.GetString("shortcodes");
+            UIView.AnimationsEnabled = true;
         }
 
         void InitializeHandlers()
@@ -735,7 +745,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var shortcodePreview = shortcodePreviewsInView[indexPath.Section][indexPath.Row];
 
                 var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("more"), (a, ip) => { viewController.DoShowMoreActionSheet(indexPath, shortcodePreview); });
-                moreAction.BackgroundColor = Theme.Blue;
+                moreAction.BackgroundColor = Theme.DarkerBlue;
                 actions.Add(moreAction);
 
                 var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("copy_to_worktray"), (a, ip) => { viewController.CopyToWorktray(shortcodePreview); viewController.EndEditing(); });

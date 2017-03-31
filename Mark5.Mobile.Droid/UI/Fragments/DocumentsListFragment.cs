@@ -25,6 +25,7 @@ using Android.Support.V7.Widget.Helper;
 using Android.Text;
 using Android.Util;
 using Android.Views;
+using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
@@ -458,7 +459,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
             Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
-            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
 
             swipeHelperCallback.Enabled = false;
             fab?.Hide();
@@ -586,7 +587,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
         {
             Activity.Window.AddFlags(WindowManagerFlags.TranslucentStatus);
-            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
 
             swipeHelperCallback.Enabled = true;
             fab?.Show();
@@ -797,6 +798,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 refreshLayout.Enabled = false;
                 adapter.ClearSelections();
                 recyclerView.SwapAdapter(searchAdapter, true);
+                (this as SearchView.IOnQueryTextListener).OnQueryTextChange(string.Empty);
                 return true;
             }
 
@@ -826,13 +828,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             searchHandler.PostDelayed(() =>
             {
                 if (string.IsNullOrWhiteSpace(newText))
-                {
-                    searchAdapter.Clear();
-                }
+                    searchAdapter.ReplaceItems(adapter.Items);
                 else
-                {
                     searchAdapter.ReplaceItems(adapter.Items.Where(dp => MatchesQuery(dp, newText)).ToList());
-                }
             }, 500);
             return false;
         }
@@ -1030,8 +1028,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region RecyclerView Adapter/ViewHolder
 
-        protected class DocumentsListAdapter : RecyclerView.Adapter
+        protected class DocumentsListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
+
             public static class ViewType
             {
                 public const int DocumentView = 0;
@@ -1129,11 +1128,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
 
                     dpvh.Subject = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
-                    dpvh.Date = dp.DateReceivedTimestamp
-                        .ConvertTimestampMillisecondsToDateTime()
-                        .ConvertUtcToServerTime()
-                        .ConvertDateTimeToTimestampMilliseconds()
-                        .FormatServerTimestampAsCompactShortDateTimeString(context);
+                    var d = dp.DateReceivedTimestamp
+                                .ConvertTimestampMillisecondsToDateTime()
+                                .ConvertUtcToServerTime()
+                                .ConvertDateTimeToTimestampMilliseconds();
+                    dpvh.Date = d.FormatServerTimestampAsCompactShortDateTimeString(context);
+                    dpvh.BubbleDate = d.FormatServerTimestampAsCompactLongDateTimeString(context);
                     dpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                     dpvh.Categories = dp.Categories;
                     dpvh.IncomingIndicator = dp.Direction == DocumentDirection.Incoming;
@@ -1161,11 +1161,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     edpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
                     edpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
 
-                    edpvh.Date = dp.DateReceivedTimestamp
-                         .ConvertTimestampMillisecondsToDateTime()
-                         .ConvertUtcToServerTime()
-                         .ConvertDateTimeToTimestampMilliseconds()
-                         .FormatServerTimestampAsCompactShortDateTimeString(context);
+                    var d = dp.DateReceivedTimestamp
+                                .ConvertTimestampMillisecondsToDateTime()
+                                .ConvertUtcToServerTime()
+                                .ConvertDateTimeToTimestampMilliseconds();
+                    edpvh.Date = d.FormatServerTimestampAsCompactShortDateTimeString(context);
+                    edpvh.BubbleDate = d.FormatServerTimestampAsCompactLongDateTimeString(context);
                     edpvh.Name = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
                     edpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                     edpvh.Categories = dp.Categories;
@@ -1324,6 +1325,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 swipedPosition = null;
             }
 
+            string ISectionedAdapter.GetSectionName(int position)
+            {
+                var vh = recyclerView.FindViewHolderForAdapterPosition(position);
+
+                var dpvh = vh as DocumentPreviewViewHolder;
+                if (dpvh != null)
+                {
+                    return dpvh.BubbleDate;
+                }
+
+                var edpvh = vh as ExternalDocumentPreviewViewHolder;
+                if (edpvh != null)
+                {
+                    return edpvh.BubbleDate;
+                }
+
+                return string.Empty;
+            }
         }
 
         class SwipeHelperCallback : ItemTouchHelper.Callback
@@ -1480,6 +1499,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dateTextView.Text = value;
                 }
             }
+
+            public string BubbleDate { get; set; }
 
             public string Subject
             {
@@ -1640,7 +1661,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 unreadImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_unread);
                 attachmentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_attachment);
                 commentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_comment);
-                itemContent = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_internal_Layout);
+                itemContent = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_internal_layout);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
                 swipedBackground = itemView.FindViewById<View>(Resource.Id.swiped_background);
             }
@@ -1664,6 +1685,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dateTextView.Text = value;
                 }
             }
+
+            public string BubbleDate { get; set; }
 
             public string Preview
             {
@@ -1745,7 +1768,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 previewTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_external_preview);
                 categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_external_categories);
                 commentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_external_comment);
-                itemContent = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_internal_Layout);
+                itemContent = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_external_internal_layout);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
                 swipedBackground = itemView.FindViewById<View>(Resource.Id.swiped_background);
             }
@@ -1796,9 +1819,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public void Stop()
             {
                 lock (lockObj)
-                {
                     cts?.Cancel();
-                }
             }
         }
     }

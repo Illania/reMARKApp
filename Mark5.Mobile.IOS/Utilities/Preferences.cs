@@ -26,8 +26,6 @@ namespace Mark5.Mobile.IOS.Utilities
 
         class Keys
         {
-            public const string MainTabsOrderKey = "MainTabsOrder";
-
             public const string DocumentsToDownloadKey = "DocumentsToDownload";
             public const string UnreadIndicatorMeKey = "UnreadIndicatorMe";
             public const string CompactDocumentsListKey = "CompactDocumentsList";
@@ -35,15 +33,6 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string LargeAttachmentWarningKey = "LargeAttachmentWarning";
             public const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
 
-            public const string ContactCommunicationFaxNumbersEnabledKey = "ContactCommunicationFaxNumbersEnabled";
-            public const string ContactCommunicationTelexNumbersEnabledKey = "ContactCommunicationTelexNumbersEnabled";
-            public const string ContactCommunicationImEnabledKey = "ContactCommunicationImEnabled";
-            public const string ContactCommunicationInternalEnabledKey = "ContactCommunicationInternalEnabled";
-            public const string ContactCommunicationOtherEnabledKey = "ContactCommunicationOtherEnabled";
-            public const string ContactAddressesEnabledKey = "ContactAddressesEnabled";
-            public const string ContactBirthdateEnabledKey = "ContactBirthdateEnabled";
-            public const string ContactAccountEnabledKey = "ContactAccountEnabled";
-            public const string ContactVatEnabledKey = "ContactVatEnabled";
             public const string SynchroniseContactsKey = "SynchroniseContacts";
 
             public const string SynchroniseShortcodesKey = "SynchroniseShortcodes";
@@ -53,7 +42,10 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string UseTemplateKey = "UseTemplate";
             public const string LocalTemplateKey = "LocalTemplate";
 
-            public const string NotificationsRingtoneKey = "NotificationsRingtone";
+            public const string DocumentsToSearchKey = "DocumentsToSearch";
+            public const string ContactsToSearchKey = "ContactsToSearch";
+            public const string ShortcodesToSearchKey = "ShortcodesToSearch";
+
             public const string CleanCacheIntervalDaysKey = "CleanCacheIntervalDays";
             public const string ClearCacheKey = "ClearCache";
             public const string EnableReportingKey = "EnableReporting";
@@ -82,15 +74,6 @@ namespace Mark5.Mobile.IOS.Utilities
             defaultsDictionary.Add(new NSString(Keys.LargeAttachmentWarningKey), NSNumber.FromBoolean(true));
             defaultsDictionary.Add(new NSString(Keys.DocumentBodyRequestTypeKey), NSNumber.FromBoolean(false));
 
-            defaultsDictionary.Add(new NSString(Keys.ContactCommunicationFaxNumbersEnabledKey), NSNumber.FromBoolean(true));
-            defaultsDictionary.Add(new NSString(Keys.ContactCommunicationTelexNumbersEnabledKey), NSNumber.FromBoolean(true));
-            defaultsDictionary.Add(new NSString(Keys.ContactCommunicationImEnabledKey), NSNumber.FromBoolean(true));
-            defaultsDictionary.Add(new NSString(Keys.ContactCommunicationInternalEnabledKey), NSNumber.FromBoolean(true));
-            defaultsDictionary.Add(new NSString(Keys.ContactCommunicationOtherEnabledKey), NSNumber.FromBoolean(true));
-            defaultsDictionary.Add(new NSString(Keys.ContactAddressesEnabledKey), NSNumber.FromBoolean(true));
-            defaultsDictionary.Add(new NSString(Keys.ContactBirthdateEnabledKey), NSNumber.FromBoolean(true));
-            defaultsDictionary.Add(new NSString(Keys.ContactAccountEnabledKey), NSNumber.FromBoolean(true));
-            defaultsDictionary.Add(new NSString(Keys.ContactVatEnabledKey), NSNumber.FromBoolean(true));
             defaultsDictionary.Add(new NSString(Keys.SynchroniseContactsKey), NSNumber.FromBoolean(true));
 
             defaultsDictionary.Add(new NSString(Keys.SynchroniseShortcodesKey), NSNumber.FromBoolean(false));
@@ -98,6 +81,10 @@ namespace Mark5.Mobile.IOS.Utilities
             defaultsDictionary.Add(new NSString(Keys.ComposePriorityEnabledKey), NSNumber.FromBoolean(false));
             defaultsDictionary.Add(new NSString(Keys.RemoveLineKey), NSNumber.FromBoolean(true));
             defaultsDictionary.Add(new NSString(Keys.UseTemplateKey), NSNumber.FromInt16(1));
+
+            defaultsDictionary.Add(new NSString(Keys.DocumentsToSearchKey), NSNumber.FromInt16(250));
+            defaultsDictionary.Add(new NSString(Keys.ContactsToSearchKey), NSNumber.FromInt16(250));
+            defaultsDictionary.Add(new NSString(Keys.ShortcodesToSearchKey), NSNumber.FromInt16(250));
 
             defaultsDictionary.Add(new NSString(Keys.CleanCacheIntervalDaysKey), NSNumber.FromInt16(7));
             defaultsDictionary.Add(new NSString(Keys.ClearCacheKey), NSNumber.FromBoolean(false));
@@ -117,25 +104,6 @@ namespace Mark5.Mobile.IOS.Utilities
                     dict.Add(kv.Key.ToString(), kv.Value.ToString());
                 }
                 return dict;
-            }
-        }
-
-        public string[] MainTabsOrder
-        {
-            get
-            {
-                var order = ud.StringForKey(Keys.MainTabsOrderKey);
-                if (string.IsNullOrWhiteSpace(order))
-                {
-                    return null;
-                }
-
-                return order.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-            }
-            set
-            {
-                ud.SetString(string.Join(",", value), Keys.MainTabsOrderKey);
-                ud.Synchronize();
             }
         }
 
@@ -192,79 +160,6 @@ namespace Mark5.Mobile.IOS.Utilities
         #endregion
 
         #region Contacts
-
-        public bool ContactCommunicationFaxNumbersEnabled
-        {
-            get
-            {
-                return ud.BoolForKey(Keys.ContactCommunicationFaxNumbersEnabledKey);
-            }
-        }
-
-        public bool ContactCommunicationTelexNumbersEnabled
-        {
-            get
-            {
-                return ud.BoolForKey(Keys.ContactCommunicationTelexNumbersEnabledKey);
-            }
-        }
-
-        public bool ContactCommunicationImEnabled
-        {
-            get
-            {
-                return ud.BoolForKey(Keys.ContactCommunicationImEnabledKey);
-            }
-        }
-
-        public bool ContactCommunicationInternalEnabled
-        {
-            get
-            {
-                return ud.BoolForKey(Keys.ContactCommunicationInternalEnabledKey);
-            }
-        }
-
-        public bool ContactCommunicationOtherEnabled
-        {
-            get
-            {
-                return ud.BoolForKey(Keys.ContactCommunicationOtherEnabledKey);
-            }
-        }
-
-        public bool ContactAddressesEnabled
-        {
-            get
-            {
-                return ud.BoolForKey(Keys.ContactAddressesEnabledKey);
-            }
-        }
-
-        public bool ContactBirthdateEnabled
-        {
-            get
-            {
-                return ud.BoolForKey(Keys.ContactBirthdateEnabledKey);
-            }
-        }
-
-        public bool ContactAccountEnabled
-        {
-            get
-            {
-                return ud.BoolForKey(Keys.ContactAccountEnabledKey);
-            }
-        }
-
-        public bool ContactVatEnabled
-        {
-            get
-            {
-                return ud.BoolForKey(Keys.ContactVatEnabledKey);
-            }
-        }
-
 
         public bool SynchroniseContacts
         {
@@ -329,16 +224,27 @@ namespace Mark5.Mobile.IOS.Utilities
 
         #endregion
 
-        public string NotificationsRingtone
+        public int DocumentsToSearch
         {
             get
             {
-                return ud.StringForKey(Keys.NotificationsRingtoneKey);
+                return (int)ud.IntForKey(Keys.DocumentsToSearchKey);
             }
-            set
+        }
+
+        public int ContactsToSearch
+        {
+            get
             {
-                ud.SetString(value, Keys.NotificationsRingtoneKey);
-                ud.Synchronize();
+                return (int)ud.IntForKey(Keys.ContactsToSearchKey);
+            }
+        }
+
+        public int ShortcodesToSearch
+        {
+            get
+            {
+                return (int)ud.IntForKey(Keys.ShortcodesToSearchKey);
             }
         }
 

@@ -24,6 +24,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
     public class NotificationsListViewController : AbstractViewController
     {
+        
+        readonly ObjectType[] objectTypes;
 
         UIBarButtonItem markAsReadItem;
 
@@ -34,12 +36,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         TinyMessageSubscriptionToken newNotificationsMessageToken;
 
+        public NotificationsListViewController(ObjectType[] objectTypes)
+        {
+            this.objectTypes = objectTypes;
+        }
+
         public override void LoadView()
         {
             base.LoadView();
 
             InitializeNavigationBar();
             InitializeView();
+        }
+
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            ExtendedLayoutIncludesOpaqueBars = true;
         }
 
         public override void ViewWillAppear(bool animated)
@@ -191,6 +205,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
+                notifications = notifications.Where(n => objectTypes.Contains(n.ObjectType)).ToList();
                 var ds = (DataSource)tableView.Source;
                 ds.SetItems(notifications);
 

@@ -95,7 +95,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             suggestionsTextView.SearchRequested += (sender, e) => DoSearch(e);
             suggestionsTextView.CommaOrEnterPressed += (sender, e) => Dismiss();
-            suggestionsTextView.AddButtonTapped += (sender, e) => Dismiss();
             suggestionsTextView.ReachedOriginalState += (sender, e) => Dismiss();
 
             separator = new SeparatorSubView();
@@ -113,7 +112,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         void InitializeListView()
         {
             suggestionsTableView = new UITableView();
-            suggestionsTableView.BackgroundColor = Theme.LighterGray;
+            suggestionsTableView.BackgroundColor = Theme.Gray;
             suggestionsTableView.RowHeight = UITableView.AutomaticDimension;
             suggestionsTableView.EstimatedRowHeight = 44f;
             suggestionsTableView.TableFooterView = new UIView(CGRect.Empty); //Used to avoid showing empty rows at the bottom
@@ -388,6 +387,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
     public class SuggestionsTextView : RecipientsView
     {
+        
         string originalState;
 
         public event EventHandler ReachedOriginalState = delegate { };
@@ -396,8 +396,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             : base(DocumentAddressType.None)
         {
             CollapseExpandAnimationEnabled = false;
-            var okayButtonIcon = UIImage.FromBundle(Path.Combine("icons", "okay.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            AddButton.SetImage(okayButtonIcon, UIControlState.Normal);
         }
 
         #region Public methods
