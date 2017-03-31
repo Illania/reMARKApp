@@ -27,8 +27,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         DocumentPickDateHeaderView dateHeaderView;
 
-        CalendarView fromDatePicker;
-        CalendarView toDatePicker;
+        CalendarView fromCalendar;
+        CalendarView toCalendar;
 
         public Action<long, long> CloseRequest { get; set; }
         public bool StartWithToDate { get; set; }
@@ -51,18 +51,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             dateHeaderView.ToClicked += DateView_ToClicked;
             containerLinearLayout.AddView(dateHeaderView);
 
-            fromDatePicker = new CalendarView(Context);
-            fromDatePicker.LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            fromDatePicker.Date = DateTime.UtcNow.Date.ConvertDateTimeToTimestampMilliseconds();
-            fromDatePicker.Visibility = ViewStates.Gone;
-            fromDatePicker.DateChange += FromDatePicker_DateChange;
-            containerLinearLayout.AddView(fromDatePicker);
+            fromCalendar = new CalendarView(Context);
+            fromCalendar.LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            fromCalendar.Date = DateTime.UtcNow.Date.ConvertDateTimeToTimestampMilliseconds();
+            fromCalendar.Visibility = ViewStates.Gone;
+            fromCalendar.DateChange += FromDatePicker_DateChange;
+            containerLinearLayout.AddView(fromCalendar);
 
-            toDatePicker = new CalendarView(Context);
-            toDatePicker.LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            toDatePicker.Visibility = ViewStates.Gone;
-            toDatePicker.DateChange += ToDatePicker_DateChange;
-            containerLinearLayout.AddView(toDatePicker);
+            toCalendar = new CalendarView(Context);
+            toCalendar.LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            toCalendar.Visibility = ViewStates.Gone;
+            toCalendar.DateChange += ToDatePicker_DateChange;
+            containerLinearLayout.AddView(toCalendar);
 
             HasOptionsMenu = false;
 
@@ -88,11 +88,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var todayTimeStamp = DateTime.UtcNow.Date.ConvertDateTimeToTimestampMilliseconds();
 
-            fromDatePicker.MaxDate = todayTimeStamp;
-            toDatePicker.MaxDate = todayTimeStamp;
+            fromCalendar.MaxDate = todayTimeStamp;
+            toCalendar.MaxDate = todayTimeStamp;
 
-            fromDatePicker.Date = FromTimestamp == -1 ? todayTimeStamp : FromTimestamp;
-            toDatePicker.Date = ToTimestamp == -1 ? todayTimeStamp : ToTimestamp;
+            fromCalendar.Date = FromTimestamp == -1 ? todayTimeStamp : FromTimestamp;
+            toCalendar.Date = ToTimestamp == -1 ? todayTimeStamp : ToTimestamp;
 
             UpdateDatePickersLimits();
 
@@ -110,7 +110,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void DateView_FromClicked(object sender, EventArgs e)
         {
-            if (fromDatePicker.Visibility == ViewStates.Visible)
+            if (fromCalendar.Visibility == ViewStates.Visible)
                 return;
 
             SelectFrom();
@@ -118,7 +118,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void DateView_ToClicked(object sender, EventArgs e)
         {
-            if (toDatePicker.Visibility == ViewStates.Visible)
+            if (toCalendar.Visibility == ViewStates.Visible)
                 return;
 
             SelectTo();
@@ -126,23 +126,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void SelectFrom()
         {
-            fromDatePicker.Visibility = ViewStates.Visible;
-            toDatePicker.Visibility = ViewStates.Gone;
+            fromCalendar.Visibility = ViewStates.Visible;
+            toCalendar.Visibility = ViewStates.Gone;
 
             dateHeaderView.PickFrom();
         }
 
         void SelectTo()
         {
-            fromDatePicker.Visibility = ViewStates.Gone;
-            toDatePicker.Visibility = ViewStates.Visible;
+            fromCalendar.Visibility = ViewStates.Gone;
+            toCalendar.Visibility = ViewStates.Visible;
 
             dateHeaderView.PickTo();
         }
 
         void FromDatePicker_DateChange(object sender, CalendarView.DateChangeEventArgs e)
         {
-            FromTimestamp = fromDatePicker.Date;
+            FromTimestamp = new DateTime(e.Year, e.Month + 1, e.DayOfMonth, 0, 0, 1, DateTimeKind.Utc).ConvertDateTimeToTimestampMilliseconds();
 
             UpdateText();
             UpdateDatePickersLimits();
@@ -152,7 +152,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void ToDatePicker_DateChange(object sender, CalendarView.DateChangeEventArgs e)
         {
-            ToTimestamp = toDatePicker.Date;
+            ToTimestamp = new DateTime(e.Year, e.Month + 1, e.DayOfMonth, 23, 59, 59, DateTimeKind.Utc).ConvertDateTimeToTimestampMilliseconds();
 
             UpdateText();
             CloseFragment();
@@ -168,7 +168,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (FromTimestamp != -1)
             {
-                toDatePicker.MinDate = FromTimestamp;
+                toCalendar.MinDate = FromTimestamp;
             }
         }
 
@@ -186,7 +186,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 FromTimestamp = FromTimestamp,
                 ToTimestamp = ToTimestamp,
-                StartWithToDate = toDatePicker.Visibility == ViewStates.Visible,
+                StartWithToDate = toCalendar.Visibility == ViewStates.Visible,
             };
         }
 
