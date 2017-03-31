@@ -12,7 +12,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public class ContactNameSearchView : AbstractEditableLargeSearchView<SearchContactsCriteria>
     {
-        protected ContactNameSearchView(Android.Content.Context context)
+        public ContactNameSearchView(Android.Content.Context context)
             : base(context, Resource.String.search_contact_name, Resource.String.search_contact_name_hint)
         {
 

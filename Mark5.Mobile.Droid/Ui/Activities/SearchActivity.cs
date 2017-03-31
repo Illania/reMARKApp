@@ -9,6 +9,8 @@ using Android.App;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
@@ -18,8 +20,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity]
     public class SearchActivity : BaseAppCompatActivity
     {
+        public const string ModuleIntentKey = "Module_0775cdc7-e733-4dea-a291-19c719bfb546";
+
         Toolbar toolbar;
-        DocumentSearchCriteriaFragment dscf;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -38,10 +41,29 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
+                var moduleType = SerializationUtils.Deserialize<ModuleType>(Intent.Extras.GetString(ModuleIntentKey));
+
                 var ft = SupportFragmentManager.BeginTransaction();
-                dscf = new DocumentSearchCriteriaFragment();
-                ft.Replace(Resource.Id.fragment_container, dscf, dscf.GenerateTag());
-                ft.Commit();
+
+                if (moduleType == ModuleType.Documents)
+                {
+                    var f = new DocumentSearchCriteriaFragment();
+                    ft.Replace(Resource.Id.fragment_container, f, f.GenerateTag());
+                    ft.Commit();
+                }
+                if (moduleType == ModuleType.Contacts)
+                {
+                    var f = new ContactsSearchCriteriaFragment();
+                    ft.Replace(Resource.Id.fragment_container, f, f.GenerateTag());
+                    ft.Commit();
+                }
+
+                if (moduleType == ModuleType.Shortcodes)
+                {
+                    var f = new ShortcodesSearchCriteriaFragment();
+                    ft.Replace(Resource.Id.fragment_container, f, f.GenerateTag());
+                    ft.Commit();
+                }
 
                 CommonConfig.Logger.Info($"Created {nameof(SearchActivity)}");
             }

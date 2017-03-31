@@ -12,7 +12,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public class ShortcodeAddressSearchView : AbstractEditableLargeSearchView<SearchShortcodesCriteria>
     {
-        protected ShortcodeAddressSearchView(Android.Content.Context context)
+        public ShortcodeAddressSearchView(Android.Content.Context context)
             : base(context, Resource.String.search_shortcode_address, Resource.String.search_shortcode_address_hint)
         {
 

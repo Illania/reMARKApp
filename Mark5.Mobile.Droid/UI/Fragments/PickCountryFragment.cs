@@ -7,8 +7,6 @@
 //
 using System;
 using System.Collections.Generic;
-using Android.App;
-using Android.Content;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
@@ -112,7 +110,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
             {
-                var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.search_list_item_priority, parent, false);
+                var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.search_list_item_country, parent, false);
                 return new CountryViewHolder(itemView);
             }
 

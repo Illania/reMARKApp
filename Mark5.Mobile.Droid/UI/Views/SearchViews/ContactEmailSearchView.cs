@@ -11,7 +11,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public class ContactEmailSearchView : AbstractEditableLargeSearchView<SearchContactsCriteria>
     {
-        protected ContactEmailSearchView(Android.Content.Context context)
+        public ContactEmailSearchView(Android.Content.Context context)
             : base(context, Resource.String.search_contact_com_address, Resource.String.search_contact_com_address_hint)
         {
 

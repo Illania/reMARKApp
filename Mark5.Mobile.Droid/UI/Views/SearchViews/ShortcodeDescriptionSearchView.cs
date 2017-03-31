@@ -5,14 +5,13 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
-using System;
 using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public class ShortcodeDescriptionSearchView : AbstractEditableLargeSearchView<SearchShortcodesCriteria>
     {
-        protected ShortcodeDescriptionSearchView(Android.Content.Context context)
+        public ShortcodeDescriptionSearchView(Android.Content.Context context)
                     : base(context, Resource.String.search_shortcode_description, Resource.String.search_shortcode_description_hint)
         {
 

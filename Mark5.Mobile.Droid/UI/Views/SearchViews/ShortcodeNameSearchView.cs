@@ -11,7 +11,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public class ShortcodeNameSearchView : AbstractEditableLargeSearchView<SearchShortcodesCriteria>
     {
-        protected ShortcodeNameSearchView(Android.Content.Context context)
+        public ShortcodeNameSearchView(Android.Content.Context context)
             : base(context, Resource.String.search_shortcode_name, Resource.String.search_shortcode_name_hint)
         {
 

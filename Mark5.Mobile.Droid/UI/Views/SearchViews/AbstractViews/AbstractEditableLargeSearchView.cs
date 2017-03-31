@@ -19,13 +19,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         readonly AppCompatTextView topTextView;
         readonly AppCompatEditText bottomEditText;
 
-        public event EventHandler BackPressed = delegate { };
-
         protected AbstractEditableLargeSearchView(Android.Content.Context context,
                                                  int topTextResId,
                                                  int bottomEditResId) : base(context)
         {
-            Orientation = Horizontal;
+            Orientation = Vertical;
             SetBackgroundColor(BackgroundColorNormalState);
 
             topTextView = new AppCompatTextView(context)

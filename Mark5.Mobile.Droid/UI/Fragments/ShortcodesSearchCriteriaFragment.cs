@@ -1,12 +1,11 @@
-//
+﻿//
 // Project: Mark5.Mobile.Droid
-// File: SearchFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
+// File: ShortcodesSearchCriteriaFragment.cs
+// Author: ferdinandopapale <fp@nordic-it.com>
 //
-// Copyright (c) 2016 Nordic IT
+// Copyright (c) 2017 Nordic IT
 //
 using System.Collections.Generic;
-using System.Linq;
 using Android.Animation;
 using Android.Content;
 using Android.Content.Res;
@@ -30,18 +29,18 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class DocumentSearchCriteriaFragment : RetainableStateFragment, ISearchCriteriaFragment
+    public class ShortcodesSearchCriteriaFragment : RetainableStateFragment, ISearchCriteriaFragment
     {
-        SearchDocumentsCriteria searchCriteria;
+        SearchShortcodesCriteria searchCriteria;
 
         LinearLayoutCompat containerLinearLayout;
         FloatingActionButton fab;
 
-        List<AbstractSearchView<SearchDocumentsCriteria>> subviews = new List<AbstractSearchView<SearchDocumentsCriteria>>();
+        List<AbstractSearchView<SearchShortcodesCriteria>> subviews = new List<AbstractSearchView<SearchShortcodesCriteria>>();
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(DocumentSearchCriteriaFragment)}...");
+            CommonConfig.Logger.Info($"Creating {nameof(ShortcodesSearchCriteriaFragment)}...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_base, container, false);
 
@@ -74,99 +73,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             p.Gravity = (int)(GravityFlags.Bottom | GravityFlags.CenterHorizontal);
             fab.LayoutParameters = p;
 
-            var directionCriteria = new DocumentDirectionsSearchView(Context);
-            subviews.Add(directionCriteria);
+            var nameCriteria = new ShortcodeNameSearchView(Context);
+            subviews.Add(nameCriteria);
 
-            var daterangeCriteria = new DocumentDateRangeSearchView(Context, this);
-            subviews.Add(daterangeCriteria);
+            var emailCriteria = new ShortcodeAddressSearchView(Context);
+            subviews.Add(emailCriteria);
 
-            var subjectMessageCriteria = new DocumentSubjectMessageSearchView(Context);
-            subviews.Add(subjectMessageCriteria);
+            var descriptionCriteria = new ShortcodeDescriptionSearchView(Context);
+            subviews.Add(descriptionCriteria);
 
-            var fromToCriteria = new DocumentFromToSearchView(Context);
-            subviews.Add(fromToCriteria);
-
-            var extraFieldsCriteria = new DocumentExtraFieldsSearchView(Context);
-            subviews.Add(extraFieldsCriteria);
-
-            var attUnreadCriteria = new DocumentAttachmentUnreadSearchView(Context);
-            subviews.Add(attUnreadCriteria);
-
-            var handledCriteria = new DocumentHandledSearchView(Context);
-            subviews.Add(handledCriteria);
-
-            containerLinearLayout.AddView(directionCriteria);
-            containerLinearLayout.AddView(subjectMessageCriteria);
-            containerLinearLayout.AddView(fromToCriteria);
-            containerLinearLayout.AddView(daterangeCriteria);
-            PrepareEditableTextRow();
-            PrepareDropdownTextRow();
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.ExtraFieldInfos.Any())
-                containerLinearLayout.AddView(extraFieldsCriteria);
-            containerLinearLayout.AddView(attUnreadCriteria);
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
-                containerLinearLayout.AddView(handledCriteria);
+            containerLinearLayout.AddView(nameCriteria);
+            containerLinearLayout.AddView(emailCriteria);
+            containerLinearLayout.AddView(descriptionCriteria);
 
             HasOptionsMenu = true;
 
             return rootView;
-        }
-
-        public void PrepareEditableTextRow()
-        {
-            var ll = new LinearLayoutCompat(Context)
-            {
-                LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
-            };
-
-            ll.DividerDrawable = ContextCompat.GetDrawable(Context, Resource.Drawable.search_divider_vertical);
-            ll.ShowDividers = LinearLayoutCompat.ShowDividerMiddle;
-
-            var lp = new LinearLayoutCompat.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1);
-
-            var commentCriteria = new DocumentCommentsSearchView(Context, ll);
-            subviews.Add(commentCriteria);
-
-            var attachmentCriteria = new DocumentAttachmentSearchView(Context, ll);
-            subviews.Add(attachmentCriteria);
-
-            var referenceNumberCriteria = new DocumentReferenceNumberSearchView(Context, ll);
-            subviews.Add(referenceNumberCriteria);
-
-            ll.AddView(referenceNumberCriteria, lp);
-            ll.AddView(commentCriteria, lp);
-            ll.AddView(attachmentCriteria, lp);
-            ll.LayoutTransition = new LayoutTransition();
-
-            containerLinearLayout.AddView(ll);
-        }
-
-        public void PrepareDropdownTextRow()
-        {
-            var ll = new LinearLayoutCompat(Context)
-            {
-                LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
-            };
-
-            ll.DividerDrawable = ContextCompat.GetDrawable(Context, Resource.Drawable.search_divider_vertical);
-            ll.ShowDividers = LinearLayoutCompat.ShowDividerMiddle;
-
-            var lp = new LinearLayoutCompat.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1);
-
-            var categoriesCriteria = new DocumentCategoriesSearchView(Context, this);
-            subviews.Add(categoriesCriteria);
-
-            var linesCriteria = new DocumentLinesSearchView(Context, this);
-            subviews.Add(linesCriteria);
-
-            var priorityCriteria = new DocumentPrioritySearchView(Context, this);
-            subviews.Add(priorityCriteria);
-
-            ll.AddView(categoriesCriteria, lp);
-            ll.AddView(linesCriteria, lp);
-            ll.AddView(priorityCriteria, lp);
-
-            containerLinearLayout.AddView(ll);
         }
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
@@ -174,16 +96,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnViewCreated(view, savedInstanceState);
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.shortcodes);
 
-            CommonConfig.Logger.Info($"Created {nameof(DocumentSearchCriteriaFragment)}");
+            CommonConfig.Logger.Info($"Created {nameof(ShortcodesSearchCriteriaFragment)}");
         }
 
         public override void OnResume()
         {
             base.OnResume();
 
-            searchCriteria = searchCriteria ?? new SearchDocumentsCriteria();
+            searchCriteria = searchCriteria ?? new SearchShortcodesCriteria();
             RefreshViews();
         }
 
@@ -198,7 +120,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Reset()
         {
-            searchCriteria = new SearchDocumentsCriteria();
+            searchCriteria = new SearchShortcodesCriteria();
             containerLinearLayout.RequestFocus();
             ((InputMethodManager)Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
             RefreshViews();
@@ -222,7 +144,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return base.OnOptionsItemSelected(item);
         }
 
-
         public void ReplaceFragment(Fragment f, string tag)
         {
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
@@ -239,12 +160,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             GetCriteria();
 
             var i = new Intent(Activity, typeof(SearchResultsActivity));
-            i.PutExtra(SearchResultsActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
+            i.PutExtra(SearchResultsActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
             i.PutExtra(SearchResultsActivity.CriteriaIntentKey, SerializationUtils.Serialize(GetCriteria()));
             StartActivity(i);
         }
 
-        SearchDocumentsCriteria GetCriteria()
+        SearchShortcodesCriteria GetCriteria()
         {
             subviews.ForEach(v => v.UpdateCriteria());
             return searchCriteria;
@@ -254,7 +175,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            return new DocumentSearchCriteriaFragmentState
+            return new ShortcodeSearchCriteriaFragmentState
             {
                 Criteria = GetCriteria(),
             };
@@ -262,7 +183,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var df = restoredState as DocumentSearchCriteriaFragmentState;
+            var df = restoredState as ShortcodeSearchCriteriaFragmentState;
             if (df != null)
             {
                 searchCriteria = df.Criteria;
@@ -271,20 +192,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(DocumentSearchCriteriaFragment)}";
+            return $"{nameof(ShortcodesSearchCriteriaFragment)}";
         }
 
-        class DocumentSearchCriteriaFragmentState : IRetainableState
+        class ShortcodeSearchCriteriaFragmentState : IRetainableState
         {
-            public SearchDocumentsCriteria Criteria { get; set; }
+            public SearchShortcodesCriteria Criteria { get; set; }
         }
 
         #endregion
     }
-
-    public interface ISearchCriteriaFragment
-    {
-        void ReplaceFragment(Fragment f, string tag);
-    }
-
 }

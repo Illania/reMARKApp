@@ -1,12 +1,11 @@
-//
+﻿//
 // Project: Mark5.Mobile.Droid
-// File: SearchFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
+// File: ContactsSearchCriteriaFragment.cs
+// Author: ferdinandopapale <fp@nordic-it.com>
 //
-// Copyright (c) 2016 Nordic IT
+// Copyright (c) 2017 Nordic IT
 //
 using System.Collections.Generic;
-using System.Linq;
 using Android.Animation;
 using Android.Content;
 using Android.Content.Res;
@@ -30,18 +29,18 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class DocumentSearchCriteriaFragment : RetainableStateFragment, ISearchCriteriaFragment
+    public class ContactsSearchCriteriaFragment : RetainableStateFragment, ISearchCriteriaFragment
     {
-        SearchDocumentsCriteria searchCriteria;
+        SearchContactsCriteria searchCriteria;
 
         LinearLayoutCompat containerLinearLayout;
         FloatingActionButton fab;
 
-        List<AbstractSearchView<SearchDocumentsCriteria>> subviews = new List<AbstractSearchView<SearchDocumentsCriteria>>();
+        List<AbstractSearchView<SearchContactsCriteria>> subviews = new List<AbstractSearchView<SearchContactsCriteria>>();
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(DocumentSearchCriteriaFragment)}...");
+            CommonConfig.Logger.Info($"Creating {nameof(ContactsSearchCriteriaFragment)}...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_base, container, false);
 
@@ -74,38 +73,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             p.Gravity = (int)(GravityFlags.Bottom | GravityFlags.CenterHorizontal);
             fab.LayoutParameters = p;
 
-            var directionCriteria = new DocumentDirectionsSearchView(Context);
-            subviews.Add(directionCriteria);
+            var typeCriteria = new ContactTypeSearchView(Context);
+            subviews.Add(typeCriteria);
 
-            var daterangeCriteria = new DocumentDateRangeSearchView(Context, this);
-            subviews.Add(daterangeCriteria);
+            var nameCriteria = new ContactNameSearchView(Context);
+            subviews.Add(nameCriteria);
 
-            var subjectMessageCriteria = new DocumentSubjectMessageSearchView(Context);
-            subviews.Add(subjectMessageCriteria);
+            var emailCriteria = new ContactEmailSearchView(Context);
+            subviews.Add(emailCriteria);
 
-            var fromToCriteria = new DocumentFromToSearchView(Context);
-            subviews.Add(fromToCriteria);
-
-            var extraFieldsCriteria = new DocumentExtraFieldsSearchView(Context);
-            subviews.Add(extraFieldsCriteria);
-
-            var attUnreadCriteria = new DocumentAttachmentUnreadSearchView(Context);
-            subviews.Add(attUnreadCriteria);
-
-            var handledCriteria = new DocumentHandledSearchView(Context);
-            subviews.Add(handledCriteria);
-
-            containerLinearLayout.AddView(directionCriteria);
-            containerLinearLayout.AddView(subjectMessageCriteria);
-            containerLinearLayout.AddView(fromToCriteria);
-            containerLinearLayout.AddView(daterangeCriteria);
+            containerLinearLayout.AddView(typeCriteria);
+            containerLinearLayout.AddView(nameCriteria);
+            containerLinearLayout.AddView(emailCriteria);
             PrepareEditableTextRow();
             PrepareDropdownTextRow();
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.ExtraFieldInfos.Any())
-                containerLinearLayout.AddView(extraFieldsCriteria);
-            containerLinearLayout.AddView(attUnreadCriteria);
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
-                containerLinearLayout.AddView(handledCriteria);
 
             HasOptionsMenu = true;
 
@@ -124,18 +105,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var lp = new LinearLayoutCompat.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1);
 
-            var commentCriteria = new DocumentCommentsSearchView(Context, ll);
-            subviews.Add(commentCriteria);
+            var shortIdCriteria = new ContactShortIdSearchView(Context, ll);
+            subviews.Add(shortIdCriteria);
 
-            var attachmentCriteria = new DocumentAttachmentSearchView(Context, ll);
-            subviews.Add(attachmentCriteria);
+            var postAddressCriteria = new ContactPostAddressSearchView(Context, ll);
+            subviews.Add(postAddressCriteria);
 
-            var referenceNumberCriteria = new DocumentReferenceNumberSearchView(Context, ll);
-            subviews.Add(referenceNumberCriteria);
+            var descriptionCriteria = new ContactDescriptionSearchView(Context, ll);
+            subviews.Add(descriptionCriteria);
 
-            ll.AddView(referenceNumberCriteria, lp);
-            ll.AddView(commentCriteria, lp);
-            ll.AddView(attachmentCriteria, lp);
+            ll.AddView(descriptionCriteria, lp);
+            ll.AddView(shortIdCriteria, lp);
+            ll.AddView(postAddressCriteria, lp);
             ll.LayoutTransition = new LayoutTransition();
 
             containerLinearLayout.AddView(ll);
@@ -153,18 +134,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var lp = new LinearLayoutCompat.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1);
 
-            var categoriesCriteria = new DocumentCategoriesSearchView(Context, this);
+            var countryCriteria = new ContactCountrySearchView(Context, this);
+            subviews.Add(countryCriteria);
+
+            var categoriesCriteria = new ContactCategoriesSearchView(Context, this);
             subviews.Add(categoriesCriteria);
 
-            var linesCriteria = new DocumentLinesSearchView(Context, this);
-            subviews.Add(linesCriteria);
-
-            var priorityCriteria = new DocumentPrioritySearchView(Context, this);
-            subviews.Add(priorityCriteria);
-
+            ll.AddView(countryCriteria, lp);
             ll.AddView(categoriesCriteria, lp);
-            ll.AddView(linesCriteria, lp);
-            ll.AddView(priorityCriteria, lp);
 
             containerLinearLayout.AddView(ll);
         }
@@ -174,16 +151,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnViewCreated(view, savedInstanceState);
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.contacts);
 
-            CommonConfig.Logger.Info($"Created {nameof(DocumentSearchCriteriaFragment)}");
+            CommonConfig.Logger.Info($"Created {nameof(ContactsSearchCriteriaFragment)}");
         }
 
         public override void OnResume()
         {
             base.OnResume();
 
-            searchCriteria = searchCriteria ?? new SearchDocumentsCriteria();
+            searchCriteria = searchCriteria ?? new SearchContactsCriteria();
             RefreshViews();
         }
 
@@ -198,7 +175,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Reset()
         {
-            searchCriteria = new SearchDocumentsCriteria();
+            searchCriteria = new SearchContactsCriteria();
             containerLinearLayout.RequestFocus();
             ((InputMethodManager)Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
             RefreshViews();
@@ -239,12 +216,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             GetCriteria();
 
             var i = new Intent(Activity, typeof(SearchResultsActivity));
-            i.PutExtra(SearchResultsActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
+            i.PutExtra(SearchResultsActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
             i.PutExtra(SearchResultsActivity.CriteriaIntentKey, SerializationUtils.Serialize(GetCriteria()));
             StartActivity(i);
         }
 
-        SearchDocumentsCriteria GetCriteria()
+        SearchContactsCriteria GetCriteria()
         {
             subviews.ForEach(v => v.UpdateCriteria());
             return searchCriteria;
@@ -254,7 +231,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            return new DocumentSearchCriteriaFragmentState
+            return new ContactSearchCriteriaFragmentState
             {
                 Criteria = GetCriteria(),
             };
@@ -262,7 +239,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var df = restoredState as DocumentSearchCriteriaFragmentState;
+            var df = restoredState as ContactSearchCriteriaFragmentState;
             if (df != null)
             {
                 searchCriteria = df.Criteria;
@@ -271,20 +248,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(DocumentSearchCriteriaFragment)}";
+            return $"{nameof(ContactsSearchCriteriaFragment)}";
         }
 
-        class DocumentSearchCriteriaFragmentState : IRetainableState
+        class ContactSearchCriteriaFragmentState : IRetainableState
         {
-            public SearchDocumentsCriteria Criteria { get; set; }
+            public SearchContactsCriteria Criteria { get; set; }
         }
 
         #endregion
     }
-
-    public interface ISearchCriteriaFragment
-    {
-        void ReplaceFragment(Fragment f, string tag);
-    }
-
 }
+

@@ -41,16 +41,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             return true;
         }
 
-        void ResetButtons()
+        void ResetButtons(bool selected)
         {
-            personButton.UpdateSelectedState(false);
-            departmentButton.UpdateSelectedState(false);
-            companyButton.UpdateSelectedState(false);
+            personButton.UpdateSelectedState(selected);
+            departmentButton.UpdateSelectedState(selected);
+            companyButton.UpdateSelectedState(selected);
         }
 
         public override void Refresh()
         {
-            ResetButtons();
+            if (!Criteria.ContactTypes.Any())
+            {
+                ResetButtons(true);
+                return;
+            }
+
+            ResetButtons(false);
 
             if (Criteria.ContactTypes.Contains(ContactType.Person))
             {

@@ -15,7 +15,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
     {
         int prefix = -1;
 
-        public ContactCountrySearchView(Android.Content.Context context, DocumentSearchCriteriaFragment f)
+        public ContactCountrySearchView(Android.Content.Context context, ISearchCriteriaFragment f)
             : base(context, Resource.String.search_contact_country, Resource.String.search_contact_country_none_selected, f)
         {
         }

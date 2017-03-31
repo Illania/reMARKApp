@@ -175,7 +175,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == 10)
             {
-                StartActivity(new Intent(Activity, typeof(SearchActivity)));
+                var i = new Intent(Activity, typeof(SearchActivity));
+                i.PutExtra(SearchActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
+                StartActivity(i);
 
                 return true;
             }
