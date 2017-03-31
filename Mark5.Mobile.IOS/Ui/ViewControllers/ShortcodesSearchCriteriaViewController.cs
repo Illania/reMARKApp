@@ -398,7 +398,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 label = new UILabel
                 {
-                    Text = Localization.GetString("search_description"),
+                    Text = Localization.GetString("search_search_description"),
                     TextColor = LabelTextColor,
                     Font = Font,
                     TextAlignment = UITextAlignment.Left,

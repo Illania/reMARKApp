@@ -229,6 +229,7 @@
 "search_ref" = "Reference no.";
 "search_results" = "Search results";
 "search_search_addresses" = "Search addresses: ";
+"search_search_description" = "Search description";
 "search_short_id" = "Short ID";
 "search_subject" = "Subject";
 "search_subject_or_message" = "Subject or Message";
