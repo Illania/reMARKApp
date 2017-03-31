@@ -117,8 +117,8 @@ namespace Mark5.Mobile.Common.Managers
                 {
                     Token = Token,
                     SavedSearchFilterHash = criteria.SavedSearchFilterHash,
-                    MaxToFetch = criteria.MaxToFetch,
-                    Name = MaxContactsToFetch,
+                    MaxToFetch = MaxContactsToFetch,
+                    Name = criteria.Name,
                     FirstName = criteria.FirstName,
                     LastName = criteria.LastName,
                     ShortId = criteria.ShortId,
