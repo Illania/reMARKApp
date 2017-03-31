@@ -87,7 +87,7 @@
 		<item name="tabIndicatorColor">@color/lightblue</item>
 		<item name="tabIndicatorHeight">4dp</item>
 		<item name="tabMaxWidth">0dp</item>
-        <item name="tabBackground">@drawable/tab_background</item>
+		<item name="tabBackground">@drawable/tab_background</item>
 	</style>
 	<!-- Fonts -->
 	<style name="fontListPrimary" parent="TextAppearance.AppCompat.Body1">
@@ -160,6 +160,57 @@
 	</style>
 	<style name="contactViewHeaderSubtitle" parent="TextAppearance.AppCompat.Body2">
 		<item name="android:textSize">16sp</item>
+	</style>
+	<style name="searchViewButtonSelected" parent="TextAppearance.AppCompat.Body2">
+		<item name="android:textSize">14sp</item>
+		<item name="android:textColor">@color/darkerblue</item>
+	</style>
+	<style name="searchViewButtonNormal" parent="TextAppearance.AppCompat.Body2">
+		<item name="android:textSize">14sp</item>
+		<item name="android:textColor">@color/lightgray</item>
+	</style>
+	<style name="searchViewTopLine" parent="TextAppearance.AppCompat.Body2">
+		<item name="android:textSize">14sp</item>
+		<item name="android:textColor">@color/lightblue</item>
+	</style>
+	<style name="searchViewBottomLine" parent="TextAppearance.AppCompat.Body2">
+		<item name="android:textSize">15sp</item>
+		<item name="android:textColor">@color/lightgray</item>
+	</style>
+	<style name="searchViewTopLineSelected" parent="TextAppearance.AppCompat.Body2">
+		<item name="android:textSize">14sp</item>
+		<item name="android:textColor">@color/blue</item>
+	</style>
+	<style name="searchViewBottomLineSelected" parent="TextAppearance.AppCompat.Body2">
+		<item name="android:textSize">15sp</item>
+	</style>
+	<style name="searchViewDateTopLine" parent="searchViewTopLine">
+		<item name="android:textSize">17sp</item>
+	</style>
+	<style name="searchViewDateBottomLine" parent="searchViewBottomLine">
+		<item name="android:textSize">18sp</item>
+	</style>
+	<style name="searchViewDateTopLineSelected" parent="searchViewTopLineSelected">
+		<item name="android:textSize">17sp</item>
+	</style>
+	<style name="searchViewDateBottomLineSelected" parent="searchViewBottomLineSelected">
+		<item name="android:textSize">18sp</item>
+	</style>
+	<style name="searchListTitle" parent="TextAppearance.AppCompat.Body2">
+		<item name="android:textSize">16sp</item>
+		<item name="android:textColor">@color/lightgray</item>
+	</style>
+	<style name="searchListTitleSelected" parent="TextAppearance.AppCompat.Body2">
+		<item name="android:textSize">16sp</item>
+		<item name="android:textColor">@color/darkerblue</item>
+	</style>
+	<style name="searchListSubtitle" parent="TextAppearance.AppCompat.Caption">
+		<item name="android:textSize">14sp</item>
+		<item name="android:textColor">@color/lightgray</item>
+	</style>
+	<style name="searchListSubtitleSelected" parent="TextAppearance.AppCompat.Caption">
+		<item name="android:textSize">14sp</item>
+		<item name="android:textColor">@color/darkgray</item>
 	</style>
 	<style name="popupMenuTextAppearanceSmall" parent="TextAppearance.AppCompat.Widget.PopupMenu.Small">
 		<item name="android:textColor">@color/darkerblue</item>

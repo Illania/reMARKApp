@@ -18,6 +18,12 @@ namespace Mark5.Mobile.Common.Managers
 
         DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; }
 
+        int MaxDocumentsToFetch { get; set; }
+
+        int MaxContactsToFetch { get; set; }
+
+        int MaxShortcodesToFetch { get; set; }
+
         Task<List<SavedSearch>> GetSavedSearches(SourceType sourceType = SourceType.Auto);
 
         Task<List<DocumentPreview>> SearchDocumentsAsync(SearchDocumentsCriteria criteria, SourceType sourceType = SourceType.Auto);

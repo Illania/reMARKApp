@@ -80,4 +80,43 @@
 	<string name="pref_cache_auto_clean_default">7</string>
 	<bool name="pref_cache_clear_default">false</bool>
 	<bool name="pref_advanced_enable_reporting_default">true</bool>
+	<string-array name="pref_search_documents_to_get_entries">
+		<item>100</item>
+		<item>250</item>
+		<item>500</item>
+		<item>1000</item>
+	</string-array>
+	<string-array name="pref_search_documents_to_get_entryvalues">
+		<item>100</item>
+		<item>250</item>
+		<item>500</item>
+		<item>1000</item>
+	</string-array>
+	<string name="pref_search_documents_to_get_default">100</string>
+	<string-array name="pref_search_contacts_to_get_entries">
+		<item>100</item>
+		<item>250</item>
+		<item>500</item>
+		<item>1000</item>
+	</string-array>
+	<string-array name="pref_search_contacts_to_get_entryvalues">
+		<item>100</item>
+		<item>250</item>
+		<item>500</item>
+		<item>1000</item>
+	</string-array>
+	<string name="pref_search_contacts_to_get_default">100</string>
+	<string-array name="pref_search_shortcodes_to_get_entries">
+		<item>100</item>
+		<item>250</item>
+		<item>500</item>
+		<item>1000</item>
+	</string-array>
+	<string-array name="pref_search_shortcodes_to_get_entryvalues">
+		<item>100</item>
+		<item>250</item>
+		<item>500</item>
+		<item>1000</item>
+	</string-array>
+	<string name="pref_search_shortcodes_to_get_default">100</string>
 </resources>

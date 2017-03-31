@@ -184,7 +184,7 @@ namespace Mark5.Mobile.Droid.Utilities
         #region Composing Documents
 
         public bool ComposePriorityEnabled
-        { 
+        {
             get
             {
                 return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_compose_priority_enabled), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_compose_priority_enabled_default));
@@ -214,6 +214,37 @@ namespace Mark5.Mobile.Droid.Utilities
                 return sp.GetString(Application.Context.GetString(Resource.String.pref_key_compose_template_local), Application.Context.GetString(Resource.String.pref_compose_template_local_default));
             }
         }
+
+        #endregion
+
+        #region Search
+
+
+        public int MaxDocumentsToSearch
+        {
+            get
+            {
+                return int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_search_documents_to_get), Application.Context.Resources.GetString(Resource.String.pref_search_documents_to_get_default)));
+            }
+        }
+
+        public int MaxContactsToSearch
+        {
+            get
+            {
+                return int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_search_contacts_to_get), Application.Context.Resources.GetString(Resource.String.pref_search_contacts_to_get_default)));
+            }
+        }
+
+
+        public int MaxShortcodesToSearch
+        {
+            get
+            {
+                return int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_search_shortcodes_to_get), Application.Context.Resources.GetString(Resource.String.pref_search_shortcodes_to_get_default)));
+            }
+        }
+
 
         #endregion
 

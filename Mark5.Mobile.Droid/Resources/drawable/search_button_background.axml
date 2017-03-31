@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="@color/darkerblue">
+	<item android:id="@android:id/mask">
+		<color android:color="@color/white" />
+	</item>
+	<item>
+		<selector>
+			<item android:state_selected="true">
+				<color android:color="@color/lightblue" />
+			</item>
+			<item>
+				<color android:color="@color/darkblue" />
+			</item>
+		</selector>
+	</item>
+</ripple>

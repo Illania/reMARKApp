@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using Android.Content;
+using Android.Content.Res;
 using Android.OS;
 using Android.Widget;
 
@@ -28,6 +29,22 @@ namespace Mark5.Mobile.Droid.Ui.Common
 #pragma warning disable XA0001 // Find issues with Android API usage
                 view.SetTextAppearance(resourceId);
 #pragma warning restore XA0001 // Find issues with Android API usage
+            }
+        }
+
+        public static ColorStateList GetColorStateList(Context context, int resId)
+        {
+            if (Build.VERSION.SdkInt < BuildVersionCodes.M)
+            {
+#pragma warning disable XA0001 // Find issues with Android API usage
+                return context.Resources.GetColorStateList(resId, null);
+#pragma warning restore XA0001 // Find issues with Android API usage
+            }
+            else
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                return context.Resources.GetColorStateList(resId);
+#pragma warning restore CS0618 // Type or member is obsolete
             }
         }
     }

@@ -236,7 +236,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             tableRowLine = new TableRow(Context);
             var lineLabel = new AppCompatTextView(Context)
             {
-                Text = Context.GetString(Resource.String.lines)
+                Text = Context.GetString(Resource.String.lines) + ":"
             };
             lineLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
 
@@ -253,7 +253,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             tableRowReferenceNumber.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
             var referenceNumberLabel = new AppCompatTextView(Context)
             {
-                Text = Context.GetString(Resource.String.reference)
+                Text = Context.GetString(Resource.String.reference) + ":"
             };
             referenceNumberLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
 
