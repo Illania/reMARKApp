@@ -22,7 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         readonly protected AppCompatTextView TopTextView;
         readonly protected AppCompatEditText BottomEditText;
 
-        public event EventHandler BackPressed = delegate { };
+        public event EventHandler BackPressed = delegate { }; //TODO it wss to solve the focus problems
 
         protected AbstractMultiSearchView(Android.Content.Context context,
                                          int topTextResId,
@@ -118,7 +118,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             rightLayout.AddView(BottomEditText);
         }
 
-        class CustomEditText : AppCompatEditText
+        class CustomEditText : AppCompatEditText //TODO this was for the focusing problem eventually
         {
             public event EventHandler BackPressed = delegate { };
 

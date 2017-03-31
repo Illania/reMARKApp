@@ -185,6 +185,7 @@
 	<string name="search_contact_department">Department</string>
 	<string name="search_contact_company">Company</string>
 	<string name="search_contact_com_address">Communication address</string>
+	<string name="search_contact_com_address_hint">Enter address</string>
 	<string name="search_contact_comment">Comment</string>
 	<string name="search_contact_country">Country</string>
 	<string name="search_contact_country_none_selected">Any</string>
@@ -193,6 +194,7 @@
 	<string name="search_contact_last_name">Last name</string>
 	<string name="search_contact_ledger">Ledger</string>
 	<string name="search_contact_name">Name</string>
+	<string name="search_contact_name_hint">Enter name</string>
 	<string name="search_contact_post_address">Post address</string>
 	<string name="search_contact_shortid">Short ID</string>
 	<string name="search_contact_types">Type</string>
@@ -232,8 +234,11 @@
 	<string name="search_max_documents">Maximum documents in results</string>
 	<string name="search_max_shortcodes">Maximum shortcodes in results</string>
 	<string name="search_shortcode_address">Address</string>
+	<string name="search_shortcode_address_hint">Enter addresss</string>
 	<string name="search_shortcode_description">Description</string>
+	<string name="search_shortcode_description_hint">Enter description</string>
 	<string name="search_shortcode_name">Name</string>
+	<string name="search_shortcode_name_hint">Enter name</string>
 	<string name="search_shortcodes">Search shortcodes</string>
 	<string name="search_shortcodes_result">Result</string>
 	<string name="select">Select</string>
