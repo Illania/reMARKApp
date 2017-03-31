@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.Animation;
+using Android.Content;
 using Android.Content.Res;
 using Android.Graphics;
 using Android.OS;
@@ -22,6 +23,8 @@ using Android.Views;
 using Android.Views.InputMethods;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.SearchViews;
 using Mark5.Mobile.Droid.Utilities;
@@ -52,8 +55,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.ShowDividers = LinearLayoutCompat.ShowDividerMiddle;
             containerLinearLayout.Focusable = true;
             containerLinearLayout.FocusableInTouchMode = true;
-            containerLinearLayout.RequestFocus(); //TODO
-            containerLinearLayout.FocusChange += ContainerLinearLayout_FocusChange; //TODO
 
             var paddingLinearLayout = ConversionUtils.ConvertDpToPixels(12);
             var bottomPadding = ConversionUtils.ConvertDpToPixels(56) + (Resources.GetDimension(Resource.Dimension.fab_margin) + 2) * 2;
@@ -81,7 +82,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             subviews.Add(daterangeCriteria);
 
             var subjectMessageCriteria = new DocumentSubjectMessageSearchView(Context);
-            subjectMessageCriteria.BackPressed += EditorText_BackPressed;
             subviews.Add(subjectMessageCriteria);
 
             var fromToCriteria = new DocumentFromToSearchView(Context);
@@ -113,44 +113,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return rootView;
         }
 
-        void EditorText_BackPressed(object sender, EventArgs e)
-        {
-            //TODO to be completed
-        }
-
-        void ContainerLinearLayout_FocusChange(object sender, View.FocusChangeEventArgs e)
-        {
-            CommonConfig.Logger.Error($" --- STATUS ---- : {e.HasFocus} ");
-
-            UpdateFabVisibility();
-        }
-
-        public void OnBackButtonPressed()
-        {
-            containerLinearLayout.RequestFocus();
-            UpdateFabVisibility();
-        }
-
-        void UpdateFabVisibility()
-        {
-            if (containerLinearLayout.HasFocus)
-            {
-                fab.Visibility = ViewStates.Visible;
-            }
-            else
-            {
-                fab.Visibility = ViewStates.Gone;
-            }
-        }
-
         void HandleSearchButtonClicked()
         {
-            CollectCriterias();
+            GetCriteria();
+
+            var i = new Intent(Activity, typeof(SearchResultsActivity));
+            i.PutExtra(SearchResultsActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
+            i.PutExtra(SearchResultsActivity.CriteriaIntentKey, SerializationUtils.Serialize(GetCriteria()));
+            StartActivity(i);
         }
 
-        void CollectCriterias()
+        SearchDocumentsCriteria GetCriteria()
         {
             subviews.ForEach(v => v.UpdateCriteria());
+            return searchCriteria;
         }
 
         public void PrepareEditableTextRow()
@@ -241,7 +217,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             searchCriteria = new SearchDocumentsCriteria();
             containerLinearLayout.RequestFocus();
-            ((InputMethodManager)Context.GetSystemService(Android.Content.Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
+            ((InputMethodManager)Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
             RefreshViews();
         }
 
@@ -280,11 +256,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            CollectCriterias();
-
             return new DocumentSearchCriteriaFragmentState
             {
-                Criteria = searchCriteria,
+                Criteria = GetCriteria(),
             };
         }
 
