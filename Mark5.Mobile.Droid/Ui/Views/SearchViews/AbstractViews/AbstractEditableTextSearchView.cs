@@ -94,7 +94,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                     RightMargin = ConversionUtils.ConvertDpToPixels(4),
                 }
             };
-            cancelIconView.SetImageResource(Resource.Drawable.cross); //TODO new icon?
+            cancelIconView.SetImageResource(Resource.Drawable.cross);
             cancelIconView.SetColorFilter(Color.White);
             cancelIconLayout.AddView(cancelIconView);
             cancelIconLayout.Clickable = true;
@@ -104,9 +104,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             AddView(leftLayout);
             AddView(cancelIconLayout);
         }
-
-        //TODO 
-        // - What to do with the back button?
 
         void BottomEditText_FocusChange(object sender, FocusChangeEventArgs e)
         {
