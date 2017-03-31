@@ -1073,8 +1073,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var ci = countries[row];
 
-                    if (ci.Id == 0)
-                        return "-";
+                    if (string.IsNullOrWhiteSpace(ci.CCode))
+                        return ci.Name;
 
                     return $"{ci.Name} [{ci.CCode}/{ci.CCode3}]";
                 }
