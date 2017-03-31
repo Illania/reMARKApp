@@ -62,21 +62,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 return UIImage.FromBundle(Path.Combine("icons", "folderslist", "worktray.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             }
 
-            if (folder.Type == FolderType.Inbox)
-            {
-                return UIImage.FromBundle(Path.Combine("icons", "folderslist", "inbox.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            }
-
-            if (folder.Type == FolderType.Outbox)
-            {
-                return UIImage.FromBundle(Path.Combine("icons", "folderslist", "outbox.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            }
-
-            if (folder.Type == FolderType.Spam)
-            {
-                return UIImage.FromBundle(Path.Combine("icons", "folderslist", "spam.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            }
-
             if (folder.Type == FolderType.Draft)
             {
                 return UIImage.FromBundle(Path.Combine("icons", "folderslist", "draft.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
