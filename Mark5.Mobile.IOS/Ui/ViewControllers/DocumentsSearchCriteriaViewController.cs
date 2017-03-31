@@ -27,7 +27,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UIBarButtonItem closeItem;
         UIBarButtonItem resetItem;
-        
+
         UIView bottomView;
         UIScrollView scrollView;
         UIStackView stackView;
@@ -696,9 +696,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     Items = new[]
                     {
-                        fromDateCancelButton = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, this, new Selector("cancelTapped:")),
+                        fromDateCancelButton = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, this, new Selector("cancelTapped:")) { TintColor = Theme.DarkerBlue },
                         new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                        fromDateDoneButton = new UIBarButtonItem(UIBarButtonSystemItem.Done, this, new Selector("doneTapped:"))
+                        fromDateDoneButton = new UIBarButtonItem(UIBarButtonSystemItem.Done, this, new Selector("doneTapped:")) { TintColor = Theme.DarkerBlue }
                     }
                 };
 
@@ -759,9 +759,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     Items = new[]
                     {
-                        toDateCancelButton = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, this, new Selector("cancelTapped:")),
+                        toDateCancelButton = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, this, new Selector("cancelTapped:")) { TintColor = Theme.DarkerBlue },
                         new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                        toDateDoneButton = new UIBarButtonItem(UIBarButtonSystemItem.Done, this, new Selector("doneTapped:"))
+                        toDateDoneButton = new UIBarButtonItem(UIBarButtonSystemItem.Done, this, new Selector("doneTapped:")) { TintColor = Theme.DarkerBlue }
                     }
                 };
 

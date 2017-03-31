@@ -351,7 +351,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (!types.Any())
                     types.UnionWith(new[] { ContactType.Person, ContactType.Department, ContactType.Company });
-                
+
                 SetLabelActive(personView, types.Contains(ContactType.Person));
                 SetLabelActive(departmentView, types.Contains(ContactType.Department));
                 SetLabelActive(companyView, types.Contains(ContactType.Company));
@@ -383,7 +383,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     else
                         types.Add(ContactType.Company);
                 }
-            
+
 
                 UpdateRow();
             }
@@ -867,10 +867,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             readonly UIView countryView;
             readonly UILabel countryLabel;
-            readonly UILabel countryValue;
+            readonly UITextField countryValue;
             readonly UIView categoriesView;
             readonly UILabel categoriesLabel;
             readonly UILabel categoriesValue;
+
+            readonly UIToolbar countryPickerToolbar;
+            readonly UIBarButtonItem countryCancelButton;
+            readonly UIBarButtonItem countryDoneButton;
+            readonly Source countrySource;
+            readonly UIPickerView countryPicker;
 
             public CountryCategoriesView()
             {
@@ -882,6 +888,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 countryView.Layer.CornerRadius = CornerRadius;
                 countryView.Layer.MasksToBounds = true;
                 countryView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
+
+                countryPickerToolbar = new UIToolbar(new CGRect(0f, 0f, 0f, 44f))
+                {
+                    Items = new[]
+                    {
+                        countryCancelButton = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, this, new Selector("cancelTapped:")) { TintColor = Theme.DarkerBlue },
+                        new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                        countryDoneButton = new UIBarButtonItem(UIBarButtonSystemItem.Done, this, new Selector("doneTapped:")) { TintColor = Theme.DarkerBlue }
+                    }
+                };
 
                 countryLabel = new UILabel
                 {
@@ -895,16 +911,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                countryValue = new UILabel
+                countrySource = new Source();
+                countryPicker = new UIPickerView
+                {
+                    DataSource = countrySource,
+                    Delegate = countrySource,
+                };
+
+                countryValue = new UITextField
                 {
                     TextColor = InactiveTextColor,
                     Font = Font,
-                    TintColor = Theme.LightGray,
+                    TintColor = UIColor.Clear,
                     TextAlignment = UITextAlignment.Center,
+                    InputView = countryPicker,
+                    InputAccessoryView = countryPickerToolbar,
                     TranslatesAutoresizingMaskIntoConstraints = false,
-                    Lines = 1,
-                    MinimumScaleFactor = .8f,
-                    AdjustsFontSizeToFitWidth = true
+                    UserInteractionEnabled = false
                 };
                 countryView.Add(countryLabel);
                 countryView.Add(countryValue);
@@ -975,7 +998,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             protected override void UpdateRow()
             {
-                countryValue.Text = Criteria.CountryPrefix == -1 ? Localization.GetString("search_any") : Criteria.CountryPrefix.ToString();
+                if (Criteria.CountryPrefix == -1)
+                {
+                    countryValue.Text = Localization.GetString("search_any");
+                }
+                else
+                {
+                    var ci = countrySource.CountryByPrefix(Criteria.CountryPrefix);
+                    if (string.IsNullOrWhiteSpace(ci.CCode))
+                        countryValue.Text = ci.Name;
+                    else
+                        countryValue.Text = ci.CCode;
+                }
+
                 categoriesValue.Text = Criteria.CategoryIds.Count < 1 ? Localization.GetString("search_any") : Criteria.CategoryIds.Count.ToString();
             }
 
@@ -984,7 +1019,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 if (recognizer.View == countryView)
                 {
-                    // TODO
+                    countryPicker.ReloadAllComponents();
+
+                    if (Criteria.CountryPrefix >= 0)
+                        countrySource.SelectCountryByFaxPrefix(countryPicker, Criteria.CountryPrefix);
+                    else
+                        countryPicker.Select(0, 0, false);
+
+                    countryValue.UserInteractionEnabled = true;
+                    countryValue.BecomeFirstResponder();
                 }
 
                 if (recognizer.View == categoriesView)
@@ -993,6 +1036,78 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 UpdateRow();
+            }
+
+            [Export("doneTapped:")]
+            void DoneTapped(UIBarButtonItem sender)
+            {
+                countryValue.UserInteractionEnabled = false;
+                Criteria.CountryPrefix = countrySource.SelectedCountryFaxPrefix(countryPicker);
+
+                UpdateRow();
+            }
+
+            [Export("cancelTapped:")]
+            void CancelTapped(UIBarButtonItem sender)
+            {
+                countryValue.UserInteractionEnabled = false;
+            }
+
+            class Source : UIPickerViewDataSource, IUIPickerViewDelegate
+            {
+
+                readonly CountryInfo[] countries = ServerConfig.SystemSettings.ContactsModuleInfo.Countries.OrderBy(ci => ci.Name).ToArray();
+
+                public override nint GetComponentCount(UIPickerView pickerView)
+                {
+                    return 1;
+                }
+
+                public override nint GetRowsInComponent(UIPickerView pickerView, nint component)
+                {
+                    return countries.Length;
+                }
+
+                [Export("pickerView:titleForRow:forComponent:")]
+                public string GetTitle(UIPickerView picker, nint row, nint component)
+                {
+                    var ci = countries[row];
+
+                    if (ci.Id == 0)
+                        return "-";
+
+                    return $"{ci.Name} [{ci.CCode}/{ci.CCode3}]";
+                }
+
+                public void SelectCountryByFaxPrefix(UIPickerView picker, int faxPrefix)
+                {
+                    var index = 0;
+                    for (int i = 0; i < countries.Length; i++)
+                    {
+                        if (countries[i].FaxPrefix == faxPrefix)
+                        {
+                            index = i;
+                            break;
+                        }
+                    }
+
+                    picker.Select(index, 0, true);
+                }
+
+                public int SelectedCountryFaxPrefix(UIPickerView picker)
+                {
+                    var selectedIndex = picker.SelectedRowInComponent(0);
+                    return countries[selectedIndex].FaxPrefix;
+                }
+
+                public CountryInfo CountryByPrefix(int faxPrefix)
+                {
+                    for (int i = 0; i < countries.Length; i++)
+                        if (countries[i].FaxPrefix == faxPrefix)
+                            return countries[i];
+
+                    return null;
+                }
             }
         }
     }
