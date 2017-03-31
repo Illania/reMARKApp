@@ -20,7 +20,7 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
 
-    public class CategoriesSelectListViewController : UITableViewController
+    public class SelectCategoriesListViewController : UITableViewController
     {
 
         readonly ModuleType module;
@@ -36,7 +36,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public Task<List<Category>> Task { get { return tcs.Task; } }
 
-        public CategoriesSelectListViewController(ModuleType module)
+        public SelectCategoriesListViewController(ModuleType module)
         {
             this.module = module;
         }

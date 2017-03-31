@@ -413,7 +413,7 @@
     <Compile Include="Ui\ViewControllers\SearchCriteriaViewController.cs" />
     <Compile Include="Ui\ViewControllers\ShortcodesSearchCriteriaViewController.cs" />
     <Compile Include="Ui\Common\MultiSelectViewController.cs" />
-    <Compile Include="Ui\ViewControllers\CategoriesSelectListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\SelectCategoriesListViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

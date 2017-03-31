@@ -1036,7 +1036,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (recognizer.View == categoriesView)
                 {
-                    var vc = new CategoriesSelectListViewController(ModuleType.Contacts);
+                    var vc = new SelectCategoriesListViewController(ModuleType.Contacts);
                     parentViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
 
                     var result = await vc.Task;
