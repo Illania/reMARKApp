@@ -29,7 +29,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class ContactsSearchCriteriaFragment : RetainableStateFragment, ISearchCriteriaFragment
+    public class ContactsSearchCriteriaFragment : RetainableStateFragment, ISearchCriteriaFragment, View.IOnLayoutChangeListener
     {
         SearchContactsCriteria searchCriteria;
 
@@ -59,6 +59,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, (int)bottomPadding);
 
             fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab.AddOnLayoutChangeListener(this);
 
             var fabIcon = Resources.GetDrawable(Resource.Drawable.action_search_server, null).GetConstantState().NewDrawable().Mutate();
             fabIcon.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)), PorterDuff.Mode.Multiply);
@@ -232,6 +233,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             subviews.ForEach(v => v.UpdateCriteria());
             return searchCriteria;
+        }
+
+        public void OnLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom)
+        {
+            var parent = containerLinearLayout.Parent.Parent.Parent.Parent.Parent as CoordinatorLayout;
+
+            if (parent == null)
+                return;
+
+            var distance = parent.Bottom - v.Bottom;
+            var bottomMargin = v.Context.Resources.GetDimension(Resource.Dimension.fab_margin);
+
+            v.Visibility = distance > bottomMargin * 2 ? ViewStates.Invisible : ViewStates.Visible;
         }
 
         #region Retained State

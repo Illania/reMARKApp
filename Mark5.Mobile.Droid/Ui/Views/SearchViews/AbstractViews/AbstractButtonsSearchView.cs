@@ -77,7 +77,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
             void UpdateTextAppearance()
             {
+                var previousTextSize = TextSize;
                 this.SetTextAppearanceCompat(context, Selected ? buttonTextStyleSelectedResourceId : buttonTextStyleNormalResourceId);
+                SetTextSize(Android.Util.ComplexUnitType.Px, previousTextSize);
             }
 
             public void UpdateSelectedState(bool selected)
