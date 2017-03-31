@@ -94,9 +94,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public static Task<T[]> ShowMultiSelectDialogAsync<T>(UIViewController vc, string title, T[] data, T[] preselected, Func<T, string> description, IEqualityComparer<T> equalityComparer)
         {
-            var tcs = new TaskCompletionSource<T[]>();
-            vc.PresentViewController(new NavigationController(new MultiSelectViewController<T>(title, data, preselected, description, equalityComparer, (obj) => tcs.SetResult(obj)), UIModalPresentationStyle.FormSheet), true, null);
-            return tcs.Task;
+            var msvc = new MultiSelectViewController<T>(title, data, preselected, description, equalityComparer);
+            vc.PresentViewController(new NavigationController(msvc, UIModalPresentationStyle.FormSheet), true, null);
+            return msvc.Task;
         }
 
         static UIAlertController PrepareLisDialogActionSheet(TaskCompletionSource<int> tcs, string message, string[] listStrings)

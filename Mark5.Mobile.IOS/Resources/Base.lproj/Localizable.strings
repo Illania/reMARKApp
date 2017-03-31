@@ -144,10 +144,9 @@
 "network_interface" = "Network interface: ";
 "new_document" = "New Document";
 "no" = "No";
-"no" = "No";
 "no_addresses" = "No addresses";
-"no_categories" = "No categories present";
-"no_comments" = "No comments present";
+"no_categories" = "No categories";
+"no_comments" = "No comments";
 "no_contacts_found" = "No contacts were found";
 "no_content" = "This document has no content";
 "no_description" = "No description";

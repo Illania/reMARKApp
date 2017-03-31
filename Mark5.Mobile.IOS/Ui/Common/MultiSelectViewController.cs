@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Foundation;
 using UIKit;
 
@@ -25,11 +26,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
         T[] preselected;
         Func<T, string> description;
         IEqualityComparer<T> equalityComparer;
-        Action<T[]> onResult;
 
         HashSet<T> selectedItems;
 
-        public MultiSelectViewController(string title, T[] data, T[] preselected, Func<T, string> description, IEqualityComparer<T> equalityComparer, Action<T[]> onResult)
+        TaskCompletionSource<T[]> tcs = new TaskCompletionSource<T[]>();
+
+        public Task<T[]> Task { get { return tcs.Task; } }
+
+        public MultiSelectViewController(string title, T[] data, T[] preselected, Func<T, string> description, IEqualityComparer<T> equalityComparer)
             : base(UITableViewStyle.Grouped)
         {
             this.title = title;
@@ -37,7 +41,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
             this.preselected = preselected;
             this.description = description;
             this.equalityComparer = equalityComparer;
-            this.onResult = onResult;
 
             selectedItems = new HashSet<T>(equalityComparer);
         }
@@ -94,30 +97,23 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             cancelItem.Clicked -= CancelItem_Clicked;
             doneItem.Clicked -= DoneItem_Clicked;
-        }
-
-        void CancelItem_Clicked(object sender, EventArgs e)
-        {
-            onResult(null);
 
             title = null;
             data = null;
             description = null;
-            onResult = null;
             selectedItems = null;
+        }
+
+        void CancelItem_Clicked(object sender, EventArgs e)
+        {
+            tcs.SetResult(null);
 
             DismissViewController(true, null);
         }
 
         void DoneItem_Clicked(object sender, EventArgs e)
         {
-            onResult(selectedItems.ToArray());
-
-            title = null;
-            data = null;
-            description = null;
-            onResult = null;
-            selectedItems = null;
+            tcs.SetResult(selectedItems.ToArray());
 
             DismissViewController(true, null);
         }

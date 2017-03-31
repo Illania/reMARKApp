@@ -118,7 +118,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             AutomaticallyAdjustsScrollViewInsets = true;
 
             tableView = new UITableView();
-            tableView.Source = dataSource = new DataSource(tableView, Localization.GetString("no_categories")); ;
+            tableView.Source = dataSource = new DataSource(tableView, Localization.GetString("no_categories"));
             tableView.AllowsSelection = false;
             tableView.AllowsSelectionDuringEditing = true;
             tableView.AllowsMultipleSelection = false;
@@ -131,7 +131,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
                 });
         }
 

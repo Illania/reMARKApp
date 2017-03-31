@@ -104,7 +104,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             bottomView = new TouchTransparentView
             {
-                TranslatesAutoresizingMaskIntoConstraints = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
             };
             View.AddSubview(bottomView);
             View.AddConstraints(new[]
@@ -138,7 +138,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             stackView.AddArrangedSubview(new NameSearchView());
             stackView.AddArrangedSubview(new AddressSearchView());
             stackView.AddArrangedSubview(new ShortIdDescriptionPhysicalAddressView());
-            stackView.AddArrangedSubview(new CountryCategoriesView());
+            stackView.AddArrangedSubview(new CountryCategoriesView(this));
 
             foreach (var view in stackView.Subviews.OfType<AbstractSearchView>())
                 view.SetCriteria(criteria);
@@ -865,6 +865,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         class CountryCategoriesView : AbstractSearchView
         {
 
+            readonly UIViewController parentViewController;
+
             readonly UIView countryView;
             readonly UILabel countryLabel;
             readonly UITextField countryValue;
@@ -873,13 +875,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             readonly UILabel categoriesValue;
 
             readonly UIToolbar countryPickerToolbar;
-            readonly UIBarButtonItem countryCancelButton;
-            readonly UIBarButtonItem countryDoneButton;
             readonly Source countrySource;
             readonly UIPickerView countryPicker;
 
-            public CountryCategoriesView()
+            public CountryCategoriesView(UIViewController parentViewController)
             {
+                this.parentViewController = parentViewController;
+
                 countryView = new UIView
                 {
                     BackgroundColor = InactiveBackgroundColor,
@@ -893,9 +895,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     Items = new[]
                     {
-                        countryCancelButton = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, this, new Selector("cancelTapped:")) { TintColor = Theme.DarkerBlue },
+                        new UIBarButtonItem(UIBarButtonSystemItem.Cancel, this, new Selector("cancelTapped:")) { TintColor = Theme.DarkerBlue },
                         new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                        countryDoneButton = new UIBarButtonItem(UIBarButtonSystemItem.Done, this, new Selector("doneTapped:")) { TintColor = Theme.DarkerBlue }
+                        new UIBarButtonItem(UIBarButtonSystemItem.Done, this, new Selector("doneTapped:")) { TintColor = Theme.DarkerBlue }
                     }
                 };
 
@@ -915,7 +917,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 countryPicker = new UIPickerView
                 {
                     DataSource = countrySource,
-                    Delegate = countrySource,
+                    Delegate = countrySource
                 };
 
                 countryValue = new UITextField
@@ -1015,7 +1017,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             [Export("tapped:")]
-            void Tapped(UITapGestureRecognizer recognizer)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+            async void Tapped(UITapGestureRecognizer recognizer)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
             {
                 if (recognizer.View == countryView)
                 {
@@ -1032,7 +1036,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (recognizer.View == categoriesView)
                 {
-                    // TODO
+                    var vc = new CategoriesSelectListViewController(ModuleType.Contacts);
+                    parentViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
+
+                    var result = await vc.Task;
+
+                    if (result == null)
+                        return;
+
+                    Criteria.CategoryIds = result.Select(c => c.Id).ToList();
                 }
 
                 UpdateRow();

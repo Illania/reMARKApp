@@ -956,7 +956,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         class LineCategoriesPriorityNameView : AbstractSearchView
         {
 
-            readonly UIViewController parent;
+            readonly UIViewController parentViewController;
 
             readonly UIView lineView;
             readonly UILabel lineLabel;
@@ -968,9 +968,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             readonly UILabel priorityLabel;
             readonly UILabel priorityValue;
 
-            public LineCategoriesPriorityNameView(UIViewController parent)
+            public LineCategoriesPriorityNameView(UIViewController parentViewController)
             {
-                this.parent = parent;
+                this.parentViewController = parentViewController;
 
                 lineView = new UIView
                 {
@@ -1129,14 +1129,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             [Export("tapped:")]
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
             async void Tapped(UITapGestureRecognizer recognizer)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
             {
                 if (recognizer.View == lineView)
                 {
                     var data = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.ToArray();
                     var preselected = data.Where(l => Criteria.LineGuids.Contains(l.Guid)).ToArray();
 
-                    var result = await Dialogs.ShowMultiSelectDialogAsync(parent,
+                    var result = await Dialogs.ShowMultiSelectDialogAsync(parentViewController,
                                                                           Localization.GetString("search_lines"),
                                                                           data,
                                                                           preselected,
@@ -1151,7 +1153,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (recognizer.View == categoriesView)
                 {
-                    // TODO
+                    var vc = new CategoriesSelectListViewController(ModuleType.Documents);
+                    parentViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
+
+                    var result = await vc.Task;
+
+                    if (result == null)
+                        return;
+
+                    Criteria.CategoryIds = result.Select(c => c.Id).ToList();
                 }
 
                 if (recognizer.View == priorityView)
@@ -1174,7 +1184,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         }
                     };
 
-                    var result = await Dialogs.ShowMultiSelectDialogAsync(parent,
+                    var result = await Dialogs.ShowMultiSelectDialogAsync(parentViewController,
                                                                           Localization.GetString("priority"),
                                                                           data,
                                                                           preselected,
@@ -1186,7 +1196,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     Criteria.Priorities = result.ToList();
                 }
-
+                
                 UpdateRow();
             }
         }
