@@ -1,4 +1,4 @@
-﻿M//
+﻿//
 // Project: Mark5.Mobile.Droid
 // File: AbstractEditableLargeSearchView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>

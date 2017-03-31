@@ -640,7 +640,6 @@
     <AndroidResource Include="Resources\drawable-xxhdpi\cross.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\cross.png" />
     <AndroidResource Include="Resources\drawable-hdpi\cross.png" />
-    <AndroidResource Include="Resources\transition\search_date_transition.axml" />
     <AndroidResource Include="Resources\layout\search_list_item_country.axml" />
   </ItemGroup>
   <ItemGroup>
@@ -652,7 +651,6 @@
     <Folder Include="Resources\drawable-hdpi\" />
     <Folder Include="Ui\Views\SearchViews\" />
     <Folder Include="Ui\Views\SearchViews\AbstractViews\" />
-    <Folder Include="Resources\transition\" />
     <Folder Include="Ui\Views\SearchViews\RelatedViews\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
