@@ -497,8 +497,6 @@
     <BundleResource Include="Resources\icons\message%403x.png" />
     <BundleResource Include="Resources\icons\offline%402x.png" />
     <BundleResource Include="Resources\icons\offline%403x.png" />
-    <BundleResource Include="Resources\icons\okay%402x.png" />
-    <BundleResource Include="Resources\icons\okay%403x.png" />
     <BundleResource Include="Resources\icons\outgoing%402x.png" />
     <BundleResource Include="Resources\icons\outgoing%403x.png" />
     <BundleResource Include="Resources\icons\pencil%402x.png" />
