@@ -65,7 +65,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             RefreshHiddenSettings();
 
-            ReachabilityBar.Attach(View.Superview, TableView, (float)NavigationController.BottomLayoutGuide.Length);
+            ReachabilityBar.Attach(View.Superview, TableView, (float)NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
         }
 
         public override nfloat GetHeightForFooter(UITableView tableView, nint section)

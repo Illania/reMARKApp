@@ -31,26 +31,27 @@ namespace Mark5.Mobile.IOS.Ui.Common
         UIView parent;
         CGRect parentFrame;
 
-        public static void Attach(UIView parent, UIScrollView scrollView = null, float offset = 0f)
+        public static void Attach(UIView parent, UIScrollView scrollView = null, float offset = 0f, UITextAlignment alignment = UITextAlignment.Center)
         {
             if (parent == null)
                 return;
-            
+
             if (parent.Subviews.Any(v => v is ReachabilityBar))
                 return;
 
-            parent.AddSubview(new ReachabilityBar(parent, scrollView, offset));
+            parent.AddSubview(new ReachabilityBar(scrollView, offset, alignment));
         }
 
-        ReachabilityBar(UIView parent, UIScrollView scrollView, float offset)
+        ReachabilityBar(UIScrollView scrollView, float offset, UITextAlignment alignment)
         {
             this.scrollView = scrollView;
             this.offset = offset;
 
             AutoresizingMask = UIViewAutoresizing.None;
 
-            TextAlignment = UITextAlignment.Center;
+            TextAlignment = alignment;
             Font = Theme.DefaultFont.WithSize(12f);
+
 
             AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
             AddGestureRecognizer(new UILongPressGestureRecognizer(this, new Selector("longPressed:")) { MinimumPressDuration = 2d });
@@ -109,6 +110,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (keyPath == "frame" && ofObject == Superview)
                 Position();
         }
+
+        public override void DrawText(CGRect rect) => base.DrawText(new UIEdgeInsets(0f, 5f, 0f, 5f).InsetRect(rect));
 
         [Export("tapped:")]
         public void Tapped(UILongPressGestureRecognizer recognizer) => CommonConfig.ReachabilityService.Refresh();
