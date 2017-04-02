@@ -11,7 +11,7 @@
 "cache" = "Cache";
 "clean_cache_interval_days" = "Compact cache every";
 "clear_all_cache" = "Clear all cache";
-"compact_documents_list" = "Compact documents list";
+"compact_documents_list" = "Compact emails list";
 "compose_options" = "Compose view options";
 "compose_priority_enabled" = "Show priority field";
 "contact_section_visibility" = "Sections";
@@ -22,9 +22,9 @@
 "default_template" = "Default MARK5 template";
 "default_template_short" = "Default";
 "document_body_request_type" = "Viewing format";
-"documents" = "Documents";
-"documents_to_download" = "Documents to download";
-"documents_to_search" = "Documents search results";
+"documents" = "Emails";
+"documents_to_download" = "Emails to download";
+"documents_to_search" = "Emails search results";
 "dont_use" = "Don't use";
 "dont_use_short" = "Don't use";
 "enable_reporting" = "Share diagnostic information";
