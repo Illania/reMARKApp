@@ -237,7 +237,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void OnLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom)
         {
-            var parent = containerLinearLayout.Parent.Parent.Parent.Parent.Parent as CoordinatorLayout;
+            var parent = containerLinearLayout?.Parent?.Parent?.Parent?.Parent?.Parent as CoordinatorLayout;
 
             if (parent == null)
                 return;
