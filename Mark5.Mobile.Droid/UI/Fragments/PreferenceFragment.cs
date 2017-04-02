@@ -277,6 +277,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
+            if (preference.Key == GetString(Resource.String.pref_key_about_privacy_policy))
+            {
+                var i = new Intent(Intent.ActionView, Android.Net.Uri.Parse("https://www.iubenda.com/privacy-policy/8086960"));
+                StartActivity(i);
+            }
+
             if (preference.Key == GetString(Resource.String.pref_key_about_version))
             {
                 var i = new Intent(Settings.ActionApplicationDetailsSettings, Android.Net.Uri.Parse("package:" + Activity.PackageName));
