@@ -113,7 +113,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (!(view.Parent is ViewPager))
             {
-                ((AppCompatActivity)Activity).SupportActionBar.Title = RemoteFolder.Module.ToString();
+                var title = string.Empty;
+
+                switch (RemoteFolder.Module)
+                {
+                    case ModuleType.Documents:
+                        title = GetString(Resource.String.documents);
+                        break;
+                    case ModuleType.Contacts:
+                        title = GetString(Resource.String.contacts);
+                        break;
+                    case ModuleType.Shortcodes:
+                        title = GetString(Resource.String.shortcodes);
+                        break;
+                }
+
+                ((AppCompatActivity)Activity).SupportActionBar.Title = title;
                 ((AppCompatActivity)Activity).SupportActionBar.Subtitle = RemoteFolder.Root ? null : RemoteFolder.Name;
             }
 

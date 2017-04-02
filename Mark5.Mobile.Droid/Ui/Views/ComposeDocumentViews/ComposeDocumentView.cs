@@ -35,7 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
-            DistanceVeryLarge = ConversionUtils.ConvertDpToPixels(56f);
+            DistanceVeryLarge = ConversionUtils.ConvertDpToPixels(64f);
             DistanceLarge = ConversionUtils.ConvertDpToPixels(16f);
             DistanceNormal = ConversionUtils.ConvertDpToPixels(8f);
             DistanceSmall = ConversionUtils.ConvertDpToPixels(4f);
