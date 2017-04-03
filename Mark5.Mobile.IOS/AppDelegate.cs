@@ -78,15 +78,47 @@ namespace Mark5.Mobile.IOS
 
                 startupTime.Stop();
                 CommonConfig.Logger.Info($"Total startup time: {startupTime.ElapsedMilliseconds}ms");
-
-                return true;
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger?.Error(ex);
 
-                return false;
             }
+
+            return false; // Always return false to pass handling of notifications
+                          // to FinishedLaunching
+        }
+
+        public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
+        {
+            if (launchOptions == null)
+                return true;
+
+            try
+            {
+                var userInfo = (NSDictionary)launchOptions.ObjectForKey(UIApplication.LaunchOptionsRemoteNotificationKey);
+                if (userInfo != null)
+                {
+                    var n = userInfo.ConvertToNotification();
+
+                    if (n.ObjectType == ObjectType.Document)
+                    {
+                        var vc = new DocumentViewController();
+                        vc.Modal = true;
+                        vc.SetRefreshDataOnAppear();
+                        vc.SetData(n.ObjectId);
+
+                        Window.RootViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error(ex);
+
+            }
+
+            return true;
         }
 
         public override void ReceiveMemoryWarning(UIApplication application)
@@ -139,8 +171,10 @@ namespace Mark5.Mobile.IOS
                 else
                     options(UNNotificationPresentationOptions.None);
             }
-            catch
+            catch (Exception ex)
             {
+                CommonConfig.Logger.Error(ex);
+
                 options(UNNotificationPresentationOptions.None);
             }
         }
@@ -161,6 +195,10 @@ namespace Mark5.Mobile.IOS
 
                     Window.RootViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                 }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error(ex);
             }
             finally
             {
