@@ -114,9 +114,6 @@ namespace FastScrollRecycler
             {
                 Show();
             }));
-
-            if (autoHideEnabled)
-                PostAutoHideDelayed();
         }
 
         public int GetThumbHeight()
