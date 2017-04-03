@@ -18,7 +18,7 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
 
-    public class SearchCriteriaViewController : UIViewController
+    public class SearchCriteriaViewController : AbstractViewController
     {
 
         UISegmentedControl segmentedControl;

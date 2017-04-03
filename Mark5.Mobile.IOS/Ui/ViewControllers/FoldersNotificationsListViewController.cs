@@ -18,7 +18,7 @@ using UIKit;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
 
-    public class FoldersNotificationsListViewController : UIViewController
+    public class FoldersNotificationsListViewController : AbstractViewController
     {
 
         readonly ModuleType moduleType;

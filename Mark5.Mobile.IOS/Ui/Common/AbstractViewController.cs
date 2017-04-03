@@ -14,5 +14,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
     {
 
         public string Tag { get; set; }
+
+        public override void LoadView()
+        {
+            base.LoadView();
+
+            View.BackgroundColor = UIColor.White;
+        }
     }
 }
