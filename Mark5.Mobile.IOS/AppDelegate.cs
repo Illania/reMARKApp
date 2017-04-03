@@ -125,20 +125,47 @@ namespace Mark5.Mobile.IOS
         [Export("userNotificationCenter:willPresentNotification:withCompletionHandler:")]
         public void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification, Action<UNNotificationPresentationOptions> options)
         {
-            if (notification.Request.Identifier != LocalNotificationsListener.FailedSendingIdentifier)
+            try
             {
-                PlatformConfig.MessengerHub.PublishAsync(new NewNotificationsMessage(this));
-            }
+                var n = notification.ConvertToNotification();
 
-            options(UNNotificationPresentationOptions.Alert);
+                if (n.ObjectType == ObjectType.Document)
+                {
+                    if (notification.Request.Identifier != LocalNotificationsListener.FailedSendingIdentifier)
+                        PlatformConfig.MessengerHub.PublishAsync(new NewNotificationsMessage(this));
+
+                    options(UNNotificationPresentationOptions.Alert);
+                }
+                else
+                    options(UNNotificationPresentationOptions.None);
+            }
+            catch
+            {
+                options(UNNotificationPresentationOptions.None);
+            }
         }
 
         [Export("userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:")]
         public void DidReceiveNotificationResponse(UNUserNotificationCenter center, UNNotificationResponse response, Action completionHandler)
         {
-            // TODO open document view
+            try
+            {
+                var n = response.Notification.ConvertToNotification();
 
-            completionHandler();
+                if (n.ObjectType == ObjectType.Document)
+                {
+                    var vc = new DocumentViewController();
+                    vc.Modal = true;
+                    vc.SetRefreshDataOnAppear();
+                    vc.SetData(n.ObjectId);
+
+                    Window.RootViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                }
+            }
+            finally
+            {
+                completionHandler();
+            }
         }
 
         void InitializeCommon()
