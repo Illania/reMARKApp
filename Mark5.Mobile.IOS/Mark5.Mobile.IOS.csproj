@@ -466,7 +466,6 @@
     <BundleResource Include="Resources\icons\contacts%402x.png" />
     <BundleResource Include="Resources\icons\contacts%403x.png" />
     <BundleResource Include="Resources\icons\documents-filled%402x.png" />
-    <BundleResource Include="Resources\icons\documents-filled%403x.png.png" />
     <BundleResource Include="Resources\icons\documents-small%402x.png" />
     <BundleResource Include="Resources\icons\documents-small%403x.png" />
     <BundleResource Include="Resources\icons\documents%402x.png" />
@@ -513,8 +512,6 @@
     <BundleResource Include="Resources\icons\folderslist\draft%403x.png" />
     <BundleResource Include="Resources\icons\folderslist\folder%402x.png" />
     <BundleResource Include="Resources\icons\folderslist\folder%403x.png" />
-    <BundleResource Include="Resources\icons\folderslist\outgoing%402x.png" />
-    <BundleResource Include="Resources\icons\folderslist\outgoing%403x.png" />
     <BundleResource Include="Resources\icons\folderslist\worktray%402x.png" />
     <BundleResource Include="Resources\icons\folderslist\worktray%403x.png" />
     <BundleResource Include="Resources\Settings.bundle\Root.inApp.plist" />
@@ -530,6 +527,15 @@
     <BundleResource Include="Resources\icons\search_large%403x.png" />
     <BundleResource Include="Resources\icons\search_small%402x.png" />
     <BundleResource Include="Resources\icons\search_small%403x.png" />
+    <BundleResource Include="Resources\icons\documents-filled%403x.png" />
+    <BundleResource Include="Resources\icons\attachment%402x.png" />
+    <BundleResource Include="Resources\icons\attachment%403x.png" />
+    <BundleResource Include="Resources\icons\message-small%402x.png" />
+    <BundleResource Include="Resources\icons\message-small%403x.png" />
+    <BundleResource Include="Resources\icons\sending%402x.png" />
+    <BundleResource Include="Resources\icons\sending%403x.png" />
+    <BundleResource Include="Resources\icons\remove%403x.png" />
+    <BundleResource Include="Resources\icons\remove%402x.png" />
   </ItemGroup>
   <ItemGroup>
     <XamarinComponentReference Include="InAppSettingsKit">

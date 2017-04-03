@@ -103,7 +103,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             return new PickLinesListFragmentState
             {
-                SelectedPriorities = adapter.SelectedPriorities, //TODO the state
+                SelectedPriorities = adapter.SelectedPriorities,
             };
         }
 

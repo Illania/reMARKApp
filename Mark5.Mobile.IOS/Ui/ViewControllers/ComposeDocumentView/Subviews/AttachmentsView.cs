@@ -7,6 +7,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Extensions;
@@ -179,7 +180,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 filenameButton.TouchUpInside += (sender, e) => attachmentClickedAction(this, attachmentDescription);
                 AddArrangedSubview(filenameButton);
 
-                deleteButton = UIButton.FromType(UIButtonType.ContactAdd); //TODO change icon
+                deleteButton = new UIButton();
+                deleteButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "remove.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
                 deleteButton.TranslatesAutoresizingMaskIntoConstraints = false;
                 deleteButton.TouchUpInside += (sender, e) => deleteAttachmentClickedAction(this, attachmentDescription);
                 deleteButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);

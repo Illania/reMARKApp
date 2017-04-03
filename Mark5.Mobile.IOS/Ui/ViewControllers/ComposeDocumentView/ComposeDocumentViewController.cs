@@ -213,17 +213,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             sendButtonItem.Enabled = false;
 
             attachmentButtonItem = new UIBarButtonItem();
-            attachmentButtonItem.Title = "ATT"; //TODO need to put an icon here
+            attachmentButtonItem.Image = UIImage.FromBundle(Path.Combine("icons", "attachment.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             attachmentButtonItem.Enabled = true;
 
             if (LocalDocument)
-            {
                 NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { attachmentButtonItem }, false);
-            }
             else
-            {
                 NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { sendButtonItem, attachmentButtonItem }, false);
-            }
         }
 
         void InitSubViews()

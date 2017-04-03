@@ -91,7 +91,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             IndicatorImageView1.Image = directionIcon;
             IndicatorImageView2.Image = (PlatformConfig.Preferences.UnreadIndicatorMe ? documentPreview.IsReadByCurrent : documentPreview.IsReadByAnyone) ? null : UIImage.FromBundle(Path.Combine("icons", "full-dot.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             IndicatorImageView3.Image = documentPreview.AttachmentsCount > 0 ? UIImage.FromBundle(Path.Combine("icons", "attachment-small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate) : null;
-            IndicatorImageView4.Image = documentPreview.CommentsCount > 0 ? UIImage.FromBundle(Path.Combine("icons", "attachment-small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate) : null; // TODO PUT RIGHT ICON
+            IndicatorImageView4.Image = documentPreview.CommentsCount > 0 ? UIImage.FromBundle(Path.Combine("icons", "message-small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate) : null;
         }
 
         public void Initialize(OutgoingDocumentContainer container)
@@ -116,7 +116,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     stateIcon = UIImage.FromBundle(Path.Combine("icons", "failed.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
                 case OutgoingDocumentState.Sending:
-                    stateIcon = UIImage.FromBundle(Path.Combine("icons", "pencil.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);  //TODO need to put the right icon
+                    stateIcon = UIImage.FromBundle(Path.Combine("icons", "sending.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
                 case OutgoingDocumentState.Waiting:
                     stateIcon = UIImage.FromBundle(Path.Combine("icons", "pending.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);

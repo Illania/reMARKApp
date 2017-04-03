@@ -103,11 +103,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         static UIImage GetIcon(Folder folder)
         {
-            if (folder.Id == Folder.DocumentsOutgoingFolder.Id)
-            {
-                return UIImage.FromBundle(Path.Combine("icons", "folderslist", "outgoing.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            }
-
             if (folder.InternalType == FolderInternalType.Worktray)
             {
                 return UIImage.FromBundle(Path.Combine("icons", "folderslist", "worktray.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);

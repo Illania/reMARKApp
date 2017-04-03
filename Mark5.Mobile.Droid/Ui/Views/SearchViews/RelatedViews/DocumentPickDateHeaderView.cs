@@ -17,8 +17,10 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
-    public class DocumentPickDateHeaderView : LinearLayoutCompat //TODO probably this should be in a different place
+    
+    public class DocumentPickDateHeaderView : LinearLayoutCompat
     {
+        
         long fromTimestamp = -1;
         long toTimestamp = -1;
 
@@ -60,7 +62,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 },
             };
             fromLayout.Clickable = true;
-            fromLayout.Click += FromClicked; //TODO for now they don't work, so the flow is one directional
+            fromLayout.Click += FromClicked;
             fromLayout.SetPadding(0, mediumPaddingValue, 0, mediumPaddingValue);
             AddView(fromLayout);
 

@@ -13,6 +13,7 @@ using Android.Views.InputMethods;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using System;
+using Android.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
@@ -116,21 +117,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             rightLayout.AddView(BottomEditText);
         }
 
-        class CustomEditText : AppCompatEditText //TODO this was for the focusing problem eventually
+        class CustomEditText : AppCompatEditText
         {
             public event EventHandler BackPressed = delegate { };
 
 
-            public CustomEditText(Android.Content.Context context) : base(context)
+            public CustomEditText(Context context) : base(context)
             {
             }
 
             public override bool OnKeyPreIme(Keycode keyCode, KeyEvent e)
             {
                 if ((keyCode == Keycode.Back) && (e.Action == KeyEventActions.Up))
-                {
                     BackPressed(this, EventArgs.Empty);
-                }
 
                 return base.OnKeyPreIme(keyCode, e);
             }
