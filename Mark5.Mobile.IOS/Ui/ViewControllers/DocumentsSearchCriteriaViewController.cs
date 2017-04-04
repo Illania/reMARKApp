@@ -210,6 +210,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void ResetItem_Clicked(object sender, EventArgs e)
         {
+            View.EndEditing(true);
+
             criteria = new SearchDocumentsCriteria();
 
             foreach (var view in stackView.Subviews.OfType<AbstractSearchView>())
@@ -422,14 +424,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
 
             readonly UILabel titleLabel;
+            readonly UIView valueTextFieldAccessoryView;
+            readonly UISegmentedControl valueTextFieldSegmentedControl;
             readonly UITextField valueTextField;
 
             public MessageSubjectView()
             {
                 var mainView = new UIView
                 {
-                    BackgroundColor = InactiveBackgroundColor
+                    BackgroundColor = InactiveBackgroundColor,
+                    UserInteractionEnabled = true
                 };
+                mainView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 mainView.Layer.CornerRadius = CornerRadius;
                 mainView.Layer.MasksToBounds = true;
 
@@ -437,7 +443,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     Image = UIImage.FromBundle(Path.Combine("icons", "search_small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                     TintColor = Theme.LightGray,
-                    TranslatesAutoresizingMaskIntoConstraints = false
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    UserInteractionEnabled = false
                 };
 
                 titleLabel = new UILabel
@@ -446,9 +453,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Left,
                     TranslatesAutoresizingMaskIntoConstraints = false,
-                    UserInteractionEnabled = true
+                    UserInteractionEnabled = false
                 };
-                titleLabel.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
+
+                valueTextFieldAccessoryView = new UIView(new CGRect(0f, 0f, 0f, 44f));
+                valueTextFieldAccessoryView.BackgroundColor = Theme.LightGray;
+                valueTextFieldSegmentedControl = new UISegmentedControl(new[] { Localization.GetString("search_subject"), Localization.GetString("search_message"), Localization.GetString("search_both") });
+                valueTextFieldSegmentedControl.TranslatesAutoresizingMaskIntoConstraints = false;
+                valueTextFieldSegmentedControl.AddTarget(this, new Selector("segmentedControlChanged:"), UIControlEvent.ValueChanged);
+                valueTextFieldAccessoryView.AddSubview(valueTextFieldSegmentedControl);
+                valueTextFieldAccessoryView.AddConstraints(new[] { 
+                    valueTextFieldSegmentedControl.CenterXAnchor.ConstraintEqualTo(valueTextFieldAccessoryView.CenterXAnchor),
+                    valueTextFieldSegmentedControl.CenterYAnchor.ConstraintEqualTo(valueTextFieldAccessoryView.CenterYAnchor),
+                    valueTextFieldSegmentedControl.WidthAnchor.ConstraintLessThanOrEqualTo(valueTextFieldAccessoryView.WidthAnchor, 1f, -5f),
+                    valueTextFieldSegmentedControl.HeightAnchor.ConstraintLessThanOrEqualTo(valueTextFieldAccessoryView.HeightAnchor, 1f, -5f)
+                });
 
                 valueTextField = new UITextField
                 {
@@ -458,7 +477,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     TintColor = Theme.LightGray,
                     TextAlignment = UITextAlignment.Left,
                     TranslatesAutoresizingMaskIntoConstraints = false,
-                    WeakDelegate = this
+                    WeakDelegate = this,
+                    InputAccessoryView = valueTextFieldAccessoryView,
+                    UserInteractionEnabled = false
                 };
                 valueTextField.AddTarget(this, new Selector("textFieldDidChange:"), UIControlEvent.EditingChanged);
                 mainView.Add(icon);
@@ -498,25 +519,56 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     default:
                         titleLabel.Text += Localization.GetString("search_subject_or_message");
                         break;
-
                 }
+
                 valueTextField.Text = Criteria.SubjectMessageField;
             }
 
             [Export("tapped:")]
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-            async void Tapped(UITapGestureRecognizer recognizer)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+            void Tapped(UIView sender)
             {
-                var vc = (UIViewController)NextResponder.NextResponder.NextResponder.NextResponder;
+                valueTextField.UserInteractionEnabled = true;
+                valueTextField.BecomeFirstResponder();
+            }
 
-                var item = await Dialogs.ShowListDialogAsync(vc, null, new[] { Localization.GetString("search_subject_or_message"), Localization.GetString("search_subject"), Localization.GetString("search_message") }, titleLabel);
-                if (item < 0)
-                    return;
+            [Export("segmentedControlChanged:")]
+            void SegmentedControlChanged(UISegmentedControl segmentedControl)
+            {
+                switch (segmentedControl.SelectedSegment)
+                {
+                    case 0:
+                        Criteria.SubjectMessageClause = SubjectMessageClause.SubjectOnly;
+                        break;
 
-                Criteria.SubjectMessageClause = (SubjectMessageClause)item;
+                    case 1:
+                        Criteria.SubjectMessageClause = SubjectMessageClause.MessageOnly;
+                        break;
+
+                    case 2:
+                        Criteria.SubjectMessageClause = SubjectMessageClause.SubjectOrMessage;
+                        break;
+                }
 
                 UpdateRow();
+            }
+
+            [Export("textFieldShouldBeginEditing:")]
+            bool TextFieldShouldBeginEditing(UITextField textField)
+            {
+                switch (Criteria.SubjectMessageClause)
+                {
+                    case SubjectMessageClause.SubjectOnly:
+                        valueTextFieldSegmentedControl.SelectedSegment = 0;
+                        break;
+                    case SubjectMessageClause.MessageOnly:
+                        valueTextFieldSegmentedControl.SelectedSegment = 1;
+                        break;
+                    default:
+                        valueTextFieldSegmentedControl.SelectedSegment = 2;
+                        break;
+                }
+
+                return true;
             }
 
             [Export("textFieldDidChange:")]
@@ -531,12 +583,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 textField.ResignFirstResponder();
                 return true;
             }
+
+            [Export("textFieldDidEndEditing:")]
+            void TextFieldDidEndEditing(UITextField textField)
+            {
+                textField.UserInteractionEnabled = false;
+            }
         }
 
         class FromToView : AbstractSearchView
         {
 
             readonly UILabel titleLabel;
+            readonly UIView valueTextFieldAccessoryView;
+            readonly UISegmentedControl valueTextFieldSegmentedControl;
             readonly UITextField valueTextField;
 
             public FromToView()
@@ -545,6 +605,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     BackgroundColor = InactiveBackgroundColor
                 };
+                mainView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
                 mainView.Layer.CornerRadius = CornerRadius;
                 mainView.Layer.MasksToBounds = true;
 
@@ -552,7 +613,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     Image = UIImage.FromBundle(Path.Combine("icons", "search_small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                     TintColor = Theme.LightGray,
-                    TranslatesAutoresizingMaskIntoConstraints = false
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    UserInteractionEnabled = false
                 };
 
                 titleLabel = new UILabel
@@ -561,9 +623,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Font = Font,
                     TextAlignment = UITextAlignment.Left,
                     TranslatesAutoresizingMaskIntoConstraints = false,
-                    UserInteractionEnabled = true
+                    UserInteractionEnabled = false
                 };
-                titleLabel.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
+
+                valueTextFieldAccessoryView = new UIView(new CGRect(0f, 0f, 0f, 44f));
+                valueTextFieldAccessoryView.BackgroundColor = Theme.LightGray;
+                valueTextFieldSegmentedControl = new UISegmentedControl(new[] { Localization.GetString("search_from"), Localization.GetString("search_to"), Localization.GetString("search_both") });
+                valueTextFieldSegmentedControl.TranslatesAutoresizingMaskIntoConstraints = false;
+                valueTextFieldSegmentedControl.AddTarget(this, new Selector("segmentedControlChanged:"), UIControlEvent.ValueChanged);
+                valueTextFieldAccessoryView.AddSubview(valueTextFieldSegmentedControl);
+                valueTextFieldAccessoryView.AddConstraints(new[] {
+                    valueTextFieldSegmentedControl.CenterXAnchor.ConstraintEqualTo(valueTextFieldAccessoryView.CenterXAnchor),
+                    valueTextFieldSegmentedControl.CenterYAnchor.ConstraintEqualTo(valueTextFieldAccessoryView.CenterYAnchor),
+                    valueTextFieldSegmentedControl.WidthAnchor.ConstraintLessThanOrEqualTo(valueTextFieldAccessoryView.WidthAnchor, 1f, -5f),
+                    valueTextFieldSegmentedControl.HeightAnchor.ConstraintLessThanOrEqualTo(valueTextFieldAccessoryView.HeightAnchor, 1f, -5f)
+                });
+
 
                 valueTextField = new UITextField
                 {
@@ -573,7 +648,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     TintColor = Theme.LightGray,
                     TextAlignment = UITextAlignment.Left,
                     TranslatesAutoresizingMaskIntoConstraints = false,
-                    WeakDelegate = this
+                    WeakDelegate = this,
+                    InputAccessoryView = valueTextFieldAccessoryView,
+                    UserInteractionEnabled = false
                 };
                 valueTextField.AddTarget(this, new Selector("textFieldDidChange:"), UIControlEvent.EditingChanged);
                 mainView.Add(icon);
@@ -601,6 +678,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             protected override void UpdateRow()
             {
                 titleLabel.Text = Localization.GetString("search_search_addresses");
+
                 switch (Criteria.FromToClause)
                 {
                     case FromToClause.FromOnly:
@@ -618,19 +696,50 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             [Export("tapped:")]
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-            async void Tapped(UITapGestureRecognizer recognizer)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+            void Tapped(UIView sender)
             {
-                var vc = (UIViewController)NextResponder.NextResponder.NextResponder.NextResponder;
+                valueTextField.UserInteractionEnabled = true;
+                valueTextField.BecomeFirstResponder();
+            }
 
-                var item = await Dialogs.ShowListDialogAsync(vc, null, new[] { Localization.GetString("search_from_or_to"), Localization.GetString("search_from"), Localization.GetString("search_to") }, titleLabel);
-                if (item < 0)
-                    return;
+            [Export("segmentedControlChanged:")]
+            void SegmentedControlChanged(UISegmentedControl segmentedControl)
+            {
+                switch (segmentedControl.SelectedSegment)
+                {
+                    case 0:
+                        Criteria.FromToClause = FromToClause.FromOnly;
+                        break;
 
-                Criteria.FromToClause = (FromToClause)item;
+                    case 1:
+                        Criteria.FromToClause = FromToClause.ToOnly;
+                        break;
+
+                    case 2:
+                        Criteria.FromToClause = FromToClause.FromOrTo;
+                        break;
+                }
 
                 UpdateRow();
+            }
+
+            [Export("textFieldShouldBeginEditing:")]
+            bool TextFieldShouldBeginEditing(UITextField textField)
+            {
+                switch (Criteria.FromToClause)
+                {
+                    case FromToClause.FromOnly:
+                        valueTextFieldSegmentedControl.SelectedSegment = 0;
+                        break;
+                    case FromToClause.ToOnly:
+                        valueTextFieldSegmentedControl.SelectedSegment = 1;
+                        break;
+                    default:
+                        valueTextFieldSegmentedControl.SelectedSegment = 2;
+                        break;
+                }
+
+                return true;
             }
 
             [Export("textFieldDidChange:")]
@@ -644,6 +753,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 textField.ResignFirstResponder();
                 return true;
+            }
+
+            [Export("textFieldDidEndEditing:")]
+            void TextFieldDidEndEditing(UITextField textField)
+            {
+                textField.UserInteractionEnabled = false;
             }
         }
 
@@ -1436,7 +1551,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 textField.ResignFirstResponder();
                 return true;
             }
-
 
             [Export("textFieldDidEndEditing:")]
             void TextFieldDidEndEditing(UITextField textField)

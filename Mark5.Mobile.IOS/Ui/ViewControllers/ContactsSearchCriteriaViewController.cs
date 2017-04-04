@@ -203,6 +203,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void ResetItem_Clicked(object sender, EventArgs e)
         {
+            View.EndEditing(true);
+
             criteria = new SearchContactsCriteria();
 
             foreach (var view in stackView.Subviews.OfType<AbstractSearchView>())

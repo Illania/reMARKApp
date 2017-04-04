@@ -203,6 +203,7 @@
 "search_all" = "All";
 "search_any" = "Any";
 "search_attachments" = "Attachment";
+"search_both" = "Both";
 "search_categories" = "Categories";
 "search_comments" = "Comments";
 "search_company" = "Company";
