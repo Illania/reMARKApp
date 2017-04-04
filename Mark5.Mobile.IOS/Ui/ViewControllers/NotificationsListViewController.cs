@@ -7,6 +7,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
@@ -120,7 +121,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitializeNavigationBar()
         {
             markAsReadItem = new UIBarButtonItem();
-            markAsReadItem.Title = Localization.GetString("mark_as_read");
+            markAsReadItem.Image = UIImage.FromBundle(Path.Combine("icons", "markasread.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             markAsReadItem.Enabled = false;
             NavigationItem.SetRightBarButtonItem(markAsReadItem, false);
         }

@@ -538,6 +538,8 @@
     <BundleResource Include="Resources\icons\sending%403x.png" />
     <BundleResource Include="Resources\icons\remove%403x.png" />
     <BundleResource Include="Resources\icons\remove%402x.png" />
+    <BundleResource Include="Resources\icons\markasread%402x.png" />
+    <BundleResource Include="Resources\icons\markasread%403x.png" />
   </ItemGroup>
   <ItemGroup>
     <XamarinComponentReference Include="InAppSettingsKit">
