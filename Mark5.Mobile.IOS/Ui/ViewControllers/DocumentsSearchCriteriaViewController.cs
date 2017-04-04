@@ -465,7 +465,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 valueTextFieldAccessoryView.AddConstraints(new[] { 
                     valueTextFieldSegmentedControl.CenterXAnchor.ConstraintEqualTo(valueTextFieldAccessoryView.CenterXAnchor),
                     valueTextFieldSegmentedControl.CenterYAnchor.ConstraintEqualTo(valueTextFieldAccessoryView.CenterYAnchor),
-                    valueTextFieldSegmentedControl.WidthAnchor.ConstraintLessThanOrEqualTo(valueTextFieldAccessoryView.WidthAnchor, 1f, -5f),
+                    valueTextFieldSegmentedControl.WidthAnchor.ConstraintEqualTo(valueTextFieldAccessoryView.WidthAnchor, 1f, -10f),
                     valueTextFieldSegmentedControl.HeightAnchor.ConstraintLessThanOrEqualTo(valueTextFieldAccessoryView.HeightAnchor, 1f, -5f)
                 });
 
@@ -635,10 +635,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 valueTextFieldAccessoryView.AddConstraints(new[] {
                     valueTextFieldSegmentedControl.CenterXAnchor.ConstraintEqualTo(valueTextFieldAccessoryView.CenterXAnchor),
                     valueTextFieldSegmentedControl.CenterYAnchor.ConstraintEqualTo(valueTextFieldAccessoryView.CenterYAnchor),
-                    valueTextFieldSegmentedControl.WidthAnchor.ConstraintLessThanOrEqualTo(valueTextFieldAccessoryView.WidthAnchor, 1f, -5f),
+                    valueTextFieldSegmentedControl.WidthAnchor.ConstraintEqualTo(valueTextFieldAccessoryView.WidthAnchor, 1f, -10f),
                     valueTextFieldSegmentedControl.HeightAnchor.ConstraintLessThanOrEqualTo(valueTextFieldAccessoryView.HeightAnchor, 1f, -5f)
                 });
-
 
                 valueTextField = new UITextField
                 {
