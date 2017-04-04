@@ -114,6 +114,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             AdjustScrollViewInsets();
         }
 
+        public override void ViewDidAppear(bool animated)
+        {
+            base.ViewDidAppear(animated);
+
+            AdjustScrollViewInsets();
+        }
+
         public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
         {
             base.ViewWillTransitionToSize(toSize, coordinator);

@@ -156,7 +156,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             UIView.AnimationsEnabled = false;
             NavigationItem.Title = outgoingFolder.Name;
-            NavigationItem.Prompt = Localization.GetString("documents");
+            NavigationItem.Prompt = null;
             UIView.AnimationsEnabled = true;
         }
 
@@ -205,9 +205,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void DocumentSelected(OutgoingDocumentContainer container)
         {
             if (tableView.Editing || container.Info.State == OutgoingDocumentState.Sending)
-            {
                 return;
-            }
 
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
@@ -245,7 +243,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         [Export("longPressed:")]
         public void LongPressed(UILongPressGestureRecognizer recognizer)
         {
-            if (tableView.Editing) return;
+            if (tableView.Editing)
+                return;
 
             StartEditing();
 

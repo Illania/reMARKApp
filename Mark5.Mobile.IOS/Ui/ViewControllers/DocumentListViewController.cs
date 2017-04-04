@@ -220,7 +220,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             UIView.AnimationsEnabled = false;
             NavigationItem.Title = Folder.Name;
-            NavigationItem.Prompt = Localization.GetString("documents");
+            NavigationItem.Prompt = null;
             UIView.AnimationsEnabled = true;
         }
 
