@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -71,6 +72,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         FloatingActionButton fab;
 
         List<ComposeDocumentView> subViews = new List<ComposeDocumentView>();
+
+        AutoSaveWorker autoSaveWorker;
+        int autoSaveInterval = 3 * 1000; //3 seconds (for testing)
 
         bool documentShown;
         bool templateLoaded;
@@ -141,12 +145,51 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnResume();
 
+            CommonConfig.Logger.Info($"Resuming {nameof(ComposeDocumentFragment)}...");
+
             if (OutgoingDocumentGuid == Guid.Empty)
                 OutgoingDocumentGuid = Guid.NewGuid();
 
             await LoadDocument();
 
             UpdateSendButtonState();
+
+            autoSaveWorker?.Stop();
+            autoSaveWorker = new AutoSaveWorker(AutoSaveFunction, autoSaveInterval);
+            autoSaveWorker.Start();
+
+            CommonConfig.Logger.Info($"Resumed {nameof(ComposeDocumentFragment)}...");
+        }
+
+        async Task AutoSaveFunction()
+        {
+            if (LocalDocument) //TODO enable it for local documents...? If not, I should not even start it
+                return;
+
+            foreach (var subView in subViews)
+                await subView.UpdateDocument();
+
+            DocumentPreview.Direction = DocumentDirection.Outgoing;
+            await Managers.DocumentsManager.AutoSaveDocumentAsync(OutgoingDocumentGuid,
+                                                                          Document,
+                                                                          DocumentPreview,
+                                                                          CreationModeFlag,
+                                                                          PreviousDocumentId ?? -1,
+                                                                          PreviousDocumentFolderId ?? -1,
+                                                                          0,
+                                                                          false,
+                                                                          false);
+        }
+
+        public override void OnPause()
+        {
+            base.OnPause();
+
+            CommonConfig.Logger.Info($"Pausing {nameof(ComposeDocumentFragment)}...");
+
+            autoSaveWorker?.Stop();
+
+            CommonConfig.Logger.Info($"Paused {nameof(ComposeDocumentFragment)}");
         }
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
@@ -908,5 +951,43 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
+    }
+
+    public class AutoSaveWorker
+    {
+        CancellationTokenSource cts;
+        Func<Task> autoSaveAction;
+        int delay;
+
+        public AutoSaveWorker(Func<Task> autoSaveAction, int delay)
+        {
+            this.autoSaveAction = autoSaveAction;
+            this.delay = delay;
+        }
+
+        public void Start()
+        {
+            cts?.Cancel();
+            cts = new CancellationTokenSource();
+
+            Task.Run(async () =>
+            {
+                while (true)
+                {
+                    await Task.Delay(delay);
+                    if (cts.IsCancellationRequested) return;
+
+                    await autoSaveAction();
+
+                }
+            });
+        }
+
+        public void Stop()
+        {
+            cts?.Cancel();
+            cts = null;
+        }
+
     }
 }

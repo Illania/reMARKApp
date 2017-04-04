@@ -37,6 +37,7 @@ namespace Mark5.Mobile.Common.Storage
             public const string OutgoingInfo = "info.json";
             public const string OutgoingLock = ".lock";
             public const string OutgoingFailed = ".failed";
+            public const string OutgoingAutoSave = ".autosave";
             public const string OutgoingAttachmentFolder = "attachment";
         }
 
@@ -196,6 +197,13 @@ namespace Mark5.Mobile.Common.Storage
                 await isLockedFile.DeleteAsync();
             }
 
+            var wasSaved = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingAutoSave)) == ExistenceCheckResult.FileExists;
+            if (wasSaved)
+            {
+                var isSavedFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingAutoSave);
+                await isSavedFile.DeleteAsync();
+            }
+
             var documentFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingDocument, CreationCollisionOption.ReplaceExisting);
             await documentFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(document));
 
@@ -231,10 +239,15 @@ namespace Mark5.Mobile.Common.Storage
                 var infoFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingInfo);
                 var info = await SerializationUtils.DeserializeAsync<OutgoingDocumentInfo>(await infoFile.ReadAllTextAsync());
                 var isFailed = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed)) == ExistenceCheckResult.FileExists;
+                var isAutoSave = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingAutoSave)) == ExistenceCheckResult.FileExists;
 
                 if (isFailed)
                 {
                     info.State = OutgoingDocumentState.Failed;
+                }
+                else if (isAutoSave)
+                {
+                    info.State = OutgoingDocumentState.AutoSaved;
                 }
                 else
                 {
@@ -302,7 +315,9 @@ namespace Mark5.Mobile.Common.Storage
 
             foreach (var id in identifiers)
             {
-                outgoingDocumentContainers.Add(await GetOutgoingDocumentContainerAsync(id, false, LoadMode.Preview));
+                var container = await GetOutgoingDocumentContainerAsync(id, false, LoadMode.Preview);
+                if (container != null && container.Info.State != OutgoingDocumentState.AutoSaved)
+                    outgoingDocumentContainers.Add(container);
             }
 
             return outgoingDocumentContainers;
@@ -411,6 +426,44 @@ namespace Mark5.Mobile.Common.Storage
         static async Task<IFolder> GetOutgoingFolderAsync(Guid id)
         {
             return await CommonConfig.OutgoingFolder.CreateFolderAsync(id.ToString(), CreationCollisionOption.OpenIfExists);
+        }
+
+        #endregion
+
+
+        #region Saved documents
+
+        public static async Task AutoSaveDocumentAsync(OutgoingDocumentInfo outgoingDocumentInfo, Document document, DocumentPreview documentPreview)
+        {
+            var outgoingDocumentFolder = await GetOutgoingFolderAsync(outgoingDocumentInfo.Identifier);
+
+            var documentFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingDocument, CreationCollisionOption.ReplaceExisting);
+            await documentFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(document));
+
+            var documentPreviewFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingDocumentPreview, CreationCollisionOption.ReplaceExisting);
+            await documentPreviewFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(documentPreview));
+
+            outgoingDocumentInfo.DateLastSavedTimestamp = DateTime.Now.ToUniversalTime().ConvertDateTimeToTimestampMilliseconds();
+            outgoingDocumentInfo.State = OutgoingDocumentState.AutoSaved;
+            var infoFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingInfo, CreationCollisionOption.ReplaceExisting);
+            await infoFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(outgoingDocumentInfo));
+
+            await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingAutoSave, CreationCollisionOption.ReplaceExisting);
+        }
+
+        public static async Task<OutgoingDocumentContainer> GetAutoSavedDocumentAsync()
+        {
+            var identifiers = await GetOutgoingDocumentIdentifiersAsync();
+            foreach (var id in identifiers)
+            {
+                var folder = await GetOutgoingFolderAsync(id);
+                if (await folder.CheckExistsAsync(Filenames.OutgoingAutoSave) == ExistenceCheckResult.FileExists)
+                {
+                    return await GetOutgoingDocumentContainerAsync(id, false, LoadMode.Complete);
+                }
+            }
+
+            return null;
         }
 
         #endregion

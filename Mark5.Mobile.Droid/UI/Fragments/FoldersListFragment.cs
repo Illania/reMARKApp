@@ -135,7 +135,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Created {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]");
         }
 
-        public override void OnResume()
+        public override async void OnResume()
         {
             base.OnResume();
 
@@ -157,6 +157,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             SetSections();
             RefreshData();
             RestoreSelection();
+
+            await CheckAutoSavedDocument();
+        }
+
+        async Task CheckAutoSavedDocument()
+        {
+            var documents = await Managers.DocumentsManager.GetAutoSavedDocumentAsync();
+
+            if (documents != null)
+            {
+                var result = await Dialogs.ShowYesNoDialogAsync(Context, "Title", "There was an unsaved document...");
+                if (result)
+                {
+
+                }
+            }
         }
 
         public override void OnPause()

@@ -294,6 +294,28 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        public async Task AutoSaveDocumentAsync(Guid id, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId,
+                                               long sendOnTimestamp, bool confirmRead, bool confirmDelivery)
+        {
+            var outgoingDocumentInfo = new OutgoingDocumentInfo
+            {
+                Flag = flag,
+                PreviousDocumentId = precedingDocumentId,
+                PreviousDocumentdFolderId = precedingDocumentFolderId,
+                SendOnTimestamp = sendOnTimestamp,
+                ConfirmRead = confirmRead,
+                ConfirmDelivery = confirmDelivery,
+                Identifier = id
+            };
+
+            await FileSystemStorage.AutoSaveDocumentAsync(outgoingDocumentInfo, document, documentPreview);
+        }
+
+        public async Task<OutgoingDocumentContainer> GetAutoSavedDocumentAsync()
+        {
+            return await FileSystemStorage.GetAutoSavedDocumentAsync();
+        }
+
         public async Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;

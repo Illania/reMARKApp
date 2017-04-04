@@ -53,6 +53,10 @@ namespace Mark5.Mobile.Common.Managers
 
         Task UnlockOutgoingDocumentAsync(Guid identifier);
 
+        Task AutoSaveDocumentAsync(Guid identifier, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery);
+
+        Task<OutgoingDocumentContainer> GetAutoSavedDocumentAsync();
+
         Task SetDocumentReadStatusAsync(DocumentPreview documentPreview, Document document, bool isRead, SystemUser currentUser, SourceType sourceType = SourceType.Auto);
 
         Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto);
