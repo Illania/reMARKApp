@@ -135,6 +135,7 @@
 "mark5_service_reachability" = "MARK5 service: ";
 "mark_as_read" = "Mark as read";
 "mark_as_read_ml" = "Mark as\nread";
+"mark_as_unread" = "Mark as unread";
 "mark_as_unread_ml" = "Mark as\nunread";
 "marking_document_as_read___" = "Marking email as read...";
 "marking_document_as_unread___" = "Marking email as unread...";

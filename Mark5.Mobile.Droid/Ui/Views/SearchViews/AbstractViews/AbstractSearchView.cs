@@ -1,5 +1,5 @@
 ﻿//
-// Project: ${Project}
+// Project: Mark5.Mobile.Droid
 // File: AbstractSearchView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
 //

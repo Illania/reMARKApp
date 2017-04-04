@@ -377,9 +377,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 flag,
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                fileTo,
-                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 replyActions,
+                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                fileTo,
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 comments,
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),

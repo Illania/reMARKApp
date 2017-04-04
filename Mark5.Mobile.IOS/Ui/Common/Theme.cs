@@ -55,6 +55,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public static UIFont DefaultLightFont { get { return UIFont.FromName(DefaultLightFontName, DefaultFontSize); } }
 
+        public static UIFont DefaultActionsFont { get { return UIFont.FromName(DefaultFontName, 14f); } }
+
         #endregion
 
         #region Apply theme methods

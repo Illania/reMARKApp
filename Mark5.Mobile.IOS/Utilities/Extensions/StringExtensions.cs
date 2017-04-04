@@ -1,5 +1,5 @@
-﻿//
-// Project: ${Project}
+//
+// Project: Mark5.Mobile.IOS
 // File: StringExtensions.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
 //
