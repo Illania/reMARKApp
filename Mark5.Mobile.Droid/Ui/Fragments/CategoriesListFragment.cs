@@ -128,7 +128,7 @@ namespace Mark5.Mobile.Droid
                 };
 
                 var ft = ((AppCompatActivity)Activity).SupportFragmentManager.BeginTransaction();
-                ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out, Resource.Animation.fade_out, Resource.Animation.fade_in);
+                ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out, Resource.Animation.fade_in, Resource.Animation.fade_out);
                 ft.Replace(Resource.Id.fragment_container, clf, clf.GenerateTag());
                 ft.AddToBackStack(null);
                 ft.Commit();
