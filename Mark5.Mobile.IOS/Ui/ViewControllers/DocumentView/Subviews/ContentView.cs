@@ -235,6 +235,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             heightConstraint.Constant = defaultHeight;
             widthConstraint.Constant = defaultWidth;
 
+            if (content == null)
+            {
+                webView.LoadData(NSData.FromString("Content could not be loaded."), "text/plain", "UTF-8", new NSUrl("/"));
+                return;
+            }
+
             switch (contentType)
             {
                 case ContentType.Html:

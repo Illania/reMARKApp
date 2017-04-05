@@ -21,7 +21,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         {
             if (Document != null)
             {
-                TextView.Text = string.Join(", ", Document.ReadByUserNames.Values.OrderBy(n => n));
+                var readByUsernames = Document.ReadByUserNames.Values.SelectMany(s => s.Split('|')).OrderBy(s => s).Select(s => s.ToUpper());
+                TextView.Text = string.Join(", ", readByUsernames);
             }
         }
 

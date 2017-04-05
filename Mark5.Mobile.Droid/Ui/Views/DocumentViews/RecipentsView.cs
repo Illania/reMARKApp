@@ -354,7 +354,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 tableRowReplyTo.Visibility = string.IsNullOrWhiteSpace(replyToText) ? ViewStates.Gone : ViewStates.Visible;
                 replyToValue.Text = replyToText;
 
-                var readByText = string.Join(", ", Document.ReadByUserNames.Values).ToUpper();
+                var readByUsernames = Document.ReadByUserNames.Values.SelectMany(s => s.Split('|')).OrderBy(s=>s).Select(s =>s.ToUpper());
+                var readByText = string.Join(", ", readByUsernames);
                 tableRowReadBy.Visibility = string.IsNullOrWhiteSpace(readByText) ? ViewStates.Gone : ViewStates.Visible;
                 readByValue.Text = readByText;
 
