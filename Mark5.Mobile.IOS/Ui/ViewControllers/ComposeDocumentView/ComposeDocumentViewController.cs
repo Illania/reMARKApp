@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -76,6 +77,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         // This value will be later updated from notification.
         float keyboardHeight = 216f;
 
+        AutoSaveWorker autoSaveWorker;
+        int autoSaveInterval = 5 * 1000; //5 seconds
+
         public ComposeDocumentViewController()
         {
             Title = DefaultTitle;
@@ -124,6 +128,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
 
             await LoadDocument();
+
+            if (!LocalDocument || (LocalDocument && OutgoingDocumentState == OutgoingDocumentState.AutoSaved))
+            {
+                autoSaveWorker?.Stop();
+                autoSaveWorker = new AutoSaveWorker(AutoSaveAction, autoSaveInterval);
+                autoSaveWorker.Start();
+            }
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -139,6 +150,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 });
 
             NavigationController.HidesBarsOnSwipe = false;
+
+            autoSaveWorker?.Stop();
         }
 
         #endregion
@@ -336,6 +349,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                         await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_while_sending_document")));
                         NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { sendButtonItem, attachmentButtonItem }, false);
                     }
+                    if (outgoingContainer.Info.State == OutgoingDocumentState.AutoSaved)
+                    {
+                        NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { sendButtonItem, attachmentButtonItem }, false);
+                    }
                     if (outgoingContainer.LocalAttachments != null)
                     {
                         OutgoingDocumentInitialAttachments.AddRange(outgoingContainer.LocalAttachments);
@@ -518,6 +535,44 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 NavigationController.PopViewController(true);
             }
+
+            DeleteAutoSavedDocument();
+        }
+
+        public void DeleteAutoSavedDocument()
+        {
+            Task.Run(async () =>
+            {
+                await Managers.DocumentsManager.DeleteAutoSavedDocumentAsync();
+            }).ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                {
+                    CommonConfig.Logger.Error("Error while deleting autosaved document", t.Exception);
+                }
+            });
+        }
+
+        async Task AutoSaveAction()
+        {
+            InvokeOnMainThread(async () =>
+            {
+                foreach (var subView in subViews)
+                    await subView.UpdateDocument();
+            });
+
+            await SynchOutgoingAttachments(false);
+
+            DocumentPreview.Direction = DocumentDirection.Outgoing;
+            await Managers.DocumentsManager.AutoSaveDocumentAsync(OutgoingDocumentGuid,
+                                                                          Document,
+                                                                          DocumentPreview,
+                                                                          CreationModeFlag,
+                                                                          PreviousDocumentId ?? -1,
+                                                                          PreviousDocumentFolderId ?? -1,
+                                                                          0,
+                                                                          false,
+                                                                          false);
         }
 
         public async Task SynchOutgoingAttachments(bool restoreState)
@@ -705,7 +760,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void CancelButtonItem_Clicked(object sender, EventArgs e)
         {
-            if (LocalDocument)
+            if (LocalDocument && OutgoingDocumentState != OutgoingDocumentState.AutoSaved)
             {
                 var confirm = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("save_modifications"), Localization.GetString("confirm_save_modified_document"));
                 if (confirm)
@@ -1247,6 +1302,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 // Nothing to do
             }
+        }
+
+        public class AutoSaveWorker
+        {
+            CancellationTokenSource cts;
+            Func<Task> autoSaveAction;
+            int delay;
+
+            public AutoSaveWorker(Func<Task> autoSaveAction, int delay)
+            {
+                this.autoSaveAction = autoSaveAction;
+                this.delay = delay;
+            }
+
+            public void Start()
+            {
+                cts?.Cancel();
+                cts = new CancellationTokenSource();
+
+                Task.Run(async () =>
+                {
+                    while (true)
+                    {
+                        await Task.Delay(delay);
+                        if (cts.IsCancellationRequested) return;
+
+                        await autoSaveAction();
+                    }
+                });
+            }
+
+            public void Stop()
+            {
+                cts?.Cancel();
+                cts = null;
+            }
+
         }
     }
 }

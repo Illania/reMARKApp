@@ -6,6 +6,8 @@
 "address" = "Address";
 "attachment_too_big" = "The attachment is bigger than the maximum allowed size on the server";
 "attachments" = "Attachments";
+"autosave_recover_title" = "Recover email";
+"autosave_recover_content" = "MARK5 recovered an autosaved email. Do you want to continue editing it?";
 "back" = "Back";
 "bcc" = "Bcc";
 "big_attachment_title" = "Big attachment";
