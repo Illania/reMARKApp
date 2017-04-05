@@ -161,20 +161,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             await CheckAutoSavedDocument();
         }
 
-        async Task CheckAutoSavedDocument()
-        {
-            var documents = await Managers.DocumentsManager.GetAutoSavedDocumentAsync();
-
-            if (documents != null)
-            {
-                var result = await Dialogs.ShowYesNoDialogAsync(Context, "Title", "There was an unsaved document...");
-                if (result)
-                {
-
-                }
-            }
-        }
-
         public override void OnPause()
         {
             base.OnPause();
@@ -219,6 +205,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         #endregion
 
         #region Actions
+
+        async Task CheckAutoSavedDocument()
+        {
+            var container = await Managers.DocumentsManager.GetAutoSavedDocumentAsync();
+
+            if (container == null)
+                return;
+
+            var shouldRecover = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.autosave_recover_title, Resource.String.autosave_recover_content);
+            if (shouldRecover)
+            {
+                var composeActivity = ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Edit, container.DocumentPreview.Direction, outgoingDocumentGuid: container.Info.Identifier);
+                StartActivity(composeActivity);
+            }
+            else
+            {
+                await Managers.DocumentsManager.DeleteAutoSavedDocumentAsync();
+            }
+        }
 
         void ComposeDocument()
         {

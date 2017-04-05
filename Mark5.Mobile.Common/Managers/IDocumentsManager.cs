@@ -57,6 +57,8 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<OutgoingDocumentContainer> GetAutoSavedDocumentAsync();
 
+        Task DeleteAutoSavedDocumentAsync();
+
         Task SetDocumentReadStatusAsync(DocumentPreview documentPreview, Document document, bool isRead, SystemUser currentUser, SourceType sourceType = SourceType.Auto);
 
         Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto);

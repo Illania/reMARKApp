@@ -316,6 +316,11 @@ namespace Mark5.Mobile.Common.Managers
             return await FileSystemStorage.GetAutoSavedDocumentAsync();
         }
 
+        public async Task DeleteAutoSavedDocumentAsync()
+        {
+            await FileSystemStorage.DeleteAutoSavedDocumentAsync();
+        }
+
         public async Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;

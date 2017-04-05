@@ -32,10 +32,10 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
-    
+
     public class RecipientsView : ComposeDocumentView
     {
-    
+
         public event EventHandler Edited = delegate { };
 
         readonly AppCompatMultiAutoCompleteTextView emailEditor;
@@ -202,6 +202,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override Task UpdateDocument()
         {
+            DocumentPreview.Addresses.RemoveAll(a => a.AddressType == this.AddressType);
             GetEmails().ForEach(s => DocumentPreview.Addresses.Add(new DocumentAddress { Address = s, AddressType = this.AddressType, Type = CommunicationAddressType.Email }));
             return Task.CompletedTask;
         }

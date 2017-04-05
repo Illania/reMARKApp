@@ -430,7 +430,6 @@ namespace Mark5.Mobile.Common.Storage
 
         #endregion
 
-
         #region Saved documents
 
         public static async Task AutoSaveDocumentAsync(OutgoingDocumentInfo outgoingDocumentInfo, Document document, DocumentPreview documentPreview)
@@ -453,17 +452,32 @@ namespace Mark5.Mobile.Common.Storage
 
         public static async Task<OutgoingDocumentContainer> GetAutoSavedDocumentAsync()
         {
+            var autoSavedGuid = await GetAutoSavedIdAsync();
+            return autoSavedGuid == Guid.Empty ? null : await GetOutgoingDocumentContainerAsync(autoSavedGuid, false, LoadMode.Complete);
+        }
+
+        public static async Task DeleteAutoSavedDocumentAsync()
+        {
+            var autoSavedGuid = await GetAutoSavedIdAsync();
+            if (autoSavedGuid != Guid.Empty)  //If not found, it means that in the meanwhile the document was inserted in outgoing list, for instance
+            {
+                await DeleteOutgoingDocumentFolderAsync(autoSavedGuid);
+            }
+        }
+
+        static async Task<Guid> GetAutoSavedIdAsync()
+        {
             var identifiers = await GetOutgoingDocumentIdentifiersAsync();
             foreach (var id in identifiers)
             {
                 var folder = await GetOutgoingFolderAsync(id);
                 if (await folder.CheckExistsAsync(Filenames.OutgoingAutoSave) == ExistenceCheckResult.FileExists)
                 {
-                    return await GetOutgoingDocumentContainerAsync(id, false, LoadMode.Complete);
+                    return id;
                 }
             }
 
-            return null;
+            return Guid.Empty;
         }
 
         #endregion
