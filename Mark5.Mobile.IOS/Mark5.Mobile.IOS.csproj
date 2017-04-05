@@ -408,6 +408,7 @@
     <Compile Include="Ui\ViewControllers\SelectCategoriesListViewController.cs" />
     <Compile Include="Utilities\PushNotificationsConverter.cs" />
     <Compile Include="Model\PushNotification.cs" />
+    <Compile Include="Utilities\Hacks.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
@@ -538,6 +539,10 @@
     <BundleResource Include="Resources\icons\sending%403x.png" />
     <BundleResource Include="Resources\icons\remove%403x.png" />
     <BundleResource Include="Resources\icons\remove%402x.png" />
+    <BundleResource Include="Resources\icons\markasread%402x.png" />
+    <BundleResource Include="Resources\icons\markasread%403x.png" />
+    <BundleResource Include="Resources\icons\worktray%402x.png" />
+    <BundleResource Include="Resources\icons\worktray%403x.png" />
   </ItemGroup>
   <ItemGroup>
     <XamarinComponentReference Include="InAppSettingsKit">

@@ -131,7 +131,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 55f),
                 NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 55f),
                 NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, bottomView, NSLayoutAttribute.CenterX, 1f, 0f),
-                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, bottomView, NSLayoutAttribute.Bottom, 1f, -12f)
+                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, bottomView, NSLayoutAttribute.Bottom, 1f, -8f)
             });
 
             stackView.AddArrangedSubview(new ContactTypesSearchView());
@@ -203,6 +203,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void ResetItem_Clicked(object sender, EventArgs e)
         {
+            View.EndEditing(true);
+
             criteria = new SearchContactsCriteria();
 
             foreach (var view in stackView.Subviews.OfType<AbstractSearchView>())

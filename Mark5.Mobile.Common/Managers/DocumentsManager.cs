@@ -272,13 +272,32 @@ namespace Mark5.Mobile.Common.Managers
 
                 if (isRead)
                 {
-                    document.ReadByUserIds.Add(currentUser.Id);
-                    document.ReadByUserNames[currentUser.Id] = currentUser.Username;
+                    if (!document.ReadByUserIds.Contains(currentUser.Id))
+                        document.ReadByUserIds.Add(currentUser.Id);
+
+                    if (!document.ReadByUserNames.ContainsKey(currentUser.Id))
+                        document.ReadByUserNames[currentUser.Id] = currentUser.Username;
+                    else
+                        document.ReadByUserNames[currentUser.Id] += '|' + currentUser.Username;
                 }
                 else
                 {
-                    document.ReadByUserIds.Remove(currentUser.Id);
-                    document.ReadByUserNames.Remove(currentUser.Id);
+                    if (document.ReadByUserNames.ContainsKey(currentUser.Id))
+                    {
+                        if (!document.ReadByUserNames[currentUser.Id].Contains('|'))
+                        {
+                            document.ReadByUserIds.Remove(currentUser.Id);
+                            document.ReadByUserNames.Remove(currentUser.Id);
+                        }
+                        else
+                        {
+                            var usernames = document.ReadByUserNames[currentUser.Id].Split('|');
+                            var index = Array.IndexOf(usernames, currentUser.Username);
+                            if (index >= 0)
+                                usernames = usernames.Where((s, i) => i != index).ToArray();
+                            document.ReadByUserNames[currentUser.Id] = string.Join("|", usernames);
+                        }
+                    }
                 }
 
                 await documentsDataAccess.SetDocumentReadStatusAsync(documentPreview, document);

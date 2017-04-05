@@ -79,6 +79,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         [Export("segmentedControlHasChangedValue:")]
         void SegmentedControlHasChangedValue(UISegmentedControl sender)
         {
+            View.EndEditing(true);
+
             var vc = viewControllers[sender.SelectedSegment];
             currentViewController.WillMoveToParentViewController(null);
             vc.WillMoveToParentViewController(this);

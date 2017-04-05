@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: ShortcodesTableViewCell.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -9,6 +9,7 @@ using System;
 using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
@@ -27,11 +28,18 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         {
         }
 
-        public static ShortcodesTableViewCell Create(bool swipeActionsEnabled = true)
+        public static ShortcodesTableViewCell Create()
         {
             var cell = (ShortcodesTableViewCell)Nib.Instantiate(null, null)[0];
             cell.NameLabel.Font = Theme.DefaultFont;
             return cell;
+        }
+
+        public override void LayoutSubviews()
+        {
+            base.LayoutSubviews();
+
+            Hacks.CorrectFontInActions(this, Theme.DefaultActionsFont);
         }
 
         public void Initialize(ShortcodePreview shortcodePreview)

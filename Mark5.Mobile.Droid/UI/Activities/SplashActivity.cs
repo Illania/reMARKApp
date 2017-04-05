@@ -58,8 +58,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Starting {nameof(SplashActivity)}...");
 
+#if !DEBUG
             CrashManager.Register(this, PlatformConfig.HockeyId, new CustomCrashManagerListener());
             CrashManager.ResetAlwaysSend(new Java.Lang.Ref.WeakReference(this));
+#endif
 
             Task.Run(async () =>
             {

@@ -122,6 +122,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             ClearNavigationBarTitle();
             DeinitializeHandlers();
+
+            if (NavigationController != null && NavigationController.NavigationBarHidden)
+                NavigationController?.SetNavigationBarHidden(false, true);
+
+            if (SearchController != null && SearchController.Active)
+                SearchController.Active = false;
         }
 
         public override void DidReceiveMemoryWarning()

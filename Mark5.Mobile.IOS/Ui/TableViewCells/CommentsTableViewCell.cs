@@ -1,5 +1,5 @@
-﻿//
-// Project: ${Project}
+//
+// Project: Mark5.Mobile.IOS
 // File: CommentsTableViewCell.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
 //
@@ -45,6 +45,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 
             return cell;
+        }
+
+        public override void LayoutSubviews()
+        {
+            base.LayoutSubviews();
+
+            Hacks.CorrectFontInActions(this, Theme.DefaultActionsFont);
         }
 
         public void Initialize(Comment comment)

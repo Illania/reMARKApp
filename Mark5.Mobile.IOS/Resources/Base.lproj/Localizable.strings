@@ -131,12 +131,13 @@
 "logging_out___" = "Logging out...";
 "login" = "Login";
 "login_failed" = "Login failed";
-"login_failed_desc" = "Could not log in to MARK5. Please check your credentials and server address.";
+"login_failed_desc" = "Could not log in to MARK5. Please check your username, password and server address.\n\nYou may also want to verify SSL settings, by tapping Settings in top right corner of the screen.";
 "low" = "Low";
 "mark5_server_reachability" = "MARK5 server: ";
 "mark5_service_reachability" = "MARK5 service: ";
 "mark_as_read" = "Mark as read";
 "mark_as_read_ml" = "Mark as\nread";
+"mark_as_unread" = "Mark as unread";
 "mark_as_unread_ml" = "Mark as\nunread";
 "marking_document_as_read___" = "Marking email as read...";
 "marking_document_as_unread___" = "Marking email as unread...";
@@ -205,6 +206,7 @@
 "search_all" = "All";
 "search_any" = "Any";
 "search_attachments" = "Attachment";
+"search_both" = "Both";
 "search_categories" = "Categories";
 "search_comments" = "Comments";
 "search_company" = "Company";

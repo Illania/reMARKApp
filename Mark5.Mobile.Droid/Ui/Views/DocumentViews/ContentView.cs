@@ -49,15 +49,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
                 if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
                 {
-                    webView.LoadDataWithBaseURL(null, Document.PlainTextBody, "text/plain", "UTF-8", null);
+                    webView.LoadDataWithBaseURL(null, Document.PlainTextBody ?? "Content could not be loaded.", "text/plain", "UTF-8", null);
                 }
                 else if (!string.IsNullOrWhiteSpace(Document.HtmlBody))
                 {
-                    webView.LoadDataWithBaseURL(null, Document.HtmlBody, "text/html", "UTF-8", null);
+                    webView.LoadDataWithBaseURL(null, Document.HtmlBody ?? "Content could not be loaded.", "text/html", "UTF-8", null);
                 }
                 else
                 {
-                    webView.LoadDataWithBaseURL(null, Document.PlainTextBody, "text/plain", "UTF-8", null);
+                    webView.LoadDataWithBaseURL(null, Document.PlainTextBody ?? "Content could not be loaded.", "text/plain", "UTF-8", null);
                 }
             }
             else

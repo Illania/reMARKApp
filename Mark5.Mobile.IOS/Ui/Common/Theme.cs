@@ -55,6 +55,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public static UIFont DefaultLightFont { get { return UIFont.FromName(DefaultLightFontName, DefaultFontSize); } }
 
+        public static UIFont DefaultActionsFont { get { return UIFont.FromName(DefaultFontName, 14f); } }
+
         #endregion
 
         #region Apply theme methods
@@ -111,8 +113,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var uiSegmentControlTitleTextAttributes = UISegmentedControl.Appearance.GetTitleTextAttributes(UIControlState.Normal);
             uiSegmentControlTitleTextAttributes.Font = DefaultFont;
             UISegmentedControl.Appearance.SetTitleTextAttributes(uiSegmentControlTitleTextAttributes, UIControlState.Normal);
+            UISegmentedControl.Appearance.TintColor = DarkerBlue;
 
-            UISwitch.Appearance.OnTintColor = Theme.DarkBlue;
+            UISwitch.Appearance.OnTintColor = DarkBlue;
         }
 
         #endregion
