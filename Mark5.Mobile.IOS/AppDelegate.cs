@@ -58,7 +58,11 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.Logger.Info("MARK5 initialized");
 
                 BITHockeyManager.SharedHockeyManager.Configure(PlatformConfig.HockeyId);
+#if DEBUG
+                BITHockeyManager.SharedHockeyManager.CrashManager.CrashManagerStatus = BITCrashManagerStatus.Disabled;
+#else
                 BITHockeyManager.SharedHockeyManager.CrashManager.CrashManagerStatus = PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BITCrashManagerStatus.Disabled;
+#endif
                 BITHockeyManager.SharedHockeyManager.StartManager();
                 BITHockeyManager.SharedHockeyManager.Authenticator.AuthenticateInstallation();
 
