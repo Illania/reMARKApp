@@ -100,7 +100,7 @@
 	<string name="large_attachment">This attachment is larger than 20MB. Do you want to download it?</string>
 	<string name="ledger">Ledger</string>
 	<string name="line">Mailbox</string>
-	<string name="lines">Mailboxes:</string>
+	<string name="lines">Mailboxes</string>
 	<string name="links">Links</string>
 	<string name="loading_document">Loading email</string>
 	<string name="loading_template">Loading template</string>
@@ -164,7 +164,7 @@
 	<string name="priority_urgent">Urgent</string>
 	<string name="read_by">Read by:</string>
 	<string name="read_by_prefix">read by</string>
-	<string name="reference">Ref.:</string>
+	<string name="reference">Ref.</string>
 	<string name="reset">Reset</string>
 	<string name="related_contacts">Related</string>
 	<string name="remove_favorites">Remove from favourites</string>
