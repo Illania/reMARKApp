@@ -16,7 +16,7 @@
 	<string name="attachment_too_big">The attachment is bigger than the maximum allowed size on the server</string>
 	<string name="attachments">Attachments:</string>
 	<string name="autosave_recover_title">Recover email</string>
-	<string name="autosave_recover_content">MARK5 recovered an unsaved email. Do you want to continue editing it?</string>
+	<string name="autosave_recover_content">MARK5 recovered an autosaved email. Do you want to continue editing it?</string>
 	<string name="bcc">Bcc</string>
 	<string name="birthdate">Birthdate</string>
 	<string name="by">by</string>
