@@ -158,7 +158,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             RefreshData();
             RestoreSelection();
 
-            await CheckAutoSavedDocument();
+            if (RemoteFolder?.Module == ModuleType.Documents)
+                await CheckAutoSavedDocument();
+
         }
 
         public override void OnPause()
