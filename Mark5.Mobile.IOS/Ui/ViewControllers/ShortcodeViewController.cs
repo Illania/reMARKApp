@@ -101,9 +101,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             CommonConfig.Logger.Warning($"{nameof(ShortcodeViewController)} received memory warning!");
 
-            var ds = tableView?.Source as DataSource;
-            ds?.Clear();
-
+            GC.Collect();
             base.DidReceiveMemoryWarning();
         }
 
