@@ -74,7 +74,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         List<ComposeDocumentView> subViews = new List<ComposeDocumentView>();
 
         AutoSaveWorker autoSaveWorker;
-        int autoSaveInterval = 3 * 1000; //3 seconds (for testing)
+        int autoSaveInterval = 5 * 1000; //5 seconds
 
         bool documentShown;
         bool templateLoaded;
