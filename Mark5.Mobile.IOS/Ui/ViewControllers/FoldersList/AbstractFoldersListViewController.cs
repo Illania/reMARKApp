@@ -120,10 +120,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             ClearNavigationBarTitle();
             DeinitializeHandlers();
 
-            if (NavigationController.NavigationBarHidden)
-                NavigationController.SetNavigationBarHidden(false, true);
+            if (NavigationController != null && NavigationController.NavigationBarHidden)
+                NavigationController?.SetNavigationBarHidden(false, true);
 
-            if (SearchController.Active)
+            if (SearchController != null && SearchController.Active)
                 SearchController.Active = false;
         }
 
