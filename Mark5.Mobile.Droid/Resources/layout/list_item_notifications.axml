@@ -43,7 +43,8 @@
                     android:layout_height="match_parent"
                     android:layout_weight="75"
                     android:gravity="left|center_vertical"
-                    android:textAppearance="@style/fontListPrimaryBold"
+                    android:textAppearance="@style/fontListPrimary"
+                    android:textColor="@color/black"
                     android:maxLines="1"
                     android:ellipsize="end" />
                 <android.support.v7.widget.AppCompatTextView
@@ -57,9 +58,18 @@
                     android:maxLines="1" />
             </android.support.v7.widget.LinearLayoutCompat>
             <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/list_item_notification_message"
+                android:id="@+id/list_item_notification_message_first_line"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textAppearance="@style/fontListPrimary"
+                android:textColor="@color/darkblue"
+                android:maxLines="3"
+                android:ellipsize="end" />
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/list_item_notification_message_second_line"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:textAppearance="@style/fontListSmallLight"
                 android:maxLines="5"
                 android:ellipsize="end" />
