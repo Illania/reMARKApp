@@ -191,6 +191,9 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\netstandard1.3\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="MailBee.NET">
+      <HintPath>..\packages\MailBee.NET.11.0.1\lib\netstandard1.3\MailBee.NET.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Resources\Resource.designer.cs" />
@@ -357,6 +360,7 @@
     <Compile Include="Ui\Fragments\ContactsSearchCriteriaFragment.cs" />
     <Compile Include="Ui\Fragments\ShortcodesSearchCriteriaFragment.cs" />
     <Compile Include="Ui\Fragments\ContactFragment.cs" />
+    <Compile Include="Ui\Activities\MailViewerActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

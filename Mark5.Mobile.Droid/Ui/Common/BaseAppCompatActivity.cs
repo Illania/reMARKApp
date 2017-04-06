@@ -13,7 +13,6 @@ using System.Text;
 using System;
 using Android.OS;
 using Android.Support.Design.Widget;
-using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
