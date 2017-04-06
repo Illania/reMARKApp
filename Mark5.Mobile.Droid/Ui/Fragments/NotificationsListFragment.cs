@@ -313,8 +313,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 cpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, n)));
 
-                cpvh.Title = n.Title;
-                cpvh.Message = n.Message;
+                cpvh.Title = n.Type == EventType.NewObjectCreated ? string.Empty : n.Title;
+
+                var splitMessage = n.Message.Split('\n');
+
+                cpvh.MessageFirstLine = splitMessage.ElementAtOrDefault(0);
+                cpvh.MessageSecondLine = splitMessage.ElementAtOrDefault(1);
+
                 cpvh.DateTime = n.DateTimeTimestamp
                     .ConvertTimestampMillisecondsToDateTime()
                     .ConvertUtcToServerTime()
@@ -370,15 +375,47 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 set
                 {
-                    titleTextView.Text = value;
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        titleTextView.Visibility = ViewStates.Gone;
+                    }
+                    else
+                    {
+                        titleTextView.Visibility = ViewStates.Visible;
+                        titleTextView.Text = value;
+                    }
                 }
             }
 
-            public string Message
+            public string MessageFirstLine
             {
                 set
                 {
-                    messageTextView.Text = value;
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        messageFirstLine.Visibility = ViewStates.Gone;
+                    }
+                    else
+                    {
+                        messageFirstLine.Visibility = ViewStates.Visible;
+                        messageFirstLine.Text = value;
+                    }
+                }
+            }
+
+            public string MessageSecondLine
+            {
+                set
+                {
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        messageSecondLine.Visibility = ViewStates.Gone;
+                    }
+                    else
+                    {
+                        messageSecondLine.Visibility = ViewStates.Visible;
+                        messageSecondLine.Text = value;
+                    }
                 }
             }
 
@@ -400,7 +437,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             readonly AppCompatImageView unreadImageView;
             readonly AppCompatTextView titleTextView;
-            readonly AppCompatTextView messageTextView;
+            readonly AppCompatTextView messageFirstLine;
+            readonly AppCompatTextView messageSecondLine;
             readonly AppCompatTextView dateTimeTextView;
 
             public NotificationViewHolder(View itemView)
@@ -408,7 +446,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 unreadImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_notification_unread);
                 titleTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_notification_title);
-                messageTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_notification_message);
+                messageFirstLine = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_notification_message_first_line);
+                messageSecondLine = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_notification_message_second_line);
                 dateTimeTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_notification_date);
             }
         }
