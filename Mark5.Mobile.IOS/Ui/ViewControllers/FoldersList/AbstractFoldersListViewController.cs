@@ -137,6 +137,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             var gds = TableView?.Source as GrouppedDataSource;
             gds?.Reset();
 
+            GC.Collect();
             base.DidReceiveMemoryWarning();
         }
 
@@ -1234,6 +1235,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 foreach (var kv in foldersInView)
                     kv.Value.Clear();
 
+                tableView.BeginUpdates();
                 if (module == ModuleType.Documents)
                 {
                     tableView.ReloadSections(NSIndexSet.FromIndex(Section.Local), UITableViewRowAnimation.Fade);
@@ -1241,6 +1243,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 tableView.ReloadSections(NSIndexSet.FromIndex(Section.Favorites), UITableViewRowAnimation.Fade);
                 tableView.ReloadSections(NSIndexSet.FromIndex(Section.Folders), UITableViewRowAnimation.Fade);
+                tableView.EndUpdates();
             }
 
             public Folder[] GetFolders(int folderId)

@@ -129,7 +129,7 @@ namespace Mark5.Mobile.IOS
         {
             CommonConfig.Logger.Warning("Received memery warning!");
 
-            GC.Collect();
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
         }
 
         public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
