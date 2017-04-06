@@ -336,16 +336,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void AppendItems(List<Notification> items)
             {
-                var n = new Notification()
-                {
-                    Title = "New document filed in worktray",
-                    Message = "Document .... was filed in worktray",
-                    Type = EventType.NewObjectInWorktray,
-                    DateTimeTimestamp = 1491466767511,
-                };
-
-                items.Add(n);
-
                 var count = notificationsInView.Count;
                 notificationsInView.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
