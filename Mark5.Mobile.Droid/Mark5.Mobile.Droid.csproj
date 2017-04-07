@@ -194,6 +194,9 @@
     <Reference Include="MailBee.NET">
       <HintPath>..\packages\MailBee.NET.11.0.1\lib\netstandard1.3\MailBee.NET.dll</HintPath>
     </Reference>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>..\packages\HtmlAgilityPack.1.4.9.5\lib\portable-net45+netcore45+wp8+MonoAndroid+MonoTouch\HtmlAgilityPack.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Resources\Resource.designer.cs" />
