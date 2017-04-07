@@ -19,6 +19,7 @@ using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using HtmlAgilityPack;
 using MailBee;
+using MailBee.Html;
 using MailBee.Mime;
 using MailBee.Outlook;
 using Mark5.Mobile.Common;
@@ -120,6 +121,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         mm.ThrowExceptions = true;
                         mm.LoadMessage(bytes);
                         bytes = null;
+                        MakeHtmlSafe(mm);
                         InlineImages(mm);
                         return mm;
                     }
@@ -152,6 +154,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                                     mm.ThrowExceptions = true;
                                     mm.LoadMessage(emlStream.ToArray());
                                     emlStream.Dispose();
+                                    MakeHtmlSafe(mm);
                                     InlineImages(mm);
                                     return mm;
                                 }
@@ -321,6 +324,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
 
             mm.BodyHtmlText = htmlDoc.DocumentNode.OuterHtml;
+        }
+
+        static void MakeHtmlSafe(MailMessage mm)
+        {
+            var p = new Processor();
+            p.Dom.OuterHtml = mm.BodyHtmlText;
+            mm.BodyHtmlText = p.Dom.ProcessToString(RuleSet.GetSafeHtmlRules(), null);
         }
 
         async Task<Java.IO.File> CreateTempFile(string filename, byte[] bytes)
