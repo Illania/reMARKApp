@@ -19,6 +19,7 @@ using Android.Widget;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Model.Exceptions;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Model.Exceptions;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.ServiceReference.Exceptions;
 
@@ -399,6 +400,10 @@ namespace Mark5.Mobile.Droid.Ui.Common
             {
                 return context.GetString(Resource.String.invalidsourcetypeexception_title);
             }
+            if (ex is MailViewerException)
+            {
+                return context.GetString(Resource.String.couldnotopenemlmsg_title);
+            }
 
             return context.GetString(Resource.String.generalexception_title);
         }
@@ -425,6 +430,10 @@ namespace Mark5.Mobile.Droid.Ui.Common
             {
                 return context.GetString(Resource.String.invalidsourcetypeexception_message);
             }
+            if (ex is MailViewerException)
+            {
+                return ex.Message;
+            }
 
             return ex.Message;
         }
@@ -450,6 +459,10 @@ namespace Mark5.Mobile.Droid.Ui.Common
             if (ex is InvalidSourceTypeException)
             {
                 return false;
+            }
+            if (ex is MailViewerException)
+            {
+                return true;
             }
 
             return true;

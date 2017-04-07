@@ -43,10 +43,16 @@ namespace Mark5.Mobile.Common.Utilities
             return index > 0 ? str.SafeSubstring(0, index) : str;
         }
 
+        public static string SafeSubstringAfter(this string str, string value, StringComparison comparisonType = StringComparison.CurrentCulture)
+        {
+            var index = str.IndexOf(value, comparisonType);
+            return index >= 0 ? str.SafeSubstring(index + value.Length) : str;
+        }
+
         public static string SafeSubstringAfterLast(this string str, string value, StringComparison comparisonType = StringComparison.CurrentCulture)
         {
             var index = str.LastIndexOf(value, comparisonType);
-            return index > 0 ? str.SafeSubstring(index + 1) : str;
+            return index >= 0 ? str.SafeSubstring(index + value.Length) : str;
         }
 
         public static bool ContainsCaseInsensitive(this string str, string value)

@@ -369,6 +369,8 @@
     <Compile Include="Ui\Views\MailViewerViews\SubjectView.cs" />
     <Compile Include="Ui\Views\MailViewerViews\ContentView.cs" />
     <Compile Include="Ui\Views\MailViewerViews\PriorityView.cs" />
+    <Compile Include="Ui\Views\MailViewerViews\RecipentsView.cs" />
+    <Compile Include="Ui\Views\MailViewerViews\AttachmentsView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

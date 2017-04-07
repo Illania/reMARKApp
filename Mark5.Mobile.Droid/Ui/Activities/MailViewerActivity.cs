@@ -7,17 +7,22 @@
 //
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Provider;
+using Android.Support.V4.App;
+using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
+using HtmlAgilityPack;
 using MailBee;
 using MailBee.Mime;
 using MailBee.Outlook;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Model.Exceptions;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -33,7 +38,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     public class MailViewerActivity : BaseAppCompatActivity
     {
 
-        const long MaxSize = 25 * 1024 * 1024; // 25MB
+        const long MaxSize = 10 * 1024 * 1024; // 10MB
 
         Toolbar toolbar;
         LinearLayoutCompat linearLayout;
@@ -44,7 +49,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             base.OnCreate(savedInstanceState);
 
-            Global.LicenseKey = "MN110-0FC7C778C79DC717C73F6688DFAB-8C0F";
+            Global.LicenseKey = "MN110-C50DF2550CBE0D750DF4AF2E15D9-0B99";
 
             SetContentView(Resource.Layout.mailviewer_layout);
 
@@ -57,14 +62,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             linearLayout.AddView(new SubjectView(this));
             linearLayout.AddView(new Divider(this));
-//            linearLayout.AddView(new RecipentsView(Context));
-//            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new RecipentsView(this));
+            linearLayout.AddView(new Divider(this));
             linearLayout.AddView(new PriorityView(this));
             linearLayout.AddView(new Divider(this));
-//            var av = new AttachmentsView(Context);
-//            av.AttachmentClicked += AttachmentsView_AttachmentClicked;
-//            av.AttachmentLongClicked += AttachmentsView_AttachmentLongClicked;
-//            linearLayout.AddView(av);
+            var av = new AttachmentsView(this);
+            av.AttachmentClicked += AttachmentsView_AttachmentClicked;
+            av.AttachmentLongClicked += AttachmentsView_AttachmentLongClicked;
+            linearLayout.AddView(av);
             linearLayout.AddView(new ContentView(this));
 
             LoadMailFromUri();
@@ -80,7 +85,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 if (uri == null)
                     throw new MailViewerException("File could not be loaded.");
-                
+
                 var cursor = ContentResolver.Query(uri, null, null, null, null, null);
 
                 if (cursor == null)
@@ -105,6 +110,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         var mm = new MailMessage();
                         mm.ThrowExceptions = true;
                         mm.LoadMessage(bytes);
+                        InlineImages(mm);
                         return mm;
                     }
                     catch (MailBeeException ex)
@@ -128,6 +134,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                             var mm = new MailMessage();
                             mm.ThrowExceptions = true;
                             mm.LoadMessage(emlStream.ToArray());
+                        InlineImages(mm);
                             return mm;
                         }
                         catch (MailBeeException ex)
@@ -164,7 +171,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         void RefreshView()
         {
-            for (var i = 0; i<linearLayout.ChildCount; i++)
+            for (var i = 0; i < linearLayout.ChildCount; i++)
             {
                 var dv = linearLayout.GetChildAt(i) as MailViewerView;
                 if (dv != null)
@@ -185,6 +192,64 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             linearLayout.RequestLayout();
         }
 
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void AttachmentsView_AttachmentClicked(object sender, MailBee.Mime.Attachment att)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.opening_attachment, Resource.String.please_wait);
+
+            try
+            {
+                var attFile = await CreateTempFile(att.FilenameOriginal, att.GetData());
+
+                var uri = FileProvider.GetUriForFile(this, PackageName + ".fileprovider", attFile);
+                var mimeType = ContentResolver.GetType(uri);
+
+                var openFileIntent = new Intent(Intent.ActionView);
+                openFileIntent.SetDataAndType(uri, mimeType);
+                openFileIntent.AddFlags(ActivityFlags.NewTask);
+                openFileIntent.AddFlags(ActivityFlags.GrantReadUriPermission);
+                StartActivity(openFileIntent);
+
+                dismissAction();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to view attachment [attachment={att}]", ex);
+
+                dismissAction();
+
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+        }
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void AttachmentsView_AttachmentLongClicked(object sender, MailBee.Mime.Attachment att)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.opening_attachment, Resource.String.please_wait);
+
+            try
+            {
+                var attFile = await CreateTempFile(att.FilenameOriginal, att.GetData());
+
+                var uri = FileProvider.GetUriForFile(this, PackageName + ".fileprovider", attFile);
+                var mimeType = ContentResolver.GetType(uri);
+
+                ShareCompat.IntentBuilder.From(this).SetType(mimeType).SetStream(uri).StartChooser();
+
+                dismissAction();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to view attachment [attachment={att}]", ex);
+
+                dismissAction();
+                
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+        }
+
         static byte[] ReadToEnd(Stream input)
         {
             byte[] buffer = new byte[16 * 1024];
@@ -195,6 +260,66 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     ms.Write(buffer, 0, read);
                 return ms.ToArray();
             }
+        }
+
+        static void InlineImages(MailMessage mm)
+        {
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(mm.BodyHtmlText);
+
+            var nodes = htmlDoc.DocumentNode.Descendants("img").Where(n => n.GetAttributeValue("src", null).StartsWith("cid:", StringComparison.CurrentCultureIgnoreCase)).ToArray();
+            var atts = mm.Attachments;
+
+            foreach (var node in nodes)
+            {
+                var srcAttrValue = node.GetAttributeValue("src", null);
+                var cid = srcAttrValue.SafeSubstringAfter("cid:", StringComparison.CurrentCultureIgnoreCase);
+
+                if (string.IsNullOrWhiteSpace(cid))
+                    continue;
+
+                MailBee.Mime.Attachment matchingAtt = null;
+                foreach (var obj in atts)
+                {
+                    var att = (MailBee.Mime.Attachment)obj;
+                    if (att.ContentID == cid)
+                    {
+                        matchingAtt = att;
+                        break;
+                    }
+                }
+
+                if (matchingAtt == null)
+                    continue;
+
+                var matchingAttExt = Path.GetExtension(matchingAtt.FilenameOriginal);
+
+                if (string.IsNullOrWhiteSpace(matchingAttExt))
+                    continue;
+
+                node.SetAttributeValue("src", $"data:image/{matchingAttExt};base64,{Convert.ToBase64String(matchingAtt.GetData())}");
+            }
+
+            mm.BodyHtmlText = htmlDoc.DocumentNode.OuterHtml;
+        }
+
+        async Task<Java.IO.File> CreateTempFile(string filename, byte[] bytes)
+        {
+            var mailViewerCacheDir = new Java.IO.File(CacheDir, "mailviewer");
+            if (!mailViewerCacheDir.Exists())
+                mailViewerCacheDir.Mkdir();
+
+            var specificDir = new Java.IO.File(mailViewerCacheDir, Guid.NewGuid().ToString());
+            if (!specificDir.Exists())
+                specificDir.Mkdir();
+
+            var cacheFile = new Java.IO.File(specificDir, filename);
+            cacheFile.CreateNewFile();
+
+            using (var fos = new Java.IO.FileOutputStream(cacheFile))
+                await fos.WriteAsync(bytes);
+
+            return cacheFile;
         }
     }
 }
