@@ -115,6 +115,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var ds = tableView?.Source as DataSource;
             ds?.Reset();
 
+            GC.Collect();
             base.DidReceiveMemoryWarning();
         }
 

@@ -139,9 +139,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             CommonConfig.Logger.Warning($"{nameof(DocumentsListViewController)} received memory warning!");
 
+            autoRefreshWorker?.Stop();
+            autoRefreshWorker = null;
+
             var ds = tableView?.Source as DataSource;
             ds?.Reset();
 
+            GC.Collect();
             base.DidReceiveMemoryWarning();
         }
 

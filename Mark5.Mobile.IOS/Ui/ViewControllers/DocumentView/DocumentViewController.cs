@@ -179,6 +179,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
         }
 
+        public override void DidReceiveMemoryWarning()
+        {
+            CommonConfig.Logger.Warning($"{nameof(DocumentViewController)} received memory warning!");
+
+            GC.Collect();
+            base.DidReceiveMemoryWarning();
+        }
+
         #endregion
 
         #region Init methods
@@ -1402,3 +1410,4 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
     }
 }
+

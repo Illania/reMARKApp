@@ -111,6 +111,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             if (((TableView?.Source as GrouppedDataSource)?.Empty ?? false) || ((TableView?.Source as DataSource)?.Empty ?? false))
                 RefreshData();
+            else if (IsRootOfFoldersList && TableView?.Source as GrouppedDataSource != null)
+                RefreshFavoritesOnly();
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -137,6 +139,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             var gds = TableView?.Source as GrouppedDataSource;
             gds?.Reset();
 
+            GC.Collect();
             base.DidReceiveMemoryWarning();
         }
 
@@ -438,6 +441,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             RefreshControl.EndRefreshing();
             RefreshControl.ValueChanged += RefreshControl_ValueChanged;
+        }
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void RefreshFavoritesOnly()
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            try
+            {
+                var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(ParentFolder.Module);
+                var gds = (GrouppedDataSource)TableView.Source;
+                gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Could not refresh favorites [parentFolder={ParentFolder}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+
+                if (!IsRootOfFoldersList)
+                    NavigationController?.PopViewController(true);
+            }
         }
 
         #endregion
@@ -1234,6 +1258,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 foreach (var kv in foldersInView)
                     kv.Value.Clear();
 
+                tableView.BeginUpdates();
                 if (module == ModuleType.Documents)
                 {
                     tableView.ReloadSections(NSIndexSet.FromIndex(Section.Local), UITableViewRowAnimation.Fade);
@@ -1241,6 +1266,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 tableView.ReloadSections(NSIndexSet.FromIndex(Section.Favorites), UITableViewRowAnimation.Fade);
                 tableView.ReloadSections(NSIndexSet.FromIndex(Section.Folders), UITableViewRowAnimation.Fade);
+                tableView.EndUpdates();
             }
 
             public Folder[] GetFolders(int folderId)
