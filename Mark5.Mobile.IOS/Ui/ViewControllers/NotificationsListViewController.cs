@@ -25,7 +25,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
     public class NotificationsListViewController : AbstractViewController
     {
-        
+
         readonly ObjectType[] objectTypes;
 
         UIBarButtonItem markAsReadItem;
@@ -226,8 +226,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             refreshing = false;
         }
 
-        public void NotificationSelected(Notification notification)
+        public async void NotificationSelected(Notification notification, NSIndexPath row)
         {
+            await Managers.NotificationsManager.MarkAsRead(notification);
+            tableView.ReloadRows(new[] { row }, UITableViewRowAnimation.Fade);
+
             switch (notification.ObjectType)
             {
                 case ObjectType.Document:
@@ -345,15 +348,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (tableView.CellAt(indexPath).SelectionStyle == UITableViewCellSelectionStyle.None) return;
 
                 var n = notificationsInView[indexPath.Row];
-                viewController.NotificationSelected(n);
+                viewController.NotificationSelected(n, indexPath);
             }
 
-            public void SetItems(List<Notification> systemUsers)
+            public void SetItems(List<Notification> notifications)
             {
                 loading = false;
 
                 notificationsInView.Clear();
-                notificationsInView.AddRange(systemUsers);
+                notificationsInView.AddRange(notifications);
 
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
