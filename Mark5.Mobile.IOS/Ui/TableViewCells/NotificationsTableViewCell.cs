@@ -7,6 +7,7 @@
 //
 using System;
 using System.IO;
+using System.Linq;
 using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -17,12 +18,15 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    
+
     public partial class NotificationsTableViewCell : UITableViewCell
     {
-        
+
         public static readonly UINib Nib = UINib.FromName("NotificationsTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("NotificationsTableViewCell");
+
+        static nfloat firstLineHeightConstraintConstant;
+        static nfloat firstLineBottomConstraintConstant;
 
         public Notification Notification
         {
@@ -39,8 +43,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         {
             var cell = (NotificationsTableViewCell)Nib.Instantiate(null, null)[0];
 
-            cell.TitleLabel.Font = Theme.DefaultBoldFont;
             cell.DateReceivedLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
+            cell.SecondLineLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-1f);
+            cell.FirstLineLabel.Font = Theme.DefaultBoldFont;
+
+            firstLineHeightConstraintConstant = cell.FirstLineHeightConstraint.Constant;
+            firstLineBottomConstraintConstant = cell.FirstLineBottomConstraint.Constant;
 
             return cell;
         }
@@ -51,8 +59,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         {
             Notification = notification;
 
-            BackgroundColor = notification.IsRead ? UIColor.White : Theme.LightGray;
-            ContentLabel.Font = notification.IsRead ? Theme.DefaultFont : Theme.DefaultBoldFont;
+            BackgroundColor = UIColor.White;
 
             UIImage icon;
             switch (notification.ObjectType)
@@ -66,14 +73,39 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             }
             IconImageView.Image = icon;
 
-            TitleLabel.Text = notification.Title;
-            ContentLabel.Text = notification.Message;
+            var splitMessage = notification.Message.Split('\n');
+
+            if (notification.Type == EventType.NewObjectCreated)
+            {
+                TitleLabel.Font = Theme.DefaultBoldFont;
+
+                TitleLabel.Text = splitMessage.ElementAtOrDefault(0);
+                SecondLineLabel.Text = splitMessage.ElementAtOrDefault(1);
+
+                FirstLineLabel.Hidden = true;
+                FirstLineHeightConstraint.Constant = 0;
+                FirstLineBottomConstraint.Constant = 0;
+            }
+            else
+            {
+                TitleLabel.Font = Theme.DefaultFont;
+
+                TitleLabel.Text = notification.Title;
+                FirstLineLabel.Text = splitMessage.ElementAtOrDefault(0);
+                SecondLineLabel.Text = splitMessage.ElementAtOrDefault(1);
+
+                FirstLineLabel.Hidden = false;
+                FirstLineHeightConstraint.Constant = firstLineHeightConstraintConstant;
+                FirstLineBottomConstraint.Constant = firstLineBottomConstraintConstant;
+            }
+
             DateReceivedLabel.Text = notification.DateTimeTimestamp
                     .ConvertTimestampMillisecondsToDateTime()
                     .ConvertUtcToServerTime()
                     .ConvertDateTimeToTimestampMilliseconds()
                     .FormatServerTimestampAsCompactShortDateTimeString();
 
+            ReadImageView.Image = notification.IsRead ? null : UIImage.FromBundle(Path.Combine("icons", "full-dot.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             SelectionStyle = notification.ObjectType == ObjectType.Document ? UITableViewCellSelectionStyle.Default : UITableViewCellSelectionStyle.None;
         }
 
