@@ -32,23 +32,28 @@ namespace Mark5.Mobile.Droid.Ui.Common
             base.OnResume();
 
             var connectionBar = FindViewById(Resource.Id.connection_bar);
-            connectionBar.Clickable = true;
-            connectionBar.Click += ConnectionBar_Click;
-            connectionBar.LongClickable = true;
-            connectionBar.LongClick += ConnectionBar_LongClick;
-            connectionBar.Visibility = CommonConfig.ReachabilityService.IsReachable ? ViewStates.Gone : ViewStates.Visible;
-
-            var fab = FindViewById<FloatingActionButton>(Resource.Id.fab);
-            var lp = fab?.LayoutParameters as CoordinatorLayout.LayoutParams;
-            if (lp != null)
+            if (connectionBar != null)
             {
-                lp.BottomMargin = (int)Resources.GetDimension(Resource.Dimension.fab_margin);
-                if (!CommonConfig.ReachabilityService.IsReachable)
-                    lp.BottomMargin += (int)Resources.GetDimension(Resource.Dimension.connection_bar_height);
-                fab.RequestLayout();
+                connectionBar.Clickable = true;
+                connectionBar.Click += ConnectionBar_Click;
+                connectionBar.LongClickable = true;
+                connectionBar.LongClick += ConnectionBar_LongClick;
+                connectionBar.Visibility = CommonConfig.ReachabilityService.IsReachable ? ViewStates.Gone : ViewStates.Visible;
+                CommonConfig.ReachabilityService.ReachabilityRefreshed += ReachabilityService_ReachabilityRefreshed;
             }
 
-            CommonConfig.ReachabilityService.ReachabilityRefreshed += ReachabilityService_ReachabilityRefreshed;
+            var fab = FindViewById<FloatingActionButton>(Resource.Id.fab);
+            if (fab != null)
+            {
+                var lp = fab.LayoutParameters as CoordinatorLayout.LayoutParams;
+                if (lp != null)
+                {
+                    lp.BottomMargin = (int)Resources.GetDimension(Resource.Dimension.fab_margin);
+                    if (!CommonConfig.ReachabilityService.IsReachable)
+                        lp.BottomMargin += (int)Resources.GetDimension(Resource.Dimension.connection_bar_height);
+                    fab.RequestLayout();
+                }
+            }
         }
 
         protected override void OnPause()
@@ -56,9 +61,12 @@ namespace Mark5.Mobile.Droid.Ui.Common
             base.OnPause();
 
             var connectionBar = FindViewById(Resource.Id.connection_bar);
-            connectionBar.Click -= ConnectionBar_Click;
-            connectionBar.LongClick -= ConnectionBar_LongClick;
-            CommonConfig.ReachabilityService.ReachabilityRefreshed -= ReachabilityService_ReachabilityRefreshed;
+            if (connectionBar != null)
+            {
+                connectionBar.Click -= ConnectionBar_Click;
+                connectionBar.LongClick -= ConnectionBar_LongClick;
+                CommonConfig.ReachabilityService.ReachabilityRefreshed -= ReachabilityService_ReachabilityRefreshed;
+            }
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)

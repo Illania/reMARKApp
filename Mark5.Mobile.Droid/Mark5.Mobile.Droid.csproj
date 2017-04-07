@@ -361,6 +361,11 @@
     <Compile Include="Ui\Fragments\ShortcodesSearchCriteriaFragment.cs" />
     <Compile Include="Ui\Fragments\ContactFragment.cs" />
     <Compile Include="Ui\Activities\MailViewerActivity.cs" />
+    <Compile Include="Model\Exceptions\MailViewerException.cs" />
+    <Compile Include="Ui\Views\MailViewerViews\MailViewerView.cs" />
+    <Compile Include="Ui\Views\MailViewerViews\SubjectView.cs" />
+    <Compile Include="Ui\Views\MailViewerViews\ContentView.cs" />
+    <Compile Include="Ui\Views\MailViewerViews\PriorityView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -651,6 +656,7 @@
     <AndroidResource Include="Resources\layout\search_list_item_country.axml" />
     <AndroidResource Include="Resources\drawable-nodpi\background.png" />
     <AndroidResource Include="Resources\drawable\circle_dark.xml" />
+    <AndroidResource Include="Resources\layout\mailviewer_layout.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\anim\" />
@@ -664,6 +670,8 @@
     <Folder Include="Ui\Views\SearchViews\RelatedViews\" />
     <Folder Include="Resources\mipmap\" />
     <Folder Include="Resources\drawable-nodpi\" />
+    <Folder Include="Model\Exceptions\" />
+    <Folder Include="Ui\Views\MailViewerViews\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Xamarin.Android.Support.Compat.25.0.1-rc1\build\Xamarin.Android.Support.Compat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Compat.25.0.1-rc1\build\Xamarin.Android.Support.Compat.targets')" />

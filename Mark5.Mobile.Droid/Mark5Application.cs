@@ -32,8 +32,6 @@ namespace Mark5.Mobile.Droid
         {
             ThreadPool.SetMinThreads(50, 50);
             ThreadPool.SetMaxThreads(100, 100);
-
-            MailBee.Global.LicenseKey = "MN110-0FC7C778C79DC717C73F6688DFAB-8C0F";
         }
 
         public override void OnCreate()

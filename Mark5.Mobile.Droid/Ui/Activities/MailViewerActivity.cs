@@ -7,16 +7,21 @@
 //
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Provider;
 using Android.Support.V7.Widget;
+using MailBee;
 using MailBee.Mime;
 using MailBee.Outlook;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Droid.Model.Exceptions;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Views.Common;
+using Mark5.Mobile.Droid.Ui.Views.MailViewerViews;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -31,60 +36,153 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         const long MaxSize = 25 * 1024 * 1024; // 25MB
 
         Toolbar toolbar;
+        LinearLayoutCompat linearLayout;
+
+        MailMessage mailMessage;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
-            SetContentView(Resource.Layout.base_layout);
+            Global.LicenseKey = "MN110-0FC7C778C79DC717C73F6688DFAB-8C0F";
+
+            SetContentView(Resource.Layout.mailviewer_layout);
 
             toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
 
             SetSupportActionBar(toolbar);
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
 
+            linearLayout = FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
+
+            linearLayout.AddView(new SubjectView(this));
+            linearLayout.AddView(new Divider(this));
+//            linearLayout.AddView(new RecipentsView(Context));
+//            linearLayout.AddView(new Divider(Context));
+            linearLayout.AddView(new PriorityView(this));
+            linearLayout.AddView(new Divider(this));
+//            var av = new AttachmentsView(Context);
+//            av.AttachmentClicked += AttachmentsView_AttachmentClicked;
+//            av.AttachmentLongClicked += AttachmentsView_AttachmentLongClicked;
+//            linearLayout.AddView(av);
+            linearLayout.AddView(new ContentView(this));
+
+            LoadMailFromUri();
+        }
+
+        void LoadMailFromUri()
+        {
             var uri = Intent.Data;
 
-            try
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.loading_mail, Resource.String.please_wait);
+
+            Task.Run(() =>
             {
+                if (uri == null)
+                    throw new MailViewerException("File could not be loaded.");
+                
                 var cursor = ContentResolver.Query(uri, null, null, null, null, null);
+
+                if (cursor == null)
+                    throw new MailViewerException("File could not be loaded.");
+
                 cursor.MoveToFirst();
 
                 var name = cursor.GetString(cursor.GetColumnIndex(OpenableColumns.DisplayName));
                 var size = cursor.GetLong(cursor.GetColumnIndex(OpenableColumns.Size));
 
                 if (size > MaxSize)
-                    throw new Exception("Too large.");
+                    throw new MailViewerException("File too large.");
 
-                byte[] bytes;
-                using (var stream = ContentResolver.OpenInputStream(uri))
+                if (name.EndsWith(".eml", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    bytes = ReadToEnd(stream);
+                    byte[] bytes;
+                    using (var stream = ContentResolver.OpenInputStream(uri))
+                        bytes = ReadToEnd(stream);
+
+                    try
+                    {
+                        var mm = new MailMessage();
+                        mm.ThrowExceptions = true;
+                        mm.LoadMessage(bytes);
+                        return mm;
+                    }
+                    catch (MailBeeException ex)
+                    {
+                        throw new MailViewerException("File could not be loaded.", ex);
+                    }
                 }
 
                 if (name.EndsWith(".msg", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    using (var stream = new MemoryStream())
+                    using (var msgStream = ContentResolver.OpenInputStream(uri))
+                    using (var emlStream = new MemoryStream())
                     {
-                        var msgConverter = new MsgConvert();
-                        msgConverter.MsgToEml(new MemoryStream(bytes), stream);
+                        try
+                        {
+                            var msgConverter = new MsgConvert();
+                            msgConverter.MsgToEml(msgStream, emlStream);
 
-                        stream.Position = 0;
-                        bytes = ReadToEnd(stream);
+                            emlStream.Position = 0;
+
+                            var mm = new MailMessage();
+                            mm.ThrowExceptions = true;
+                            mm.LoadMessage(emlStream.ToArray());
+                            return mm;
+                        }
+                        catch (MailBeeException ex)
+                        {
+                            throw new MailViewerException("File could not be loaded.", ex);
+                        }
                     }
                 }
 
-                var eml = new MailMessage();
-                eml.LoadMessage(bytes);
-
-                CommonConfig.Logger.Info(eml.Subject);
-            }
-            catch (Exception ex)
+                throw new MailViewerException("Unsupported file.");
+            }).ContinueWith(async t =>
             {
-                CommonConfig.Logger.Error(ex);
+                dismissAction();
 
-                Dialogs.ShowErrorDialog(this, ex);
+                if (t.IsFaulted)
+                {
+                    var ex = t.Exception.InnerException;
+                    mailMessage = null;
+
+                    CommonConfig.Logger.Error(ex);
+
+                    await Dialogs.ShowErrorDialogAsync(this, ex);
+
+                    Finish();
+                }
+                else
+                {
+                    mailMessage = t.Result;
+
+                    RefreshView();
+                }
+            }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        void RefreshView()
+        {
+            for (var i = 0; i<linearLayout.ChildCount; i++)
+            {
+                var dv = linearLayout.GetChildAt(i) as MailViewerView;
+                if (dv != null)
+                {
+                    dv.MailMessage = mailMessage;
+                    dv.RefreshView();
+
+                    var d = linearLayout.GetChildAt(i + 1) as Divider;
+                    if (d != null)
+                    {
+                        d.Visibility = dv.Visibility;
+                        i++;
+                    }
+                }
             }
+
+            linearLayout.Invalidate();
+            linearLayout.RequestLayout();
         }
 
         static byte[] ReadToEnd(Stream input)
@@ -94,9 +192,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 int read;
                 while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-                {
                     ms.Write(buffer, 0, read);
-                }
                 return ms.ToArray();
             }
         }
