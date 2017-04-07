@@ -103,7 +103,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             ReachabilityBar.Attach(View, TableView, (float)NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
         }
 
-        public override async void ViewDidAppear(bool animated)
+        public override void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
@@ -111,9 +111,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             if (((TableView?.Source as GrouppedDataSource)?.Empty ?? false) || ((TableView?.Source as DataSource)?.Empty ?? false))
                 RefreshData();
-
-            if (ParentFolder.Module == ModuleType.Documents)
-                await CheckAutoSavedDocument();
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -441,35 +438,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             RefreshControl.EndRefreshing();
             RefreshControl.ValueChanged += RefreshControl_ValueChanged;
-        }
-
-        async Task CheckAutoSavedDocument()
-        {
-            var container = await Managers.DocumentsManager.GetAutoSavedDocumentAsync();
-
-            if (container == null)
-                return;
-
-            var title = Localization.GetString("autosave_recover_title");
-            var content = Localization.GetString("autosave_recover_content");
-
-            var shouldRecover = await Dialogs.ShowYesNoDialogAsync(this, title, content);
-            if (shouldRecover)
-            {
-                var vc = new ComposeDocumentViewController
-                {
-                    LocalDocument = true,
-                    CreationModeFlag = DocumentCreationModeFlag.Edit,
-                    PreviousDocumentDirection = container.DocumentPreview.Direction,
-                    OutgoingDocumentGuid = container.Info.Identifier
-                };
-
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }
-            else
-            {
-                await Managers.DocumentsManager.DeleteAutoSavedDocumentAsync();
-            }
         }
 
         #endregion
