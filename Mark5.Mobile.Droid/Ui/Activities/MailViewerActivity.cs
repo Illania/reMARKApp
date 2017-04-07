@@ -79,6 +79,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             var uri = Intent.Data;
 
+            if (uri == null && Intent.ClipData != null && Intent.ClipData.ItemCount > 0)
+                uri = Intent.ClipData.GetItemAt(0).Uri;
+
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.loading_mail, Resource.String.please_wait);
 
             Task.Run(() =>
@@ -86,15 +89,21 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (uri == null)
                     throw new MailViewerException("File could not be loaded.");
 
-                var cursor = ContentResolver.Query(uri, null, null, null, null, null);
+                string name;
+                long size;
 
-                if (cursor == null)
-                    throw new MailViewerException("File could not be loaded.");
+                using (var cursor = ContentResolver.Query(uri, null, null, null, null, null))
+                {
+                    if (cursor == null)
+                        throw new MailViewerException("File could not be loaded.");
 
-                cursor.MoveToFirst();
+                    cursor.MoveToFirst();
 
-                var name = cursor.GetString(cursor.GetColumnIndex(OpenableColumns.DisplayName));
-                var size = cursor.GetLong(cursor.GetColumnIndex(OpenableColumns.Size));
+                    name = cursor.GetString(cursor.GetColumnIndex(OpenableColumns.DisplayName));
+                    size = cursor.GetLong(cursor.GetColumnIndex(OpenableColumns.Size));
+                }
+
+                toolbar.Subtitle = name;
 
                 if (size > MaxSize)
                     throw new MailViewerException("File too large.");
@@ -312,9 +321,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
 
             mm.BodyHtmlText = htmlDoc.DocumentNode.OuterHtml;
-
-            htmlDoc = null;
-            GC.Collect();
         }
 
         async Task<Java.IO.File> CreateTempFile(string filename, byte[] bytes)
