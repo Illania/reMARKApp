@@ -110,6 +110,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         var mm = new MailMessage();
                         mm.ThrowExceptions = true;
                         mm.LoadMessage(bytes);
+                        bytes = null;
                         InlineImages(mm);
                         return mm;
                     }
@@ -121,25 +122,35 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (name.EndsWith(".msg", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    using (var msgStream = ContentResolver.OpenInputStream(uri))
-                    using (var emlStream = new MemoryStream())
+                    using (var inputStream = ContentResolver.OpenInputStream(uri))
                     {
-                        try
+                        using (var msgStream = new MemoryStream())
                         {
-                            var msgConverter = new MsgConvert();
-                            msgConverter.MsgToEml(msgStream, emlStream);
+                            inputStream.CopyTo(msgStream);
+                            inputStream.Dispose();
 
-                            emlStream.Position = 0;
+                            using (var emlStream = new MemoryStream())
+                            {
+                                try
+                                {
+                                    var msgConverter = new MsgConvert();
+                                    msgConverter.MsgToEml(msgStream, emlStream);
+                                    msgStream.Dispose();
 
-                            var mm = new MailMessage();
-                            mm.ThrowExceptions = true;
-                            mm.LoadMessage(emlStream.ToArray());
-                        InlineImages(mm);
-                            return mm;
-                        }
-                        catch (MailBeeException ex)
-                        {
-                            throw new MailViewerException("File could not be loaded.", ex);
+                                    emlStream.Position = 0;
+
+                                    var mm = new MailMessage();
+                                    mm.ThrowExceptions = true;
+                                    mm.LoadMessage(emlStream.ToArray());
+                                    emlStream.Dispose();
+                                    InlineImages(mm);
+                                    return mm;
+                                }
+                                catch (MailBeeException ex)
+                                {
+                                    throw new MailViewerException("File could not be loaded.", ex);
+                                }
+                            }
                         }
                     }
                 }
@@ -245,7 +256,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.Logger.Error($"Failed to view attachment [attachment={att}]", ex);
 
                 dismissAction();
-                
+
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
@@ -301,6 +312,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
 
             mm.BodyHtmlText = htmlDoc.DocumentNode.OuterHtml;
+
+            htmlDoc = null;
+            GC.Collect();
         }
 
         async Task<Java.IO.File> CreateTempFile(string filename, byte[] bytes)
