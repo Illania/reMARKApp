@@ -5,8 +5,10 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+using System;
 using System.IO;
 using System.Threading.Tasks;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -63,11 +65,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             searchButton.TouchUpInside += SearchButton_TouchUpInside;
         }
 
-        public override async void ViewDidAppear(bool animated)
+        public override void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
-            await CheckAutoSavedDocument();
+            CheckAutoSavedDocument();
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -86,33 +88,41 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(nc, true, null);
         }
 
-        async Task CheckAutoSavedDocument()
+        async void CheckAutoSavedDocument()
         {
-            var container = await Managers.DocumentsManager.GetAutoSavedDocumentAsync();
-
-            if (container == null)
-                return;
-
-            var title = Localization.GetString("autosave_recover_title");
-            var content = Localization.GetString("autosave_recover_content");
-
-            var shouldRecover = await Dialogs.ShowYesNoDialogAsync(this, title, content);
-            if (shouldRecover)
+            try
             {
-                var vc = new ComposeDocumentViewController
+                var container = await Managers.DocumentsManager.GetAutoSavedDocumentAsync();
+
+                if (container == null)
+                    return;
+
+                var title = Localization.GetString("autosave_recover_title");
+                var content = Localization.GetString("autosave_recover_content");
+
+                var shouldRecover = await Dialogs.ShowYesNoDialogAsync(this, title, content);
+                if (shouldRecover)
                 {
-                    LocalDocument = true,
-                    CreationModeFlag = DocumentCreationModeFlag.Edit,
-                    PreviousDocumentDirection = container.DocumentPreview.Direction,
-                    OutgoingDocumentGuid = container.Info.Identifier
-                };
+                    var vc = new ComposeDocumentViewController
+                    {
+                        LocalDocument = true,
+                        CreationModeFlag = DocumentCreationModeFlag.Edit,
+                        PreviousDocumentDirection = container.DocumentPreview.Direction,
+                        OutgoingDocumentGuid = container.Info.Identifier
+                    };
 
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                }
+                else
+                {
+                    await Managers.DocumentsManager.DeleteAutoSavedDocumentAsync();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                await Managers.DocumentsManager.DeleteAutoSavedDocumentAsync();
+                CommonConfig.Logger.Error("Error while checking if autosaved document is present", ex);
             }
+
         }
     }
 }

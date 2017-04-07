@@ -130,7 +130,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             drawerToggle.SyncState();
         }
 
-        protected override async void OnResume()
+        protected override void OnResume()
         {
             base.OnResume();
 
@@ -164,7 +164,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             permissionsAsked = true;
 
-            await CheckAutoSavedDocument();
+            CheckAutoSavedDocument();
         }
 
         public override void OnBackPressed()
@@ -216,22 +216,29 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         #region Utility methods
 
-        async Task CheckAutoSavedDocument()
+        async void CheckAutoSavedDocument()
         {
-            var container = await Managers.DocumentsManager.GetAutoSavedDocumentAsync();
-
-            if (container == null)
-                return;
-
-            var shouldRecover = await Dialogs.ShowYesNoDialogAsync(this, Resource.String.autosave_recover_title, Resource.String.autosave_recover_content);
-            if (shouldRecover)
+            try
             {
-                var composeActivity = ComposeDocumentActivity.CreateIntent(this, DocumentCreationModeFlag.Edit, container.DocumentPreview.Direction, outgoingDocumentGuid: container.Info.Identifier);
-                StartActivity(composeActivity);
+                var container = await Managers.DocumentsManager.GetAutoSavedDocumentAsync();
+
+                if (container == null)
+                    return;
+
+                var shouldRecover = await Dialogs.ShowYesNoDialogAsync(this, Resource.String.autosave_recover_title, Resource.String.autosave_recover_content);
+                if (shouldRecover)
+                {
+                    var composeActivity = ComposeDocumentActivity.CreateIntent(this, DocumentCreationModeFlag.Edit, container.DocumentPreview.Direction, outgoingDocumentGuid: container.Info.Identifier);
+                    StartActivity(composeActivity);
+                }
+                else
+                {
+                    await Managers.DocumentsManager.DeleteAutoSavedDocumentAsync();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                await Managers.DocumentsManager.DeleteAutoSavedDocumentAsync();
+                CommonConfig.Logger.Error("Error while checking is there is an autosaved document", ex);
             }
         }
 
