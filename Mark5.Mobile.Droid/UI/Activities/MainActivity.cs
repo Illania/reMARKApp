@@ -130,7 +130,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             drawerToggle.SyncState();
         }
 
-        protected override void OnResume()
+        protected override async void OnResume()
         {
             base.OnResume();
 
@@ -163,6 +163,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
 
             permissionsAsked = true;
+
+            await CheckAutoSavedDocument();
         }
 
         public override void OnBackPressed()
@@ -213,6 +215,25 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         #endregion
 
         #region Utility methods
+
+        async Task CheckAutoSavedDocument()
+        {
+            var container = await Managers.DocumentsManager.GetAutoSavedDocumentAsync();
+
+            if (container == null)
+                return;
+
+            var shouldRecover = await Dialogs.ShowYesNoDialogAsync(this, Resource.String.autosave_recover_title, Resource.String.autosave_recover_content);
+            if (shouldRecover)
+            {
+                var composeActivity = ComposeDocumentActivity.CreateIntent(this, DocumentCreationModeFlag.Edit, container.DocumentPreview.Direction, outgoingDocumentGuid: container.Info.Identifier);
+                StartActivity(composeActivity);
+            }
+            else
+            {
+                await Managers.DocumentsManager.DeleteAutoSavedDocumentAsync();
+            }
+        }
 
         public void LockDrawer()
         {
@@ -357,12 +378,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var tag = item.Tag;
 
                     RetainableStateFragment f = null;
-                    
+
                     if (tag.StartsWith(nameof(FoldersNotificationsListFragment), StringComparison.Ordinal))
                         f = new FoldersNotificationsListFragment();
                     else if (tag.StartsWith(nameof(FoldersListFragment), StringComparison.Ordinal))
                         f = new FoldersListFragment();
-                        
+
                     f.SetInitialSavedState(state);
 
                     var ft = fm.BeginTransaction();
