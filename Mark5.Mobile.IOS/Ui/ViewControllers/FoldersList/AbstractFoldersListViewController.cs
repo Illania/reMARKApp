@@ -111,6 +111,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             if (((TableView?.Source as GrouppedDataSource)?.Empty ?? false) || ((TableView?.Source as DataSource)?.Empty ?? false))
                 RefreshData();
+            else if (IsRootOfFoldersList && TableView?.Source as GrouppedDataSource != null)
+                RefreshFavoritesOnly();
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -439,6 +441,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             RefreshControl.EndRefreshing();
             RefreshControl.ValueChanged += RefreshControl_ValueChanged;
+        }
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void RefreshFavoritesOnly()
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            try
+            {
+                var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(ParentFolder.Module);
+                var gds = (GrouppedDataSource)TableView.Source;
+                gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Could not refresh favorites [parentFolder={ParentFolder}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+
+                if (!IsRootOfFoldersList)
+                    NavigationController?.PopViewController(true);
+            }
         }
 
         #endregion
