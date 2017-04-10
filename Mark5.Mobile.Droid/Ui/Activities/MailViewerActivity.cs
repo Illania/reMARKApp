@@ -23,6 +23,7 @@ using MailBee.Html;
 using MailBee.Mime;
 using MailBee.Outlook;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Model.Exceptions;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -85,8 +86,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.loading_mail, Resource.String.please_wait);
 
-            Task.Run(() =>
+            Task.Run(async () =>
             {
+                var auth = AuthenticatorFactory.Create();
+                if (!(await auth.IsAuthenticatedAsync()))
+                    throw new MailViewerException("You need to log in to MARK5 before you can use mail viewer.");
+
                 if (uri == null)
                     throw new MailViewerException("File could not be loaded.");
 
@@ -103,8 +108,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     name = cursor.GetString(cursor.GetColumnIndex(OpenableColumns.DisplayName));
                     size = cursor.GetLong(cursor.GetColumnIndex(OpenableColumns.Size));
                 }
-
-                toolbar.Subtitle = name;
 
                 if (size > MaxSize)
                     throw new MailViewerException("File too large.");
