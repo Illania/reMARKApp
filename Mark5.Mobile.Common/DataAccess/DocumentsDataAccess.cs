@@ -99,6 +99,54 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
+        public async Task<List<int>> GetDocumentIdsAsync(Folder folder, int startId = -1, int endId = -1, int maxItems = 500)
+        {
+            try
+            {
+                List<int> documentPreviews = null;
+
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    var query = $"select {nameof(DocumentPreview.Id)} " +
+                                $"from {nameof(DocumentPreview)}, {nameof(FolderDocumentLink)} " +
+                                $"where {nameof(FolderDocumentLink.FolderId)} = {folder.Id} " +
+                                $"     and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} = {nameof(FolderDocumentLink)}.{nameof(FolderDocumentLink.DocumentId)} ";
+
+                    if (startId > 0)
+                    {
+                        query += $"    and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} < \"{startId}\" ";
+                    }
+
+                    if (endId > 0)
+                    {
+                        query += $"    and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} > \"{endId}\" ";
+                    }
+
+                    query += $"order by {nameof(DocumentPreview.Id)} desc ";
+
+                    if (maxItems > 0)
+                    {
+                        query += $"limit {maxItems - 1} ";
+                    }
+
+                    var result = c.Query<int>(query);
+
+                    if (result == null || result.Count < 1)
+                    {
+                        throw new DataNotFoundException("Document previews could not be found.");
+                    }
+
+                    documentPreviews = result;
+                });
+
+                return documentPreviews;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting documents.", ex);
+            }
+        }
+
         public async Task SaveDocumentAsync(Document document)
         {
             try
