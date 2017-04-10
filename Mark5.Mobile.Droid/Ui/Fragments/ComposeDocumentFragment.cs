@@ -540,10 +540,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     Name = filename,
                     SizeInBytes = size,
-                    Stream = stream,
                     Path = path
                 };
-
             }).ContinueWith(async t =>
             {
                 stream?.Dispose();

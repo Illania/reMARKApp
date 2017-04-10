@@ -606,7 +606,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         async void HandleAttachmentUrl(NSUrl url)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            OutgoingDocumentAttachmentDescription attachment = null;
             Stream stream = null;
 
             try
@@ -631,13 +630,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
 
-                attachment = new OutgoingDocumentAttachmentDescription
+                var attachment = new OutgoingDocumentAttachmentDescription
                 {
                     Name = filename,
                     SizeInBytes = sizeInBytes,
-                    Stream = stream,
                     Path = path
                 };
+
+                attachmentsView.AddAttachment(attachment);
             }
             catch (Exception ex)
             {
@@ -649,9 +649,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 stream?.Dispose();
             }
-
-            if (attachment != null)
-                attachmentsView.AddAttachment(attachment);
         }
 
 
@@ -659,7 +656,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         async void HandleAttachmentImage(string filename, NSData jpegData)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            OutgoingDocumentAttachmentDescription attachment = null;
             Stream stream = null;
 
             try
@@ -675,13 +671,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
 
-                attachment = new OutgoingDocumentAttachmentDescription
+                var attachment = new OutgoingDocumentAttachmentDescription
                 {
                     Name = filename,
                     SizeInBytes = sizeInBytes,
-                    Stream = stream,
                     Path = path
                 };
+
+                attachmentsView.AddAttachment(attachment);
             }
             catch (Exception ex)
             {
@@ -693,9 +690,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 stream?.Dispose();
             }
-
-            if (attachment != null)
-                attachmentsView.AddAttachment(attachment);
         }
 
         async void SendButtonItem_Clicked(object sender, EventArgs e)
