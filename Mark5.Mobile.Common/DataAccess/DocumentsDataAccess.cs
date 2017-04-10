@@ -99,11 +99,11 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<List<int>> GetDocumentIdsAsync(Folder folder, int startId = -1, int endId = -1, int maxItems = 500)
+        public async Task<List<int>> GetDocumentsIdAsync(Folder folder, int startId = -1, int endId = -1, int maxItems = 500)
         {
             try
             {
-                List<int> documentPreviews = null;
+                List<int> documentIds = null;
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
@@ -136,10 +136,10 @@ namespace Mark5.Mobile.Common.DataAccess
                         throw new DataNotFoundException("Document previews could not be found.");
                     }
 
-                    documentPreviews = result;
+                    documentIds = result.ToList();
                 });
 
-                return documentPreviews;
+                return documentIds;
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {

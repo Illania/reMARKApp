@@ -25,6 +25,8 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId = -1, int endId = -1, SourceType sourceType = SourceType.Auto);
 
+        Task<List<int>> GetDocumentsIdAsync(Folder folder, int startId = -1, int endId = -1);
+
         Task<Document> GetDocumentAsync(Folder folder, int documentId, SourceType sourceType = SourceType.Auto);
 
         Task<Document> GetDocumentAsync(int? folderId, int documentId, SourceType sourceType = SourceType.Auto);

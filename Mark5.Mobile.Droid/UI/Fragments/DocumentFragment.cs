@@ -200,6 +200,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         static class MenuItemActions
         {
+            public const int GoToPrevious = 5;
+            public const int GoToNext = 6;
             public const int MarkAsRead = 10;
             public const int MarkAsUnread = 11;
             public const int CopyToWorktray = 20;
@@ -217,6 +219,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             if (DocumentPreview == null) return;
+
+            var goToPreviousItem = menu.Add(Menu.None, MenuItemActions.GoToPrevious, MenuItemActions.GoToPrevious, Resource.String.lines);
+            goToPreviousItem.SetShowAsAction(ShowAsAction.Always);
+
+            var goToNextItem = menu.Add(Menu.None, MenuItemActions.GoToNext, MenuItemActions.GoToNext, Resource.String.links); //TODO put correct
+            goToNextItem.SetShowAsAction(ShowAsAction.Always);
 
             if (!DocumentPreview.IsReadByCurrent)
             {
@@ -274,10 +282,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var menuItem = menu.FindItem(itemId);
                 menuItem?.SetEnabled(isDocumentReady);
             }
+
+            var goToPreviousItem = menu.FindItem(MenuItemActions.GoToPrevious);
+            goToPreviousItem?.SetEnabled(((DocumentActivity)Activity).HasPrevious(DocumentId ?? DocumentPreview.Id)); //TODO find a solution
+
+            var goToNextItem = menu.FindItem(MenuItemActions.GoToNext);
+            goToNextItem?.SetEnabled(((DocumentActivity)Activity).HasNext(DocumentId ?? DocumentPreview.Id));
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
+            if (item.ItemId == MenuItemActions.GoToPrevious)
+            {
+                ((DocumentActivity)Activity).GoToPrevious(DocumentId ?? DocumentPreview.Id);
+            }
+
+            if (item.ItemId == MenuItemActions.GoToNext)
+            {
+                ((DocumentActivity)Activity).GoToNext(DocumentId ?? DocumentPreview.Id);
+            }
+
             if (item.ItemId == MenuItemActions.MarkAsRead)
             {
                 MarkAsRead();

@@ -6,11 +6,13 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.Collections.Generic;
 using Android.App;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -31,7 +33,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
 
-        protected override void OnCreate(Bundle savedInstanceState)
+        Folder folder;
+        List<int> documentIds;
+
+        protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
@@ -54,8 +59,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     df.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
 
                 if (Intent.HasExtra(FolderIntentKey))
-                    df.Folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
-                
+                {
+                    folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+                    df.Folder = folder;
+                }
+
                 if (Intent.HasExtra(DocumentIdIntentKey))
                     df.DocumentId = Intent.Extras.GetInt(DocumentIdIntentKey);
 
@@ -77,6 +85,76 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 CommonConfig.Logger.Info($"Restored {nameof(DocumentActivity)}");
             }
+
+            documentIds = await Managers.DocumentsManager.GetDocumentsIdAsync(folder);
+        }
+
+        public bool HasPrevious(int documentId) //TODO check if ordered in the query
+        {
+            return GetPreviousId(documentId) != null;
+        }
+
+        public bool HasNext(int documentId)
+        {
+            return GetNextId(documentId) != null;
+        }
+
+        public void GoToPrevious(int documentId)
+        {
+            var previousId = GetPreviousId(documentId);
+            if (previousId == null)
+                return;
+
+            var df = new DocumentFragment
+            {
+                Folder = folder,
+                DocumentId = previousId,
+                CloseRequest = OnBackPressed,
+            };
+
+            var ft = SupportFragmentManager.BeginTransaction();
+            ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
+            ft.Commit();
+        }
+
+        public void GoToNext(int documentId)
+        {
+            var nextId = GetNextId(documentId);
+            if (nextId == null)
+                return;
+
+            var df = new DocumentFragment
+            {
+                Folder = folder,
+                DocumentId = nextId,
+                CloseRequest = OnBackPressed,
+            };
+
+            var ft = SupportFragmentManager.BeginTransaction();
+            ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
+            ft.Commit();
+        }
+
+        int? GetNextId(int documentId)
+        {
+            var documentIndex = documentIds.FindIndex(d => d == documentId);
+            if (documentIndex < documentIds.Count - 1)
+            {
+                return documentIds[documentIndex + 1];
+            }
+
+            return null;
+        }
+
+        int? GetPreviousId(int documentId)
+        {
+            var documentIndex = documentIds.FindIndex(d => d == documentId);
+            if (documentIndex > 0)
+            {
+                return documentIds[documentIndex - 1];
+            }
+
+            return null;
         }
 
         public override void Finish()
@@ -85,6 +163,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             OverridePendingTransition(Resource.Animation.enter_from_left_half, Resource.Animation.exit_to_right);
         }
+
     }
 }
 
