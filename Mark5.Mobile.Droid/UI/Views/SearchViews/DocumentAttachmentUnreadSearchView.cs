@@ -25,13 +25,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         public override void Refresh()
         {
-            withAttachmentsButton.UpdateSelectedState(Criteria.SearchInAttachments);
+            withAttachmentsButton.UpdateSelectedState(Criteria.HavingAttachmentsOnly);
             unreadEmailsButton.UpdateSelectedState(Criteria.UnreadOnly);
         }
 
         public override void UpdateCriteria()
         {
-            Criteria.SearchInAttachments = withAttachmentsButton.Selected;
+            Criteria.HavingAttachmentsOnly = withAttachmentsButton.Selected;
             Criteria.UnreadOnly = unreadEmailsButton.Selected;
         }
     }
