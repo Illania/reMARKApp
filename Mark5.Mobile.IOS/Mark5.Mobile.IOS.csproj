@@ -30,7 +30,8 @@
     <DeviceSpecificBuild>false</DeviceSpecificBuild>
     <CodesignProvision>840a3d1f-e198-49d0-a939-835e472a1e97</CodesignProvision>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-<RunCodeAnalysis>true</RunCodeAnalysis>  </PropertyGroup>
+<RunCodeAnalysis>true</RunCodeAnalysis>  <MtouchI18n>cjk,mideast,west</MtouchI18n>
+</PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType></DebugType>
     <Optimize>true</Optimize>
@@ -48,7 +49,8 @@
     <PlatformTarget>x86</PlatformTarget>
     <CodesignProvision>d21b6e09-3a9c-4161-89a2-8a2e3b9d5ad2</CodesignProvision>
     <MtouchUseLlvm>true</MtouchUseLlvm>
-<RunCodeAnalysis>true</RunCodeAnalysis>  </PropertyGroup>
+<RunCodeAnalysis>true</RunCodeAnalysis>  <MtouchI18n>cjk,mideast,west</MtouchI18n>
+</PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
@@ -57,12 +59,14 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodesignKey>iPhone Developer</CodesignKey>
-    <MtouchLink>None</MtouchLink>
+    <MtouchLink>SdkOnly</MtouchLink>
     <MtouchArch>x86_64</MtouchArch>
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
-<RunCodeAnalysis>true</RunCodeAnalysis>  </PropertyGroup>
+<RunCodeAnalysis>true</RunCodeAnalysis>  <MtouchUseLlvm>true</MtouchUseLlvm>
+<MtouchI18n>cjk,mideast,west</MtouchI18n>
+</PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -83,7 +87,8 @@
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
     <CodesignProvision>840a3d1f-e198-49d0-a939-835e472a1e97</CodesignProvision>
-<RunCodeAnalysis>true</RunCodeAnalysis>  </PropertyGroup>
+<RunCodeAnalysis>true</RunCodeAnalysis>  <MtouchI18n>cjk,mideast,west</MtouchI18n>
+</PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />

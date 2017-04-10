@@ -39,7 +39,8 @@
     <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-<RunCodeAnalysis>true</RunCodeAnalysis>  </PropertyGroup>
+<RunCodeAnalysis>true</RunCodeAnalysis>  <MandroidI18n>cjk;mideast;west</MandroidI18n>
+</PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>pdbonly</DebugType>
@@ -56,7 +57,8 @@
     <AndroidLinkSkip>System.Runtime;System.Collections;System.Runtime.Serialization</AndroidLinkSkip>
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
     <AndroidSupportedAbis>armeabi-v7a;arm64-v8a;armeabi</AndroidSupportedAbis>
-<RunCodeAnalysis>true</RunCodeAnalysis>  </PropertyGroup>
+<RunCodeAnalysis>true</RunCodeAnalysis>  <MandroidI18n>cjk;mideast;west</MandroidI18n>
+</PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
