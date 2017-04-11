@@ -275,7 +275,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override void OnPrepareOptionsMenu(IMenu menu)
+        public override async void OnPrepareOptionsMenu(IMenu menu)
         {
             var isDocumentReady = Document != null;
 
@@ -286,23 +286,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 menuItem?.SetEnabled(isDocumentReady);
             }
 
-            var goToPreviousItem = menu.FindItem(MenuItemActions.GoToPrevious);
-            goToPreviousItem?.SetEnabled(((DocumentActivity)Activity).HasPrevious(DocumentId ?? DocumentPreview.Id)); //TODO find a solution
+            if (Folder != null)
+            {
+                var goToPreviousItem = menu.FindItem(MenuItemActions.GoToPrevious);
+                goToPreviousItem?.SetEnabled(await ((DocumentActivity)Activity).HasPrevious(DocumentPreview.Id));
 
-            var goToNextItem = menu.FindItem(MenuItemActions.GoToNext);
-            goToNextItem?.SetEnabled(((DocumentActivity)Activity).HasNext(DocumentId ?? DocumentPreview.Id));
+                var goToNextItem = menu.FindItem(MenuItemActions.GoToNext);
+                goToNextItem?.SetEnabled(await ((DocumentActivity)Activity).HasNext(DocumentPreview.Id));
+            }
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if (item.ItemId == MenuItemActions.GoToPrevious)
             {
-                ((DocumentActivity)Activity).GoToPrevious(DocumentId ?? DocumentPreview.Id);
+                ((DocumentActivity)Activity).GoToPrevious(DocumentPreview.Id);
             }
 
             if (item.ItemId == MenuItemActions.GoToNext)
             {
-                ((DocumentActivity)Activity).GoToNext(DocumentId ?? DocumentPreview.Id);
+                ((DocumentActivity)Activity).GoToNext(DocumentPreview.Id);
             }
 
             if (item.ItemId == MenuItemActions.MarkAsRead)
