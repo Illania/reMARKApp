@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.IOS
-// File: MailViewerActivity.cs
+// File: MailViewerViewController.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2017 Nordic IT
@@ -9,14 +9,8 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Android.App;
-using Android.Content;
-using Android.Content.PM;
-using Android.OS;
-using Android.Provider;
-using Android.Support.V4.App;
-using Android.Support.V4.Content;
-using Android.Support.V7.Widget;
+using CoreGraphics;
+using Foundation;
 using HtmlAgilityPack;
 using MailBee;
 using MailBee.Html;
@@ -25,66 +19,86 @@ using MailBee.Outlook;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.Exceptions;
-using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Views.Common;
-using Mark5.Mobile.Droid.Ui.Views.MailViewerViews;
+using Mark5.Mobile.IOS.Model.Exceptions;
+using Mark5.Mobile.IOS.Ui.Common;
+using UIKit;
 
-namespace Mark5.Mobile.Droid.Ui.Activities
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 {
 
-    [Activity(Label = "MARK5 Mail Viewer", ScreenOrientation = ScreenOrientation.Portrait, Exported = true)]
-    [IntentFilter(new[] { Intent.ActionView, Intent.ActionSend },
-                  Categories = new[] { Intent.CategoryDefault },
-                  DataMimeTypes = new[] { "application/octet-stream", "message/rfc822" })]
-    public class MailViewerActivity : BaseAppCompatActivity
+    public class MailViewerViewController : AbstractViewController
     {
 
         const long MaxSize = 5 * 1024 * 1024; // 5MB
 
-        Toolbar toolbar;
-        LinearLayoutCompat linearLayout;
+        readonly NSUrl url;
+
+        UIBarButtonItem closeItem;
+        UIBarButtonItem shareItem;
+        UIDocumentInteractionController attachmentInteractionController;
 
         MailMessage mailMessage;
 
-        protected override void OnCreate(Bundle savedInstanceState)
+        public static bool CanOpen(NSUrl url)
         {
-            base.OnCreate(savedInstanceState);
+            return url.Path.EndsWith(".eml", StringComparison.CurrentCultureIgnoreCase) || url.Path.EndsWith(".msg", StringComparison.CurrentCultureIgnoreCase);
+        }
+
+        public MailViewerViewController(NSUrl url)
+        {
+            this.url = url;
+        }
+
+        public override void LoadView()
+        {
+            base.LoadView();
 
             Global.LicenseKey = "MN110-C50DF2550CBE0D750DF4AF2E15D9-0B99";
 
-            SetContentView(Resource.Layout.mailviewer_layout);
+            closeItem = new UIBarButtonItem();
+            closeItem.Title = Localization.GetString("close");
+            NavigationItem.SetLeftBarButtonItem(closeItem, false);
 
-            toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
-
-            SetSupportActionBar(toolbar);
-            SupportActionBar.SetDisplayHomeAsUpEnabled(true);
-
-            linearLayout = FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
-
-            linearLayout.AddView(new SubjectView(this));
-            linearLayout.AddView(new Divider(this));
-            linearLayout.AddView(new RecipentsView(this));
-            linearLayout.AddView(new Divider(this));
-            linearLayout.AddView(new PriorityView(this));
-            linearLayout.AddView(new Divider(this));
-            var av = new AttachmentsView(this);
-            av.AttachmentClicked += AttachmentsView_AttachmentClicked;
-            av.AttachmentLongClicked += AttachmentsView_AttachmentLongClicked;
-            linearLayout.AddView(av);
-            linearLayout.AddView(new ContentView(this));
-
-            LoadMailFromUri();
+            shareItem = new UIBarButtonItem(UIBarButtonSystemItem.Action);
+            NavigationItem.SetRightBarButtonItem(shareItem, false);
         }
 
-        void LoadMailFromUri()
+        public override void ViewWillAppear(bool animated)
         {
-            var uri = Intent.Data;
+            base.ViewWillAppear(animated);
 
-            if (uri == null && Intent.ClipData != null && Intent.ClipData.ItemCount > 0)
-                uri = Intent.ClipData.GetItemAt(0).Uri;
+            closeItem.Clicked += CloseItem_Clicked;
+            shareItem.Clicked += ShareItem_Clicked;
+        }
 
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.loading_mail, Resource.String.please_wait);
+        public override void ViewDidAppear(bool animated)
+        {
+            base.ViewDidAppear(animated);
+
+            LoadFromUrl();
+        }
+
+        public override void ViewWillDisappear(bool animated)
+        {
+            base.ViewWillDisappear(animated);
+
+            closeItem.Clicked -= CloseItem_Clicked;
+            shareItem.Clicked -= ShareItem_Clicked;
+        }
+
+        void CloseItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
+
+        void ShareItem_Clicked(object sender, EventArgs e)
+        {
+            var avc = new UIActivityViewController(new NSObject[] { url }, null);
+            if (avc.PopoverPresentationController != null)
+                avc.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+            PresentViewController(avc, true, null);
+        }
+
+        void LoadFromUrl()
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("please_wait___"));
 
             Task.Run(async () =>
             {
@@ -92,22 +106,18 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (!(await auth.IsAuthenticatedAsync()))
                     throw new MailViewerException("You need to log in to MARK5 before you can use mail viewer.");
 
-                if (uri == null)
+                if (url == null)
                     throw new MailViewerException("File could not be loaded.");
 
-                string name;
-                long size;
+                NSObject sizeObject;
+                NSError _error;
+                var result = url.TryGetResource(NSUrl.FileSizeKey, out sizeObject, out _error);
 
-                using (var cursor = ContentResolver.Query(uri, null, null, null, null, null))
-                {
-                    if (cursor == null)
-                        throw new MailViewerException("File could not be loaded.");
+                if (!result)
+                    throw new MailViewerException(_error.ToString());
 
-                    cursor.MoveToFirst();
-
-                    name = cursor.GetString(cursor.GetColumnIndex(OpenableColumns.DisplayName));
-                    size = cursor.GetLong(cursor.GetColumnIndex(OpenableColumns.Size));
-                }
+                var name = url.LastPathComponent;
+                var size = int.Parse(sizeObject.ToString());
 
                 if (size > MaxSize)
                     throw new MailViewerException("File too large.");
@@ -115,7 +125,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (name.EndsWith(".eml", StringComparison.CurrentCultureIgnoreCase))
                 {
                     byte[] bytes;
-                    using (var stream = ContentResolver.OpenInputStream(uri))
+                    using (var stream = new FileStream(url.Path, FileMode.Open, FileAccess.Read))
                         bytes = ReadToEnd(stream);
 
                     try
@@ -136,7 +146,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (name.EndsWith(".msg", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    using (var inputStream = ContentResolver.OpenInputStream(uri))
+                    using (var inputStream = new FileStream(url.Path, FileMode.Open, FileAccess.Read))
                     {
                         using (var msgStream = new MemoryStream())
                         {
@@ -184,7 +194,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                     await Dialogs.ShowErrorDialogAsync(this, ex);
 
-                    Finish();
+                    DismissViewController(true, null);
                 }
                 else
                 {
@@ -197,7 +207,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         void RefreshView()
         {
-            for (var i = 0; i < linearLayout.ChildCount; i++)
+            /*for (var i = 0; i < linearLayout.ChildCount; i++)
             {
                 var dv = linearLayout.GetChildAt(i) as MailViewerView;
                 if (dv != null)
@@ -215,27 +225,43 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
 
             linearLayout.Invalidate();
-            linearLayout.RequestLayout();
+            linearLayout.RequestLayout();*/
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void AttachmentsView_AttachmentClicked(object sender, MailBee.Mime.Attachment att)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.opening_attachment, Resource.String.please_wait);
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("please_wait___"));
 
             try
             {
                 var attFile = await CreateTempFile(att.FilenameOriginal, att.GetData());
 
-                var uri = FileProvider.GetUriForFile(this, PackageName + ".fileprovider", attFile);
-                var mimeType = ContentResolver.GetType(uri);
+                if (CanOpen(attFile))
+                {
+                    PresentViewController(new NavigationController(new MailViewerViewController(attFile), UIModalPresentationStyle.PageSheet), true, null);
+                }
+                else
+                {
+                    attachmentInteractionController = UIDocumentInteractionController.FromUrl(attFile);
+                    attachmentInteractionController.Delegate = new DocumentInteractionControllerDelegate(this);
 
-                var openFileIntent = new Intent(Intent.ActionView);
-                openFileIntent.SetDataAndType(uri, mimeType);
-                openFileIntent.AddFlags(ActivityFlags.NewTask);
-                openFileIntent.AddFlags(ActivityFlags.GrantReadUriPermission);
-                StartActivity(openFileIntent);
+                    var previewSuccessful = attachmentInteractionController.PresentPreview(true);
+
+                    if (!previewSuccessful)
+                    {
+                        CommonConfig.Logger.Info("Failed to present preview for attachment. Presenting open with instead.");
+
+                        var openInSuccessful = attachmentInteractionController.PresentOptionsMenu(View.Frame, View, true);
+                        if (!openInSuccessful)
+                        {
+                            CommonConfig.Logger.Warning("Failed to present open in view - there is no app that can open this type of attachment installed.");
+
+                            await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
+                        }
+                    }
+                }
 
                 dismissAction();
             }
@@ -246,45 +272,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 dismissAction();
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
-            }
-        }
-
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        async void AttachmentsView_AttachmentLongClicked(object sender, MailBee.Mime.Attachment att)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
-        {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.opening_attachment, Resource.String.please_wait);
-
-            try
-            {
-                var attFile = await CreateTempFile(att.FilenameOriginal, att.GetData());
-
-                var uri = FileProvider.GetUriForFile(this, PackageName + ".fileprovider", attFile);
-                var mimeType = ContentResolver.GetType(uri);
-
-                ShareCompat.IntentBuilder.From(this).SetType(mimeType).SetStream(uri).StartChooser();
-
-                dismissAction();
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error($"Failed to view attachment [attachment={att}]", ex);
-
-                dismissAction();
-
-                await Dialogs.ShowErrorDialogAsync(this, ex);
-            }
-        }
-
-        static byte[] ReadToEnd(Stream input)
-        {
-            byte[] buffer = new byte[16 * 1024];
-            using (MemoryStream ms = new MemoryStream())
-            {
-                int read;
-                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-                    ms.Write(buffer, 0, read);
-                return ms.ToArray();
             }
         }
 
@@ -336,23 +323,63 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             mm.BodyHtmlText = p.Dom.ProcessToString(RuleSet.GetSafeHtmlRules(), null);
         }
 
-        async Task<Java.IO.File> CreateTempFile(string filename, byte[] bytes)
+        static byte[] ReadToEnd(Stream input)
         {
-            var mailViewerCacheDir = new Java.IO.File(CacheDir, "mailviewer");
-            if (!mailViewerCacheDir.Exists())
-                mailViewerCacheDir.Mkdir();
+            byte[] buffer = new byte[16 * 1024];
+            using (MemoryStream ms = new MemoryStream())
+            {
+                int read;
+                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+                    ms.Write(buffer, 0, read);
+                return ms.ToArray();
+            }
+        }
 
-            var specificDir = new Java.IO.File(mailViewerCacheDir, Guid.NewGuid().ToString());
-            if (!specificDir.Exists())
-                specificDir.Mkdir();
+        async Task<NSUrl> CreateTempFile(string filename, byte[] bytes)
+        {
+            var fm = NSFileManager.DefaultManager;
 
-            var cacheFile = new Java.IO.File(specificDir, filename);
-            cacheFile.CreateNewFile();
+            var tempDir = fm.GetTemporaryDirectory();
+            var specificDir = tempDir.Append("mailviewer", true).Append(Guid.NewGuid().ToString(), true);
 
-            using (var fos = new Java.IO.FileOutputStream(cacheFile))
-                await fos.WriteAsync(bytes);
+            NSError _error;
+            fm.CreateDirectory(specificDir, true, null, out _error);
+
+            if (_error != null)
+                throw new MailViewerException(_error.ToString());
+
+            var cacheFile = specificDir.Append(filename, false);
+
+            using (var stream = new FileStream(cacheFile.Path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None, 4096, true))
+                await stream.WriteAsync(bytes, 0, bytes.Length);
 
             return cacheFile;
+        }
+
+        class DocumentInteractionControllerDelegate : UIDocumentInteractionControllerDelegate
+        {
+
+            readonly UIViewController parentController;
+
+            public DocumentInteractionControllerDelegate(UIViewController parentController)
+            {
+                this.parentController = parentController;
+            }
+
+            public override UIViewController ViewControllerForPreview(UIDocumentInteractionController controller)
+            {
+                return parentController;
+            }
+
+            public override UIView ViewForPreview(UIDocumentInteractionController controller)
+            {
+                return parentController.View;
+            }
+
+            public override CGRect RectangleForPreview(UIDocumentInteractionController controller)
+            {
+                return parentController.View.Frame;
+            }
         }
     }
 }

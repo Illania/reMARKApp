@@ -180,6 +180,8 @@
     <Folder Include="Ui\ViewControllers\DocumentView\" />
     <Folder Include="Ui\ViewControllers\DocumentView\Subviews\" />
     <Folder Include="Model\HubMessages\" />
+    <Folder Include="Model\Exceptions\" />
+    <Folder Include="Ui\ViewControllers\MailViewerView\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -421,6 +423,8 @@
     <Compile Include="Model\PushNotification.cs" />
     <Compile Include="Utilities\Hacks.cs" />
     <Compile Include="Ui\Common\DocumentMenuViewController.cs" />
+    <Compile Include="Model\Exceptions\MailViewerException.cs" />
+    <Compile Include="Ui\ViewControllers\MailViewerView\MailViewerViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

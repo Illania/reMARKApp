@@ -21,6 +21,7 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
+using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 using WebKit;
@@ -868,21 +869,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     throw new Exception("Unable to get attachment path.");
                 }
 
-
                 var url = NSUrl.FromFilename(path);
-                attachmentInteractionController = UIDocumentInteractionController.FromUrl(url);
-                attachmentInteractionController.Delegate = new AttachmentInteractionControllerDelegate(this, attachmentDescription);
 
-                var previewSuccessful = attachmentInteractionController.PresentPreview(true);
-
-                if (!previewSuccessful)
+                if (MailViewerViewController.CanOpen(url))
                 {
-                    CommonConfig.Logger.Info(string.Format("Failed to present preview for attachment. Presenting open with instead. [documentId={0}, attachment={1}]", document.Id, attachmentDescription));
-                    var openInSuccessful = attachmentInteractionController.PresentOptionsMenu(View.Frame, View, true);
-                    if (!openInSuccessful)
+                    PresentViewController(new NavigationController(new MailViewerViewController(url), UIModalPresentationStyle.PageSheet), true, null);
+                }
+                else
+                {
+                    attachmentInteractionController = UIDocumentInteractionController.FromUrl(url);
+                    attachmentInteractionController.Delegate = new AttachmentInteractionControllerDelegate(this, attachmentDescription);
+
+                    var previewSuccessful = attachmentInteractionController.PresentPreview(true);
+
+                    if (!previewSuccessful)
                     {
-                        CommonConfig.Logger.Warning(string.Format("Failed to present open in view - there is no app that can open this type of attachment installed. [documentId={0}, attachment={1}]", document.Id, attachmentDescription));
-                        await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
+                        CommonConfig.Logger.Info(string.Format("Failed to present preview for attachment. Presenting open with instead. [documentId={0}, attachment={1}]", document.Id, attachmentDescription));
+                        var openInSuccessful = attachmentInteractionController.PresentOptionsMenu(View.Frame, View, true);
+                        if (!openInSuccessful)
+                        {
+                            CommonConfig.Logger.Warning(string.Format("Failed to present open in view - there is no app that can open this type of attachment installed. [documentId={0}, attachment={1}]", document.Id, attachmentDescription));
+                            await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
+                        }
                     }
                 }
             }
