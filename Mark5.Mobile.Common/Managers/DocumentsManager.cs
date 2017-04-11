@@ -73,9 +73,9 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<List<int>> GetDocumentsIdAsync(Folder folder, int startId = -1, int endId = -1)
+        public async Task<List<int>> GetNeighbourDocumentsIdAsync(Folder folder, int documentId, bool getPrevious, bool getNext, int maxItems = 30)
         {
-            return await documentsDataAccess.GetDocumentsIdAsync(folder, startId, endId, MaxToFetch);
+            return await documentsDataAccess.GetNeighbourDocumentsIdAsync(folder, documentId, getPrevious, getNext, maxItems);
         }
 
         public async Task<List<OutgoingDocumentContainer>> GetOutgoingDocumentContainersPreviewAsync()

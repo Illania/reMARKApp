@@ -7,6 +7,8 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content.PM;
 using Android.OS;
@@ -31,10 +33,20 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string DocumentPreviewIntentKey = "DocumentPreview_0bd291a4-22a5-431c-ad6e-4c8b273eeb98";
         public const string NotificationGuidIntentKey = "NotificationGuid_0473a08d-5f96-4acd-924a-6d160a23cdf2";
 
+        const string reachedLastDocumentKey = "reachedLastDocumentKey";
+        const string reachedFirstDocumentKey = "reachedFirstDocumentKey";
+        const string documentIdsKey = "documentIdsKey";
+        const string folderKey = "folderKey";
+
         Toolbar toolbar;
 
         Folder folder;
-        List<int> documentIds;
+        List<int> documentIds = new List<int>(50);
+
+        const int maxNeighbours = 20;
+
+        bool reachedLastDocument;
+        bool reachedFirstDocument;
 
         protected override async void OnCreate(Bundle savedInstanceState)
         {
@@ -67,8 +79,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (Intent.HasExtra(DocumentIdIntentKey))
                     df.DocumentId = Intent.Extras.GetInt(DocumentIdIntentKey);
 
+                DocumentPreview dp = null;
+
                 if (Intent.HasExtra(DocumentPreviewIntentKey))
-                    df.DocumentPreview = SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
+                {
+                    dp = SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
+                    df.DocumentPreview = dp;
+                }
 
                 if (Intent.HasExtra(NotificationGuidIntentKey))
                     df.NotificationGuid = SerializationUtils.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
@@ -80,23 +97,83 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(DocumentActivity)}");
+
+                documentIds.AddRange(await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, dp.Id, true, true, maxNeighbours));
+
+                //TODO already here we can check if it's we have the last element in the last or the first
             }
             else
             {
+                reachedLastDocument = savedInstanceState.GetBoolean(reachedLastDocumentKey);
+                reachedFirstDocument = savedInstanceState.GetBoolean(reachedFirstDocumentKey);
+                documentIds = SerializationUtils.Deserialize<List<int>>(savedInstanceState.GetString(documentIdsKey));
+
+                var serializedFolder = savedInstanceState.GetString(folderKey);
+                folder = !string.IsNullOrEmpty(serializedFolder) ? SerializationUtils.Deserialize<Folder>(serializedFolder) : null;
+
                 CommonConfig.Logger.Info($"Restored {nameof(DocumentActivity)}");
             }
-
-            documentIds = await Managers.DocumentsManager.GetDocumentsIdAsync(folder);
         }
 
-        public bool HasPrevious(int documentId) //TODO check if ordered in the query
+        protected override void OnSaveInstanceState(Bundle outState)
         {
-            return GetPreviousId(documentId) != null;
+            outState.PutBoolean(reachedLastDocumentKey, reachedLastDocument);
+            outState.PutBoolean(reachedFirstDocumentKey, reachedFirstDocument);
+            outState.PutString(documentIdsKey, SerializationUtils.Serialize(documentIds));
+            outState.PutString(folderKey, folder != null ? SerializationUtils.Serialize(folder) : null);
+
+            base.OnSaveInstanceState(outState);
         }
 
-        public bool HasNext(int documentId)
+        #region List-related 
+
+        public async Task<bool> HasPrevious(int documentId)
         {
-            return GetNextId(documentId) != null;
+            var documentIndex = documentIds.FindIndex(d => d == documentId);
+            if (documentIndex == -1)
+            {
+                return false;
+            }
+
+            if (documentIndex == 0 && !reachedFirstDocument)
+            {
+                var previous = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, documentId, true, false, maxNeighbours);
+                if (previous == null || !previous.Any())
+                {
+                    reachedFirstDocument = true;
+                    return false;
+                }
+
+                documentIds.InsertRange(0, previous);
+                return true;
+                //TODO should put some try catch
+            }
+
+            return true;
+        }
+
+        public async Task<bool> HasNext(int documentId)
+        {
+            var documentIndex = documentIds.FindIndex(d => d == documentId);
+            if (documentIndex == -1)
+            {
+                return false;
+            }
+
+            if (documentIndex == documentIds.Count - 1 && !reachedLastDocument)
+            {
+                var next = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, documentId, false, true, maxNeighbours);
+                if (next == null || !next.Any())
+                {
+                    reachedLastDocument = true;
+                    return false;
+                }
+
+                documentIds.AddRange(next);
+                return true;
+            }
+
+            return true;
         }
 
         public void GoToPrevious(int documentId)
@@ -164,6 +241,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             OverridePendingTransition(Resource.Animation.enter_from_left_half, Resource.Animation.exit_to_right);
         }
 
+        #endregion
     }
 }
 

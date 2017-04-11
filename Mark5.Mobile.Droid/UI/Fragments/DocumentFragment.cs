@@ -220,11 +220,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (DocumentPreview == null) return;
 
-            var goToPreviousItem = menu.Add(Menu.None, MenuItemActions.GoToPrevious, MenuItemActions.GoToPrevious, Resource.String.lines);
-            goToPreviousItem.SetShowAsAction(ShowAsAction.Always);
+            if (Folder != null)
+            {
+                var goToPreviousItem = menu.Add(Menu.None, MenuItemActions.GoToPrevious, MenuItemActions.GoToPrevious, Resource.String.document_previous);
+                goToPreviousItem.SetShowAsAction(ShowAsAction.Always);
 
-            var goToNextItem = menu.Add(Menu.None, MenuItemActions.GoToNext, MenuItemActions.GoToNext, Resource.String.links); //TODO put correct
-            goToNextItem.SetShowAsAction(ShowAsAction.Always);
+                var goToNextItem = menu.Add(Menu.None, MenuItemActions.GoToNext, MenuItemActions.GoToNext, Resource.String.document_next);
+                goToNextItem.SetShowAsAction(ShowAsAction.Always);
+            }
 
             if (!DocumentPreview.IsReadByCurrent)
             {

@@ -99,44 +99,42 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<List<int>> GetDocumentsIdAsync(Folder folder, int startId = -1, int endId = -1, int maxItems = 500)
+        public async Task<List<int>> GetNeighbourDocumentsIdAsync(Folder folder, int documentId, bool getPrevious, bool getNext, int maxItems)
         {
             try
             {
-                List<int> documentIds = null;
+                List<int> documentIds = new List<int>(maxItems * 2 + 1) { };
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var query = $"select {nameof(DocumentPreview.Id)} " +
-                                $"from {nameof(DocumentPreview)}, {nameof(FolderDocumentLink)} " +
-                                $"where {nameof(FolderDocumentLink.FolderId)} = {folder.Id} " +
-                                $"     and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} = {nameof(FolderDocumentLink)}.{nameof(FolderDocumentLink.DocumentId)} ";
+                    var query = $"select {nameof(FolderDocumentLink.DocumentId)} as '{nameof(IdValue.Id)}' " +
+                                $"from {nameof(FolderDocumentLink)} " +
+                        $"where {nameof(FolderDocumentLink.FolderId)} = {folder.Id} ";
 
-                    if (startId > 0)
+                    string getPreviousQuery;
+                    string getNextQuery;
+
+                    if (getPrevious)
                     {
-                        query += $"    and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} < \"{startId}\" ";
+                        getPreviousQuery = query + $" and  {nameof(FolderDocumentLink.DocumentId)} > \"{documentId}\" ";
+                        getPreviousQuery += $"order by {nameof(FolderDocumentLink.DocumentId)} asc ";
+                        getPreviousQuery += $"limit {maxItems} ";
+                        var previous = c.Query<IdValue>(getPreviousQuery).Select(v => v.Id).Reverse();
+                        documentIds.AddRange(previous);
+                        if (getNext)
+                        {
+                            documentIds.Add(documentId);
+                        }
                     }
 
-                    if (endId > 0)
+                    if (getNext)
                     {
-                        query += $"    and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} > \"{endId}\" ";
+                        getNextQuery = query + $" and  {nameof(FolderDocumentLink.DocumentId)} < \"{documentId}\" ";
+                        getNextQuery += $"order by {nameof(FolderDocumentLink.DocumentId)} desc ";
+                        getNextQuery += $"limit {maxItems} ";
+                        var next = c.Query<IdValue>(getNextQuery).Select(v => v.Id);
+                        documentIds.AddRange(next);
                     }
-
-                    query += $"order by {nameof(DocumentPreview.Id)} desc ";
-
-                    if (maxItems > 0)
-                    {
-                        query += $"limit {maxItems - 1} ";
-                    }
-
-                    var result = c.Query<int>(query);
-
-                    if (result == null || result.Count < 1)
-                    {
-                        throw new DataNotFoundException("Document previews could not be found.");
-                    }
-
-                    documentIds = result.ToList();
                 });
 
                 return documentIds;
