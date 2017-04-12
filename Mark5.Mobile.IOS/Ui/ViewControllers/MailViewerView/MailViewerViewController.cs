@@ -18,10 +18,15 @@ using MailBee.Mime;
 using MailBee.Outlook;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Model.Exceptions;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
+using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
+using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 {
@@ -35,6 +40,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
         UIBarButtonItem closeItem;
         UIBarButtonItem shareItem;
+        ActionableLayoutScrollView mainScrollView;
+        UIStackView stackViewBeforeContent;
+        ContentView contentView;
+        UIStackView stackViewAfterContent;
         UIDocumentInteractionController attachmentInteractionController;
 
         MailMessage mailMessage;
@@ -61,6 +70,86 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
             shareItem = new UIBarButtonItem(UIBarButtonSystemItem.Action);
             NavigationItem.SetRightBarButtonItem(shareItem, false);
+
+            AutomaticallyAdjustsScrollViewInsets = true;
+
+            mainScrollView = new ActionableLayoutScrollView
+            {
+                BackgroundColor = UIColor.White,
+                ShowsVerticalScrollIndicator = true,
+                ShowsHorizontalScrollIndicator = false,
+                ScrollEnabled = true,
+                ScrollsToTop = true,
+                UserInteractionEnabled = true,
+                ClipsToBounds = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            mainScrollView.LayoutSubviewsAction = HandleScrollViewLayoutSubviewsAction;
+            View.AddSubview(mainScrollView);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+                });
+
+            stackViewBeforeContent = new UIStackView
+            {
+                Axis = UILayoutConstraintAxis.Vertical,
+                Alignment = UIStackViewAlignment.Fill,
+                Distribution = UIStackViewDistribution.Fill,
+                Spacing = 0f,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            mainScrollView.AddSubview(stackViewBeforeContent);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f)
+                });
+
+            contentView = new ContentView(mainScrollView, DecidePolicyForNavigationAction);
+            mainScrollView.AddSubview(contentView);
+            mainScrollView.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, stackViewBeforeContent, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, mainScrollView, NSLayoutAttribute.Width, 1f, 0f)
+            });
+
+            stackViewAfterContent = new UIStackView
+            {
+                Axis = UILayoutConstraintAxis.Vertical,
+                Alignment = UIStackViewAlignment.Fill,
+                Distribution = UIStackViewDistribution.Fill,
+                Spacing = 0f,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            mainScrollView.AddSubview(stackViewAfterContent);
+            View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, contentView, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f),
+                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Bottom, 1f, 0f)
+                });
+
+            stackViewBeforeContent.AddArrangedSubview(new SubjectView());
+            stackViewBeforeContent.AddArrangedSubview(new RecipientsView(RecipientsView.Type.From));
+            stackViewBeforeContent.AddArrangedSubview(new RecipientsView(RecipientsView.Type.To));
+            stackViewBeforeContent.AddArrangedSubview(new RecipientsView(RecipientsView.Type.Cc));
+            stackViewBeforeContent.AddArrangedSubview(new RecipientsView(RecipientsView.Type.Bcc));
+            stackViewBeforeContent.AddArrangedSubview(new RecipientsView(RecipientsView.Type.ReplyTo));
+            stackViewBeforeContent.AddArrangedSubview(new DateReceivedView());
+            stackViewBeforeContent.AddArrangedSubview(new PriorityView());
+            var av = new AttachmentsView();
+            av.AttachmentTapped += AttachmentsView_AttachmentTapped;
+            stackViewAfterContent.AddArrangedSubview(av);
+
+            RefreshView();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -75,7 +164,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
         {
             base.ViewDidAppear(animated);
 
-            LoadFromUrl();
+            if (mailMessage == null)
+                LoadFromUrl();
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -181,7 +271,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 }
 
                 throw new MailViewerException("Unsupported file.");
-            }).ContinueWith(async t =>
+            }).ContinueWith(t =>
             {
                 dismissAction();
 
@@ -192,9 +282,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
                     CommonConfig.Logger.Error(ex);
 
-                    await Dialogs.ShowErrorDialogAsync(this, ex);
-
-                    DismissViewController(true, null);
+                    Dialogs.ShowErrorDialog(this, ex);
                 }
                 else
                 {
@@ -207,31 +295,93 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
         void RefreshView()
         {
-            /*for (var i = 0; i < linearLayout.ChildCount; i++)
+            foreach (var sv in stackViewBeforeContent.Subviews.OfType<MailViewerSubview>())
             {
-                var dv = linearLayout.GetChildAt(i) as MailViewerView;
-                if (dv != null)
-                {
-                    dv.MailMessage = mailMessage;
-                    dv.RefreshView();
-
-                    var d = linearLayout.GetChildAt(i + 1) as Divider;
-                    if (d != null)
-                    {
-                        d.Visibility = dv.Visibility;
-                        i++;
-                    }
-                }
+                sv.MailMessage = mailMessage;
+                sv.RefreshView();
+                sv.UpdateVisibility();
             }
 
-            linearLayout.Invalidate();
-            linearLayout.RequestLayout();*/
+            contentView.MailMessage = mailMessage;
+            contentView.RefreshView();
+            contentView.UpdateVisibility();
+
+            foreach (var sv in stackViewAfterContent.Subviews.OfType<MailViewerSubview>())
+            {
+                sv.MailMessage = mailMessage;
+                sv.RefreshView();
+                sv.UpdateVisibility();
+            }
+        }
+
+        void HandleScrollViewLayoutSubviewsAction(UIScrollView scrollView)
+        {
+            //Used to keep the views before and after the content anchored to the scrollView
+            var minimumVisibleX = scrollView.ContentOffset.X;
+
+            var views = new UIView[] { stackViewBeforeContent, stackViewAfterContent };
+
+            foreach (var item in views)
+            {
+                var actualFrame = item.Frame;
+                actualFrame.X = minimumVisibleX;
+                item.Frame = actualFrame;
+            }
+        }
+
+        WKNavigationActionPolicy DecidePolicyForNavigationAction(WKNavigationAction navigationAction)
+        {
+            if (navigationAction.NavigationType == WKNavigationType.LinkActivated
+                || navigationAction.NavigationType == WKNavigationType.BackForward
+                || navigationAction.NavigationType == WKNavigationType.FormSubmitted
+                || navigationAction.NavigationType == WKNavigationType.FormResubmitted)
+            {
+                if (navigationAction.Request.Url.Scheme == "mailto")
+                {
+                    var address = navigationAction.Request.Url.ResourceSpecifier;
+                    PresentComposeViewWithPreconfiguredAddresses(new string[] { address });
+                }
+                else
+                {
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+                    Integration.OpenLink(navigationAction.Request.Url,
+                                                      async () => await Dialogs.ShowConfirmDialogAsync(this,
+                                                                                                       Localization.GetString("unable_open_link_title"),
+                                                                                                       Localization.GetString("unable_open_link_content") + navigationAction.Request.Url.Scheme));
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+                }
+
+                return WKNavigationActionPolicy.Cancel;
+            }
+
+            if (navigationAction.NavigationType == WKNavigationType.Reload)
+            {
+                return WKNavigationActionPolicy.Cancel;
+            }
+
+            return WKNavigationActionPolicy.Allow;
+        }
+
+        void PresentComposeViewWithPreconfiguredAddresses(string[] preconfiguredEmailAddresses)
+        {
+            var vc = new ComposeDocumentViewController
+            {
+                CreationModeFlag = DocumentCreationModeFlag.New,
+                PreviousDocumentDirection = DocumentDirection.None,
+                PreconfiguredEmailAddresses = preconfiguredEmailAddresses
+            };
+
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        async void AttachmentsView_AttachmentClicked(object sender, MailBee.Mime.Attachment att)
+#pragma warning disable RECS0154 // Parameter is never used
+        async void AttachmentsView_AttachmentTapped(object sender, AttachmentButtonTappedEventArgs e)
+#pragma warning restore RECS0154 // Parameter is never used
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
+            var att = e.Attachment;
+
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("please_wait___"));
 
             try

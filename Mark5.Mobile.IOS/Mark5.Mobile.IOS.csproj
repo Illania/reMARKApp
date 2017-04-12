@@ -182,6 +182,7 @@
     <Folder Include="Model\HubMessages\" />
     <Folder Include="Model\Exceptions\" />
     <Folder Include="Ui\ViewControllers\MailViewerView\" />
+    <Folder Include="Ui\ViewControllers\MailViewerView\Subviews\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -425,6 +426,13 @@
     <Compile Include="Ui\Common\DocumentMenuViewController.cs" />
     <Compile Include="Model\Exceptions\MailViewerException.cs" />
     <Compile Include="Ui\ViewControllers\MailViewerView\MailViewerViewController.cs" />
+    <Compile Include="Ui\ViewControllers\MailViewerView\Subviews\MailViewerSubview.cs" />
+    <Compile Include="Ui\ViewControllers\MailViewerView\Subviews\AttachmentsView.cs" />
+    <Compile Include="Ui\ViewControllers\MailViewerView\Subviews\RecipientsView.cs" />
+    <Compile Include="Ui\ViewControllers\MailViewerView\Subviews\SubjectView.cs" />
+    <Compile Include="Ui\ViewControllers\MailViewerView\Subviews\ContentView.cs" />
+    <Compile Include="Ui\ViewControllers\MailViewerView\Subviews\DateReceivedView.cs" />
+    <Compile Include="Ui\ViewControllers\MailViewerView\Subviews\PriorityView.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
