@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
-using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
@@ -79,13 +78,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (Intent.HasExtra(DocumentIdIntentKey))
                     df.DocumentId = Intent.Extras.GetInt(DocumentIdIntentKey);
 
-                DocumentPreview dp = null;
 
                 if (Intent.HasExtra(DocumentPreviewIntentKey))
-                {
-                    dp = SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
-                    df.DocumentPreview = dp;
-                }
+                    df.DocumentPreview = SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
 
                 if (Intent.HasExtra(NotificationGuidIntentKey))
                     df.NotificationGuid = SerializationUtils.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
@@ -98,9 +93,20 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 CommonConfig.Logger.Info($"Created {nameof(DocumentActivity)}");
 
-                documentIds.AddRange(await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, dp.Id, true, true, maxNeighbours));
+                if (folder != null && df.DocumentPreview != null)
+                {
+                    try
+                    {
+                        documentIds.AddRange(await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, df.DocumentPreview.Id, true, true, maxNeighbours));
 
-                //TODO already here we can check if it's we have the last element in the last or the first
+                        reachedFirstDocument |= documentIds.First() == df.DocumentPreview.Id;
+                        reachedLastDocument |= documentIds.Last() == df.DocumentPreview.Id;
+                    }
+                    catch (Exception ex)
+                    {
+                        CommonConfig.Logger.Error("Error while retrieveing neighbour documents", ex);
+                    }
+                }
             }
             else
             {
@@ -125,28 +131,48 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.OnSaveInstanceState(outState);
         }
 
+        public override void Finish()
+        {
+            base.Finish();
+
+            OverridePendingTransition(Resource.Animation.enter_from_left_half, Resource.Animation.exit_to_right);
+        }
+
         #region List-related 
 
         public async Task<bool> HasPrevious(int documentId)
         {
+            if (folder == null)
+                return false;
+
             var documentIndex = documentIds.FindIndex(d => d == documentId);
             if (documentIndex == -1)
             {
                 return false;
             }
 
-            if (documentIndex == 0 && !reachedFirstDocument)
+            if (documentIndex == 0)
             {
-                var previous = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, documentId, true, false, maxNeighbours);
-                if (previous == null || !previous.Any())
+                if (reachedFirstDocument)
+                    return false;
+
+                try
                 {
-                    reachedFirstDocument = true;
+                    var previous = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, documentId, true, false, maxNeighbours);
+                    if (previous == null || !previous.Any())
+                    {
+                        reachedFirstDocument = true;
+                        return false;
+                    }
+
+                    documentIds.InsertRange(0, previous);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Error while checking if previous document exists", ex);
                     return false;
                 }
-
-                documentIds.InsertRange(0, previous);
-                return true;
-                //TODO should put some try catch
             }
 
             return true;
@@ -154,23 +180,37 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         public async Task<bool> HasNext(int documentId)
         {
+            if (folder == null)
+                return false;
+
             var documentIndex = documentIds.FindIndex(d => d == documentId);
             if (documentIndex == -1)
             {
                 return false;
             }
 
-            if (documentIndex == documentIds.Count - 1 && !reachedLastDocument)
+            if (documentIndex == documentIds.Count - 1)
             {
-                var next = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, documentId, false, true, maxNeighbours);
-                if (next == null || !next.Any())
+                if (reachedLastDocument)
+                    return false;
+
+                try
                 {
-                    reachedLastDocument = true;
+                    var next = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, documentId, false, true, maxNeighbours);
+                    if (next == null || !next.Any())
+                    {
+                        reachedLastDocument = true;
+                        return false;
+                    }
+
+                    documentIds.AddRange(next);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Error while checking if next document exists", ex);
                     return false;
                 }
-
-                documentIds.AddRange(next);
-                return true;
             }
 
             return true;
@@ -232,13 +272,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
 
             return null;
-        }
-
-        public override void Finish()
-        {
-            base.Finish();
-
-            OverridePendingTransition(Resource.Animation.enter_from_left_half, Resource.Animation.exit_to_right);
         }
 
         #endregion

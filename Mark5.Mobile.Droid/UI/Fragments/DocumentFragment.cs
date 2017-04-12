@@ -223,7 +223,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Folder != null)
             {
                 var goToPreviousItem = menu.Add(Menu.None, MenuItemActions.GoToPrevious, MenuItemActions.GoToPrevious, Resource.String.document_previous);
-                goToPreviousItem.SetShowAsAction(ShowAsAction.Always);
+                goToPreviousItem.SetShowAsAction(ShowAsAction.Always); //TODO need to put icons, and grey them out when disabled
 
                 var goToNextItem = menu.Add(Menu.None, MenuItemActions.GoToNext, MenuItemActions.GoToNext, Resource.String.document_next);
                 goToNextItem.SetShowAsAction(ShowAsAction.Always);
