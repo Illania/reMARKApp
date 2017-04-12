@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
+using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
@@ -37,15 +38,15 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         const string documentIdsKey = "documentIdsKey";
         const string folderKey = "folderKey";
 
-        Toolbar toolbar;
-
-        Folder folder;
-        List<int> documentIds = new List<int>(50);
-
         const int maxNeighbours = 20;
 
         bool reachedLastDocument;
         bool reachedFirstDocument;
+
+        Folder folder;
+        List<int> documentIds = new List<int>(50);
+
+        Toolbar toolbar;
 
         protected override async void OnCreate(Bundle savedInstanceState)
         {

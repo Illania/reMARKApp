@@ -141,7 +141,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
-                throw new DataAccessException("Error getting documents.", ex);
+                throw new DataAccessException("Error getting neighbour document ids.", ex);
             }
         }
 
