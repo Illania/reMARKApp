@@ -289,10 +289,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Folder != null)
             {
                 var goToPreviousItem = menu.FindItem(MenuItemActions.GoToPrevious);
-                goToPreviousItem?.SetEnabled(await ((DocumentActivity)Activity).HasPrevious(DocumentPreview.Id));
+                if (goToPreviousItem != null)
+                {
+                    goToPreviousItem.SetEnabled(await ((DocumentActivity)Activity).HasPrevious(DocumentId ?? DocumentPreview.Id));
+                }
 
                 var goToNextItem = menu.FindItem(MenuItemActions.GoToNext);
-                goToNextItem?.SetEnabled(await ((DocumentActivity)Activity).HasNext(DocumentPreview.Id));
+                if (goToNextItem != null)
+                {
+                    goToNextItem.SetEnabled(await ((DocumentActivity)Activity).HasNext(DocumentId ?? DocumentPreview.Id));
+                }
             }
         }
 
@@ -300,12 +306,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == MenuItemActions.GoToPrevious)
             {
-                ((DocumentActivity)Activity).GoToPrevious(DocumentPreview.Id);
+                ((DocumentActivity)Activity).GoToPrevious(DocumentId ?? DocumentPreview.Id);
             }
 
             if (item.ItemId == MenuItemActions.GoToNext)
             {
-                ((DocumentActivity)Activity).GoToNext(DocumentPreview.Id);
+                ((DocumentActivity)Activity).GoToNext(DocumentId ?? DocumentPreview.Id);
             }
 
             if (item.ItemId == MenuItemActions.MarkAsRead)
