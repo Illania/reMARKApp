@@ -225,33 +225,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void InitSubViews()
         {
-            var subviewsInStacView = new List<ComposeDocumentSubView>();
+            var subviewsInStackView = new List<ComposeDocumentSubView>();
 
             toView = new ToView();
-            subviewsInStacView.Add(toView);
+            subviewsInStackView.Add(toView);
 
             ccView = new CcView();
-            subviewsInStacView.Add(ccView);
+            subviewsInStackView.Add(ccView);
 
             bccView = new BccView();
-            subviewsInStacView.Add(bccView);
+            subviewsInStackView.Add(bccView);
 
             lineView = new LineView(this);
-            subviewsInStacView.Add(lineView);
+            subviewsInStackView.Add(lineView);
 
             priorityView = new PriorityView(this);
             if (PlatformConfig.Preferences.ComposePriorityEnabled)
-                subviewsInStacView.Add(priorityView);
+                subviewsInStackView.Add(priorityView);
 
             subjectView = new SubjectView();
-            subviewsInStacView.Add(subjectView);
+            subviewsInStackView.Add(subjectView);
 
             attachmentsView = new AttachmentsView();
-            subviewsInStacView.Add(attachmentsView);
+            subviewsInStackView.Add(attachmentsView);
 
-            subviewsInStacView.ForEach(stackView.AddArrangedSubview);
+            subviewsInStackView.ForEach(stackView.AddArrangedSubview);
 
-            subViews.AddRange(subviewsInStacView);
+            subViews.AddRange(subviewsInStackView);
             subViews.Add(contentView);
         }
 

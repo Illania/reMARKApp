@@ -147,7 +147,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             stackViewBeforeContent.AddArrangedSubview(new PriorityView());
             var av = new AttachmentsView();
             av.AttachmentTapped += AttachmentsView_AttachmentTapped;
-            stackViewAfterContent.AddArrangedSubview(av);
+            stackViewBeforeContent.AddArrangedSubview(av);
 
             RefreshView();
         }

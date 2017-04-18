@@ -331,7 +331,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             viewsBeforeContent.Add(priorityView);
 
             attachmentsListView = new AttachmentsView();
-            viewsAfterContent.Add(attachmentsListView);
+            viewsBeforeContent.Add(attachmentsListView);
 
             referenceNumberView = new ReferenceNumberView();
             viewsAfterContent.Add(referenceNumberView);
