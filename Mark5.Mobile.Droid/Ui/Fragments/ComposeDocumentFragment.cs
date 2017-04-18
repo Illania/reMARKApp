@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -71,6 +72,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         FloatingActionButton fab;
 
         List<ComposeDocumentView> subViews = new List<ComposeDocumentView>();
+
+        AutoSaveWorker autoSaveWorker;
+        int autoSaveInterval = 5 * 1000; //5 seconds
 
         bool documentShown;
         bool templateLoaded;
@@ -141,12 +145,34 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnResume();
 
+            CommonConfig.Logger.Info($"Resuming {nameof(ComposeDocumentFragment)}...");
+
             if (OutgoingDocumentGuid == Guid.Empty)
                 OutgoingDocumentGuid = Guid.NewGuid();
 
             await LoadDocument();
 
             UpdateSendButtonState();
+
+            if (!LocalDocument || (LocalDocument && OutgoingDocumentState == OutgoingDocumentState.AutoSaved))
+            {
+                autoSaveWorker?.Stop();
+                autoSaveWorker = new AutoSaveWorker(AutoSaveAction, autoSaveInterval);
+                autoSaveWorker.Start();
+            }
+
+            CommonConfig.Logger.Info($"Resumed {nameof(ComposeDocumentFragment)}...");
+        }
+
+        public override void OnPause()
+        {
+            base.OnPause();
+
+            CommonConfig.Logger.Info($"Pausing {nameof(ComposeDocumentFragment)}...");
+
+            autoSaveWorker?.Stop();
+
+            CommonConfig.Logger.Info($"Paused {nameof(ComposeDocumentFragment)}");
         }
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
@@ -436,7 +462,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void AskIfShouldSave()
         {
-            if (LocalDocument)
+            if (LocalDocument && OutgoingDocumentState != OutgoingDocumentState.AutoSaved)
                 Dialogs.ShowYesNoDialog(Context, Resource.String.save_modifications, Resource.String.confirm_save_modified_document, SaveModifiedOutgoingDocument, SaveAndCloseComposeActivity);
             else if (PreviousDocumentDirection == DocumentDirection.Draft)
                 Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_change_draft, () => SendDocument(true), SaveAndCloseComposeActivity);
@@ -540,10 +566,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     Name = filename,
                     SizeInBytes = size,
-                    Stream = stream,
                     Path = path
                 };
-
             }).ContinueWith(async t =>
             {
                 stream?.Dispose();
@@ -560,6 +584,39 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
             }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        public void DeleteAutoSavedDocument()
+        {
+            Task.Run(async () =>
+            {
+                await Managers.DocumentsManager.DeleteAutoSavedDocumentAsync();
+            }).ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                {
+                    CommonConfig.Logger.Error("Error while deleting autosaved document", t.Exception);
+                }
+            });
+        }
+
+        async Task AutoSaveAction()
+        {
+            foreach (var subView in subViews)
+                await subView.UpdateDocument();
+
+            await SynchOutgoingAttachments(false);
+
+            DocumentPreview.Direction = DocumentDirection.Outgoing;
+            await Managers.DocumentsManager.AutoSaveDocumentAsync(OutgoingDocumentGuid,
+                                                                          Document,
+                                                                          DocumentPreview,
+                                                                          CreationModeFlag,
+                                                                          PreviousDocumentId ?? -1,
+                                                                          PreviousDocumentFolderId ?? -1,
+                                                                          0,
+                                                                          false,
+                                                                          false);
         }
 
         #endregion
@@ -908,5 +965,42 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
+    }
+
+    public class AutoSaveWorker
+    {
+        CancellationTokenSource cts;
+        Func<Task> autoSaveAction;
+        int delay;
+
+        public AutoSaveWorker(Func<Task> autoSaveAction, int delay)
+        {
+            this.autoSaveAction = autoSaveAction;
+            this.delay = delay;
+        }
+
+        public void Start()
+        {
+            cts?.Cancel();
+            cts = new CancellationTokenSource();
+
+            Task.Run(async () =>
+            {
+                while (true)
+                {
+                    await Task.Delay(delay);
+                    if (cts.IsCancellationRequested) return;
+
+                    await autoSaveAction();
+                }
+            });
+        }
+
+        public void Stop()
+        {
+            cts?.Cancel();
+            cts = null;
+        }
+
     }
 }

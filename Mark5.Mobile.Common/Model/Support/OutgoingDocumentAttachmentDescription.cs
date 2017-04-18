@@ -5,14 +5,12 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
-using System.IO;
 
 namespace Mark5.Mobile.Common.Model
 {
+
     public class OutgoingDocumentAttachmentDescription : IAttachmentDescription
     {
-        public Stream Stream { get; set; }
 
         public string Name { get; set; }
 

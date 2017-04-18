@@ -39,7 +39,8 @@
     <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-<RunCodeAnalysis>true</RunCodeAnalysis>  </PropertyGroup>
+<RunCodeAnalysis>true</RunCodeAnalysis>  <MandroidI18n>cjk;mideast;west</MandroidI18n>
+</PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>pdbonly</DebugType>
@@ -56,7 +57,8 @@
     <AndroidLinkSkip>System.Runtime;System.Collections;System.Runtime.Serialization</AndroidLinkSkip>
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
     <AndroidSupportedAbis>armeabi-v7a;arm64-v8a;armeabi</AndroidSupportedAbis>
-<RunCodeAnalysis>true</RunCodeAnalysis>  </PropertyGroup>
+<RunCodeAnalysis>true</RunCodeAnalysis>  <MandroidI18n>cjk;mideast;west</MandroidI18n>
+</PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
@@ -190,6 +192,12 @@
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\netstandard1.3\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="MailBee.NET">
+      <HintPath>..\packages\MailBee.NET.11.0.1\lib\netstandard1.3\MailBee.NET.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>..\packages\HtmlAgilityPack.1.4.9.5\lib\portable-net45+netcore45+wp8+MonoAndroid+MonoTouch\HtmlAgilityPack.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -357,6 +365,14 @@
     <Compile Include="Ui\Fragments\ContactsSearchCriteriaFragment.cs" />
     <Compile Include="Ui\Fragments\ShortcodesSearchCriteriaFragment.cs" />
     <Compile Include="Ui\Fragments\ContactFragment.cs" />
+    <Compile Include="Ui\Activities\MailViewerActivity.cs" />
+    <Compile Include="Model\Exceptions\MailViewerException.cs" />
+    <Compile Include="Ui\Views\MailViewerViews\MailViewerView.cs" />
+    <Compile Include="Ui\Views\MailViewerViews\SubjectView.cs" />
+    <Compile Include="Ui\Views\MailViewerViews\ContentView.cs" />
+    <Compile Include="Ui\Views\MailViewerViews\PriorityView.cs" />
+    <Compile Include="Ui\Views\MailViewerViews\RecipentsView.cs" />
+    <Compile Include="Ui\Views\MailViewerViews\AttachmentsView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -647,6 +663,7 @@
     <AndroidResource Include="Resources\layout\search_list_item_country.axml" />
     <AndroidResource Include="Resources\drawable-nodpi\background.png" />
     <AndroidResource Include="Resources\drawable\circle_dark.xml" />
+    <AndroidResource Include="Resources\layout\mailviewer_layout.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\anim\" />
@@ -660,6 +677,8 @@
     <Folder Include="Ui\Views\SearchViews\RelatedViews\" />
     <Folder Include="Resources\mipmap\" />
     <Folder Include="Resources\drawable-nodpi\" />
+    <Folder Include="Model\Exceptions\" />
+    <Folder Include="Ui\Views\MailViewerViews\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Xamarin.Android.Support.Compat.25.0.1-rc1\build\Xamarin.Android.Support.Compat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Compat.25.0.1-rc1\build\Xamarin.Android.Support.Compat.targets')" />

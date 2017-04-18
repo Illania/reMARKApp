@@ -7,6 +7,7 @@
 //
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
+using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
@@ -115,7 +116,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
             UISegmentedControl.Appearance.SetTitleTextAttributes(uiSegmentControlTitleTextAttributes, UIControlState.Normal);
             UISegmentedControl.Appearance.TintColor = DarkerBlue;
 
+            // UISwitch
             UISwitch.Appearance.OnTintColor = DarkBlue;
+
+            //WKWebView
+            WKWebView.Appearance.TintColor = DarkBlue;
         }
 
         #endregion

@@ -19,11 +19,11 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    
+
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class ComposeDocumentActivity : AppCompatActivity
     {
-        
+
         Toolbar toolbar;
         ComposeDocumentFragment cdf;
 
@@ -61,7 +61,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (outgoingDocumentGuid != default(Guid))
                 intent.PutExtra(OutgoingDocumentGuidIntentKey, outgoingDocumentGuid.ToString());
-            
+
             if (preconfiguredEmailToAddresses != null)
                 intent.PutExtra(PreconfiguredEmailToAddressesIntentKey, preconfiguredEmailToAddresses.ToArray());
 
@@ -167,7 +167,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             base.Finish();
 
+            cdf?.DeleteAutoSavedDocument();
+
             OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
         }
+
     }
 }

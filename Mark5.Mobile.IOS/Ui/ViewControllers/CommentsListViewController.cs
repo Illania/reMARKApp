@@ -33,7 +33,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public BusinessEntity Entity { get; set; }
 
         UIBarButtonItem doneButtonItem;
-        UITableView tableView;
+        UITableView commentsTableView;
         UIView commentEditView;
         UIButton addComment;
         UITextView commentContent;
@@ -77,7 +77,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeHandlers();
 
-            ReachabilityBar.Attach(View, tableView, (float)(NavigationController.BottomLayoutGuide.Length + commentEditView.Frame.Height));
+            ReachabilityBar.Attach(View, commentsTableView, (float)(NavigationController.BottomLayoutGuide.Length + commentEditView.Frame.Height));
         }
 
         public override void ViewDidAppear(bool animated)
@@ -86,7 +86,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"{nameof(CommentsListViewController)} appeared");
 
-            var ds = (DataSource)tableView.Source;
+            var ds = (DataSource)commentsTableView.Source;
             if (ds.Empty)
                 RefreshView();
         }
@@ -114,19 +114,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             AutomaticallyAdjustsScrollViewInsets = true;
 
-            tableView = new UITableView();
-            tableView.Source = new DataSource(this, tableView, Localization.GetString("no_comments"));
-            tableView.EstimatedRowHeight = CommentsTableViewCell.Height;
-            tableView.RowHeight = UITableView.AutomaticDimension;
-            tableView.ClipsToBounds = false;
-            tableView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.OnDrag;
-            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            View.AddSubview(tableView);
+            commentsTableView = new UITableView();
+            commentsTableView.Source = new DataSource(this, commentsTableView, Localization.GetString("no_comments"));
+            commentsTableView.EstimatedRowHeight = CommentsTableViewCell.Height;
+            commentsTableView.RowHeight = UITableView.AutomaticDimension;
+            commentsTableView.ClipsToBounds = false;
+            commentsTableView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.OnDrag;
+            commentsTableView.TranslatesAutoresizingMaskIntoConstraints = false;
+            View.AddSubview(commentsTableView);
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f)
+                    NSLayoutConstraint.Create(commentsTableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(commentsTableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(commentsTableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f)
                 });
         }
 
@@ -142,7 +142,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     NSLayoutConstraint.Create(commentEditView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(commentEditView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(commentsTableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Top, 1f, 0f),
                     commentEditViewBottomConstraint
                 });
 
@@ -249,7 +249,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     throw new ArgumentException("The input business entity does not have comments defined in the model");
             }
 
-            var ds = (tableView.Source as DataSource);
+            var ds = (commentsTableView.Source as DataSource);
             ds.RefreshData(comments);
         }
 
@@ -285,9 +285,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         throw new ArgumentException("The input business entity does not have comments defined in the model");
                 }
 
-                var ds = tableView.Source as DataSource;
+                var ds = commentsTableView.Source as DataSource;
                 ds.AddComment(newComment);
-                tableView.ScrollToRow(NSIndexPath.FromRowSection(ds.Items.Count - 1, 0), UITableViewScrollPosition.Middle, true);
+                commentsTableView.ScrollToRow(NSIndexPath.FromRowSection(ds.Items.Count - 1, 0), UITableViewScrollPosition.Middle, true);
                 commentContent.Text = string.Empty;
             }
             catch (Exception ex)
@@ -315,7 +315,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DeleteComment(Comment comment)
         {
-            tableView.Editing = false;
+            commentsTableView.Editing = false;
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting_comment___"));
 
@@ -347,13 +347,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                  }
                  else
                  {
-                     (tableView.Source as DataSource).RemoveComment(comment);
+                     (commentsTableView.Source as DataSource).RemoveComment(comment);
                  }
 
              }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        void StartEditComment(Comment comment)
+        void StartEditComment(Comment comment, UITableView tableView, NSIndexPath indexPath)
         {
             tableView.Editing = false;
 
@@ -365,6 +365,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             var alert = UIAlertController.Create(Localization.GetString("edit_message"), string.Empty, UIAlertControllerStyle.Alert);
+
+            if (alert.PopoverPresentationController != null)
+                alert.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(tableView, tableView.CellAt(indexPath));
+
             var cancelAction = UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null);
             var confirmAction = UIAlertAction.Create(Localization.GetString("confirm"), UIAlertActionStyle.Default, obj => FinalizeEditComment(comment, alert.TextFields[0].Text));
             alert.AddTextField(tf => tf.Text = comment.Content);
@@ -415,7 +419,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                  }
                  else if (t.Result)
                  {
-                     (tableView.Source as DataSource).EditComment(newComment);
+                     (commentsTableView.Source as DataSource).EditComment(newComment);
                  }
                  else
                  {
@@ -481,9 +485,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void ScrollCommentsToTop(bool animated)
         {
-            var commentsCount = (tableView.Source as DataSource).Items.Count;
+            var commentsCount = (commentsTableView.Source as DataSource).Items.Count;
             if (commentsCount > 0)
-                tableView.ScrollToRow(NSIndexPath.FromRowSection(0, 0), UITableViewScrollPosition.Top, animated);
+                commentsTableView.ScrollToRow(NSIndexPath.FromRowSection(0, 0), UITableViewScrollPosition.Top, animated);
         }
 
         #endregion
@@ -556,7 +560,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     if (isEditable)
                     {
-                        var editAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive, Localization.GetString("edit"), (a, ip) => viewController.StartEditComment(comment));
+                        var editAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive, Localization.GetString("edit"), (a, ip) => viewController.StartEditComment(comment, tableView, indexPath));
                         editAction.BackgroundColor = Theme.DarkBlue;
                         actions.Add(editAction);
                     }

@@ -34,6 +34,7 @@ namespace Mark5.Mobile.Common.Model
         Waiting,
         Failed,
         Sending,
+        AutoSaved,
     }
 }
 

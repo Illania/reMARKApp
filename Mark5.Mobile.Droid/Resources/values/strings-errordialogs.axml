@@ -8,5 +8,6 @@
 	<string name="generalexception_title">Unexpected exception</string>
 	<string name="invalidsourcetypeexception_message">This action cannot be performed offline</string>
 	<string name="invalidsourcetypeexception_title">Unavailable offline</string>
+	<string name="couldnotopenemlmsg_title">Could not open file</string>
 	<string name="report">Report</string>
 </resources>
