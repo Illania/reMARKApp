@@ -33,12 +33,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string DocumentPreviewIntentKey = "DocumentPreview_0bd291a4-22a5-431c-ad6e-4c8b273eeb98";
         public const string NotificationGuidIntentKey = "NotificationGuid_0473a08d-5f96-4acd-924a-6d160a23cdf2";
 
-        const string reachedLastDocumentKey = "reachedLastDocumentKey";
-        const string reachedFirstDocumentKey = "reachedFirstDocumentKey";
-        const string documentIdsKey = "documentIdsKey";
-        const string folderKey = "folderKey";
-
-        const int maxNeighbours = 20;
+        const int MaxNeighbours = 20;
+        const string ReachedLastDocumentKey = "reachedLastDocumentKey";
+        const string ReachedFirstDocumentKey = "reachedFirstDocumentKey";
+        const string DocumentIdsKey = "documentIdsKey";
+        const string FolderKey = "folderKey";
 
         bool reachedLastDocument;
         bool reachedFirstDocument;
@@ -98,7 +97,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
                     try
                     {
-                        documentIds.AddRange(await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, df.DocumentPreview.Id, true, true, maxNeighbours));
+                        documentIds.AddRange(await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, df.DocumentPreview.Id, true, true, MaxNeighbours));
 
                         reachedFirstDocument |= documentIds.First() == df.DocumentPreview.Id;
                         reachedLastDocument |= documentIds.Last() == df.DocumentPreview.Id;
@@ -111,11 +110,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
             else
             {
-                reachedLastDocument = savedInstanceState.GetBoolean(reachedLastDocumentKey);
-                reachedFirstDocument = savedInstanceState.GetBoolean(reachedFirstDocumentKey);
-                documentIds = SerializationUtils.Deserialize<List<int>>(savedInstanceState.GetString(documentIdsKey));
+                reachedLastDocument = savedInstanceState.GetBoolean(ReachedLastDocumentKey);
+                reachedFirstDocument = savedInstanceState.GetBoolean(ReachedFirstDocumentKey);
+                documentIds = SerializationUtils.Deserialize<List<int>>(savedInstanceState.GetString(DocumentIdsKey));
 
-                var serializedFolder = savedInstanceState.GetString(folderKey);
+                var serializedFolder = savedInstanceState.GetString(FolderKey);
                 folder = !string.IsNullOrEmpty(serializedFolder) ? SerializationUtils.Deserialize<Folder>(serializedFolder) : null;
 
                 CommonConfig.Logger.Info($"Restored {nameof(DocumentActivity)}");
@@ -124,10 +123,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         protected override void OnSaveInstanceState(Bundle outState)
         {
-            outState.PutBoolean(reachedLastDocumentKey, reachedLastDocument);
-            outState.PutBoolean(reachedFirstDocumentKey, reachedFirstDocument);
-            outState.PutString(documentIdsKey, SerializationUtils.Serialize(documentIds));
-            outState.PutString(folderKey, folder != null ? SerializationUtils.Serialize(folder) : null);
+            outState.PutBoolean(ReachedLastDocumentKey, reachedLastDocument);
+            outState.PutBoolean(ReachedFirstDocumentKey, reachedFirstDocument);
+            outState.PutString(DocumentIdsKey, SerializationUtils.Serialize(documentIds));
+            outState.PutString(FolderKey, folder != null ? SerializationUtils.Serialize(folder) : null);
 
             base.OnSaveInstanceState(outState);
         }
@@ -159,7 +158,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 try
                 {
-                    var previous = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, documentId, true, false, maxNeighbours);
+                    var previous = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, documentId, true, false, MaxNeighbours);
                     if (previous == null || !previous.Any())
                     {
                         reachedFirstDocument = true;
@@ -197,7 +196,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 try
                 {
-                    var next = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, documentId, false, true, maxNeighbours);
+                    var next = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, documentId, false, true, MaxNeighbours);
                     if (next == null || !next.Any())
                     {
                         reachedLastDocument = true;
@@ -231,6 +230,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             };
 
             var ft = SupportFragmentManager.BeginTransaction();
+            ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);
             ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
             ft.Commit();
         }
@@ -249,6 +249,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             };
 
             var ft = SupportFragmentManager.BeginTransaction();
+            ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);
             ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
             ft.Commit();
         }
