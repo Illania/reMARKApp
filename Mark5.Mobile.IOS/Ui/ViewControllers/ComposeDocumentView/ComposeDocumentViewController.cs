@@ -17,6 +17,7 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
+using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
 using MobileCoreServices;
 using Photos;
@@ -237,33 +238,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void InitSubViews()
         {
-            var subviewsInStacView = new List<ComposeDocumentSubView>();
+            var subviewsInStackView = new List<ComposeDocumentSubView>();
 
             toView = new ToView();
-            subviewsInStacView.Add(toView);
+            subviewsInStackView.Add(toView);
 
             ccView = new CcView();
-            subviewsInStacView.Add(ccView);
+            subviewsInStackView.Add(ccView);
 
             bccView = new BccView();
-            subviewsInStacView.Add(bccView);
+            subviewsInStackView.Add(bccView);
 
             lineView = new LineView(this);
-            subviewsInStacView.Add(lineView);
+            subviewsInStackView.Add(lineView);
 
             priorityView = new PriorityView(this);
             if (PlatformConfig.Preferences.ComposePriorityEnabled)
-                subviewsInStacView.Add(priorityView);
+                subviewsInStackView.Add(priorityView);
 
             subjectView = new SubjectView();
-            subviewsInStacView.Add(subjectView);
+            subviewsInStackView.Add(subjectView);
 
             attachmentsView = new AttachmentsView();
-            subviewsInStacView.Add(attachmentsView);
+            subviewsInStackView.Add(attachmentsView);
 
-            subviewsInStacView.ForEach(stackView.AddArrangedSubview);
+            subviewsInStackView.ForEach(stackView.AddArrangedSubview);
 
-            subViews.AddRange(subviewsInStacView);
+            subViews.AddRange(subviewsInStackView);
             subViews.Add(contentView);
         }
 
@@ -661,7 +662,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         async void HandleAttachmentUrl(NSUrl url)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            OutgoingDocumentAttachmentDescription attachment = null;
             Stream stream = null;
 
             try
@@ -686,13 +686,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
 
-                attachment = new OutgoingDocumentAttachmentDescription
+                var attachment = new OutgoingDocumentAttachmentDescription
                 {
                     Name = filename,
                     SizeInBytes = sizeInBytes,
-                    Stream = stream,
                     Path = path
                 };
+
+                attachmentsView.AddAttachment(attachment);
             }
             catch (Exception ex)
             {
@@ -704,9 +705,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 stream?.Dispose();
             }
-
-            if (attachment != null)
-                attachmentsView.AddAttachment(attachment);
         }
 
 
@@ -714,7 +712,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         async void HandleAttachmentImage(string filename, NSData jpegData)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            OutgoingDocumentAttachmentDescription attachment = null;
             Stream stream = null;
 
             try
@@ -730,13 +727,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
 
-                attachment = new OutgoingDocumentAttachmentDescription
+                var attachment = new OutgoingDocumentAttachmentDescription
                 {
                     Name = filename,
                     SizeInBytes = sizeInBytes,
-                    Stream = stream,
                     Path = path
                 };
+
+                attachmentsView.AddAttachment(attachment);
             }
             catch (Exception ex)
             {
@@ -748,9 +746,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 stream?.Dispose();
             }
-
-            if (attachment != null)
-                attachmentsView.AddAttachment(attachment);
         }
 
         async void SendButtonItem_Clicked(object sender, EventArgs e)
@@ -926,21 +921,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     throw new Exception("Unable to get attachment path.");
                 }
 
-
                 var url = NSUrl.FromFilename(path);
-                attachmentInteractionController = UIDocumentInteractionController.FromUrl(url);
-                attachmentInteractionController.Delegate = new AttachmentInteractionControllerDelegate(this, attachmentDescription);
 
-                var previewSuccessful = attachmentInteractionController.PresentPreview(true);
 
-                if (!previewSuccessful)
+                if (MailViewerViewController.CanOpen(url))
                 {
-                    CommonConfig.Logger.Info(string.Format("Failed to present preview for attachment. Presenting open with instead. [documentId={0}, attachment={1}]", Document.Id, attachmentDescription));
-                    var openInSuccessful = attachmentInteractionController.PresentOptionsMenu(View.Frame, View, true);
-                    if (!openInSuccessful)
+                    PresentViewController(new NavigationController(new MailViewerViewController(url), UIModalPresentationStyle.PageSheet), true, null);
+                }
+                else
+                {
+                    attachmentInteractionController = UIDocumentInteractionController.FromUrl(url);
+                    attachmentInteractionController.Delegate = new AttachmentInteractionControllerDelegate(this, attachmentDescription);
+
+                    var previewSuccessful = attachmentInteractionController.PresentPreview(true);
+
+                    if (!previewSuccessful)
                     {
-                        CommonConfig.Logger.Warning(string.Format("Failed to present open in view - there is no app that can open this type of attachment installed. [documentId={0}, attachment={1}]", Document.Id, attachmentDescription));
-                        await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
+                        CommonConfig.Logger.Info(string.Format("Failed to present preview for attachment. Presenting open with instead. [documentId={0}, attachment={1}]", Document.Id, attachmentDescription));
+                        var openInSuccessful = attachmentInteractionController.PresentOptionsMenu(View.Frame, View, true);
+                        if (!openInSuccessful)
+                        {
+                            CommonConfig.Logger.Warning(string.Format("Failed to present open in view - there is no app that can open this type of attachment installed. [documentId={0}, attachment={1}]", Document.Id, attachmentDescription));
+                            await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
+                        }
                     }
                 }
             }

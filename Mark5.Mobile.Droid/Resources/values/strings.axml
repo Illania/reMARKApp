@@ -103,6 +103,7 @@
 	<string name="lines">Mailboxes</string>
 	<string name="links">Links</string>
 	<string name="loading_document">Loading email</string>
+	<string name="loading_mail">Loading email</string>
 	<string name="loading_template">Loading template</string>
 	<string name="loading_templates">Loading templates</string>
 	<string name="log_in">Log in</string>

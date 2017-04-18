@@ -195,6 +195,7 @@
 "remove_from_favorites" = "Remove from\nfavorites";
 "reply" = "Reply";
 "reply_all" = "Reply all";
+"reply_to" = "Reply to";
 "report" = "Report";
 "reset" = "Reset";
 "responsible_users" = "Responsible users";

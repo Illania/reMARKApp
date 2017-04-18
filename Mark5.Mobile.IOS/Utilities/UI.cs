@@ -22,10 +22,22 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static string PrettyFileSize(long bytes)
         {
-            var mag = (int)Math.Log(bytes, 1024);
-            decimal adjustedSize = (decimal)bytes / (1L << (mag * 10));
+            try
+            {
+                if (bytes < 0)
+                    return "Unknown size";
 
-            return string.Format("{0:n1} {1}", adjustedSize, SizeSuffixes[mag]);
+                var mag = (int)Math.Log(bytes, 1024);
+                decimal adjustedSize = (decimal)bytes / (1L << (mag * 10));
+
+                return string.Format("{0:n1} {1}", adjustedSize, SizeSuffixes[mag]);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to get size for {bytes} bytes.", ex);
+
+                return "Unknown size";
+            }
         }
 
         public static string PriorityString(Priority priority)

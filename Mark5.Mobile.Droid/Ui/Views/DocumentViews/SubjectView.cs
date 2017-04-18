@@ -17,7 +17,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
     public class SubjectView : DocumentView
     {
 
-        AppCompatTextView fromToModeSpinner;
+        AppCompatTextView subjectTextView;
 
         public SubjectView(Context context)
             : base(context)
@@ -29,13 +29,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         {
             SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceNormal);
 
-            fromToModeSpinner = new AppCompatTextView(Context)
+            subjectTextView = new AppCompatTextView(Context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
-            fromToModeSpinner.SetTextAppearanceCompat(Context, Resource.Style.fontTitle);
+            subjectTextView.SetTextAppearanceCompat(Context, Resource.Style.fontTitle);
 
-            AddView(fromToModeSpinner);
+            AddView(subjectTextView);
         }
 
         public override void RefreshView()
@@ -44,13 +44,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 Visibility = ViewStates.Visible;
 
-                fromToModeSpinner.Text = string.IsNullOrWhiteSpace(DocumentPreview.Subject) ? Context.GetString(Resource.String.no_subject) : DocumentPreview.Subject;
+                subjectTextView.Text = string.IsNullOrWhiteSpace(DocumentPreview.Subject) ? Context.GetString(Resource.String.no_subject) : DocumentPreview.Subject;
             }
             else
             {
                 Visibility = ViewStates.Gone;
 
-                fromToModeSpinner.Text = string.Empty;
+                subjectTextView.Text = string.Empty;
             }
         }
     }
