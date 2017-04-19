@@ -16,6 +16,8 @@ namespace Mark5.Mobile.Droid.Ui.Common
     public class RetainedFragment<Y> : Fragment where Y : class
     {
 
+        const string TagPrefix = "RF_";
+
         public Y State { get; set; }
 
         public override void OnCreate(Bundle savedInstanceState)
@@ -35,7 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             if (CommonConfig.Logger.IsDebugEnabled())
                 CommonConfig.Logger.Debug($"Finding retained fragment for {parentTag}");
 
-            var f = fragmentManager.FindFragmentByTag("RF_" + parentTag) as RetainedFragment<Y>;
+            var f = fragmentManager.FindFragmentByTag(TagPrefix + parentTag) as RetainedFragment<Y>;
             if (f == null)
             {
                 if (CommonConfig.Logger.IsDebugEnabled())
@@ -43,7 +45,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
                 f = new RetainedFragment<Y>();
                 var ft = fragmentManager.BeginTransaction();
-                ft.Add(f, "RetainedFragment_" + parentTag);
+                ft.Add(f, TagPrefix + parentTag);
                 ft.CommitAllowingStateLoss();
             }
             return f;
