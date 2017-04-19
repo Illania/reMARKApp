@@ -23,7 +23,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
-    [Activity(ScreenOrientation = ScreenOrientation.FullUser)]
+    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class SwitchDocumentActivity : BaseAppCompatActivity
     {
 

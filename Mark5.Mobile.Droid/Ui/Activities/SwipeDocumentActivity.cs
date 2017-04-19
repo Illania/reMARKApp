@@ -23,7 +23,7 @@ using Newtonsoft.Json;
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
-    [Android.App.Activity(ScreenOrientation = ScreenOrientation.FullUser)]
+    [Android.App.Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class SwipeDocumentActivity : BaseAppCompatActivity, ViewPager.IOnPageChangeListener
     {
 
