@@ -743,7 +743,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.Invalidate();
             linearLayout.RequestLayout();
 
-            Activity.InvalidateOptionsMenu();
+            Activity?.InvalidateOptionsMenu();
         }
 
         void RefreshView<T>() where T : DocumentView
@@ -772,7 +772,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.Invalidate();
             linearLayout.RequestLayout();
 
-            Activity.InvalidateOptionsMenu();
+            Activity?.InvalidateOptionsMenu();
         }
 
         void MarkAsReadIfNecessary()

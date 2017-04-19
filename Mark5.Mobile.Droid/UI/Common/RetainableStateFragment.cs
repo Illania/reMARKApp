@@ -23,9 +23,9 @@ namespace Mark5.Mobile.Droid.Ui.Common
             base.OnViewCreated(view, savedInstanceState);
 
             if (CommonConfig.Logger.IsDebugEnabled())
-                CommonConfig.Logger.Debug($"Creating retainable fragment {Tag}");
+                CommonConfig.Logger.Debug($"Creating retainable fragment [Tag={Tag}, GeneratedTag={GenerateTag()}");
 
-            retainedFragment = RetainedFragment<IRetainableState>.FindOrCreate(Activity.SupportFragmentManager, Tag);
+            retainedFragment = RetainedFragment<IRetainableState>.FindOrCreate(Activity.SupportFragmentManager, Tag ?? GenerateTag());
             OnRetainedInstanceStateRestored(retainedFragment.State);
             retainedFragment.State = null;
         }
