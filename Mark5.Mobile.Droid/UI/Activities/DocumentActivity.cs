@@ -70,14 +70,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     df.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
 
                 if (Intent.HasExtra(FolderIntentKey))
-                {
-                    folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
-                    df.Folder = folder;
-                }
+                    df.Folder = folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
 
                 if (Intent.HasExtra(DocumentIdIntentKey))
                     df.DocumentId = Intent.Extras.GetInt(DocumentIdIntentKey);
-
 
                 if (Intent.HasExtra(DocumentPreviewIntentKey))
                     df.DocumentPreview = SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));

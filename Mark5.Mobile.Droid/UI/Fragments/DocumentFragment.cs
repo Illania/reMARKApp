@@ -220,13 +220,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (DocumentPreview == null) return;
 
-            if (Folder != null)
+            if (Activity is DocumentActivity && Folder != null)
             {
                 var goToPreviousItem = menu.Add(Menu.None, MenuItemActions.GoToPrevious, MenuItemActions.GoToPrevious, Resource.String.document_previous);
                 goToPreviousItem.SetShowAsAction(ShowAsAction.Always); //TODO need to put icons, and grey them out when disabled
 
                 var goToNextItem = menu.Add(Menu.None, MenuItemActions.GoToNext, MenuItemActions.GoToNext, Resource.String.document_next);
-                goToNextItem.SetShowAsAction(ShowAsAction.Always);
+                goToNextItem.SetShowAsAction(ShowAsAction.Always); //TODO need to put icons, and grey them out when disabled
             }
 
             if (!DocumentPreview.IsReadByCurrent)
@@ -286,30 +286,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 menuItem?.SetEnabled(isDocumentReady);
             }
 
-            if (Folder != null)
+            if (Activity is DocumentActivity && Folder != null)
             {
                 var goToPreviousItem = menu.FindItem(MenuItemActions.GoToPrevious);
                 if (goToPreviousItem != null)
                 {
-                    goToPreviousItem.SetEnabled(await ((DocumentActivity)Activity).HasPrevious(DocumentId ?? DocumentPreview.Id));
+                    goToPreviousItem.SetEnabled(await ((DocumentActivity)Activity).HasPrevious(DocumentId ?? DocumentPreview.Id)); // TODO set color alpha for disabled state
                 }
 
                 var goToNextItem = menu.FindItem(MenuItemActions.GoToNext);
                 if (goToNextItem != null)
                 {
-                    goToNextItem.SetEnabled(await ((DocumentActivity)Activity).HasNext(DocumentId ?? DocumentPreview.Id));
+                    goToNextItem.SetEnabled(await ((DocumentActivity)Activity).HasNext(DocumentId ?? DocumentPreview.Id)); // TODO set color alpha for disabled state
                 }
             }
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            if (item.ItemId == MenuItemActions.GoToPrevious)
+            if (Activity is DocumentActivity && item.ItemId == MenuItemActions.GoToPrevious)
             {
                 ((DocumentActivity)Activity).GoToPrevious(DocumentId ?? DocumentPreview.Id);
             }
 
-            if (item.ItemId == MenuItemActions.GoToNext)
+            if (Activity is DocumentActivity && item.ItemId == MenuItemActions.GoToNext)
             {
                 ((DocumentActivity)Activity).GoToNext(DocumentId ?? DocumentPreview.Id);
             }
