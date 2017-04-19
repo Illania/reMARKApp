@@ -99,7 +99,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(FoldersNotificationsListFragment)} [FolderId={RemoteFolder?.Id}, ModuleType={RemoteFolder?.Module}]";
+            return $"{nameof(FoldersNotificationsListFragment)} [FolderId={RemoteFolder.Id}, ModuleType={RemoteFolder.Module}]";
         }
 
         class FoldersNotificationsRetainableState : IRetainableState

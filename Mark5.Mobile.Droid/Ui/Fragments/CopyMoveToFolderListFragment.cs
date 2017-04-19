@@ -179,7 +179,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return base.GenerateTag() + $" / {nameof(CopyMoveToFolderListFragment)} [businessEntities.Count={BusinessEntities?.Count}, businessEntity.Type={BusinessEntities?.First().ObjectType}, fromFolder.Id={FromFolder?.Id}]";
+            return base.GenerateTag() + $" / {nameof(CopyMoveToFolderListFragment)} [businessEntities.Count={BusinessEntities.Count}, businessEntity.Type={BusinessEntities.First().ObjectType}, fromFolder.Id={FromFolder?.Id ?? -1}]";
         }
 
         public override IRetainableState OnRetainInstanceState()

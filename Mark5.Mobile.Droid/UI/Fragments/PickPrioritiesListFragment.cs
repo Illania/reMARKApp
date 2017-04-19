@@ -118,7 +118,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(PickLinesListFragment)} ]";
+            return $"{nameof(PickLinesListFragment)}";
         }
 
         class PickLinesListFragmentState : IRetainableState

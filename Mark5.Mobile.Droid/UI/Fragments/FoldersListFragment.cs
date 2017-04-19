@@ -756,7 +756,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(FoldersListFragment)} [FolderId={RemoteFolder?.Id}, ModuleType={RemoteFolder?.Module}]";
+            return $"{nameof(FoldersListFragment)} [FolderId={RemoteFolder.Id}, ModuleType={RemoteFolder.Module}]";
         }
 
         public override IRetainableState OnRetainInstanceState()

@@ -238,7 +238,7 @@ namespace Mark5.Mobile.Droid
 
         public override string GenerateTag()
         {
-            return $"{nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]";
+            return $"{nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview.Id}, businessEntity.objectType={BusinessEntityPreview.ObjectType}]";
         }
 
         class CategoriesListFragmentState : IRetainableState

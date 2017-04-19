@@ -935,7 +935,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(ComposeDocumentFragment)} [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]";
+            return $"{nameof(ComposeDocumentFragment)} [CreationModeFlag={CreationModeFlag}, PreviousDocument.Id={PreviousDocument?.Id ?? -1}]";
         }
 
         class ComposeDocumentFragmentState : IRetainableState
