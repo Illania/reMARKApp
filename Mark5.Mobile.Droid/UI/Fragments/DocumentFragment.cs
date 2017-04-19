@@ -220,7 +220,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (DocumentPreview == null) return;
 
-            if (Activity is DocumentActivity && Folder != null)
+            if (Activity is SwitchDocumentActivity && Folder != null)
             {
                 var goToPreviousItem = menu.Add(Menu.None, MenuItemActions.GoToPrevious, MenuItemActions.GoToPrevious, Resource.String.document_previous);
                 goToPreviousItem.SetShowAsAction(ShowAsAction.Always); //TODO need to put icons, and grey them out when disabled
@@ -286,32 +286,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 menuItem?.SetEnabled(isDocumentReady);
             }
 
-            if (Activity is DocumentActivity && Folder != null)
+            if (Activity is SwitchDocumentActivity && Folder != null)
             {
                 var goToPreviousItem = menu.FindItem(MenuItemActions.GoToPrevious);
                 if (goToPreviousItem != null)
                 {
-                    goToPreviousItem.SetEnabled(await ((DocumentActivity)Activity).HasPrevious(DocumentId ?? DocumentPreview.Id)); // TODO set color alpha for disabled state
+                    goToPreviousItem.SetEnabled(await ((SwitchDocumentActivity)Activity).HasPrevious(DocumentId ?? DocumentPreview.Id)); // TODO set color alpha for disabled state
                 }
 
                 var goToNextItem = menu.FindItem(MenuItemActions.GoToNext);
                 if (goToNextItem != null)
                 {
-                    goToNextItem.SetEnabled(await ((DocumentActivity)Activity).HasNext(DocumentId ?? DocumentPreview.Id)); // TODO set color alpha for disabled state
+                    goToNextItem.SetEnabled(await ((SwitchDocumentActivity)Activity).HasNext(DocumentId ?? DocumentPreview.Id)); // TODO set color alpha for disabled state
                 }
             }
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            if (Activity is DocumentActivity && item.ItemId == MenuItemActions.GoToPrevious)
+            if (Activity is SwitchDocumentActivity && item.ItemId == MenuItemActions.GoToPrevious)
             {
-                ((DocumentActivity)Activity).GoToPrevious(DocumentId ?? DocumentPreview.Id);
+                ((SwitchDocumentActivity)Activity).GoToPrevious(DocumentId ?? DocumentPreview.Id);
             }
 
-            if (Activity is DocumentActivity && item.ItemId == MenuItemActions.GoToNext)
+            if (Activity is SwitchDocumentActivity && item.ItemId == MenuItemActions.GoToNext)
             {
-                ((DocumentActivity)Activity).GoToNext(DocumentId ?? DocumentPreview.Id);
+                ((SwitchDocumentActivity)Activity).GoToNext(DocumentId ?? DocumentPreview.Id);
             }
 
             if (item.ItemId == MenuItemActions.MarkAsRead)
@@ -846,8 +846,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 FolderId = FolderId,
                 Folder = Folder,
                 DocumentId = DocumentId,
-                DocumentPreview = DocumentPreview,
-                Document = Document
+                DocumentPreview = DocumentPreview
             };
         }
 
@@ -860,7 +859,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Folder = dfs.Folder;
                 DocumentId = dfs.DocumentId;
                 DocumentPreview = dfs.DocumentPreview;
-                Document = dfs.Document;
             }
         }
 
@@ -879,8 +877,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int? DocumentId { get; set; }
 
             public DocumentPreview DocumentPreview { get; set; }
-
-            public Document Document { get; set; }
         }
     }
 }

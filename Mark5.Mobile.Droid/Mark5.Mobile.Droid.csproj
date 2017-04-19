@@ -216,7 +216,7 @@
     <Compile Include="Ui\Activities\ContactActivity.cs" />
     <Compile Include="Ui\Activities\ContactsListActivity.cs" />
     <Compile Include="Ui\Activities\CopyToUserWorktrayActivity.cs" />
-    <Compile Include="Ui\Activities\DocumentActivity.cs" />
+    <Compile Include="Ui\Activities\SwitchDocumentActivity.cs" />
     <Compile Include="Ui\Activities\DocumentsListActivity.cs" />
     <Compile Include="Ui\Activities\CopyMoveToFolderListActivity.cs" />
     <Compile Include="Ui\Activities\LoginActivity.cs" />
@@ -373,6 +373,8 @@
     <Compile Include="Ui\Views\MailViewerViews\PriorityView.cs" />
     <Compile Include="Ui\Views\MailViewerViews\RecipentsView.cs" />
     <Compile Include="Ui\Views\MailViewerViews\AttachmentsView.cs" />
+    <Compile Include="Ui\Activities\SwipeDocumentActivity.cs" />
+    <Compile Include="Ui\Activities\DocumentActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

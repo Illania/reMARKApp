@@ -1,6 +1,6 @@
 //
 // Project: Mark5.Mobile.Droid
-// File: DocumentActivity.cs
+// File: SwitchDocumentActivity.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -23,8 +23,8 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
 
-    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
-    public class DocumentActivity : BaseAppCompatActivity
+    [Activity(ScreenOrientation = ScreenOrientation.FullUser)]
+    public class SwitchDocumentActivity : BaseAppCompatActivity
     {
 
         public const string FolderIdIntentKey = "FolderId_4bd29db4-c529-48a2-bf8f-8f1a96ed60b5";
@@ -47,7 +47,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             base.OnCreate(savedInstanceState);
 
-            CommonConfig.Logger.Info($"Creating {nameof(DocumentActivity)}...");
+            CommonConfig.Logger.Info($"Creating {nameof(SwitchDocumentActivity)}...");
 
             OverridePendingTransition(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left_half);
 
@@ -83,7 +83,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
                 ft.Commit();
 
-                CommonConfig.Logger.Info($"Created {nameof(DocumentActivity)}");
+                CommonConfig.Logger.Info($"Created {nameof(SwitchDocumentActivity)}");
 
                 if (folder != null && df.DocumentPreview != null)
                 {
@@ -104,7 +104,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var serializedFolder = savedInstanceState.GetString(FolderKey);
                 folder = !string.IsNullOrEmpty(serializedFolder) ? SerializationUtils.Deserialize<Folder>(serializedFolder) : null;
 
-                CommonConfig.Logger.Info($"Restored {nameof(DocumentActivity)}");
+                CommonConfig.Logger.Info($"Restored {nameof(SwitchDocumentActivity)}");
             }
         }
 
