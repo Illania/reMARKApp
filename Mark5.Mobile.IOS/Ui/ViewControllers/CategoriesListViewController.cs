@@ -273,7 +273,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (dataSource.CategoriesChanged)
             {
-                CommonConfig.Logger.Info(string.Format("Categories changed - will update. [entity={0}]", BusinessEntityPreview));
+                CommonConfig.Logger.Info(string.Format("Categories changed - will update [entity={0}]", BusinessEntityPreview));
 
                 var categoriesToAssign = dataSource.SelectedCategories;
 
@@ -315,7 +315,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             else
             {
-                CommonConfig.Logger.Info(string.Format($"Categories did not change - exiting edit mode. [entity={BusinessEntityPreview}]"));
+                CommonConfig.Logger.Info(string.Format($"Categories did not change - exiting edit mode [entity={BusinessEntityPreview}]"));
 
                 UpdateAfterExitEditMode();
             }

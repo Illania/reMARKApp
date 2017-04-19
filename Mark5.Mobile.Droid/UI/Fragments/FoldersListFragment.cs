@@ -761,7 +761,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            CommonConfig.Logger.Info($"Retaining state: [folderName={RemoteFolder?.Name}, folderId={RemoteFolder?.Id}, selectedItemsCount={Adapter.SelectedItemPositions.Count} ]");
+            CommonConfig.Logger.Info($"Retaining state: [folderName={RemoteFolder?.Name}, folderId={RemoteFolder?.Id}, selectedItemsCount={Adapter.SelectedItemPositions.Count}]");
 
             return new FolderListFragmentState
             {

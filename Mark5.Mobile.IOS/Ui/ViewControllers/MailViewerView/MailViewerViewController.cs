@@ -401,12 +401,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
                     if (!previewSuccessful)
                     {
-                        CommonConfig.Logger.Info("Failed to present preview for attachment. Presenting open with instead.");
+                        CommonConfig.Logger.Info("Failed to present preview for attachment - presenting open with instead");
 
                         var openInSuccessful = attachmentInteractionController.PresentOptionsMenu(View.Frame, View, true);
                         if (!openInSuccessful)
                         {
-                            CommonConfig.Logger.Warning("Failed to present open in view - there is no app that can open this type of attachment installed.");
+                            CommonConfig.Logger.Warning("Failed to present open in view - there is no app that can open this type of attachment installed");
 
                             await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
                         }

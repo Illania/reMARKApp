@@ -1028,7 +1028,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                CommonConfig.Logger.Info($"Attempting to setting priority for document [documentId{document.Id}]");
+                CommonConfig.Logger.Info($"Attempting to setting priority for document [documentId={document.Id}]");
                 await Managers.DocumentsManager.SetDocumentsPriorityAsync(new List<DocumentPreview> { documentPreview }, priority);
 
                 UpdatePriority();
@@ -1039,7 +1039,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Error while setting priority for document [documentId{document.Id}", ex);
+                CommonConfig.Logger.Error($"Error while setting priority for document [documentId={document.Id}]", ex);
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
@@ -1392,12 +1392,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void WillBeginSendingToApplication(UIDocumentInteractionController controller, string application)
         {
-            CommonConfig.Logger.Info(string.Format("Sending atttachment to {0} app. [attachment={1}", attachmentDescription, application));
+            CommonConfig.Logger.Info($"Sending atttachment to {attachmentDescription} app [attachment={application}");
         }
 
         public override void DidEndSendingToApplication(UIDocumentInteractionController controller, string application)
         {
-            CommonConfig.Logger.Info(string.Format("Sent atttachment to {0} app. [attachment={1}", attachmentDescription, application));
+            CommonConfig.Logger.Info($"Sent atttachment to {attachmentDescription} app [attachment={application}");
         }
 
         #endregion

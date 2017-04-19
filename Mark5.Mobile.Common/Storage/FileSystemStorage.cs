@@ -302,7 +302,7 @@ namespace Mark5.Mobile.Common.Storage
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Failed to retrieve outgoing document container.", ex);
+                CommonConfig.Logger.Error("Failed to retrieve outgoing document container", ex);
 
                 return null;
             }

@@ -38,6 +38,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         Toolbar toolbar;
         ViewPager pager;
 
+        SwipeDocumentActivityState state;
+
         protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -55,6 +57,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             pager = FindViewById<ViewPager>(Resource.Id.pager);
             pager.OffscreenPageLimit = 1;
+            pager.AddOnPageChangeListener(this);
 
             if (savedInstanceState == null)
             {
@@ -93,22 +96,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                         foreach (var previousId in previousIds)
                         {
-                            activityState.FragmentStates.Insert(0, new DocumentFragmentState
-                            {
-                                DocumentId = previousId
-                            });
+                            activityState.FragmentStates.Insert(0, new DocumentFragmentState { DocumentId = previousId });
                             activityState.Position++;
                         }
 
                         var nextIds = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(activityState.Folder, mainFragmentState.DocumentPreview.Id, false, true, MaxNeighbours);
 
                         foreach (var nextId in nextIds)
-                        {
-                            activityState.FragmentStates.Add(new DocumentFragmentState
-                            {
-                                DocumentId = nextId
-                            });
-                        }
+                            activityState.FragmentStates.Add(new DocumentFragmentState { DocumentId = nextId });
                     }
                     catch (Exception ex)
                     {
@@ -116,16 +111,26 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     }
                 }
 
+                state = activityState;
                 pager.Adapter = new PagerAdapter(SupportFragmentManager, activityState);
                 pager.SetCurrentItem(activityState.Position, false);
+
+                // We need to call OnPageSelected manually due to a possible bug in ViewPager
+                if (pager.CurrentItem == 0)
+                    pager.Post(() => ((ViewPager.IOnPageChangeListener)this).OnPageSelected(pager.CurrentItem));
             }
             else
             {
                 var activityState = SerializationUtils.Deserialize<SwipeDocumentActivityState>(savedInstanceState.GetString("state"));
                 activityState.CloseRequest = OnBackPressed;
 
+                state = activityState;
                 pager.Adapter = new PagerAdapter(SupportFragmentManager, activityState);
                 pager.SetCurrentItem(activityState.Position, false);
+
+                // We need to call OnPageSelected manually due to a possible bug in ViewPager
+                if (pager.CurrentItem == 0)
+                    pager.Post(() => ((ViewPager.IOnPageChangeListener)this).OnPageSelected(pager.CurrentItem));
 
                 CommonConfig.Logger.Info($"Restored {nameof(SwipeDocumentActivity)}");
             }
@@ -133,7 +138,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         protected override void OnSaveInstanceState(Bundle outState)
         {
-            outState.PutString("state", SerializationUtils.Serialize(((PagerAdapter)pager.Adapter).State));
+            outState.PutString("state", SerializationUtils.Serialize(state));
 
             base.OnSaveInstanceState(outState);
         }
@@ -147,33 +152,36 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         void ViewPager.IOnPageChangeListener.OnPageScrollStateChanged(int state)
         {
+            // Nothing to do
         }
 
         void ViewPager.IOnPageChangeListener.OnPageScrolled(int position, float positionOffset, int positionOffsetPixels)
         {
+            // Nothing to do
         }
 
         void ViewPager.IOnPageChangeListener.OnPageSelected(int position)
         {
-            ((PagerAdapter)pager.Adapter).State.Position = position;
+            state.Position = position;
         }
 
         class PagerAdapter : FragmentStatePagerAdapter
         {
 
-            public override int Count { get { return State.FragmentStates.Count; } }
+            public override int Count { get { return state.FragmentStates.Count; } }
 
-            public SwipeDocumentActivityState State { get; private set; }
+            readonly SwipeDocumentActivityState state;
 
-            public PagerAdapter(FragmentManager fm, SwipeDocumentActivityState state) : base(fm)
+            public PagerAdapter(FragmentManager fm, SwipeDocumentActivityState state)
+                : base(fm)
             {
-                State = state;
+                this.state = state;
             }
 
             public override Fragment GetItem(int position)
             {
-                var s = State;
-                var fd = State.FragmentStates[position];
+                var s = state;
+                var fd = state.FragmentStates[position];
 
                 var df = new DocumentFragment
                 {
@@ -193,22 +201,19 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
 
             public int? FolderId { get; set; }
-
             public Folder Folder { get; set; }
+
+            public int Position { get; set; } = -1;
+            public List<DocumentFragmentState> FragmentStates { get; set; } = new List<DocumentFragmentState>();
 
             [JsonIgnore]
             public Action CloseRequest { get; set; }
-
-            public int Position { get; set; }
-
-            public List<DocumentFragmentState> FragmentStates { get; set; } = new List<DocumentFragmentState>();
         }
 
         class DocumentFragmentState
         {
 
             public int? DocumentId { get; set; }
-
             public DocumentPreview DocumentPreview { get; set; }
 
             public Guid NotificationGuid { get; set; }

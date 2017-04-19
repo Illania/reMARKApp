@@ -179,6 +179,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnDestroyedByUser();
 
             setReadStatusCancellationTokenSource?.Cancel();
+            setReadStatusCancellationTokenSource = null;
         }
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)

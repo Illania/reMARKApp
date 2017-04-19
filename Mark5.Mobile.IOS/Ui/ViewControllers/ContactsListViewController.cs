@@ -539,7 +539,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                CommonConfig.Logger.Info($"Attempting to delete contacts]");
+                CommonConfig.Logger.Info($"Attempting to delete contacts");
 
                 await Managers.CommonActionsManager.Delete(selectedContacts.Cast<IBusinessEntity>().ToList());
 

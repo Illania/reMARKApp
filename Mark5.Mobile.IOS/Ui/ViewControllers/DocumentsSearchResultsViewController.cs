@@ -377,7 +377,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 EndEditing();
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Error while setting priority for documents]", ex);
+                CommonConfig.Logger.Error($"Error while setting priority for documents", ex);
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
@@ -401,7 +401,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                CommonConfig.Logger.Info($"Attempting to delete documents]");
+                CommonConfig.Logger.Info($"Attempting to delete documents");
 
                 await Managers.CommonActionsManager.Delete(selectedDocuments.Cast<IBusinessEntity>().ToList());
 

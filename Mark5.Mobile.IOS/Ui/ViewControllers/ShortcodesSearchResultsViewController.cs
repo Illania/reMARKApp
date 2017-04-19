@@ -296,7 +296,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                CommonConfig.Logger.Info($"Attempting to delete shortcodes]");
+                CommonConfig.Logger.Info($"Attempting to delete shortcodes");
 
                 await Managers.CommonActionsManager.Delete(selectedShortcodes.Cast<IBusinessEntity>().ToList());
 
