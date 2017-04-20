@@ -135,7 +135,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Created {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]");
         }
 
-        public override async void OnResume()
+        public override void OnResume()
         {
             base.OnResume();
 
@@ -157,7 +157,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             SetSections();
             RefreshData();
             RestoreSelection();
-
         }
 
         public override void OnPause()
@@ -757,12 +756,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(FoldersListFragment)} [FolderId={RemoteFolder?.Id}, ModuleType={RemoteFolder?.Module}]";
+            return $"{nameof(FoldersListFragment)} [FolderId={RemoteFolder.Id}, ModuleType={RemoteFolder.Module}]";
         }
 
         public override IRetainableState OnRetainInstanceState()
         {
-            CommonConfig.Logger.Info($"Retaining state: [folderName={RemoteFolder?.Name}, folderId={RemoteFolder?.Id}, selectedItemsCount={Adapter.SelectedItemPositions.Count} ]");
+            CommonConfig.Logger.Info($"Retaining state: [folderName={RemoteFolder?.Name}, folderId={RemoteFolder?.Id}, selectedItemsCount={Adapter.SelectedItemPositions.Count}]");
 
             return new FolderListFragmentState
             {

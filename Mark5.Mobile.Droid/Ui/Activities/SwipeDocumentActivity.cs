@@ -1,0 +1,222 @@
+﻿//
+// Project: Mark5.Mobile.Droid
+// File: SwipeDocumentActivity.cs
+// Author: Bartosz Cichecki <bgc@nordic-it.com>
+//
+// Copyright (c) 2017 Nordic IT
+//
+using System;
+using System.Collections.Generic;
+using Android.Content.PM;
+using Android.OS;
+using Android.Support.V4.App;
+using Android.Support.V4.View;
+using Android.Support.V7.Widget;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Fragments;
+using Newtonsoft.Json;
+
+namespace Mark5.Mobile.Droid.Ui.Activities
+{
+
+    [Android.App.Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+    public class SwipeDocumentActivity : BaseAppCompatActivity, ViewPager.IOnPageChangeListener
+    {
+
+        public const string FolderIdIntentKey = "FolderId_4bd29db4-c529-48a2-bf8f-8f1a96ed60b5";
+        public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
+        public const string DocumentIdIntentKey = "DocumentId_690fc3d6-ae73-4f5e-844a-06bdc44b6747";
+        public const string DocumentPreviewIntentKey = "DocumentPreview_0bd291a4-22a5-431c-ad6e-4c8b273eeb98";
+        public const string NotificationGuidIntentKey = "NotificationGuid_0473a08d-5f96-4acd-924a-6d160a23cdf2";
+
+        const int MaxNeighbours = 500;
+
+        Toolbar toolbar;
+        ViewPager pager;
+
+        SwipeDocumentActivityState state;
+
+        protected override async void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+
+            CommonConfig.Logger.Info($"Creating {nameof(SwipeDocumentActivity)}...");
+
+            OverridePendingTransition(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left_half);
+
+            Title = string.Empty;
+            SetContentView(Resource.Layout.base_layout_pager);
+
+            toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
+            SetSupportActionBar(toolbar);
+            SupportActionBar.SetDisplayHomeAsUpEnabled(true);
+
+            pager = FindViewById<ViewPager>(Resource.Id.pager);
+            pager.OffscreenPageLimit = 1;
+            pager.AddOnPageChangeListener(this);
+
+            if (savedInstanceState == null)
+            {
+                var activityState = new SwipeDocumentActivityState();
+
+                if (Intent.HasExtra(FolderIdIntentKey))
+                    activityState.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
+
+                if (Intent.HasExtra(FolderIntentKey))
+                    activityState.Folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+
+                activityState.CloseRequest = OnBackPressed;
+
+                var mainFragmentState = new DocumentFragmentState();
+
+                if (Intent.HasExtra(DocumentIdIntentKey))
+                    mainFragmentState.DocumentId = Intent.Extras.GetInt(DocumentIdIntentKey);
+
+                if (Intent.HasExtra(DocumentPreviewIntentKey))
+                    mainFragmentState.DocumentPreview = SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
+
+                if (Intent.HasExtra(NotificationGuidIntentKey))
+                    mainFragmentState.NotificationGuid = SerializationUtils.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
+
+                activityState.FragmentStates.Add(mainFragmentState);
+                activityState.Position = 0;
+
+                CommonConfig.Logger.Info($"Created {nameof(SwipeDocumentActivity)}");
+
+                if (activityState.Folder != null && mainFragmentState.DocumentPreview != null)
+                {
+                    try
+                    {
+                        var previousIds = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(activityState.Folder, mainFragmentState.DocumentPreview.Id, true, false, MaxNeighbours);
+                        previousIds.Reverse();
+
+                        foreach (var previousId in previousIds)
+                        {
+                            activityState.FragmentStates.Insert(0, new DocumentFragmentState { DocumentId = previousId });
+                            activityState.Position++;
+                        }
+
+                        var nextIds = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(activityState.Folder, mainFragmentState.DocumentPreview.Id, false, true, MaxNeighbours);
+
+                        foreach (var nextId in nextIds)
+                            activityState.FragmentStates.Add(new DocumentFragmentState { DocumentId = nextId });
+                    }
+                    catch (Exception ex)
+                    {
+                        CommonConfig.Logger.Error("Error while retrieveing neighbour documents", ex);
+                    }
+                }
+
+                state = activityState;
+                pager.Adapter = new PagerAdapter(SupportFragmentManager, activityState);
+                pager.SetCurrentItem(activityState.Position, false);
+
+                // We need to call OnPageSelected manually due to a possible bug in ViewPager
+                if (pager.CurrentItem == 0)
+                    pager.Post(() => ((ViewPager.IOnPageChangeListener)this).OnPageSelected(pager.CurrentItem));
+            }
+            else
+            {
+                var activityState = SerializationUtils.Deserialize<SwipeDocumentActivityState>(savedInstanceState.GetString("state"));
+                activityState.CloseRequest = OnBackPressed;
+
+                state = activityState;
+                pager.Adapter = new PagerAdapter(SupportFragmentManager, activityState);
+                pager.SetCurrentItem(activityState.Position, false);
+
+                // We need to call OnPageSelected manually due to a possible bug in ViewPager
+                if (pager.CurrentItem == 0)
+                    pager.Post(() => ((ViewPager.IOnPageChangeListener)this).OnPageSelected(pager.CurrentItem));
+
+                CommonConfig.Logger.Info($"Restored {nameof(SwipeDocumentActivity)}");
+            }
+        }
+
+        protected override void OnSaveInstanceState(Bundle outState)
+        {
+            outState.PutString("state", SerializationUtils.Serialize(state));
+
+            base.OnSaveInstanceState(outState);
+        }
+
+        public override void Finish()
+        {
+            base.Finish();
+
+            OverridePendingTransition(Resource.Animation.enter_from_left_half, Resource.Animation.exit_to_right);
+        }
+
+        void ViewPager.IOnPageChangeListener.OnPageScrollStateChanged(int state)
+        {
+            // Nothing to do
+        }
+
+        void ViewPager.IOnPageChangeListener.OnPageScrolled(int position, float positionOffset, int positionOffsetPixels)
+        {
+            // Nothing to do
+        }
+
+        void ViewPager.IOnPageChangeListener.OnPageSelected(int position)
+        {
+            state.Position = position;
+        }
+
+        class PagerAdapter : FragmentStatePagerAdapter
+        {
+
+            public override int Count { get { return state.FragmentStates.Count; } }
+
+            readonly SwipeDocumentActivityState state;
+
+            public PagerAdapter(FragmentManager fm, SwipeDocumentActivityState state)
+                : base(fm)
+            {
+                this.state = state;
+            }
+
+            public override Fragment GetItem(int position)
+            {
+                var s = state;
+                var fd = state.FragmentStates[position];
+
+                var df = new DocumentFragment
+                {
+                    FolderId = s.FolderId,
+                    Folder = s.Folder,
+                    DocumentId = fd.DocumentId,
+                    DocumentPreview = fd.DocumentPreview,
+                    NotificationGuid = fd.NotificationGuid,
+                    CloseRequest = s.CloseRequest
+                };
+
+                return df;
+            }
+        }
+
+        class SwipeDocumentActivityState
+        {
+
+            public int? FolderId { get; set; }
+            public Folder Folder { get; set; }
+
+            public int Position { get; set; } = -1;
+            public List<DocumentFragmentState> FragmentStates { get; set; } = new List<DocumentFragmentState>();
+
+            [JsonIgnore]
+            public Action CloseRequest { get; set; }
+        }
+
+        class DocumentFragmentState
+        {
+
+            public int? DocumentId { get; set; }
+            public DocumentPreview DocumentPreview { get; set; }
+
+            public Guid NotificationGuid { get; set; }
+        }
+    }
+}

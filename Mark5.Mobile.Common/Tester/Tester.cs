@@ -43,7 +43,7 @@ namespace Mark5.Mobile.Common.Tester
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Error occured when checking reachability.", ex);
+                CommonConfig.Logger.Error("Error occured when checking reachability", ex);
 
                 return false;
             }

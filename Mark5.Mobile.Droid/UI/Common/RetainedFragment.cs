@@ -12,10 +12,12 @@ using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
-    
+
     public class RetainedFragment<Y> : Fragment where Y : class
     {
-    
+
+        const string TagPrefix = "RF_";
+
         public Y State { get; set; }
 
         public override void OnCreate(Bundle savedInstanceState)
@@ -24,22 +26,26 @@ namespace Mark5.Mobile.Droid.Ui.Common
             RetainInstance = true;
         }
 
-        public static RetainedFragment<Y> FindOrCreate(FragmentManager fm, string parentTag)
+        public static RetainedFragment<Y> FindOrCreate(FragmentManager fragmentManager, string parentTag)
         {
-            if (string.IsNullOrEmpty(parentTag)) throw new ArgumentNullException(nameof(parentTag));
+            if (fragmentManager == null)
+                throw new ArgumentNullException(nameof(fragmentManager));
+            
+            if (string.IsNullOrEmpty(parentTag))
+                throw new ArgumentNullException(nameof(parentTag));
 
             if (CommonConfig.Logger.IsDebugEnabled())
                 CommonConfig.Logger.Debug($"Finding retained fragment for {parentTag}");
 
-            var f = fm.FindFragmentByTag("RetainedFragment_" + parentTag) as RetainedFragment<Y>;
+            var f = fragmentManager.FindFragmentByTag(TagPrefix + parentTag) as RetainedFragment<Y>;
             if (f == null)
             {
                 if (CommonConfig.Logger.IsDebugEnabled())
                     CommonConfig.Logger.Debug($"Creating retained fragment for {parentTag}");
 
                 f = new RetainedFragment<Y>();
-                var ft = fm.BeginTransaction();
-                ft.Add(f, "RetainedFragment_" + parentTag);
+                var ft = fragmentManager.BeginTransaction();
+                ft.Add(f, TagPrefix + parentTag);
                 ft.CommitAllowingStateLoss();
             }
             return f;
@@ -47,6 +53,9 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         public void Remove(FragmentManager fragmentManager)
         {
+            if (fragmentManager == null)
+                throw new ArgumentNullException(nameof(fragmentManager));
+
             if (!fragmentManager.IsDestroyed)
             {
                 var ft = fragmentManager.BeginTransaction();

@@ -38,7 +38,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void DisableSelfSignedCertificates()
         {
-            CommonConfig.Logger.Info("Disabling custom validation callback.");
+            CommonConfig.Logger.Info("Disabling custom validation callback");
 
             ServicePointManager.ServerCertificateValidationCallback = null;
             CommonConfig.HttpClientHandler = () => { return new AndroidClientHandler(); };

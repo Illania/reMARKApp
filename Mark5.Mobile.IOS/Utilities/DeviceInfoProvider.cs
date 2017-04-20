@@ -52,9 +52,7 @@ namespace Mark5.Mobile.IOS.Utilities
             var err = SecKeyChain.Add(rec);
 
             if (err != SecStatusCode.Success && err != SecStatusCode.DuplicateItem)
-            {
                 CommonConfig.Logger.Error($"Could not save Device ID to keychain. Error: {err}");
-            }
 
             return newId;
         }

@@ -170,8 +170,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             await RefreshData();
 
             if (!IsAdded || IsDetached || IsRemoving) return;
+            if (!UserVisibleHint) return;
 
             MarkAsReadIfNecessary();
+        }
+
+        public override void OnUserVisibilityHintChanged()
+        {
+            base.OnUserVisibilityHintChanged();
+
+            if (UserVisibleHint)
+            {
+                MarkAsReadIfNecessary();
+            }
+            else
+            {
+                setReadStatusCancellationTokenSource?.Cancel();
+                setReadStatusCancellationTokenSource = null;
+            }
         }
 
         public override void OnDestroyedByUser()
@@ -179,6 +195,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnDestroyedByUser();
 
             setReadStatusCancellationTokenSource?.Cancel();
+            setReadStatusCancellationTokenSource = null;
         }
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
@@ -200,6 +217,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         static class MenuItemActions
         {
+            public const int GoToPrevious = 5;
+            public const int GoToNext = 6;
             public const int MarkAsRead = 10;
             public const int MarkAsUnread = 11;
             public const int CopyToWorktray = 20;
@@ -217,6 +236,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             if (DocumentPreview == null) return;
+
+            if (Activity is SwitchDocumentActivity && Folder != null)
+            {
+                var goToPreviousItem = menu.Add(Menu.None, MenuItemActions.GoToPrevious, MenuItemActions.GoToPrevious, Resource.String.document_previous);
+                goToPreviousItem.SetShowAsAction(ShowAsAction.Always); //TODO need to put icons, and grey them out when disabled
+
+                var goToNextItem = menu.Add(Menu.None, MenuItemActions.GoToNext, MenuItemActions.GoToNext, Resource.String.document_next);
+                goToNextItem.SetShowAsAction(ShowAsAction.Always); //TODO need to put icons, and grey them out when disabled
+            }
 
             if (!DocumentPreview.IsReadByCurrent)
             {
@@ -264,7 +292,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override void OnPrepareOptionsMenu(IMenu menu)
+        public override async void OnPrepareOptionsMenu(IMenu menu)
         {
             var isDocumentReady = Document != null;
 
@@ -274,10 +302,35 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var menuItem = menu.FindItem(itemId);
                 menuItem?.SetEnabled(isDocumentReady);
             }
+
+            if (Activity is SwitchDocumentActivity && Folder != null)
+            {
+                var goToPreviousItem = menu.FindItem(MenuItemActions.GoToPrevious);
+                if (goToPreviousItem != null)
+                {
+                    goToPreviousItem.SetEnabled(await ((SwitchDocumentActivity)Activity).HasPrevious(DocumentId ?? DocumentPreview.Id)); // TODO set color alpha for disabled state
+                }
+
+                var goToNextItem = menu.FindItem(MenuItemActions.GoToNext);
+                if (goToNextItem != null)
+                {
+                    goToNextItem.SetEnabled(await ((SwitchDocumentActivity)Activity).HasNext(DocumentId ?? DocumentPreview.Id)); // TODO set color alpha for disabled state
+                }
+            }
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
+            if (Activity is SwitchDocumentActivity && item.ItemId == MenuItemActions.GoToPrevious)
+            {
+                ((SwitchDocumentActivity)Activity).GoToPrevious(DocumentId ?? DocumentPreview.Id);
+            }
+
+            if (Activity is SwitchDocumentActivity && item.ItemId == MenuItemActions.GoToNext)
+            {
+                ((SwitchDocumentActivity)Activity).GoToNext(DocumentId ?? DocumentPreview.Id);
+            }
+
             if (item.ItemId == MenuItemActions.MarkAsRead)
             {
                 MarkAsRead();
@@ -707,7 +760,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.Invalidate();
             linearLayout.RequestLayout();
 
-            Activity.InvalidateOptionsMenu();
+            Activity?.InvalidateOptionsMenu();
         }
 
         void RefreshView<T>() where T : DocumentView
@@ -736,7 +789,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.Invalidate();
             linearLayout.RequestLayout();
 
-            Activity.InvalidateOptionsMenu();
+            Activity?.InvalidateOptionsMenu();
         }
 
         void MarkAsReadIfNecessary()
@@ -746,31 +799,39 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             Task.Run(async () =>
             {
-                var f = Folder;
                 var d = Document;
                 var dp = DocumentPreview;
                 var token = setReadStatusCancellationTokenSource.Token;
 
                 try
                 {
-                    if (dp.IsReadByCurrent)
-                    {
+                    if (dp == null || d == null)
                         return;
-                    }
+
+                    if (dp.IsReadByCurrent)
+                        return;
 
                     var delaySeconds = PlatformConfig.Preferences.MarkAsReadDelaySeconds;
-                    if (delaySeconds < 0) return;
+                    if (delaySeconds < 0)
+                        return;
 
                     await Task.Delay(delaySeconds * 1000);
 
-                    if (token.IsCancellationRequested) return;
+                    if (token.IsCancellationRequested)
+                        return;
+                    
                     await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true, ServerConfig.SystemSettings.UserInfo.User);
 
                     Activity?.RunOnUiThread(() =>
                     {
-                        if (token.IsCancellationRequested) return;
-                        if (!IsAdded || IsDetached || IsRemoving) return;
-                        if (dp == null) return;
+                        if (token.IsCancellationRequested)
+                            return;
+
+                        if (!IsAdded || IsDetached || IsRemoving)
+                            return;
+
+                        if (dp == null)
+                            return;
 
                         RefreshView<RecipentsView>();
                         PlatformConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, dp.Id, dp.IsReadByCurrent, dp.IsReadByAnyone));
@@ -778,7 +839,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 catch (Exception ex)
                 {
-                    CommonConfig.Logger.Error($"Marking document as read failed [folder.name={f?.Name}, folder.id={f?.Id}, documentPreviewId={dp?.Id}]", ex);
+                    CommonConfig.Logger.Error($"Marking document as read failed [documentPreviewId={dp?.Id}]", ex);
                 }
             });
         }
@@ -810,8 +871,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 FolderId = FolderId,
                 Folder = Folder,
                 DocumentId = DocumentId,
-                DocumentPreview = DocumentPreview,
-                Document = Document
+                DocumentPreview = DocumentPreview
             };
         }
 
@@ -824,7 +884,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Folder = dfs.Folder;
                 DocumentId = dfs.DocumentId;
                 DocumentPreview = dfs.DocumentPreview;
-                Document = dfs.Document;
             }
         }
 
@@ -843,8 +902,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int? DocumentId { get; set; }
 
             public DocumentPreview DocumentPreview { get; set; }
-
-            public Document Document { get; set; }
         }
     }
 }

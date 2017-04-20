@@ -404,9 +404,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 else
                 {
-                    var i = new Intent(Activity, typeof(DocumentActivity));
-                    i.PutExtra(DocumentActivity.FolderIntentKey, SerializationUtils.Serialize(Folder));
-                    i.PutExtra(DocumentActivity.DocumentPreviewIntentKey, SerializationUtils.Serialize(documentPreview));
+                    var i = new Intent(Activity, typeof(SwipeDocumentActivity));
+                    i.PutExtra(SwipeDocumentActivity.FolderIntentKey, SerializationUtils.Serialize(Folder));
+                    i.PutExtra(SwipeDocumentActivity.DocumentPreviewIntentKey, SerializationUtils.Serialize(documentPreview));
                     StartActivity(i);
                 }
             }

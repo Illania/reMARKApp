@@ -593,7 +593,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (widthConstraint != null)
             {
                 widthConstraint.Constant = webView.ScrollView.ContentSize.Width;
-                CommonConfig.Logger.Trace($"H={heightConstraint.Constant}, W={widthConstraint.Constant}");
+                if (CommonConfig.Logger.IsTraceEnabled())
+                    CommonConfig.Logger.Trace($"H={heightConstraint.Constant}, W={widthConstraint.Constant}");
             }
         }
 

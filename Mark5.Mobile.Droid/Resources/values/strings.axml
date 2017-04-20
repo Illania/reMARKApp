@@ -68,6 +68,8 @@
 	<string name="disable_notifications_folder">Disable notifications</string>
 	<string name="disabling_notifications_folders">Disabling notifications...</string>
 	<string name="document">Email</string>
+	<string name="document_previous">Previous</string>
+	<string name="document_next">Next</string>
 	<string name="documents">Emails</string>
 	<string name="done">Done</string>
 	<string name="edit">Edit</string>

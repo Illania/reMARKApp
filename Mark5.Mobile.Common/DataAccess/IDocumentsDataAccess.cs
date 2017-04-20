@@ -21,6 +21,8 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId, int endId, int maxItems);
 
+        Task<List<int>> GetNeighbourDocumentsIdAsync(Folder folder, int documentId, bool getPrevious, bool getNext, int maxItems);
+
         Task SaveDocumentAsync(Document document);
 
         Task<Document> GetDocumentAsync(int documentId);
