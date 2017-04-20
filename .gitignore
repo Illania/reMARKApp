@@ -6,3 +6,4 @@ obj
 bin
 Resource.designer.cs
 project.lock.json
+.idea
