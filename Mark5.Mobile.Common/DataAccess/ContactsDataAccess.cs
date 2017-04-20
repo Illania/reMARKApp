@@ -84,7 +84,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     }
 
                     contactPreviews = result;
-                    
+
                     startRowId = startRowId < 1 ? 1 : startRowId;
                     foreach (var contactPreview in contactPreviews)
                     {
@@ -477,13 +477,13 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var queryString = $"select {nameof(FolderContactLink.FolderId)} " +
-                        $"from {nameof(FolderContactLink)} " +
-                        $"where {nameof(FolderContactLink.ContactId)} not in (select {nameof(Contact.Id)} from {nameof(Contact)})";
+                    var queryString = $"select {nameof(FolderContactLink.FolderId)} as '{nameof(IdValue.Id)}'" +
+                                      $"   from {nameof(FolderContactLink)}" +
+                                      $"   where {nameof(FolderContactLink.ContactId)} not in (select {nameof(Contact.Id)} from {nameof(Contact)})";
 
-                    var result = c.Query<int>(queryString);
+                    var result = c.Query<IdValue>(queryString);
 
-                    fIds = result.ToList();
+                    fIds = result.Select(v => v.Id).ToList();
                 });
 
                 return fIds;
@@ -518,20 +518,21 @@ namespace Mark5.Mobile.Common.DataAccess
         {
             try
             {
-                var contactsId = new List<int>();
+                var contactIds = new List<int>();
 
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var folderCondition = $"{ nameof(FolderContactLink.FolderId)} = ? ";
-                    var inCondition = $"{ nameof(FolderContactLink.ContactId) }   not in (select { nameof(Contact.Id)}   from { nameof(Contact)})";
-                    var queryString = $"select {nameof(FolderContactLink.ContactId)} from {nameof(FolderContactLink)} " +
-                        $"where {folderCondition} and {inCondition}";
+                    var folderCondition = $"{ nameof(FolderContactLink.FolderId)} = ?";
+                    var inCondition = $"{nameof(FolderContactLink.ContactId)} not in (select {nameof(Contact.Id)} from { nameof(Contact)})";
+                    var queryString = $"select {nameof(FolderContactLink.ContactId)} as '{nameof(IdValue.Id)}'" +
+                                      $"   from {nameof(FolderContactLink)}" +
+                                      $"   where {folderCondition} and {inCondition}";
 
-                    var result = c.Query<int>(queryString, folderId);
-                    contactsId = result.ToList();
+                    var result = c.Query<IdValue>(queryString, folderId);
+                    contactIds = result.Select(v => v.Id).ToList();
                 });
 
-                return contactsId;
+                return contactIds;
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
@@ -575,22 +576,22 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                   var commandString = $"select CP.{nameof(ContactPreview.Name)} as {nameof(PrintableSuggestion.Name)}," +
-                      $" CP.{nameof(ContactPreview.ShortId)} as {nameof(PrintableSuggestion.ShortId)}, " +
-                        $" CP.{nameof(ContactPreview.Description)} as {nameof(PrintableSuggestion.ContactDescription)}, " +
-                        $" CA.{nameof(ContactCommunicationAddress.Address)} as {nameof(PrintableSuggestion.Address)}, " +
-                        $" CA.{nameof(ContactCommunicationAddress.Description)} as {nameof(PrintableSuggestion.AddressDescription)} " +
-                        $" from {nameof(ContactPreview)} CP inner join {nameof(ContactCommunicationAddress)} CA" +
-                        $" on CP.{nameof(ContactPreview.Id)} = CA.{nameof(ContactCommunicationAddress.ContactId)}" +
-                        $" where (CA.{nameof(ContactCommunicationAddress.Type)} = @addressType) AND " +
-                        $" ((CP.{nameof(ContactPreview.Name)} like @phrase) OR (CP.{nameof(ContactPreview.ShortId)} like @phrase)" +
-                        $" OR (CA.{nameof(ContactCommunicationAddress.Address)} like @phrase))  " +
-                        "COLLATE Nocase";
-                   var cmd = c.CreateCommand(commandString);
-                   cmd.Bind("@phrase", $"%{phrase}%");
-                   cmd.Bind("@addressType", (int)CommunicationAddressType.Email);
-                   var result = cmd.ExecuteQuery<PrintableSuggestion>();
-                   suggestions = result;
+                    var commandString = $"select CP.{nameof(ContactPreview.Name)} as {nameof(PrintableSuggestion.Name)}," +
+                       $" CP.{nameof(ContactPreview.ShortId)} as {nameof(PrintableSuggestion.ShortId)}, " +
+                         $" CP.{nameof(ContactPreview.Description)} as {nameof(PrintableSuggestion.ContactDescription)}, " +
+                         $" CA.{nameof(ContactCommunicationAddress.Address)} as {nameof(PrintableSuggestion.Address)}, " +
+                         $" CA.{nameof(ContactCommunicationAddress.Description)} as {nameof(PrintableSuggestion.AddressDescription)} " +
+                         $" from {nameof(ContactPreview)} CP inner join {nameof(ContactCommunicationAddress)} CA" +
+                         $" on CP.{nameof(ContactPreview.Id)} = CA.{nameof(ContactCommunicationAddress.ContactId)}" +
+                         $" where (CA.{nameof(ContactCommunicationAddress.Type)} = @addressType) AND " +
+                         $" ((CP.{nameof(ContactPreview.Name)} like @phrase) OR (CP.{nameof(ContactPreview.ShortId)} like @phrase)" +
+                         $" OR (CA.{nameof(ContactCommunicationAddress.Address)} like @phrase))  " +
+                         "COLLATE Nocase";
+                    var cmd = c.CreateCommand(commandString);
+                    cmd.Bind("@phrase", $"%{phrase}%");
+                    cmd.Bind("@addressType", (int)CommunicationAddressType.Email);
+                    var result = cmd.ExecuteQuery<PrintableSuggestion>();
+                    suggestions = result;
                 });
 
                 return suggestions;
