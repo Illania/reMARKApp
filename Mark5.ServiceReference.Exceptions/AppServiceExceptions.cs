@@ -57,7 +57,7 @@ namespace Mark5.ServiceReference.Exceptions
                 return "There was a problem communicating with service.";
             }
 
-            return "Unexpected exception.";
+            return "Unexpected exception of type: \"" + ex?.GetType()?.Name + "\", message: \"" + ex?.Message + "\" occured.";
         }
 
         public override string ToString()
