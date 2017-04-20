@@ -260,12 +260,13 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
-                    var queryString = $"select {nameof(FolderShortcodeLink.FolderId)} from {nameof(FolderShortcodeLink)} where  {nameof(FolderShortcodeLink.ShortcodeId)}  " +
-                        $" not in (select {nameof(Shortcode.Id)} from {nameof(Shortcode)})";
+                    var queryString = $"select {nameof(FolderShortcodeLink.FolderId)} as '{nameof(IdValue.Id)}'" +
+                                      $"   from {nameof(FolderShortcodeLink)}" +
+                                      $"   where {nameof(FolderShortcodeLink.ShortcodeId)} not in (select {nameof(Shortcode.Id)} from {nameof(Shortcode)})";
 
-                    var result = c.Query<int>(queryString);
+                    var result = c.Query<IdValue>(queryString);
 
-                    fIds = result.ToList();
+                    fIds = result.Select(v => v.Id).ToList();
                 });
 
                 return fIds;
@@ -301,20 +302,21 @@ namespace Mark5.Mobile.Common.DataAccess
         {
             try
             {
-                var shortcodesId = new List<int>();
+                var shortcodeIds = new List<int>();
 
                 await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
-                    var folderCondition = $"{ nameof(FolderShortcodeLink.FolderId)} = ? ";
-                    var inCondition = $"{ nameof(FolderShortcodeLink.ShortcodeId) }   not in (select { nameof(Shortcode.Id)}   from { nameof(Shortcode)})";
-                    var queryString = $"select {nameof(FolderShortcodeLink.ShortcodeId)} from {nameof(FolderShortcodeLink)} " +
-                        $"where {folderCondition} and {inCondition}";
+                    var folderCondition = $"{ nameof(FolderShortcodeLink.FolderId)} = ?";
+                    var inCondition = $"{nameof(FolderShortcodeLink.ShortcodeId)} not in (select {nameof(Shortcode.Id)} from { nameof(Shortcode)})";
+                    var queryString = $"select {nameof(FolderShortcodeLink.ShortcodeId)} as '{nameof(IdValue.Id)}'" +
+                                      $"   from {nameof(FolderShortcodeLink)}" +
+                                      $"   where {folderCondition} and {inCondition}";
 
-                    var result = c.Query<int>(queryString, folderId);
-                    shortcodesId = result.ToList();
+                    var result = c.Query<IdValue>(queryString, folderId);
+                    shortcodeIds = result.Select(v => v.Id).ToList();
                 });
 
-                return shortcodesId;
+                return shortcodeIds;
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {

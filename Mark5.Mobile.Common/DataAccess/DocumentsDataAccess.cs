@@ -744,12 +744,13 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var queryString = $"select {nameof(FolderDocumentLink.FolderId)} from {nameof(FolderDocumentLink)} where  {nameof(FolderDocumentLink.DocumentId)}  " +
-                        $" not in (select {nameof(Document.Id)} from {nameof(Document)})";
+                    var queryString = $"select {nameof(FolderDocumentLink.FolderId)} as '{nameof(IdValue.Id)}'" +
+                                      $"   from {nameof(FolderDocumentLink)}" +
+                                      $"   where {nameof(FolderDocumentLink.DocumentId)} not in (select {nameof(Document.Id)} from {nameof(Document)})";
 
-                    var result = c.Query<int>(queryString);
+                    var result = c.Query<IdValue>(queryString);
 
-                    fIds = result.ToList();
+                    fIds = result.Select(v => v.Id).ToList();
                 });
 
                 return fIds;
@@ -788,13 +789,14 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var folderCondition = $"{ nameof(FolderDocumentLink.FolderId)} = ? ";
-                    var inCondition = $"{ nameof(FolderDocumentLink.DocumentId) }   not in (select { nameof(Document.Id)}   from { nameof(Document)})";
-                    var queryString = $"select {nameof(FolderDocumentLink.DocumentId)} from {nameof(FolderDocumentLink)} " +
-                        $"where {folderCondition} and {inCondition}";
+                    var folderCondition = $"{ nameof(FolderDocumentLink.FolderId)} = ?";
+                    var inCondition = $"{nameof(FolderDocumentLink.DocumentId)} not in (select {nameof(Document.Id)} from { nameof(Document)})";
+                    var queryString = $"select {nameof(FolderDocumentLink.DocumentId)} as '{nameof(IdValue.Id)}'" +
+                                      $"   from {nameof(FolderDocumentLink)}" +
+                                      $"   where {folderCondition} and {inCondition}";
 
-                    var result = c.Query<int>(queryString, folderId);
-                    documentIds = result.ToList();
+                    var result = c.Query<IdValue>(queryString, folderId);
+                    documentIds = result.Select(v => v.Id).ToList();
                 });
 
                 return documentIds;
