@@ -232,6 +232,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         SearchContactsCriteria GetCriteria()
         {
             subviews.ForEach(v => v.UpdateCriteria());
+
+            searchCriteria.MaxToFetch = PlatformConfig.Preferences.MaxContactsToSearch;
+
             return searchCriteria;
         }
 

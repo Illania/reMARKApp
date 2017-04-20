@@ -26,10 +26,6 @@ namespace Mark5.Mobile.Common.Managers
 
         public DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; } = DocumentBodyTypeRequest.HtmlOnly;
 
-        public int MaxDocumentsToFetch { get; set; } = 100;
-        public int MaxContactsToFetch { get; set; } = 100;
-        public int MaxShortcodesToFetch { get; set; } = 100;
-
         public SearchManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy)
                 : base(connectionInfo, appServiceProxy)
         {
@@ -67,7 +63,7 @@ namespace Mark5.Mobile.Common.Managers
                 {
                     Token = Token,
                     SavedSearchFilterHash = criteria.SavedSearchFilterHash,
-                    MaxToFetch = MaxDocumentsToFetch,
+                    MaxToFetch = criteria.MaxToFetch,
                     SubjectMessageField = criteria.SubjectMessageField,
                     SubjectMessageClause = criteria.SubjectMessageClause.ConvertEnum<DataContract.SubjectMessageClause>(),
                     FromToField = criteria.FromToField,
@@ -117,7 +113,7 @@ namespace Mark5.Mobile.Common.Managers
                 {
                     Token = Token,
                     SavedSearchFilterHash = criteria.SavedSearchFilterHash,
-                    MaxToFetch = MaxContactsToFetch,
+                    MaxToFetch = criteria.MaxToFetch,
                     Name = criteria.Name,
                     FirstName = criteria.FirstName,
                     LastName = criteria.LastName,
@@ -157,7 +153,7 @@ namespace Mark5.Mobile.Common.Managers
                 {
                     Token = Token,
                     SavedSearchFilterHash = criteria.SavedSearchFilterHash,
-                    MaxToFetch = MaxShortcodesToFetch,
+                    MaxToFetch = criteria.MaxToFetch,
                     Name = criteria.Name,
                     Description = criteria.Description,
                     Address = criteria.Address,

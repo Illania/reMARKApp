@@ -257,6 +257,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         SearchDocumentsCriteria GetCriteria()
         {
             subviews.ForEach(v => v.UpdateCriteria());
+
+            searchCriteria.MaxToFetch = PlatformConfig.Preferences.MaxDocumentsToSearch;
+
             return searchCriteria;
         }
 

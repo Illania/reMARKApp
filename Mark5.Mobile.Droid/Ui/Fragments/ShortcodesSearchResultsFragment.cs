@@ -142,6 +142,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
                 }
 
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug($"Retrieved {shortcodePreviews.Count} items");
+
                 adapter.AppendItems(shortcodePreviews);
             }
             catch (Exception ex)

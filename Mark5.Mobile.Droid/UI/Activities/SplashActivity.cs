@@ -108,10 +108,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
 
-                Managers.SearchManager.MaxDocumentsToFetch = PlatformConfig.Preferences.MaxDocumentsToSearch;
-                Managers.SearchManager.MaxContactsToFetch = PlatformConfig.Preferences.MaxContactsToSearch;
-                Managers.SearchManager.MaxShortcodesToFetch = PlatformConfig.Preferences.MaxShortcodesToSearch;
-
                 var policies = Managers.DownloadManager.DownloadPolicies;
                 policies[ObjectType.Document] = new DownloadFoldersPolicy();
                 if (PlatformConfig.Preferences.SynchroniseContacts)

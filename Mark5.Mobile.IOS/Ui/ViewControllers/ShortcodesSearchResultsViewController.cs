@@ -383,6 +383,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var results = await Managers.SearchManager.SearchShortcodesAsync(Criteria);
 
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug($"Retrieved {results.Count} items");
+
                 var ds = (DataSource)tableView.Source;
                 ds.AppendItems(results);
             }

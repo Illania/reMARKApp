@@ -304,19 +304,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
             }
-            if (key == GetString(Resource.String.pref_key_search_documents_to_get))
-            {
-                Managers.SearchManager.MaxDocumentsToFetch = PlatformConfig.Preferences.MaxDocumentsToSearch;
-            }
-
-            if (key == GetString(Resource.String.pref_key_search_contacts_to_get))
-            {
-                Managers.SearchManager.MaxContactsToFetch = PlatformConfig.Preferences.MaxContactsToSearch;
-            }
-            if (key == GetString(Resource.String.pref_key_search_shortcodes_to_get))
-            {
-                Managers.SearchManager.MaxShortcodesToFetch = PlatformConfig.Preferences.MaxShortcodesToSearch;
-            }
             if (key == GetString(Resource.String.pref_key_contacts_synchronised))
             {
                 if (PlatformConfig.Preferences.SynchroniseContacts)

@@ -176,6 +176,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         SearchShortcodesCriteria GetCriteria()
         {
             subviews.ForEach(v => v.UpdateCriteria());
+
+            searchCriteria.MaxToFetch = PlatformConfig.Preferences.MaxShortcodesToSearch;
+
             return searchCriteria;
         }
 
