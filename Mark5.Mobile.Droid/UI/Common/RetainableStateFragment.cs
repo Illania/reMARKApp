@@ -14,7 +14,7 @@ using Mark5.Mobile.Common;
 namespace Mark5.Mobile.Droid.Ui.Common
 {
 
-    public abstract class RetainableStateFragment : Fragment
+    public abstract class RetainableStateFragment : BaseFragment
     {
 
         const string TagKey = "tag_b474fec8";

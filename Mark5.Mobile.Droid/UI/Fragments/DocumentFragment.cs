@@ -170,8 +170,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             await RefreshData();
 
             if (!IsAdded || IsDetached || IsRemoving) return;
+            if (!UserVisibleHint) return;
 
             MarkAsReadIfNecessary();
+        }
+
+        public override void OnUserVisibilityHintChanged()
+        {
+            base.OnUserVisibilityHintChanged();
+
+            if (UserVisibleHint)
+            {
+                MarkAsReadIfNecessary();
+            }
+            else
+            {
+                setReadStatusCancellationTokenSource?.Cancel();
+                setReadStatusCancellationTokenSource = null;
+            }
         }
 
         public override void OnDestroyedByUser()
@@ -783,31 +799,39 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             Task.Run(async () =>
             {
-                var f = Folder;
                 var d = Document;
                 var dp = DocumentPreview;
                 var token = setReadStatusCancellationTokenSource.Token;
 
                 try
                 {
-                    if (dp.IsReadByCurrent)
-                    {
+                    if (dp == null || d == null)
                         return;
-                    }
+
+                    if (dp.IsReadByCurrent)
+                        return;
 
                     var delaySeconds = PlatformConfig.Preferences.MarkAsReadDelaySeconds;
-                    if (delaySeconds < 0) return;
+                    if (delaySeconds < 0)
+                        return;
 
                     await Task.Delay(delaySeconds * 1000);
 
-                    if (token.IsCancellationRequested) return;
+                    if (token.IsCancellationRequested)
+                        return;
+                    
                     await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true, ServerConfig.SystemSettings.UserInfo.User);
 
                     Activity?.RunOnUiThread(() =>
                     {
-                        if (token.IsCancellationRequested) return;
-                        if (!IsAdded || IsDetached || IsRemoving) return;
-                        if (dp == null) return;
+                        if (token.IsCancellationRequested)
+                            return;
+
+                        if (!IsAdded || IsDetached || IsRemoving)
+                            return;
+
+                        if (dp == null)
+                            return;
 
                         RefreshView<RecipentsView>();
                         PlatformConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, dp.Id, dp.IsReadByCurrent, dp.IsReadByAnyone));
@@ -815,7 +839,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 catch (Exception ex)
                 {
-                    CommonConfig.Logger.Error($"Marking document as read failed [folder.name={f?.Name}, folder.id={f?.Id}, documentPreviewId={dp?.Id}]", ex);
+                    CommonConfig.Logger.Error($"Marking document as read failed [documentPreviewId={dp?.Id}]", ex);
                 }
             });
         }

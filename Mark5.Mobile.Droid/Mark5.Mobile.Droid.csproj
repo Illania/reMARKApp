@@ -375,6 +375,7 @@
     <Compile Include="Ui\Views\MailViewerViews\AttachmentsView.cs" />
     <Compile Include="Ui\Activities\SwipeDocumentActivity.cs" />
     <Compile Include="Ui\Activities\DocumentActivity.cs" />
+    <Compile Include="Ui\Common\BaseFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
