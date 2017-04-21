@@ -5,11 +5,9 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.IOS.Utilities;
 
