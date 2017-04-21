@@ -964,7 +964,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
                     else
                     {
-                        var fromDate = dateRange.StartTimestamp.ConvertTimestampMillisecondsToDateTime();
+                        var fromDate = dateRange.StartTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime();
                         var fromComponents = new NSDateComponents
                         {
                             Day = fromDate.Day,
@@ -989,7 +989,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
                     else
                     {
-                        var toDate = dateRange.EndTimestamp.ConvertTimestampMillisecondsToDateTime();
+                        var toDate = dateRange.EndTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime();
                         var toComponents = new NSDateComponents
                         {
                             Day = toDate.Day,
