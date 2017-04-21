@@ -462,7 +462,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 valueTextFieldSegmentedControl.TranslatesAutoresizingMaskIntoConstraints = false;
                 valueTextFieldSegmentedControl.AddTarget(this, new Selector("segmentedControlChanged:"), UIControlEvent.ValueChanged);
                 valueTextFieldAccessoryView.AddSubview(valueTextFieldSegmentedControl);
-                valueTextFieldAccessoryView.AddConstraints(new[] { 
+                valueTextFieldAccessoryView.AddConstraints(new[] {
                     valueTextFieldSegmentedControl.CenterXAnchor.ConstraintEqualTo(valueTextFieldAccessoryView.CenterXAnchor),
                     valueTextFieldSegmentedControl.CenterYAnchor.ConstraintEqualTo(valueTextFieldAccessoryView.CenterYAnchor),
                     valueTextFieldSegmentedControl.WidthAnchor.ConstraintEqualTo(valueTextFieldAccessoryView.WidthAnchor, 1f, -10f),
@@ -1037,7 +1037,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var fromDate = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, 0, 0, 0, DateTimeKind.Utc);
 
                     dateRange.Enabled = true;
-                    dateRange.StartTimestamp = fromDate.ConvertDateTimeToTimestampMilliseconds();
+                    dateRange.StartTimestamp = fromDate.ConvertServerTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+
+                    if (dateRange.EndTimestamp < 0)
+                    {
+                        var now = DateTime.UtcNow;
+                        var endOfToday = new DateTime(now.Year, now.Month, now.Day, 23, 59, 59, DateTimeKind.Utc);
+                        dateRange.EndTimestamp = endOfToday.ConvertServerTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+                    }
                 }
 
                 if (sender == toDateDoneButton)
@@ -1049,7 +1056,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var toDate = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, 23, 59, 59, DateTimeKind.Utc);
 
                     dateRange.Enabled = true;
-                    dateRange.EndTimestamp = toDate.ConvertDateTimeToTimestampMilliseconds();
+                    dateRange.EndTimestamp = toDate.ConvertServerTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
                 }
 
                 UpdateRow();
@@ -1310,7 +1317,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     Criteria.Priorities = result.ToList();
                 }
-                
+
                 UpdateRow();
             }
         }
