@@ -271,7 +271,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error("Log in failed", ex);
+                CommonConfig.Logger.Error("Log in failed - main exception", ex);
+
+                if (ex.InnerException != null)
+                    CommonConfig.Logger.Error("Log in failed - inner exception", ex.InnerException);
 
                 await Dialogs.ShowConfirmDialogAsync(this, Resource.String.log_in_failed_title, Resource.String.log_in_failed_message);
             }

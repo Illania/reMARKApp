@@ -24,52 +24,48 @@ namespace Mark5.Mobile.Droid.Utilities
         protected override void WriteToLog(LogLevel logLevel, string message, Exception exception, bool includeStackTrace = false)
         {
             if (!Enabled || Level < logLevel)
-            {
                 return;
+
+            var p = LogPriority.Info;
+            switch (logLevel)
+            {
+                case LogLevel.TRACE:
+                    p = LogPriority.Verbose;
+                    break;
+                case LogLevel.DEBUG:
+                    p = LogPriority.Debug;
+                    break;
+                case LogLevel.INFO:
+                    p = LogPriority.Info;
+                    break;
+                case LogLevel.WARNING:
+                    p = LogPriority.Warn;
+                    break;
+                case LogLevel.ERROR:
+                    p = LogPriority.Error;
+                    break;
             }
 
             // Build message
-            var logMessageBuilder = new StringBuilder();
-            //logMessageBuilder.Append ("[").Append (DateTime.Now.ToString ("yyyy-MM-dd HH:mm:ss.ffff")).Append ("] ");
-            //logMessageBuilder.Append("[").Append(logLevel).Append("] ");
-            logMessageBuilder.Append("[").Append(Thread.CurrentThread.ManagedThreadId).Append("] ");
-            logMessageBuilder.Append("[").Append(GetStackInfo(3)).Append("] ");
-            logMessageBuilder.Append(message);
+            Write(p, "[" + Thread.CurrentThread.ManagedThreadId + "] [" + GetStackInfo(3) + "] " + message);
 
             if (includeStackTrace)
             {
 #pragma warning disable XS0001 // Find usages of mono todo items
-                logMessageBuilder.Append("\n Stacktrace: ").Append(new StackTrace(true));
+                Write(p, "Stacktrace:");
+                Write(p, new StackTrace(true).ToString());
 #pragma warning restore XS0001 // Find usages of mono todo items
             }
 
             if (exception != null)
             {
-                logMessageBuilder.AppendLine($"{exception.GetType()}: ").AppendLine(exception.Message).Append(" ").Append(exception.StackTrace);
+                Write(p, "Exception: " + exception.GetType() + ": " + exception.Message);
+                Write(p, "Exception stacktrace:");
+                Write(p, exception.StackTrace ?? "<no stacktrace available>");
             }
-
-            LogPriority priority = LogPriority.Info;
-            switch (logLevel)
-            {
-                case LogLevel.TRACE:
-                    priority = LogPriority.Verbose;
-                    break;
-                case LogLevel.DEBUG:
-                    priority = LogPriority.Debug;
-                    break;
-                case LogLevel.INFO:
-                    priority = LogPriority.Info;
-                    break;
-                case LogLevel.WARNING:
-                    priority = LogPriority.Warn;
-                    break;
-                case LogLevel.ERROR:
-                    priority = LogPriority.Error;
-                    break;
-            }
-
-            Log.WriteLine(priority, Tag, logMessageBuilder.ToString());
         }
+
+        void Write(LogPriority p, string s) => Log.WriteLine(p, Tag, s ?? "");
 
         static string GetStackInfo(int depth)
         {

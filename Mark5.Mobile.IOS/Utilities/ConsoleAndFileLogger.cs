@@ -72,19 +72,13 @@ namespace Mark5.Mobile.IOS.Utilities
             logMessageBuilder.Append("[").Append(logLevel).Append("] ");
             logMessageBuilder.Append("[").Append(Thread.CurrentThread.ManagedThreadId).Append("] ");
             logMessageBuilder.Append("[").Append(GetStackInfo(3)).Append("] ");
-            logMessageBuilder.Append(message);
+            logMessageBuilder.Append(message).Append(" ");
 
             if (includeStackTrace)
-            {
-#pragma warning disable XS0001 // Find usages of mono todo items
-                logMessageBuilder.Append("\n Stacktrace: ").Append(new StackTrace(true));
-#pragma warning restore XS0001 // Find usages of mono todo items
-            }
+                logMessageBuilder.AppendLine("Stacktrace: ").Append(new StackTrace(true));
 
             if (exception != null)
-            {
                 logMessageBuilder.AppendLine($"{exception.GetType()}: ").AppendLine(exception.Message).Append(" ").Append(exception.StackTrace);
-            }
 
             var log = logMessageBuilder.ToString();
 

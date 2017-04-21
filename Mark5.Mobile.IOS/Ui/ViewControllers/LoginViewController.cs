@@ -637,7 +637,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 if (dismissAction != null) dismissAction();
 
-                CommonConfig.Logger.Error("Log in failed", ex);
+                CommonConfig.Logger.Error("Log in failed - exception", ex);
+
+                if (ex.InnerException != null)
+                    CommonConfig.Logger.Error("Log in failed - inner exception", ex.InnerException);
 
                 await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("login_failed"), Localization.GetString("login_failed_desc"));
 
