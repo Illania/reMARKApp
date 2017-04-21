@@ -12,6 +12,7 @@ using Android.Graphics;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -152,18 +153,30 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         void UpdateText()
         {
-            dateRangeFromTextView.Text = fromTimestamp == -1 ? "-" : fromTimestamp.FormatServerTimestampAsDateString(Context);
-            dateRangeToTextView.Text = toTimestamp == -1 ? "-" : toTimestamp.FormatServerTimestampAsDateString(Context);
+            dateRangeFromTextView.Text = fromTimestamp == -1 ? "-" : fromTimestamp.ConvertTimestampMillisecondsToDateTime()
+                                                                                    .ConvertUtcToServerTime()
+                                                                                    .ConvertDateTimeToTimestampMilliseconds()
+                                                                                    .FormatServerTimestampAsDateString(Context);
+            dateRangeToTextView.Text = toTimestamp == -1 ? "-" : toTimestamp.ConvertTimestampMillisecondsToDateTime()
+                                                                                    .ConvertUtcToServerTime()
+                                                                                    .ConvertDateTimeToTimestampMilliseconds()
+                                                                                    .FormatServerTimestampAsDateString(Context);
         }
 
         public void SetFromText(long timestamp)
         {
-            dateRangeFromTextView.Text = timestamp == -1 ? "-" : timestamp.FormatServerTimestampAsDateString(Context);
+            dateRangeFromTextView.Text = timestamp == -1 ? "-" : timestamp.ConvertTimestampMillisecondsToDateTime()
+                                                                                    .ConvertUtcToServerTime()
+                                                                                    .ConvertDateTimeToTimestampMilliseconds()
+                                                                                    .FormatServerTimestampAsDateString(Context);
         }
 
         public void SetToText(long timestamp)
         {
-            dateRangeToTextView.Text = timestamp == -1 ? "-" : timestamp.FormatServerTimestampAsDateString(Context);
+            dateRangeToTextView.Text = timestamp == -1 ? "-" : timestamp.ConvertTimestampMillisecondsToDateTime()
+                                                                                    .ConvertUtcToServerTime()
+                                                                                    .ConvertDateTimeToTimestampMilliseconds()
+                                                                                    .FormatServerTimestampAsDateString(Context);
         }
     }
 }

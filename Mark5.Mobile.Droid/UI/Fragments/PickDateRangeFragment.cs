@@ -20,6 +20,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.SearchViews;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -27,8 +28,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         DocumentPickDateHeaderView dateHeaderView;
 
-        CalendarView fromCalendar;
-        CalendarView toCalendar;
+        CalendarView fromCalendarView;
+        CalendarView toCalendarView;
 
         public Action<long, long> CloseRequest { get; set; }
         public bool StartWithToDate { get; set; }
@@ -51,18 +52,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             dateHeaderView.ToClicked += DateView_ToClicked;
             containerLinearLayout.AddView(dateHeaderView);
 
-            fromCalendar = new CalendarView(Context);
-            fromCalendar.LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            fromCalendar.Date = DateTime.UtcNow.Date.ConvertDateTimeToTimestampMilliseconds();
-            fromCalendar.Visibility = ViewStates.Gone;
-            fromCalendar.DateChange += FromDatePicker_DateChange;
-            containerLinearLayout.AddView(fromCalendar);
+            fromCalendarView = new CalendarView(Context);
+            fromCalendarView.LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            fromCalendarView.Date = DateTime.UtcNow.Date.ConvertDateTimeToTimestampMilliseconds();
+            fromCalendarView.Visibility = ViewStates.Gone;
+            fromCalendarView.DateChange += FromDatePicker_DateChange;
+            containerLinearLayout.AddView(fromCalendarView);
 
-            toCalendar = new CalendarView(Context);
-            toCalendar.LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            toCalendar.Visibility = ViewStates.Gone;
-            toCalendar.DateChange += ToDatePicker_DateChange;
-            containerLinearLayout.AddView(toCalendar);
+            toCalendarView = new CalendarView(Context);
+            toCalendarView.LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            toCalendarView.Visibility = ViewStates.Gone;
+            toCalendarView.DateChange += ToDatePicker_DateChange;
+            containerLinearLayout.AddView(toCalendarView);
 
             HasOptionsMenu = false;
 
@@ -81,36 +82,61 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnResume()
         {
             base.OnResume();
-            Initialize();
-        }
 
-        void Initialize()
-        {
-            var todayTimeStamp = DateTime.UtcNow.Date.ConvertDateTimeToTimestampMilliseconds();
+            var now = DateTime.Now;
 
-            fromCalendar.MaxDate = todayTimeStamp;
-            toCalendar.MaxDate = todayTimeStamp;
+            var fromLimitCalendar = Java.Util.Calendar.Instance;
+            fromLimitCalendar.Set(Java.Util.CalendarField.Year, now.Year);
+            fromLimitCalendar.Set(Java.Util.CalendarField.Month, now.Month - 1);
+            fromLimitCalendar.Set(Java.Util.CalendarField.DayOfMonth, now.Day);
+            fromLimitCalendar.Set(Java.Util.CalendarField.HourOfDay, 0);
+            fromLimitCalendar.Set(Java.Util.CalendarField.Minute, 0);
+            fromLimitCalendar.Set(Java.Util.CalendarField.Second, 0);
 
-            fromCalendar.Date = FromTimestamp == -1 ? todayTimeStamp : FromTimestamp;
-            toCalendar.Date = ToTimestamp == -1 ? todayTimeStamp : ToTimestamp;
+            var toLimitCalendar = Java.Util.Calendar.Instance;
+            toLimitCalendar.Set(Java.Util.CalendarField.Year, now.Year);
+            toLimitCalendar.Set(Java.Util.CalendarField.Month, now.Month - 1);
+            toLimitCalendar.Set(Java.Util.CalendarField.DayOfMonth, now.Day);
+            toLimitCalendar.Set(Java.Util.CalendarField.HourOfDay, 23);
+            toLimitCalendar.Set(Java.Util.CalendarField.Minute, 59);
+            toLimitCalendar.Set(Java.Util.CalendarField.Second, 59);
+
+            fromCalendarView.MaxDate = toLimitCalendar.TimeInMillis;
+            toCalendarView.MaxDate = toLimitCalendar.TimeInMillis;
+
+            var fromDate = FromTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime();
+            var fromDateCalendar = Java.Util.Calendar.Instance;
+            fromDateCalendar.Set(Java.Util.CalendarField.Year, fromDate.Year);
+            fromDateCalendar.Set(Java.Util.CalendarField.Month, fromDate.Month - 1);
+            fromDateCalendar.Set(Java.Util.CalendarField.DayOfMonth, fromDate.Day);
+            fromDateCalendar.Set(Java.Util.CalendarField.HourOfDay, 0);
+            fromDateCalendar.Set(Java.Util.CalendarField.Minute, 0);
+            fromDateCalendar.Set(Java.Util.CalendarField.Second, 1);
+
+            var toDate = ToTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime();
+            var toDateCalendar = Java.Util.Calendar.Instance;
+            toDateCalendar.Set(Java.Util.CalendarField.Year, toDate.Year);
+            toDateCalendar.Set(Java.Util.CalendarField.Month, toDate.Month - 1);
+            toDateCalendar.Set(Java.Util.CalendarField.DayOfMonth, toDate.Day);
+            toDateCalendar.Set(Java.Util.CalendarField.HourOfDay, 23);
+            toDateCalendar.Set(Java.Util.CalendarField.Minute, 59);
+            toDateCalendar.Set(Java.Util.CalendarField.Second, 59);
+
+            fromCalendarView.Date = FromTimestamp == -1 ? fromLimitCalendar.TimeInMillis : fromDateCalendar.TimeInMillis;
+            toCalendarView.Date = ToTimestamp == -1 ? toLimitCalendar.TimeInMillis : toDateCalendar.TimeInMillis;
 
             UpdateDatePickersLimits();
-
             UpdateText();
 
             if (StartWithToDate)
-            {
                 SelectTo();
-            }
             else
-            {
                 SelectFrom();
-            }
         }
 
         void DateView_FromClicked(object sender, EventArgs e)
         {
-            if (fromCalendar.Visibility == ViewStates.Visible)
+            if (fromCalendarView.Visibility == ViewStates.Visible)
                 return;
 
             SelectFrom();
@@ -118,7 +144,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void DateView_ToClicked(object sender, EventArgs e)
         {
-            if (toCalendar.Visibility == ViewStates.Visible)
+            if (toCalendarView.Visibility == ViewStates.Visible)
                 return;
 
             SelectTo();
@@ -126,23 +152,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void SelectFrom()
         {
-            fromCalendar.Visibility = ViewStates.Visible;
-            toCalendar.Visibility = ViewStates.Gone;
+            fromCalendarView.Visibility = ViewStates.Visible;
+            toCalendarView.Visibility = ViewStates.Gone;
 
             dateHeaderView.PickFrom();
         }
 
         void SelectTo()
         {
-            fromCalendar.Visibility = ViewStates.Gone;
-            toCalendar.Visibility = ViewStates.Visible;
+            fromCalendarView.Visibility = ViewStates.Gone;
+            toCalendarView.Visibility = ViewStates.Visible;
 
             dateHeaderView.PickTo();
         }
 
         void FromDatePicker_DateChange(object sender, CalendarView.DateChangeEventArgs e)
         {
-            FromTimestamp = new DateTime(e.Year, e.Month + 1, e.DayOfMonth, 0, 0, 1, DateTimeKind.Utc).ConvertDateTimeToTimestampMilliseconds();
+            FromTimestamp = new DateTime(e.Year, e.Month + 1, e.DayOfMonth, 0, 0, 0, DateTimeKind.Unspecified)
+                            .ConvertServerTimeToUtc()
+                            .ConvertDateTimeToTimestampMilliseconds();
 
             UpdateText();
             UpdateDatePickersLimits();
@@ -152,7 +180,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void ToDatePicker_DateChange(object sender, CalendarView.DateChangeEventArgs e)
         {
-            ToTimestamp = new DateTime(e.Year, e.Month + 1, e.DayOfMonth, 23, 59, 59, DateTimeKind.Utc).ConvertDateTimeToTimestampMilliseconds();
+            ToTimestamp = new DateTime(e.Year, e.Month + 1, e.DayOfMonth, 23, 59, 59, DateTimeKind.Unspecified)
+                            .ConvertServerTimeToUtc()
+                            .ConvertDateTimeToTimestampMilliseconds();
 
             UpdateText();
             CloseFragment();
@@ -168,7 +198,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (FromTimestamp != -1)
             {
-                toCalendar.MinDate = FromTimestamp;
+                var fromDate = FromTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime();
+                var fromDateCalendar = Java.Util.Calendar.Instance;
+                fromDateCalendar.Set(Java.Util.CalendarField.Year, fromDate.Year);
+                fromDateCalendar.Set(Java.Util.CalendarField.Month, fromDate.Month - 1);
+                fromDateCalendar.Set(Java.Util.CalendarField.DayOfMonth, fromDate.Day);
+                fromDateCalendar.Set(Java.Util.CalendarField.HourOfDay, 0);
+                fromDateCalendar.Set(Java.Util.CalendarField.Minute, 0);
+                fromDateCalendar.Set(Java.Util.CalendarField.Second, 1);
+
+                toCalendarView.MinDate = fromDateCalendar.TimeInMillis;
+
+                if (toCalendarView.Date < toCalendarView.MinDate)
+                    toCalendarView.Date = toCalendarView.MinDate;
             }
         }
 
@@ -186,7 +228,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 FromTimestamp = FromTimestamp,
                 ToTimestamp = ToTimestamp,
-                StartWithToDate = toCalendar.Visibility == ViewStates.Visible,
+                StartWithToDate = toCalendarView.Visibility == ViewStates.Visible,
             };
         }
 

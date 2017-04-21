@@ -10,14 +10,17 @@ using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
+    
     public class DocumentDateRangeSearchView : AbstractSearchView<SearchDocumentsCriteria>
     {
+        
         long fromTimestamp = -1;
         long toTimestamp = -1;
 
@@ -102,6 +105,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
             UpdateText();
         }
+
         void OpenDateRangeFragment(bool startWithTo)
         {
             var f = new PickDateRangeFragment
@@ -114,38 +118,29 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             parentFragment.ReplaceFragment(f, f.GenerateTag());
         }
 
-        void UpdateTimestamps(long fromT, long toT)
+        void UpdateTimestamps(long fromTimestamp, long toTimestamp)
         {
-            fromTimestamp = fromT;
-            toTimestamp = toT;
+            this.fromTimestamp = fromTimestamp;
+            this.toTimestamp = toTimestamp;
+
             UpdateText();
             UpdateCriteria();
         }
 
-        void From_Click(object sender, EventArgs e)
-        {
-            OpenDateRangeFragment(false);
-        }
+        void From_Click(object sender, EventArgs e) => OpenDateRangeFragment(false);
 
-        void To_Click(object sender, EventArgs e)
-        {
-            OpenDateRangeFragment(true);
-        }
+        void To_Click(object sender, EventArgs e) => OpenDateRangeFragment(true);
 
         void UpdateText()
         {
-            dateRangeFromTextView.Text = fromTimestamp == -1 ? "-" : fromTimestamp.FormatServerTimestampAsDateString(Context);
-            dateRangeToTextView.Text = toTimestamp == -1 ? "-" : toTimestamp.FormatServerTimestampAsDateString(Context);
-        }
-
-        public void SetFromText(long timestamp)
-        {
-            dateRangeFromTextView.Text = timestamp == -1 ? "-" : timestamp.FormatServerTimestampAsDateString(Context);
-        }
-
-        public void SetToText(long timestamp)
-        {
-            dateRangeToTextView.Text = timestamp == -1 ? "-" : timestamp.FormatServerTimestampAsDateString(Context);
+            dateRangeFromTextView.Text = fromTimestamp == -1 ? "-" : fromTimestamp.ConvertTimestampMillisecondsToDateTime()
+                                                                                    .ConvertUtcToServerTime()
+                                                                                    .ConvertDateTimeToTimestampMilliseconds()
+                                                                                    .FormatServerTimestampAsDateString(Context);
+            dateRangeToTextView.Text = toTimestamp == -1 ? "-" : toTimestamp.ConvertTimestampMillisecondsToDateTime()
+                                                                                .ConvertUtcToServerTime()
+                                                                                .ConvertDateTimeToTimestampMilliseconds()
+                                                                                .FormatServerTimestampAsDateString(Context);
         }
 
         public override void Refresh()

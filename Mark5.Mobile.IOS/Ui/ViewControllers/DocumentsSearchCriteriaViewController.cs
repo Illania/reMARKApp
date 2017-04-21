@@ -1041,8 +1041,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     if (dateRange.EndTimestamp < 0)
                     {
-                        var now = DateTime.UtcNow;
-                        var endOfToday = new DateTime(now.Year, now.Month, now.Day, 23, 59, 59, DateTimeKind.Utc);
+                        var now = DateTime.Now;
+                        var endOfToday = new DateTime(now.Year, now.Month, now.Day, 23, 59, 59, DateTimeKind.Unspecified);
                         dateRange.EndTimestamp = endOfToday.ConvertServerTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
                     }
                 }
