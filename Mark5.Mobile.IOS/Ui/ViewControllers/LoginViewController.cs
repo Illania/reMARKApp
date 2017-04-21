@@ -551,7 +551,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return;
                 }
 
-                CommonConfig.Logger.Info("Logging in...");
+                CommonConfig.Logger.Info($"Logging in... [username={username}, hostname={hostname}, port={port}, ssl={sslMode}]");
 
                 usernameTextField.ResignFirstResponder();
                 passwordTextField.ResignFirstResponder();
