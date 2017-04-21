@@ -19,15 +19,7 @@ namespace Mark5.Mobile.Droid.Utilities
     public class SSLCertificateVerificationManager
     {
 
-        readonly RemoteCertificateValidationCallback remoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
-        {
-            var certificate2 = new X509Certificate2(certificate);
-            var now = DateTime.Now;
-            var valid = true;
-            valid &= certificate2.NotAfter > now;
-            valid &= certificate2.NotBefore < now;
-            return valid;
-        };
+        readonly RemoteCertificateValidationCallback remoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => { return true; };
 
         public void EnableSelfSignedCertificates()
         {
