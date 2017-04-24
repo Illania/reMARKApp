@@ -631,7 +631,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
-                var mimeType = Context.ContentResolver.GetType(uri);
+                var mimeType = MimeTypeMap.GetMimeType(System.IO.Path.GetExtension(path));
 
                 var openFileIntent = new Intent(Intent.ActionView);
                 openFileIntent.SetDataAndType(uri, mimeType);
@@ -680,7 +680,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
-                var mimeType = Context.ContentResolver.GetType(uri);
+                var mimeType = MimeTypeMap.GetMimeType(System.IO.Path.GetExtension(path));
 
                 ShareCompat.IntentBuilder.From(Activity).SetType(mimeType).SetStream(uri).StartChooser();
             }
@@ -819,7 +819,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     if (token.IsCancellationRequested)
                         return;
-                    
+
                     await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true, ServerConfig.SystemSettings.UserInfo.User);
 
                     Activity?.RunOnUiThread(() =>
