@@ -631,7 +631,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
-                var mimeType = Context.ContentResolver.GetType(uri);
+                var mimeType = MimeTypeMap.GetMimeType(System.IO.Path.GetExtension(path));
 
                 var openFileIntent = new Intent(Intent.ActionView);
                 openFileIntent.SetDataAndType(uri, mimeType);

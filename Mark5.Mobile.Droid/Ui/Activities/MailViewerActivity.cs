@@ -29,6 +29,7 @@ using Mark5.Mobile.Droid.Model.Exceptions;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.MailViewerViews;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -229,7 +230,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var attFile = await CreateTempFile(att.FilenameOriginal, att.GetData());
 
                 var uri = FileProvider.GetUriForFile(this, PackageName + ".fileprovider", attFile);
-                var mimeType = ContentResolver.GetType(uri);
+                var mimeType = MimeTypeMap.GetMimeType(Path.GetExtension(att.FilenameOriginal));
 
                 var openFileIntent = new Intent(Intent.ActionView);
                 openFileIntent.SetDataAndType(uri, mimeType);
