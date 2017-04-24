@@ -261,7 +261,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var attFile = await CreateTempFile(att.FilenameOriginal, att.GetData());
 
                 var uri = FileProvider.GetUriForFile(this, PackageName + ".fileprovider", attFile);
-                var mimeType = ContentResolver.GetType(uri);
+                var mimeType = MimeTypeMap.GetMimeType(Path.GetExtension(att.FilenameOriginal));
 
                 ShareCompat.IntentBuilder.From(this).SetType(mimeType).SetStream(uri).StartChooser();
 
