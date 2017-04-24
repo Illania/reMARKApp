@@ -719,27 +719,5 @@ namespace Mark5.Mobile.Droid.Utilities
 
             return _mappings.Value.TryGetValue(extension, out mime) ? mime : "application/octet-stream";
         }
-
-        public static string GetExtension(string mimeType)
-        {
-            if (mimeType == null)
-            {
-                throw new ArgumentNullException(nameof(mimeType));
-            }
-
-            if (mimeType.StartsWith(".", StringComparison.InvariantCultureIgnoreCase))
-            {
-                throw new ArgumentException("Requested mime type is not valid: " + mimeType);
-            }
-
-            string extension;
-
-            if (_mappings.Value.TryGetValue(mimeType, out extension))
-            {
-                return extension;
-            }
-
-            throw new ArgumentException("Requested mime type is not registered: " + mimeType);
-        }
     }
 }
