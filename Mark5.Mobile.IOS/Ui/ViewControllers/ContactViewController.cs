@@ -1435,9 +1435,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var cic = (ContactInfoTableViewCell)cell;
                     cic.Initialize(Localization.GetString("birthdate").ToUpper(), Contact.BirthDateTimestamp
                                                                                      .ConvertTimestampMillisecondsToDateTime()
-                                                                                     .ConvertUtcToServerTime()
+                                                                                     .ConvertUtcToUserTime()
                                                                                      .ConvertDateTimeToTimestampMilliseconds()
-                                                                                     .FormatServerTimestampAsLongDateString());
+                                                                                     .FormatUserTimestampAsLongDateString());
                 }
             }
 

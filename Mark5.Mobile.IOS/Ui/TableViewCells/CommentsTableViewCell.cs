@@ -62,9 +62,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                                   ? Localization.GetString("me")
                                   : comment.UserName.ToUpper(CultureInfo.CurrentCulture);
             DateAddedLabel.Text = comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()
-                                                            .ConvertUtcToServerTime()
+                                                            .ConvertUtcToUserTime()
                                                             .ConvertDateTimeToTimestampMilliseconds()
-                                                            .FormatServerTimestampAsCompactLongDateTimeString();
+                                                            .FormatUserTimestampAsCompactLongDateTimeString();
             CommentContentLabel.Text = comment.Content;
         }
     }

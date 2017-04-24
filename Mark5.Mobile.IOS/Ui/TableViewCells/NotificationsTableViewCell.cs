@@ -101,9 +101,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             DateReceivedLabel.Text = notification.DateTimeTimestamp
                     .ConvertTimestampMillisecondsToDateTime()
-                    .ConvertUtcToServerTime()
+                    .ConvertUtcToUserTime()
                     .ConvertDateTimeToTimestampMilliseconds()
-                    .FormatServerTimestampAsCompactShortDateTimeString();
+                    .FormatUserTimestampAsCompactShortDateTimeString();
 
             ReadImageView.Image = notification.IsRead ? null : UIImage.FromBundle(Path.Combine("icons", "full-dot.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             SelectionStyle = notification.ObjectType == ObjectType.Document ? UITableViewCellSelectionStyle.Default : UITableViewCellSelectionStyle.None;

@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: DateReceivedView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -62,7 +62,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         public override void RefreshView()
         {
             if (MailMessage != null)
-                textView.Text = DateTime.SpecifyKind(MailMessage.Date, DateTimeKind.Unspecified).ConvertDateTimeToTimestampMilliseconds().FormatServerTimestampAsCompactLongDateTimeString();
+                textView.Text = DateTime.SpecifyKind(MailMessage.Date, DateTimeKind.Unspecified).ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactLongDateTimeString();
         }
 
         public override void UpdateVisibility()

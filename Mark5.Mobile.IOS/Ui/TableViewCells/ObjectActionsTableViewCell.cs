@@ -45,9 +45,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             UsernameLabel.Text = action.Username ?? action.UserId.ToString();
             DateLabel.Text = action.ActionTimeTimestamp
                          .ConvertTimestampMillisecondsToDateTime()
-                         .ConvertUtcToServerTime()
+                         .ConvertUtcToUserTime()
                          .ConvertDateTimeToTimestampMilliseconds()
-                         .FormatServerTimestampAsCompactShortDateTimeString();
+                         .FormatUserTimestampAsCompactShortDateTimeString();
             DescriptionLabel.Text = action.Description;
         }
     }

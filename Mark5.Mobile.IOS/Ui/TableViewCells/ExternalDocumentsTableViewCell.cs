@@ -50,9 +50,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             PreviewLabel.Text = !string.IsNullOrWhiteSpace(documentPreview.Preview) ? Regex.Replace(documentPreview.Preview, @"^\s+$[\r\n]*", string.Empty, RegexOptions.Multiline) : Localization.GetString("no_content");
             DateReceivedLabel.Text = documentPreview.DateReceivedTimestamp
                          .ConvertTimestampMillisecondsToDateTime()
-                         .ConvertUtcToServerTime()
+                         .ConvertUtcToUserTime()
                          .ConvertDateTimeToTimestampMilliseconds()
-                         .FormatServerTimestampAsCompactShortDateTimeString();
+                         .FormatUserTimestampAsCompactShortDateTimeString();
 
             UpdateCategoriesView(documentPreview);
         }

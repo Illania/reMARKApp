@@ -964,7 +964,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
                     else
                     {
-                        var fromDate = dateRange.StartTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime();
+                        var fromDate = dateRange.StartTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
                         var fromComponents = new NSDateComponents
                         {
                             Day = fromDate.Day,
@@ -989,7 +989,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
                     else
                     {
-                        var toDate = dateRange.EndTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime();
+                        var toDate = dateRange.EndTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
                         var toComponents = new NSDateComponents
                         {
                             Day = toDate.Day,
@@ -1037,13 +1037,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var fromDate = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, 0, 0, 0, DateTimeKind.Utc);
 
                     dateRange.Enabled = true;
-                    dateRange.StartTimestamp = fromDate.ConvertServerTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+                    dateRange.StartTimestamp = fromDate.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
 
                     if (dateRange.EndTimestamp < 0)
                     {
                         var now = DateTime.Now;
                         var endOfToday = new DateTime(now.Year, now.Month, now.Day, 23, 59, 59, DateTimeKind.Unspecified);
-                        dateRange.EndTimestamp = endOfToday.ConvertServerTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+                        dateRange.EndTimestamp = endOfToday.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
                     }
                 }
 
@@ -1056,7 +1056,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var toDate = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, 23, 59, 59, DateTimeKind.Utc);
 
                     dateRange.Enabled = true;
-                    dateRange.EndTimestamp = toDate.ConvertServerTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+                    dateRange.EndTimestamp = toDate.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
                 }
 
                 UpdateRow();

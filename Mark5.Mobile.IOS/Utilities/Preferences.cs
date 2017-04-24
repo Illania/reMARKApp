@@ -26,6 +26,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         class Keys
         {
+            public const string UseServerTimezoneKey = "UseServerTimezone";
             public const string DocumentsToDownloadKey = "DocumentsToDownload";
             public const string UnreadIndicatorMeKey = "UnreadIndicatorMe";
             public const string CompactDocumentsListKey = "CompactDocumentsList";
@@ -67,6 +68,7 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             var defaultsDictionary = new NSMutableDictionary();
 
+            defaultsDictionary.Add(new NSString(Keys.UseServerTimezoneKey), NSNumber.FromBoolean(false));
             defaultsDictionary.Add(new NSString(Keys.DocumentsToDownloadKey), NSNumber.FromInt16(250));
             defaultsDictionary.Add(new NSString(Keys.UnreadIndicatorMeKey), NSNumber.FromBoolean(true));
             defaultsDictionary.Add(new NSString(Keys.MarkAsReadDelaySecondsKey), NSNumber.FromInt16(2));
@@ -108,6 +110,14 @@ namespace Mark5.Mobile.IOS.Utilities
         }
 
         #region Documents
+
+        public bool UseServerTimezone
+        {
+            get
+            {
+                return ud.BoolForKey(Keys.UseServerTimezoneKey);
+            }
+        }
 
         public int DocumentsToDownload
         {
