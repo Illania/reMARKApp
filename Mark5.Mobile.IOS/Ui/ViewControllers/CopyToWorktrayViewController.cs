@@ -237,7 +237,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     if (tableView.IndexPathsForSelectedRows == null || tableView.IndexPathsForSelectedRows.Length < 1)
                         return new List<SystemUser>();
 
-                    var rows = tableView.IndexPathsForSelectedRows.ToArray();
+                    var rows = tableView.IndexPathsForSelectedRows.Where(indexPath => indexPath.Section != 0).ToArray();
                     return rows.Select(ip => systemUsersInView[ip.Row]).ToList();
                 }
             }
