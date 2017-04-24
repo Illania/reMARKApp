@@ -82,7 +82,7 @@
 	<string name="pref_documents_read_indicator_me_title">Unread indicator</string>
 	<string name="pref_documents_to_load_summary">%s emails will be downloaded when a folder is opened.</string>
 	<string name="pref_documents_to_load_title">Emails to download</string>
-	<string name="pref_documents_use_server_timezone_title">Use server timezone</string>
+	<string name="pref_documents_use_server_timezone_title">Use timezone of MARK5 Server</string>
 	<string name="pref_documents_use_server_timezone_summary_off">Dates will be shown according to this device's timezone.</string>
 	<string name="pref_documents_use_server_timezone_summary_on">Dates will be shown according to server's timezone.</string>
 	<string name="pref_key_about_privacy_policy">pref_key_about_privacy_policy</string>

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <resources>
-	<bool name="pref_documents_use_server_timezone_default">true</bool>
+	<bool name="pref_documents_use_server_timezone_default">false</bool>
 	<string-array name="pref_documents_to_load_entries">
 		<item>100</item>
 		<item>250</item>
