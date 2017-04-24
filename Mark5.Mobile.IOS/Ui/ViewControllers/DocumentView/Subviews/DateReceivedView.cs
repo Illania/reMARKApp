@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.IOS
 // File: DateReceivedView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
@@ -24,17 +24,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             {
                 TextView.Text = Container.Info.DateLastSavedTimestamp
                         .ConvertTimestampMillisecondsToDateTime()
-                        .ConvertUtcToServerTime()
+                        .ConvertUtcToUserTime()
                         .ConvertDateTimeToTimestampMilliseconds()
-                        .FormatServerTimestampAsCompactLongDateTimeString();
+                        .FormatUserTimestampAsCompactLongDateTimeString();
             }
             else if (DocumentPreview != null)
             {
                 TextView.Text = DocumentPreview.DateReceivedTimestamp
                          .ConvertTimestampMillisecondsToDateTime()
-                         .ConvertUtcToServerTime()
+                         .ConvertUtcToUserTime()
                          .ConvertDateTimeToTimestampMilliseconds()
-                        .FormatServerTimestampAsCompactLongDateTimeString();
+                        .FormatUserTimestampAsCompactLongDateTimeString();
             }
         }
 

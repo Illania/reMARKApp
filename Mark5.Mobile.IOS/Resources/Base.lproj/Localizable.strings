@@ -199,6 +199,8 @@
 "report" = "Report";
 "reset" = "Reset";
 "responsible_users" = "Responsible users";
+"restart_required_content" = "You need to restart MARK5, for this setting to take effect.";
+"restart_required_title" = "Restart required";
 "safari" = "Open in Safari";
 "save_draft" = "Save draft";
 "save_modifications" = "Save modifications";

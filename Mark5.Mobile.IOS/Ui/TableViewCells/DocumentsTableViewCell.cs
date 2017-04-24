@@ -64,9 +64,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             MessagePreviewLabel.Text = !string.IsNullOrWhiteSpace(documentPreview.Preview) ? Regex.Replace(documentPreview.Preview, @"^\s+$[\r\n]*", string.Empty, RegexOptions.Multiline) : Localization.GetString("no_content");
             DateReceivedLabel.Text = documentPreview.DateReceivedTimestamp
                          .ConvertTimestampMillisecondsToDateTime()
-                         .ConvertUtcToServerTime()
+                         .ConvertUtcToUserTime()
                          .ConvertDateTimeToTimestampMilliseconds()
-                         .FormatServerTimestampAsCompactShortDateTimeString();
+                         .FormatUserTimestampAsCompactShortDateTimeString();
 
             categoriesColors = documentPreview.Categories.Select(c => UI.UIColorFromHexString(c.HexColor)).ToArray();
             UpdateCategoriesColors();
@@ -105,9 +105,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             MessagePreviewLabel.Text = !string.IsNullOrWhiteSpace(documentPreview.Preview) ? Regex.Replace(documentPreview.Preview, @"^\s+$[\r\n]*", string.Empty, RegexOptions.Multiline) : Localization.GetString("no_content");
             DateReceivedLabel.Text = container.Info.DateLastSavedTimestamp
                          .ConvertTimestampMillisecondsToDateTime()
-                         .ConvertUtcToServerTime()
+                         .ConvertUtcToUserTime()
                          .ConvertDateTimeToTimestampMilliseconds()
-                         .FormatServerTimestampAsCompactShortDateTimeString();
+                         .FormatUserTimestampAsCompactShortDateTimeString();
 
             UIImage stateIcon;
             switch (container.Info.State)

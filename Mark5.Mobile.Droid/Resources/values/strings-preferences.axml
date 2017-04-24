@@ -5,6 +5,8 @@
 	<string name="dialog_logout_content">MARK5 will be shutdown after your are logged out. All personal settings will be lost and you will have to start MARK5 again manually. Do you want to continue?</string>
 	<string name="dialog_logout_title">Log out</string>
 	<string name="dialog_update_config_title">Updating configuration</string>
+	<string name="dialog_restart_required_content">You need to restart MARK5, for this setting to take effect.</string>
+	<string name="dialog_restart_required_title">Restart required</string>
 	<string name="pref_about_privacy_policy_summary">Tap to see how we use your data in MARK5</string>
 	<string name="pref_about_privacy_policy_title">Privacy policy</string>
 	<string name="pref_about_send_feedback_summary">Tell us what you like or what you do not like about MARK5</string>
@@ -80,6 +82,9 @@
 	<string name="pref_documents_read_indicator_me_title">Unread indicator</string>
 	<string name="pref_documents_to_load_summary">%s emails will be downloaded when a folder is opened.</string>
 	<string name="pref_documents_to_load_title">Emails to download</string>
+	<string name="pref_documents_use_server_timezone_title">Use timezone of MARK5 Server</string>
+	<string name="pref_documents_use_server_timezone_summary_off">Dates will be shown according to this device\'s timezone.</string>
+	<string name="pref_documents_use_server_timezone_summary_on">Dates will be shown according to server\'s timezone.</string>
 	<string name="pref_key_about_privacy_policy">pref_key_about_privacy_policy</string>
 	<string name="pref_key_about_send_feedback">pref_key_advanced_send_feedback</string>
 	<string name="pref_key_about_version">pref_key_about_version</string>
@@ -125,6 +130,7 @@
 	<string name="pref_key_documents_mark_as_read">pref_key_documents_mark_as_read</string>
 	<string name="pref_key_documents_read_indicator_me">pref_key_documents_read_indicator_me</string>
 	<string name="pref_key_documents_to_load">pref_key_documents_to_load</string>
+	<string name="pref_key_documents_use_server_timezone">pref_key_documents_use_server_timezone</string>
 	<string name="pref_key_notification_ringtone">pref_key_notification_ringtone</string>
 	<string name="pref_key_notification_silence">pref_key_notification_silence</string>
 	<string name="pref_key_notification_vibrate">pref_key_notification_vibrate</string>

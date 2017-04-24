@@ -322,9 +322,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 cpvh.DateTime = n.DateTimeTimestamp
                     .ConvertTimestampMillisecondsToDateTime()
-                    .ConvertUtcToServerTime()
+                    .ConvertUtcToUserTime()
                     .ConvertDateTimeToTimestampMilliseconds()
-                    .FormatServerTimestampAsCompactShortDateTimeString(context);
+                    .FormatUserTimestampAsCompactShortDateTimeString(context);
                 cpvh.UnreadIndicator = !n.IsRead;
             }
 

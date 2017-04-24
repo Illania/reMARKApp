@@ -330,6 +330,8 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.Logger.Info("Retrieving system settings...");
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
 
+                Utilities.DateTimeUtils.UseServerTimezone = PlatformConfig.Preferences.UseServerTimezone;
+
                 BeginInvokeOnMainThread(() =>
                 {
                     CommonConfig.Logger.Info("Refreshing APNS token...");
@@ -339,18 +341,11 @@ namespace Mark5.Mobile.IOS
                     UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) =>
                     {
                         if (result)
-                        {
-                            BeginInvokeOnMainThread(() =>
-                            {
-                                application.RegisterForRemoteNotifications();
-                            });
-                        }
+                            BeginInvokeOnMainThread(application.RegisterForRemoteNotifications);
                         else
                         {
                             if (error != null)
-                            {
                                 CommonConfig.Logger.Error(new NSErrorException(error));
-                            }
                         }
                     });
                 });

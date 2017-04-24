@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: CommentsFragment.cs
 // Author: Ferdinando Papale fp@nordic-it.com
@@ -391,9 +391,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 cvh.Username = commentFromCurrentUser ? "Me" : comment.UserName;
                 cvh.Date = comment.DateAddedTimestamp
                     .ConvertTimestampMillisecondsToDateTime()
-                    .ConvertUtcToServerTime()
+                    .ConvertUtcToUserTime()
                     .ConvertDateTimeToTimestampMilliseconds()
-                    .FormatServerTimestampAsCompactShortDateTimeString(context);
+                    .FormatUserTimestampAsCompactShortDateTimeString(context);
                 cvh.Content = comment.Content;
             }
 

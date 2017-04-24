@@ -404,9 +404,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 odpvh.Subject = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
                 odpvh.Date = container.Info.DateLastSavedTimestamp
                 .ConvertTimestampMillisecondsToDateTime()
-                .ConvertUtcToServerTime()
+                .ConvertUtcToUserTime()
                 .ConvertDateTimeToTimestampMilliseconds()
-                .FormatServerTimestampAsCompactShortDateTimeString(context);
+                .FormatUserTimestampAsCompactShortDateTimeString(context);
                 odpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                 odpvh.AttachmentIndicator = dp.AttachmentsCount > 0;
                 odpvh.WaitingIndicator = container.Info.State == OutgoingDocumentState.Waiting;

@@ -134,13 +134,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         void UpdateText()
         {
             dateRangeFromTextView.Text = fromTimestamp == -1 ? "-" : fromTimestamp.ConvertTimestampMillisecondsToDateTime()
-                                                                                    .ConvertUtcToServerTime()
+                                                                                    .ConvertUtcToUserTime()
                                                                                     .ConvertDateTimeToTimestampMilliseconds()
-                                                                                    .FormatServerTimestampAsDateString(Context);
+                                                                                    .FormatUserTimestampAsDateString(Context);
             dateRangeToTextView.Text = toTimestamp == -1 ? "-" : toTimestamp.ConvertTimestampMillisecondsToDateTime()
-                                                                                .ConvertUtcToServerTime()
+                                                                                .ConvertUtcToUserTime()
                                                                                 .ConvertDateTimeToTimestampMilliseconds()
-                                                                                .FormatServerTimestampAsDateString(Context);
+                                                                                .FormatUserTimestampAsDateString(Context);
         }
 
         public override void Refresh()

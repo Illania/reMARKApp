@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: RecipentsView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
@@ -191,7 +191,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
                 tableRowReplyTo.Visibility = string.IsNullOrWhiteSpace(replyToText) ? ViewStates.Gone : ViewStates.Visible;
                 replyToValue.Text = replyToText;
 
-                dateReceivedValue.Text = DateTime.SpecifyKind(MailMessage.Date, DateTimeKind.Unspecified).ConvertDateTimeToTimestampMilliseconds().FormatServerTimestampAsTimeAndDateString(Context);
+                dateReceivedValue.Text = DateTime.SpecifyKind(MailMessage.Date, DateTimeKind.Unspecified).ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsTimeAndDateString(Context);
                 tableRowDateReceived.Visibility = ViewStates.Visible;
             }
             else

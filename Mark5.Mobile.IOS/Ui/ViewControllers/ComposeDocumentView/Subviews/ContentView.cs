@@ -303,9 +303,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         string GetHtmlHeader()
         {
             var date = PreviousDocumentPreview.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime()
-                         .ConvertUtcToServerTime()
+                         .ConvertUtcToUserTime()
                          .ConvertDateTimeToTimestampMilliseconds()
-                        .FormatServerTimestampAsCompactLongDateTimeString();
+                        .FormatUserTimestampAsCompactLongDateTimeString();
 
             var header = new StringBuilder();
             header.Append("<br/><hr/>");

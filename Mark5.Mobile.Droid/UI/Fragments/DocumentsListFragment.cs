@@ -1130,10 +1130,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dpvh.Subject = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
                     var d = dp.DateReceivedTimestamp
                                 .ConvertTimestampMillisecondsToDateTime()
-                                .ConvertUtcToServerTime()
+                                .ConvertUtcToUserTime()
                                 .ConvertDateTimeToTimestampMilliseconds();
-                    dpvh.Date = d.FormatServerTimestampAsCompactShortDateTimeString(context);
-                    dpvh.BubbleDate = d.FormatServerTimestampAsCompactLongDateTimeString(context);
+                    dpvh.Date = d.FormatUserTimestampAsCompactShortDateTimeString(context);
+                    dpvh.BubbleDate = d.FormatUserTimestampAsCompactLongDateTimeString(context);
                     dpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                     dpvh.Categories = dp.Categories;
                     dpvh.IncomingIndicator = dp.Direction == DocumentDirection.Incoming;
@@ -1163,10 +1163,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     var d = dp.DateReceivedTimestamp
                                 .ConvertTimestampMillisecondsToDateTime()
-                                .ConvertUtcToServerTime()
+                                .ConvertUtcToUserTime()
                                 .ConvertDateTimeToTimestampMilliseconds();
-                    edpvh.Date = d.FormatServerTimestampAsCompactShortDateTimeString(context);
-                    edpvh.BubbleDate = d.FormatServerTimestampAsCompactLongDateTimeString(context);
+                    edpvh.Date = d.FormatUserTimestampAsCompactShortDateTimeString(context);
+                    edpvh.BubbleDate = d.FormatUserTimestampAsCompactLongDateTimeString(context);
                     edpvh.Name = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
                     edpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                     edpvh.Categories = dp.Categories;

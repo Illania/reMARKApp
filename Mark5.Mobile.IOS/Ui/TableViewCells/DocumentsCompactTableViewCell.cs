@@ -63,9 +63,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             SubjectLabel.Text = documentPreview.Subject;
             DateReceivedLabel.Text = documentPreview.DateReceivedTimestamp
                          .ConvertTimestampMillisecondsToDateTime()
-                         .ConvertUtcToServerTime()
+                         .ConvertUtcToUserTime()
                          .ConvertDateTimeToTimestampMilliseconds()
-                         .FormatServerTimestampAsCompactShortDateTimeString();
+                         .FormatUserTimestampAsCompactShortDateTimeString();
 
             categoriesColors = documentPreview.Categories.Select(c => UI.UIColorFromHexString(c.HexColor)).ToArray();
             UpdateCategoriesColors();

@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: DocumentPickDateSearchView.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
@@ -154,29 +154,29 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         void UpdateText()
         {
             dateRangeFromTextView.Text = fromTimestamp == -1 ? "-" : fromTimestamp.ConvertTimestampMillisecondsToDateTime()
-                                                                                    .ConvertUtcToServerTime()
+                                                                                    .ConvertUtcToUserTime()
                                                                                     .ConvertDateTimeToTimestampMilliseconds()
-                                                                                    .FormatServerTimestampAsDateString(Context);
+                                                                                    .FormatUserTimestampAsDateString(Context);
             dateRangeToTextView.Text = toTimestamp == -1 ? "-" : toTimestamp.ConvertTimestampMillisecondsToDateTime()
-                                                                                    .ConvertUtcToServerTime()
+                                                                                    .ConvertUtcToUserTime()
                                                                                     .ConvertDateTimeToTimestampMilliseconds()
-                                                                                    .FormatServerTimestampAsDateString(Context);
+                                                                                    .FormatUserTimestampAsDateString(Context);
         }
 
         public void SetFromText(long timestamp)
         {
             dateRangeFromTextView.Text = timestamp == -1 ? "-" : timestamp.ConvertTimestampMillisecondsToDateTime()
-                                                                                    .ConvertUtcToServerTime()
+                                                                                    .ConvertUtcToUserTime()
                                                                                     .ConvertDateTimeToTimestampMilliseconds()
-                                                                                    .FormatServerTimestampAsDateString(Context);
+                                                                                    .FormatUserTimestampAsDateString(Context);
         }
 
         public void SetToText(long timestamp)
         {
             dateRangeToTextView.Text = timestamp == -1 ? "-" : timestamp.ConvertTimestampMillisecondsToDateTime()
-                                                                                    .ConvertUtcToServerTime()
+                                                                                    .ConvertUtcToUserTime()
                                                                                     .ConvertDateTimeToTimestampMilliseconds()
-                                                                                    .FormatServerTimestampAsDateString(Context);
+                                                                                    .FormatUserTimestampAsDateString(Context);
         }
     }
 }

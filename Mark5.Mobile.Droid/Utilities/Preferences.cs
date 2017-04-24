@@ -34,6 +34,14 @@ namespace Mark5.Mobile.Droid.Utilities
 
         #region Documents
 
+        public bool UseServerTimeZone
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_use_server_timezone), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_use_server_timezone_default));
+            }
+        }
+
         public int DocumentsToDownload
         {
             get

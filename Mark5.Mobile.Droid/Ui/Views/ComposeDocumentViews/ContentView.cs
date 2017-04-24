@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: ContentView.cs
 // Author: Ferdinando Papale fp@nordic-it.com
@@ -252,9 +252,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             var processedDateReceivedTimestamp = PreviousDocumentPreview.DateReceivedTimestamp
                                                                         .ConvertTimestampMillisecondsToDateTime()
-                                                                        .ConvertUtcToServerTime()
+                                                                        .ConvertUtcToUserTime()
                                                                         .ConvertDateTimeToTimestampMilliseconds();
-            var date = processedDateReceivedTimestamp.FormatServerTimestampAsTimeAndDateString(Context);
+            var date = processedDateReceivedTimestamp.FormatUserTimestampAsTimeAndDateString(Context);
 
             var header = new StringBuilder();
             header.Append("<br/><hr/>");

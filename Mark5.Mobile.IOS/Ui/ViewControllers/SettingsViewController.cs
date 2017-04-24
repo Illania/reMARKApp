@@ -25,6 +25,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         const string Value1CellId = "Value1CellId";
 
+        const string UseServerTimezoneKey = "UseServerTimezone";
         const string CreateSystemReportKey = "createSystemReport";
         const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
         const string DocumentsToDownloadKey = "DocumentsToDownload";
@@ -53,7 +54,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            
+
             ExtendedLayoutIncludesOpaqueBars = true;
 
             NSNotificationCenter.DefaultCenter.AddObserver(new NSString(InAppSettingsKit.SettingsStore.AppSettingChangedNotification), SettingsChanged);
@@ -319,10 +320,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             // Nothing to do
         }
 
+
+
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void        async void SettingsChanged(NSNotification n)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var key = n.Object.ToString();
+
+            if (key == UseServerTimezoneKey)
+            {
+                await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("restart_required_title"), Localization.GetString("restart_required_content"));
+            }
 
             if (key == DocumentsToDownloadKey)
             {
