@@ -155,6 +155,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 LocalNotificationsListener.Initialize();
 
+                DateTimeUtils.UseServerTimezone = PlatformConfig.Preferences.UseServerTimeZone;
+
                 CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
 
                 return true;

@@ -91,12 +91,12 @@ namespace Mark5.Mobile.Droid.Ui.Views
 
                 AddView(titleView);
 
-                var processedActionTimeTimestamp = objectAction.ActionTimeTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime().ConvertDateTimeToTimestampMilliseconds();
+                var processedActionTimeTimestamp = objectAction.ActionTimeTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
 
                 var subtitleView = new AppCompatTextView(Context)
                 {
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                    Text = $"{Context.GetString(Resource.String.by)} {objectAction.Username} {Context.GetString(Resource.String.on)} {processedActionTimeTimestamp.FormatServerTimestampAsTimeAndDateString(context)}"
+                    Text = $"{Context.GetString(Resource.String.by)} {objectAction.Username} {Context.GetString(Resource.String.on)} {processedActionTimeTimestamp.FormatUserTimestampAsTimeAndDateString(context)}"
                 };
                 subtitleView.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
 

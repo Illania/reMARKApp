@@ -357,9 +357,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 tableRowReadBy.Visibility = string.IsNullOrWhiteSpace(readByText) ? ViewStates.Gone : ViewStates.Visible;
                 readByValue.Text = readByText;
 
-                var processedDateReceivedTimestamp = DocumentPreview.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime().ConvertDateTimeToTimestampMilliseconds();
+                var processedDateReceivedTimestamp = DocumentPreview.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
                 tableRowDateReceived.Visibility = DocumentPreview.DateReceivedTimestamp < 0 ? ViewStates.Gone : ViewStates.Visible;
-                dateReceivedValue.Text = processedDateReceivedTimestamp.FormatServerTimestampAsTimeAndDateString(Context);
+                dateReceivedValue.Text = processedDateReceivedTimestamp.FormatUserTimestampAsTimeAndDateString(Context);
 
                 var creatorText = DocumentPreview.Creator;
                 tableRowCreator.Visibility = string.IsNullOrWhiteSpace(creatorText) ? ViewStates.Gone : ViewStates.Visible;

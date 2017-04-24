@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: BirthdateSubview.cs
 // Author: Ferdinando Papale fp@nordic-it.com
@@ -33,9 +33,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             {
                 Visibility = ViewStates.Visible;
                 Content = Contact?.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime()
-                         .ConvertUtcToServerTime()
+                         .ConvertUtcToUserTime()
                          .ConvertDateTimeToTimestampMilliseconds()
-                         .FormatServerTimestampAsLongDateString(Context);
+                         .FormatUserTimestampAsLongDateString(Context);
             }
         }
     }

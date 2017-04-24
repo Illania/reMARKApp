@@ -1,4 +1,4 @@
-﻿//
+//
 // Project: Mark5.Mobile.Droid
 // File: PickDateRangeFragment.cs
 // Author: ferdinandopapale <fp@nordic-it.com>
@@ -104,7 +104,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fromCalendarView.MaxDate = toLimitCalendar.TimeInMillis;
             toCalendarView.MaxDate = toLimitCalendar.TimeInMillis;
 
-            var fromDate = FromTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime();
+            var fromDate = FromTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
             var fromDateCalendar = Java.Util.Calendar.Instance;
             fromDateCalendar.Set(Java.Util.CalendarField.Year, fromDate.Year);
             fromDateCalendar.Set(Java.Util.CalendarField.Month, fromDate.Month - 1);
@@ -113,7 +113,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fromDateCalendar.Set(Java.Util.CalendarField.Minute, 0);
             fromDateCalendar.Set(Java.Util.CalendarField.Second, 1);
 
-            var toDate = ToTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime();
+            var toDate = ToTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
             var toDateCalendar = Java.Util.Calendar.Instance;
             toDateCalendar.Set(Java.Util.CalendarField.Year, toDate.Year);
             toDateCalendar.Set(Java.Util.CalendarField.Month, toDate.Month - 1);
@@ -169,7 +169,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void FromDatePicker_DateChange(object sender, CalendarView.DateChangeEventArgs e)
         {
             FromTimestamp = new DateTime(e.Year, e.Month + 1, e.DayOfMonth, 0, 0, 0, DateTimeKind.Unspecified)
-                            .ConvertServerTimeToUtc()
+                            .ConvertUserTimeToUtc()
                             .ConvertDateTimeToTimestampMilliseconds();
 
             UpdateText();
@@ -181,7 +181,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void ToDatePicker_DateChange(object sender, CalendarView.DateChangeEventArgs e)
         {
             ToTimestamp = new DateTime(e.Year, e.Month + 1, e.DayOfMonth, 23, 59, 59, DateTimeKind.Unspecified)
-                            .ConvertServerTimeToUtc()
+                            .ConvertUserTimeToUtc()
                             .ConvertDateTimeToTimestampMilliseconds();
 
             UpdateText();
@@ -198,7 +198,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (FromTimestamp != -1)
             {
-                var fromDate = FromTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime();
+                var fromDate = FromTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
                 var fromDateCalendar = Java.Util.Calendar.Instance;
                 fromDateCalendar.Set(Java.Util.CalendarField.Year, fromDate.Year);
                 fromDateCalendar.Set(Java.Util.CalendarField.Month, fromDate.Month - 1);

@@ -127,6 +127,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override bool OnPreferenceTreeClick(Preference preference)
         {
+            if (preference.Key == GetString(Resource.String.pref_key_documents_use_server_timezone))
+            {
+                Dialogs.ShowConfirmDialog(Context, Resource.String.dialog_restart_required_title, Resource.String.dialog_restart_required_content);
+            }
+
             if (preference.Key == GetString(Resource.String.pref_key_contacts_synchronised) && !PlatformConfig.Preferences.SynchroniseContacts)
             {
                 Dialogs.ShowYesNoDialog(Context, Resource.String.clear_contacts_cache_title, Resource.String.clear_contacts_cache_summary, async () =>
