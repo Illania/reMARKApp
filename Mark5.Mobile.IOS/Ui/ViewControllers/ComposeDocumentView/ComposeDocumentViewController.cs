@@ -1077,8 +1077,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     var templateNames = templatesForCreationMode.Select(t => (t.Private ? "[Private] " : "[Public] ") + t.Name).ToArray();
 
                     var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("template_question"), templateNames, contentView);
-                    var selectedPreview = templatesPreviews[result];
-                    await GetTemplate(selectedPreview);
+
+                    if (result >= 0)
+                    {
+                        var selectedPreview = templatesPreviews[result];
+                        await GetTemplate(selectedPreview);
+                    }
+                    else
+                    {
+                        await AskIfShouldUseTemplates();
+                    }
                 }
                 else
                 {
