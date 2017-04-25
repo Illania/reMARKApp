@@ -7,6 +7,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Support.V7.Widget;
@@ -17,8 +18,10 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
+    
     public class PriorityView : ComposeDocumentView
     {
+    
         readonly AppCompatSpinner prioritySpinner;
         readonly List<Priority> priorities = new List<Priority> { Priority.Low, Priority.Normal, Priority.Urgent };
 
@@ -59,7 +62,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
-                SetPriority(PreviousDocumentPreview.Priority);
+                var possiblePriorities = new[] { Priority.Urgent, Priority.Normal, Priority.Low };
+                var previousDocumentPriority = PreviousDocumentPreview.Priority;
+
+                if (!possiblePriorities.Contains(previousDocumentPriority))
+                    previousDocumentPriority = Priority.Normal;
+
+                SetPriority(previousDocumentPriority);
             }
 
             return Task.CompletedTask;
@@ -75,10 +84,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #region Utilities
 
-        void SetPriority(Priority priority)
-        {
-            prioritySpinner.SetSelection(priorities.IndexOf(priority));
-        }
+        void SetPriority(Priority priority) => prioritySpinner.SetSelection(priorities.IndexOf(priority));
 
         Priority GetPriority()
         {

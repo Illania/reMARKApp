@@ -14,6 +14,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
     public class PriorityView : TextSubView
     {
+        
         public PriorityView()
             : base(Localization.GetString("priority"))
         {
@@ -22,9 +23,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         public override void RefreshView()
         {
             if (DocumentPreview != null)
-            {
                 TextView.Text = UI.PriorityString(DocumentPreview.Priority);
-            }
         }
 
         public override void UpdateVisibility()
@@ -35,7 +34,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 return;
             }
 
-            Hidden = DocumentPreview.Priority == Priority.None || DocumentPreview.Priority == Priority.Normal;
+            Hidden = DocumentPreview.Priority != Priority.Low && DocumentPreview.Priority != Priority.Urgent;
         }
     }
 }

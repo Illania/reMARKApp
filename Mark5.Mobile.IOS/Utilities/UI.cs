@@ -44,14 +44,14 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             switch (priority)
             {
-                case Common.Model.Priority.Low:
+                case Priority.Low:
                     return Localization.GetString("priority_low");
-                case Common.Model.Priority.Normal:
+                case Priority.Normal:
                     return Localization.GetString("priority_normal");
-                case Common.Model.Priority.Urgent:
+                case Priority.Urgent:
                     return Localization.GetString("priority_urgent");
                 default:
-                    throw new ArgumentException("The input priority should not be shown to the user");
+                    throw new ArgumentException($"The input priority \"{priority}\" should not be shown to the user");
             }
         }
 
