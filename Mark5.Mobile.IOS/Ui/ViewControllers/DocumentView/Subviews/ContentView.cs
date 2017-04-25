@@ -140,6 +140,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 return;
             }
 
+
+            //TODO Note: the scrollView does not scroll back after reaching a zoom scale of 5, that is the default 
+            //maximum zoom scale. Trying to change the maximum zoom scale does not work, because it gets modified internally anyway
+
             var zoomScaleRatio = scrollView.ZoomScale / actualZoomScaleBeforeZooming;
 
             heightConstraint.Constant = (initialHeight / initialZoom) * scrollView.ZoomScale;
