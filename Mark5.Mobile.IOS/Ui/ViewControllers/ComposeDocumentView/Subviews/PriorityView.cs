@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common.Model;
@@ -16,9 +17,11 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
+
     public class PriorityView : ComposeDocumentSubView
     {
-        Priority selectedPriority;
+
+        Priority selectedPriority = Priority.Normal;
 
         public event EventHandler Edited = delegate { };
         public event EventHandler ActionSheetWillAppear = delegate { };
@@ -54,7 +57,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 });
 
             selectedPriorityLabel = new UILabel();
-            selectedPriorityLabel.Text = UI.PriorityString(Priority.Normal);
+            selectedPriorityLabel.Text = UI.PriorityString(selectedPriority);
             selectedPriorityLabel.Font = Theme.DefaultFont;
             selectedPriorityLabel.Opaque = false;
             selectedPriorityLabel.Lines = 1;
@@ -77,7 +80,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
-                SelectPriority(PreviousDocumentPreview.Priority);
+                var possiblePriorities = new[] { Priority.Urgent, Priority.Normal, Priority.Low };
+                var previousDocumentPriority = PreviousDocumentPreview.Priority;
+
+                if (!possiblePriorities.Contains(previousDocumentPriority))
+                    previousDocumentPriority = Priority.Normal;
+
+                SelectPriority(previousDocumentPriority);
             }
 
             return Task.CompletedTask;
@@ -103,13 +112,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             HandleScrollToView(this, EventArgs.Empty);
             ActionSheetWillAppear(this, EventArgs.Empty);
 
-            var templateListStrings = new string[] { UI.PriorityString(Priority.Urgent), UI.PriorityString(Priority.Normal), UI.PriorityString(Priority.Low) };
+            var priorityStrings = new [] { UI.PriorityString(Priority.Urgent), UI.PriorityString(Priority.Normal), UI.PriorityString(Priority.Low) };
 
-            var result = await Dialogs.ShowListDialogAsync(viewController, null, templateListStrings, selectedPriorityLabel);
+            var result = await Dialogs.ShowListDialogAsync(viewController, null, priorityStrings, selectedPriorityLabel);
             switch (result)
             {
-                case -1:
-                    break;
                 case 0:
                     SelectPriority(Priority.Urgent);
                     break;

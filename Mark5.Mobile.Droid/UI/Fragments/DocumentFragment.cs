@@ -513,11 +513,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void SetPriority()
         {
-            var priority = await Dialogs.ShowSingleSelectDialogAsync(Context, Resource.String.set_priority, new List<Priority> { Priority.Urgent, Priority.Normal, Priority.Low }, DocumentPreview.Priority);
+            var possiblePriorities = new List<Priority> { Priority.Urgent, Priority.Normal, Priority.Low };
+            var documentPriority = DocumentPreview.Priority;
+
+            if (!possiblePriorities.Contains(documentPriority))
+                documentPriority = Priority.Normal;
+
+            var priority = await Dialogs.ShowSingleSelectDialogAsync(Context, Resource.String.set_priority, possiblePriorities, documentPriority);
             if (priority == default(Priority) || priority == DocumentPreview.Priority)
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Attempting to set priority [documentPreview={DocumentPreview}]...");
 
