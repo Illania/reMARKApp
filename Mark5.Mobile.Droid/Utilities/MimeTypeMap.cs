@@ -7,37 +7,25 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
+using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
+
     public static class MimeTypeMap
     {
-        static readonly Lazy<IDictionary<string, string>> _mappings = new Lazy<IDictionary<string, string>>(BuildMappings);
+
+        const string MimeTypeForUnknownExtension = "application/octet-stream";
+
+        static readonly Lazy<IDictionary<string, string>> mappings = new Lazy<IDictionary<string, string>>(BuildMappings);
 
         static IDictionary<string, string> BuildMappings()
         {
             var mappings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) {
 
-                #region Big freaking list of mime types
-            
-                // maps both ways,
-                // extension -> mime type
-                //   and
-                // mime type -> extension
-                //
-                // any mime types on left side not pre-loaded on right side, are added automatically
-                // some mime types can map to multiple extensions, so to get a deterministic mapping,
-                // add those to the dictionary specifcially
-                //
-                // combination of values from Windows 7 Registry and 
-                // from C:\Windows\System32\inetsrv\config\applicationHost.config
-                // some added, including .7z and .dat
-                //
-                // Some added based on http://www.iana.org/assignments/media-types/media-types.xhtml
-                // which lists mime types, but not extensions
-                //
+            #region Big freaking list of mime types
+
                 {".323", "text/h323"},
                 {".3g2", "video/3gpp2"},
                 {".3gp", "video/3gpp"},
@@ -564,7 +552,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 {".wdp", "image/vnd.ms-photo"},
                 {".webarchive", "application/x-safari-webarchive"},
                 {".webm", "video/webm"},
-                {".webp", "image/webp"}, /* https://en.wikipedia.org/wiki/WebP */
+                {".webp", "image/webp"},
                 {".webtest", "application/xml"},
                 {".wiq", "application/xml"},
                 {".wiz", "application/msword"},
@@ -635,70 +623,17 @@ namespace Mark5.Mobile.Droid.Utilities
                 {".xtp", "application/octet-stream"},
                 {".xwd", "image/x-xwindowdump"},
                 {".z", "application/x-compress"},
-                {".zip", "application/zip"},
+                {".zip", "application/zip"}
 
-                {"application/fsharp-script", ".fsx"},
-                {"application/msaccess", ".adp"},
-                {"application/msword", ".doc"},
-                {"application/octet-stream", ".bin"},
-                {"application/onenote", ".one"},
-                {"application/postscript", ".eps"},
-                {"application/step", ".step"},
-                {"application/vnd.ms-excel", ".xls"},
-                {"application/vnd.ms-powerpoint", ".ppt"},
-                {"application/vnd.ms-works", ".wks"},
-                {"application/vnd.visio", ".vsd"},
-                {"application/x-director", ".dir"},
-                {"application/x-shockwave-flash", ".swf"},
-                {"application/x-x509-ca-cert", ".cer"},
-                {"application/x-zip-compressed", ".zip"},
-                {"application/xhtml+xml", ".xhtml"},
-                {"application/xml", ".xml"},  // anomoly, .xml -> text/xml, but application/xml -> many thingss, but all are xml, so safest is .xml
-                {"audio/aac", ".AAC"},
-                {"audio/aiff", ".aiff"},
-                {"audio/basic", ".snd"},
-                {"audio/mid", ".midi"},
-                {"audio/wav", ".wav"},
-                {"audio/x-m4a", ".m4a"},
-                {"audio/x-mpegurl", ".m3u"},
-                {"audio/x-pn-realaudio", ".ra"},
-                {"audio/x-smd", ".smd"},
-                {"image/bmp", ".bmp"},
-                {"image/jpeg", ".jpg"},
-                {"image/pict", ".pic"},
-                {"image/png", ".png"},
-                {"image/tiff", ".tiff"},
-                {"image/x-macpaint", ".mac"},
-                {"image/x-quicktime", ".qti"},
-                {"message/rfc822", ".eml"},
-                {"text/html", ".html"},
-                {"text/plain", ".txt"},
-                {"text/scriptlet", ".wsc"},
-                {"text/xml", ".xml"},
-                {"video/3gpp", ".3gp"},
-                {"video/3gpp2", ".3gp2"},
-                {"video/mp4", ".mp4"},
-                {"video/mpeg", ".mpg"},
-                {"video/quicktime", ".mov"},
-                {"video/vnd.dlna.mpeg-tts", ".m2t"},
-                {"video/x-dv", ".dv"},
-                {"video/x-la-asf", ".lsf"},
-                {"video/x-ms-asf", ".asf"},
-                {"x-world/x-vrml", ".xof"},
+            #endregion
 
-                #endregion
+            };
 
-                };
-
-            var cache = mappings.ToList(); // need ToList() to avoid modifying while still enumerating
+            var cache = mappings.ToList();
 
             foreach (var mapping in cache)
-            {
                 if (!mappings.ContainsKey(mapping.Value))
-                {
                     mappings.Add(mapping.Value, mapping.Key);
-                }
-            }
 
             return mappings;
         }
@@ -706,18 +641,24 @@ namespace Mark5.Mobile.Droid.Utilities
         public static string GetMimeType(string extension)
         {
             if (extension == null)
-            {
                 throw new ArgumentNullException(nameof(extension));
-            }
 
-            if (!extension.StartsWith(".", StringComparison.InvariantCultureIgnoreCase))
-            {
+            if (!extension.StartsWith(".", StringComparison.OrdinalIgnoreCase))
                 extension = "." + extension;
-            }
 
             string mime;
+            var found = mappings.Value.TryGetValue(extension, out mime);
 
-            return _mappings.Value.TryGetValue(extension, out mime) ? mime : "application/octet-stream";
+            if (!found)
+            {
+                CommonConfig.Logger.Warning($"Could not find mime type for extension {extension}, returning {MimeTypeForUnknownExtension}");
+                return MimeTypeForUnknownExtension;
+            }
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug($"Found mime type for extension {extension}, returning {mime}");
+            
+            return mime;
         }
     }
 }

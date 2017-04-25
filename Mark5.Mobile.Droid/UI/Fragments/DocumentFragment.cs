@@ -8,12 +8,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
-using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.App;
 using Android.Support.V4.Content;
@@ -77,7 +77,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             button3 = rootView.FindViewById<AppCompatImageView>(Resource.Id.button3);
 
             button1.SetImageResource(Resource.Drawable.reply);
-            button1.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            button1.SetColorFilter(new Android.Graphics.Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
             button1.Enabled = false;
             button1.Clickable = true;
             button1.Click += (sender, e) =>
@@ -97,7 +97,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             button1.LongClick += (sender, e) => Toast.MakeText(Context, Resource.String.reply, ToastLength.Short).Show();
 
             button2.SetImageResource(Resource.Drawable.replyall);
-            button2.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            button2.SetColorFilter(new Android.Graphics.Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
             button2.Enabled = false;
             button2.Clickable = true;
             button2.Click += (sender, e) =>
@@ -117,7 +117,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             button2.LongClick += (sender, e) => Toast.MakeText(Context, Resource.String.reply_all, ToastLength.Short).Show();
 
             button3.SetImageResource(Resource.Drawable.forward);
-            button3.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            button3.SetColorFilter(new Android.Graphics.Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
             button3.Enabled = false;
             button3.Clickable = true;
             button3.Click += (sender, e) =>
@@ -630,12 +630,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 if (string.IsNullOrWhiteSpace(path))
-                {
                     throw new Exception("Unable to open attachment");
-                }
 
                 var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
-                var mimeType = MimeTypeMap.GetMimeType(System.IO.Path.GetExtension(path));
+                var mimeType = MimeTypeMap.GetMimeType(Path.GetExtension(path));
 
                 var openFileIntent = new Intent(Intent.ActionView);
                 openFileIntent.SetDataAndType(uri, mimeType);
@@ -679,12 +677,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 if (string.IsNullOrWhiteSpace(path))
-                {
                     throw new Exception("Unable to get attachment path.");
-                }
 
                 var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
-                var mimeType = MimeTypeMap.GetMimeType(System.IO.Path.GetExtension(path));
+                var mimeType = MimeTypeMap.GetMimeType(Path.GetExtension(path));
 
                 ShareCompat.IntentBuilder.From(Activity).SetType(mimeType).SetStream(uri).StartChooser();
             }
