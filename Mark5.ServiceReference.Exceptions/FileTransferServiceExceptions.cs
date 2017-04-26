@@ -16,6 +16,11 @@ namespace Mark5.ServiceReference.Exceptions
     public class FileTransferServiceException : Exception
     {
 
+        public FileTransferServiceException(string message)
+            : base(message)
+        {
+        }
+
         public FileTransferServiceException(Exception ex)
             : base("Unexpected exception: " + ex.Message, ex)
         {
