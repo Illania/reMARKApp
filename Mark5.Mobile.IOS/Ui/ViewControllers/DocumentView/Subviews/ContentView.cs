@@ -269,7 +269,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             widthConstraint.Constant = defaultWidth;
             initialHeight = 0;
             initialWidth = 0;
-            initialZoom = 0;
 
             SetContent(ContentType.PlainText, string.Empty);
         }
