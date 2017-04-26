@@ -12,6 +12,8 @@
 		<item>Remove attachment</item>
 	</string-array>
 	<string name="app_name">MARK5</string>
+	<string name="attachment_cannot_be_opened_summary">There are no apps installed on this device, that can open this type of attachment.</string>
+	<string name="attachment_cannot_be_opened_title">Attachment cannot be opened</string>
 	<string name="attachment_clicked">Select action</string>
 	<string name="attachment_too_big">The attachment is bigger than the maximum allowed size on the server</string>
 	<string name="attachments">Attachments:</string>

@@ -236,7 +236,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 openFileIntent.SetDataAndType(uri, mimeType);
                 openFileIntent.AddFlags(ActivityFlags.NewTask);
                 openFileIntent.AddFlags(ActivityFlags.GrantReadUriPermission);
-                StartActivity(openFileIntent);
+
+                var canOpen = PackageManager.QueryIntentActivities(openFileIntent, 0).Any();
+                if (canOpen)
+                    StartActivity(openFileIntent);
+                else
+                    await Dialogs.ShowConfirmDialogAsync(this, Resource.String.attachment_cannot_be_opened_title, Resource.String.attachment_cannot_be_opened_summary);
 
                 dismissAction();
             }
