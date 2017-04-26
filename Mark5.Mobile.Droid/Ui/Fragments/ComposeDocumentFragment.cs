@@ -340,8 +340,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     openFileIntent.SetDataAndType(uri, mimeType);
                     openFileIntent.AddFlags(ActivityFlags.NewTask);
                     openFileIntent.AddFlags(ActivityFlags.GrantReadUriPermission);
-                    var chooser = Intent.CreateChooser(openFileIntent, Resources.GetString(Resource.String.choose_application));
-                    Context.StartActivity(chooser);
+
+                    var canOpen = Context.PackageManager.QueryIntentActivities(openFileIntent, 0).Any();
+                    if (canOpen)
+                        Context.StartActivity(openFileIntent);
+                    else
+                        await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.attachment_cannot_be_opened_title, Resource.String.attachment_cannot_be_opened_summary);
                 }
                 catch (Exception ex)
                 {

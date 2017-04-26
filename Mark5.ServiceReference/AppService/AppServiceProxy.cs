@@ -20,13 +20,7 @@ namespace Mark5.ServiceReference.AppService
     class AppServiceProxy : IAppServiceProxy
     {
 
-        public Version Version
-        {
-            get
-            {
-                return new Version(3, 0, 0);
-            }
-        }
+        public Version Version { get { return new Version(3, 0, 0); } }
 
         readonly Binding binding = new BasicHttpBinding
         {

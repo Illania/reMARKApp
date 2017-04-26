@@ -17,10 +17,7 @@ namespace Mark5.ServiceReference.AppService
     public interface IAppServiceProxy
     {
 
-        Version Version
-        {
-            get;
-        }
+        Version Version { get; }
 
         #region Authentication
 
