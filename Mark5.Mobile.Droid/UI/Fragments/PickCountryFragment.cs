@@ -48,7 +48,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.search_priorities);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.search_country);
 
             CommonConfig.Logger.Info($"Created {nameof(PickCountryFragment)}");
         }
