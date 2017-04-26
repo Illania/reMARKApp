@@ -140,6 +140,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 return;
             }
 
+            if (scrollView.ZoomScale == 5) //When this happens the minimum and the maximum zoom are set to 5, and you can't zoom in either direction
+            {
+                scrollView.MinimumZoomScale = 1f; //If we do not set this the next statement is ignored
+                scrollView.SetZoomScale(4.0f, true); //We do not put a value close to 5, otherwise we have a zoom-in / zoom-out flicker
+                return;
+            }
+
             var zoomScaleRatio = scrollView.ZoomScale / actualZoomScaleBeforeZooming;
 
             heightConstraint.Constant = (initialHeight / initialZoom) * scrollView.ZoomScale;
