@@ -209,6 +209,7 @@
 	<string name="search_contact_vat">VAT</string>
 	<string name="search_contacts">Search contacts</string>
 	<string name="search_contacts_result">Results</string>
+	<string name="search_country">Country</string>
 	<string name="search_document_attachment">Attachment</string>
 	<string name="search_document_comments">Comments</string>
 	<string name="search_document_direction_all">All</string>
