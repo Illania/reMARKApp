@@ -142,6 +142,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override Task UpdateDocument()
         {
+            Document.Lines.Clear();
             Document.Lines.Add(GetLine());
             return Task.CompletedTask;
         }
