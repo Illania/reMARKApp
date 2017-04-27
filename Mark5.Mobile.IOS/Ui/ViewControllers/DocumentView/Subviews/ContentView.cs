@@ -32,11 +32,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         public ContentView(Func<WKNavigationAction, WKNavigationActionPolicy> navigationActionDelegate)
         {
             this.navigationActionDelegate = navigationActionDelegate;
-            Initialize();
         }
 
-        void Initialize()
+        void CreateWebView()
         {
+            if (webView != null)
+            {
+                webView.RemoveFromSuperview();
+                webView.NavigationDelegate = null;
+            }
+
+            webView = null;
+
             var preferences = new WKPreferences();
             preferences.MinimumFontSize = 12f;
             preferences.JavaScriptCanOpenWindowsAutomatically = false;
@@ -98,9 +105,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 resizeAction = (wv) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)), () =>
                 {
                     if (wv.IsLoading)
+                    {
                         resizeAction(wv);
+                    }
                     else
+                    {
                         webViewHeightConstraint.Constant = webView.ScrollView.ContentSize.Height;
+                        SetNeedsLayout();
+                    }
                 });
                 resizeAction(webView);
             }
@@ -114,9 +126,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         {
             if (Document == null)
             {
-                Clear();
                 return;
             }
+
+            CreateWebView();
 
             if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
                 SetContent(ContentType.PlainText, Document.PlainTextBody);
@@ -207,8 +220,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 }
             });
         }
-
-        void Clear() => SetContent(ContentType.PlainText, string.Empty);
 
         #endregion
 

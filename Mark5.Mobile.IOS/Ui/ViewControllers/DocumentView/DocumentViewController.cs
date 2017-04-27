@@ -643,6 +643,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (token.IsCancellationRequested) return;
 
                 RefreshView();
+
+                mainScrollView.SetContentOffset(new CGPoint(-NavigationController.NavigationBar.Frame.Bottom, 0), false);
+
                 EndRefreshing();
 
                 MarkAsReadIfNecessary();
