@@ -80,7 +80,11 @@ namespace Mark5.Mobile.IOS
                 Window.RootViewController = vc;
                 Window.MakeKeyAndVisible();
 
+                UIApplication.SharedApplication.ApplicationIconBadgeNumber = 1;
+                UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
+
                 startupTime.Stop();
+
                 CommonConfig.Logger.Info($"Total startup time: {startupTime.ElapsedMilliseconds}ms");
             }
             catch (Exception ex)
@@ -335,8 +339,6 @@ namespace Mark5.Mobile.IOS
                 BeginInvokeOnMainThread(() =>
                 {
                     CommonConfig.Logger.Info("Refreshing APNS token...");
-
-                    UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
 
                     UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) =>
                     {
