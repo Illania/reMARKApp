@@ -10,7 +10,6 @@ using CoreFoundation;
 using CoreGraphics;
 using Foundation;
 using HtmlAgilityPack;
-using MailBee.Html;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using UIKit;

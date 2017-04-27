@@ -17,6 +17,7 @@ using AngleSharp.Html;
 using AngleSharp.Parser.Html;
 using CoreGraphics;
 using Foundation;
+using HtmlAgilityPack;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
@@ -28,6 +29,7 @@ using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
+
     public class ContentView : ComposeDocumentSubView, IWKNavigationDelegate, IUIGestureRecognizerDelegate, IWKScriptMessageHandler
     {
         UIButton expandButton;
@@ -204,7 +206,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             oldContentWebView.NavigationDelegate = oldContentWebViewNavigationDelegate;
 
             oldContentWebView.ScrollView.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
-            oldContentWebView.ScrollView.ScrollEnabled = false;
             oldContentObserver = oldContentWebView.ScrollView.AddObserver("contentSize", NSKeyValueObservingOptions.New, obj => UpdateWebViewSize(oldContentWebView, oldContentHeightConstraint, null));
             ContainerView.AddSubview(oldContentWebView);
 
@@ -288,7 +289,52 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 }
                 else if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
                 {
-                    oldContent = await GetBodyWithHeader(PreviousDocument.HtmlBody, ContentType.Html);
+                    var content = PreviousDocument.HtmlBody;
+
+                    HtmlDocument htmlDoc = null;
+                    HtmlNode headNode = null;
+
+                    try
+                    {
+                        htmlDoc = new HtmlDocument();
+                        htmlDoc.LoadHtml(content);
+
+                        foreach (var childNode1 in htmlDoc.DocumentNode.ChildNodes)
+                        {
+                            if (headNode != null)
+                                break;
+
+                            if (childNode1.Name == "head")
+                            {
+                                headNode = childNode1;
+                                break;
+                            }
+
+                            foreach (var childNode2 in childNode1.ChildNodes)
+                            {
+                                if (childNode2.Name == "head")
+                                {
+                                    headNode = childNode2;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        CommonConfig.Logger.Warning("Could not process document", ex);
+                    }
+
+                    if (htmlDoc != null && headNode != null)
+                    {
+                        var metaElement = htmlDoc.CreateElement("meta");
+                        metaElement.SetAttributeValue("name", "viewport");
+                        metaElement.SetAttributeValue("content", $"width=device-width, initial-scale=0.7, minimum-scale=0.5, maximum-scale=2.5");
+                        headNode.AppendChild(metaElement);
+                        content = htmlDoc.DocumentNode.OuterHtml;
+                    }
+
+                    oldContent = await GetBodyWithHeader(content, ContentType.Html);
                 }
                 else
                 {
