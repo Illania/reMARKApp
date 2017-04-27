@@ -6,41 +6,32 @@
 // Copyright (c) 2017 Nordic IT
 //
 using System;
+using CoreFoundation;
+using CoreGraphics;
 using Foundation;
+using HtmlAgilityPack;
+using MailBee.Html;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using UIKit;
 using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 {
-    public class ContentView : DocumentSubView, IWKNavigationDelegate, IUIScrollViewDelegate, IUIGestureRecognizerDelegate
+
+    public class ContentView : DocumentSubView, IWKNavigationDelegate, IWKScriptMessageHandler
     {
-        float defaultHeight = 1f;
-        float defaultWidth = 1f;
+
+        readonly static NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
+        readonly static NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
 
         WKWebView webView;
-        NSLayoutConstraint heightConstraint;
-        NSLayoutConstraint widthConstraint;
-
-        nfloat initialHeight;
-        nfloat initialWidth;
-        nfloat initialZoom;
-
-        nfloat centerGestureStartX;
-        nfloat centerGestureStartY;
-        nfloat actualZoomScaleBeforeZooming;
-
-        UIScrollView mainScrollView;
-
-        IDisposable observer;
+        NSLayoutConstraint webViewHeightConstraint;
 
         Func<WKNavigationAction, WKNavigationActionPolicy> navigationActionDelegate;
 
-        bool zoomingStarted;
-
-        public ContentView(UIScrollView mainScrollView, Func<WKNavigationAction, WKNavigationActionPolicy> navigationActionDelegate)
+        public ContentView(Func<WKNavigationAction, WKNavigationActionPolicy> navigationActionDelegate)
         {
-            this.mainScrollView = mainScrollView;
             this.navigationActionDelegate = navigationActionDelegate;
             Initialize();
         }
@@ -48,151 +39,70 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         void Initialize()
         {
             var preferences = new WKPreferences();
+            preferences.MinimumFontSize = 12f;
             preferences.JavaScriptCanOpenWindowsAutomatically = false;
             preferences.JavaScriptEnabled = true;
 
+            var wkscript1 = new WKUserScript(script1, WKUserScriptInjectionTime.AtDocumentEnd, true);
+            var wkscript2 = new WKUserScript(script2, WKUserScriptInjectionTime.AtDocumentEnd, true);
+
+            var userContentController = new WKUserContentController();
+            userContentController.AddUserScript(wkscript1);
+            userContentController.AddUserScript(wkscript2);
+            userContentController.AddScriptMessageHandler(this, "sizeNotification");
+
             var configuration = new WKWebViewConfiguration();
+            configuration.UserContentController = userContentController;
+            configuration.SuppressesIncrementalRendering = true;
             configuration.Preferences = preferences;
 
-            webView = new WKWebView(CoreGraphics.CGRect.Empty, configuration);
-            observer = webView.ScrollView.AddObserver("contentSize", NSKeyValueObservingOptions.New, HandleWebViewContentSizeChanged);
+            webView = new WKWebView(CGRect.Empty, configuration);
             webView.NavigationDelegate = this;
-            webView.ScrollView.Delegate = this;
             webView.Opaque = false;
             webView.BackgroundColor = UIColor.White;
             webView.ScrollView.Bounces = false;
-            webView.ScrollView.ScrollsToTop = false;
-            webView.ScrollView.ScrollEnabled = false;
+            webView.ScrollView.BouncesZoom = false;
             webView.TranslatesAutoresizingMaskIntoConstraints = false;
-            webView.ScrollView.UserInteractionEnabled = true;
-            var pinchRecognizer = new UIPinchGestureRecognizer(HandlePinch);
-            pinchRecognizer.Delegate = this;
-            var tapRecognizer = new UITapGestureRecognizer(HandleTap);
-            tapRecognizer.Delegate = this;
-            webView.ScrollView.AddGestureRecognizer(pinchRecognizer);
-            webView.ScrollView.AddGestureRecognizer(tapRecognizer);
             ContainerView.AddSubview(webView);
-            heightConstraint = NSLayoutConstraint.Create(webView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, defaultHeight);
-            widthConstraint = NSLayoutConstraint.Create(webView, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, defaultWidth);
             ContainerView.AddConstraints(new[]
                 {
-                    heightConstraint,
-                    widthConstraint,
-                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
-                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
+                    webViewHeightConstraint = NSLayoutConstraint.Create(webView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 0f),
+                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, 0f)
                 });
         }
-
-        protected override void Dispose(bool disposing)
-        {
-            observer.Dispose();
-            base.Dispose(disposing);
-        }
-
-        #region Observer handler
-
-        void HandleWebViewContentSizeChanged(NSObservedChange obj)
-        {
-            if (webView.ScrollView.Zooming)
-            {
-                return;
-            }
-
-            BeginInvokeOnMainThread(() =>
-           {
-               initialHeight = webView.ScrollView.ContentSize.Height;
-               initialZoom = webView.ScrollView.ZoomScale;
-               initialWidth = webView.ScrollView.ContentSize.Width;
-
-               heightConstraint.Constant = initialHeight;
-               widthConstraint.Constant = initialWidth;
-           });
-        }
-
-        #endregion
 
         #region IWKNavigationDelegate
 
         [Export("webView:decidePolicyForNavigationAction:decisionHandler:")]
-        void DecidePolicy(WKWebView wkWebView, WKNavigationAction navigationAction, Action<WKNavigationActionPolicy> decisionHandler)
-        {
-            decisionHandler(navigationActionDelegate(navigationAction));
-        }
+        void DecidePolicy(WKWebView wkWebView, WKNavigationAction navigationAction, Action<WKNavigationActionPolicy> decisionHandler) => decisionHandler(navigationActionDelegate(navigationAction));
 
         #endregion
 
-        #region IUIScrollViewDelegate
+        #region IWKScriptMessageHandler
 
-        [Export("scrollViewWillBeginZooming:withView:")]
-        public void ZoomingStarted(UIScrollView scrollView, UIView view)
+        [Export("userContentController:didReceiveScriptMessage:")]
+        public void DidReceiveScriptMessage(WKUserContentController userContentController, WKScriptMessage message)
         {
-            actualZoomScaleBeforeZooming = scrollView.ZoomScale;
-            zoomingStarted = true;
-        }
-
-        [Export("scrollViewDidZoom:")]
-        public void DidZoom(UIScrollView scrollView)
-        {
-            if (!zoomingStarted)
-            {
+            var responseDict = message.Body as NSDictionary;
+            if (responseDict == null)
                 return;
-            }
 
-            if (scrollView.ZoomScale == 5) //When this happens the minimum and the maximum zoom are set to 5, and you can't zoom in either direction
+            var justLoadedNumber = responseDict["justLoaded"] as NSNumber;
+            if (justLoadedNumber != null && justLoadedNumber.BoolValue)
             {
-                scrollView.MinimumZoomScale = 1f; //If we do not set this the next statement is ignored
-                scrollView.SetZoomScale(4.0f, true); //We do not put a value close to 5, otherwise we have a zoom-in / zoom-out flicker
-                return;
+                Action<WKWebView> resizeAction = null;
+                resizeAction = (wv) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(50)), () =>
+                {
+                    if (wv.IsLoading)
+                        resizeAction(wv);
+                    else
+                        webViewHeightConstraint.Constant = webView.ScrollView.ContentSize.Height;
+                });
+                resizeAction(webView);
             }
-
-            var zoomScaleRatio = scrollView.ZoomScale / actualZoomScaleBeforeZooming;
-
-            heightConstraint.Constant = (initialHeight / initialZoom) * scrollView.ZoomScale;
-            widthConstraint.Constant = (initialWidth / initialZoom) * scrollView.ZoomScale;
-
-            var scrollViewOffset = mainScrollView.ContentOffset;
-            scrollViewOffset.X += centerGestureStartX * (zoomScaleRatio - 1);
-            scrollViewOffset.Y += centerGestureStartY * (zoomScaleRatio - 1);
-
-            mainScrollView.ContentOffset = scrollViewOffset;
-
-            actualZoomScaleBeforeZooming = scrollView.ZoomScale;
-
-            var webViewScrollViewOffset = scrollView.ContentOffset;
-            webViewScrollViewOffset.X = 0;
-            webViewScrollViewOffset.Y = 0;
-            scrollView.ContentOffset = webViewScrollViewOffset;
-        }
-
-        #endregion
-
-        #region IUIGestureRecognizerDelegate
-
-        [Export("gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:")]
-        public bool ShouldRecognizeSimultaneously(UIGestureRecognizer gestureRecognizer, UIGestureRecognizer otherGestureRecognizer)
-        {
-            return true;
-        }
-
-        #endregion
-
-        #region Gesture Recognizer handlers
-
-        void HandlePinch(UIPinchGestureRecognizer gestureRecognizer)
-        {
-            if (gestureRecognizer.State == UIGestureRecognizerState.Began)
-            {
-                centerGestureStartX = gestureRecognizer.LocationInView(webView.ScrollView).X;
-                centerGestureStartY = gestureRecognizer.LocationInView(webView.ScrollView).Y;
-            }
-        }
-
-        void HandleTap(UITapGestureRecognizer gestureRecognizer)
-        {
-            centerGestureStartX = gestureRecognizer.LocationInView(webView.ScrollView).X;
-            centerGestureStartY = gestureRecognizer.LocationInView(webView.ScrollView).Y;
         }
 
         #endregion
@@ -208,17 +118,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             }
 
             if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
-            {
                 SetContent(ContentType.PlainText, Document.PlainTextBody);
-            }
             else if (!string.IsNullOrWhiteSpace(Document.HtmlBody))
-            {
                 SetContent(ContentType.Html, Document.HtmlBody);
-            }
             else
-            {
                 SetContent(ContentType.PlainText, Document.PlainTextBody);
-            }
         }
 
         public override void UpdateVisibility()
@@ -238,40 +142,72 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         void SetContent(ContentType contentType, string content)
         {
-            webView.StopLoading();
-            heightConstraint.Constant = defaultHeight;
-            widthConstraint.Constant = defaultWidth;
-
-            if (content == null)
+            DispatchQueue.MainQueue.DispatchAsync(() =>
             {
-                webView.LoadData(NSData.FromString("Content could not be loaded."), "text/plain", "UTF-8", new NSUrl("/"));
-                return;
-            }
+                webView.StopLoading();
 
-            switch (contentType)
-            {
-                case ContentType.Html:
-                    webView.LoadHtmlString(content, null);
-                    break;
-                case ContentType.PlainText:
-                    webView.LoadData(NSData.FromString(content), "text/plain", "UTF-8", new NSUrl("/"));
-                    break;
-                default:
-                    webView.LoadData(NSData.FromString(string.Empty), "text/plain", "UTF-8", new NSUrl("/"));
-                    break;
-            }
+                if (content == null)
+                {
+                    webView.LoadData(NSData.FromString("Content could not be loaded."), "text/plain", "UTF-8", new NSUrl("/"));
+                    return;
+                }
+
+                switch (contentType)
+                {
+                    case ContentType.Html:
+                        try
+                        {
+                            HtmlNode headNode = null;
+
+                            var htmlDoc = new HtmlDocument();
+                            htmlDoc.LoadHtml(content);
+
+                            foreach (var childNode1 in htmlDoc.DocumentNode.ChildNodes)
+                            {
+                                if (headNode != null)
+                                    break;
+
+                                if (childNode1.Name == "head")
+                                {
+                                    headNode = childNode1;
+                                    break;
+                                }
+
+                                foreach (var childNode2 in childNode1.ChildNodes)
+                                    if (childNode2.Name == "head")
+                                    {
+                                        headNode = childNode2;
+                                        break;
+                                    }
+                            }
+
+                            if (htmlDoc != null && headNode != null)
+                            {
+                                var metaElement = htmlDoc.CreateElement("meta");
+                                metaElement.SetAttributeValue("name", "viewport");
+                                metaElement.SetAttributeValue("content", $"initial-scale=0.75, minimum-scale=0.75, maximum-scale=2");
+                                headNode.AppendChild(metaElement);
+                                content = htmlDoc.DocumentNode.OuterHtml;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            CommonConfig.Logger.Warning("Could not process and insert viewport tag", ex);
+                        }
+
+                        webView.LoadHtmlString(content, null);
+                        break;
+                    case ContentType.PlainText:
+                        webView.LoadData(NSData.FromString(content), "text/plain", "UTF-8", new NSUrl("/"));
+                        break;
+                    default:
+                        webView.LoadData(NSData.FromString(string.Empty), "text/plain", "UTF-8", new NSUrl("/"));
+                        break;
+                }
+            });
         }
 
-        void Clear()
-        {
-            webView.StopLoading();
-            heightConstraint.Constant = defaultHeight;
-            widthConstraint.Constant = defaultWidth;
-            initialHeight = 0;
-            initialWidth = 0;
-
-            SetContent(ContentType.PlainText, string.Empty);
-        }
+        void Clear() => SetContent(ContentType.PlainText, string.Empty);
 
         #endregion
 

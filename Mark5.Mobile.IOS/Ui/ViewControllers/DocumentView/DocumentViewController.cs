@@ -276,7 +276,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f)
                 });
 
-            contentView = new ContentView(mainScrollView, DecidePolicyForNavigationAction);
+            contentView = new ContentView(DecidePolicyForNavigationAction);
             mainScrollView.AddSubview(contentView);
             mainScrollView.AddConstraints(new[]
             {
