@@ -22,10 +22,10 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    
+
     public class OutgoingDocumentListViewController : AbstractViewController, IPrimaryViewController, IUIGestureRecognizerDelegate
     {
-        
+
         readonly Folder outgoingFolder = Folder.DocumentsOutgoingFolder;
 
         UIBarButtonItem composeDocumentItem;
@@ -228,12 +228,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             else
             {
-                var ds = (DataSource)tableView.Source;
-
                 var vc = new DocumentViewController();
-                vc.HidesBottomBarWhenPushed = true;
-
-                vc.ClearData();
                 vc.SetData(container.Info.Identifier);
                 vc.SetRefreshDataOnAppear();
 

@@ -143,6 +143,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public override Task UpdateDocument()
         {
+            Document.Lines.Clear();
             Document.Lines.Add(selectedLine);
             return Task.CompletedTask;
         }

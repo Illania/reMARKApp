@@ -16,6 +16,7 @@ namespace Mark5.Mobile.IOS.Utilities
 {
     public static class UI
     {
+        
         #region Pretty printing
 
         static readonly string[] SizeSuffixes = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
@@ -51,7 +52,7 @@ namespace Mark5.Mobile.IOS.Utilities
                 case Priority.Urgent:
                     return Localization.GetString("priority_urgent");
                 default:
-                    throw new ArgumentException($"The input priority \"{priority}\" should not be shown to the user");
+                    return string.Empty;
             }
         }
 
