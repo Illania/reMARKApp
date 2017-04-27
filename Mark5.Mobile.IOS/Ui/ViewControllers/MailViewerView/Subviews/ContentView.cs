@@ -58,8 +58,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
             var configuration = new WKWebViewConfiguration();
             configuration.UserContentController = userContentController;
-            configuration.SuppressesIncrementalRendering = true;
             configuration.Preferences = preferences;
+            configuration.SuppressesIncrementalRendering = true;
+            configuration.AllowsInlineMediaPlayback = false;
 
             webView = new WKWebView(CGRect.Empty, configuration);
             webView.NavigationDelegate = this;

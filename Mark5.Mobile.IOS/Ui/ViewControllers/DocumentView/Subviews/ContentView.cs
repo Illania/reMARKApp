@@ -58,8 +58,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             userContentController.AddScriptMessageHandler(this, "sizeNotification");
 
             var configuration = new WKWebViewConfiguration();
-            configuration.UserContentController = userContentController;
             configuration.SuppressesIncrementalRendering = true;
+            configuration.AllowsInlineMediaPlayback = false;
+            configuration.UserContentController = userContentController;
             configuration.Preferences = preferences;
 
             webView = new WKWebView(CGRect.Empty, configuration);
