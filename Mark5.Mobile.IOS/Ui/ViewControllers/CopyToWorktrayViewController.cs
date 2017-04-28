@@ -198,6 +198,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var usersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
                 var ds = (DataSource)tableView.Source;
                 ds.SetItems(usersDepartments.Users);
+
+                var firstItemIndexPath = NSIndexPath.FromRowSection(0, 0);
+                tableView.SelectRow(firstItemIndexPath, false, UITableViewScrollPosition.None);
+                ds.RowSelected(tableView, firstItemIndexPath);
             }
             catch (Exception ex)
             {
