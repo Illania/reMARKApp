@@ -413,12 +413,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             await AskIfShouldUseTemplates();
 
             documentShown = true;
-
-            //In those cases there is no predefined To
-            if (CreationModeFlag == DocumentCreationModeFlag.New || CreationModeFlag == DocumentCreationModeFlag.Forward)
-            {
-                toView.StartEditing();
-            }
         }
 
         void AddAddressesFromShortcode(Shortcode shortcode)

@@ -75,7 +75,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 {
                     webViewHeightConstraint = NSLayoutConstraint.Create(webView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 0f),
                     NSLayoutConstraint.Create(webView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
                     NSLayoutConstraint.Create(webView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, 0f),
                     NSLayoutConstraint.Create(webView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, 0f)
                 });
@@ -102,20 +102,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
             if ((justLoadedNumber != null && justLoadedNumber.BoolValue) || (resizedNumber != null && resizedNumber.BoolValue))
             {
-                Action<WKWebView> resizeAction = null;
-                resizeAction = (wv) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)), () =>
+                Action<WKWebView, NSLayoutConstraint> resizeAction = null;
+                resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)), () =>
                 {
                     if (wv.IsLoading)
                     {
-                        resizeAction(wv);
+
+                        resizeAction(wv, nslc);
                     }
-                    else
+                    else if (nslc.Constant != wv.ScrollView.ContentSize.Height)
                     {
-                        webViewHeightConstraint.Constant = webView.ScrollView.ContentSize.Height;
+                        nslc.Constant = wv.ScrollView.ContentSize.Height;
+
                         SetNeedsLayout();
                     }
                 });
-                resizeAction(webView);
+                resizeAction(webView, webViewHeightConstraint);
             }
         }
 
@@ -200,7 +202,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                             {
                                 var metaElement = htmlDoc.CreateElement("meta");
                                 metaElement.SetAttributeValue("name", "viewport");
-                                metaElement.SetAttributeValue("content", $"initial-scale=0.75, minimum-scale=0.75, maximum-scale=2");
+                                metaElement.SetAttributeValue("content", $"initial-scale=0.75, minimum-scale=0.5, maximum-scale=2");
                                 headNode.AppendChild(metaElement);
                                 content = htmlDoc.DocumentNode.OuterHtml;
                             }
