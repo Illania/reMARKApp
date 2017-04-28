@@ -36,6 +36,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         readonly static NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
         readonly static NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
+        readonly static NSString script3 = new NSString("var observer = new MutationObserver(function(mutations) { window.webkit.messageHandlers.mutation.postMessage({mutated:true}); }); observer.observe(document.querySelector('#editable-one'), { attributes: true, childList: true, characterData: true });");
 
         UIButton expandButton;
 
@@ -64,7 +65,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                                                     <meta name=""viewport"" content=""width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"">
                                                 </head>
                                                 <body>
-                                                    <div id=""editable-one"" class=""" + EditableContentClass + @""" contenteditable=""true"" style=""width: 100%"" onfocus=""editableContentFocused()""><br></div>
+                                                    <div id=""editable-one"" class=""" + EditableContentClass + @""" contenteditable=""true"" style=""font-family: sans-serif; width: 100%""><br></div>
                                                 </body >
                                             </html>";
 
@@ -90,13 +91,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var wkscript1 = new WKUserScript(script1, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript2 = new WKUserScript(script2, WKUserScriptInjectionTime.AtDocumentEnd, true);
+            var wkscript3 = new WKUserScript(script3, WKUserScriptInjectionTime.AtDocumentEnd, true);
 
             var userContentController = new WKUserContentController();
             userContentController.AddUserScript(wkscript1);
             userContentController.AddUserScript(wkscript2);
+            userContentController.AddUserScript(wkscript3);
             userContentController.AddScriptMessageHandler(this, "sizeNotification");
-            userContentController.AddScriptMessageHandler(this, "editableContentFocusedHandler");
-            userContentController.AddScriptMessageHandler(this, "editableContentInputHandler");
+            userContentController.AddScriptMessageHandler(this, "mutation");
 
             var configuration = new WKWebViewConfiguration();
             configuration.SuppressesIncrementalRendering = false;
@@ -588,8 +590,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var justLoadedNumber = responseDict["justLoaded"] as NSNumber;
             var resizedNumber = responseDict["resized"] as NSNumber;
+            var mutatedNumber = responseDict["mutated"] as NSNumber;
 
-            if ((justLoadedNumber != null && justLoadedNumber.BoolValue) || (resizedNumber != null && resizedNumber.BoolValue))
+            if ((justLoadedNumber != null && justLoadedNumber.BoolValue)
+                || (resizedNumber != null && resizedNumber.BoolValue)
+                || (mutatedNumber != null && mutatedNumber.BoolValue))
             {
                 Action<WKWebView, NSLayoutConstraint> resizeAction = null;
                 resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)), () =>
@@ -614,22 +619,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         class WebViewNavigationDelegate : WKNavigationDelegate
         {
+
             public Action DidFinishNavigationAction { get; set; }
 
             public override void DidFinishNavigation(WKWebView webView, WKNavigation navigation)
             {
                 BeginInvokeOnMainThread(async () =>
                 {
-                    //Not sure why it does not work withouth the following line
                     await webView.EvaluateJavaScriptAsync("");
 
                     if (DidFinishNavigationAction != null)
-                    {
                         DidFinishNavigationAction();
-                    }
                 });
             }
         }
-
     }
 }

@@ -52,7 +52,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                                                 <head>
                                                 </head>
                                                 <body style=""min-height: 500px;"">
-                                                    <div class=""" + EditableContentClass + @""" contenteditable=""true"" style=""width: 100%; outline: 0px solid transparent""><br><br></div>
+                                                    <div class=""" + EditableContentClass + @""" contenteditable=""true"" style=""font-family: sans-serif; width: 100%; outline: 0px solid transparent""><br><br></div>
                                                 </body>
                                             </html>";
 
