@@ -239,7 +239,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var tappedRecipent = beforeSubstring + afterSubstring;
 
-            CommonConfig.Logger.Trace($"Tapped recipent. [recipent={tappedRecipent}]");
+            if (CommonConfig.Logger.IsTraceEnabled())
+                CommonConfig.Logger.Trace($"Tapped recipent. [recipent={tappedRecipent}]");
 
             RecipentTapped(this, new RecipentTappedEventArgs(tappedRecipent));
         }
@@ -255,14 +256,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var selection = TextView.SelectedRange;
 
             if (TextView.Text.Length == selection.Location && selection.Length == 0)
-            {
                 return;
-            }
 
             if (TextView.Text.Length > selection.Location)
             {
                 var beforeCursorString = TextView.Text.SafeSubstring(0, (int)selection.Location);
-                var afterCursorString = TextView.Text.SafeSubstring((int)selection.Location, TextView.Text.Length);
+                var afterCursorString = TextView.Text.SafeSubstring((int)selection.Location, TextView.Text.Length - (int)selection.Location - 1);
 
                 var indexInSecondPartString = afterCursorString.IndexOf(EmailSeparator, StringComparison.CurrentCultureIgnoreCase);
                 if (indexInSecondPartString == -1)

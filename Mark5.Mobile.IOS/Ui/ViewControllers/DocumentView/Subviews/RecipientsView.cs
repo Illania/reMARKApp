@@ -156,7 +156,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
             var tappedRecipent = beforeSubstring + afterSubstring;
 
-            CommonConfig.Logger.Trace(string.Format("Tapped recipent. [recipent={0}]", tappedRecipent));
+            if (CommonConfig.Logger.IsTraceEnabled())
+                CommonConfig.Logger.Trace(string.Format("Tapped recipent. [recipent={0}]", tappedRecipent));
 
             RecipentTapped(this, new RecipentTappedEventArgs(tappedRecipent));
         }
