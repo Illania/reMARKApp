@@ -1,6 +1,6 @@
 //
 // Project: Mark5.Mobile.ServiceReference
-// File: AppServiceProxy.cs
+// File: WcfAppServiceProxy.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -17,7 +17,7 @@ using Mark5.ServiceReference.Exceptions;
 namespace Mark5.ServiceReference.AppService
 {
 
-    class AppServiceProxy : IAppServiceProxy
+    class WcfAppServiceProxy : IAppServiceProxy
     {
 
         public Version Version { get { return new Version(3, 0, 0); } }
@@ -48,7 +48,7 @@ namespace Mark5.ServiceReference.AppService
 
         readonly EndpointAddress endpoint;
 
-        public AppServiceProxy(bool ssl, string hostname, int port)
+        public WcfAppServiceProxy(bool ssl, string hostname, int port)
         {
             endpoint = new EndpointAddress($"{(ssl ? "https" : "http")}://{hostname}:{port}/app3");
         }

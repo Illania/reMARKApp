@@ -18,7 +18,7 @@ namespace Mark5.ServiceReference
 
         public static IAppServiceProxy Create (bool ssl, string hostname, int port)
         {
-            return new AppServiceProxy (ssl, hostname, port);
+            return new WcfAppServiceProxy (ssl, hostname, port);
         }
     }
 }

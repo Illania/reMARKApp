@@ -29,7 +29,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AppService\AppServiceClient.AppServiceClientChannel.cs" />
     <Compile Include="AppService\AppServiceClient.cs" />
-    <Compile Include="AppService\AppServiceProxy.cs" />
+    <Compile Include="AppService\WcfAppServiceProxy.cs" />
     <Compile Include="AppService\IAppServiceClient.cs" />
     <Compile Include="AppService\IAppServiceProxy.cs" />
     <Compile Include="DataContract\AppServiceDataContract.cs" />
