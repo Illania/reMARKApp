@@ -83,10 +83,10 @@
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <MtouchLink>SdkOnly</MtouchLink>
     <MtouchArch>ARMv7s, ARM64</MtouchArch>
-    <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
+    <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
-    <CodesignProvision>840a3d1f-e198-49d0-a939-835e472a1e97</CodesignProvision>
+    <CodesignProvision>Mark5 Mobile Development</CodesignProvision>
 <RunCodeAnalysis>true</RunCodeAnalysis>  <MtouchI18n>cjk,mideast,west</MtouchI18n>
 </PropertyGroup>
   <ItemGroup>
