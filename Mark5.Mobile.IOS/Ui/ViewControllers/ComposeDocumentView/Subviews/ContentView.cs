@@ -189,8 +189,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             oldContentWebView.TranslatesAutoresizingMaskIntoConstraints = false;
             oldContentWebView.Hidden = true;
             oldContentWebView.Opaque = false;
-            newContentWebView.ScrollView.Bounces = false;
-            newContentWebView.ScrollView.BouncesZoom = false;
+            oldContentWebView.ScrollView.Bounces = false;
+            oldContentWebView.ScrollView.BouncesZoom = false;
             oldContentWebView.NavigationDelegate = new WebViewNavigationDelegate();
 
             oldContentHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0.5f);
