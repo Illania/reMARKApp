@@ -37,6 +37,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         readonly static NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
         readonly static NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
         readonly static NSString script3 = new NSString("var observer = new MutationObserver(function(mutations) { window.webkit.messageHandlers.mutation.postMessage({mutated:true}); }); observer.observe(document.querySelector('#editable-one'), { attributes: true, childList: true, characterData: true });");
+        //TODO need to add the mutated also to the old document
 
         UIButton expandButton;
 
@@ -56,8 +57,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         NSLayoutConstraint oldContentHeightConstraint;
 
         SemaphoreSlim newContentLoadingSemaphore;
-
-        const string EditableContentClass = "content_c176f8ef-2579-4f1f-86c1-f289beaba2ae";
+        const string NewEditableContentClass = "new_content_c176f8ef-2579-4f1f-86c1-f289beaba2ae";
+        const string OldEditableContentClass = "old_content_cc4ee2cb-e18c-423a-adb2-d106a29dcbc3";
 
         const string DefaultEditContent = @"<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.01 Transitional//EN"" ""http://www.w3.org/TR/html4/loose.dtd"">
                                             <html>
@@ -65,7 +66,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                                                     <meta name=""viewport"" content=""width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"">
                                                 </head>
                                                 <body>
-                                                    <div id=""editable-one"" class=""" + EditableContentClass + @""" contenteditable=""true"" style=""font-family: sans-serif; width: 100%""><br></div>
+                                                    <div id=""editable-one"" class=""" + NewEditableContentClass + @""" contenteditable=""true"" style=""font-family: sans-serif; width: 100%""><br></div>
                                                 </body >
                                             </html>";
 
@@ -193,7 +194,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             oldContentWebView.ScrollView.BouncesZoom = false;
             oldContentWebView.NavigationDelegate = new WebViewNavigationDelegate();
 
-            oldContentHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0.5f);
+            oldContentHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f);
             oldContentZeroHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0f);
 
             ContainerView.AddSubview(oldContentWebView);
@@ -214,14 +215,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
                 if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
-                    await SetWebContentPart(EditableContentClass, ContentType.Html, PreviousDocument.HtmlBody);
+                    await SetWebContentPart(NewEditableContentClass, ContentType.Html, PreviousDocument.HtmlBody);
                 else
-                    await SetWebContentPart(EditableContentClass, ContentType.PlainText, PreviousDocument.PlainTextBody);
+                    await SetWebContentPart(NewEditableContentClass, ContentType.PlainText, PreviousDocument.PlainTextBody);
             }
             else
             {
                 expandButton.Hidden &= PreviousDocument == null;
                 separatorBeforeExpand.Hidden = expandButton.Hidden;
+
+                await LoadOldContent();
+                //We need to load the old content before the button is pressed, because otherwise the resize action gets called too early when the button is pressed
             }
 
         }
@@ -232,9 +236,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             DocumentPreview.Preview = await GetPreview(Document.HtmlBody);
         }
 
-        public async Task InsertTemplate(Template template) => await SetWebContentPart(EditableContentClass, template.ContentType, GetContentWithSpace(template.ContentType, template.Content));
+        public async Task InsertTemplate(Template template) => await SetWebContentPart(NewEditableContentClass, template.ContentType, GetContentWithSpace(template.ContentType, template.Content));
 
-        public async Task InsertLocalTemplate(string localTemplate) => await SetWebContentPart(EditableContentClass, ContentType.PlainText, GetContentWithSpace(ContentType.PlainText, localTemplate));
+        public async Task InsertLocalTemplate(string localTemplate) => await SetWebContentPart(NewEditableContentClass, ContentType.PlainText, GetContentWithSpace(ContentType.PlainText, localTemplate));
 
         #endregion
 
@@ -384,6 +388,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
                 body.InsertBefore(parsedHeader.Body, body.FirstChild);
 
+                var ce = htmlDocument.CreateElement("div");
+                ce.ClassName = OldEditableContentClass;
+                ce.SetAttribute("contentEditable", "true");
+
+                ce.InnerHtml = body.InnerHtml;
+                body.InnerHtml = ce.OuterHtml;
+
                 var textWriter = new StringWriter();
                 htmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
 
@@ -492,7 +503,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var elementClasses = new[]
             {
-                EditableContentClass
+                NewEditableContentClass
             };
 
             foreach (var elementClass in elementClasses)
@@ -603,7 +614,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     {
                         resizeAction(wv, nslc);
                     }
-                    else if (nslc.Constant != wv.ScrollView.ContentSize.Height)
+                    else if (Math.Abs(nslc.Constant - wv.ScrollView.ContentSize.Height) > 10) //Condition to avoid loop on size increase
                     {
                         nslc.Constant = wv.ScrollView.ContentSize.Height;
                         SetNeedsLayout();
