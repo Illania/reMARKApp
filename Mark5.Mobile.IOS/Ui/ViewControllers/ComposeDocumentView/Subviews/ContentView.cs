@@ -47,7 +47,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         SeparatorSubView separatorBeforeExpand;
         SeparatorSubView separatorAfterExpand;
 
-        string oldContent;
         bool oldContentLoaded;
 
         Dictionary<UIView, NSLayoutConstraint[]> constraintsStash;
@@ -226,6 +225,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 await LoadOldContent();
                 //We need to load the old content before the button is pressed, because otherwise the resize action gets called too early when the button is pressed
+                // and the size is not correct yet
             }
 
         }
@@ -248,6 +248,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             if (!oldContentLoaded && CreationModeFlag != DocumentCreationModeFlag.Edit && PreviousDocument != null)
             {
+                string oldContent = null;
                 if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
                 {
                     oldContent = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
@@ -428,11 +429,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             await LoadOldContent();
 
-            if (!string.IsNullOrEmpty(oldContent))
+            var oldContentString = (await oldContentWebView.EvaluateJavaScriptAsync(GetWebContentJs) as NSString).ToString();
+            var oldContentProcessed = await ProcessRetrievedContent(new HtmlParser(), oldContentString);
+
+            if (!string.IsNullOrEmpty(oldContentProcessed))
             {
                 var htmlParser = new HtmlParser();
                 var newContentParsed = await htmlParser.ParseAsync(newContentProcessedString);
-                var oldContentParsed = await htmlParser.ParseAsync(oldContent);
+                var oldContentParsed = await htmlParser.ParseAsync(oldContentProcessed);
                 var oldContentInDiv = newContentParsed.CreateElement("div");
                 oldContentInDiv.InnerHtml = oldContentParsed.Body.InnerHtml;
                 newContentParsed.Body.Append(oldContentInDiv);
@@ -503,7 +507,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var elementClasses = new[]
             {
-                NewEditableContentClass
+                NewEditableContentClass,
+                OldEditableContentClass //TODO can be improved
             };
 
             foreach (var elementClass in elementClasses)
