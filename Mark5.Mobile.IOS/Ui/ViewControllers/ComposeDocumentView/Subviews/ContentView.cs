@@ -31,7 +31,7 @@ using WebKit;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
 
-    public class ContentView : ComposeDocumentSubView, IWKNavigationDelegate, IUIGestureRecognizerDelegate, IWKScriptMessageHandler
+    public class ContentView : ComposeDocumentSubView, IWKNavigationDelegate, IUIGestureRecognizerDelegate, IWKScriptMessageHandler, IUIScrollViewDelegate
     {
 
         readonly static NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
@@ -191,6 +191,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             oldContentWebView.Opaque = false;
             oldContentWebView.ScrollView.Bounces = false;
             oldContentWebView.ScrollView.BouncesZoom = false;
+            oldContentWebView.ScrollView.Delegate = this;
+
+            var panRecognizer = new UIPanGestureRecognizer();
+            panRecognizer.AddTarget(() => HandlePan(panRecognizer));
+            panRecognizer.Delegate = this;
+
+            var pinchRecognizer = new UIPinchGestureRecognizer();
+            pinchRecognizer.AddTarget(() => HandlePinch(pinchRecognizer));
+            pinchRecognizer.Delegate = this;
+
+            oldContentWebView.ScrollView.AddGestureRecognizer(panRecognizer);
+            oldContentWebView.ScrollView.AddGestureRecognizer(pinchRecognizer);
+
             oldContentWebView.NavigationDelegate = new WebViewNavigationDelegate();
 
             oldContentHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f);
@@ -206,6 +219,57 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, 0f)
             });
         }
+
+        #region ScrollView
+
+        bool panning;
+        bool pinching;
+
+        void HandlePan(UIGestureRecognizer r)
+        {
+            if (r.State == UIGestureRecognizerState.Began)
+                panning = true;
+            else if (r.State == UIGestureRecognizerState.Cancelled || r.State == UIGestureRecognizerState.Ended)
+                panning = false;
+
+            CommonConfig.Logger.Debug("PAN STATE = " + r.State);
+        }
+
+        void HandlePinch(UIGestureRecognizer r)
+        {
+            if (r.State == UIGestureRecognizerState.Began)
+                pinching = true;
+            else if (r.State == UIGestureRecognizerState.Cancelled || r.State == UIGestureRecognizerState.Ended)
+                pinching = false;
+
+            CommonConfig.Logger.Debug("PINCH STATE = " + r.State);
+        }
+
+        [Export("scrollViewDidScroll:")]
+        void DidScroll(UIScrollView s)
+        {
+            if (panning || pinching)
+                return;
+
+            s.ContentOffset = new CGPoint(0, 0);
+        }
+
+        nfloat oldZoomScale = 0.75f;
+
+        [Export("scrollViewDidZoom:")]
+        void DidZoom(UIScrollView s)
+        {
+            if (panning || pinching)
+            {
+                oldZoomScale = oldContentWebView.ScrollView.ZoomScale;
+                return;
+            }
+
+            s.ZoomScale = oldZoomScale;
+        }
+
+        #endregion
+
 
         #region Public methods
 
