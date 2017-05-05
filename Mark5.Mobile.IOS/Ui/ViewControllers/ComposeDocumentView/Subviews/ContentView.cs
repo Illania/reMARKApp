@@ -231,8 +231,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 panning = true;
             else if (r.State == UIGestureRecognizerState.Cancelled || r.State == UIGestureRecognizerState.Ended)
                 panning = false;
-
-            CommonConfig.Logger.Debug("PAN STATE = " + r.State);
         }
 
         void HandlePinch(UIGestureRecognizer r)
@@ -241,17 +239,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 pinching = true;
             else if (r.State == UIGestureRecognizerState.Cancelled || r.State == UIGestureRecognizerState.Ended)
                 pinching = false;
-
-            CommonConfig.Logger.Debug("PINCH STATE = " + r.State);
         }
+
+        CGPoint oldContentOffset = new CGPoint(0, 0);
 
         [Export("scrollViewDidScroll:")]
         void DidScroll(UIScrollView s)
         {
             if (panning || pinching)
+            {
+                oldContentOffset = s.ContentOffset;
                 return;
+            }
 
-            s.ContentOffset = new CGPoint(0, 0);
+            CommonConfig.Logger.Debug("SCROLLING!!!");
+
+            s.ContentOffset = oldContentOffset;
         }
 
         nfloat oldZoomScale = 0.75f;
