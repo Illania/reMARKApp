@@ -225,6 +225,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         bool panning;
         bool pinching;
 
+        public void OnKeyboardDidShow(float keyboardHeight)
+        {
+        }
+
+        public void OnKeyboardWillHide()
+        {
+        }
+
+        public void OnKeyboardWillChangeFrame(float keyboardHeight)
+        {
+        }
+
+        public void OnKeyboardDidHide()
+        {
+            oldContentOffset = new CGPoint(0, 0);
+
+            CGRect scrollBounds = oldContentWebView.ScrollView.Bounds;
+            scrollBounds.X = oldContentOffset.X;
+            scrollBounds.Y = oldContentOffset.Y;
+            oldContentWebView.ScrollView.Bounds = scrollBounds; //It's the same as modifying the content offset, but wihtouth triggering didScroll
+        }
+
+        //TODO it works strangely, need to investigate further
+
         void HandlePan(UIGestureRecognizer r)
         {
             if (r.State == UIGestureRecognizerState.Began)
@@ -252,9 +276,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 return;
             }
 
-            CommonConfig.Logger.Debug("SCROLLING!!!");
+            CommonConfig.Logger.Debug($" SCROLLING - ACTUAL = {s.ContentOffset}, EXPECTED = {oldContentOffset}"); //TODO remove later
+
+            if (Math.Abs(s.ContentOffset.X - oldContentOffset.X) < 10 && Math.Abs(s.ContentOffset.Y - oldContentOffset.Y) < 10)
+                return;
 
             s.ContentOffset = oldContentOffset;
+
         }
 
         nfloat oldZoomScale = 0.75f;
@@ -267,6 +295,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 oldZoomScale = oldContentWebView.ScrollView.ZoomScale;
                 return;
             }
+
+            CommonConfig.Logger.Debug("ZOOMING : ");
 
             s.ZoomScale = oldZoomScale;
         }
@@ -688,6 +718,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     }
                     else if (Math.Abs(nslc.Constant - wv.ScrollView.ContentSize.Height) > 10) //Condition to avoid loop on size increase
                     {
+                        CommonConfig.Logger.Debug($"CONSTANT = {nslc.Constant}, HEIGHT ={wv.ScrollView.ContentSize.Height}");
                         nslc.Constant = wv.ScrollView.ContentSize.Height;
                         SetNeedsLayout();
                     }

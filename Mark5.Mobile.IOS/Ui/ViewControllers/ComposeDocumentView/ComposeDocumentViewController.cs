@@ -110,9 +110,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             InitializeHandlers();
 
-            NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.DidShowNotification, OnKeyboardDidShowNotification);
-            NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillChangeFrameNotification, OnKeyboardDidShowNotification);
-            NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
+            UIKeyboard.Notifications.ObserveDidShow(OnKeyboardDidShowNotification);
+            UIKeyboard.Notifications.ObserveWillChangeFrame(OnKeyboardWillChangeFrame);
+            UIKeyboard.Notifications.ObserveWillHide(OnKeyboardWillHideNotification);
+            UIKeyboard.Notifications.ObserveDidHide(OnKeyboardDidHideNotification);
+
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -451,20 +453,41 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         #region Keyboard Notifications
 
-        void OnKeyboardDidShowNotification(NSNotification notification)
+        void OnKeyboardDidShowNotification(object sender, UIKeyboardEventArgs e)
         {
-            keyboardHeight = UI.KeyboardHeightFromNotification(notification);
+            keyboardHeight = UI.KeyboardHeightFromNotification(e.Notification);
 
             var insets = scrollView.ContentInset;
             insets.Bottom = keyboardHeight;
             scrollView.ContentInset = insets;
+
+            contentView.OnKeyboardDidShow(keyboardHeight);
         }
 
-        void OnKeyboardWillHideNotification(NSNotification notification)
+        void OnKeyboardWillChangeFrame(object sender, UIKeyboardEventArgs e)
+        {
+            keyboardHeight = UI.KeyboardHeightFromNotification(e.Notification);
+
+            var insets = scrollView.ContentInset;
+            insets.Bottom = keyboardHeight;
+            scrollView.ContentInset = insets;
+
+            contentView.OnKeyboardWillChangeFrame(keyboardHeight);
+        }
+
+        void OnKeyboardWillHideNotification(object sender, UIKeyboardEventArgs e)
         {
             var insets = scrollView.ContentInset;
             insets.Bottom = 0f;
             scrollView.ContentInset = insets;
+
+            contentView.OnKeyboardWillHide();
+
+        }
+
+        void OnKeyboardDidHideNotification(object sender, UIKeyboardEventArgs e)
+        {
+            contentView.OnKeyboardDidHide();
         }
 
         #endregion
