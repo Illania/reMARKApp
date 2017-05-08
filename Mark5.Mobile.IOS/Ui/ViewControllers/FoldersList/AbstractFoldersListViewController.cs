@@ -363,11 +363,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     List<Folder> folders;
                     if (!forceRefresh && ParentFolder.HasSubFolders && ParentFolder.SubFolders != null && ParentFolder.SubFolders.Count > 0)
                     {
-                        folders = await Managers.FoldersManager.GetFoldersAsync(ParentFolder, 3, SourceType.Local);
+                        folders = await Managers.FoldersManager.GetFoldersAsync(ParentFolder, sourceType: SourceType.Local);
                     }
                     else
                     {
-                        folders = await Managers.FoldersManager.GetFoldersAsync(ParentFolder, 3);
+                        folders = await Managers.FoldersManager.GetFoldersAsync(ParentFolder);
                     }
 
                     var favoriteIds = favorites.Select(f => f.Id);

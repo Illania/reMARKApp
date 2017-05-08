@@ -252,7 +252,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 try
                 {
-                    var remoteFolders = await Managers.FoldersManager.GetFoldersAsync(RemoteFolder, 2);
+                    var remoteFolders = await Managers.FoldersManager.GetFoldersAsync(RemoteFolder);
                     Adapter.Refresh(remoteFolders, Section.Remote);
                 }
                 catch (Exception ex)
