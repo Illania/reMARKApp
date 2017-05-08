@@ -29,6 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
     public class ShortcodeViewController : AbstractViewController, ISecondaryViewController
     {
+        
         public bool Modal { get; set; }
 
         public bool Empty { get { return folderId == null && folder == null && shortcodeId == null && shortcodePreview == null && shortcode == null; } }
@@ -80,8 +81,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"{nameof(ShortcodeViewController)} appeared");
             
-            tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-            tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+            tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+            tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
 
             if (refreshDataOnAppear)
             {
@@ -113,8 +114,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 if (tableView == null) return;
 
-                tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-                tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+                tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+                tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
             });
         }
 
@@ -144,8 +145,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
             tableView.RowHeight = UITableView.AutomaticDimension;
             tableView.EstimatedRowHeight = 60f;
-            tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-            tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 40f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+            tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+            tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
             tableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed) { MinimumPressDuration = 1f });
             View.AddSubview(tableView);
             View.AddConstraints(new[]
@@ -168,11 +169,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 fileToButton,
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace)
             };
+            toolbar.BarTintColor = Theme.Gray;
             toolbar.TranslatesAutoresizingMaskIntoConstraints = false;
+            toolbar.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            toolbar.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             View.AddSubview(toolbar);
             View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 40f),
+                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 45f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
                     NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, -(TabBarController?.TabBar?.Frame.Height ?? 0f))
