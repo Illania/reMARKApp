@@ -62,6 +62,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             configuration.AllowsInlineMediaPlayback = false;
             configuration.UserContentController = userContentController;
             configuration.Preferences = preferences;
+            configuration.DataDetectorTypes = WKDataDetectorTypes.PhoneNumber | WKDataDetectorTypes.Link;
 
             webView = new WKWebView(CGRect.Empty, configuration);
             webView.NavigationDelegate = this;
