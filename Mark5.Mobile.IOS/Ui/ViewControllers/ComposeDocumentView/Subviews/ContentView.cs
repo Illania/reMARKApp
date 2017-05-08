@@ -232,9 +232,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             DocumentPreview.Preview = await GetPreview(Document.HtmlBody);
         }
 
-        public async Task InsertTemplate(Template template) => await SetWebContentPart(EditableContentClass, template.ContentType, GetContentWithSpace(template.ContentType, template.Content));
+        public async Task InsertTemplate(Template template) => await SetWebContentPart(EditableContentClass, template.ContentType, template.Content);
 
-        public async Task InsertLocalTemplate(string localTemplate) => await SetWebContentPart(EditableContentClass, ContentType.PlainText, GetContentWithSpace(ContentType.PlainText, localTemplate));
+        public async Task InsertLocalTemplate(string localTemplate) => await SetWebContentPart(EditableContentClass, ContentType.PlainText, "\n\n\n" + localTemplate);
 
         #endregion
 
@@ -311,26 +311,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #region Content processing
 
-        string GetContentWithSpace(ContentType contentType, string content)
-        {
-            if (contentType == ContentType.Html)
-            {
-                return "<br><br><br>" + content;
-            }
-            if (contentType == ContentType.PlainText)
-            {
-                return "\n\n\n\n" + content;
-            }
-
-            throw new ArgumentException("Invalid content type");
-        }
-
         string GetHtmlHeader()
         {
             var date = PreviousDocumentPreview.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime()
                          .ConvertUtcToUserTime()
                          .ConvertDateTimeToTimestampMilliseconds()
-                        .FormatUserTimestampAsCompactLongDateTimeString();
+                         .FormatUserTimestampAsCompactLongDateTimeString();
 
             var header = new StringBuilder();
             header.Append("<br/><hr/>");
