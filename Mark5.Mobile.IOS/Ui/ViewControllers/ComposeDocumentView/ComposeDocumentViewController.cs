@@ -636,7 +636,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }));
             sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("browse_files"), UIAlertActionStyle.Default, a =>
             {
-                var picker = new DocumentMenuViewController(new string[] { "public.content", "public.data" }, UIDocumentPickerMode.Import)
+                var picker = new DocumentMenuViewController(new [] { "public.content", "public.data", "public.msg", "public.eml" }, UIDocumentPickerMode.Import)
                 {
                     Delegate = new DocumentMenuDelegate(this, HandleAttachmentUrl)
                 };
