@@ -313,6 +313,16 @@
 		</dict>
 		<dict>
 			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>partial_word_search</string>
+			<key>Key</key>
+			<string>PartialWordSearch</string>
+			<key>DefaultValue</key>
+			<string>No</string>
+		</dict>
+		<dict>
+			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
 			<string>cache</string>

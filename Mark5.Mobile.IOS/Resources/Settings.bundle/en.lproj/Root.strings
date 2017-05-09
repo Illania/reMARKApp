@@ -38,6 +38,7 @@
 "mark_as_read_delay_seconds" = "Mark as read after";
 "me" = "Me";
 "open_settings_app" = "Open Settings app";
+"partial_word_search" = "Partial word search";
 "plain" = "Plain Text";
 "remove_line" = "Remove line address";
 "search" = "Search";

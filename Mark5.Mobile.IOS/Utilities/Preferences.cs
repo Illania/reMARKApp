@@ -46,6 +46,7 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string DocumentsToSearchKey = "DocumentsToSearch";
             public const string ContactsToSearchKey = "ContactsToSearch";
             public const string ShortcodesToSearchKey = "ShortcodesToSearch";
+            public const string PartialWordSearchKey = "PartialWordSearch";
 
             public const string CleanCacheIntervalDaysKey = "CleanCacheIntervalDays";
             public const string ClearCacheKey = "ClearCache";
@@ -87,6 +88,7 @@ namespace Mark5.Mobile.IOS.Utilities
             defaultsDictionary.Add(new NSString(Keys.DocumentsToSearchKey), NSNumber.FromInt16(250));
             defaultsDictionary.Add(new NSString(Keys.ContactsToSearchKey), NSNumber.FromInt16(250));
             defaultsDictionary.Add(new NSString(Keys.ShortcodesToSearchKey), NSNumber.FromInt16(250));
+            defaultsDictionary.Add(new NSString(Keys.PartialWordSearchKey), NSNumber.FromBoolean(false));
 
             defaultsDictionary.Add(new NSString(Keys.CleanCacheIntervalDaysKey), NSNumber.FromInt16(7));
             defaultsDictionary.Add(new NSString(Keys.ClearCacheKey), NSNumber.FromBoolean(false));
@@ -108,8 +110,6 @@ namespace Mark5.Mobile.IOS.Utilities
                 return dict;
             }
         }
-
-        #region Documents
 
         public bool UseServerTimezone
         {
@@ -167,10 +167,6 @@ namespace Mark5.Mobile.IOS.Utilities
             }
         }
 
-        #endregion
-
-        #region Contacts
-
         public bool SynchroniseContacts
         {
             get
@@ -179,10 +175,6 @@ namespace Mark5.Mobile.IOS.Utilities
             }
         }
 
-        #endregion
-
-        #region Shortcodes
-
         public bool SynchroniseShortcodes
         {
             get
@@ -190,10 +182,6 @@ namespace Mark5.Mobile.IOS.Utilities
                 return ud.BoolForKey(Keys.SynchroniseShortcodesKey);
             }
         }
-
-        #endregion
-
-        #region Composing Documents
 
         public bool ComposePriorityEnabled
         {
@@ -232,8 +220,6 @@ namespace Mark5.Mobile.IOS.Utilities
             }
         }
 
-        #endregion
-
         public int DocumentsToSearch
         {
             get
@@ -255,6 +241,14 @@ namespace Mark5.Mobile.IOS.Utilities
             get
             {
                 return (int)ud.IntForKey(Keys.ShortcodesToSearchKey);
+            }
+        }
+
+        public bool PartialWordSearch
+        {
+            get
+            {
+                return ud.BoolForKey(Keys.PartialWordSearchKey);
             }
         }
 
