@@ -253,6 +253,13 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
+        public bool PartialWordSearch
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_search_partial_word), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_search_partial_word_default));
+            }
+        }
 
         #endregion
 
