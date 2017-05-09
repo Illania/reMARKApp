@@ -73,10 +73,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         const string GetWebContentJs = "document.documentElement.outerHTML;";
         const string GetPlainTextContentJs = "document.body.innerText;";
 
-        public ContentView()
+        UIScrollView sv;
+
+        public ContentView(UIScrollView sv)
         {
             constraintsStash = new Dictionary<UIView, NSLayoutConstraint[]>();
             newContentLoadingSemaphore = new SemaphoreSlim(0);
+            this.sv = sv; //TODO beautfy
 
             InitializeNewContentControls();
             InitializeOldContentControls();
@@ -118,7 +121,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     newContentHeightConstraint = NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 200f),
                     NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
                     NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                    NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
+                    NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin) //TODO in the old content webview we don't have this
                 });
 
             newContentWebView.LoadHtmlString(DefaultEditContent, null);
@@ -201,8 +204,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             pinchRecognizer.AddTarget(() => HandlePinch(pinchRecognizer));
             pinchRecognizer.Delegate = this;
 
+            var tapRecognizer = new UITapGestureRecognizer();
+            tapRecognizer.AddTarget(() => HandleTap(tapRecognizer));
+            tapRecognizer.Delegate = this;
+
             oldContentWebView.ScrollView.AddGestureRecognizer(panRecognizer);
             oldContentWebView.ScrollView.AddGestureRecognizer(pinchRecognizer);
+            oldContentWebView.ScrollView.AddGestureRecognizer(tapRecognizer);
 
             oldContentWebView.NavigationDelegate = new WebViewNavigationDelegate();
 
@@ -224,17 +232,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         bool panning;
         bool pinching;
+        nfloat tapY;
 
-        public void OnKeyboardDidShow(float keyboardHeight)
+        public void OnKeyboardWillShow(float keyboardHeight)
         {
-        }
+            CommonConfig.Logger.Debug("TAP Y = " + tapY);
 
-        public void OnKeyboardWillHide()
-        {
-        }
+            if (tapY > Window.Frame.Bottom - keyboardHeight)
+            {
+                var difference = tapY - Window.Frame.Bottom + keyboardHeight + 20;
 
-        public void OnKeyboardWillChangeFrame(float keyboardHeight)
-        {
+                var co = sv.ContentOffset;
+                co.Y += difference;
+                sv.SetContentOffset(co, true);
+            }
         }
 
         public void OnKeyboardDidHide()
@@ -248,6 +259,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         }
 
         //TODO it works strangely, need to investigate further
+
+
+        void HandleTap(UITapGestureRecognizer tapRecognizer)
+        {
+            tapY = tapRecognizer.LocationInView(null).Y;
+        }
 
         void HandlePan(UIGestureRecognizer r)
         {
@@ -276,8 +293,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 return;
             }
 
-            CommonConfig.Logger.Debug($" SCROLLING - ACTUAL = {s.ContentOffset}, EXPECTED = {oldContentOffset}"); //TODO remove later
-
             if (Math.Abs(s.ContentOffset.X - oldContentOffset.X) < 10 && Math.Abs(s.ContentOffset.Y - oldContentOffset.Y) < 10)
                 return;
 
@@ -285,7 +300,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         }
 
-        nfloat oldZoomScale = 0.75f;
+        nfloat oldZoomScale = 0.75f; //TODO move all this section
 
         [Export("scrollViewDidZoom:")]
         void DidZoom(UIScrollView s)
@@ -295,8 +310,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 oldZoomScale = oldContentWebView.ScrollView.ZoomScale;
                 return;
             }
-
-            CommonConfig.Logger.Debug("ZOOMING : ");
 
             s.ZoomScale = oldZoomScale;
         }
@@ -392,7 +405,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     {
                         var metaElement = htmlDoc.CreateElement("meta");
                         metaElement.SetAttributeValue("name", "viewport");
-                        metaElement.SetAttributeValue("content", $"width=device-width, initial-scale=0.75, minimum-scale=0.5, maximum-scale=2.5");
+                        metaElement.SetAttributeValue("content", $"initial-scale=0.75, minimum-scale=0.5, maximum-scale=2");
                         headNode.AppendChild(metaElement);
                         content = htmlDoc.DocumentNode.OuterHtml;
                     }
@@ -704,7 +717,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     }
                     else if (Math.Abs(nslc.Constant - wv.ScrollView.ContentSize.Height) > 10) //Condition to avoid loop on size increase
                     {
-                        CommonConfig.Logger.Debug($"CONSTANT = {nslc.Constant}, HEIGHT ={wv.ScrollView.ContentSize.Height}");
+                        CommonConfig.Logger.Debug($"CONSTANT = {nslc.Constant}, HEIGHT ={wv.ScrollView.ContentSize.Height}"); //TODO debug
                         nslc.Constant = wv.ScrollView.ContentSize.Height;
                         SetNeedsLayout();
                     }

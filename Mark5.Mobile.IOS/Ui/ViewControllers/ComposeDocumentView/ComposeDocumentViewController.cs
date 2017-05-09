@@ -110,8 +110,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             InitializeHandlers();
 
+            UIKeyboard.Notifications.ObserveWillShow(OnKeyboardWillShow);
             UIKeyboard.Notifications.ObserveDidShow(OnKeyboardDidShowNotification);
-            UIKeyboard.Notifications.ObserveWillChangeFrame(OnKeyboardWillChangeFrame);
+            UIKeyboard.Notifications.ObserveWillChangeFrame(OnKeyboardDidShowNotification);
             UIKeyboard.Notifications.ObserveWillHide(OnKeyboardWillHideNotification);
             UIKeyboard.Notifications.ObserveDidHide(OnKeyboardDidHideNotification);
 
@@ -206,7 +207,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1f, 0f)
                 });
 
-            contentView = new ContentView();
+            contentView = new ContentView(scrollView);
             scrollView.AddSubview(contentView);
             View.AddConstraints(new[]
             {
@@ -453,6 +454,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         #region Keyboard Notifications
 
+        void OnKeyboardWillShow(object sender, UIKeyboardEventArgs e)
+        {
+            keyboardHeight = UI.KeyboardHeightFromNotification(e.Notification);
+            contentView.OnKeyboardWillShow(keyboardHeight);
+
+        }
+
         void OnKeyboardDidShowNotification(object sender, UIKeyboardEventArgs e)
         {
             keyboardHeight = UI.KeyboardHeightFromNotification(e.Notification);
@@ -460,19 +468,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var insets = scrollView.ContentInset;
             insets.Bottom = keyboardHeight;
             scrollView.ContentInset = insets;
-
-            contentView.OnKeyboardDidShow(keyboardHeight);
-        }
-
-        void OnKeyboardWillChangeFrame(object sender, UIKeyboardEventArgs e)
-        {
-            keyboardHeight = UI.KeyboardHeightFromNotification(e.Notification);
-
-            var insets = scrollView.ContentInset;
-            insets.Bottom = keyboardHeight;
-            scrollView.ContentInset = insets;
-
-            contentView.OnKeyboardWillChangeFrame(keyboardHeight);
         }
 
         void OnKeyboardWillHideNotification(object sender, UIKeyboardEventArgs e)
@@ -480,9 +475,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var insets = scrollView.ContentInset;
             insets.Bottom = 0f;
             scrollView.ContentInset = insets;
-
-            contentView.OnKeyboardWillHide();
-
         }
 
         void OnKeyboardDidHideNotification(object sender, UIKeyboardEventArgs e)
@@ -659,7 +651,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }));
             sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("browse_files"), UIAlertActionStyle.Default, a =>
             {
-                var picker = new DocumentMenuViewController(new [] { "public.content", "public.data", "public.msg", "public.eml" }, UIDocumentPickerMode.Import)
+                var picker = new DocumentMenuViewController(new[] { "public.content", "public.data", "public.msg", "public.eml" }, UIDocumentPickerMode.Import)
                 {
                     Delegate = new DocumentMenuDelegate(this, HandleAttachmentUrl)
                 };
@@ -1238,11 +1230,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         void HandleScrollViewLayoutSubviewsAction(UIScrollView consideredScrollView)
         {
             //Used to keep the views before and after the content anchored to the scrollView
-            var minimumVisibleX = consideredScrollView.ContentOffset.X;
+            //var minimumVisibleX = consideredScrollView.ContentOffset.X; ///TODO need to remove, were used before
 
-            var actualFrame = stackView.Frame;
-            actualFrame.X = minimumVisibleX;
-            stackView.Frame = actualFrame;
+            //var actualFrame = stackView.Frame;
+            //actualFrame.X = minimumVisibleX;
+            //stackView.Frame = actualFrame;
         }
 
         #endregion
