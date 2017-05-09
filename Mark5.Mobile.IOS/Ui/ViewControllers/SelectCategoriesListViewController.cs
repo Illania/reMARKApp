@@ -24,6 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     {
 
         readonly ModuleType module;
+        readonly List<int> preselectedItems;
 
         UIBarButtonItem cancelItem;
         UIBarButtonItem doneItem;
@@ -36,9 +37,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public Task<List<Category>> Task { get { return tcs.Task; } }
 
-        public SelectCategoriesListViewController(ModuleType module)
+
+        public SelectCategoriesListViewController(ModuleType module, List<int> preselectedItems)
         {
             this.module = module;
+            this.preselectedItems = preselectedItems;
         }
 
         public override void ViewDidLoad()
@@ -88,6 +91,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     categories = await Managers.ContactsManager.GetAllCategoriesAsync();
                     break;
             }
+
+            selectedItems = new HashSet<Category>(categories.Where(c => preselectedItems.Contains(c.Id)));
 
             loading = false;
             TableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);

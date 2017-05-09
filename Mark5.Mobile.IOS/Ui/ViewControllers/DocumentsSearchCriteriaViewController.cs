@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using CoreGraphics;
 using Foundation;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -222,7 +223,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             searchButton.TouchUpInside -= SearchButton_TouchUpInside;
 
+            criteria.PartialWordSearch = PlatformConfig.Preferences.PartialWordSearch;
             criteria.MaxToFetch = PlatformConfig.Preferences.DocumentsToSearch;
+
+            CommonConfig.Logger.Info($"Starting search... [criteria={SerializationUtils.Serialize(criteria)}]");
 
             NavigationController.PushViewController(new DocumentsSearchResultsViewController { Criteria = criteria }, true);
         }
@@ -409,11 +413,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         directions.Clear();
 
                     if (recognizer.View == inboxView)
-                        directions.Add(DocumentDirection.Incoming);
+                        if (directions.Contains(DocumentDirection.Incoming))
+                            directions.Remove(DocumentDirection.Incoming);
+                        else
+                            directions.Add(DocumentDirection.Incoming);
                     else if (recognizer.View == outboxView)
-                        directions.Add(DocumentDirection.Outgoing);
+                        if (directions.Contains(DocumentDirection.Outgoing))
+                            directions.Remove(DocumentDirection.Outgoing);
+                        else
+                            directions.Add(DocumentDirection.Outgoing);
                     else if (recognizer.View == draftView)
-                        directions.Add(DocumentDirection.Draft);
+                        if (directions.Contains(DocumentDirection.Draft))
+                            directions.Remove(DocumentDirection.Draft);
+                        else
+                            directions.Add(DocumentDirection.Draft);
                 }
 
                 UpdateRow();
@@ -1274,7 +1287,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (recognizer.View == categoriesView)
                 {
-                    var vc = new SelectCategoriesListViewController(ModuleType.Documents);
+                    var vc = new SelectCategoriesListViewController(ModuleType.Documents, Criteria.CategoryIds);
                     parentViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
 
                     var result = await vc.Task;

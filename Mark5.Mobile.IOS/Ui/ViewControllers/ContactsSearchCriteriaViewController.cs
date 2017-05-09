@@ -10,7 +10,9 @@ using System.IO;
 using System.Linq;
 using CoreGraphics;
 using Foundation;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using ObjCRuntime;
@@ -216,6 +218,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             searchButton.TouchUpInside -= SearchButton_TouchUpInside;
 
             criteria.MaxToFetch = PlatformConfig.Preferences.ContactsToSearch;
+
+            CommonConfig.Logger.Info($"Starting search... [criteria={SerializationUtils.Serialize(criteria)}]");
 
             NavigationController.PushViewController(new ContactsSearchResultsViewController { Criteria = criteria }, true);
         }
@@ -1038,7 +1042,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (recognizer.View == categoriesView)
                 {
-                    var vc = new SelectCategoriesListViewController(ModuleType.Contacts);
+                    var vc = new SelectCategoriesListViewController(ModuleType.Contacts, Criteria.CategoryIds);
                     parentViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
 
                     var result = await vc.Task;

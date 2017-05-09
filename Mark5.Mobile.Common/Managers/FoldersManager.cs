@@ -32,7 +32,7 @@ namespace Mark5.Mobile.Common.Managers
             this.foldersDataAccess = foldersDataAccess;
         }
 
-        public async Task<List<Folder>> GetFoldersAsync(Folder parentFolder, int depth = 2, SourceType sourceType = SourceType.Auto)
+        public async Task<List<Folder>> GetFoldersAsync(Folder parentFolder, int depth = 1, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
