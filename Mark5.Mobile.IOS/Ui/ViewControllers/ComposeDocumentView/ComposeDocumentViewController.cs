@@ -114,8 +114,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             UIKeyboard.Notifications.ObserveDidShow(OnKeyboardDidShowNotification);
             UIKeyboard.Notifications.ObserveWillChangeFrame(OnKeyboardDidShowNotification);
             UIKeyboard.Notifications.ObserveWillHide(OnKeyboardWillHideNotification);
-            UIKeyboard.Notifications.ObserveDidHide(OnKeyboardDidHideNotification);
-
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -475,11 +473,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var insets = scrollView.ContentInset;
             insets.Bottom = 0f;
             scrollView.ContentInset = insets;
-        }
 
-        void OnKeyboardDidHideNotification(object sender, UIKeyboardEventArgs e)
-        {
-            contentView.OnKeyboardDidHide();
+            contentView.OnKeyboardWillHide();
         }
 
         #endregion

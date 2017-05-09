@@ -233,33 +233,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         bool panning;
         bool pinching;
         nfloat tapY;
+        nfloat oldZoomScale = 0.75f; //TODO move all this section
+        CGPoint oldContentOffset = new CGPoint(0, 0);
 
         public void OnKeyboardWillShow(float keyboardHeight)
         {
-            CommonConfig.Logger.Debug("TAP Y = " + tapY);
-
-            if (tapY > Window.Frame.Bottom - keyboardHeight)
+            var difference = tapY - Window.Frame.Bottom + keyboardHeight + 20;
+            if (difference > 0)
             {
-                var difference = tapY - Window.Frame.Bottom + keyboardHeight + 20;
-
                 var co = sv.ContentOffset;
                 co.Y += difference;
                 sv.SetContentOffset(co, true);
             }
         }
 
-        public void OnKeyboardDidHide()
+        public void OnKeyboardWillHide()
         {
             oldContentOffset = new CGPoint(0, 0);
 
-            CGRect scrollBounds = oldContentWebView.ScrollView.Bounds;
-            scrollBounds.X = oldContentOffset.X;
-            scrollBounds.Y = oldContentOffset.Y;
-            oldContentWebView.ScrollView.Bounds = scrollBounds; //It's the same as modifying the content offset, but wihtouth triggering didScroll
+            Animate(0.15, () =>
+            {
+                CGRect scrollBounds = oldContentWebView.ScrollView.Bounds;
+                scrollBounds.X = oldContentOffset.X;
+                scrollBounds.Y = oldContentOffset.Y;
+                oldContentWebView.ScrollView.Bounds = scrollBounds; //It's the same as modifying the content offset, but wihtouth triggering didScroll
+            });
         }
-
-        //TODO it works strangely, need to investigate further
-
 
         void HandleTap(UITapGestureRecognizer tapRecognizer)
         {
@@ -282,8 +281,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 pinching = false;
         }
 
-        CGPoint oldContentOffset = new CGPoint(0, 0);
-
         [Export("scrollViewDidScroll:")]
         void DidScroll(UIScrollView s)
         {
@@ -300,8 +297,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         }
 
-        nfloat oldZoomScale = 0.75f; //TODO move all this section
-
         [Export("scrollViewDidZoom:")]
         void DidZoom(UIScrollView s)
         {
@@ -315,7 +310,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         }
 
         #endregion
-
 
         #region Public methods
 
@@ -614,12 +608,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 {
                     matchingElement.Attributes.RemoveNamedItem("contenteditable");
                 }
-            }
-
-            var scriptElements = currentHtmlDocument.Body.QuerySelectorAll("script");
-            foreach (var scriptElement in scriptElements)
-            {
-                currentHtmlDocument.Body.RemoveChild(scriptElement);
             }
 
             var processedWebContent = currentHtmlDocument.DocumentElement.OuterHtml;
