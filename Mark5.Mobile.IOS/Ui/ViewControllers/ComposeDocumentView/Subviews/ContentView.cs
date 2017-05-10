@@ -176,11 +176,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var wkscript1 = new WKUserScript(script1, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript2 = new WKUserScript(script2, WKUserScriptInjectionTime.AtDocumentEnd, true);
+            var wkscript3 = new WKUserScript(script3, WKUserScriptInjectionTime.AtDocumentEnd, true);
 
             var userContentController = new WKUserContentController();
             userContentController.AddUserScript(wkscript1);
             userContentController.AddUserScript(wkscript2);
+            userContentController.AddUserScript(wkscript3);
             userContentController.AddScriptMessageHandler(this, "sizeNotification");
+            userContentController.AddScriptMessageHandler(this, "mutation");
 
             var configuration = new WKWebViewConfiguration();
             configuration.SuppressesIncrementalRendering = false;
@@ -253,10 +256,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             Animate(0.15, () =>
             {
+                //Same as modifying the content offset, but without triggering didScroll in the delegate
                 CGRect scrollBounds = oldContentWebView.ScrollView.Bounds;
                 scrollBounds.X = oldContentOffset.X;
                 scrollBounds.Y = oldContentOffset.Y;
-                oldContentWebView.ScrollView.Bounds = scrollBounds; //It's the same as modifying the content offset, but wihtouth triggering didScroll
+                oldContentWebView.ScrollView.Bounds = scrollBounds;
             });
         }
 
@@ -481,6 +485,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 var ce = htmlDocument.CreateElement("div");
                 ce.ClassName = OldEditableContentClass;
+                ce.Id = "editable-one";
                 ce.SetAttribute("contentEditable", "true");
 
                 ce.InnerHtml = body.InnerHtml;
