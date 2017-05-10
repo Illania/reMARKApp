@@ -31,7 +31,7 @@ namespace Mark5.Mobile.Common.Authenticator
             var deviceName = CommonConfig.DeviceInfoProvider.GetDeviceName();
             var deviceId = CommonConfig.DeviceInfoProvider.GetDeviceId();
 
-            var proxy = AppServiceProxyFactory.Create(sslMode != SslMode.Off, hostname, port);
+            var proxy = AppServiceProxyFactory.Create(sslMode != SslMode.Off, hostname, port, CommonConfig.HttpClientHandler);
             var result = await proxy.AuthenticateAsync(new DataContract.AuthenticationParameters
             {
                 Username = username,

@@ -38,6 +38,7 @@
     <Compile Include="FileTransferService\IFileTransferServiceProxy.cs" />
     <Compile Include="AppServiceProxyFactory.cs" />
     <Compile Include="FileTransferServiceProxyFactory.cs" />
+    <Compile Include="AppService\HttpAppServiceProxy.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />
