@@ -1,6 +1,6 @@
 ﻿//
 // Project: Mark5.Mobile.IOS
-// File: InsecureNSUrlSessionHandler.cs
+// File: InsecureNativeMessageHandler.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
@@ -10,13 +10,14 @@ using ModernHttpClient;
 namespace Mark5.Mobile.IOS.Utilities
 {
     
-    public class InsecureNSUrlSessionHandler : NativeMessageHandler
+    public class InsecureNativeMessageHandler : NativeMessageHandler
     {
 
-        public InsecureNSUrlSessionHandler()
+        public InsecureNativeMessageHandler()
             : base(false, true)
         {
             DisableCaching = true;
+            ServerCertificateCustomValidationCallback = (sender, certificate, chain, sslPolicyErrors) => { return true; };
         }
     }
 }
