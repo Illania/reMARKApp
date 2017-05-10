@@ -43,7 +43,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         WKWebView newContentWebView;
         WKWebView oldContentWebView;
 
-        UIScrollView externalScrollView;
+        UIScrollView externalScrollView; //TODO check if we need it
 
         SeparatorSubView separatorBeforeExpand;
         SeparatorSubView separatorAfterExpand;
@@ -233,87 +233,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #region ScrollView
 
-        bool panning;
-        bool pinching;
         nfloat tapY;
-        nfloat oldZoomScale = 0.75f; //TODO move all this section
-        CGPoint oldContentOffset = new CGPoint(0, 0);
-
-        public void OnKeyboardWillShow(float keyboardHeight)
-        {
-            //var difference = tapY - UIApplication.SharedApplication.KeyWindow.Frame.Bottom + keyboardHeight + 20;
-            //if (difference > 0)
-            //{
-            //    var co = externalScrollView.ContentOffset;
-            //    co.Y += difference;
-            //    externalScrollView.SetContentOffset(co, true);
-            //}
-        }
-
-        public void OnKeyboardWillHide()
-        {
-            //oldContentOffset = new CGPoint(0, 0);
-
-            //Animate(0.15, () =>
-            //{
-            //    //Same as modifying the content offset, but without triggering didScroll in the delegate
-            //    CGRect scrollBounds = oldContentWebView.ScrollView.Bounds;
-            //    scrollBounds.X = oldContentOffset.X;
-            //    scrollBounds.Y = oldContentOffset.Y;
-            //    oldContentWebView.ScrollView.Bounds = scrollBounds;
-            //});
-        }
 
         void HandleTap(UITapGestureRecognizer tapRecognizer)
         {
             tapY = tapRecognizer.LocationInView(null).Y;
-        }
-
-        void HandlePan(UIGestureRecognizer r)
-        {
-            if (r.State == UIGestureRecognizerState.Began)
-                panning = true;
-            else if (r.State == UIGestureRecognizerState.Cancelled || r.State == UIGestureRecognizerState.Ended)
-                panning = false;
-        }
-
-        void HandlePinch(UIGestureRecognizer r)
-        {
-            if (r.State == UIGestureRecognizerState.Began)
-                pinching = true;
-            else if (r.State == UIGestureRecognizerState.Cancelled || r.State == UIGestureRecognizerState.Ended)
-                pinching = false;
-        }
-
-        //[Export("scrollViewDidScroll:")]
-        //void DidScroll(UIScrollView s)
-        //{
-        //    if (panning || pinching)
-        //    {
-        //        oldContentOffset = s.ContentOffset;
-        //        return;
-        //    }
-
-        //    if (Math.Abs(s.ContentOffset.X - oldContentOffset.X) < 10 && Math.Abs(s.ContentOffset.Y - oldContentOffset.Y) < 10)
-        //        return;
-
-        //    s.ContentOffset = oldContentOffset;
-        //}
-
-        [Export("scrollViewDidZoom:")]
-        void DidZoom(UIScrollView s)
-        {
-            //oldContentHeightConstraint.Constant = oldContentWebView.ScrollView.ContentSize.Height;
-
-
-            //if (panning || pinching)
-            //{
-            //    oldZoomScale = oldContentWebView.ScrollView.ZoomScale;
-            //    oldContentHeightConstraint.Constant = oldContentWebView.ScrollView.ContentSize.Height;
-            //    return;
-            //}
-
-            //s.ZoomScale = oldZoomScale;
         }
 
         #endregion
@@ -687,8 +611,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
         }
 
-        bool ignoreResize = false;
-
         [Export("userContentController:didReceiveScriptMessage:")]
         public void DidReceiveScriptMessage(WKUserContentController userContentController, WKScriptMessage message)
         {
@@ -705,16 +627,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 || (mutatedNumber != null && mutatedNumber.BoolValue))
             {
                 CommonConfig.Logger.Debug($" LOADED={justLoadedNumber}, RESIZED={resizedNumber}, MUTATED={mutatedNumber}");
-
-                //if (userContentController == oldContentWebView.Configuration.UserContentController)
-                //{
-                //    if (ignoreResize && resizedNumber != null && resizedNumber.BoolValue)
-                //    {
-                //        return;
-                //    }
-
-                //    ignoreResize |= (resizedNumber != null && resizedNumber.BoolValue);
-                //}
 
                 Action<WKWebView, NSLayoutConstraint> resizeAction = null;
                 resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)), () =>

@@ -104,16 +104,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             ExtendedLayoutIncludesOpaqueBars = true;
         }
 
+        NSObject observeDidShowNotification;
+        NSObject observeWillChangeNotification;
+        NSObject observeWillHideNotification;
+
+
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
 
             InitializeHandlers();
 
-            UIKeyboard.Notifications.ObserveWillShow(OnKeyboardWillShow);
-            UIKeyboard.Notifications.ObserveDidShow(OnKeyboardDidShowNotification);
-            UIKeyboard.Notifications.ObserveWillChangeFrame(OnKeyboardDidShowNotification);
-            UIKeyboard.Notifications.ObserveWillHide(OnKeyboardWillHideNotification);
+            observeDidShowNotification = UIKeyboard.Notifications.ObserveDidShow(OnKeyboardDidShowNotification);
+            observeWillChangeNotification = UIKeyboard.Notifications.ObserveWillChangeFrame(OnKeyboardDidShowNotification);
+            observeWillHideNotification = UIKeyboard.Notifications.ObserveWillHide(OnKeyboardWillHideNotification);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -144,14 +148,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             base.ViewWillDisappear(animated);
             DeInitializeHandlers();
 
-            NSNotificationCenter.DefaultCenter.RemoveObservers(new[]
-            {
-                    UIKeyboard.DidShowNotification,
-                    UIKeyboard.WillChangeFrameNotification,
-                    UIKeyboard.WillHideNotification
-                });
-
             NavigationController.HidesBarsOnSwipe = false;
+
+            observeDidShowNotification?.Dispose();
+            observeWillHideNotification?.Dispose();
+            observeWillChangeNotification?.Dispose();
 
             autoSaveWorker?.Stop();
         }
@@ -452,13 +453,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         #region Keyboard Notifications
 
-        void OnKeyboardWillShow(object sender, UIKeyboardEventArgs e)
-        {
-            keyboardHeight = UI.KeyboardHeightFromNotification(e.Notification);
-            contentView.OnKeyboardWillShow(keyboardHeight);
-
-        }
-
         void OnKeyboardDidShowNotification(object sender, UIKeyboardEventArgs e)
         {
             keyboardHeight = UI.KeyboardHeightFromNotification(e.Notification);
@@ -473,8 +467,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var insets = scrollView.ContentInset;
             insets.Bottom = 0f;
             scrollView.ContentInset = insets;
-
-            contentView.OnKeyboardWillHide();
         }
 
         #endregion
