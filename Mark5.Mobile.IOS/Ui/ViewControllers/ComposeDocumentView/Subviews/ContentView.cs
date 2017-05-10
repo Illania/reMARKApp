@@ -104,7 +104,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             userContentController.AddScriptMessageHandler(this, "mutation");
 
             var configuration = new WKWebViewConfiguration();
-            configuration.SuppressesIncrementalRendering = false;
+            configuration.SuppressesIncrementalRendering = true;
             configuration.AllowsInlineMediaPlayback = false;
             configuration.UserContentController = userContentController;
             configuration.Preferences = preferences;
@@ -121,8 +121,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     newContentHeightConstraint = NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 200f),
                     NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
                     NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                    NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin) //TODO in the old content webview we don't have this
-                });
+                    NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
+            });
 
             newContentWebView.LoadHtmlString(DefaultEditContent, null);
         }
