@@ -181,9 +181,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var userContentController = new WKUserContentController();
             userContentController.AddUserScript(wkscript1);
             userContentController.AddUserScript(wkscript2);
-            userContentController.AddUserScript(wkscript3);
             userContentController.AddScriptMessageHandler(this, "sizeNotification");
-            //userContentController.AddScriptMessageHandler(this, "mutation"); //TODO tesr
 
             var configuration = new WKWebViewConfiguration();
             configuration.SuppressesIncrementalRendering = true;
@@ -199,20 +197,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             oldContentWebView.ScrollView.BouncesZoom = false;
             oldContentWebView.ScrollView.Delegate = this;
 
-            var panRecognizer = new UIPanGestureRecognizer();
-            panRecognizer.AddTarget(() => HandlePan(panRecognizer));
-            panRecognizer.Delegate = this;
-
-            var pinchRecognizer = new UIPinchGestureRecognizer();
-            pinchRecognizer.AddTarget(() => HandlePinch(pinchRecognizer));
-            pinchRecognizer.Delegate = this;
-
             var tapRecognizer = new UITapGestureRecognizer();
             tapRecognizer.AddTarget(() => HandleTap(tapRecognizer));
             tapRecognizer.Delegate = this;
 
-            oldContentWebView.ScrollView.AddGestureRecognizer(panRecognizer);
-            oldContentWebView.ScrollView.AddGestureRecognizer(pinchRecognizer);
             oldContentWebView.ScrollView.AddGestureRecognizer(tapRecognizer);
 
             oldContentWebView.NavigationDelegate = new WebViewNavigationDelegate();
@@ -643,8 +631,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     }
                 });
 
-                resizeAction(oldContentWebView, oldContentHeightConstraint);
-                resizeAction(newContentWebView, newContentHeightConstraint);
+                if (userContentController == newContentWebView.Configuration.UserContentController)
+                {
+                    resizeAction(newContentWebView, newContentHeightConstraint);
+                }
+                else
+                {
+                    resizeAction(oldContentWebView, oldContentHeightConstraint);
+                }
+
             }
         }
 
