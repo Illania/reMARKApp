@@ -43,7 +43,10 @@ namespace Mark5.ServiceReference.AppService
             HttpStatusCode statusCode = 0;
             try
             {
-                using (var c = new HttpClient(httpClientHandler()))
+                using (var c = new HttpClient(httpClientHandler())
+                {
+                    Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
+                })
                 {
                     var req = CreateRequest(soapAction, parameters);
                     var res = await c.SendAsync(req, ct);
@@ -53,6 +56,13 @@ namespace Mark5.ServiceReference.AppService
             }
             catch (Exception ex) when (!(ex is HttpAppServiceException))
             {
+                var tce = ex as TaskCanceledException;
+                if (tce != null && !tce.CancellationToken.IsCancellationRequested)
+                {
+                    var te = new TimeoutException("Request timed out.");
+                    throw new HttpAppServiceException(statusCode, te.Message, te);
+                }
+
                 throw new HttpAppServiceException(statusCode, ex.Message, ex);
             }
         }
@@ -106,15 +116,15 @@ namespace Mark5.ServiceReference.AppService
 
                 var envelope = doc.DocumentElement;
                 if (envelope.LocalName != "Envelope")
-                    throw new SOAPException("Envelope not found");
+                    throw new SOAPException("Envelope not found.");
 
                 var body = envelope.FirstChild;
                 if (body.LocalName != "Body")
-                    throw new SOAPException("Body not found");
+                    throw new SOAPException("Body not found.");
 
                 var response = body.FirstChild;
                 if (response.LocalName != soapAction + "Response")
-                    throw new SOAPException($"{soapAction}Response not found");
+                    throw new SOAPException($"{soapAction}Response not found.");
 
                 var resultContent = response.InnerXml;
 
@@ -136,11 +146,11 @@ namespace Mark5.ServiceReference.AppService
 
                 var envelope = doc.DocumentElement;
                 if (envelope.LocalName != "Envelope")
-                    throw new SOAPException("Envelope not found");
+                    throw new SOAPException("Envelope not found.");
 
                 var body = envelope.FirstChild;
                 if (body.LocalName != "Body")
-                    throw new SOAPException("Body not found");
+                    throw new SOAPException("Body not found.");
 
                 var fault = body.FirstChild;
 
@@ -159,14 +169,14 @@ namespace Mark5.ServiceReference.AppService
                 throw new HttpAppServiceException(res.StatusCode, faultString, faultDetail);
             }
 
-            throw new HttpAppServiceException(res.StatusCode, "Invalid status code received");
+            throw new HttpAppServiceException(res.StatusCode, "Invalid status code received.");
         }
 
         #region Authentication
 
-        public async Task<AuthenticationResult> AuthenticateAsync(AuthenticationParameters parameters, CancellationToken ct = default(CancellationToken))
+        public async Task<AuthenticateResult> AuthenticateAsync(AuthenticateParameters parameters, CancellationToken ct = default(CancellationToken))
         {
-            return await InvokeAsync<AuthenticationResult, AuthenticationParameters>("Authenticate", parameters, ct);
+            return await InvokeAsync<AuthenticateResult, AuthenticateParameters>("Authenticate", parameters, ct);
         }
 
         #endregion

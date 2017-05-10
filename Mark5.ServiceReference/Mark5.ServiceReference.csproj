@@ -40,6 +40,7 @@
     <Compile Include="FileTransferServiceProxyFactory.cs" />
     <Compile Include="AppService\HttpAppServiceProxy.cs" />
     <Compile Include="Utilities\StringWriterWithEncoding.cs" />
+    <Compile Include="Config.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />

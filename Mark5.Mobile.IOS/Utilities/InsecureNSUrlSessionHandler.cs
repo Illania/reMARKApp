@@ -9,6 +9,7 @@ using ModernHttpClient;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
+    
     public class InsecureNSUrlSessionHandler : NativeMessageHandler
     {
 
