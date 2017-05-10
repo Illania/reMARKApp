@@ -176,7 +176,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var wkscript1 = new WKUserScript(script1, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript2 = new WKUserScript(script2, WKUserScriptInjectionTime.AtDocumentEnd, true);
-            var wkscript3 = new WKUserScript(script3, WKUserScriptInjectionTime.AtDocumentEnd, true);
 
             var userContentController = new WKUserContentController();
             userContentController.AddUserScript(wkscript1);
@@ -221,11 +220,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #region ScrollView
 
-        nfloat tapY;
+        CGPoint tapThis;
 
         void HandleTap(UITapGestureRecognizer tapRecognizer)
         {
-            tapY = tapRecognizer.LocationInView(null).Y;
+            tapThis = tapRecognizer.LocationInView(this);
+        }
+
+        public void OnKeyboardWillShow(nfloat keyboardHeight)
+        {
+            var oldY = ConvertRectToView(oldContentWebView.Frame, null).Y;
+            var difference = oldY - UIApplication.SharedApplication.KeyWindow.Frame.Bottom + keyboardHeight;
+
+            if ((oldY - UIApplication.SharedApplication.KeyWindow.Frame.Bottom + keyboardHeight) > 0)
+            {
+                var rect = new CGRect();
+                rect.Height = 40;
+                rect.Width = 1;
+                rect.X = ConvertPointToView(tapThis, externalScrollView).X;
+                rect.Y = ConvertPointToView(tapThis, externalScrollView).Y;
+
+                externalScrollView.ScrollRectToVisible(rect, true);
+            }
         }
 
         #endregion
@@ -248,7 +264,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 await LoadOldContent();
             }
-
         }
 
         public override async Task UpdateDocument()

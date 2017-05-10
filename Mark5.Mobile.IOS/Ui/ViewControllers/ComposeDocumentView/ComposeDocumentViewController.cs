@@ -106,8 +106,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         NSObject observeDidShowNotification;
         NSObject observeWillChangeNotification;
-        NSObject observeWillHideNotification;
-
+        NSObject observeWillHideNotification; //TODO move
+        NSObject observeWillShowNotification;
 
         public override void ViewWillAppear(bool animated)
         {
@@ -115,6 +115,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             InitializeHandlers();
 
+            observeWillShowNotification = UIKeyboard.Notifications.ObserveDidShow(OnKeyboardWillShowNotification);
             observeDidShowNotification = UIKeyboard.Notifications.ObserveDidShow(OnKeyboardDidShowNotification);
             observeWillChangeNotification = UIKeyboard.Notifications.ObserveWillChangeFrame(OnKeyboardDidShowNotification);
             observeWillHideNotification = UIKeyboard.Notifications.ObserveWillHide(OnKeyboardWillHideNotification);
@@ -153,6 +154,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             observeDidShowNotification?.Dispose();
             observeWillHideNotification?.Dispose();
             observeWillChangeNotification?.Dispose();
+            observeWillShowNotification?.Dispose();
 
             autoSaveWorker?.Stop();
         }
@@ -169,7 +171,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             scrollView = new ActionableLayoutScrollView
             {
-                LayoutSubviewsAction = HandleScrollViewLayoutSubviewsAction,
+                LayoutSubviewsAction = null,
                 BackgroundColor = UIColor.White,
                 ShowsVerticalScrollIndicator = true,
                 ShowsHorizontalScrollIndicator = false,
@@ -452,6 +454,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         }
 
         #region Keyboard Notifications
+
+        void OnKeyboardWillShowNotification(object sender, UIKeyboardEventArgs e)
+        {
+            keyboardHeight = UI.KeyboardHeightFromNotification(e.Notification);
+            contentView.OnKeyboardWillShow(keyboardHeight);
+        }
 
         void OnKeyboardDidShowNotification(object sender, UIKeyboardEventArgs e)
         {
@@ -1208,20 +1216,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
 
             template.Content = templateContent;
-        }
-
-        #endregion
-
-        #region ScrollView LayoutSubViews Action
-
-        void HandleScrollViewLayoutSubviewsAction(UIScrollView consideredScrollView)
-        {
-            //Used to keep the views before and after the content anchored to the scrollView
-            //var minimumVisibleX = consideredScrollView.ContentOffset.X; ///TODO need to remove, were used before
-
-            //var actualFrame = stackView.Frame;
-            //actualFrame.X = minimumVisibleX;
-            //stackView.Frame = actualFrame;
         }
 
         #endregion
