@@ -526,7 +526,7 @@ namespace Mark5.ServiceReference.AppService
                         // Nothing to do here
                     }
                 }
-                throw new AppServiceException(ex);
+                throw new WcfAppServiceException(ex);
             }
             catch (Exception ex)
             {
@@ -541,7 +541,7 @@ namespace Mark5.ServiceReference.AppService
                         // Nothing to do here
                     }
                 }
-                throw new AppServiceException(ex);
+                throw new WcfAppServiceException(ex);
             }
         }
 

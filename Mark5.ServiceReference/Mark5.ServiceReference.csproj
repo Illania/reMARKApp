@@ -39,6 +39,7 @@
     <Compile Include="AppServiceProxyFactory.cs" />
     <Compile Include="FileTransferServiceProxyFactory.cs" />
     <Compile Include="AppService\HttpAppServiceProxy.cs" />
+    <Compile Include="Utilities\StringWriterWithEncoding.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />
@@ -47,6 +48,7 @@
     <Folder Include="AppService\" />
     <Folder Include="DataContract\" />
     <Folder Include="FileTransferService\" />
+    <Folder Include="Utilities\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

@@ -27,8 +27,8 @@ namespace Mark5.ServiceReference.DataContract
 
     #region Authentication
 
-    [DataContract(Name = "AuthenticationParameters", Namespace = "com.nordic-it.appservice.v3")]
-    public class AuthenticationParameters
+    [DataContract(Name = "AuthenticateParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class AuthenticateParameters
     {
 
         [DataMember(Name = "Username", Order = 0, IsRequired = true)]
@@ -47,8 +47,8 @@ namespace Mark5.ServiceReference.DataContract
         public DeviceType DeviceType { get; set; }
     }
 
-    [DataContract(Name = "AuthenticationResult", Namespace = "com.nordic-it.appservice.v3")]
-    public class AuthenticationResult
+    [DataContract(Name = "AuthenticateResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class AuthenticateResult
     {
 
         [DataMember(Name = "Token", Order = 0, IsRequired = true)]
