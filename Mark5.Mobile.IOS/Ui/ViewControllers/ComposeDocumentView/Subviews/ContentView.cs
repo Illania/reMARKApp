@@ -37,12 +37,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         readonly static NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
         readonly static NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
         readonly static NSString script3 = new NSString("var observer = new MutationObserver(function(mutations) { window.webkit.messageHandlers.mutation.postMessage({mutated:true}); }); observer.observe(document.querySelector('#editable-one'), { attributes: true, childList: true, characterData: true });");
-        //TODO need to add the mutated also to the old document
 
         UIButton expandButton;
 
         WKWebView newContentWebView;
         WKWebView oldContentWebView;
+
+        UIScrollView externalScrollView;
 
         SeparatorSubView separatorBeforeExpand;
         SeparatorSubView separatorAfterExpand;
@@ -73,13 +74,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         const string GetWebContentJs = "document.documentElement.outerHTML;";
         const string GetPlainTextContentJs = "document.body.innerText;";
 
-        UIScrollView sv;
-
-        public ContentView(UIScrollView sv)
+        public ContentView(UIScrollView externalScrollView)
         {
+            this.externalScrollView = externalScrollView;
+
             constraintsStash = new Dictionary<UIView, NSLayoutConstraint[]>();
             newContentLoadingSemaphore = new SemaphoreSlim(0);
-            this.sv = sv; //TODO beautfy
 
             InitializeNewContentControls();
             InitializeOldContentControls();
@@ -215,7 +215,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             oldContentWebView.NavigationDelegate = new WebViewNavigationDelegate();
 
             oldContentHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f);
-            oldContentZeroHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0f);
+            oldContentZeroHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f);
 
             ContainerView.AddSubview(oldContentWebView);
             ContainerView.AddConstraints(new[]
