@@ -118,7 +118,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             ContainerView.AddSubview(newContentWebView);
             AddConstraints(new[]
                 {
-                    newContentHeightConstraint = NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 200f),
+                newContentHeightConstraint = NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 200f),
                     NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
                     NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
                     NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
@@ -183,10 +183,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             userContentController.AddUserScript(wkscript2);
             userContentController.AddUserScript(wkscript3);
             userContentController.AddScriptMessageHandler(this, "sizeNotification");
-            userContentController.AddScriptMessageHandler(this, "mutation");
+            //userContentController.AddScriptMessageHandler(this, "mutation"); //TODO tesr
 
             var configuration = new WKWebViewConfiguration();
-            configuration.SuppressesIncrementalRendering = false;
+            configuration.SuppressesIncrementalRendering = true;
             configuration.AllowsInlineMediaPlayback = false;
             configuration.UserContentController = userContentController;
             configuration.Preferences = preferences;
@@ -241,27 +241,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public void OnKeyboardWillShow(float keyboardHeight)
         {
-            var difference = tapY - Window.Frame.Bottom + keyboardHeight + 20;
-            if (difference > 0)
-            {
-                var co = sv.ContentOffset;
-                co.Y += difference;
-                sv.SetContentOffset(co, true);
-            }
+            //var difference = tapY - UIApplication.SharedApplication.KeyWindow.Frame.Bottom + keyboardHeight + 20;
+            //if (difference > 0)
+            //{
+            //    var co = externalScrollView.ContentOffset;
+            //    co.Y += difference;
+            //    externalScrollView.SetContentOffset(co, true);
+            //}
         }
 
         public void OnKeyboardWillHide()
         {
-            oldContentOffset = new CGPoint(0, 0);
+            //oldContentOffset = new CGPoint(0, 0);
 
-            Animate(0.15, () =>
-            {
-                //Same as modifying the content offset, but without triggering didScroll in the delegate
-                CGRect scrollBounds = oldContentWebView.ScrollView.Bounds;
-                scrollBounds.X = oldContentOffset.X;
-                scrollBounds.Y = oldContentOffset.Y;
-                oldContentWebView.ScrollView.Bounds = scrollBounds;
-            });
+            //Animate(0.15, () =>
+            //{
+            //    //Same as modifying the content offset, but without triggering didScroll in the delegate
+            //    CGRect scrollBounds = oldContentWebView.ScrollView.Bounds;
+            //    scrollBounds.X = oldContentOffset.X;
+            //    scrollBounds.Y = oldContentOffset.Y;
+            //    oldContentWebView.ScrollView.Bounds = scrollBounds;
+            //});
         }
 
         void HandleTap(UITapGestureRecognizer tapRecognizer)
@@ -285,32 +285,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 pinching = false;
         }
 
-        [Export("scrollViewDidScroll:")]
-        void DidScroll(UIScrollView s)
-        {
-            if (panning || pinching)
-            {
-                oldContentOffset = s.ContentOffset;
-                return;
-            }
+        //[Export("scrollViewDidScroll:")]
+        //void DidScroll(UIScrollView s)
+        //{
+        //    if (panning || pinching)
+        //    {
+        //        oldContentOffset = s.ContentOffset;
+        //        return;
+        //    }
 
-            if (Math.Abs(s.ContentOffset.X - oldContentOffset.X) < 10 && Math.Abs(s.ContentOffset.Y - oldContentOffset.Y) < 10)
-                return;
+        //    if (Math.Abs(s.ContentOffset.X - oldContentOffset.X) < 10 && Math.Abs(s.ContentOffset.Y - oldContentOffset.Y) < 10)
+        //        return;
 
-            s.ContentOffset = oldContentOffset;
-
-        }
+        //    s.ContentOffset = oldContentOffset;
+        //}
 
         [Export("scrollViewDidZoom:")]
         void DidZoom(UIScrollView s)
         {
-            if (panning || pinching)
-            {
-                oldZoomScale = oldContentWebView.ScrollView.ZoomScale;
-                return;
-            }
+            //oldContentHeightConstraint.Constant = oldContentWebView.ScrollView.ContentSize.Height;
 
-            s.ZoomScale = oldZoomScale;
+
+            //if (panning || pinching)
+            //{
+            //    oldZoomScale = oldContentWebView.ScrollView.ZoomScale;
+            //    oldContentHeightConstraint.Constant = oldContentWebView.ScrollView.ContentSize.Height;
+            //    return;
+            //}
+
+            //s.ZoomScale = oldZoomScale;
         }
 
         #endregion
@@ -332,8 +335,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 separatorBeforeExpand.Hidden = expandButton.Hidden;
 
                 await LoadOldContent();
-                //We need to load the old content before the button is pressed, because otherwise the resize action gets called too early when the button is pressed
-                // and the size is not correct yet
             }
 
         }
@@ -686,6 +687,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
         }
 
+        bool ignoreResize = false;
+
         [Export("userContentController:didReceiveScriptMessage:")]
         public void DidReceiveScriptMessage(WKUserContentController userContentController, WKScriptMessage message)
         {
@@ -701,6 +704,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 || (resizedNumber != null && resizedNumber.BoolValue)
                 || (mutatedNumber != null && mutatedNumber.BoolValue))
             {
+                CommonConfig.Logger.Debug($" LOADED={justLoadedNumber}, RESIZED={resizedNumber}, MUTATED={mutatedNumber}");
+
+                //if (userContentController == oldContentWebView.Configuration.UserContentController)
+                //{
+                //    if (ignoreResize && resizedNumber != null && resizedNumber.BoolValue)
+                //    {
+                //        return;
+                //    }
+
+                //    ignoreResize |= (resizedNumber != null && resizedNumber.BoolValue);
+                //}
+
                 Action<WKWebView, NSLayoutConstraint> resizeAction = null;
                 resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)), () =>
                 {
