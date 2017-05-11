@@ -280,7 +280,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             DocumentPreview.Preview = await GetPreview(Document.HtmlBody);
         }
 
-        public async Task InsertTemplate(Template template) => await SetWebContentPart(NewEditableContentClass, template.ContentType, template.Content);
+        public async Task InsertTemplate(Template template) => await SetWebContentPart(NewEditableContentClass, template.ContentType, "<br>" + template.Content);
 
         public async Task InsertLocalTemplate(string localTemplate) => await SetWebContentPart(NewEditableContentClass, ContentType.PlainText, "\n\n\n" + localTemplate);
 
