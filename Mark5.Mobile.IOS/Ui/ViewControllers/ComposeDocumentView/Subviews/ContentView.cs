@@ -220,25 +220,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #region ScrollView
 
-        CGPoint tapThis;
+        CGPoint tapLocation;
 
         void HandleTap(UITapGestureRecognizer tapRecognizer)
         {
-            tapThis = tapRecognizer.LocationInView(this);
+            tapLocation = tapRecognizer.LocationInView(this);
         }
 
         public void OnKeyboardWillShow(nfloat keyboardHeight)
         {
             var oldY = ConvertRectToView(oldContentWebView.Frame, null).Y;
-            var difference = oldY - UIApplication.SharedApplication.KeyWindow.Frame.Bottom + keyboardHeight;
 
-            if ((oldY - UIApplication.SharedApplication.KeyWindow.Frame.Bottom + keyboardHeight) > 0)
+            if ((oldY - UIApplication.SharedApplication.KeyWindow.Frame.Bottom + keyboardHeight + 20) > 0)
             {
                 var rect = new CGRect();
                 rect.Height = 40;
                 rect.Width = 1;
-                rect.X = ConvertPointToView(tapThis, externalScrollView).X;
-                rect.Y = ConvertPointToView(tapThis, externalScrollView).Y;
+                rect.X = ConvertPointToView(tapLocation, externalScrollView).X;
+                rect.Y = ConvertPointToView(tapLocation, externalScrollView).Y;
 
                 externalScrollView.ScrollRectToVisible(rect, true);
             }
@@ -331,7 +330,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     {
                         var metaElement = htmlDoc.CreateElement("meta");
                         metaElement.SetAttributeValue("name", "viewport");
-                        metaElement.SetAttributeValue("content", $"initial-scale=0.75, minimum-scale=0.5, maximum-scale=2");
+                        metaElement.SetAttributeValue("content", $"initial-scale=0.85, minimum-scale=0.5, maximum-scale=2");
                         headNode.AppendChild(metaElement);
                         content = htmlDoc.DocumentNode.OuterHtml;
                     }
@@ -436,6 +435,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 contentHtml.TextContent = content;
 
                 parsedHeader.Body.Append(contentHtml);
+
+                var metaElement = parsedHeader.CreateElement("meta");
+                metaElement.SetAttribute("name", "viewport");
+                metaElement.SetAttribute("content", $"initial-scale=0.85, minimum-scale=0.5, maximum-scale=2");
+                parsedHeader.Head.Append(metaElement);
+
+                var ce = parsedHeader.CreateElement("div");
+                ce.ClassName = OldEditableContentClass;
+                ce.Id = "editable-one";
+                ce.SetAttribute("contentEditable", "true");
+
+                ce.InnerHtml = parsedHeader.Body.InnerHtml;
+                parsedHeader.Body.InnerHtml = ce.OuterHtml; //TODO need to test this
 
                 var textWriter = new StringWriter();
                 parsedHeader.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
@@ -629,8 +641,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 || (resizedNumber != null && resizedNumber.BoolValue)
                 || (mutatedNumber != null && mutatedNumber.BoolValue))
             {
-                CommonConfig.Logger.Debug($" LOADED={justLoadedNumber}, RESIZED={resizedNumber}, MUTATED={mutatedNumber}");
-
                 Action<WKWebView, NSLayoutConstraint> resizeAction = null;
                 resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)), () =>
                 {
@@ -648,13 +658,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 if (userContentController == newContentWebView.Configuration.UserContentController)
                 {
+                    CommonConfig.Logger.Debug($" NEW --- LOADED={justLoadedNumber}, RESIZED={resizedNumber}, MUTATED={mutatedNumber}");
                     resizeAction(newContentWebView, newContentHeightConstraint);
                 }
                 else
                 {
+                    CommonConfig.Logger.Debug($" OLD --- LOADED={justLoadedNumber}, RESIZED={resizedNumber}, MUTATED={mutatedNumber}");
                     resizeAction(oldContentWebView, oldContentHeightConstraint);
                 }
-
             }
         }
 
