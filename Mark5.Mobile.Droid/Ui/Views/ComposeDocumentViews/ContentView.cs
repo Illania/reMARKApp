@@ -39,20 +39,24 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         readonly CustomWebView oldContentWebView;
         readonly Context context;
 
-        public SemaphoreSlim SetGetContentAsyncSemaphore = new SemaphoreSlim(1, 1);
-        SemaphoreSlim getHtmlContentInterfaceSemaphore = new SemaphoreSlim(0, 1);
+        public SemaphoreSlim NewSetGetContentAsyncSemaphore = new SemaphoreSlim(1, 1);
+        SemaphoreSlim newGetHtmlContentInterfaceSemaphore = new SemaphoreSlim(0, 1);
+
+        public SemaphoreSlim OldSetGetContentAsyncSemaphore = new SemaphoreSlim(1, 1);
+        SemaphoreSlim oldGetHtmlContentInterfaceSemaphore = new SemaphoreSlim(0, 1);
 
         string newContent;
         string oldContent;
 
-        const string EditableContentClass = "content_c176f8ef-2579-4f1f-86c1-f289beaba2ae";
+        const string NewEditableContentClass = "new_content_c176f8ef-2579-4f1f-86c1-f289beaba2ae";
+        const string OldEditableContentClass = "old_content_cc4ee2cb-e18c-423a-adb2-d106a29dcbc3";
 
         const string DefaultEditContent = @"<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.01 Transitional//EN"" ""http://www.w3.org/TR/html4/loose.dtd"">
                                             <html>
                                                 <head>
                                                 </head>
                                                 <body style=""min-height: 500px;"">
-                                                    <div class=""" + EditableContentClass + @""" contenteditable=""true"" style=""font-family: sans-serif; width: 100%; outline: 0px solid transparent""><br><br></div>
+                                                    <div class=""" + NewEditableContentClass + @""" contenteditable=""true"" style=""font-family: sans-serif; width: 100%; outline: 0px solid transparent""><br><br></div>
                                                 </body>
                                             </html>";
 
@@ -77,7 +81,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             var customWebViewClient = new CustomWebViewClient();
             customWebViewClient.PageFinishedLoading += (sender, e) =>
             {
-                SetGetContentAsyncSemaphore.Release();
+                NewSetGetContentAsyncSemaphore.Release();
             };
             newContentWebView.SetWebViewClient(customWebViewClient);
             newContentWebView.Settings.JavaScriptEnabled = true;
@@ -102,13 +106,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
             };
-            oldContentWebView.SetWebViewClient(new CustomWebViewClient());
-            oldContentWebView.Settings.SetSupportZoom(true);
-            oldContentWebView.Settings.BuiltInZoomControls = true;
-            oldContentWebView.Settings.DisplayZoomControls = false;
+            var oldContentWebViewClient = new CustomWebViewClient();
+            oldContentWebViewClient.PageFinishedLoading += (sender, e) =>
+            {
+                OldSetGetContentAsyncSemaphore.Release();
+            };
+            oldContentWebView.SetWebViewClient(oldContentWebViewClient);
+            oldContentWebView.AddJavascriptInterface(new GetHtmlContentInterface(this), "GetHtmlContentInterface");
             oldContentWebView.Settings.JavaScriptEnabled = false;
-            oldContentWebView.VerticalScrollBarEnabled = false;
-            oldContentWebView.HorizontalScrollBarEnabled = false;
             oldContentWebView.Visibility = ViewStates.Gone;
             AddView(oldContentWebView);
         }
@@ -145,17 +150,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 return;
             }
 
-            await SetHtmlContentAsync(DefaultEditContent);
+            await SetNewHtmlContentAsync(DefaultEditContent);
 
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
                 if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
                 {
-                    await SetWebContentPart(EditableContentClass, ContentType.Html, PreviousDocument.HtmlBody);
+                    await SetWebContentPart(NewEditableContentClass, ContentType.Html, PreviousDocument.HtmlBody);
                 }
                 else
                 {
-                    await SetWebContentPart(EditableContentClass, ContentType.PlainText, PreviousDocument.PlainTextBody);
+                    await SetWebContentPart(NewEditableContentClass, ContentType.PlainText, PreviousDocument.PlainTextBody);
                 }
             }
             else
@@ -164,6 +169,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 {
                     showOldContentButton.Visibility = ViewStates.Visible;
                 }
+
+                await LoadOldContent();
             }
         }
 
@@ -175,12 +182,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public async Task InsertTemplate(Template template)
         {
-            await SetWebContentPart(EditableContentClass, template.ContentType, template.Content);
+            await SetWebContentPart(NewEditableContentClass, template.ContentType, template.Content);
         }
 
         public async Task InsertLocalTemplate(string localTemplate)
         {
-            await SetWebContentPart(EditableContentClass, ContentType.PlainText, localTemplate);
+            await SetWebContentPart(NewEditableContentClass, ContentType.PlainText, localTemplate);
         }
 
         #endregion
@@ -191,20 +198,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             if (!oldContentLoaded && CreationModeFlag != DocumentCreationModeFlag.Edit && PreviousDocument != null)
             {
+                string oldContentString = null;
+
                 if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
                 {
-                    oldContent = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
+                    oldContentString = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
                 }
                 else if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
                 {
-                    oldContent = await GetBodyWithHeader(PreviousDocument.HtmlBody, ContentType.Html);
+                    oldContentString = await GetBodyWithHeader(PreviousDocument.HtmlBody, ContentType.Html);
                 }
                 else
                 {
-                    oldContent = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
+                    oldContentString = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
                 }
 
-                ((Activity)context).RunOnUiThread(() => oldContentWebView.LoadDataWithBaseURL(null, oldContent, "text/html", "UTF-8", null));
+                await SetOldHtmlContentAsync(oldContentString);
                 oldContentLoaded = true;
             }
         }
@@ -220,6 +229,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 var body = htmlDocument.Body;
                 var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
                 body.InsertBefore(parsedHeader.Body, body.FirstChild);
+
+                var ce = htmlDocument.CreateElement("div");
+                ce.ClassName = OldEditableContentClass;
+                ce.Id = "editable-one";
+                ce.SetAttribute("contentEditable", "true");
+
+                ce.InnerHtml = body.InnerHtml;
+                body.InnerHtml = ce.OuterHtml;
 
                 var textWriter = new StringWriter();
                 htmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
@@ -238,6 +255,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 contentHtml.TextContent = content;
 
                 parsedHeader.Body.Append(contentHtml);
+
+                var metaElement = parsedHeader.CreateElement("meta");
+                metaElement.SetAttribute("name", "viewport");
+                metaElement.SetAttribute("content", $"initial-scale=0.85, minimum-scale=0.5, maximum-scale=2");
+                parsedHeader.Head.Append(metaElement);
+
+                var ce = parsedHeader.CreateElement("div");
+                ce.ClassName = OldEditableContentClass;
+                ce.Id = "editable-one";
+                ce.SetAttribute("contentEditable", "true");
+
+                ce.InnerHtml = parsedHeader.Body.InnerHtml;
+                parsedHeader.Body.InnerHtml = ce.OuterHtml;
 
                 var textWriter = new StringWriter();
                 parsedHeader.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
@@ -279,7 +309,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         async Task<string> RetrieveCombinedText()
         {
-            var newContentString = await GetHtmlContentAsync(true);
+            var newContentString = await GetNewHtmlContentAsync(true);
 
             await LoadOldContent();
 
@@ -299,32 +329,59 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             return newContentString;
         }
 
-        async Task SetHtmlContentAsync(string htmlString)
+        #region Get/Set contents
+
+        async Task SetNewHtmlContentAsync(string htmlString)
         {
-            await SetGetContentAsyncSemaphore.WaitAsync();
+            await NewSetGetContentAsyncSemaphore.WaitAsync();
             ((Activity)context).RunOnUiThread(() => newContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
         }
 
-        async Task<string> GetHtmlContentAsync(bool processing)
+        async Task<string> GetNewHtmlContentAsync(bool processing)
         {
             try
             {
-                await SetGetContentAsyncSemaphore.WaitAsync();
-                ((Activity)context).RunOnUiThread(() => newContentWebView.LoadUrl(GetHtmlContentInterface.JavaScript));
+                await NewSetGetContentAsyncSemaphore.WaitAsync();
+                ((Activity)context).RunOnUiThread(() => newContentWebView.LoadUrl(GetHtmlContentInterface.NewContentJavascript));
 
-                await getHtmlContentInterfaceSemaphore.WaitAsync();
+                await newGetHtmlContentInterfaceSemaphore.WaitAsync();
             }
             finally
             {
-                SetGetContentAsyncSemaphore.Release();
+                NewSetGetContentAsyncSemaphore.Release();
             }
 
             return processing ? await ProcessRetrievedContent(new HtmlParser(), newContent) : newContent;
         }
 
+        async Task SetOldHtmlContentAsync(string htmlString)
+        {
+            await OldSetGetContentAsyncSemaphore.WaitAsync();
+            ((Activity)context).RunOnUiThread(() => oldContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
+        }
+
+        async Task<string> GetOldHtmlContentAsync(bool processing)
+        {
+            try
+            {
+                await OldSetGetContentAsyncSemaphore.WaitAsync();
+                ((Activity)context).RunOnUiThread(() => oldContentWebView.LoadUrl(GetHtmlContentInterface.OldContentJavascript));
+
+                await oldGetHtmlContentInterfaceSemaphore.WaitAsync();
+            }
+            finally
+            {
+                OldSetGetContentAsyncSemaphore.Release();
+            }
+
+            return processing ? await ProcessRetrievedContent(new HtmlParser(), oldContent) : oldContent;
+        }
+
+        #endregion
+
         async Task SetWebContentPart(string parentElementClass, ContentType contentType, string content)
         {
-            var currentContent = await GetHtmlContentAsync(false);
+            var currentContent = await GetNewHtmlContentAsync(false);
 
             var htmlParser = new HtmlParser();
             var currentHtmlDocument = await htmlParser.ParseAsync(currentContent);
@@ -353,7 +410,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             var textWriter = new StringWriter();
             currentHtmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
 
-            await SetHtmlContentAsync(textWriter.ToString());
+            await SetNewHtmlContentAsync(textWriter.ToString());
         }
 
         static async Task<IHtmlCollection<IElement>> ProcessInsertedContent(HtmlParser htmlParser, ContentType contentToInsertType, string contentToInsert)
@@ -382,7 +439,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             var elementClasses = new[]
             {
-                EditableContentClass,
+                NewEditableContentClass,
             };
 
             foreach (var elementClass in elementClasses)
@@ -457,27 +514,27 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         async Task RestoreState()
         {
             var contentViewState = State as ContentViewState;
-            oldContent = contentViewState.OldContent;
             oldContentLoaded = contentViewState.OldContentLoaded;
             oldContentWebView.Visibility = contentViewState.OldContentWebViewVisibility;
             showOldContentButton.Visibility = contentViewState.ShowOldContentButtonVisibility;
             showOldContentButton.Text = contentViewState.ShowOldContentButtonText;
 
-            await SetHtmlContentAsync(contentViewState.NewContent);
+            await SetNewHtmlContentAsync(contentViewState.NewContent);
 
             if (oldContentLoaded)
             {
-                ((Activity)context).RunOnUiThread(() => oldContentWebView.LoadDataWithBaseURL(null, oldContent, "text/html", "UTF-8", null));
+                await SetOldHtmlContentAsync(contentViewState.OldContent);
             }
         }
 
         public override IComposeDocumentViewState ReturnState()
         {
-            var newContentString = AsyncHelpers.RunSync(() => { return GetHtmlContentAsync(false); });
+            var newContentString = AsyncHelpers.RunSync(() => { return GetNewHtmlContentAsync(false); });
+            var oldContentString = AsyncHelpers.RunSync(() => { return GetOldHtmlContentAsync(false); });
             return new ContentViewState
             {
                 NewContent = newContentString,
-                OldContent = oldContent,
+                OldContent = oldContentString,
                 OldContentLoaded = oldContentLoaded,
                 OldContentWebViewVisibility = oldContentWebView.Visibility,
                 ShowOldContentButtonVisibility = showOldContentButton.Visibility,
@@ -499,10 +556,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #region Java script interfaces callbacks
 
-        public void FinalizeGetHtmlContent(Java.Lang.String content)
+        public void FinalizeGetNewHtmlContent(Java.Lang.String content)
         {
             newContent = (string)content;
-            getHtmlContentInterfaceSemaphore.Release();
+            newGetHtmlContentInterfaceSemaphore.Release();
+        }
+
+        public void FinalizeGetOldHtmlContent(Java.Lang.String content)
+        {
+            oldContent = (string)content;
+            oldGetHtmlContentInterfaceSemaphore.Release();
         }
 
         #endregion
@@ -511,7 +574,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         class GetHtmlContentInterface : Java.Lang.Object
         {
-            public const string JavaScript = "javascript:window.GetHtmlContentInterface.getHtmlContent('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');";
+            public const string NewContentJavascript = "javascript:window.GetHtmlContentInterface.getNewHtmlContent('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');";
+            public const string OldContentJavascript = "javascript:window.GetHtmlContentInterface.getOldHtmlContent('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');";
 
             readonly ContentView view;
 
@@ -525,11 +589,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
             }
 
-            [Export("getHtmlContent")]
+            [Export("getNewHtmlContent")]
             [JavascriptInterface]
-            public void GetHtmlContent(Java.Lang.String htmlContent)
+            public void GetNewHtmlContent(Java.Lang.String htmlContent)
             {
-                view.FinalizeGetHtmlContent(htmlContent);
+                view.FinalizeGetNewHtmlContent(htmlContent);
+            }
+
+            [Export("getOldHtmlContent")]
+            [JavascriptInterface]
+            public void GetOldHtmlContent(Java.Lang.String htmlContent)
+            {
+                view.FinalizeGetOldHtmlContent(htmlContent);
             }
         }
 
