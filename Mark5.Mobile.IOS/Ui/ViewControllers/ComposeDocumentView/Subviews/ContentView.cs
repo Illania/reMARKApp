@@ -43,12 +43,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         WKWebView newContentWebView;
         WKWebView oldContentWebView;
 
-        UIScrollView externalScrollView; //TODO check if we need it
+        UIScrollView externalScrollView;
 
         SeparatorSubView separatorBeforeExpand;
         SeparatorSubView separatorAfterExpand;
 
         bool oldContentLoaded;
+
+        bool oldContentResized;
+        bool newContentResized;
 
         Dictionary<UIView, NSLayoutConstraint[]> constraintsStash;
 
@@ -229,6 +232,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public void OnKeyboardWillShow(nfloat keyboardHeight)
         {
+            if (tapLocation == default(CGPoint))
+                return;
+
             var oldY = ConvertRectToView(oldContentWebView.Frame, null).Y;
 
             if ((oldY - UIApplication.SharedApplication.KeyWindow.Frame.Bottom + keyboardHeight + 20) > 0)
@@ -241,6 +247,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 externalScrollView.ScrollRectToVisible(rect, true);
             }
+
+            tapLocation = default(CGPoint);
         }
 
         #endregion
@@ -637,9 +645,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var resizedNumber = responseDict["resized"] as NSNumber;
             var mutatedNumber = responseDict["mutated"] as NSNumber;
 
-            if ((justLoadedNumber != null && justLoadedNumber.BoolValue)
-                || (resizedNumber != null && resizedNumber.BoolValue)
-                || (mutatedNumber != null && mutatedNumber.BoolValue))
+            var justLoaded = justLoadedNumber != null && justLoadedNumber.BoolValue;
+            var resized = resizedNumber != null && resizedNumber.BoolValue;
+            var mutated = mutatedNumber != null && mutatedNumber.BoolValue;
+
+            if (justLoaded || resized || mutated)
             {
                 Action<WKWebView, NSLayoutConstraint> resizeAction = null;
                 resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)), () =>
@@ -658,12 +668,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 if (userContentController == newContentWebView.Configuration.UserContentController)
                 {
-                    CommonConfig.Logger.Debug($" NEW --- LOADED={justLoadedNumber}, RESIZED={resizedNumber}, MUTATED={mutatedNumber}");
+                    if (resized && newContentResized)
+                        return;
+
+                    newContentResized = resized;
                     resizeAction(newContentWebView, newContentHeightConstraint);
                 }
                 else
                 {
-                    CommonConfig.Logger.Debug($" OLD --- LOADED={justLoadedNumber}, RESIZED={resizedNumber}, MUTATED={mutatedNumber}");
+                    if (resized && oldContentResized)
+                        return;
+
+                    oldContentResized = resized;
                     resizeAction(oldContentWebView, oldContentHeightConstraint);
                 }
             }
