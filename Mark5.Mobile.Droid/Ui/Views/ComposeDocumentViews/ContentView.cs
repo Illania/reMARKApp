@@ -300,7 +300,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             return header.ToString();
         }
 
-
         async Task<string> RetrieveCombinedText()
         {
             var newContentString = await GetNewHtmlContentAsync(true);
@@ -346,7 +345,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 NewSetGetContentAsyncSemaphore.Release();
             }
 
-            return processing ? await ProcessRetrievedContent(new HtmlParser(), newContent) : newContent;
+            return processing ? await ProcessRetrievedContent(new HtmlParser(), newContent, NewEditableContentClass) : newContent;
         }
 
         async Task SetOldHtmlContentAsync(string htmlString)
@@ -369,7 +368,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 OldSetGetContentAsyncSemaphore.Release();
             }
 
-            return processing ? await ProcessRetrievedContent(new HtmlParser(), oldContent) : oldContent;
+            return processing ? await ProcessRetrievedContent(new HtmlParser(), oldContent, OldEditableContentClass) : oldContent;
         }
 
         #endregion
@@ -428,22 +427,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             throw new ArgumentException(string.Format("Unsupported contentType. [contentType={0}]", contentToInsertType));
         }
 
-        static async Task<string> ProcessRetrievedContent(HtmlParser htmlParser, string content)
+        static async Task<string> ProcessRetrievedContent(HtmlParser htmlParser, string content, string elementClass)
         {
             var currentHtmlDocument = await htmlParser.ParseAsync(content);
 
-            var elementClasses = new[]
+            var matchingElements = currentHtmlDocument.QuerySelectorAll("div." + elementClass);
+            foreach (var matchingElement in matchingElements)
             {
-                NewEditableContentClass,
-            };
-
-            foreach (var elementClass in elementClasses)
-            {
-                var matchingElements = currentHtmlDocument.QuerySelectorAll("div." + elementClass);
-                foreach (var matchingElement in matchingElements)
-                {
-                    matchingElement.Attributes.RemoveNamedItem("contenteditable");
-                }
+                matchingElement.Attributes.RemoveNamedItem("contenteditable");
             }
 
             var processedWebContent = currentHtmlDocument.DocumentElement.OuterHtml;
