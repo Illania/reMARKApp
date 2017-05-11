@@ -53,6 +53,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         bool oldContentResized;
         bool newContentResized;
 
+        CGPoint tapLocationOldContent;
+        CGPoint tapLocationNewContent;
+
         Dictionary<UIView, NSLayoutConstraint[]> constraintsStash;
 
         NSLayoutConstraint newContentHeightConstraint;
@@ -117,6 +120,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             newContentWebView.Opaque = false;
             newContentWebView.ScrollView.Bounces = false;
             newContentWebView.ScrollView.BouncesZoom = false;
+
+            var tapRecognizer = new UITapGestureRecognizer();
+            tapRecognizer.AddTarget(() => HandleTapNewContent(tapRecognizer));
+            tapRecognizer.Delegate = this;
+
+            newContentWebView.ScrollView.AddGestureRecognizer(tapRecognizer);
+
             newContentWebView.NavigationDelegate = new WebViewNavigationDelegate { DidFinishNavigationAction = () => { newContentLoadingSemaphore.Release(); } };
             ContainerView.AddSubview(newContentWebView);
             AddConstraints(new[]
@@ -200,7 +210,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             oldContentWebView.ScrollView.Delegate = this;
 
             var tapRecognizer = new UITapGestureRecognizer();
-            tapRecognizer.AddTarget(() => HandleTap(tapRecognizer));
+            tapRecognizer.AddTarget(() => HandleTapOldContent(tapRecognizer));
             tapRecognizer.Delegate = this;
 
             oldContentWebView.ScrollView.AddGestureRecognizer(tapRecognizer);
@@ -223,20 +233,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #region ScrollView
 
-        CGPoint tapLocation;
-
-        void HandleTap(UITapGestureRecognizer tapRecognizer)
+        void HandleTapOldContent(UITapGestureRecognizer tapRecognizer)
         {
-            tapLocation = tapRecognizer.LocationInView(this);
+            tapLocationOldContent = tapRecognizer.LocationInView(this);
         }
 
-        //The following is used to cover the case in which the oldContentWebView will be covered by the keyboard
+        void HandleTapNewContent(UITapGestureRecognizer tapRecognizer)
+        {
+            tapLocationNewContent = tapRecognizer.LocationInView(this);
+        }
+
         public void OnKeyboardWillShow(nfloat keyboardHeight)
+        {
+            ScrollToVisibleIfNecessary(ref tapLocationNewContent, newContentWebView, keyboardHeight);
+            ScrollToVisibleIfNecessary(ref tapLocationOldContent, oldContentWebView, keyboardHeight);
+        }
+
+        void ScrollToVisibleIfNecessary(ref CGPoint tapLocation, WKWebView webview, nfloat keyboardHeight)
         {
             if (tapLocation == default(CGPoint))
                 return;
 
-            var oldY = ConvertRectToView(oldContentWebView.Frame, null).Y; //Position in current window
+            var oldY = ConvertRectToView(webview.Frame, null).Y; //Position in current window
 
             if ((oldY - UIApplication.SharedApplication.KeyWindow.Frame.Bottom + keyboardHeight + 20) > 0)
             {
@@ -644,7 +662,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (justLoaded || resized || mutated)
             {
                 Action<WKWebView, NSLayoutConstraint> resizeAction = null;
-                resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)), () =>
+                resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(150)), () =>
                 {
                     if (wv.IsLoading)
                     {
@@ -652,7 +670,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     }
                     else if (Math.Abs(nslc.Constant - wv.ScrollView.ContentSize.Height) > 10) //Condition to avoid loop on size increase
                     {
-                        CommonConfig.Logger.Debug($"CONSTANT = {nslc.Constant}, HEIGHT ={wv.ScrollView.ContentSize.Height}"); //TODO debug
                         nslc.Constant = wv.ScrollView.ContentSize.Height;
                         SetNeedsLayout();
                     }
