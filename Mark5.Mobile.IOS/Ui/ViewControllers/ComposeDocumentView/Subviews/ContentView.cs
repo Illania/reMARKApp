@@ -230,12 +230,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             tapLocation = tapRecognizer.LocationInView(this);
         }
 
+        //The following is used to cover the case in which the oldContentWebView will be covered by the keyboard
         public void OnKeyboardWillShow(nfloat keyboardHeight)
         {
             if (tapLocation == default(CGPoint))
                 return;
 
-            var oldY = ConvertRectToView(oldContentWebView.Frame, null).Y;
+            var oldY = ConvertRectToView(oldContentWebView.Frame, null).Y; //Position in current window
 
             if ((oldY - UIApplication.SharedApplication.KeyWindow.Frame.Bottom + keyboardHeight + 20) > 0)
             {
@@ -455,7 +456,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 ce.SetAttribute("contentEditable", "true");
 
                 ce.InnerHtml = parsedHeader.Body.InnerHtml;
-                parsedHeader.Body.InnerHtml = ce.OuterHtml; //TODO need to test this
+                parsedHeader.Body.InnerHtml = ce.OuterHtml;
 
                 var textWriter = new StringWriter();
                 parsedHeader.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
@@ -468,12 +469,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         async Task<string> RetrieveCombinedText()
         {
             var newContentString = (await newContentWebView.EvaluateJavaScriptAsync(GetWebContentJs) as NSString).ToString();
-            var newContentProcessedString = await ProcessRetrievedContent(new HtmlParser(), newContentString);
+            var newContentProcessedString = await ProcessRetrievedContent(new HtmlParser(), newContentString, NewEditableContentClass);
 
             await LoadOldContent();
 
             var oldContentString = (await oldContentWebView.EvaluateJavaScriptAsync(GetWebContentJs) as NSString).ToString();
-            var oldContentProcessed = await ProcessRetrievedContent(new HtmlParser(), oldContentString);
+            var oldContentProcessed = await ProcessRetrievedContent(new HtmlParser(), oldContentString, OldEditableContentClass);
 
             if (!string.IsNullOrEmpty(oldContentProcessed))
             {
@@ -544,23 +545,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             throw new ArgumentException(string.Format("Unsupported contentType. [contentType={0}]", contentToInsertType));
         }
 
-        static async Task<string> ProcessRetrievedContent(HtmlParser htmlParser, string content)
+        static async Task<string> ProcessRetrievedContent(HtmlParser htmlParser, string content, string elementClass)
         {
             var currentHtmlDocument = await htmlParser.ParseAsync(content);
 
-            var elementClasses = new[]
+            var matchingElements = currentHtmlDocument.QuerySelectorAll("div." + elementClass);
+            foreach (var matchingElement in matchingElements)
             {
-                NewEditableContentClass,
-                OldEditableContentClass //TODO can be improved
-            };
-
-            foreach (var elementClass in elementClasses)
-            {
-                var matchingElements = currentHtmlDocument.QuerySelectorAll("div." + elementClass);
-                foreach (var matchingElement in matchingElements)
-                {
-                    matchingElement.Attributes.RemoveNamedItem("contenteditable");
-                }
+                matchingElement.Attributes.RemoveNamedItem("contenteditable");
             }
 
             var processedWebContent = currentHtmlDocument.DocumentElement.OuterHtml;
