@@ -113,21 +113,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             };
             oldContentWebView.SetWebViewClient(oldContentWebViewClient);
             oldContentWebView.AddJavascriptInterface(new GetHtmlContentInterface(this), "GetHtmlContentInterface");
-            oldContentWebView.Settings.JavaScriptEnabled = false;
+            oldContentWebView.Settings.JavaScriptEnabled = true;
             oldContentWebView.Visibility = ViewStates.Gone;
             AddView(oldContentWebView);
         }
 
-        async void ShowOldContentButton_Click(object sender, EventArgs e)
+        void ShowOldContentButton_Click(object sender, EventArgs e)
         {
             if (oldContentWebView.Visibility == ViewStates.Gone)
             {
-                showOldContentButton.Enabled = false;
-                showOldContentButton.SetText(Resource.String.showing_previous_message);
-
-                await Task.Delay(100); // Let the button animation run
-                await LoadOldContent();
-
                 showOldContentButton.SetText(Resource.String.hide_previous_message);
                 showOldContentButton.Enabled = true;
                 oldContentWebView.Visibility = ViewStates.Visible;
@@ -310,14 +304,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         async Task<string> RetrieveCombinedText()
         {
             var newContentString = await GetNewHtmlContentAsync(true);
+            var oldContentString = await GetOldHtmlContentAsync(true);
 
             await LoadOldContent();
 
-            if (!string.IsNullOrEmpty(oldContent))
+            if (!string.IsNullOrEmpty(oldContentString))
             {
                 var htmlParser = new HtmlParser();
                 var newContentParsed = await htmlParser.ParseAsync(newContentString);
-                var oldContentParsed = await htmlParser.ParseAsync(oldContent);
+                var oldContentParsed = await htmlParser.ParseAsync(oldContentString);
                 var oldContentInDiv = newContentParsed.CreateElement("div");
                 oldContentInDiv.InnerHtml = oldContentParsed.Body.InnerHtml;
                 newContentParsed.Body.Append(oldContentInDiv);
