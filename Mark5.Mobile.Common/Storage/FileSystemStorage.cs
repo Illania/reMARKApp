@@ -488,35 +488,34 @@ namespace Mark5.Mobile.Common.Storage
         {
             var path = await CheckAttachmentsExistsAsync(attachmentDescription);
             if (!string.IsNullOrEmpty(path))
-            {
                 return path;
-            }
 
-            var file = await CommonConfig.AttachmentsFolder.CreateFileAsync(GetAttachmentFilename(attachmentDescription), CreationCollisionOption.ReplaceExisting, ct);
+            var folderExists = await CommonConfig.AttachmentsFolder.CheckExistsAsync(attachmentDescription.Id.ToString());
+            if (folderExists != ExistenceCheckResult.FolderExists)
+                await CommonConfig.AttachmentsFolder.CreateFolderAsync(attachmentDescription.Id.ToString(), CreationCollisionOption.OpenIfExists);
+
+            var folder = await CommonConfig.AttachmentsFolder.GetFolderAsync(attachmentDescription.Id.ToString());
+
+            var file = await folder.CreateFileAsync(attachmentDescription.SafeName, CreationCollisionOption.ReplaceExisting, ct);
             using (var fileStream = await file.OpenAsync(PCLStorage.FileAccess.ReadAndWrite))
-            {
                 await attachmentStream.CopyToAsync(fileStream);
-            }
 
             return file.Path;
         }
 
         public static async Task<string> CheckAttachmentsExistsAsync(AttachmentDescription attachmentDescription)
         {
-            var filename = GetAttachmentFilename(attachmentDescription);
+            var folderExists = await CommonConfig.AttachmentsFolder.CheckExistsAsync(attachmentDescription.Id.ToString());
+            if (folderExists != ExistenceCheckResult.FolderExists)
+                return string.Empty;
 
-            var fileExists = await CommonConfig.AttachmentsFolder.CheckExistsAsync(filename);
-            if (fileExists == ExistenceCheckResult.FileExists)
-            {
-                return CommonConfig.AttachmentsFolder.Path + CommonConfig.PathSeparator + filename;
-            }
+            var folder = await CommonConfig.AttachmentsFolder.GetFolderAsync(attachmentDescription.Id.ToString());
 
-            return string.Empty;
-        }
+            var fileExists = await folder.CheckExistsAsync(attachmentDescription.SafeName);
+            if (fileExists != ExistenceCheckResult.FileExists)
+                return string.Empty;
 
-        static string GetAttachmentFilename(AttachmentDescription attachmentDescription)
-        {
-            return $"{attachmentDescription.Id}_{attachmentDescription.Name}";
+            return CommonConfig.AttachmentsFolder.Path + CommonConfig.PathSeparator + attachmentDescription.Id + CommonConfig.PathSeparator + attachmentDescription.SafeName;
         }
 
         #endregion
