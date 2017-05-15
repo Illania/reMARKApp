@@ -704,7 +704,10 @@ namespace Mark5.Mobile.Common.Managers
                     Token = Token,
                     Id = attachmentDescription.Id,
                     DocumentId = document.Id
-                }, async stream => { path = await FileSystemStorage.SaveAttachmentAsync(attachmentDescription, stream); });
+                }, async stream =>
+                {
+                    path = await FileSystemStorage.SaveAttachmentAsync(attachmentDescription, stream);
+                });
 
                 return path;
             }

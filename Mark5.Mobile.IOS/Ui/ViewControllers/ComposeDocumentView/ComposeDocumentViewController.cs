@@ -51,7 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         Document Document { get; set; } = new Document();
         DocumentPreview DocumentPreview { get; set; } = new DocumentPreview();
 
-        ActionableLayoutScrollView scrollView;
+        UIScrollView scrollView;
         UIStackView stackView;
 
         ToView toView;
@@ -104,15 +104,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             ExtendedLayoutIncludesOpaqueBars = true;
         }
 
+        NSObject observeDidShowNotification;
+        NSObject observeWillChangeNotification;
+        NSObject observeWillHideNotification; //TODO move
+        NSObject observeWillShowNotification;
+
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
 
             InitializeHandlers();
 
-            NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.DidShowNotification, OnKeyboardDidShowNotification);
-            NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillChangeFrameNotification, OnKeyboardDidShowNotification);
-            NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
+            observeWillShowNotification = UIKeyboard.Notifications.ObserveDidShow(OnKeyboardWillShowNotification);
+            observeDidShowNotification = UIKeyboard.Notifications.ObserveDidShow(OnKeyboardDidShowNotification);
+            observeWillChangeNotification = UIKeyboard.Notifications.ObserveWillChangeFrame(OnKeyboardDidShowNotification);
+            observeWillHideNotification = UIKeyboard.Notifications.ObserveWillHide(OnKeyboardWillHideNotification);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -143,14 +149,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             base.ViewWillDisappear(animated);
             DeInitializeHandlers();
 
-            NSNotificationCenter.DefaultCenter.RemoveObservers(new[]
-            {
-                    UIKeyboard.DidShowNotification,
-                    UIKeyboard.WillChangeFrameNotification,
-                    UIKeyboard.WillHideNotification
-                });
-
             NavigationController.HidesBarsOnSwipe = false;
+
+            observeDidShowNotification?.Dispose();
+            observeWillHideNotification?.Dispose();
+            observeWillChangeNotification?.Dispose();
+            observeWillShowNotification?.Dispose();
 
             autoSaveWorker?.Stop();
         }
@@ -165,9 +169,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             View.BackgroundColor = UIColor.White;
 
-            scrollView = new ActionableLayoutScrollView
+            scrollView = new UIScrollView
             {
-                LayoutSubviewsAction = HandleScrollViewLayoutSubviewsAction,
                 BackgroundColor = UIColor.White,
                 ShowsVerticalScrollIndicator = true,
                 ShowsHorizontalScrollIndicator = false,
@@ -204,7 +207,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1f, 0f)
                 });
 
-            contentView = new ContentView();
+            contentView = new ContentView(scrollView);
             scrollView.AddSubview(contentView);
             View.AddConstraints(new[]
             {
@@ -451,16 +454,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         #region Keyboard Notifications
 
-        void OnKeyboardDidShowNotification(NSNotification notification)
+        void OnKeyboardWillShowNotification(object sender, UIKeyboardEventArgs e)
         {
-            keyboardHeight = UI.KeyboardHeightFromNotification(notification);
+            keyboardHeight = UI.KeyboardHeightFromNotification(e.Notification);
+            contentView.OnKeyboardWillShow(keyboardHeight);
+        }
+
+        void OnKeyboardDidShowNotification(object sender, UIKeyboardEventArgs e)
+        {
+            keyboardHeight = UI.KeyboardHeightFromNotification(e.Notification);
 
             var insets = scrollView.ContentInset;
             insets.Bottom = keyboardHeight;
             scrollView.ContentInset = insets;
         }
 
-        void OnKeyboardWillHideNotification(NSNotification notification)
+        void OnKeyboardWillHideNotification(object sender, UIKeyboardEventArgs e)
         {
             var insets = scrollView.ContentInset;
             insets.Bottom = 0f;
@@ -636,7 +645,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }));
             sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("browse_files"), UIAlertActionStyle.Default, a =>
             {
-                var picker = new DocumentMenuViewController(new [] { "public.content", "public.data", "public.msg", "public.eml" }, UIDocumentPickerMode.Import)
+                var picker = new DocumentMenuViewController(new[] { "public.content", "public.data", "public.msg", "public.eml" }, UIDocumentPickerMode.Import)
                 {
                     Delegate = new DocumentMenuDelegate(this, HandleAttachmentUrl)
                 };
@@ -1206,20 +1215,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
 
             template.Content = templateContent;
-        }
-
-        #endregion
-
-        #region ScrollView LayoutSubViews Action
-
-        void HandleScrollViewLayoutSubviewsAction(UIScrollView consideredScrollView)
-        {
-            //Used to keep the views before and after the content anchored to the scrollView
-            var minimumVisibleX = consideredScrollView.ContentOffset.X;
-
-            var actualFrame = stackView.Frame;
-            actualFrame.X = minimumVisibleX;
-            stackView.Frame = actualFrame;
         }
 
         #endregion

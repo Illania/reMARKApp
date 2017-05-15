@@ -211,8 +211,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 else
                 {
-                    var sourceType = PreviousDocumentDirection == DocumentDirection.Draft ? SourceType.Auto : SourceType.Local;
-                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, sourceType);
+                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId, PreviousDocumentId.Value, PreviousDocumentFolderId == null ? SourceType.Auto : SourceType.Local);
                     PreviousDocument = container.Document;
                     PreviousDocumentPreview = container.DocumentPreview;
 
@@ -227,6 +226,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             catch (Exception ex)
             {
                 dismissAction();
+
+                CommonConfig.Logger.Error("Failed to load document", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 

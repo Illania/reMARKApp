@@ -402,7 +402,6 @@
     <Compile Include="Model\HubMessages\EntityDeletedMessage.cs" />
     <Compile Include="Model\HubMessages\EntityRemovedFromFolderMessage.cs" />
     <Compile Include="Utilities\Extensions\NSObjectExtensions.cs" />
-    <Compile Include="Ui\Common\ActionableLayoutScrollView.cs" />
     <Compile Include="Ui\Common\SeparatorSubView.cs" />
     <Compile Include="Utilities\Extensions\UIFontExtensions.cs" />
     <Compile Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsListView.cs" />

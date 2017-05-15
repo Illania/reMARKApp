@@ -253,7 +253,7 @@
 "select_priority" = "Select priority";
 "send" = "Send";
 "send_text" = "Send message";
-"sending_document" = "Sending email...";
+"sending_document___" = "Sending email...";
 "set_priority" = "Set priority";
 "setting_priority___" = "Setting priority...";
 "settings" = "Settings";
