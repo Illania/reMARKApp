@@ -176,7 +176,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public async Task InsertTemplate(Template template)
         {
-            await SetWebContentPart(NewEditableContentClass, template.ContentType, template.Content);
+            await SetWebContentPart(NewEditableContentClass, template.ContentType, "<br><br>" + template.Content);
         }
 
         public async Task InsertLocalTemplate(string localTemplate)
@@ -250,11 +250,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 parsedHeader.Body.Append(contentHtml);
 
-                var metaElement = parsedHeader.CreateElement("meta");
-                metaElement.SetAttribute("name", "viewport");
-                metaElement.SetAttribute("content", $"initial-scale=0.85, minimum-scale=0.5, maximum-scale=2");
-                parsedHeader.Head.Append(metaElement);
-
                 var ce = parsedHeader.CreateElement("div");
                 ce.ClassName = OldEditableContentClass;
                 ce.Id = "editable-one";
@@ -303,12 +298,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         async Task<string> RetrieveCombinedText()
         {
             var newContentString = await GetNewHtmlContentAsync(true);
-            var oldContentString = await GetOldHtmlContentAsync(true);
 
-            await LoadOldContent();
-
-            if (!string.IsNullOrEmpty(oldContentString))
+            if (oldContentLoaded)
             {
+                var oldContentString = await GetOldHtmlContentAsync(true);
+
                 var htmlParser = new HtmlParser();
                 var newContentParsed = await htmlParser.ParseAsync(newContentString);
                 var oldContentParsed = await htmlParser.ParseAsync(oldContentString);
