@@ -676,6 +676,7 @@
     <AndroidResource Include="Resources\drawable\circle_dark.xml" />
     <AndroidResource Include="Resources\layout\mailviewer_layout.axml" />
     <AndroidResource Include="Resources\layout\base_layout_pager.axml" />
+    <AndroidResource Include="Resources\xml\network_security_config.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\anim\" />
