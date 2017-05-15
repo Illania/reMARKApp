@@ -683,7 +683,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     newContentResized = resized;
                     resizeAction(newContentWebView, newContentHeightConstraint);
                 }
-                else
+                else if (userContentController == oldContentWebView.Configuration.UserContentController)
                 {
                     if (resized && oldContentResized)
                         return;
