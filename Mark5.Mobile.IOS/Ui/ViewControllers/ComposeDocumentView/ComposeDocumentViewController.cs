@@ -51,7 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         Document Document { get; set; } = new Document();
         DocumentPreview DocumentPreview { get; set; } = new DocumentPreview();
 
-        ActionableLayoutScrollView scrollView;
+        UIScrollView scrollView;
         UIStackView stackView;
 
         ToView toView;
@@ -169,9 +169,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             View.BackgroundColor = UIColor.White;
 
-            scrollView = new ActionableLayoutScrollView
+            scrollView = new UIScrollView
             {
-                LayoutSubviewsAction = null,
                 BackgroundColor = UIColor.White,
                 ShowsVerticalScrollIndicator = true,
                 ShowsHorizontalScrollIndicator = false,
