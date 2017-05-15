@@ -19,11 +19,20 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
     public abstract class BaseAppCompatActivity : AppCompatActivity
     {
+        protected override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+            Init();
+        }
 
         public override void OnCreate(Bundle savedInstanceState, PersistableBundle persistentState)
         {
             base.OnCreate(savedInstanceState, persistentState);
+            Init();
+        }
 
+        void Init()
+        {
             Window.DecorView.SystemUiVisibility = (StatusBarVisibility)(SystemUiFlags.LayoutStable | SystemUiFlags.Fullscreen);
         }
 
