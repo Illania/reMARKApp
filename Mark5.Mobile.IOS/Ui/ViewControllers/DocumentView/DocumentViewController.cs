@@ -62,7 +62,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem nextDocumentButtonItem;
         UIBarButtonItem editDocumentButtonItem;
 
-        ActionableLayoutScrollView mainScrollView;
+        UIScrollView mainScrollView;
         UIStackView stackViewBeforeContent;
         UIStackView stackViewAfterContent;
 
@@ -237,7 +237,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             AutomaticallyAdjustsScrollViewInsets = false;
 
-            mainScrollView = new ActionableLayoutScrollView
+            mainScrollView = new UIScrollView
             {
                 BackgroundColor = UIColor.White,
                 ShowsVerticalScrollIndicator = true,
@@ -250,7 +250,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             mainScrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
             mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-            mainScrollView.LayoutSubviewsAction = HandleScrollViewLayoutSubviewsAction;
             View.AddSubview(mainScrollView);
             View.AddConstraints(new[]
                 {
@@ -1342,25 +1341,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-
-        #endregion
-
-        #region ScrollView LayoutSubViews Action
-
-        void HandleScrollViewLayoutSubviewsAction(UIScrollView scrollView)
-        {
-            //Used to keep the views before and after the content anchored to the scrollView
-            var minimumVisibleX = scrollView.ContentOffset.X;
-
-            var views = new UIView[] { stackViewBeforeContent, stackViewAfterContent };
-
-            foreach (var item in views)
-            {
-                var actualFrame = item.Frame;
-                actualFrame.X = minimumVisibleX;
-                item.Frame = actualFrame;
-            }
-        }
 
         #endregion
     }

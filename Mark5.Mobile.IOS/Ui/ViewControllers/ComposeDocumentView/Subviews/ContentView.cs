@@ -31,23 +31,30 @@ using WebKit;
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
 
-    public class ContentView : ComposeDocumentSubView, IWKNavigationDelegate, IUIGestureRecognizerDelegate, IWKScriptMessageHandler
+    public class ContentView : ComposeDocumentSubView, IWKNavigationDelegate, IUIGestureRecognizerDelegate, IWKScriptMessageHandler, IUIScrollViewDelegate
     {
 
         readonly static NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
         readonly static NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
-        readonly static NSString script3 = new NSString("var observer = new MutationObserver(function(mutations) { window.webkit.messageHandlers.mutation.postMessage({mutated:true}); }); observer.observe(document.querySelector('#editable-one'), { attributes: true, childList: true, characterData: true });");
+        readonly static NSString script3 = new NSString("var observer = new MutationObserver(function(mutations) { window.webkit.messageHandlers.mutation.postMessage({mutated:true}); }); observer.observe(document.querySelector('#editable-one'), { attributes: true, childList: true, characterData: true, subtree: true });");
 
         UIButton expandButton;
 
         WKWebView newContentWebView;
         WKWebView oldContentWebView;
 
+        UIScrollView externalScrollView;
+
         SeparatorSubView separatorBeforeExpand;
         SeparatorSubView separatorAfterExpand;
 
-        string oldContent;
         bool oldContentLoaded;
+
+        bool oldContentResized;
+        bool newContentResized;
+
+        CGPoint tapLocationOldContent;
+        CGPoint tapLocationNewContent;
 
         Dictionary<UIView, NSLayoutConstraint[]> constraintsStash;
 
@@ -56,8 +63,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         NSLayoutConstraint oldContentHeightConstraint;
 
         SemaphoreSlim newContentLoadingSemaphore;
-
-        const string EditableContentClass = "content_c176f8ef-2579-4f1f-86c1-f289beaba2ae";
+        const string NewEditableContentClass = "new_content_c176f8ef-2579-4f1f-86c1-f289beaba2ae";
+        const string OldEditableContentClass = "old_content_cc4ee2cb-e18c-423a-adb2-d106a29dcbc3";
 
         const string DefaultEditContent = @"<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.01 Transitional//EN"" ""http://www.w3.org/TR/html4/loose.dtd"">
                                             <html>
@@ -65,7 +72,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                                                     <meta name=""viewport"" content=""width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"">
                                                 </head>
                                                 <body>
-                                                    <div id=""editable-one"" class=""" + EditableContentClass + @""" contenteditable=""true"" style=""font-family: sans-serif; width: 100%""><br></div>
+                                                    <div id=""editable-one"" class=""" + NewEditableContentClass + @""" contenteditable=""true"" style=""font-family: sans-serif; width: 100%""><br></div>
                                                 </body >
                                             </html>";
 
@@ -73,8 +80,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         const string GetWebContentJs = "document.documentElement.outerHTML;";
         const string GetPlainTextContentJs = "document.body.innerText;";
 
-        public ContentView()
+        public ContentView(UIScrollView externalScrollView)
         {
+            this.externalScrollView = externalScrollView;
+
             constraintsStash = new Dictionary<UIView, NSLayoutConstraint[]>();
             newContentLoadingSemaphore = new SemaphoreSlim(0);
 
@@ -101,7 +110,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             userContentController.AddScriptMessageHandler(this, "mutation");
 
             var configuration = new WKWebViewConfiguration();
-            configuration.SuppressesIncrementalRendering = false;
+            configuration.SuppressesIncrementalRendering = true;
             configuration.AllowsInlineMediaPlayback = false;
             configuration.UserContentController = userContentController;
             configuration.Preferences = preferences;
@@ -111,15 +120,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             newContentWebView.Opaque = false;
             newContentWebView.ScrollView.Bounces = false;
             newContentWebView.ScrollView.BouncesZoom = false;
+
+            var tapRecognizer = new UITapGestureRecognizer();
+            tapRecognizer.AddTarget(() => HandleTapNewContent(tapRecognizer));
+            tapRecognizer.Delegate = this;
+
+            newContentWebView.ScrollView.AddGestureRecognizer(tapRecognizer);
+
             newContentWebView.NavigationDelegate = new WebViewNavigationDelegate { DidFinishNavigationAction = () => { newContentLoadingSemaphore.Release(); } };
             ContainerView.AddSubview(newContentWebView);
             AddConstraints(new[]
                 {
-                    newContentHeightConstraint = NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 200f),
+                newContentHeightConstraint = NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 200f),
                     NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
                     NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
                     NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
-                });
+            });
 
             newContentWebView.LoadHtmlString(DefaultEditContent, null);
         }
@@ -180,7 +196,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             userContentController.AddScriptMessageHandler(this, "sizeNotification");
 
             var configuration = new WKWebViewConfiguration();
-            configuration.SuppressesIncrementalRendering = false;
+            configuration.SuppressesIncrementalRendering = true;
             configuration.AllowsInlineMediaPlayback = false;
             configuration.UserContentController = userContentController;
             configuration.Preferences = preferences;
@@ -191,10 +207,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             oldContentWebView.Opaque = false;
             oldContentWebView.ScrollView.Bounces = false;
             oldContentWebView.ScrollView.BouncesZoom = false;
+            oldContentWebView.ScrollView.Delegate = this;
+
+            var tapRecognizer = new UITapGestureRecognizer();
+            tapRecognizer.AddTarget(() => HandleTapOldContent(tapRecognizer));
+            tapRecognizer.Delegate = this;
+
+            oldContentWebView.ScrollView.AddGestureRecognizer(tapRecognizer);
+
             oldContentWebView.NavigationDelegate = new WebViewNavigationDelegate();
 
-            oldContentHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0.5f);
-            oldContentZeroHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0f);
+            oldContentHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f);
+            oldContentZeroHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f);
 
             ContainerView.AddSubview(oldContentWebView);
             ContainerView.AddConstraints(new[]
@@ -207,6 +231,47 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             });
         }
 
+        #region ScrollView
+
+        void HandleTapOldContent(UITapGestureRecognizer tapRecognizer)
+        {
+            tapLocationOldContent = tapRecognizer.LocationInView(this);
+        }
+
+        void HandleTapNewContent(UITapGestureRecognizer tapRecognizer)
+        {
+            tapLocationNewContent = tapRecognizer.LocationInView(this);
+        }
+
+        public void OnKeyboardWillShow(nfloat keyboardHeight)
+        {
+            ScrollToVisibleIfNecessary(ref tapLocationNewContent, newContentWebView, keyboardHeight);
+            ScrollToVisibleIfNecessary(ref tapLocationOldContent, oldContentWebView, keyboardHeight);
+        }
+
+        void ScrollToVisibleIfNecessary(ref CGPoint tapLocation, WKWebView webview, nfloat keyboardHeight)
+        {
+            if (tapLocation == default(CGPoint))
+                return;
+
+            var oldY = ConvertRectToView(webview.Frame, null).Y; //Position in current window
+
+            if ((oldY - UIApplication.SharedApplication.KeyWindow.Frame.Bottom + keyboardHeight + 20) > 0)
+            {
+                var rect = new CGRect();
+                rect.Height = 40;
+                rect.Width = 1;
+                rect.X = ConvertPointToView(tapLocation, externalScrollView).X;
+                rect.Y = ConvertPointToView(tapLocation, externalScrollView).Y;
+
+                externalScrollView.ScrollRectToVisible(rect, true);
+            }
+
+            tapLocation = default(CGPoint);
+        }
+
+        #endregion
+
         #region Public methods
 
         public override async Task RefreshView()
@@ -214,16 +279,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
                 if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
-                    await SetWebContentPart(EditableContentClass, ContentType.Html, PreviousDocument.HtmlBody);
+                    await SetWebContentPart(NewEditableContentClass, ContentType.Html, PreviousDocument.HtmlBody);
                 else
-                    await SetWebContentPart(EditableContentClass, ContentType.PlainText, PreviousDocument.PlainTextBody);
+                    await SetWebContentPart(NewEditableContentClass, ContentType.PlainText, PreviousDocument.PlainTextBody);
             }
             else
             {
                 expandButton.Hidden &= PreviousDocument == null;
                 separatorBeforeExpand.Hidden = expandButton.Hidden;
-            }
 
+                await LoadOldContent();
+            }
         }
 
         public override async Task UpdateDocument()
@@ -232,9 +298,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             DocumentPreview.Preview = await GetPreview(Document.HtmlBody);
         }
 
-        public async Task InsertTemplate(Template template) => await SetWebContentPart(EditableContentClass, template.ContentType, template.Content);
+        public async Task InsertTemplate(Template template) => await SetWebContentPart(NewEditableContentClass, template.ContentType, "<br>" + template.Content);
 
-        public async Task InsertLocalTemplate(string localTemplate) => await SetWebContentPart(EditableContentClass, ContentType.PlainText, "\n\n\n" + localTemplate);
+        public async Task InsertLocalTemplate(string localTemplate) => await SetWebContentPart(NewEditableContentClass, ContentType.PlainText, "\n\n\n" + localTemplate);
 
         #endregion
 
@@ -244,6 +310,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             if (!oldContentLoaded && CreationModeFlag != DocumentCreationModeFlag.Edit && PreviousDocument != null)
             {
+                string oldContent = null;
                 if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
                 {
                     oldContent = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
@@ -290,7 +357,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     {
                         var metaElement = htmlDoc.CreateElement("meta");
                         metaElement.SetAttributeValue("name", "viewport");
-                        metaElement.SetAttributeValue("content", $"width=device-width, initial-scale=0.75, minimum-scale=0.5, maximum-scale=2.5");
+                        metaElement.SetAttributeValue("content", $"initial-scale=0.85, minimum-scale=0.5, maximum-scale=2");
                         headNode.AppendChild(metaElement);
                         content = htmlDoc.DocumentNode.OuterHtml;
                     }
@@ -370,6 +437,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
                 body.InsertBefore(parsedHeader.Body, body.FirstChild);
 
+                var ce = htmlDocument.CreateElement("div");
+                ce.ClassName = OldEditableContentClass;
+                ce.Id = "editable-one";
+                ce.SetAttribute("contentEditable", "true");
+
+                ce.InnerHtml = body.InnerHtml;
+                body.InnerHtml = ce.OuterHtml;
+
                 var textWriter = new StringWriter();
                 htmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
 
@@ -388,6 +463,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 parsedHeader.Body.Append(contentHtml);
 
+                var metaElement = parsedHeader.CreateElement("meta");
+                metaElement.SetAttribute("name", "viewport");
+                metaElement.SetAttribute("content", $"initial-scale=0.85, minimum-scale=0.5, maximum-scale=2");
+                parsedHeader.Head.Append(metaElement);
+
+                var ce = parsedHeader.CreateElement("div");
+                ce.ClassName = OldEditableContentClass;
+                ce.Id = "editable-one";
+                ce.SetAttribute("contentEditable", "true");
+
+                ce.InnerHtml = parsedHeader.Body.InnerHtml;
+                parsedHeader.Body.InnerHtml = ce.OuterHtml;
+
                 var textWriter = new StringWriter();
                 parsedHeader.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
 
@@ -399,15 +487,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         async Task<string> RetrieveCombinedText()
         {
             var newContentString = (await newContentWebView.EvaluateJavaScriptAsync(GetWebContentJs) as NSString).ToString();
-            var newContentProcessedString = await ProcessRetrievedContent(new HtmlParser(), newContentString);
+            var newContentProcessedString = await ProcessRetrievedContent(new HtmlParser(), newContentString, NewEditableContentClass);
 
             await LoadOldContent();
 
-            if (!string.IsNullOrEmpty(oldContent))
+            var oldContentString = (await oldContentWebView.EvaluateJavaScriptAsync(GetWebContentJs) as NSString).ToString();
+            var oldContentProcessed = await ProcessRetrievedContent(new HtmlParser(), oldContentString, OldEditableContentClass);
+
+            if (!string.IsNullOrEmpty(oldContentProcessed))
             {
                 var htmlParser = new HtmlParser();
                 var newContentParsed = await htmlParser.ParseAsync(newContentProcessedString);
-                var oldContentParsed = await htmlParser.ParseAsync(oldContent);
+                var oldContentParsed = await htmlParser.ParseAsync(oldContentProcessed);
                 var oldContentInDiv = newContentParsed.CreateElement("div");
                 oldContentInDiv.InnerHtml = oldContentParsed.Body.InnerHtml;
                 newContentParsed.Body.Append(oldContentInDiv);
@@ -472,28 +563,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             throw new ArgumentException(string.Format("Unsupported contentType. [contentType={0}]", contentToInsertType));
         }
 
-        static async Task<string> ProcessRetrievedContent(HtmlParser htmlParser, string content)
+        static async Task<string> ProcessRetrievedContent(HtmlParser htmlParser, string content, string elementClass)
         {
             var currentHtmlDocument = await htmlParser.ParseAsync(content);
 
-            var elementClasses = new[]
+            var matchingElements = currentHtmlDocument.QuerySelectorAll("div." + elementClass);
+            foreach (var matchingElement in matchingElements)
             {
-                EditableContentClass
-            };
-
-            foreach (var elementClass in elementClasses)
-            {
-                var matchingElements = currentHtmlDocument.QuerySelectorAll("div." + elementClass);
-                foreach (var matchingElement in matchingElements)
-                {
-                    matchingElement.Attributes.RemoveNamedItem("contenteditable");
-                }
-            }
-
-            var scriptElements = currentHtmlDocument.Body.QuerySelectorAll("script");
-            foreach (var scriptElement in scriptElements)
-            {
-                currentHtmlDocument.Body.RemoveChild(scriptElement);
+                matchingElement.Attributes.RemoveNamedItem("contenteditable");
             }
 
             var processedWebContent = currentHtmlDocument.DocumentElement.OuterHtml;
@@ -578,26 +655,42 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var resizedNumber = responseDict["resized"] as NSNumber;
             var mutatedNumber = responseDict["mutated"] as NSNumber;
 
-            if ((justLoadedNumber != null && justLoadedNumber.BoolValue)
-                || (resizedNumber != null && resizedNumber.BoolValue)
-                || (mutatedNumber != null && mutatedNumber.BoolValue))
+            var justLoaded = justLoadedNumber != null && justLoadedNumber.BoolValue;
+            var resized = resizedNumber != null && resizedNumber.BoolValue;
+            var mutated = mutatedNumber != null && mutatedNumber.BoolValue;
+
+            if (justLoaded || resized || mutated)
             {
                 Action<WKWebView, NSLayoutConstraint> resizeAction = null;
-                resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)), () =>
+                resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(150)), () =>
                 {
                     if (wv.IsLoading)
                     {
                         resizeAction(wv, nslc);
                     }
-                    else if (nslc.Constant != wv.ScrollView.ContentSize.Height)
+                    else if (Math.Abs(nslc.Constant - wv.ScrollView.ContentSize.Height) > 10) //Condition to avoid loop on size increase
                     {
                         nslc.Constant = wv.ScrollView.ContentSize.Height;
                         SetNeedsLayout();
                     }
                 });
 
-                resizeAction(oldContentWebView, oldContentHeightConstraint);
-                resizeAction(newContentWebView, newContentHeightConstraint);
+                if (userContentController == newContentWebView.Configuration.UserContentController)
+                {
+                    if (resized && newContentResized)
+                        return;
+
+                    newContentResized = resized;
+                    resizeAction(newContentWebView, newContentHeightConstraint);
+                }
+                else if (userContentController == oldContentWebView.Configuration.UserContentController)
+                {
+                    if (resized && oldContentResized)
+                        return;
+
+                    oldContentResized = resized;
+                    resizeAction(oldContentWebView, oldContentHeightConstraint);
+                }
             }
         }
 

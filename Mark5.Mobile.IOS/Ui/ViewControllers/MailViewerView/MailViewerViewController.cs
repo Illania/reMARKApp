@@ -40,7 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
         UIBarButtonItem closeItem;
         UIBarButtonItem shareItem;
-        ActionableLayoutScrollView mainScrollView;
+        UIScrollView mainScrollView;
         UIStackView stackViewBeforeContent;
         ContentView contentView;
         UIStackView stackViewAfterContent;
@@ -73,7 +73,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
             AutomaticallyAdjustsScrollViewInsets = true;
 
-            mainScrollView = new ActionableLayoutScrollView
+            mainScrollView = new UIScrollView
             {
                 BackgroundColor = UIColor.White,
                 ShowsVerticalScrollIndicator = true,
@@ -84,7 +84,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 ClipsToBounds = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            mainScrollView.LayoutSubviewsAction = HandleScrollViewLayoutSubviewsAction;
             View.AddSubview(mainScrollView);
             View.AddConstraints(new[]
                 {
@@ -311,21 +310,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 sv.MailMessage = mailMessage;
                 sv.RefreshView();
                 sv.UpdateVisibility();
-            }
-        }
-
-        void HandleScrollViewLayoutSubviewsAction(UIScrollView scrollView)
-        {
-            //Used to keep the views before and after the content anchored to the scrollView
-            var minimumVisibleX = scrollView.ContentOffset.X;
-
-            var views = new UIView[] { stackViewBeforeContent, stackViewAfterContent };
-
-            foreach (var item in views)
-            {
-                var actualFrame = item.Frame;
-                actualFrame.X = minimumVisibleX;
-                item.Frame = actualFrame;
             }
         }
 
