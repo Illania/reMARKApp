@@ -228,6 +228,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 ce.ClassName = OldEditableContentClass;
                 ce.Id = "editable-one";
                 ce.SetAttribute("contentEditable", "true");
+                ce.SetAttribute("style", "outline: 0px solid transparent");
 
                 ce.InnerHtml = body.InnerHtml;
                 body.InnerHtml = ce.OuterHtml;
@@ -254,6 +255,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 ce.ClassName = OldEditableContentClass;
                 ce.Id = "editable-one";
                 ce.SetAttribute("contentEditable", "true");
+                ce.SetAttribute("style", "outline: 0px solid transparent");
 
                 ce.InnerHtml = parsedHeader.Body.InnerHtml;
                 parsedHeader.Body.InnerHtml = ce.OuterHtml;
