@@ -138,6 +138,7 @@
 	<string name="pref_key_search_documents_to_get">pref_key_search_documents_to_get</string>
 	<string name="pref_key_search_contacts_to_get">pref_key_search_contacts_to_get</string>
 	<string name="pref_key_search_shortcodes_to_get">pref_key_search_shortcodes_to_get</string>
+	<string name="pref_key_search_partial_word">pref_key_search_partial_word</string>
 	<string name="pref_notification_ringtone_title">Notification sound</string>
 	<string name="pref_notification_silence_summary_off">Notifications will be shown in MARK5 app and system drawer</string>
 	<string name="pref_notification_silence_summary_on">Notifications will be visible only in MARK5 app</string>
@@ -152,6 +153,7 @@
 	<string name="pref_search_contacts_to_get_summary">Max %s contacts will appear in the search results</string>
 	<string name="pref_search_shortcodes_to_get_title">Shortcodes search results</string>
 	<string name="pref_search_shortcodes_to_get_summary">Max %s shortcodes will appear in the search results</string>
+	<string name="pref_search_partial_word_title">Partial word search</string>
 	<string name="push_notification_token">push_notification_token</string>
 	<string name="ssl_off">Disabled</string>
 	<string name="ssl_on">Enabled</string>

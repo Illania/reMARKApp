@@ -179,6 +179,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             searchCriteria.MaxToFetch = PlatformConfig.Preferences.MaxShortcodesToSearch;
 
+            CommonConfig.Logger.Info($"Starting search... [criteria={SerializationUtils.Serialize(searchCriteria)}]");
+
             return searchCriteria;
         }
 

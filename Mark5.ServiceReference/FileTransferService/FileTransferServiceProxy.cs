@@ -108,7 +108,8 @@ namespace Mark5.ServiceReference.FileTransferService
                         request.Headers.Add(Headers.Token, req.Token);
                         var res = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
 
-                        if (res.StatusCode != HttpStatusCode.OK) return null;
+                        if (res.StatusCode != HttpStatusCode.OK)
+                            throw new HttpRequestException($"Invalid server response: {res.StatusCode}.");
 
                         var result = new GetAttachmentResponse();
 

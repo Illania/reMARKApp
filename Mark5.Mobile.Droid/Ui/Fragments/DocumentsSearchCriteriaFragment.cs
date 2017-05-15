@@ -258,7 +258,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             subviews.ForEach(v => v.UpdateCriteria());
 
+            searchCriteria.PartialWordSearch = PlatformConfig.Preferences.PartialWordSearch;
             searchCriteria.MaxToFetch = PlatformConfig.Preferences.MaxDocumentsToSearch;
+
+            CommonConfig.Logger.Info($"Starting search... [criteria={SerializationUtils.Serialize(searchCriteria)}]");
 
             return searchCriteria;
         }
