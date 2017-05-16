@@ -20,18 +20,18 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Views.InputMethods;
-using Java.Interop;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Common.FloatingActionButtonRelated;
 using Mark5.Mobile.Droid.Ui.Views.SearchViews;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class DocumentSearchCriteriaFragment : RetainableStateFragment, ISearchCriteriaFragment, View.IOnLayoutChangeListener
+    public class DocumentSearchCriteriaFragment : RetainableStateFragment, ISearchCriteriaFragment
     {
         SearchDocumentsCriteria searchCriteria;
 
@@ -61,7 +61,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, (int)bottomPadding);
 
             fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
-            fab.AddOnLayoutChangeListener(this);
+            fab.AddOnLayoutChangeListener(new FloatingActionButtonLayoutChangeListener());
 
             var fabIcon = Resources.GetDrawable(Resource.Drawable.action_search_server, null).GetConstantState().NewDrawable().Mutate();
             fabIcon.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)), PorterDuff.Mode.Multiply);
@@ -73,7 +73,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var p = (CoordinatorLayout.LayoutParams)fab.LayoutParameters;
             p.Gravity = (int)(GravityFlags.Bottom | GravityFlags.CenterHorizontal);
-            p.Behavior = new FABBehavior();
+            p.Behavior = new FloatingActionButtonBehavior();
             fab.LayoutParameters = p;
 
             var directionCriteria = new DocumentDirectionsSearchView(Context);
@@ -266,28 +266,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return searchCriteria;
         }
 
-        public void OnLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom)
-        {
-            var parent = fab.Parent as CoordinatorLayout;
-
-            if (parent == null)
-                return;
-
-            var distance = parent.Bottom - v.Bottom;
-            var bottomMargin = v.Context.Resources.GetDimension(Resource.Dimension.fab_margin);
-
-            if (distance > bottomMargin * 2)
-            {
-                fab.Visibility = ViewStates.Invisible; //We cannot put GONE otherwise it does not get notified of scrolling anymore
-                fab.Hide();
-            }
-            else if (!fab.IsShown)
-            {
-                fab.Show();
-            }
-
-        }
-
         #region Retained State
 
         public override IRetainableState OnRetainInstanceState()
@@ -318,29 +296,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
-    }
-
-    public class FABBehavior : CoordinatorLayout.Behavior
-    {
-        public override bool OnStartNestedScroll(CoordinatorLayout coordinatorLayout, Java.Lang.Object child, View directTargetChild, View target, int nestedScrollAxes)
-        {
-            var fab = child.JavaCast<FloatingActionButton>();
-
-            return nestedScrollAxes == (int)ScrollAxis.Vertical && (fab.Visibility != ViewStates.Visible);
-        }
-
-        public override void OnNestedScroll(CoordinatorLayout coordinatorLayout, Java.Lang.Object child, View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed)
-        {
-            base.OnNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
-
-            var fab = child.JavaCast<FloatingActionButton>();
-
-            if (dyConsumed > 1)
-            {
-                fab.Show();
-            }
-
-        }
     }
 
     public interface ISearchCriteriaFragment
