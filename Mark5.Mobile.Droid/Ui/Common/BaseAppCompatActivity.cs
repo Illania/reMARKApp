@@ -11,31 +11,12 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Services;
 using System.Text;
 using System;
-using Android.OS;
 using Android.Support.Design.Widget;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
-
     public abstract class BaseAppCompatActivity : AppCompatActivity
     {
-        protected override void OnCreate(Bundle savedInstanceState)
-        {
-            base.OnCreate(savedInstanceState);
-            Init();
-        }
-
-        public override void OnCreate(Bundle savedInstanceState, PersistableBundle persistentState)
-        {
-            base.OnCreate(savedInstanceState, persistentState);
-            Init();
-        }
-
-        void Init()
-        {
-            Window.DecorView.SystemUiVisibility = (StatusBarVisibility)(SystemUiFlags.LayoutStable | SystemUiFlags.Fullscreen);
-        }
-
         protected override void OnResume()
         {
             base.OnResume();

@@ -5,7 +5,6 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.Animation;
@@ -21,7 +20,7 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Views.InputMethods;
-using Android.Widget;
+using Java.Interop;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -74,6 +73,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var p = (CoordinatorLayout.LayoutParams)fab.LayoutParameters;
             p.Gravity = (int)(GravityFlags.Bottom | GravityFlags.CenterHorizontal);
+            p.Behavior = new FABBehavior();
             fab.LayoutParameters = p;
 
             var directionCriteria = new DocumentDirectionsSearchView(Context);
@@ -268,7 +268,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void OnLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom)
         {
-            var parent = containerLinearLayout?.Parent?.Parent?.Parent?.Parent?.Parent as CoordinatorLayout;
+            var parent = fab.Parent as CoordinatorLayout;
 
             if (parent == null)
                 return;
@@ -276,7 +276,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var distance = parent.Bottom - v.Bottom;
             var bottomMargin = v.Context.Resources.GetDimension(Resource.Dimension.fab_margin);
 
-            v.Visibility = distance > bottomMargin * 2 ? ViewStates.Invisible : ViewStates.Visible;
+            if (distance > bottomMargin * 2)
+            {
+                fab.Visibility = ViewStates.Invisible; //We cannot put GONE otherwise it does not get notified of scrolling anymore
+                fab.Hide();
+            }
+            else if (!fab.IsShown)
+            {
+                fab.Show();
+            }
+
         }
 
         #region Retained State
@@ -309,6 +318,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
+    }
+
+    public class FABBehavior : CoordinatorLayout.Behavior
+    {
+        public override bool OnStartNestedScroll(CoordinatorLayout coordinatorLayout, Java.Lang.Object child, View directTargetChild, View target, int nestedScrollAxes)
+        {
+            var fab = child.JavaCast<FloatingActionButton>();
+
+            return nestedScrollAxes == (int)ScrollAxis.Vertical && (fab.Visibility != ViewStates.Visible);
+        }
+
+        public override void OnNestedScroll(CoordinatorLayout coordinatorLayout, Java.Lang.Object child, View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed)
+        {
+            base.OnNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
+
+            var fab = child.JavaCast<FloatingActionButton>();
+
+            if (dyConsumed > 1)
+            {
+                fab.Show();
+            }
+
+        }
     }
 
     public interface ISearchCriteriaFragment
