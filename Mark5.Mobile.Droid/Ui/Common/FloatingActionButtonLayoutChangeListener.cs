@@ -8,7 +8,7 @@
 using Android.Support.Design.Widget;
 using Android.Views;
 
-namespace Mark5.Mobile.Droid.Ui.Common.FloatingActionButtonRelated
+namespace Mark5.Mobile.Droid.Ui.Common
 {
     public class FloatingActionButtonLayoutChangeListener : Java.Lang.Object, View.IOnLayoutChangeListener
     {

@@ -10,7 +10,7 @@ using Android.Support.Design.Widget;
 using Android.Views;
 using Java.Interop;
 
-namespace Mark5.Mobile.Droid.Ui.Common.FloatingActionButtonRelated
+namespace Mark5.Mobile.Droid.Ui.Common
 {
     public class FloatingActionButtonBehavior : CoordinatorLayout.Behavior
     {
