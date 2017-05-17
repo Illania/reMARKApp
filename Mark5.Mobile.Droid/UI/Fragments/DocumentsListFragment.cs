@@ -865,6 +865,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 return true;
             }
+            if (dp.Creator.ContainsCaseInsensitive(query))
+            {
+                return true;
+            }
 
             return false;
         }

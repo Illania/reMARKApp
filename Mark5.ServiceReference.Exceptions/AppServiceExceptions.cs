@@ -6,6 +6,7 @@
 // Copyright (c) 2016 Nordic IT
 //
 using System;
+using System.Net;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
@@ -16,7 +17,7 @@ namespace Mark5.ServiceReference.Exceptions
 
     #region Local exceptions
 
-    public class AppServiceException : Exception
+    public class WcfAppServiceException : Exception
     {
 
         public AppServiceFaultDetail Detail
@@ -25,7 +26,7 @@ namespace Mark5.ServiceReference.Exceptions
             private set;
         }
 
-        public AppServiceException(Exception ex)
+        public WcfAppServiceException(Exception ex)
             : base(GetMessage(ex), ex)
         {
             Detail = (ex as FaultException<AppServiceFaultDetail>)?.Detail;
@@ -72,6 +73,33 @@ namespace Mark5.ServiceReference.Exceptions
             }
 
             return base.ToString();
+        }
+    }
+
+    public class HttpAppServiceException : Exception
+    {
+
+        public HttpStatusCode StatusCode { get; private set; }
+
+        public AppServiceFaultDetail Detail { get; private set; }
+
+        public HttpAppServiceException(HttpStatusCode statusCode, string message)
+            : base(message)
+        {
+            StatusCode = statusCode;
+        }
+
+        public HttpAppServiceException(HttpStatusCode statusCode, string message, AppServiceFaultDetail detail)
+                    : base(message)
+        {
+            StatusCode = statusCode;
+            Detail = detail;
+        }
+
+        public HttpAppServiceException(HttpStatusCode statusCode, string message, Exception innerException)
+            : base(message, innerException)
+        {
+            StatusCode = statusCode;
         }
     }
 

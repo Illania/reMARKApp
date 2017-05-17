@@ -9,7 +9,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Foundation;
 using HockeyApp.iOS;
@@ -26,6 +25,7 @@ using Mark5.Mobile.IOS.Services;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
 using Mark5.Mobile.IOS.Utilities;
+using ModernHttpClient;
 using PCLStorage;
 using TinyMessenger;
 using UIKit;
@@ -232,7 +232,7 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.ReachabilityService = new ReachabilityService();
                 CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
                 CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
-                CommonConfig.HttpClientHandler = () => { return new NSUrlSessionHandler(); };
+                CommonConfig.HttpClientHandler = () => { return new NativeMessageHandler(); };
                 CommonConfig.PhonebookUtilities = new PhonebookUtilities();
 
 #if !DEBUG

@@ -55,7 +55,7 @@ namespace Mark5.ServiceReference.AppService
 
         #region Authentication
 
-        public async Task<AuthenticationResult> AuthenticateAsync(AuthenticationParameters parameters, CancellationToken ct = default(CancellationToken))
+        public async Task<AuthenticateResult> AuthenticateAsync(AuthenticateParameters parameters, CancellationToken ct = default(CancellationToken))
         {
             var c = GetClient();
             var result = await InvokeAsync(c, c.BeginAuthenticate, c.EndAuthenticate, parameters, ct);
@@ -526,7 +526,7 @@ namespace Mark5.ServiceReference.AppService
                         // Nothing to do here
                     }
                 }
-                throw new AppServiceException(ex);
+                throw new WcfAppServiceException(ex);
             }
             catch (Exception ex)
             {
@@ -541,7 +541,7 @@ namespace Mark5.ServiceReference.AppService
                         // Nothing to do here
                     }
                 }
-                throw new AppServiceException(ex);
+                throw new WcfAppServiceException(ex);
             }
         }
 

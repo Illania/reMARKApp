@@ -380,7 +380,11 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         static string GetErrorTitle(Context context, Exception ex)
         {
-            if (ex is AppServiceException)
+            if (ex is WcfAppServiceException)
+            {
+                return context.GetString(Resource.String.appserviceexception_title);
+            }
+            if (ex is HttpAppServiceException)
             {
                 return context.GetString(Resource.String.appserviceexception_title);
             }
@@ -410,7 +414,11 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         static string GetErrorMessage(Context context, Exception ex)
         {
-            if (ex is AppServiceException)
+            if (ex is WcfAppServiceException)
+            {
+                return ex.Message;
+            }
+            if (ex is HttpAppServiceException)
             {
                 return ex.Message;
             }
@@ -440,7 +448,11 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         static bool ShouldShowCreateReport(Exception ex)
         {
-            if (ex is AppServiceException)
+            if (ex is WcfAppServiceException)
+            {
+                return true;
+            }
+            if (ex is HttpAppServiceException)
             {
                 return true;
             }

@@ -59,7 +59,10 @@ namespace Mark5.ServiceReference.FileTransferService
         {
             try
             {
-                using (var client = new HttpClient(httpClientHandler()))
+                using (var client = new HttpClient(httpClientHandler())
+                {
+                    Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
+                })
                 {
                     var uri = (new Uri(endpointUrl)).AppendPathSegments(Segments.Version);
                     var request = new HttpRequestMessage(HttpMethod.Get, uri);
@@ -100,7 +103,10 @@ namespace Mark5.ServiceReference.FileTransferService
             {
                 try
                 {
-                    using (var client = new HttpClient(httpClientHandler()))
+                    using (var client = new HttpClient(httpClientHandler())
+                    {
+                        Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
+                    })
                     {
                         var path = $"{endpointUrl}/{Segments.Attachment}/{req.Id}&documentId={req.DocumentId}";
 
@@ -147,7 +153,10 @@ namespace Mark5.ServiceReference.FileTransferService
             {
                 try
                 {
-                    using (var client = new HttpClient(httpClientHandler()))
+                    using (var client = new HttpClient(httpClientHandler())
+                    {
+                        Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
+                    })
                     {
                         var path = $"{endpointUrl}/{Segments.Attachment}/{req.Id}&documentId={req.DocumentId}";
 
@@ -208,7 +217,10 @@ namespace Mark5.ServiceReference.FileTransferService
             {
                 try
                 {
-                    using (var client = new HttpClient(httpClientHandler()))
+                    using (var client = new HttpClient(httpClientHandler())
+                    {
+                        Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
+                    })
                     {
                         req.Stream.Position = 0;
 
@@ -247,7 +259,10 @@ namespace Mark5.ServiceReference.FileTransferService
             {
                 try
                 {
-                    using (var client = new HttpClient(httpClientHandler()))
+                    using (var client = new HttpClient(httpClientHandler())
+                    {
+                        Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
+                    })
                     {
                         req.Stream.Position = 0;
 

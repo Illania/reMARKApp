@@ -44,33 +44,23 @@ namespace Mark5.Mobile.IOS.Services
             IsReachable = CheckNetworkAvailability();
         }
 
-        public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.ServiceConnection, bool testOnly = false)
+        public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.Service, bool testOnly = false)
         {
             IsCheckingReachability = true;
 
             if (!testOnly)
-            {
                 RefreshingReachability(this, EventArgs.Empty);
-            }
 
             var result = true;
 
             if (result && mode.HasFlag(ReachabilityMode.NetworkAvailability))
-            {
                 result &= CheckNetworkAvailability();
-            }
             if (result && mode.HasFlag(ReachabilityMode.Google))
-            {
                 result &= await CheckWithGoogle();
-            }
             if (result && mode.HasFlag(ReachabilityMode.ServiceConnection))
-            {
                 result &= await CheckWithServiceConnection();
-            }
             if (result && mode.HasFlag(ReachabilityMode.Service))
-            {
                 result &= await CheckWithService();
-            }
 
             IsCheckingReachability = false;
 

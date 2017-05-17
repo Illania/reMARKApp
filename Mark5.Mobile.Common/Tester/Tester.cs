@@ -36,7 +36,7 @@ namespace Mark5.Mobile.Common.Tester
 
                 var ci = await FileSystemStorage.GetConnectionInfoAsync(ct);
 
-                var proxy = AppServiceProxyFactory.Create(ci.SslMode != SslMode.Off, ci.Hostname, ci.Port);
+                var proxy = AppServiceProxyFactory.Create(ci.SslMode != SslMode.Off, ci.Hostname, ci.Port, CommonConfig.HttpClientHandler);
                 await proxy.TestAsync(new DataContract.TestParameters());
 
                 return true;

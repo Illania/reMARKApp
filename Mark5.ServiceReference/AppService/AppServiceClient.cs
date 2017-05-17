@@ -28,12 +28,12 @@ namespace Mark5.ServiceReference.AppService
 
         #region Authentication
 
-        public IAsyncResult BeginAuthenticate(AuthenticationParameters parameters, AsyncCallback callback, object asyncState)
+        public IAsyncResult BeginAuthenticate(AuthenticateParameters parameters, AsyncCallback callback, object asyncState)
         {
             return Channel.BeginAuthenticate(parameters, callback, asyncState);
         }
 
-        public AuthenticationResult EndAuthenticate(IAsyncResult asyncResult)
+        public AuthenticateResult EndAuthenticate(IAsyncResult asyncResult)
         {
             return Channel.EndAuthenticate(asyncResult);
         }

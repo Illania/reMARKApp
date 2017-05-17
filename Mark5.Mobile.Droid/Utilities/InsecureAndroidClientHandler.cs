@@ -23,8 +23,7 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             CommonConfig.Logger.Warning("**** USING INSECURE ANDROID CLIENT HANDLER ****");
 
-            var httpsConn = conn as HttpsURLConnection;
-            if (httpsConn != null)
+            if (conn is HttpsURLConnection httpsConn)
             {
                 httpsConn.HostnameVerifier = new InsecureHostnameVerifier();
                 var sslContext = SSLContext.GetInstance("TLS");

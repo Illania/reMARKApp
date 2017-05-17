@@ -21,7 +21,7 @@ namespace Mark5.ServiceReference.AppService
 
         #region Authentication
 
-        Task<AuthenticationResult> AuthenticateAsync(AuthenticationParameters parameters, CancellationToken ct = default(CancellationToken));
+        Task<AuthenticateResult> AuthenticateAsync(AuthenticateParameters parameters, CancellationToken ct = default(CancellationToken));
 
         #endregion
 

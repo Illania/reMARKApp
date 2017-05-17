@@ -24,7 +24,7 @@
     <IOSDebuggerPort>27003</IOSDebuggerPort>
     <MtouchLink>None</MtouchLink>
     <MtouchArch>x86_64</MtouchArch>
-    <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
+    <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
     <DeviceSpecificBuild>false</DeviceSpecificBuild>
@@ -61,7 +61,7 @@
     <CodesignKey>iPhone Developer</CodesignKey>
     <MtouchLink>SdkOnly</MtouchLink>
     <MtouchArch>x86_64</MtouchArch>
-    <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
+    <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
 <RunCodeAnalysis>true</RunCodeAnalysis>  <MtouchUseLlvm>true</MtouchUseLlvm>
@@ -227,7 +227,7 @@
     <Compile Include="Services\ReachabilityService.cs" />
     <Compile Include="Services\ReachabilityProvider.cs" />
     <Compile Include="Utilities\PhonebookUtilities.cs" />
-    <Compile Include="Utilities\InsecureNSUrlSessionHandler.cs" />
+    <Compile Include="Utilities\InsecureNativeMessageHandler.cs" />
     <Compile Include="Ui\ViewControllers\LoginViewController.cs" />
     <Compile Include="Ui\Common\Theme.cs" />
     <Compile Include="ServerConfig.cs" />
