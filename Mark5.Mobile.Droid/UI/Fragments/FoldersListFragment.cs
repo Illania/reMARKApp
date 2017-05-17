@@ -736,13 +736,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 else
                 {
-                    var folder = Folder.RootForModule(RemoteFolder.Module);
-                    var flattenedFolders = folder.SubFolders.Flatten(f => f.SubFolders);
-                    var matchingFolders = flattenedFolders.Where(f => f.Name.IndexOf(newText, StringComparison.CurrentCultureIgnoreCase) >= 0).OrderBy(f => f.Name).ToList();
-                    SearchAdapter.RefreshSearch(matchingFolders);
+                    var root = Folder.RootForModule(RemoteFolder.Module);
+
+                    var resultList = new List<Folder>();
+                    SearchRecursively(root, newText, resultList);
+
+                    SearchAdapter.RefreshSearch(resultList);
                 }
             }, 500);
             return false;
+        }
+
+        void SearchRecursively(Folder folder, string searchText, List<Folder> resultList)
+        {
+            if (folder.SubFolders == null || folder.SubFolders.Count < 1)
+                return;
+
+            foreach (var subFolder in folder.SubFolders)
+            {
+                if (subFolder.Name.IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                    resultList.Add(subFolder);
+
+                SearchRecursively(subFolder, searchText, resultList);
+            }
         }
 
         public bool OnQueryTextSubmit(string query)

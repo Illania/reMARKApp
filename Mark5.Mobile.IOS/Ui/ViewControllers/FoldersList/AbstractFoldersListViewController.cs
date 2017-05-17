@@ -746,19 +746,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 if (cancellationToken.IsCancellationRequested) return;
 
                 var root = Folder.RootForModule(ParentFolder.Module);
-                var flattenedFolders = root.SubFolders
-                                             .Flatten(f => f.SubFolders)
-                                             .Where(f => f.Name.IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                                             .OrderBy(f => f.Name)
-                                             .ToList();
+
+                var resultList = new List<Folder>();
+                await Task.Run(() => SearchRecursively(root, searchText, resultList, cancellationToken));
 
                 if (cancellationToken.IsCancellationRequested) return;
 
-                SearchResultsDataSource.SetFolders(flattenedFolders);
+                SearchResultsDataSource.SetFolders(resultList);
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error(ex);
+            }
+        }
+
+        void SearchRecursively(Folder folder, string searchText, List<Folder> resultList, CancellationToken ct)
+        {
+            if (folder.SubFolders == null || folder.SubFolders.Count < 1)
+                return;
+
+            foreach (var subFolder in folder.SubFolders)
+            {
+                if (ct.IsCancellationRequested)
+                    return;
+
+                if (subFolder.Name.IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                    resultList.Add(subFolder);
+
+                SearchRecursively(subFolder, searchText, resultList, ct);
             }
         }
 
