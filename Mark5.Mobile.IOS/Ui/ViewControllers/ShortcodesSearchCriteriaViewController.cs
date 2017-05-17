@@ -40,6 +40,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         SearchShortcodesCriteria criteria = new SearchShortcodesCriteria();
 
+        UIView activeField;
+
         public override void LoadView()
         {
             base.LoadView();
@@ -162,6 +164,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             resetItem.Clicked += ResetItem_Clicked;
             searchButton.TouchUpInside += SearchButton_TouchUpInside;
 
+            foreach (var view in stackView.Subviews.OfType<AbstractSearchView>())
+                view.Activated += View_Activated;
+
             didShowNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.DidShowNotification, OnKeyboardDidShowNotification);
             willChangeFrameNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillChangeFrameNotification, OnKeyboardWillChangeFrameNotification);
             willHideNotification = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
@@ -183,6 +188,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             resetItem.Clicked -= ResetItem_Clicked;
             searchButton.TouchUpInside -= SearchButton_TouchUpInside;
 
+            foreach (var view in stackView.Subviews.OfType<AbstractSearchView>())
+                view.Activated -= View_Activated;
+
             NSNotificationCenter.DefaultCenter.RemoveObservers(new[] { didShowNotificationObserver, willChangeFrameNotificationObserver, willHideNotification });
         }
 
@@ -197,6 +205,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 scrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f);
                 scrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f);
             });
+        }
+
+        void View_Activated(object sender, EventArgs e)
+        {
+            activeField = sender as UIView;
         }
 
         void CloseItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
@@ -222,13 +235,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationController.PushViewController(new ShortcodesSearchResultsViewController { Criteria = criteria }, true);
         }
 
-        void OnKeyboardDidShowNotification(NSNotification notification) => AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification);
+        void OnKeyboardDidShowNotification(NSNotification notification) => AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification, true);
 
         void OnKeyboardWillChangeFrameNotification(NSNotification notification) => AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification);
 
         void OnKeyboardWillHideNotification(NSNotification notification) => AdjustViewToKeyboard(0f, notification);
 
-        void AdjustViewToKeyboard(float keyboardHeight, NSNotification notification)
+        void AdjustViewToKeyboard(float keyboardHeight, NSNotification notification, bool correctOffset = false)
         {
             scrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize + keyboardHeight, 0f);
             scrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize + keyboardHeight, 0f);
@@ -242,11 +255,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var duration = UI.KeyboardAnimationDurationFromNotification(notification);
             var options = UI.KeyboardAnimationOptionsFromNotification(notification);
             UIView.AnimateNotify(duration, 0.0d, options, View.LayoutIfNeeded, null);
+
+            if (correctOffset && activeField != null)
+            {
+                var difference = activeField.Frame.Bottom - scrollView.ContentOffset.Y - (View.Frame.Height - keyboardHeight) + 10;
+
+                if (difference > 0)
+                {
+                    var co = scrollView.ContentOffset;
+                    co.Y += difference;
+                    scrollView.SetContentOffset(co, true);
+                }
+            }
         }
 
         abstract class AbstractSearchView : UIStackView
         {
-
             protected const float CornerRadius = 4f;
             protected const float InnerMargin = 2f;
             protected const float AnimationLength = .1f;
@@ -259,6 +283,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             protected static readonly UIFont Font = Theme.DefaultFont;
 
             protected SearchShortcodesCriteria Criteria;
+
+            public event EventHandler Activated = delegate { };
 
             protected AbstractSearchView()
             {
@@ -285,6 +311,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     label.TextColor = active ? ActiveTextColor : InactiveTextColor;
                     label.BackgroundColor = active ? ActiveBackgroundColor : InactiveBackgroundColor;
                 }, null);
+            }
+
+            protected void SetAsActive()
+            {
+                Activated(this, EventArgs.Empty);
             }
         }
 
@@ -360,6 +391,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 text.BecomeFirstResponder();
 
                 UpdateRow();
+                SetAsActive();
             }
 
             [Export("textFieldDidChange:")]
@@ -456,6 +488,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 text.BecomeFirstResponder();
 
                 UpdateRow();
+                SetAsActive();
             }
 
             [Export("textFieldDidChange:")]
@@ -552,6 +585,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 text.BecomeFirstResponder();
 
                 UpdateRow();
+                SetAsActive();
             }
 
             [Export("textFieldDidChange:")]
