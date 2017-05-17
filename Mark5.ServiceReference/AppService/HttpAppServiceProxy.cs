@@ -424,7 +424,5 @@ namespace Mark5.ServiceReference.AppService
         {
             return await InvokeAsync<TestResult, TestParameters>("Test", parameters, ct);
         }
-
     }
 }
-

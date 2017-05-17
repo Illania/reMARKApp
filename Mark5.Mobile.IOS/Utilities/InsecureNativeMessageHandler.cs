@@ -17,7 +17,6 @@ namespace Mark5.Mobile.IOS.Utilities
             : base(false, true)
         {
             DisableCaching = true;
-            ServerCertificateCustomValidationCallback = (sender, certificate, chain, sslPolicyErrors) => { return true; };
         }
     }
 }
