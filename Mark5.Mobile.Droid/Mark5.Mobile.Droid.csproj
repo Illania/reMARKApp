@@ -384,6 +384,8 @@
     <Compile Include="Ui\Activities\DocumentActivity.cs" />
     <Compile Include="Ui\Common\BaseFragment.cs" />
     <Compile Include="Utilities\MimeTypeMap.cs" />
+    <Compile Include="Ui\Common\FloatingActionButtonBehavior.cs" />
+    <Compile Include="Ui\Common\FloatingActionButtonLayoutChangeListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

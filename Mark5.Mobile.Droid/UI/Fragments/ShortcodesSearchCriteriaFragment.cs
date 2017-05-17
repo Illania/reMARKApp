@@ -6,7 +6,6 @@
 // Copyright (c) 2017 Nordic IT
 //
 using System.Collections.Generic;
-using Android.Animation;
 using Android.Content;
 using Android.Content.Res;
 using Android.Graphics;
@@ -59,7 +58,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, (int)bottomPadding);
 
             fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
-            fab.AddOnLayoutChangeListener(this);
+            fab.AddOnLayoutChangeListener(new FloatingActionButtonLayoutChangeListener());
 
             var fabIcon = Resources.GetDrawable(Resource.Drawable.action_search_server, null).GetConstantState().NewDrawable().Mutate();
             fabIcon.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)), PorterDuff.Mode.Multiply);
@@ -72,6 +71,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var p = (CoordinatorLayout.LayoutParams)fab.LayoutParameters;
             p.Gravity = (int)(GravityFlags.Bottom | GravityFlags.CenterHorizontal);
+            p.Behavior = new FloatingActionButtonBehavior();
             fab.LayoutParameters = p;
 
             var nameCriteria = new ShortcodeNameSearchView(Context);
