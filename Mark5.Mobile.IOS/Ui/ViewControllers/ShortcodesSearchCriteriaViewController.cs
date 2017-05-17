@@ -42,6 +42,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UIView activeField;
 
+        NSLayoutConstraint bottomLayoutConstraint;
+
         public override void LoadView()
         {
             base.LoadView();
@@ -111,12 +113,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };
             View.AddSubview(bottomView);
+
+            bottomLayoutConstraint = NSLayoutConstraint.Create(bottomView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f);
+
             View.AddConstraints(new[]
             {
                 NSLayoutConstraint.Create(bottomView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, BottomViewSize),
                 NSLayoutConstraint.Create(bottomView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, BottomViewSize),
                 NSLayoutConstraint.Create(bottomView, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f),
-                NSLayoutConstraint.Create(bottomView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+                bottomLayoutConstraint
             });
 
             searchButton = new UIButton
@@ -254,11 +259,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var duration = UI.KeyboardAnimationDurationFromNotification(notification);
             var options = UI.KeyboardAnimationOptionsFromNotification(notification);
-            UIView.AnimateNotify(duration, 0.0d, options, View.LayoutIfNeeded, null);
+            UIView.AnimateNotify(duration, 0.0d, options, () =>
+             {
+                 bottomLayoutConstraint.Constant = -keyboardHeight;
+                 View.LayoutIfNeeded();
+             }, null);
 
             if (correctOffset && activeField != null)
             {
-                var difference = activeField.Frame.Bottom - scrollView.ContentOffset.Y - (View.Frame.Height - keyboardHeight) + 10;
+                var difference = activeField.Frame.Bottom - scrollView.ContentOffset.Y - (View.Frame.Height - keyboardHeight - BottomViewSize) + 10;
 
                 if (difference > 0)
                 {
