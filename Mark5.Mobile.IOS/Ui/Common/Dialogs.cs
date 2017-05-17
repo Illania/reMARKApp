@@ -196,7 +196,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         static string GetErrorTitle(Exception ex)
         {
-            if (ex is AppServiceException)
+            if (ex is WcfAppServiceException)
+            {
+                return Localization.GetString("error_appserviceexception_title");
+            }
+            if (ex is HttpAppServiceException)
             {
                 return Localization.GetString("error_appserviceexception_title");
             }
@@ -222,7 +226,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         static string GetErrorContent(Exception ex)
         {
-            if (ex is AppServiceException)
+            if (ex is WcfAppServiceException)
+            {
+                return ex.Message;
+            }
+            if (ex is HttpAppServiceException)
             {
                 return ex.Message;
             }
@@ -248,7 +256,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         static bool ShouldShowCreateReport(Exception ex)
         {
-            if (ex is AppServiceException)
+            if (ex is WcfAppServiceException)
+            {
+                return true;
+            }
+            if (ex is HttpAppServiceException)
             {
                 return true;
             }

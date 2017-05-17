@@ -22,9 +22,9 @@ namespace Mark5.ServiceReference.AppService
 
         [OperationContract(Action = "Authenticate", AsyncPattern = true)]
         [FaultContract(typeof(AppServiceFaultDetail), Name = "AppServiceFaultDetail", Namespace = "com.nordic-it.appservice.v3")]
-        IAsyncResult BeginAuthenticate(AuthenticationParameters parameters, AsyncCallback callback, object asyncState);
+        IAsyncResult BeginAuthenticate(AuthenticateParameters parameters, AsyncCallback callback, object asyncState);
 
-        AuthenticationResult EndAuthenticate(IAsyncResult asyncResult);
+        AuthenticateResult EndAuthenticate(IAsyncResult asyncResult);
 
         #endregion
 

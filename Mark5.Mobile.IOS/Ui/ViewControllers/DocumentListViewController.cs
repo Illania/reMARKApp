@@ -940,6 +940,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (dp.Categories.Any(da => da.Name.ContainsCaseInsensitive(query)))
                 return true;
 
+            if (dp.Creator.ContainsCaseInsensitive(query))
+                return true;
+
             return false;
         }
 
