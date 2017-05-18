@@ -925,6 +925,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         static bool MatchesQuery(DocumentPreview dp, string query)
         {
+            if (dp.ReferenceNumber.ContainsCaseInsensitive(query))
+                return true;
+
             if (dp.Subject.ContainsCaseInsensitive(query))
                 return true;
 

@@ -703,7 +703,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var priority = await Dialogs.ShowSingleSelectDialogAsync(Context, Resource.String.set_priority, possiblePriorities, selectedPriority);
             if (priority == default(Priority) || priority == selectedPriority)
-                return;  
+                return;
 
             CommonConfig.Logger.Info($"Attempting to set priority [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
 
@@ -845,6 +845,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         static bool MatchesQuery(DocumentPreview dp, string query)
         {
+            if (dp.ReferenceNumber.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+            {
+                return true;
+            }
             if (dp.Subject.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
             {
                 return true;
