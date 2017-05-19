@@ -20,6 +20,18 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<List<SavedSearch>> GetSavedSearches(SourceType sourceType = SourceType.Auto);
 
+        Task SaveLastSearchDocumentsCriteriaAsync(SearchDocumentsCriteria criteria);
+
+        Task SaveLastSearchContactsCriteriaAsync(SearchContactsCriteria critiera);
+
+        Task SaveLastSearchShortcodesCrtieriaAsync(SearchShortcodesCriteria criteria);
+
+        Task<SearchDocumentsCriteria> GetLastSearchDocumentsCriteriaAsync();
+
+        Task<SearchContactsCriteria> GetLastSearchContactsCriteriaAsync();
+
+        Task<SearchShortcodesCriteria> GetLastSearchShortcodesCrtieriaAsync();
+
         Task<List<DocumentPreview>> SearchDocumentsAsync(SearchDocumentsCriteria criteria, SourceType sourceType = SourceType.Auto);
 
         Task<List<ContactPreview>> SearchContactsAsync(SearchContactsCriteria critera, SourceType sourceType = SourceType.Auto);

@@ -32,6 +32,10 @@ namespace Mark5.Mobile.Common.Storage
             public const string NotificationSettings = "notificationSettings.json";
             public const string LastCacheCleanUp = "lastCacheCleanUp.json";
 
+            public const string LastSearchDocumentCriteria = "lastSearchDocumentCriteria.json";
+            public const string LastSearchContactsCriteria = "lastSearchContactsCriteria.json";
+            public const string LastSearchShortcodesCriteria = "lastSearchShortcodesCriteria.json";
+
             public const string OutgoingDocument = "document.json";
             public const string OutgoingDocumentPreview = "documentPreview.json";
             public const string OutgoingInfo = "info.json";
@@ -50,7 +54,11 @@ namespace Mark5.Mobile.Common.Storage
             [Filenames.FavoriteFolders] = new SemaphoreSlim(1),
             [Filenames.OfflineFolders] = new SemaphoreSlim(1),
             [Filenames.NotificationSettings] = new SemaphoreSlim(1),
-            [Filenames.LastCacheCleanUp] = new SemaphoreSlim(1)
+            [Filenames.LastCacheCleanUp] = new SemaphoreSlim(1),
+
+            [Filenames.LastSearchDocumentCriteria] = new SemaphoreSlim(1),
+            [Filenames.LastSearchContactsCriteria] = new SemaphoreSlim(1),
+            [Filenames.LastSearchShortcodesCriteria] = new SemaphoreSlim(1),
         };
 
         static readonly IDictionary<string, object> objectCache = new Dictionary<string, object>();
@@ -122,6 +130,43 @@ namespace Mark5.Mobile.Common.Storage
         public static async Task SaveFavoriteFoldersAsync(Dictionary<ModuleType, List<Folder>> favoriteFolders, CancellationToken ct = default(CancellationToken))
         {
             await SaveAsync(favoriteFolders, Filenames.FavoriteFolders, ct);
+        }
+
+        #endregion
+
+        #region Last search criteria
+
+        public static async Task<SearchDocumentsCriteria> GetLastSearchDocumentCrtiera(CancellationToken ct = default(CancellationToken))
+        {
+            var criteria = await GetAsync<SearchDocumentsCriteria>(Filenames.LastSearchDocumentCriteria, ct);
+            return criteria ?? new SearchDocumentsCriteria();
+        }
+
+        public static async Task SaveLastSearchDocumentCrtiera(SearchDocumentsCriteria criteria, CancellationToken ct = default(CancellationToken))
+        {
+            await SaveAsync(criteria, Filenames.LastSearchDocumentCriteria, ct);
+        }
+
+        public static async Task<SearchContactsCriteria> GetLastSearchContactsCrtiera(CancellationToken ct = default(CancellationToken))
+        {
+            var criteria = await GetAsync<SearchContactsCriteria>(Filenames.LastSearchContactsCriteria, ct);
+            return criteria ?? new SearchContactsCriteria();
+        }
+
+        public static async Task SaveLastSearchContactsCrtiera(SearchContactsCriteria criteria, CancellationToken ct = default(CancellationToken))
+        {
+            await SaveAsync(criteria, Filenames.LastSearchContactsCriteria, ct);
+        }
+
+        public static async Task<SearchShortcodesCriteria> GetLastSearchShortcodesCrtiera(CancellationToken ct = default(CancellationToken))
+        {
+            var criteria = await GetAsync<SearchShortcodesCriteria>(Filenames.LastSearchShortcodesCriteria, ct);
+            return criteria ?? new SearchShortcodesCriteria();
+        }
+
+        public static async Task SaveLastSearchShortcodesCrtiera(SearchShortcodesCriteria criteria, CancellationToken ct = default(CancellationToken))
+        {
+            await SaveAsync(criteria, Filenames.LastSearchShortcodesCriteria, ct);
         }
 
         #endregion

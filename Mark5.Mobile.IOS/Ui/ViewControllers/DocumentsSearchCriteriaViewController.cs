@@ -17,6 +17,7 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using ObjCRuntime;
 using UIKit;
+using Mark5.Mobile.Common.Managers;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -183,12 +184,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             willHideNotification = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
         }
 
-        public override void ViewDidAppear(bool animated)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        public override async void ViewDidAppear(bool animated)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             base.ViewDidAppear(animated);
 
             scrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f);
             scrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f);
+
+            try
+            {
+                criteria = await Managers.SearchManager.GetLastSearchDocumentsCriteriaAsync();
+
+                foreach (var view in stackView.Subviews.OfType<AbstractSearchView>())
+                    view.SetCriteria(criteria);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to restore last search criteria.", ex);
+            }
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -223,9 +238,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             activeField = sender as UIView;
         }
 
-        void CloseItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
+        async void CloseItem_Clicked(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
 
-        void ResetItem_Clicked(object sender, EventArgs e)
+            try
+            {
+                await Managers.SearchManager.SaveLastSearchDocumentsCriteriaAsync(criteria);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to save last search criteria.", ex);
+            }
+        }
+
+        async void ResetItem_Clicked(object sender, EventArgs e)
         {
             View.EndEditing(true);
 
@@ -233,6 +260,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             foreach (var view in stackView.Subviews.OfType<AbstractSearchView>())
                 view.SetCriteria(criteria);
+
+            try
+            {
+                await Managers.SearchManager.SaveLastSearchDocumentsCriteriaAsync(criteria);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to clear last search criteria.", ex);
+            }
         }
 
         void SearchButton_TouchUpInside(object sender, EventArgs e)

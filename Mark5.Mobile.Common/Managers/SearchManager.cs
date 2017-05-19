@@ -16,6 +16,7 @@ using Mark5.Mobile.Common.Model.Exceptions;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
+using Mark5.Mobile.Common.Storage;
 
 #pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
@@ -53,12 +54,44 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        public async Task SaveLastSearchDocumentsCriteriaAsync(SearchDocumentsCriteria criteria)
+        {
+            await FileSystemStorage.SaveLastSearchDocumentCrtiera(criteria);
+        }
+
+        public async Task SaveLastSearchContactsCriteriaAsync(SearchContactsCriteria criteria)
+        {
+            await FileSystemStorage.SaveLastSearchContactsCrtiera(criteria);
+        }
+
+        public async Task SaveLastSearchShortcodesCrtieriaAsync(SearchShortcodesCriteria criteria)
+        {
+            await FileSystemStorage.SaveLastSearchShortcodesCrtiera(criteria);
+        }
+
+        public async Task<SearchDocumentsCriteria> GetLastSearchDocumentsCriteriaAsync()
+        {
+            return await FileSystemStorage.GetLastSearchDocumentCrtiera();
+        }
+
+        public async Task<SearchContactsCriteria> GetLastSearchContactsCriteriaAsync()
+        {
+            return await FileSystemStorage.GetLastSearchContactsCrtiera();
+        }
+
+        public async Task<SearchShortcodesCriteria> GetLastSearchShortcodesCrtieriaAsync()
+        {
+            return await FileSystemStorage.GetLastSearchShortcodesCrtiera();
+        }
+
         public async Task<List<DocumentPreview>> SearchDocumentsAsync(SearchDocumentsCriteria criteria, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
+                await FileSystemStorage.SaveLastSearchDocumentCrtiera(criteria);
+
                 var result = await AppServiceProxy.SearchDocumentsAsync(new DataContract.SearchDocumentsParameters
                 {
                     Token = Token,
@@ -109,6 +142,8 @@ namespace Mark5.Mobile.Common.Managers
 
             if (sourceType == SourceType.Remote)
             {
+                await FileSystemStorage.SaveLastSearchContactsCrtiera(criteria);
+
                 var result = await AppServiceProxy.SearchContactsAsync(new DataContract.SearchContactsParameters
                 {
                     Token = Token,
@@ -149,6 +184,8 @@ namespace Mark5.Mobile.Common.Managers
 
             if (sourceType == SourceType.Remote)
             {
+                await FileSystemStorage.SaveLastSearchShortcodesCrtiera(criteria);
+
                 var result = await AppServiceProxy.SearchShortcodesAsync(new DataContract.SearchShortcodesParameters
                 {
                     Token = Token,
