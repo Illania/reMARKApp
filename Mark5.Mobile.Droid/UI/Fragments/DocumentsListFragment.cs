@@ -845,35 +845,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         static bool MatchesQuery(DocumentPreview dp, string query)
         {
-            if (dp.ReferenceNumber.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
+            if (dp.ReferenceNumber?.ContainsCaseInsensitive(query) ?? false)
                 return true;
-            }
-            if (dp.Subject.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
-                return true;
-            }
-            if (dp.Preview.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
-                return true;
-            }
-            if (dp.Addresses.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
-            {
-                return true;
-            }
-            if (dp.Addresses.Any(da => da.Address.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
-            {
-                return true;
-            }
-            if (dp.Categories.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
-            {
-                return true;
-            }
-            if (dp.Creator.ContainsCaseInsensitive(query))
-            {
-                return true;
-            }
 
+            if (dp.Subject?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (dp.Preview?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (dp.Addresses.Any(da => da.Name?.ContainsCaseInsensitive(query) ?? false))
+                return true;
+
+            if (dp.Addresses.Any(da => da.Address?.ContainsCaseInsensitive(query) ?? false))
+                return true;
+
+            if (dp.Categories.Any(da => da.Name?.ContainsCaseInsensitive(query) ?? false))
+                return true;
+
+            if (dp.Creator?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+            
             return false;
         }
 

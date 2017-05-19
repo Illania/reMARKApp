@@ -925,25 +925,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         static bool MatchesQuery(DocumentPreview dp, string query)
         {
-            if (dp.ReferenceNumber.ContainsCaseInsensitive(query))
+            if (dp.ReferenceNumber?.ContainsCaseInsensitive(query) ?? false)
                 return true;
 
-            if (dp.Subject.ContainsCaseInsensitive(query))
+            if (dp.Subject?.ContainsCaseInsensitive(query) ?? false)
                 return true;
 
-            if (dp.Preview.ContainsCaseInsensitive(query))
+            if (dp.Preview?.ContainsCaseInsensitive(query) ?? false)
                 return true;
 
-            if (dp.Addresses.Any(da => da.Name.ContainsCaseInsensitive(query)))
+            if (dp.Addresses.Any(da => da.Name?.ContainsCaseInsensitive(query) ?? false))
                 return true;
 
-            if (dp.Addresses.Any(da => da.Address.ContainsCaseInsensitive(query)))
+            if (dp.Addresses.Any(da => da.Address?.ContainsCaseInsensitive(query) ?? false))
                 return true;
 
-            if (dp.Categories.Any(da => da.Name.ContainsCaseInsensitive(query)))
+            if (dp.Categories.Any(da => da.Name?.ContainsCaseInsensitive(query) ?? false))
                 return true;
 
-            if (dp.Creator.ContainsCaseInsensitive(query))
+            if (dp.Creator?.ContainsCaseInsensitive(query) ?? false)
                 return true;
 
             return false;

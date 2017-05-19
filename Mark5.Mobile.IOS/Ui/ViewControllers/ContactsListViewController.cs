@@ -464,17 +464,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         static bool MatchesQuery(ContactPreview cp, string query)
         {
-            if (cp.Name.ContainsCaseInsensitive(query))
+            if (cp.Name?.ContainsCaseInsensitive(query) ?? false)
                 return true;
-            if (cp.CompanyName.ContainsCaseInsensitive(query))
+
+            if (cp.CompanyName?.ContainsCaseInsensitive(query) ?? false)
                 return true;
-            if (cp.ShortId.ContainsCaseInsensitive(query))
+
+            if (cp.ShortId?.ContainsCaseInsensitive(query) ?? false)
                 return true;
-            if (cp.Description.ContainsCaseInsensitive(query))
+
+            if (cp.Description?.ContainsCaseInsensitive(query) ?? false)
                 return true;
-            if (cp.PrimaryAddress?.Address?.ContainsCaseInsensitive(query) ?? false)
+
+            if (cp.PrimaryAddress?.Address?.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
                 return true;
-            if (cp.Categories.Any(da => da.Name.ContainsCaseInsensitive(query)))
+
+            if (cp.Categories.Any(da => da.Name?.ContainsCaseInsensitive(query) ?? false))
                 return true;
 
             return false;

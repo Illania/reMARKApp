@@ -574,16 +574,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return false;
         }
 
-        static bool MatchesQuery(ShortcodePreview cp, string query)
+        static bool MatchesQuery(ShortcodePreview sp, string query)
         {
-            if (cp.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
+            if (sp.Name?.ContainsCaseInsensitive(query) ?? false)
                 return true;
-            }
-            if (cp.Description.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
+
+            if (sp.Description?.ContainsCaseInsensitive(query) ?? false)
                 return true;
-            }
 
             return false;
         }

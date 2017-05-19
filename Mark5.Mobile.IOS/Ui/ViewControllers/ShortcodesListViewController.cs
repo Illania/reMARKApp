@@ -462,10 +462,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         static bool MatchesQuery(ShortcodePreview sp, string query)
         {
-            if (sp.Name.ContainsCaseInsensitive(query))
+            if (sp.Name?.ContainsCaseInsensitive(query) ?? false)
                 return true;
 
-            if (sp.Description.ContainsCaseInsensitive(query))
+            if (sp.Description?.ContainsCaseInsensitive(query) ?? false)
                 return true;
 
             return false;

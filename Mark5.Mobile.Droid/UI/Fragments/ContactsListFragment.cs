@@ -593,30 +593,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         static bool MatchesQuery(ContactPreview cp, string query)
         {
-            if (cp.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
+            if (cp.Name?.ContainsCaseInsensitive(query) ?? false)
                 return true;
-            }
-            if (cp.CompanyName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
+
+            if (cp.CompanyName?.ContainsCaseInsensitive(query) ?? false)
                 return true;
-            }
-            if (cp.ShortId.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
+
+            if (cp.ShortId?.ContainsCaseInsensitive(query) ?? false)
                 return true;
-            }
-            if (cp.Description.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
+
+            if (cp.Description?.ContainsCaseInsensitive(query) ?? false)
                 return true;
-            }
+
             if (cp.PrimaryAddress?.Address?.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
                 return true;
-            }
-            if (cp.Categories.Any(da => da.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
-            {
+
+            if (cp.Categories.Any(da => da.Name?.ContainsCaseInsensitive(query) ?? false))
                 return true;
-            }
 
             return false;
         }
