@@ -14,6 +14,6 @@ namespace Mark5.ServiceReference
     public static class Config
     {
 
-        public const int HttpClientTimeoutSeconds = 30;
+        public const int HttpClientTimeoutSeconds = 60;
     }
 }
