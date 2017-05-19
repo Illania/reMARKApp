@@ -28,7 +28,7 @@
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
     <DeviceSpecificBuild>false</DeviceSpecificBuild>
-    <CodesignProvision>840a3d1f-e198-49d0-a939-835e472a1e97</CodesignProvision>
+    <CodesignProvision>Mark5 Mobile Development</CodesignProvision>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
 <RunCodeAnalysis>true</RunCodeAnalysis>  <MtouchI18n>cjk,mideast,west</MtouchI18n>
 </PropertyGroup>
