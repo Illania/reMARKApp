@@ -39,6 +39,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         NSLayoutConstraint bottomLayoutConstraint;
 
+        bool firstRun = true;
+
         public override void LoadView()
         {
             base.LoadView();
@@ -164,7 +166,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             willChangeFrameNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillChangeFrameNotification, OnKeyboardWillChangeFrameNotification);
             willHideNotification = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
 
-            RestoreCriteria();
+            if (firstRun)
+            {
+                firstRun = false;
+                RestoreCriteria();
+            }
         }
 
         public override void ViewDidAppear(bool animated)
