@@ -183,6 +183,7 @@
     <Folder Include="Model\Exceptions\" />
     <Folder Include="Ui\ViewControllers\MailViewerView\" />
     <Folder Include="Ui\ViewControllers\MailViewerView\Subviews\" />
+    <Folder Include="Ui\ViewControllers\SearchCriteriaView\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -411,12 +412,9 @@
     <Compile Include="Ui\TableViewCells\ContactInfoTableViewCell.designer.cs">
       <DependentUpon>ContactInfoTableViewCell.cs</DependentUpon>
     </Compile>
-    <Compile Include="Ui\ViewControllers\DocumentsSearchCriteriaViewController.cs" />
     <Compile Include="Ui\Common\TouchTransparentView.cs" />
     <Compile Include="Ui\ViewControllers\DocumentView\Subviews\LargeTextSubView.cs" />
-    <Compile Include="Ui\ViewControllers\ContactsSearchCriteriaViewController.cs" />
     <Compile Include="Ui\ViewControllers\SearchCriteriaViewController.cs" />
-    <Compile Include="Ui\ViewControllers\ShortcodesSearchCriteriaViewController.cs" />
     <Compile Include="Ui\Common\MultiSelectViewController.cs" />
     <Compile Include="Ui\ViewControllers\SelectCategoriesListViewController.cs" />
     <Compile Include="Utilities\PushNotificationsConverter.cs" />
@@ -432,6 +430,10 @@
     <Compile Include="Ui\ViewControllers\MailViewerView\Subviews\ContentView.cs" />
     <Compile Include="Ui\ViewControllers\MailViewerView\Subviews\DateReceivedView.cs" />
     <Compile Include="Ui\ViewControllers\MailViewerView\Subviews\PriorityView.cs" />
+    <Compile Include="Ui\ViewControllers\SearchCriteriaView\AbstractSearchCritriaViewController.cs" />
+    <Compile Include="Ui\ViewControllers\SearchCriteriaView\ContactsSearchCriteriaViewController.cs" />
+    <Compile Include="Ui\ViewControllers\SearchCriteriaView\DocumentsSearchCriteriaViewController.cs" />
+    <Compile Include="Ui\ViewControllers\SearchCriteriaView\ShortcodesSearchCriteriaViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

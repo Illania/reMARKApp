@@ -131,29 +131,9 @@ Global
 		$0.TextStylePolicy = $2
 		$2.FileWidth = 160
 		$2.EolMarker = Unix
-		$2.inheritsSet = VisualStudio
-		$2.inheritsScope = text/plain
 		$2.scope = text/x-csharp
+		$2.TabsToSpaces = True
 		$0.CSharpFormattingPolicy = $3
-		$3.IndentSwitchSection = True
-		$3.NewLinesForBracesInProperties = True
-		$3.NewLinesForBracesInAccessors = True
-		$3.NewLinesForBracesInAnonymousMethods = True
-		$3.NewLinesForBracesInControlBlocks = True
-		$3.NewLinesForBracesInAnonymousTypes = True
-		$3.NewLinesForBracesInObjectCollectionArrayInitializers = True
-		$3.NewLinesForBracesInLambdaExpressionBody = True
-		$3.NewLineForElse = True
-		$3.NewLineForCatch = True
-		$3.NewLineForFinally = True
-		$3.NewLineForMembersInObjectInit = True
-		$3.NewLineForMembersInAnonymousTypes = True
-		$3.NewLineForClausesInQuery = True
-		$3.SpacingAfterMethodDeclarationName = False
-		$3.SpaceAfterMethodCallName = False
-		$3.SpaceBeforeOpenSquareBracket = False
-		$3.inheritsSet = Mono
-		$3.inheritsScope = text/x-csharp
 		$3.scope = text/x-csharp
 		$0.XmlFormattingPolicy = $4
 		$4.inheritsSet = null
@@ -174,6 +154,5 @@ Global
 		$9.String = Exception
 		$0.StandardHeader = $10
 		$10.Text = @\nProject: ${Project}\nFile: ${FileName}\nAuthor: ${AuthorName} <${AuthorEmail}>\n\nCopyright (c) ${Year} Nordic IT\n
-		$10.IncludeInNewFiles = True
 	EndGlobalSection
 EndGlobal

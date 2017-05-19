@@ -7,10 +7,9 @@
 //
 using CoreGraphics;
 using Foundation;
-using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
+using Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using ObjCRuntime;
 using UIKit;
