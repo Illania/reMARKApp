@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+using System;
 using System.Collections.Generic;
 using Android.Content;
 using Android.Content.Res;
@@ -19,6 +20,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Views.InputMethods;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -102,12 +104,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Created {nameof(ShortcodesSearchCriteriaFragment)}");
         }
 
-        public override void OnResume()
+        public override async void OnResume()
         {
             base.OnResume();
 
             fab.Visibility = ViewStates.Visible;
-            searchCriteria = searchCriteria ?? new SearchShortcodesCriteria();
+
+            try
+            {
+                searchCriteria = searchCriteria ?? await Managers.SearchManager.GetLastSearchShortcodesCrtieriaAsync();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to restore last search criteria", ex);
+
+                searchCriteria = new SearchShortcodesCriteria();
+            }
+
             RefreshViews();
         }
 
@@ -115,6 +128,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             fab.Visibility = ViewStates.Gone;
             base.OnPause();
+        }
+
+        public override async void OnStop()
+        {
+            base.OnStop();
+
+            try
+            {
+                await Managers.SearchManager.SaveLastSearchShortcodesCrtieriaAsync(searchCriteria);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
+            }
         }
 
         void RefreshViews()
@@ -126,12 +153,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             });
         }
 
-        void Reset()
+        async void Reset()
         {
             searchCriteria = new SearchShortcodesCriteria();
             containerLinearLayout.RequestFocus();
             ((InputMethodManager)Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
             RefreshViews();
+
+            try
+            {
+                await Managers.SearchManager.SaveLastSearchShortcodesCrtieriaAsync(searchCriteria);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
+            }
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)

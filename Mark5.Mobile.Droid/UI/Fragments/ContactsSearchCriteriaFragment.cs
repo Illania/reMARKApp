@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+using System;
 using System.Collections.Generic;
 using Android.Animation;
 using Android.Content;
@@ -20,6 +21,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Views.InputMethods;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -158,19 +160,45 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Created {nameof(ContactsSearchCriteriaFragment)}");
         }
 
-        public override void OnResume()
+        public override async void OnResume()
         {
             base.OnResume();
 
             fab.Visibility = ViewStates.Visible;
-            searchCriteria = searchCriteria ?? new SearchContactsCriteria();
+
+            try
+            {
+                searchCriteria = searchCriteria ?? await Managers.SearchManager.GetLastSearchContactsCriteriaAsync();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to restore last search criteria", ex);
+
+                searchCriteria = new SearchContactsCriteria();
+            }
+
             RefreshViews();
         }
 
         public override void OnPause()
         {
             fab.Visibility = ViewStates.Gone;
+
             base.OnPause();
+        }
+
+        public override async void OnStop()
+        {
+            base.OnStop();
+
+            try
+            {
+                await Managers.SearchManager.SaveLastSearchContactsCriteriaAsync(searchCriteria);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
+            }
         }
 
         void RefreshViews()
@@ -182,12 +210,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             });
         }
 
-        void Reset()
+        async void Reset()
         {
             searchCriteria = new SearchContactsCriteria();
             containerLinearLayout.RequestFocus();
             ((InputMethodManager)Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
             RefreshViews();
+
+            try
+            {
+                await Managers.SearchManager.SaveLastSearchContactsCriteriaAsync(searchCriteria);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
+            }
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
