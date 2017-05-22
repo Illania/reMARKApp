@@ -72,7 +72,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Failed to clear last search criteria.", ex);
+                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
             }
         }
 
@@ -89,7 +89,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Failed to restore last search criteria.", ex);
+                CommonConfig.Logger.Error("Failed to restore last search criteria", ex);
             }
         }
 
