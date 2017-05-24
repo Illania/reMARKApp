@@ -40,10 +40,10 @@ namespace Mark5.ServiceReference.AppService
             Namespace = "com.nordic-it.appservice.v3",
             MaxBufferSize = 16 * 1024 * 1024,
             MaxReceivedMessageSize = 16 * 1024 * 1024,
-            OpenTimeout = new TimeSpan(0, 2, 0),
-            ReceiveTimeout = new TimeSpan(0, 2, 0),
-            CloseTimeout = new TimeSpan(0, 2, 0),
-            SendTimeout = new TimeSpan(0, 2, 0)
+            OpenTimeout = new TimeSpan(0, 5, 0),
+            ReceiveTimeout = new TimeSpan(0, 5, 0),
+            CloseTimeout = new TimeSpan(0, 5, 0),
+            SendTimeout = new TimeSpan(0, 5, 0)
         };
 
         readonly EndpointAddress endpoint;
