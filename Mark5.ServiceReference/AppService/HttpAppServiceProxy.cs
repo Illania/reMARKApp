@@ -87,7 +87,7 @@ namespace Mark5.ServiceReference.AppService
                 w.WriteStartDocument();
                 w.WriteStartElement("s", "Envelope", "http://schemas.xmlsoap.org/soap/envelope/");
                 w.WriteStartElement("s", "Body", "http://schemas.xmlsoap.org/soap/envelope/");
-                w.WriteStartElement(soapAction, "com.nordic-it.appservice.v3");
+                w.WriteStartElement(typeof(P).Name.Replace("Parameters", ""), "com.nordic-it.appservice.v3");
                 w.WriteStartElement("parameters");
                 dcs.WriteObjectContent(w, parameters);
                 w.WriteEndElement();
@@ -123,7 +123,7 @@ namespace Mark5.ServiceReference.AppService
                     throw new SOAPException("Body not found.");
 
                 var response = body.FirstChild;
-                if (response.LocalName != soapAction + "Response")
+                if (response.LocalName != typeof(R).Name.Replace("Result", "Response"))
                     throw new SOAPException($"{soapAction}Response not found.");
 
                 var resultContent = response.InnerXml;
@@ -232,7 +232,7 @@ namespace Mark5.ServiceReference.AppService
 
         public async Task<GetDefaultTemplateResult> GetDefaultTemplateAsync(GetDefaultTemplateParameters parameters, CancellationToken ct = default(CancellationToken))
         {
-            return await InvokeAsync<GetDefaultTemplateResult, GetDefaultTemplateParameters>("GetDefaultTemplate", parameters, ct);
+            return await InvokeAsync<GetDefaultTemplateResult, GetDefaultTemplateParameters>("GetDefaultTempalte", parameters, ct);
         }
 
         public async Task<GetContactPreviewsResult> GetContactPreviewsAsync(GetContactPreviewsParameters parameters, CancellationToken ct = default(CancellationToken))
