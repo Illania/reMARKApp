@@ -575,7 +575,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             try
             {
-                await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, folder.Module, new List<Folder> { folder }, true);
+                await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken, folder.Module, new List<Folder> { folder }, true);
 
                 var gds = TableView.Source as GrouppedDataSource;
                 if (gds != null)
@@ -609,7 +609,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             try
             {
-                await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, folder.Module, new List<Folder> { folder }, false);
+                await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken, folder.Module, new List<Folder> { folder }, false);
 
                 var gds = TableView.Source as GrouppedDataSource;
                 if (gds != null)
