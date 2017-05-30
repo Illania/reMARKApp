@@ -1148,27 +1148,38 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                                           out bool nextDocumentAvailable,
                                                           bool scrollToDocument = false)
             {
-                var currentDocumentRow = documentPreviewsInView.IndexOf(d => d.Id == documentPreview.Id);
-                if (currentDocumentRow < 0)
+                try
                 {
+                    var currentDocumentRow = documentPreviewsInView.IndexOf(d => d.Id == documentPreview.Id);
+                    if (currentDocumentRow < 0)
+                    {
+                        previousDocumentAvailable = false;
+                        nextDocumentAvailable = false;
+                        return null;
+                    }
+
+                    var nextDocumentRow = currentDocumentRow + 1;
+                    previousDocumentAvailable = true;
+                    nextDocumentAvailable = nextDocumentRow < documentPreviewsInView.Count - 1;
+
+                    if (!nextDocumentAvailable && LoadMoreEnabled && loadMoreAction != null)
+                        loadMoreAction(documentPreviewsInView.Last().Id);
+
+                    if (scrollToDocument)
+                    {
+                        ScrollAndSelect(nextDocumentRow);
+                    }
+
+                    return documentPreviewsInView.ElementAtOrDefault(nextDocumentRow);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Could not switch to next document", ex);
+
                     previousDocumentAvailable = false;
                     nextDocumentAvailable = false;
                     return null;
                 }
-
-                var nextDocumentRow = currentDocumentRow + 1;
-                previousDocumentAvailable = true;
-                nextDocumentAvailable = nextDocumentRow < documentPreviewsInView.Count - 1;
-
-                if (!nextDocumentAvailable && LoadMoreEnabled && loadMoreAction != null)
-                    loadMoreAction(documentPreviewsInView.Last().Id);
-
-                if (scrollToDocument)
-                {
-                    ScrollAndSelect(nextDocumentRow);
-                }
-
-                return documentPreviewsInView.ElementAtOrDefault(nextDocumentRow);
             }
 
             public DocumentPreview GetPreviousDocumentPreview(DocumentPreview documentPreview,
@@ -1176,24 +1187,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                                               out bool nextDocumentAvailable,
                                                               bool scrollToDocument = false)
             {
-                var currentDocumentRow = documentPreviewsInView.IndexOf(d => d.Id == documentPreview.Id);
-                if (currentDocumentRow < 0)
+                try
                 {
+                    var currentDocumentRow = documentPreviewsInView.IndexOf(d => d.Id == documentPreview.Id);
+                    if (currentDocumentRow < 0)
+                    {
+                        previousDocumentAvailable = false;
+                        nextDocumentAvailable = false;
+                        return null;
+                    }
+
+                    var previousDocumentRow = currentDocumentRow - 1;
+                    previousDocumentAvailable = previousDocumentRow > 0;
+                    nextDocumentAvailable = previousDocumentRow < documentPreviewsInView.Count - 1;
+
+                    if (scrollToDocument)
+                    {
+                        ScrollAndSelect(previousDocumentRow);
+                    }
+
+                    return documentPreviewsInView.ElementAtOrDefault(previousDocumentRow);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Could not switch to previous document", ex);
+
                     previousDocumentAvailable = false;
                     nextDocumentAvailable = false;
                     return null;
                 }
-
-                var previousDocumentRow = currentDocumentRow - 1;
-                previousDocumentAvailable = previousDocumentRow > 0;
-                nextDocumentAvailable = previousDocumentRow < documentPreviewsInView.Count - 1;
-
-                if (scrollToDocument)
-                {
-                    ScrollAndSelect(previousDocumentRow);
-                }
-
-                return documentPreviewsInView.ElementAtOrDefault(previousDocumentRow);
             }
 
             void ScrollAndSelect(int row)
