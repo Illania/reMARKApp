@@ -450,7 +450,7 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task MarkAsRead(List<Notification> notifications)
         {
-            await notificationsDataAccess.MarkAllAsRead(notifications, true);
+            await notificationsDataAccess.MarkAllAsRead();
 
             notifications.ForEach(n => n.IsRead = true);
         }

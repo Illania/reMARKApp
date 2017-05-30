@@ -31,8 +31,9 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string UnreadIndicatorMeKey = "UnreadIndicatorMe";
             public const string CompactDocumentsListKey = "CompactDocumentsList";
             public const string MarkAsReadDelaySecondsKey = "MarkAsReadDelaySeconds";
-            public const string LargeAttachmentWarningKey = "LargeAttachmentWarning";
             public const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
+            public const string LargeAttachmentWarningKey = "LargeAttachmentWarning";
+            public const string HideReadNotificationsKey = "HideReadNotifications";
 
             public const string SynchroniseContactsKey = "SynchroniseContacts";
 
@@ -67,33 +68,34 @@ namespace Mark5.Mobile.IOS.Utilities
 
         void RegisterDefaults()
         {
-            var defaultsDictionary = new NSMutableDictionary();
+            var defaultsDictionary = new NSMutableDictionary
+            {
+                { new NSString(Keys.UseServerTimezoneKey), NSNumber.FromBoolean(false) },
+                { new NSString(Keys.DocumentsToDownloadKey), NSNumber.FromInt16(250) },
+                { new NSString(Keys.UnreadIndicatorMeKey), NSNumber.FromBoolean(true) },
+                { new NSString(Keys.MarkAsReadDelaySecondsKey), NSNumber.FromInt16(2) },
+                { new NSString(Keys.CompactDocumentsListKey), NSNumber.FromBoolean(false) },
+                { new NSString(Keys.DocumentBodyRequestTypeKey), NSNumber.FromBoolean(false) },
+                { new NSString(Keys.LargeAttachmentWarningKey), NSNumber.FromBoolean(true) },
+                { new NSString(Keys.HideReadNotificationsKey), NSNumber.FromBoolean(false) },
 
-            defaultsDictionary.Add(new NSString(Keys.UseServerTimezoneKey), NSNumber.FromBoolean(false));
-            defaultsDictionary.Add(new NSString(Keys.DocumentsToDownloadKey), NSNumber.FromInt16(250));
-            defaultsDictionary.Add(new NSString(Keys.UnreadIndicatorMeKey), NSNumber.FromBoolean(true));
-            defaultsDictionary.Add(new NSString(Keys.MarkAsReadDelaySecondsKey), NSNumber.FromInt16(2));
-            defaultsDictionary.Add(new NSString(Keys.CompactDocumentsListKey), NSNumber.FromBoolean(false));
-            defaultsDictionary.Add(new NSString(Keys.LargeAttachmentWarningKey), NSNumber.FromBoolean(true));
-            defaultsDictionary.Add(new NSString(Keys.DocumentBodyRequestTypeKey), NSNumber.FromBoolean(false));
+                { new NSString(Keys.SynchroniseContactsKey), NSNumber.FromBoolean(true) },
 
-            defaultsDictionary.Add(new NSString(Keys.SynchroniseContactsKey), NSNumber.FromBoolean(true));
+                { new NSString(Keys.SynchroniseShortcodesKey), NSNumber.FromBoolean(false) },
 
-            defaultsDictionary.Add(new NSString(Keys.SynchroniseShortcodesKey), NSNumber.FromBoolean(false));
+                { new NSString(Keys.ComposePriorityEnabledKey), NSNumber.FromBoolean(false) },
+                { new NSString(Keys.RemoveLineKey), NSNumber.FromBoolean(true) },
+                { new NSString(Keys.UseTemplateKey), NSNumber.FromInt16(1) },
 
-            defaultsDictionary.Add(new NSString(Keys.ComposePriorityEnabledKey), NSNumber.FromBoolean(false));
-            defaultsDictionary.Add(new NSString(Keys.RemoveLineKey), NSNumber.FromBoolean(true));
-            defaultsDictionary.Add(new NSString(Keys.UseTemplateKey), NSNumber.FromInt16(1));
+                { new NSString(Keys.DocumentsToSearchKey), NSNumber.FromInt16(250) },
+                { new NSString(Keys.ContactsToSearchKey), NSNumber.FromInt16(250) },
+                { new NSString(Keys.ShortcodesToSearchKey), NSNumber.FromInt16(250) },
+                { new NSString(Keys.PartialWordSearchKey), NSNumber.FromBoolean(false) },
 
-            defaultsDictionary.Add(new NSString(Keys.DocumentsToSearchKey), NSNumber.FromInt16(250));
-            defaultsDictionary.Add(new NSString(Keys.ContactsToSearchKey), NSNumber.FromInt16(250));
-            defaultsDictionary.Add(new NSString(Keys.ShortcodesToSearchKey), NSNumber.FromInt16(250));
-            defaultsDictionary.Add(new NSString(Keys.PartialWordSearchKey), NSNumber.FromBoolean(false));
-
-            defaultsDictionary.Add(new NSString(Keys.CleanCacheIntervalDaysKey), NSNumber.FromInt16(7));
-            defaultsDictionary.Add(new NSString(Keys.ClearCacheKey), NSNumber.FromBoolean(false));
-            defaultsDictionary.Add(new NSString(Keys.EnableReportingKey), NSNumber.FromBoolean(true));
-
+                { new NSString(Keys.CleanCacheIntervalDaysKey), NSNumber.FromInt16(7) },
+                { new NSString(Keys.ClearCacheKey), NSNumber.FromBoolean(false) },
+                { new NSString(Keys.EnableReportingKey), NSNumber.FromBoolean(true) }
+            };
             ud.RegisterDefaults(defaultsDictionary);
         }
 
@@ -164,6 +166,14 @@ namespace Mark5.Mobile.IOS.Utilities
             get
             {
                 return ud.BoolForKey(Keys.DocumentBodyRequestTypeKey) ? DocumentBodyTypeRequest.PlainTextOnly : DocumentBodyTypeRequest.HtmlOnly;
+            }
+        }
+
+        public bool HideReadNotifications
+        {
+            get
+            {
+                return ud.BoolForKey(Keys.HideReadNotificationsKey);
             }
         }
 

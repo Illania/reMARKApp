@@ -120,18 +120,17 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task MarkAllAsRead(List<Notification> notifications, bool clear)
+        public async Task MarkAllAsRead()
         {
             try
             {
                 await systemDatabase.RunInConnectionAsync(c =>
                 {
-                    if (clear)
-                    {
-                        c.DeleteAll<ReadNotificationInfo>();
-                    }
+                    var query = $"select {nameof(Notification.Guid)} from {nameof(Notification)}";
+                    var result = c.Query<GuidValue>(query);
 
-                    c.InsertOrReplaceAll(notifications.Select(n => new ReadNotificationInfo { NotificationGuid = n.Guid }));
+                    c.DeleteAll<ReadNotificationInfo>();
+                    c.InsertOrReplaceAll(result.Select(r => new ReadNotificationInfo { NotificationGuid = r.Guid }));
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))

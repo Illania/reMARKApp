@@ -178,6 +178,7 @@
     <Compile Include="Utilities\AddressUtilities.cs" />
     <Compile Include="Utilities\LambdaEqualityComparer.cs" />
     <Compile Include="Extensions\ModuleTypeExtensions.cs" />
+    <Compile Include="Model\GuidValue.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />
