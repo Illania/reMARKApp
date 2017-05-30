@@ -893,8 +893,9 @@ namespace SVProgressHUD
                 var windowOnMainScreen = window.Screen == UIScreen.MainScreen;
                 var windowVisible = !window.Hidden && window.Alpha > 0f;
                 var windowLevelSupported = window.WindowLevel >= UIWindowLevel.Normal && window.WindowLevel <= MaxSupportedWindowLevel;
+                var windowsKeyWindow = window.IsKeyWindow;
 
-                if (windowOnMainScreen && windowVisible && windowLevelSupported)
+                if (windowOnMainScreen && windowVisible && windowLevelSupported && windowsKeyWindow)
                     return window;
             }
 #endif
