@@ -118,7 +118,19 @@ namespace Mark5.Mobile.Common.Managers
 
             if (sourceType == SourceType.Local)
             {
-                return await notificationsDataAccess.GetNotifications();
+                var result = await notificationsDataAccess.GetNotifications();
+
+                var notifications = result.WhereNotNull().Where(n => EnabledObjectTypes.Contains(n.ObjectType)).OrderByDescending(n => n.DateTimeTimestamp).ToList();
+
+                await notificationsDataAccess.SaveNotifications(notifications);
+
+                var readGuids = await notificationsDataAccess.GetReadNotificationGuids();
+                if (readGuids.Count > 0)
+                {
+                    notifications.ForEach(n => n.IsRead = readGuids.Contains(n.Guid));
+                }
+
+                return notifications;
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
