@@ -40,6 +40,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         TinyMessageSubscriptionToken newNotificationsToken;
 
+        Func<Notification, bool> unreadFilter = (n) => !n.IsRead;
+
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -187,7 +189,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 notifications = notifications.Where(n => ObjectTypes.Contains(n.ObjectType)).ToList();
 
                 adapter.Clear();
-                adapter.AppendItems(notifications);
+                adapter.AppendItems(notifications, PlatformConfig.Preferences.HideReadNotifications ? unreadFilter : null);
             }
             catch (Exception ex)
             {
@@ -248,8 +250,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             try
             {
-                await Managers.NotificationsManager.MarkAsRead(adapter.Items);
-                adapter.NotifyItemRangeChanged(0, adapter.ItemCount);
+                await Managers.NotificationsManager.MarkAllAsRead();
+                await RefreshData();
             }
             catch (Exception ex)
             {
@@ -334,9 +336,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return new NotificationViewHolder(itemView);
             }
 
-            public void AppendItems(List<Notification> items)
+            public void AppendItems(List<Notification> items, Func<Notification, bool> filter = null)
             {
                 var count = notificationsInView.Count;
+
+                if (filter != null)
+                    items = items.Where(filter).ToList();
+                
                 notificationsInView.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
