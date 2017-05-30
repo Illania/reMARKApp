@@ -131,6 +131,7 @@
 	<string name="pref_key_documents_read_indicator_me">pref_key_documents_read_indicator_me</string>
 	<string name="pref_key_documents_to_load">pref_key_documents_to_load</string>
 	<string name="pref_key_documents_use_server_timezone">pref_key_documents_use_server_timezone</string>
+	<string name="pref_key_notification_hide_read">pref_key_notification_hide_read</string>
 	<string name="pref_key_notification_ringtone">pref_key_notification_ringtone</string>
 	<string name="pref_key_notification_silence">pref_key_notification_silence</string>
 	<string name="pref_key_notification_vibrate">pref_key_notification_vibrate</string>
@@ -139,10 +140,13 @@
 	<string name="pref_key_search_contacts_to_get">pref_key_search_contacts_to_get</string>
 	<string name="pref_key_search_shortcodes_to_get">pref_key_search_shortcodes_to_get</string>
 	<string name="pref_key_search_partial_word">pref_key_search_partial_word</string>
+    <string name="pref_notification_hide_read_summary_off">Do not hide read notifications in the list</string>
+    <string name="pref_notification_hide_read_summary_on">Do not show read notifications in the list</string>
+	<string name="pref_notification_hide_read_title">Hide read notifications</string>
 	<string name="pref_notification_ringtone_title">Notification sound</string>
 	<string name="pref_notification_silence_summary_off">Notifications will be shown in MARK5 app and system drawer</string>
 	<string name="pref_notification_silence_summary_on">Notifications will be visible only in MARK5 app</string>
-	<string name="pref_notification_silence_title">Do not show notifications</string>
+	<string name="pref_notification_silence_title">Silence notifications</string>
 	<string name="pref_notification_vibrate_title">Vibration</string>
 	<string name="pref_shortcodes_synchronised_summary_off">Shortcodes will no be downloaded automatically</string>
 	<string name="pref_shortcodes_synchronised_summary_on">Whenever folder is opened all shortcodes will be downloaded automatically and available offline</string>

@@ -209,7 +209,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 var size = int.Parse(sizeObject.ToString());
 
                 if (size > MaxSize)
+                {
+                    CommonConfig.Logger.Error($"Attempted to open file that is too large. Size {size} bytes.");
+
                     throw new MailViewerException("File too large.");
+                }
 
                 if (name.EndsWith(".eml", StringComparison.CurrentCultureIgnoreCase))
                 {

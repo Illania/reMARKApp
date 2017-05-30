@@ -925,6 +925,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         static bool MatchesQuery(DocumentPreview dp, string query)
         {
+#if DEBUG
+            if (dp.Id.ToString() == query)
+                return true;
+#endif
+
             if (dp.ReferenceNumber?.ContainsCaseInsensitive(query) ?? false)
                 return true;
 
@@ -949,9 +954,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             return false;
         }
 
-        #endregion
+#endregion
 
-        #region Messages handlers
+#region Messages handlers
 
         void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m) => RemoveDocumentsFromList(m.EntitiesId);
 
@@ -959,7 +964,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void HandleDeleted(EntityDeletedMessage m) => RemoveDocumentsFromList(m.EntitiesId);
 
-        #endregion
+#endregion
 
         class DataSource : UITableViewSource, IDisposable
         {

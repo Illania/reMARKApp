@@ -263,6 +263,14 @@ namespace Mark5.Mobile.Droid.Utilities
 
         #endregion
 
+        public bool HideReadNotifications
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_notification_hide_read), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_notification_hide_read_default));
+            }
+        }
+
         public bool SilenceNotifications
         {
             get

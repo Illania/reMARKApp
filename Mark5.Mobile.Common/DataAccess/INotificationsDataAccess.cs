@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task MarkAsRead(Notification notification);
 
-        Task MarkAllAsRead(List<Notification> notifications, bool clear);
+        Task MarkAllAsRead();
     }
 }
 

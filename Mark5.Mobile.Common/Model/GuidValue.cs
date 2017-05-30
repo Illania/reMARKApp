@@ -1,21 +1,21 @@
-//
+﻿//
 // Project: Mark5.Mobile.Common
-// File: IdValue.cs
+// File: GuidValue.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
-// Copyright (c) 2016 Nordic IT
+// Copyright (c) 2017 Nordic IT
 //
+using System;
 using SQLite;
 
 #pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
     
-    public class IdValue
+    public class GuidValue
     {
 
-        [Column("Id")]
-        public int Id { get; set; } = -1;
+        [Column("Guid")]
+        public Guid Guid { get; set; }
     }
 }
-

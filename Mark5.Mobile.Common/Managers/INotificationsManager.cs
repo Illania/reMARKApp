@@ -49,7 +49,7 @@ namespace Mark5.Mobile.Common.Managers
 
         Task MarkAsRead(Notification notification);
 
-        Task MarkAsRead(List<Notification> notifications);
+        Task MarkAllAsRead();
     }
 }
 

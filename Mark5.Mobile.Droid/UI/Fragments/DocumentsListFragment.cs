@@ -845,6 +845,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         static bool MatchesQuery(DocumentPreview dp, string query)
         {
+#if DEBUG
+            if (dp.Id.ToString() == query)
+                return true;
+#endif
+
             if (dp.ReferenceNumber?.ContainsCaseInsensitive(query) ?? false)
                 return true;
 
@@ -865,7 +870,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (dp.Creator?.ContainsCaseInsensitive(query) ?? false)
                 return true;
-            
+
             return false;
         }
 

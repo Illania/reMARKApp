@@ -37,6 +37,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         TinyMessageSubscriptionToken newNotificationsMessageToken;
 
+        Func<Notification, bool> unreadFilter = (n) => !n.IsRead;
+
         public NotificationsListViewController(ObjectType[] objectTypes)
         {
             this.objectTypes = objectTypes;
@@ -179,11 +181,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             try
             {
-                var ds = (DataSource)tableView.Source;
-                await Managers.NotificationsManager.MarkAsRead(ds.Items);
-                ds.Reload();
-
-                markAsReadItem.Enabled = false;
+                await Managers.NotificationsManager.MarkAllAsRead();
+                await RefreshData();
             }
             catch (Exception ex)
             {
@@ -209,7 +208,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
                 notifications = notifications.Where(n => objectTypes.Contains(n.ObjectType)).ToList();
                 var ds = (DataSource)tableView.Source;
-                ds.SetItems(notifications);
+                ds.SetItems(notifications, PlatformConfig.Preferences.HideReadNotifications ? unreadFilter : null);
 
                 markAsReadItem.Enabled = notifications.Any(n => !n.IsRead);
             }
@@ -237,11 +236,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     PresentDocumentViewController(notification.ObjectId);
                     break;
                 case ObjectType.Contact:
-
                     PresentContactViewController(notification.ObjectId);
                     break;
                 case ObjectType.Shortcode:
-
                     PresentShortcodeViewController(notification.ObjectId);
                     break;
             }
@@ -351,18 +348,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 viewController.NotificationSelected(n, indexPath);
             }
 
-            public void SetItems(List<Notification> notifications)
+            public void SetItems(List<Notification> notifications, Func<Notification, bool> filter = null)
             {
                 loading = false;
 
                 notificationsInView.Clear();
-                notificationsInView.AddRange(notifications);
 
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-            }
+                if (filter == null)
+                    notificationsInView.AddRange(notifications);
+                else
+                    notificationsInView.AddRange(notifications.Where(filter).ToList());
 
-            public void Reload()
-            {
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 

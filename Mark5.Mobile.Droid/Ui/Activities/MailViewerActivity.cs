@@ -111,7 +111,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 }
 
                 if (size > MaxSize)
+                {
+                    CommonConfig.Logger.Error($"Attempted to open file that is too large. Size {size} bytes.");
+
                     throw new MailViewerException("File too large.");
+                }
 
                 if (name.EndsWith(".eml", StringComparison.CurrentCultureIgnoreCase))
                 {
