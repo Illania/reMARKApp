@@ -193,6 +193,9 @@ namespace SVProgressHUD
                         if (_backgroundRadialGradientLayer.SuperLayer == null)
                             _backgroundView.Layer.InsertSublayer(_backgroundRadialGradientLayer, 0);
                         break;
+                    default:
+                        _backgroundView.BackgroundColor = UIColor.Clear;
+                        break;
                 }
 
                 if (_backgroundView != null)
