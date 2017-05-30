@@ -181,11 +181,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             try
             {
-                var ds = (DataSource)tableView.Source;
-                await Managers.NotificationsManager.MarkAsRead(ds.Items);
-                ds.Reload(PlatformConfig.Preferences.HideReadNotifications ? unreadFilter : null);
-
-                markAsReadItem.Enabled = false;
+                await Managers.NotificationsManager.MarkAllAsRead();
+                await RefreshData();
             }
             catch (Exception ex)
             {
@@ -361,18 +358,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     notificationsInView.AddRange(notifications);
                 else
                     notificationsInView.AddRange(notifications.Where(filter).ToList());
-
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-            }
-
-            public void Reload(Func<Notification, bool> filter = null)
-            {
-                if (filter != null)
-                {
-                    var notifications = notificationsInView.ToList();
-                    notificationsInView.Clear();
-                    notificationsInView.AddRange(notifications.Where(filter).ToList());
-                }
 
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
