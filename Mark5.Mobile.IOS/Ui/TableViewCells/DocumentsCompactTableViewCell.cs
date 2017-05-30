@@ -56,8 +56,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             }
             else
             {
-                var address = documentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType).FirstOrDefault();
-                SenderNameLabel.Text = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
+                if (PlatformConfig.Preferences.ShowCreatorOutgoing)
+                {
+                    SenderNameLabel.Text = documentPreview.Creator;
+                }
+                else
+                {
+                    var address = documentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType).FirstOrDefault();
+                    SenderNameLabel.Text = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
+                }
             }
 
             SubjectLabel.Text = documentPreview.Subject;
