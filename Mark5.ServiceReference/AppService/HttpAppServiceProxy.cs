@@ -130,7 +130,11 @@ namespace Mark5.ServiceReference.AppService
 
                 var dcs = new DataContractSerializer(typeof(R));
                 var sb = new StringReader(resultContent);
-                using (var r = XmlReader.Create(sb))
+                using (var r = XmlReader.Create(sb, new XmlReaderSettings
+                {
+                    CheckCharacters = false,
+                    ConformanceLevel = ConformanceLevel.Fragment
+                }))
                 {
                     var result = dcs.ReadObject(r);
                     return (R)result;
@@ -160,7 +164,11 @@ namespace Mark5.ServiceReference.AppService
 
                 var dcs = new DataContractSerializer(typeof(AppServiceFaultDetail));
                 var sb = new StringReader(faultDetailContent);
-                using (var r = XmlReader.Create(sb))
+                using (var r = XmlReader.Create(sb, new XmlReaderSettings
+                {
+                    CheckCharacters = false,
+                    ConformanceLevel = ConformanceLevel.Fragment
+                }))
                 {
                     var result = dcs.ReadObject(r);
                     faultDetail = (AppServiceFaultDetail)result;
