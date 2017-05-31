@@ -125,7 +125,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public static Action ShowInfiniteProgressDialog(string content)
         {
-            ProgressHUD.Instance.Show(Localization.GetString(content));
+            ProgressHUD.Instance.ShowProgress(Localization.GetString(content));
             return ProgressHUD.Instance.Dismiss;
         }
 

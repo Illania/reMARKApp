@@ -66,6 +66,7 @@ namespace SVProgressHUD
         public static double FadeInAnimationDuration { get; set; } = 0.15d;
         public static double FadeOutAnimationDuration { get; set; } = 0.15d;
         public static nfloat MaxSupportedWindowLevel { get; set; } = UIWindowLevel.Normal;
+        public static bool HapticsEnabled { get; set; }
 
         #endregion
 
@@ -123,6 +124,7 @@ namespace SVProgressHUD
         UIView _indefiniteAnimatedView;
         ProgressAnimatedView _ringView;
         ProgressAnimatedView _backgroundRingView;
+        UINotificationFeedbackGenerator _hapticGenerator;
         // END
 
         float progress;
@@ -367,6 +369,20 @@ namespace SVProgressHUD
             }
         }
 
+        UINotificationFeedbackGenerator HapticGenerator
+        {
+            get
+            {
+                if (!HapticsEnabled)
+                    return null;
+
+                if (_hapticGenerator == null)
+                    _hapticGenerator = new UINotificationFeedbackGenerator();
+
+                return _hapticGenerator;
+            }
+        }
+
         #endregion
 
         #region Private constructors
@@ -385,13 +401,12 @@ namespace SVProgressHUD
 
         #region Show methods
 
-        public void Show(string status = null, float progress = UndefinedProgress)
+        public void ShowProgress(string status = null, float progress = UndefinedProgress)
         {
             var weakThis = new WeakReference<ProgressHUD>(this);
             NSOperationQueue.MainQueue.AddOperation(() =>
             {
-                ProgressHUD strongThis;
-                if (!weakThis.TryGetTarget(out strongThis)) return;
+                if (!weakThis.TryGetTarget(out ProgressHUD strongThis)) return;
 
                 strongThis.UpdateViewHierarchy();
 
@@ -435,21 +450,34 @@ namespace SVProgressHUD
                     strongThis.activityCount++;
                 }
 
-                ShowInternal();
+                strongThis.ShowInternal();
+
+                strongThis.HapticGenerator?.Prepare();
             });
         }
 
-        public void ShowInfo(string status = null) => ShowImage(InfoImage, status);
-        public void ShowSuccess(string status = null) => ShowImage(SuccessImage, status);
-        public void ShowError(string status = null) => ShowImage(ErrorImage, status);
+        public void ShowInfo(string status = null)
+        {
+            ShowImageInternal(InfoImage, status);
+            NSOperationQueue.MainQueue.AddOperation(() => HapticGenerator?.NotificationOccurred(UINotificationFeedbackType.Warning));
+        }
+        public void ShowSuccess(string status = null)
+        {
+            ShowImageInternal(SuccessImage, status);
+            NSOperationQueue.MainQueue.AddOperation(() => HapticGenerator?.NotificationOccurred(UINotificationFeedbackType.Success));
+        }
+        public void ShowError(string status = null)
+        {
+            ShowImageInternal(ErrorImage, status);
+            NSOperationQueue.MainQueue.AddOperation(() => HapticGenerator?.NotificationOccurred(UINotificationFeedbackType.Error));
+        }
 
-        public void ShowImage(UIImage image, string status = null)
+        void ShowImageInternal(UIImage image, string status = null)
         {
             var weakThis = new WeakReference<ProgressHUD>(this);
             NSOperationQueue.MainQueue.AddOperation(() =>
             {
-                ProgressHUD strongThis;
-                if (!weakThis.TryGetTarget(out strongThis)) return;
+                if (!weakThis.TryGetTarget(out ProgressHUD strongThis)) return;
 
                 strongThis.UpdateViewHierarchy();
 
@@ -543,11 +571,9 @@ namespace SVProgressHUD
             var weakThis = new WeakReference<ProgressHUD>(this);
             NSOperationQueue.MainQueue.AddOperation(() =>
             {
-                ProgressHUD strongThis;
-                if (!weakThis.TryGetTarget(out strongThis))
+                if (!weakThis.TryGetTarget(out ProgressHUD strongThis))
                 {
-                    if (completionHandler != null)
-                        completionHandler();
+                    completionHandler?.Invoke();
                     return;
                 }
 
@@ -595,8 +621,7 @@ namespace SVProgressHUD
                         vc.SetNeedsStatusBarAppearanceUpdate();
 #endif
 
-                        if (completionHandler != null)
-                            completionHandler();
+                        completionHandler?.Invoke();
                     }
                 };
 
@@ -739,7 +764,9 @@ namespace SVProgressHUD
 
             if (notification != null)
             {
+#pragma warning disable iOSAndMacApiUsageIssue // Find issues with Mac and iOS API usage
                 if (notification.Name == UIKeyboard.WillShowNotification || notification.Name == UIKeyboard.DidShowNotification)
+#pragma warning restore iOSAndMacApiUsageIssue // Find issues with Mac and iOS API usage
                 {
                     var keyboardInfo = notification.UserInfo;
                     var keyboardFrame = ((NSValue)keyboardInfo[UIKeyboard.FrameBeginUserInfoKey]).CGRectValue;
@@ -932,12 +959,14 @@ namespace SVProgressHUD
 
         void RegisterNotifications()
         {
+#pragma warning disable iOSAndMacApiUsageIssue // Find issues with Mac and iOS API usage
             NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("positionHud:"), UIApplication.DidChangeStatusBarOrientationNotification, null);
             NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("positionHud:"), UIApplication.DidBecomeActiveNotification, null);
             NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("positionHud:"), UIKeyboard.WillShowNotification, null);
             NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("positionHud:"), UIKeyboard.DidShowNotification, null);
             NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("positionHud:"), UIKeyboard.WillHideNotification, null);
             NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("positionHud:"), UIKeyboard.DidHideNotification, null);
+#pragma warning restore iOSAndMacApiUsageIssue // Find issues with Mac and iOS API usage
         }
 
         [Export("controlViewDidReceiveTouchEvent:forEvent:")]

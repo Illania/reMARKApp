@@ -19,7 +19,7 @@ namespace SVProgressHUD
 
         public CGPoint GradientCenter { get; set; }
 
-        public override void DrawInContext(CGContext context)
+        public override void DrawInContext(CGContext ctx)
         {
             var locations = new nfloat[] { 0f, 1f };
             var colors = new nfloat[] { 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0.75f };
@@ -28,7 +28,7 @@ namespace SVProgressHUD
             colorsSpace.Dispose();
 
             var radius = (nfloat)Math.Min(Bounds.Size.Width, Bounds.Size.Height);
-            context.DrawRadialGradient(gradient, GradientCenter, 0, GradientCenter, radius, CGGradientDrawingOptions.DrawsAfterEndLocation);
+            ctx.DrawRadialGradient(gradient, GradientCenter, 0, GradientCenter, radius, CGGradientDrawingOptions.DrawsAfterEndLocation);
             gradient.Dispose();
         }
     }
