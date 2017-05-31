@@ -39,9 +39,7 @@ namespace Mark5.Mobile.IOS.Services
 
             using (var r = new NetworkReachability(host))
             {
-                NetworkReachabilityFlags flags;
-
-                if (r.TryGetFlags(out flags))
+                if (r.TryGetFlags(out NetworkReachabilityFlags flags))
                     return IsReachableWithoutRequiringConnection(flags);
             }
             return false;
@@ -128,8 +126,7 @@ namespace Mark5.Mobile.IOS.Services
 
         public static NetworkStatus InternetConnectionStatus()
         {
-            NetworkReachabilityFlags flags;
-            var defaultNetworkAvailable = IsNetworkAvailable(out flags);
+            var defaultNetworkAvailable = IsNetworkAvailable(out NetworkReachabilityFlags flags);
 
             if (defaultNetworkAvailable && ((flags & NetworkReachabilityFlags.IsDirect) != 0))
                 return NetworkStatus.NotReachable;
@@ -145,8 +142,7 @@ namespace Mark5.Mobile.IOS.Services
 
         public static NetworkStatus LocalWifiConnectionStatus()
         {
-            NetworkReachabilityFlags flags;
-            if (IsAdHocWiFiNetworkAvailable(out flags))
+            if (IsAdHocWiFiNetworkAvailable(out NetworkReachabilityFlags flags))
                 if ((flags & NetworkReachabilityFlags.IsDirect) != 0)
                     return NetworkStatus.ReachableViaWiFiNetwork;
 
