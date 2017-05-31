@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
@@ -28,6 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
     public abstract class AbstractFoldersListViewController : AbstractViewController, IPrimaryViewController, IUISearchResultsUpdating
     {
+        protected virtual bool LoadRemoteFromCache { get; }
 
         protected readonly Folder ParentFolder;
         protected readonly bool IsRootOfFoldersList;
@@ -354,25 +356,46 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             try
             {
+                List<Folder> remoteFolders = null;
+                if (!forceRefresh && ParentFolder.HasSubFolders && ParentFolder.SubFolders != null && ParentFolder.SubFolders.Count > 0)
+                {
+                    remoteFolders = ParentFolder.SubFolders;
+                }
+                else
+                {
+                    if (LoadRemoteFromCache)
+                    {
+                        try
+                        {
+                            remoteFolders = await Managers.FoldersManager.GetFoldersAsync(ParentFolder, sourceType: SourceType.Local);
+                        }
+                        catch (DataNotFoundException)
+                        {
+                            //Do nothing
+                        }
+                        catch (Exception ex)
+                        {
+                            CommonConfig.Logger.Error($"Could not retrieve folders from cache only [parentFolder={ParentFolder}]", ex);
+                        }
+                    }
+
+                    if (remoteFolders == null)
+                    {
+                        remoteFolders = await Managers.FoldersManager.GetFoldersAsync(ParentFolder);
+                    }
+                }
+
+                var remoteFolderIds = remoteFolders.Select(f => f.Id);
+
+
                 if (IsRootOfFoldersList)
                 {
                     var gds = (GrouppedDataSource)TableView.Source;
 
                     var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(ParentFolder.Module);
 
-                    List<Folder> folders;
-                    if (!forceRefresh && ParentFolder.HasSubFolders && ParentFolder.SubFolders != null && ParentFolder.SubFolders.Count > 0)
-                    {
-                        folders = await Managers.FoldersManager.GetFoldersAsync(ParentFolder, sourceType: SourceType.Local);
-                    }
-                    else
-                    {
-                        folders = await Managers.FoldersManager.GetFoldersAsync(ParentFolder);
-                    }
-
                     var favoriteIds = favorites.Select(f => f.Id);
-                    var folderIds = folders.Select(f => f.Id);
-                    var allIds = favoriteIds.Union(folderIds).Distinct();
+                    var allIds = favoriteIds.Union(remoteFolderIds).Distinct();
 
                     var favoritesStatus = new Dictionary<int, bool>();
                     var offlineStatus = new Dictionary<int, bool>();
@@ -391,7 +414,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         gds.SetFolders(GrouppedDataSource.Section.Local, Folder.LocalRootForModule(ModuleType.Documents).SubFolders);
                     }
                     gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
-                    gds.SetFolders(GrouppedDataSource.Section.Folders, folders);
+                    gds.SetFolders(GrouppedDataSource.Section.Folders, remoteFolders);
 
                     if (EditModeItem != null)
                         EditModeItem.Enabled = gds.ItemsInSection(GrouppedDataSource.Section.Favorites) > 0;
@@ -400,22 +423,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 {
                     var ds = (DataSource)TableView.Source;
 
-                    List<Folder> folders;
-                    if (!forceRefresh && ParentFolder.HasSubFolders && ParentFolder.SubFolders != null && ParentFolder.SubFolders.Count > 0)
-                    {
-                        folders = ParentFolder.SubFolders;
-                    }
-                    else
-                    {
-                        folders = await Managers.FoldersManager.GetFoldersAsync(ParentFolder);
-                    }
-
-                    var folderIds = folders.Select(f => f.Id).Distinct();
-
                     var favoritesStatus = new Dictionary<int, bool>();
                     var offlineStatus = new Dictionary<int, bool>();
 
-                    foreach (var id in folderIds)
+                    foreach (var id in remoteFolderIds)
                     {
                         favoritesStatus[id] = await Managers.FoldersManager.IsFolderFavouriteAsync(ParentFolder.Module, id);
                         offlineStatus[id] = await Managers.FoldersManager.IsFolderOfflineAsync(ParentFolder.Module, id);
@@ -424,7 +435,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     ds.FavoriteStatus = favoritesStatus;
                     ds.CachingStatus = offlineStatus;
 
-                    ds.SetFolders(folders);
+                    ds.SetFolders(remoteFolders);
 
                     CommonConfig.Logger.Info($"Refreshed folders list [parentFolder={ParentFolder}]");
                 }

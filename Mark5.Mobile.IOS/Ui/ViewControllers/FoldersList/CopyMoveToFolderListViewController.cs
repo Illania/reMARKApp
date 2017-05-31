@@ -20,6 +20,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
     public class CopyMoveToFolderListViewController : AbstractFoldersListViewController
     {
+        protected override bool LoadRemoteFromCache { get { return true; } }
 
         readonly List<IBusinessEntity> businessEntities;
         readonly Folder fromFolder;
