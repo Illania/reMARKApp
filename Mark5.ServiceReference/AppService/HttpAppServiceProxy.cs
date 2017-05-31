@@ -87,7 +87,7 @@ namespace Mark5.ServiceReference.AppService
                 w.WriteStartDocument();
                 w.WriteStartElement("s", "Envelope", "http://schemas.xmlsoap.org/soap/envelope/");
                 w.WriteStartElement("s", "Body", "http://schemas.xmlsoap.org/soap/envelope/");
-                w.WriteStartElement(soapAction, "com.nordic-it.appservice.v3");
+                w.WriteStartElement(typeof(P).Name.Replace("Parameters", ""), "com.nordic-it.appservice.v3");
                 w.WriteStartElement("parameters");
                 dcs.WriteObjectContent(w, parameters);
                 w.WriteEndElement();
@@ -123,14 +123,18 @@ namespace Mark5.ServiceReference.AppService
                     throw new SOAPException("Body not found.");
 
                 var response = body.FirstChild;
-                if (response.LocalName != soapAction + "Response")
+                if (response.LocalName != typeof(R).Name.Replace("Result", "Response"))
                     throw new SOAPException($"{soapAction}Response not found.");
 
                 var resultContent = response.InnerXml;
 
                 var dcs = new DataContractSerializer(typeof(R));
                 var sb = new StringReader(resultContent);
-                using (var r = XmlReader.Create(sb))
+                using (var r = XmlReader.Create(sb, new XmlReaderSettings
+                {
+                    CheckCharacters = false,
+                    ConformanceLevel = ConformanceLevel.Fragment
+                }))
                 {
                     var result = dcs.ReadObject(r);
                     return (R)result;
@@ -160,7 +164,11 @@ namespace Mark5.ServiceReference.AppService
 
                 var dcs = new DataContractSerializer(typeof(AppServiceFaultDetail));
                 var sb = new StringReader(faultDetailContent);
-                using (var r = XmlReader.Create(sb))
+                using (var r = XmlReader.Create(sb, new XmlReaderSettings
+                {
+                    CheckCharacters = false,
+                    ConformanceLevel = ConformanceLevel.Fragment
+                }))
                 {
                     var result = dcs.ReadObject(r);
                     faultDetail = (AppServiceFaultDetail)result;
@@ -232,7 +240,7 @@ namespace Mark5.ServiceReference.AppService
 
         public async Task<GetDefaultTemplateResult> GetDefaultTemplateAsync(GetDefaultTemplateParameters parameters, CancellationToken ct = default(CancellationToken))
         {
-            return await InvokeAsync<GetDefaultTemplateResult, GetDefaultTemplateParameters>("GetDefaultTemplate", parameters, ct);
+            return await InvokeAsync<GetDefaultTemplateResult, GetDefaultTemplateParameters>("GetDefaultTempalte", parameters, ct);
         }
 
         public async Task<GetContactPreviewsResult> GetContactPreviewsAsync(GetContactPreviewsParameters parameters, CancellationToken ct = default(CancellationToken))
