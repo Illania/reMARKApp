@@ -66,6 +66,7 @@ namespace SVProgressHUD
         public static double FadeInAnimationDuration { get; set; } = 0.15d;
         public static double FadeOutAnimationDuration { get; set; } = 0.15d;
         public static nfloat MaxSupportedWindowLevel { get; set; } = UIWindowLevel.Normal;
+        public static bool HapticsEnabled;
 
         #endregion
 
@@ -88,9 +89,9 @@ namespace SVProgressHUD
                 throw new InvalidOperationException("ProgressHUD was already initialized.");
 
 #if !SV_APP_EXTENSIONS
-            _instanceLazy = new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIApplication.SharedApplication.Delegate.GetWindow().Bounds); }, LazyThreadSafetyMode.ExecutionAndPublication);
+            _instanceLazy = new Lazy<ProgressHUD>(() => new ProgressHUD(UIApplication.SharedApplication.Delegate.GetWindow().Bounds), LazyThreadSafetyMode.ExecutionAndPublication);
 #else
-            _instanceLazy = new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds); }, LazyThreadSafetyMode.ExecutionAndPublication);
+            _instanceLazy = new Lazy<ProgressHUD>(() => new ProgressHUD(UIScreen.MainScreen.Bounds), LazyThreadSafetyMode.ExecutionAndPublication);
 #endif
         }
 
@@ -98,13 +99,7 @@ namespace SVProgressHUD
 
         #region Public properties
 
-        public bool Visible
-        {
-            get
-            {
-                return HudView.ContentView.Alpha > 0f;
-            }
-        }
+        public bool Visible { get { return HudView.ContentView.Alpha > 0f; } }
 
         #endregion
 
@@ -113,6 +108,7 @@ namespace SVProgressHUD
         // BEGIN: These fields should not be used
         // anywhere else then in private properties getters/setters
         NSTimer _fadeOutTimer;
+
         UIControl _controlView;
         UIView _backgroundView;
         RadialGradientLayer _backgroundRadialGradientLayer;
@@ -120,13 +116,19 @@ namespace SVProgressHUD
         UIVisualEffectView _hudVibrancyView;
         UILabel _statusLabel;
         UIImageView _imageView;
+
         UIView _indefiniteAnimatedView;
         ProgressAnimatedView _ringView;
         ProgressAnimatedView _backgroundRingView;
-        // END
 
-        float progress;
-        int activityCount;
+        float _progress;
+        int _activityCount;
+
+        float _visibleKeyboardHeight;
+        UIWindow _frontWindow;
+
+        UINotificationFeedbackGenerator _hapticGenerator;
+        // END
 
         NSTimer FadeOutTimer
         {
@@ -179,23 +181,27 @@ namespace SVProgressHUD
                 if (_backgroundView.Superview == null)
                     InsertSubviewBelow(_backgroundView, HudView);
 
-                switch (DefaultMaskType)
+                if (DefaultMaskType == MaskType.Gradient)
                 {
-                    case MaskType.Custom:
-                    case MaskType.Black:
-                        if (_backgroundRadialGradientLayer != null && _backgroundRadialGradientLayer.SuperLayer != null)
-                            _backgroundRadialGradientLayer.RemoveFromSuperLayer();
-                        _backgroundView.BackgroundColor = DefaultMaskType == MaskType.Custom ? BackgroundLayerColor : UIColor.FromWhiteAlpha(0f, 0.4f);
-                        break;
-                    case MaskType.Gradient:
-                        if (_backgroundRadialGradientLayer == null)
-                            _backgroundRadialGradientLayer = new RadialGradientLayer();
-                        if (_backgroundRadialGradientLayer.SuperLayer == null)
-                            _backgroundView.Layer.InsertSublayer(_backgroundRadialGradientLayer, 0);
-                        break;
-                    default:
+                    if (_backgroundRadialGradientLayer == null)
+                        _backgroundRadialGradientLayer = new RadialGradientLayer();
+
+                    if (_backgroundRadialGradientLayer.SuperLayer == null)
+                        _backgroundView.Layer.InsertSublayer(_backgroundRadialGradientLayer, 0);
+
+                    _backgroundView.BackgroundColor = UIColor.Clear;
+                }
+                else
+                {
+                    if (_backgroundRadialGradientLayer != null && _backgroundRadialGradientLayer.SuperLayer != null)
+                        _backgroundRadialGradientLayer.RemoveFromSuperLayer();
+
+                    if (DefaultMaskType == MaskType.Black)
+                        _backgroundView.BackgroundColor = UIColor.FromWhiteAlpha(0f, .4f);
+                    else if (DefaultMaskType == MaskType.Custom)
+                        _backgroundView.BackgroundColor = BackgroundLayerColor;
+                    else
                         _backgroundView.BackgroundColor = UIColor.Clear;
-                        break;
                 }
 
                 if (_backgroundView != null)
@@ -206,8 +212,9 @@ namespace SVProgressHUD
                     _backgroundRadialGradientLayer.Frame = Bounds;
 
                     var gradientCenter = Center;
-                    gradientCenter.Y = (Bounds.Size.Height - GetVisibleKeyboardHeight()) / 2;
+                    gradientCenter.Y = (Bounds.Size.Height - GetVisibleKeyboardHeight()) / 2f;
                     _backgroundRadialGradientLayer.GradientCenter = gradientCenter;
+                    _backgroundRadialGradientLayer.SetNeedsDisplay();
                 }
 
                 return _backgroundView;
@@ -263,7 +270,7 @@ namespace SVProgressHUD
             get
             {
                 if (_statusLabel == null)
-                    _statusLabel = new UILabel
+                    _statusLabel = new UILabel(CGRect.Empty)
                     {
                         BackgroundColor = UIColor.Clear,
                         AdjustsFontSizeToFitWidth = true,
@@ -309,7 +316,7 @@ namespace SVProgressHUD
                     }
 
                     if (_indefiniteAnimatedView == null)
-                        _indefiniteAnimatedView = new IndefiniteAnimatedView();
+                        _indefiniteAnimatedView = new IndefiniteAnimatedView(CGRect.Empty);
 
                     var iav = (IndefiniteAnimatedView)_indefiniteAnimatedView;
                     iav.StrokeColor = GetForegroundColorForStyle();
@@ -342,7 +349,7 @@ namespace SVProgressHUD
             get
             {
                 if (_ringView == null)
-                    _ringView = new ProgressAnimatedView();
+                    _ringView = new ProgressAnimatedView(CGRect.Empty);
 
                 _ringView.StrokeColor = GetForegroundColorForStyle();
                 _ringView.StrokeThickness = RingThickness;
@@ -357,13 +364,33 @@ namespace SVProgressHUD
             get
             {
                 if (_backgroundRingView == null)
-                    _backgroundRingView = new ProgressAnimatedView();
+                    _backgroundRingView = new ProgressAnimatedView(CGRect.Empty);
 
                 _backgroundRingView.StrokeColor = GetForegroundColorForStyle().ColorWithAlpha(0.1f);
                 _backgroundRingView.StrokeThickness = RingThickness;
                 _backgroundRingView.Radius = string.IsNullOrWhiteSpace(StatusLabel.Text) ? RingRadius : RingNoTextRadius;
 
                 return _backgroundRingView;
+            }
+        }
+
+        float Progress { get { return _progress; } set { _progress = value; } }
+
+        int ActivityCount { get { return _activityCount; } set { _activityCount = value; } }
+
+        UINotificationFeedbackGenerator HapticGenerator
+        {
+            get
+            {
+                if (_hapticGenerator == null)
+                {
+                    _hapticGenerator = new UINotificationFeedbackGenerator();
+                }
+                return _hapticGenerator;
+            }
+            set
+            {
+                _hapticGenerator = value;
             }
         }
 
@@ -375,7 +402,7 @@ namespace SVProgressHUD
             : base(frame)
         {
             UserInteractionEnabled = false;
-            activityCount = 0;
+            ActivityCount = 0;
 
             HudView.ContentView.Alpha = 0f;
             BackgroundView.Alpha = 0f;
@@ -383,15 +410,14 @@ namespace SVProgressHUD
 
         #endregion
 
-        #region Show methods
+        #region Master show/hide methods
 
-        public void Show(string status = null, float progress = UndefinedProgress)
+        public void ShowProgress(float progress = UndefinedProgress, string status = null)
         {
             var weakThis = new WeakReference<ProgressHUD>(this);
             NSOperationQueue.MainQueue.AddOperation(() =>
             {
-                ProgressHUD strongThis;
-                if (!weakThis.TryGetTarget(out strongThis)) return;
+                if (!weakThis.TryGetTarget(out ProgressHUD strongThis)) return;
 
                 strongThis.UpdateViewHierarchy();
 
@@ -399,11 +425,11 @@ namespace SVProgressHUD
                 strongThis.ImageView.Image = null;
 
                 if (strongThis.FadeOutTimer != null)
-                    strongThis.activityCount = 0;
+                    strongThis.ActivityCount = 0;
                 strongThis.FadeOutTimer = null;
 
                 strongThis.StatusLabel.Text = status;
-                strongThis.progress = progress;
+                strongThis.Progress = progress;
 
                 if (progress >= 0)
                 {
@@ -420,8 +446,10 @@ namespace SVProgressHUD
                     strongThis.RingView.StrokeEnd = progress;
                     CATransaction.Commit();
 
-                    if (progress <= 0)
-                        strongThis.activityCount++;
+#pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
+                    if (progress == 0)
+#pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
+                        strongThis.ActivityCount++;
                 }
                 else
                 {
@@ -432,54 +460,32 @@ namespace SVProgressHUD
                     if (strongThis.IndefiniteAnimatedView.RespondsToSelector(new Selector("startAnimating")))
                         strongThis.IndefiniteAnimatedView.PerformSelector(new Selector("startAnimating"));
 
-                    strongThis.activityCount++;
+                    strongThis.ActivityCount++;
                 }
 
-                ShowInternal();
+                strongThis.ShowStatus(status);
+
+                strongThis.HapticGenerator.Prepare();
             });
         }
 
-        public void ShowInfo(string status = null) => ShowImage(InfoImage, status);
-        public void ShowSuccess(string status = null) => ShowImage(SuccessImage, status);
-        public void ShowError(string status = null) => ShowImage(ErrorImage, status);
-
-        public void ShowImage(UIImage image, string status = null)
-        {
-            var weakThis = new WeakReference<ProgressHUD>(this);
-            NSOperationQueue.MainQueue.AddOperation(() =>
-            {
-                ProgressHUD strongThis;
-                if (!weakThis.TryGetTarget(out strongThis)) return;
-
-                strongThis.UpdateViewHierarchy();
-
-                strongThis.progress = UndefinedProgress;
-                strongThis.CancelRingLayerAnimation();
-                strongThis.CancelIndefiniteAnimatedViewAnimation();
-
-                var tintColor = strongThis.GetForegroundColorForStyle();
-                var tintedImage = image;
-                if (image.RenderingMode != UIImageRenderingMode.AlwaysTemplate)
-                    tintedImage = image.ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-                strongThis.ImageView.TintColor = tintColor;
-                strongThis.ImageView.Image = tintedImage;
-                strongThis.ImageView.Hidden = false;
-
-                strongThis.StatusLabel.Text = status;
-
-                strongThis.ShowInternal();
-
-                var duration = GetDisplayDurationForString(status);
-
-                strongThis.FadeOutTimer = NSTimer.CreateTimer(duration, nsTimer => Dismiss());
-                NSRunLoop.Main.AddTimer(strongThis.FadeOutTimer, NSRunLoopMode.Common);
-            });
-        }
-
-        void ShowInternal()
+        void ShowStatus(string status)
         {
             UpdateHudFrame();
             PositionHud(null);
+
+            if (DefaultMaskType != MaskType.None)
+            {
+                ControlView.UserInteractionEnabled = true;
+                AccessibilityLabel = status;
+                IsAccessibilityElement = true;
+            }
+            else
+            {
+                ControlView.UserInteractionEnabled = false;
+                HudView.AccessibilityLabel = status;
+                HudView.IsAccessibilityElement = true;
+            }
 
             ControlView.UserInteractionEnabled = DefaultMaskType != MaskType.None;
 
@@ -514,6 +520,8 @@ namespace SVProgressHUD
                         NSNotificationCenter.DefaultCenter.PostNotificationName(DidAppearNotification, this, GetNotificationUserInfo());
                     }
 
+                    UIAccessibility.PostNotification(UIAccessibilityPostNotification.ScreenChanged, null);
+                    UIAccessibility.PostNotification(UIAccessibilityPostNotification.Announcement, new NSString(status));
                 };
 
                 if (FadeInAnimationDuration > 0)
@@ -543,17 +551,15 @@ namespace SVProgressHUD
             var weakThis = new WeakReference<ProgressHUD>(this);
             NSOperationQueue.MainQueue.AddOperation(() =>
             {
-                ProgressHUD strongThis;
-                if (!weakThis.TryGetTarget(out strongThis))
+                if (!weakThis.TryGetTarget(out ProgressHUD strongThis))
                 {
-                    if (completionHandler != null)
-                        completionHandler();
+                    completionHandler?.Invoke();
                     return;
                 }
 
                 NSNotificationCenter.DefaultCenter.PostNotificationName(WillDisappearNotification, this, GetNotificationUserInfo());
 
-                strongThis.activityCount = 0;
+                strongThis.ActivityCount = 0;
 
                 Action animation = () =>
                 {
@@ -582,7 +588,7 @@ namespace SVProgressHUD
                         strongThis.HudView.RemoveFromSuperview();
                         strongThis.RemoveFromSuperview();
 
-                        strongThis.progress = UndefinedProgress;
+                        strongThis.Progress = UndefinedProgress;
                         strongThis.CancelRingLayerAnimation();
                         strongThis.CancelIndefiniteAnimatedViewAnimation();
 
@@ -595,8 +601,7 @@ namespace SVProgressHUD
                         vc.SetNeedsStatusBarAppearanceUpdate();
 #endif
 
-                        if (completionHandler != null)
-                            completionHandler();
+                        completionHandler?.Invoke();
                     }
                 };
 
@@ -663,11 +668,11 @@ namespace SVProgressHUD
                 labelWidth = (float)Math.Ceiling(labelRect.Width);
             }
 
-            var hudHeight = 0f;
             var hudWidth = 0f;
+            var hudHeight = 0f;
 
-            var contentHeight = 0f;
             var contentWidth = 0f;
+            var contentHeight = 0f;
 
             if (imageUsed || progressUsed)
             {
@@ -682,8 +687,7 @@ namespace SVProgressHUD
                 hudHeight += LabelSpacing;
 
             HudView.Bounds = new CGRect(0f, 0f, Math.Max(MinimumSize.Width, hudWidth), Math.Max(MinimumSize.Height, hudHeight));
-            HudVibrancyView.Bounds = new CGRect(0f, 0f, Math.Max(MinimumSize.Width, hudWidth), Math.Max(MinimumSize.Height, hudHeight));
-            HudVibrancyView.Frame = new CGRect(0f, 0f, HudVibrancyView.Frame.Width, HudVibrancyView.Frame.Height);
+            HudVibrancyView.Bounds = HudView.Bounds;
 
             CATransaction.Begin();
             CATransaction.DisableActions = true;
@@ -701,7 +705,7 @@ namespace SVProgressHUD
 
             IndefiniteAnimatedView.Center = new CGPoint(HudView.Bounds.GetMidX(), centerY);
 #pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
-            if (progress != UndefinedProgress)
+            if (Progress != UndefinedProgress)
 #pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
                 BackgroundRingView.Center = new CGPoint(HudView.Bounds.GetMidX(), centerY);
             ImageView.Center = new CGPoint(HudView.Bounds.GetMidX(), centerY);
@@ -739,7 +743,9 @@ namespace SVProgressHUD
 
             if (notification != null)
             {
+#pragma warning disable iOSAndMacApiUsageIssue // Find issues with Mac and iOS API usage
                 if (notification.Name == UIKeyboard.WillShowNotification || notification.Name == UIKeyboard.DidShowNotification)
+#pragma warning restore iOSAndMacApiUsageIssue // Find issues with Mac and iOS API usage
                 {
                     var keyboardInfo = notification.UserInfo;
                     var keyboardFrame = ((NSValue)keyboardInfo[UIKeyboard.FrameBeginUserInfoKey]).CGRectValue;
@@ -926,18 +932,20 @@ namespace SVProgressHUD
             if (string.IsNullOrWhiteSpace(str))
                 return MinimumDismissInterval;
 
-            var min = Math.Max(str.Length * 0.06 + 5, MinimumDismissInterval);
+            var min = Math.Max(str.Length * 0.06f + 5f, MinimumDismissInterval);
             return Math.Min(min, MaximumDismissInterval);
         }
 
         void RegisterNotifications()
         {
+#pragma warning disable iOSAndMacApiUsageIssue // Find issues with Mac and iOS API usage
             NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("positionHud:"), UIApplication.DidChangeStatusBarOrientationNotification, null);
             NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("positionHud:"), UIApplication.DidBecomeActiveNotification, null);
             NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("positionHud:"), UIKeyboard.WillShowNotification, null);
             NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("positionHud:"), UIKeyboard.DidShowNotification, null);
             NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("positionHud:"), UIKeyboard.WillHideNotification, null);
             NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("positionHud:"), UIKeyboard.DidHideNotification, null);
+#pragma warning restore iOSAndMacApiUsageIssue // Find issues with Mac and iOS API usage
         }
 
         [Export("controlViewDidReceiveTouchEvent:forEvent:")]
