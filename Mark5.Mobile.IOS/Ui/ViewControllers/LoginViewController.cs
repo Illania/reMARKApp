@@ -97,7 +97,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeHandlers();
 
-            NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.DidChangeFrameNotification, OnKeyboardDidChangeFrameNotification);
+            UIKeyboard.Notifications.ObserveDidChangeFrame((sender, e) => OnKeyboardDidChangeFrameNotification(e.Notification));
         }
 
         public override void ViewDidAppear(bool animated)
@@ -121,11 +121,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             authenticator = null;
 
             DeinitializeHandlers();
-
-            NSNotificationCenter.DefaultCenter.RemoveObservers(new[]
-                {
-                    UIKeyboard.DidChangeFrameNotification
-                });
         }
 
         #endregion
@@ -182,9 +177,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 backgroundFileName = Path.Combine("startscreens", "start-screen-bg-retinahd47.png");
             }
 
-            logoContainer = new UIView();
-            logoContainer.Opaque = false;
-            logoContainer.TranslatesAutoresizingMaskIntoConstraints = false;
+            logoContainer = new UIView
+            {
+                Opaque = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             logoContainer.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             logoContainer.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             logoContainer.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
@@ -199,11 +196,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(logoContainer, NSLayoutAttribute.Height, NSLayoutRelation.Equal, View, NSLayoutAttribute.Height, 1f, 0f)
                 });
 
-            logoImageView = new UIImageView();
-            logoImageView.Image = UIImage.FromBundle(logoFileName);
-            logoImageView.ContentMode = UIViewContentMode.ScaleAspectFit;
-            logoImageView.Opaque = false;
-            logoImageView.TranslatesAutoresizingMaskIntoConstraints = false;
+            logoImageView = new UIImageView
+            {
+                Image = UIImage.FromBundle(logoFileName),
+                ContentMode = UIViewContentMode.ScaleAspectFit,
+                Opaque = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             logoImageView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             logoImageView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             logoImageView.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
@@ -218,11 +217,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 });
 
 
-            var backgroundImageView = new UIImageView();
-            backgroundImageView.Image = UIImage.FromBundle(backgroundFileName);
-            backgroundImageView.ContentMode = UIViewContentMode.ScaleAspectFill;
-            backgroundImageView.Opaque = false;
-            backgroundImageView.TranslatesAutoresizingMaskIntoConstraints = false;
+            var backgroundImageView = new UIImageView
+            {
+                Image = UIImage.FromBundle(backgroundFileName),
+                ContentMode = UIViewContentMode.ScaleAspectFill,
+                Opaque = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             View.AddSubview(backgroundImageView);
             View.AddConstraints(new[]
                 {
@@ -247,15 +248,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeSubViews()
         {
-            usernameTextField = new UITextField();
-            usernameTextField.BorderStyle = UITextBorderStyle.RoundedRect;
-            usernameTextField.Font = Theme.DefaultFont;
-            usernameTextField.AutocapitalizationType = UITextAutocapitalizationType.AllCharacters;
-            usernameTextField.AutocorrectionType = UITextAutocorrectionType.No;
-            usernameTextField.ClearButtonMode = UITextFieldViewMode.WhileEditing;
-            usernameTextField.ReturnKeyType = UIReturnKeyType.Next;
-            usernameTextField.AttributedPlaceholder = new NSAttributedString(Localization.GetString("username"));
-            usernameTextField.TranslatesAutoresizingMaskIntoConstraints = false;
+            usernameTextField = new UITextField
+            {
+                BorderStyle = UITextBorderStyle.RoundedRect,
+                Font = Theme.DefaultFont,
+                AutocapitalizationType = UITextAutocapitalizationType.AllCharacters,
+                AutocorrectionType = UITextAutocorrectionType.No,
+                ClearButtonMode = UITextFieldViewMode.WhileEditing,
+                ReturnKeyType = UIReturnKeyType.Next,
+                AttributedPlaceholder = new NSAttributedString(Localization.GetString("username")),
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             View.AddSubview(usernameTextField);
             usernameTextFieldTopConstraint = NSLayoutConstraint.Create(usernameTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, logoImageView, NSLayoutAttribute.Bottom, 1f, TextFieldToLogoImageViewInitialDistance);
             View.AddConstraints(new[]
@@ -266,17 +269,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(usernameTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, TextFieldHeight)
                 });
 
-            passwordTextField = new UITextField();
-            passwordTextField.BorderStyle = UITextBorderStyle.RoundedRect;
-            passwordTextField.Font = Theme.DefaultFont;
-            passwordTextField.AutocapitalizationType = UITextAutocapitalizationType.None;
-            passwordTextField.AutocorrectionType = UITextAutocorrectionType.No;
-            passwordTextField.ClearsOnBeginEditing = true;
-            passwordTextField.ClearButtonMode = UITextFieldViewMode.WhileEditing;
-            passwordTextField.SecureTextEntry = true;
-            passwordTextField.ReturnKeyType = UIReturnKeyType.Next;
-            passwordTextField.AttributedPlaceholder = new NSAttributedString(Localization.GetString("password"));
-            passwordTextField.TranslatesAutoresizingMaskIntoConstraints = false;
+            passwordTextField = new UITextField
+            {
+                BorderStyle = UITextBorderStyle.RoundedRect,
+                Font = Theme.DefaultFont,
+                AutocapitalizationType = UITextAutocapitalizationType.None,
+                AutocorrectionType = UITextAutocorrectionType.No,
+                ClearsOnBeginEditing = true,
+                ClearButtonMode = UITextFieldViewMode.WhileEditing,
+                SecureTextEntry = true,
+                ReturnKeyType = UIReturnKeyType.Next,
+                AttributedPlaceholder = new NSAttributedString(Localization.GetString("password")),
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             View.AddSubview(passwordTextField);
             passwordTextFieldTopConstraint = NSLayoutConstraint.Create(passwordTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, usernameTextField, NSLayoutAttribute.Bottom, 1f, 50f);
             View.AddConstraints(new[]
@@ -287,15 +292,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(passwordTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, TextFieldHeight)
                 });
 
-            hostnameTextField = new UITextField();
-            hostnameTextField.BorderStyle = UITextBorderStyle.RoundedRect;
-            hostnameTextField.Font = Theme.DefaultFont;
-            hostnameTextField.AutocapitalizationType = UITextAutocapitalizationType.None;
-            hostnameTextField.AutocorrectionType = UITextAutocorrectionType.No;
-            hostnameTextField.ClearButtonMode = UITextFieldViewMode.WhileEditing;
-            hostnameTextField.ReturnKeyType = UIReturnKeyType.Next;
-            hostnameTextField.AttributedPlaceholder = new NSAttributedString(Localization.GetString("hostname"));
-            hostnameTextField.TranslatesAutoresizingMaskIntoConstraints = false;
+            hostnameTextField = new UITextField
+            {
+                BorderStyle = UITextBorderStyle.RoundedRect,
+                Font = Theme.DefaultFont,
+                AutocapitalizationType = UITextAutocapitalizationType.None,
+                AutocorrectionType = UITextAutocorrectionType.No,
+                ClearButtonMode = UITextFieldViewMode.WhileEditing,
+                ReturnKeyType = UIReturnKeyType.Next,
+                AttributedPlaceholder = new NSAttributedString(Localization.GetString("hostname")),
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             View.AddSubview(hostnameTextField);
             hostnameTextFieldTopConstraint = NSLayoutConstraint.Create(hostnameTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, passwordTextField, NSLayoutAttribute.Bottom, 1f, TextFieldToTextFieldInitialDistance);
             View.AddConstraints(new[]
@@ -306,16 +313,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NSLayoutConstraint.Create(hostnameTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, TextFieldHeight)
                 });
 
-            portTextField = new UITextField();
-            portTextField.BorderStyle = UITextBorderStyle.RoundedRect;
-            portTextField.Font = Theme.DefaultFont;
-            portTextField.AutocapitalizationType = UITextAutocapitalizationType.None;
-            portTextField.AutocorrectionType = UITextAutocorrectionType.No;
-            portTextField.ClearButtonMode = UITextFieldViewMode.WhileEditing;
-            portTextField.KeyboardType = UIKeyboardType.NumberPad;
-            portTextField.ReturnKeyType = UIReturnKeyType.Go;
-            portTextField.AttributedPlaceholder = new NSAttributedString(Localization.GetString("port"));
-            portTextField.TranslatesAutoresizingMaskIntoConstraints = false;
+            portTextField = new UITextField
+            {
+                BorderStyle = UITextBorderStyle.RoundedRect,
+                Font = Theme.DefaultFont,
+                AutocapitalizationType = UITextAutocapitalizationType.None,
+                AutocorrectionType = UITextAutocorrectionType.No,
+                ClearButtonMode = UITextFieldViewMode.WhileEditing,
+                KeyboardType = UIKeyboardType.NumberPad,
+                ReturnKeyType = UIReturnKeyType.Go,
+                AttributedPlaceholder = new NSAttributedString(Localization.GetString("port")),
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             View.AddSubview(portTextField);
             portTextFieldTopConstraint = NSLayoutConstraint.Create(portTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, hostnameTextField, NSLayoutAttribute.Bottom, 1f, TextFieldToTextFieldInitialDistance);
             View.AddConstraints(new[]
@@ -496,6 +505,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             Action dismissAction = null;
 
+            var hapticGenerator = new UINotificationFeedbackGenerator();
+            hapticGenerator.Prepare();
+
             try
             {
                 var username = usernameTextField.Text;
@@ -510,6 +522,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     errors = true;
                     await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("wrong_username_title"), Localization.GetString("wrong_username_summary"));
+
+                    hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
                 }
                 else if (!Validator.IsPasswordValid(password))
                 {
@@ -517,6 +531,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     errors = true;
                     await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("wrong_password_title"), Localization.GetString("wrong_password_summary"));
+
+                    hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
                 }
                 else if (!Validator.IsHostNameValid(hostname))
                 {
@@ -524,6 +540,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     errors = true;
                     await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("wrong_hostname_title"), Localization.GetString("wrong_hostname_summary"));
+
+                    hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
                 }
                 else if (!Validator.IsPortValid(port))
                 {
@@ -531,6 +549,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     errors = true;
                     await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("wrong_port_title"), Localization.GetString("wrong_port_summary"));
+
+                    hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
                 }
 
                 if (errors)
@@ -539,16 +559,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return;
                 }
 
-                if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("warning"), Localization.GetString("warning_ssl_off"), Localization.GetString("continue"), Localization.GetString("cancel")))
+                if (sslMode == SslMode.Off)
                 {
-                    loginButton.TouchUpInside += LoginButton_TouchUpInside;
-                    return;
+                    hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
+
+                    if (!await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("warning"), Localization.GetString("warning_ssl_off"), Localization.GetString("continue"), Localization.GetString("cancel")))
+                    {
+                        loginButton.TouchUpInside += LoginButton_TouchUpInside;
+                        return;
+                    }
                 }
 
-                if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("warning"), Localization.GetString("warning_selfsigned_on"), Localization.GetString("continue"), Localization.GetString("cancel")))
+                if (sslMode == SslMode.AllowSelfSigned)
                 {
-                    loginButton.TouchUpInside += LoginButton_TouchUpInside;
-                    return;
+                    hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
+
+                    if (!await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("warning"), Localization.GetString("warning_selfsigned_on"), Localization.GetString("continue"), Localization.GetString("cancel")))
+                    {
+                        loginButton.TouchUpInside += LoginButton_TouchUpInside;
+                        return;
+                    }
                 }
 
                 CommonConfig.Logger.Info($"Logging in... [username={username}, hostname={hostname}, port={port}, ssl={sslMode}]");
@@ -615,7 +645,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Info($"Logged in - will present {nameof(SplitMainViewController)}");
 
-                if (dismissAction != null) dismissAction();
+                dismissAction?.Invoke();
 
                 UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) => { });
 
@@ -635,7 +665,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             catch (Exception ex)
             {
-                if (dismissAction != null) dismissAction();
+                dismissAction?.Invoke();
 
                 CommonConfig.Logger.Error("Log in failed - exception", ex);
 
@@ -643,6 +673,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.Logger.Error("Log in failed - inner exception", ex.InnerException);
 
                 await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("login_failed"), Localization.GetString("login_failed_desc"));
+
+                hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error);
 
                 usernameTextField.BecomeFirstResponder();
 
