@@ -5,7 +5,6 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
-using System;
 
 #pragma warning disable CS1701
 namespace Mark5.ServiceReference
@@ -13,6 +12,8 @@ namespace Mark5.ServiceReference
     
     public static class Config
     {
+
+        public const int HttpClientShortTimeoutSeconds = 5;
 
         public const int HttpClientTimeoutSeconds = 60;
     }
