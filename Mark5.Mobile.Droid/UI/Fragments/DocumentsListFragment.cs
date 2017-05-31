@@ -1090,6 +1090,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             bool unreadIndicatorMe = PlatformConfig.Preferences.UnreadIndicatorMe;
             bool compactList = PlatformConfig.Preferences.CompactDocumentsList;
+            bool showCreatorOutgoing = PlatformConfig.Preferences.ShowCreatorOutgoing;
 
             int? swipedPosition;
             int swipedDirection;
@@ -1131,7 +1132,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
                     else
                     {
-                        if (PlatformConfig.Preferences.ShowCreatorOutgoing)
+                        if (showCreatorOutgoing)
                         {
                             dpvh.Recipent = dp.Creator;
                         }
