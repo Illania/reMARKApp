@@ -20,6 +20,7 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
@@ -51,6 +52,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         FloatingActionButton fab;
         List<int> recoveredSelectedItemsPosition;
 
+        protected virtual bool LoadRemoteFromCache { get; }
         protected FolderListAdapter CurrentAdapter
         {
             get { return SearchEnabled ? SearchAdapter : Adapter; }
@@ -250,16 +252,40 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (forceRefresh || !RemoteFolder.SubFolders.Any())
             {
-                try
+                List<Folder> remoteFolders = null;
+
+                if (LoadRemoteFromCache)
                 {
-                    var remoteFolders = await Managers.FoldersManager.GetFoldersAsync(RemoteFolder);
+                    try
+                    {
+                        remoteFolders = await Managers.FoldersManager.GetFoldersAsync(RemoteFolder, sourceType: SourceType.Local);
+                    }
+                    catch (DataNotFoundException)
+                    {
+                        // Do nothing
+                    }
+                    catch (Exception ex)
+                    {
+                        CommonConfig.Logger.Error($"Retrieving folders from cache only failed [folder.name={RemoteFolder.Name}, folder.id={RemoteFolder.Id}]", ex);
+                    }
+                }
+
+                if (remoteFolders == null)
+                {
+                    try
+                    {
+                        remoteFolders = await Managers.FoldersManager.GetFoldersAsync(RemoteFolder);
+                    }
+                    catch (Exception ex)
+                    {
+                        CommonConfig.Logger.Error($"Downloading folders failed [folder.name={RemoteFolder.Name}, folder.id={RemoteFolder.Id}]", ex);
+                        await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                    }
+                }
+
+                if (remoteFolders != null)
                     Adapter.Refresh(remoteFolders, Section.Remote);
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error($"Downloading folders failed [folder.name={RemoteFolder.Name}, folder.id={RemoteFolder.Id}]", ex);
-                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                }
+
             }
             else
             {

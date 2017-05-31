@@ -28,6 +28,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Move,
         };
 
+        protected override bool LoadRemoteFromCache { get { return true; } }
+
         public List<IBusinessEntity> BusinessEntities { get; set; }
         public Folder FromFolder { get; set; }
         public ActionType Type { get; set; }
