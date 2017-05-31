@@ -60,6 +60,17 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
+			<string>show_creator_outgoing</string>
+			<key>Key</key>
+			<string>ShowCreatorOutgoing</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
 			<string>compact_documents_list</string>
 			<key>Key</key>
 			<string>CompactDocumentsList</string>
@@ -73,18 +84,6 @@
 			<string>use_server_timezone</string>
 			<key>Key</key>
 			<string>UseServerTimezone</string>
-			<key>DefaultValue</key>
-			<false/>
-		</dict>
-
-
-		<dict>
-			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-			<key>Title</key>
-			<string>show_creator_outgoing</string>
-			<key>Key</key>
-			<string>ShowCreatorOutgoing</string>
 			<key>DefaultValue</key>
 			<false/>
 		</dict>

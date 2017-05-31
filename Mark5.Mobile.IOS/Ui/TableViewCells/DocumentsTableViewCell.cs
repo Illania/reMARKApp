@@ -30,6 +30,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static readonly NSString Key = new NSString("DocumentsTableViewCell");
 
         UIColor[] categoriesColors;
+        bool unreadIndicatorMe;
+        bool showCreatorOutgoing;
 
         public DocumentsTableViewCell(IntPtr handle)
             : base(handle)
@@ -42,6 +44,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             cell.SenderNameLabel.Font = Theme.DefaultBoldFont;
             cell.DateReceivedLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
             cell.MessagePreviewLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
+            cell.unreadIndicatorMe = PlatformConfig.Preferences.UnreadIndicatorMe;
+            cell.showCreatorOutgoing = PlatformConfig.Preferences.ShowCreatorOutgoing;
+
             return cell;
         }
 
@@ -56,7 +61,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             }
             else
             {
-                if (PlatformConfig.Preferences.ShowCreatorOutgoing)
+                if (showCreatorOutgoing)
                 {
                     SenderNameLabel.Text = documentPreview.Creator;
                 }
@@ -96,7 +101,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             }
 
             IndicatorImageView1.Image = directionIcon;
-            IndicatorImageView2.Image = (PlatformConfig.Preferences.UnreadIndicatorMe ? documentPreview.IsReadByCurrent : documentPreview.IsReadByAnyone) ? null : UIImage.FromBundle(Path.Combine("icons", "full-dot.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            IndicatorImageView2.Image = (unreadIndicatorMe ? documentPreview.IsReadByCurrent : documentPreview.IsReadByAnyone) ? null : UIImage.FromBundle(Path.Combine("icons", "full-dot.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             IndicatorImageView3.Image = documentPreview.AttachmentsCount > 0 ? UIImage.FromBundle(Path.Combine("icons", "attachment-small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate) : null;
             IndicatorImageView4.Image = documentPreview.CommentsCount > 0 ? UIImage.FromBundle(Path.Combine("icons", "message-small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate) : null;
         }
