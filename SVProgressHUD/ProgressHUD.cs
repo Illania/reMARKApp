@@ -564,7 +564,7 @@ namespace SVProgressHUD
                     else
                     {
                         strongThis.HudView.Effect = null;
-                        strongThis.HudVibrancyView = null;
+                        strongThis.HudVibrancyView.Effect = null;
                     }
 
                     strongThis.HudView.ContentView.Alpha = 0f;
