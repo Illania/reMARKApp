@@ -34,6 +34,14 @@ namespace Mark5.Mobile.Droid.Utilities
 
         #region Documents
 
+        public bool ShowCreatorOutgoing
+        {
+            get
+            {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_show_creator_outgoing), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_show_creator_outgoing_default));
+            }
+        }
+
         public bool UseServerTimeZone
         {
             get
