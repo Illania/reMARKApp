@@ -93,11 +93,6 @@ namespace SVProgressHUD
 
         CAShapeLayer indefiniteAnimatedLayer;
 
-        public IndefiniteAnimatedView(CGRect frame)
-            : base(frame)
-        {
-        }
-
         public override void WillMoveToSuperview(UIView newsuper)
         {
             if (newsuper != null)

@@ -156,7 +156,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 try
                 {
                     await Managers.CommonActionsManager.CopyToWorktray(BusinessEntities);
-                    await Task.Delay(2000);
                     dismissAction();
                 }
                 catch (Exception ex)
