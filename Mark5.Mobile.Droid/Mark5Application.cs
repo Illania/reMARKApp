@@ -53,6 +53,7 @@ namespace Mark5.Mobile.Droid
                 CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
                 CommonConfig.HttpClientHandler = () => { return new AndroidClientHandler(); };
                 CommonConfig.PhonebookUtilities = new PhonebookUtilities();
+                CommonConfig.Utf8Normalizer = s => s;
 
 #if !DEBUG
                 CommonConfig.Logger.Level = LogLevel.INFO;
