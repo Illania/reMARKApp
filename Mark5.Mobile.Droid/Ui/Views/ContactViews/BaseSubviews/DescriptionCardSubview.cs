@@ -18,7 +18,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
     {
 
         readonly AppCompatTextView titleTextView;
-        readonly AppCompatTextView contentTextView;
+        protected readonly AppCompatTextView ContentTextView;
 
         public string Title
         {
@@ -32,7 +32,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         {
             set
             {
-                contentTextView.Text = value;
+                ContentTextView.Text = value;
             }
         }
 
@@ -47,9 +47,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             LongClickable = true;
             LongClick += (sender, e) =>
             {
-                if (!string.IsNullOrWhiteSpace(contentTextView.Text))
+                if (!string.IsNullOrWhiteSpace(ContentTextView.Text))
                 {
-                    Integration.CopyToClipboard(context, contentTextView.Text);
+                    Integration.CopyToClipboard(context, ContentTextView.Text);
                 }
             };
 
@@ -57,9 +57,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             AddView(titleTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
-            contentTextView = new AppCompatTextView(context);
-            contentTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
-            AddView(contentTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+            ContentTextView = new AppCompatTextView(context);
+            ContentTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
+            AddView(ContentTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
         }
     }
 
