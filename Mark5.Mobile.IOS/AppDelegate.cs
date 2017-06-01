@@ -236,17 +236,21 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
                 CommonConfig.HttpClientHandler = () => { return new NativeMessageHandler(); };
                 CommonConfig.PhonebookUtilities = new PhonebookUtilities();
-                CommonConfig.Utf8Normalizer = filename =>
-                {
-                    var url = NSUrl.FromFilename(filename);
-                    var fsPtr = url.GetFileSystemRepresentationAsUtf8Ptr;
-                    var numBytes = 0;
-                    while (Marshal.ReadByte(fsPtr, numBytes) != 0)
-                        numBytes++;
-                    var utf8Bytes = new byte[numBytes];
-                    Marshal.Copy(fsPtr, utf8Bytes, 0, numBytes);
-                    return Encoding.UTF8.GetString(utf8Bytes).SafeSubstringAfterLast(Path.DirectorySeparatorChar);
-                };
+
+                if (UIDevice.CurrentDevice.CheckSystemVersion(10, 3))
+                    CommonConfig.Utf8Normalizer = filename =>
+                    {
+                        var url = NSUrl.FromFilename(filename);
+                        var fsPtr = url.GetFileSystemRepresentationAsUtf8Ptr;
+                        var numBytes = 0;
+                        while (Marshal.ReadByte(fsPtr, numBytes) != 0)
+                            numBytes++;
+                        var utf8Bytes = new byte[numBytes];
+                        Marshal.Copy(fsPtr, utf8Bytes, 0, numBytes);
+                        return Encoding.UTF8.GetString(utf8Bytes).SafeSubstringAfterLast(Path.DirectorySeparatorChar);
+                    };
+                else
+                    CommonConfig.Utf8Normalizer = filename => filename;
 
 #if !DEBUG
                 CommonConfig.Logger.Level = LogLevel.INFO;
