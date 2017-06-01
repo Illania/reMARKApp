@@ -38,14 +38,14 @@ namespace Mark5.ServiceReference.AppService
             requestUri = $"{(ssl ? "https" : "http")}://{hostname}:{port}/app3";
         }
 
-        async Task<R> InvokeAsync<R, P>(string soapAction, P parameters, CancellationToken ct) where R : class where P : class
+        async Task<R> InvokeAsync<R, P>(string soapAction, P parameters, CancellationToken ct, bool useShortTimeout = false) where R : class where P : class
         {
             HttpStatusCode statusCode = 0;
             try
             {
                 using (var c = new HttpClient(httpClientHandler())
                 {
-                    Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
+                    Timeout = TimeSpan.FromSeconds(useShortTimeout ? Config.HttpClientShortTimeoutSeconds : Config.HttpClientTimeoutSeconds)
                 })
                 {
                     var req = CreateRequest(soapAction, parameters);
@@ -430,7 +430,7 @@ namespace Mark5.ServiceReference.AppService
 
         public async Task<TestResult> TestAsync(TestParameters parameters, CancellationToken ct = default(CancellationToken))
         {
-            return await InvokeAsync<TestResult, TestParameters>("Test", parameters, ct);
+            return await InvokeAsync<TestResult, TestParameters>("Test", parameters, ct, true);
         }
     }
 }

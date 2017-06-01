@@ -125,7 +125,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public static Action ShowInfiniteProgressDialog(string content)
         {
-            ProgressHUD.Instance.Show(Localization.GetString(content));
+            ProgressHUD.Instance.ShowProgress(Localization.GetString(content));
             return ProgressHUD.Instance.Dismiss;
         }
 
@@ -135,6 +135,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public static Task ShowErrorDialogAsync(UIViewController vc, Exception ex)
         {
+            var hapticGenerator = new UINotificationFeedbackGenerator();
+            hapticGenerator.Prepare();
+
             var tcs = new TaskCompletionSource<bool>();
             var alert = UIAlertController.Create(GetErrorTitle(ex), GetErrorContent(ex), UIAlertControllerStyle.Alert);
             alert.AddAction(UIAlertAction.Create(Localization.GetString("ok"), UIAlertActionStyle.Default, a => tcs.SetResult(true)));
@@ -164,12 +167,15 @@ namespace Mark5.Mobile.IOS.Ui.Common
                     }, TaskScheduler.FromCurrentSynchronizationContext());
                 }));
             }
-            vc.PresentViewController(alert, true, null);
+            vc.PresentViewController(alert, true, () => hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error));
             return tcs.Task;
         }
 
         public static void ShowErrorDialog(UIViewController vc, Exception ex)
         {
+            var hapticGenerator = new UINotificationFeedbackGenerator();
+            hapticGenerator.Prepare();
+
             var alert = UIAlertController.Create(GetErrorTitle(ex), GetErrorContent(ex), UIAlertControllerStyle.Alert);
             alert.AddAction(UIAlertAction.Create(Localization.GetString("ok"), UIAlertActionStyle.Default, null));
             if (ShouldShowCreateReport(ex))
@@ -191,7 +197,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                     }, TaskScheduler.FromCurrentSynchronizationContext());
                 }));
             }
-            vc.PresentViewController(alert, true, null);
+            vc.PresentViewController(alert, true, () => hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error));
         }
 
         static string GetErrorTitle(Exception ex)
