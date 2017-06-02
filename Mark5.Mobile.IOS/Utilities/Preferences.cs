@@ -26,6 +26,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         class Keys
         {
+            public const string ShowCreatorOutgoing = "ShowCreatorOutgoing";
             public const string UseServerTimezoneKey = "UseServerTimezone";
             public const string DocumentsToDownloadKey = "DocumentsToDownload";
             public const string UnreadIndicatorMeKey = "UnreadIndicatorMe";
@@ -70,6 +71,7 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             var defaultsDictionary = new NSMutableDictionary
             {
+                { new NSString(Keys.ShowCreatorOutgoing), NSNumber.FromBoolean(false) },
                 { new NSString(Keys.UseServerTimezoneKey), NSNumber.FromBoolean(false) },
                 { new NSString(Keys.DocumentsToDownloadKey), NSNumber.FromInt16(250) },
                 { new NSString(Keys.UnreadIndicatorMeKey), NSNumber.FromBoolean(true) },
@@ -112,6 +114,15 @@ namespace Mark5.Mobile.IOS.Utilities
                 return dict;
             }
         }
+
+        public bool ShowCreatorOutgoing
+        {
+            get
+            {
+                return ud.BoolForKey(Keys.ShowCreatorOutgoing);
+            }
+        }
+
 
         public bool UseServerTimezone
         {

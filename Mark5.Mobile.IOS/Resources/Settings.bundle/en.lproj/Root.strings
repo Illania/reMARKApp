@@ -49,6 +49,7 @@
 "server" = "Server";
 "shortcodes" = "Shortcodes";
 "shortcodes_to_search" = "Shortcodes search results";
+"show_creator_outgoing" = "Show creator for outgoing documents";
 "ssl" = "SSL";
 "synchronise_contacts" = "Synchronise contacts";
 "synchronise_shortcodes" = "Synchronise shortcodes";
