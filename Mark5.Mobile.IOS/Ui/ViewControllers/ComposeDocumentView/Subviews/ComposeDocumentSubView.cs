@@ -8,6 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
@@ -22,6 +23,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public DocumentPreview PreviousDocumentPreview { get; set; }
         public Document PreviousDocument { get; set; }
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
+        public CopyToNewOptions CopyToNewOptions { get; set; }
 
         protected float MinimumHeight = 21f;
         protected float HorizontalMargin = 15f;

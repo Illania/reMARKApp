@@ -180,6 +180,7 @@
     <Compile Include="Extensions\ModuleTypeExtensions.cs" />
     <Compile Include="Model\GuidValue.cs" />
     <Compile Include="Model\IAttachmentDescription.cs" />
+    <Compile Include="Model\Support\CopyToNewOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />

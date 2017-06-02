@@ -16,6 +16,7 @@ using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -68,7 +69,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 return Task.CompletedTask;
             }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.Forward)
+            if (CreationModeFlag == DocumentCreationModeFlag.Forward || CreationModeFlag == DocumentCreationModeFlag.New
+                && (CopyToNewOptions == CopyToNewOptions.KeepOnlyAttachments || CopyToNewOptions == CopyToNewOptions.KeepTextAndAttachments))
             {
                 foreach (var attachmentDescription in PreviousDocument.Attachments)
                     AddAttachment(attachmentDescription);

@@ -24,6 +24,7 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews;
@@ -50,6 +51,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public string[] PreconfiguredEmailToAddresses { get; set; }
         public string[] PreconfiguredEmailCcAddresses { get; set; }
         public string[] PreconfiguredEmailBccAddresses { get; set; }
+        public CopyToNewOptions CopyToNewOptions { get; set; } //Ignored if CreationModeFlag != New
         public Action CloseRequest { get; set; }
 
         Document PreviousDocument { get; set; }
@@ -231,8 +233,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null)
-                    CloseRequest();
+                CloseRequest?.Invoke();
             }
         }
 
@@ -250,6 +251,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 subView.PreviousDocument = PreviousDocument;
                 subView.PreviousDocumentPreview = PreviousDocumentPreview;
                 subView.CreationModeFlag = CreationModeFlag;
+                subView.CopyToNewOptions = CopyToNewOptions;
                 await subView.RefreshView();
             }
 
@@ -905,7 +907,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 LocalDocument = LocalDocument,
                 OutgoingDocumentOriginalCreationModeFlag = OutgoingDocumentOriginalCreationModeFlag,
                 OutgoingDocumentState = OutgoingDocumentState,
-                OutgoingDocumentInitialAttachments = OutgoingDocumentInitialAttachments
+                OutgoingDocumentInitialAttachments = OutgoingDocumentInitialAttachments,
+                CopyToNewOptions = CopyToNewOptions,
             };
         }
 
@@ -935,6 +938,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 OutgoingDocumentOriginalCreationModeFlag = cfs.OutgoingDocumentOriginalCreationModeFlag;
                 OutgoingDocumentState = cfs.OutgoingDocumentState;
                 OutgoingDocumentInitialAttachments = cfs.OutgoingDocumentInitialAttachments;
+                CopyToNewOptions = cfs.CopyToNewOptions;
             }
         }
 
@@ -959,6 +963,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public DocumentCreationModeFlag CreationModeFlag { get; set; }
             public List<OutgoingDocumentAttachmentDescription> OutgoingDocumentInitialAttachments { get; set; }
             public DocumentCreationModeFlag OutgoingDocumentOriginalCreationModeFlag { get; set; }
+            public CopyToNewOptions CopyToNewOptions { get; set; }
             public IComposeDocumentViewState ToState { get; set; }
             public IComposeDocumentViewState CcState { get; set; }
             public IComposeDocumentViewState BccState { get; set; }

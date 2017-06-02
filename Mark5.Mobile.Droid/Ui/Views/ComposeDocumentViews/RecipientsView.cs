@@ -25,6 +25,7 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.PortableCollections;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -132,13 +133,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 return Task.CompletedTask;
             }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.New || CreationModeFlag == DocumentCreationModeFlag.None
+            if (CreationModeFlag == DocumentCreationModeFlag.None
                 || CreationModeFlag == DocumentCreationModeFlag.Forward)
             {
                 return Task.CompletedTask;
             }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.Edit)
+            if (CreationModeFlag == DocumentCreationModeFlag.Edit || (CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOptions.KeepOnlyAddresses))
             {
                 SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
             }
