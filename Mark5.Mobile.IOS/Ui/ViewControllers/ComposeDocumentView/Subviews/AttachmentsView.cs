@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -78,7 +79,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             attachmentsDescription.Clear();
             stackView.Subviews.OfType<AttachmentsSubView>().ForEach(v => v.RemoveFromSuperview());
 
-            if (CreationModeFlag == DocumentCreationModeFlag.Forward || CreationModeFlag == DocumentCreationModeFlag.Edit)
+            if (CreationModeFlag == DocumentCreationModeFlag.Forward || CreationModeFlag == DocumentCreationModeFlag.Edit
+                || CreationModeFlag == DocumentCreationModeFlag.New
+                && (CopyToNewOptions == CopyToNewOptions.KeepOnlyAttachments || CopyToNewOptions == CopyToNewOptions.KeepTextAndAttachments))
             {
                 foreach (var attachmentDescription in PreviousDocument.Attachments)
                 {

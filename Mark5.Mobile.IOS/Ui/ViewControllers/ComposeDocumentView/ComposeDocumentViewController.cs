@@ -15,6 +15,7 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
@@ -45,6 +46,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public string[] PreconfiguredEmailAddresses { get; set; }
         public Shortcode PreConfiguredShortcode;
         public Document PreviousDocument { get; set; }
+        public CopyToNewOptions CopyToNewOptions { get; set; }
 
         public DocumentPreview PreviousDocumentPreview { get; set; }
 
@@ -396,6 +398,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 subView.PreviousDocument = PreviousDocument;
                 subView.PreviousDocumentPreview = PreviousDocumentPreview;
                 subView.CreationModeFlag = CreationModeFlag;
+                subView.CopyToNewOptions = CopyToNewOptions;
                 await subView.RefreshView();
             }
 

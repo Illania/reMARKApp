@@ -25,6 +25,7 @@ using Java.Interop;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -146,7 +147,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             await SetNewHtmlContentAsync(DefaultEditContent);
 
-            if (CreationModeFlag == DocumentCreationModeFlag.Edit)
+            if (CreationModeFlag == DocumentCreationModeFlag.Edit
+                || CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOptions.KeepTextAndAttachments)
             {
                 if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
                 {
