@@ -133,7 +133,7 @@ namespace Mark5.Mobile.IOS
 
         public override void ReceiveMemoryWarning(UIApplication application)
         {
-            CommonConfig.Logger.Warning("Received memery warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
         }
