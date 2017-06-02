@@ -378,16 +378,6 @@ namespace Mark5.Mobile.Common.Storage
             return identifiers;
         }
 
-        static async Task<IFolder> GetOutgoingAttachmentsFolderAsync(Guid id)
-        {
-            return await (await GetOutgoingFolderAsync(id)).CreateFolderAsync(Filenames.OutgoingAttachmentFolder, CreationCollisionOption.OpenIfExists);
-        }
-
-        static async Task<bool> OutgoingFolderExistsAsync(Guid id)
-        {
-            return await CommonConfig.OutgoingFolder.CheckExistsAsync(id.ToString()) == ExistenceCheckResult.FolderExists;
-        }
-
         public static async Task DeleteOutgoingDocumentFolderAsync(Guid id)
         {
             var folderExists = await CommonConfig.OutgoingFolder.CheckExistsAsync(id.ToString()) == ExistenceCheckResult.FolderExists;
@@ -468,6 +458,16 @@ namespace Mark5.Mobile.Common.Storage
             await lockFile?.DeleteAsync();
         }
 
+        static async Task<IFolder> GetOutgoingAttachmentsFolderAsync(Guid id)
+        {
+            return await (await GetOutgoingFolderAsync(id)).CreateFolderAsync(Filenames.OutgoingAttachmentFolder, CreationCollisionOption.OpenIfExists);
+        }
+
+        static async Task<bool> OutgoingFolderExistsAsync(Guid id)
+        {
+            return await CommonConfig.OutgoingFolder.CheckExistsAsync(id.ToString()) == ExistenceCheckResult.FolderExists;
+        }
+
         static async Task<IFolder> GetOutgoingFolderAsync(Guid id)
         {
             return await CommonConfig.OutgoingFolder.CreateFolderAsync(id.ToString(), CreationCollisionOption.OpenIfExists);
@@ -541,7 +541,7 @@ namespace Mark5.Mobile.Common.Storage
 
             var folder = await CommonConfig.AttachmentsFolder.GetFolderAsync(attachmentDescription.Id.ToString());
 
-            var file = await folder.CreateFileAsync(attachmentDescription.SafeName, CreationCollisionOption.ReplaceExisting, ct);
+            var file = await folder.CreateFileAsync(CommonConfig.Utf8Normalizer(attachmentDescription.SafeName), CreationCollisionOption.ReplaceExisting, ct);
             using (var fileStream = await file.OpenAsync(PCLStorage.FileAccess.ReadAndWrite))
                 await attachmentStream.CopyToAsync(fileStream);
 
@@ -556,11 +556,11 @@ namespace Mark5.Mobile.Common.Storage
 
             var folder = await CommonConfig.AttachmentsFolder.GetFolderAsync(attachmentDescription.Id.ToString());
 
-            var fileExists = await folder.CheckExistsAsync(attachmentDescription.SafeName);
+            var fileExists = await folder.CheckExistsAsync(CommonConfig.Utf8Normalizer(attachmentDescription.SafeName));
             if (fileExists != ExistenceCheckResult.FileExists)
                 return string.Empty;
 
-            return CommonConfig.AttachmentsFolder.Path + CommonConfig.PathSeparator + attachmentDescription.Id + CommonConfig.PathSeparator + attachmentDescription.SafeName;
+            return CommonConfig.AttachmentsFolder.Path + CommonConfig.PathSeparator + attachmentDescription.Id + CommonConfig.PathSeparator + CommonConfig.Utf8Normalizer(attachmentDescription.SafeName);
         }
 
         #endregion

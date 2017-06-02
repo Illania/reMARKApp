@@ -31,33 +31,39 @@ namespace Mark5.Mobile.Common.Utilities
             return str.Substring(startIndex, length);
         }
 
-        public static string SafeSubstringBefore(this string str, string value, StringComparison comparisonType = StringComparison.CurrentCulture)
+        public static string SafeSubstringBefore(this string str, string v, StringComparison comparisonType = StringComparison.CurrentCulture)
         {
-            var index = str.IndexOf(value, comparisonType);
+            var index = str.IndexOf(v, comparisonType);
             return index > 0 ? str.SafeSubstring(0, index) : str;
         }
 
-        public static string SafeSubstringBeforeLast(this string str, string value, StringComparison comparisonType = StringComparison.CurrentCulture)
+        public static string SafeSubstringBeforeLast(this string str, string v, StringComparison comparisonType = StringComparison.CurrentCulture)
         {
-            var index = str.LastIndexOf(value, comparisonType);
+            var index = str.LastIndexOf(v, comparisonType);
             return index > 0 ? str.SafeSubstring(0, index) : str;
         }
 
-        public static string SafeSubstringAfter(this string str, string value, StringComparison comparisonType = StringComparison.CurrentCulture)
+        public static string SafeSubstringAfter(this string str, string v, StringComparison comparisonType = StringComparison.CurrentCulture)
         {
-            var index = str.IndexOf(value, comparisonType);
-            return index >= 0 ? str.SafeSubstring(index + value.Length) : str;
+            var index = str.IndexOf(v, comparisonType);
+            return index >= 0 ? str.SafeSubstring(index + v.Length) : str;
         }
 
-        public static string SafeSubstringAfterLast(this string str, string value, StringComparison comparisonType = StringComparison.CurrentCulture)
+        public static string SafeSubstringAfterLast(this string str, char v, StringComparison comparisonType = StringComparison.CurrentCulture)
         {
-            var index = str.LastIndexOf(value, comparisonType);
-            return index >= 0 ? str.SafeSubstring(index + value.Length) : str;
+            var index = str.LastIndexOf(v);
+            return index >= 0 ? str.SafeSubstring(index + 1) : str;
         }
 
-        public static bool ContainsCaseInsensitive(this string str, string value)
+        public static string SafeSubstringAfterLast(this string str, string v, StringComparison comparisonType = StringComparison.CurrentCulture)
         {
-            return str.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) >= 0;
+            var index = str.LastIndexOf(v, comparisonType);
+            return index >= 0 ? str.SafeSubstring(index + v.Length) : str;
+        }
+
+        public static bool ContainsCaseInsensitive(this string str, string v)
+        {
+            return str.IndexOf(v, StringComparison.CurrentCultureIgnoreCase) >= 0;
         }
     }
 }
