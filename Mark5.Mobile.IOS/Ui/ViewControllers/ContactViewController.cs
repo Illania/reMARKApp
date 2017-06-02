@@ -1221,7 +1221,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public override void Bind(UITableViewCell cell)
                 {
                     var cic = (ContactInfoTableViewCell)cell;
-                    cic.Initialize(Localization.GetString("description").ToUpper(), ContactPreview.Description);
+                    cic.Initialize(Localization.GetString("description").ToUpper(), ContactPreview.Description, true);
                 }
 
                 public override void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)

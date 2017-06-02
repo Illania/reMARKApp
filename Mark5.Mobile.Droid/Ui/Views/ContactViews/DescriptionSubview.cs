@@ -18,6 +18,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             : base(context)
         {
             Title = context.GetString(Resource.String.description);
+            ContentTextView.AutoLinkMask = Android.Text.Util.MatchOptions.All;
+            ContentTextView.LinksClickable = true;
         }
 
         public override void RefreshView()

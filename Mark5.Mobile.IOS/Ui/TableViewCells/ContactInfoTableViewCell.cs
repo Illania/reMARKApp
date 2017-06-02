@@ -13,10 +13,10 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    
+
     public partial class ContactInfoTableViewCell : UITableViewCell
     {
-        
+
         public static readonly NSString Key = new NSString("ContactInfoTableViewCell");
         public static readonly UINib Nib = UINib.FromName("ContactInfoTableViewCell", NSBundle.MainBundle);
 
@@ -29,20 +29,27 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         {
             var cell = (ContactInfoTableViewCell)Nib.Instantiate(null, null)[0];
             cell.TypeLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-3f);
-            cell.InfoLabel.Font = Theme.DefaultFont;
+            cell.InfoTextView.Font = Theme.DefaultFont;
+            cell.InfoTextView.Editable = false;
+            cell.InfoTextView.TextContainerInset = UIEdgeInsets.Zero;
+            cell.InfoTextView.TextContainer.LineFragmentPadding = 0;
+
             return cell;
         }
 
-        public void Initialize(string type, string info)
+        public void Initialize(string type, string info, bool enableDataDetection = false)
         {
             TypeLabel.Text = type;
-            InfoLabel.Text = info;
+            InfoTextView.Text = info;
+
+            if (enableDataDetection)
+                InfoTextView.DataDetectorTypes = UIDataDetectorType.All;
         }
 
         public void Initialize(string type, NSAttributedString info)
         {
             TypeLabel.Text = type.ToUpper();
-            InfoLabel.AttributedText = info;
+            InfoTextView.AttributedText = info;
         }
     }
 }
