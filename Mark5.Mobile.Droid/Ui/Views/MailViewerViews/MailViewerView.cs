@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: DocumentView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using Android.Content;
+﻿using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using MailBee.Mime;

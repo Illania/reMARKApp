@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: ReadByView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System.Linq;
+﻿using System.Linq;
 using Mark5.Mobile.IOS.Ui.Common;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews

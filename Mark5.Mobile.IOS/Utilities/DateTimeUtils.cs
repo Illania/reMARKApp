@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: DateTimeUtils.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using Foundation;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -65,8 +57,8 @@ namespace Mark5.Mobile.IOS.Utilities
         }
 
         /// <summary>
-        /// IMPORTANT!!!
-        /// THIS METHOD ACCEPTS TIMESTAMP IN SERVER TIMEZONE
+        ///     IMPORTANT!!!
+        ///     THIS METHOD ACCEPTS TIMESTAMP IN SERVER TIMEZONE
         /// </summary>
         public static string FormatUserTimestampAsDateString(this long timestamp)
         {
@@ -74,8 +66,8 @@ namespace Mark5.Mobile.IOS.Utilities
         }
 
         /// <summary>
-        /// IMPORTANT!!!
-        /// THIS METHOD ACCEPTS TIMESTAMP IN SERVER TIMEZONE
+        ///     IMPORTANT!!!
+        ///     THIS METHOD ACCEPTS TIMESTAMP IN SERVER TIMEZONE
         /// </summary>
         public static string FormatUserTimestampAsLongDateString(this long timestamp)
         {
@@ -83,8 +75,8 @@ namespace Mark5.Mobile.IOS.Utilities
         }
 
         /// <summary>
-        /// IMPORTANT!!!
-        /// THIS METHOD ACCEPTS TIMESTAMP IN SERVER TIMEZONE
+        ///     IMPORTANT!!!
+        ///     THIS METHOD ACCEPTS TIMESTAMP IN SERVER TIMEZONE
         /// </summary>
         public static string FormatUserTimestampAsTimeAndDateString(this long timestamp)
         {
@@ -92,8 +84,8 @@ namespace Mark5.Mobile.IOS.Utilities
         }
 
         /// <summary>
-        /// IMPORTANT!!!
-        /// THIS METHOD ACCEPTS TIMESTAMP IN SERVER TIMEZONE
+        ///     IMPORTANT!!!
+        ///     THIS METHOD ACCEPTS TIMESTAMP IN SERVER TIMEZONE
         /// </summary>
         public static string FormatUserTimestampAsCompactShortDateTimeString(this long timestamp)
         {
@@ -101,20 +93,16 @@ namespace Mark5.Mobile.IOS.Utilities
             var nowUtc = DateTime.UtcNow.ConvertUtcToUserTime();
 
             if (serverTimezone.Date == nowUtc.Date)
-            {
                 return timestamp.FormatUserTimestampAsTimeString();
-            }
             if (serverTimezone.Date == nowUtc.Date.AddDays(-1))
-            {
                 return Localization.GetString("yesterday");
-            }
 
             return timestamp.FormatUserTimestampAsDateString();
         }
 
         /// <summary>
-        /// IMPORTANT!!!
-        /// THIS METHOD ACCEPTS TIMESTAMP IN SERVER TIMEZONE
+        ///     IMPORTANT!!!
+        ///     THIS METHOD ACCEPTS TIMESTAMP IN SERVER TIMEZONE
         /// </summary>
         public static string FormatUserTimestampAsCompactLongDateTimeString(this long timestamp)
         {
@@ -122,13 +110,9 @@ namespace Mark5.Mobile.IOS.Utilities
             var nowUtc = DateTime.UtcNow.ConvertUtcToUserTime();
 
             if (serverTimezone.Date == nowUtc.Date)
-            {
                 return timestamp.FormatUserTimestampAsTimeString() + ", " + Localization.GetString("today");
-            }
             if (serverTimezone.Date == nowUtc.Date.AddDays(-1))
-            {
                 return timestamp.FormatUserTimestampAsTimeString() + ", " + Localization.GetString("yesterday");
-            }
 
             return timestamp.FormatUserTimestampAsTimeAndDateString();
         }

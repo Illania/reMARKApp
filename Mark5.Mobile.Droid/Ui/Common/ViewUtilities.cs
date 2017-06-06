@@ -1,12 +1,4 @@
-﻿//
-// Project: 
-// File: ViewUtilities.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using Android.Content;
+﻿using Android.Content;
 using Android.Content.Res;
 using Android.OS;
 using Android.Widget;

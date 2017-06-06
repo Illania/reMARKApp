@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: MainActivity.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -171,17 +163,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public override void OnBackPressed()
         {
             if (drawer.IsDrawerOpen(GravityCompat.Start))
-            {
                 drawer.CloseDrawer(GravityCompat.Start);
-            }
             else if (SupportFragmentManager.BackStackEntryCount > 1)
-            {
                 base.OnBackPressed();
-            }
             else
-            {
                 Finish();
-            }
         }
 
         protected override void OnSaveInstanceState(Bundle outState)

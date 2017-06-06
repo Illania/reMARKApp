@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: SystemReportCollector.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Text;
 using System.Threading.Tasks;
 using Foundation;
@@ -20,10 +12,7 @@ namespace Mark5.Mobile.IOS.Utilities
 {
     public static class SystemReportCollector
     {
-        public static bool CanMailReport
-        {
-            get { return MFMailComposeViewController.CanSendMail; }
-        }
+        public static bool CanMailReport => MFMailComposeViewController.CanSendMail;
 
         public static UIActivityViewController CreateShareReportController(string report)
         {
@@ -124,9 +113,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
             sb.AppendLine("===== Preferences =====");
             foreach (var kv in PlatformConfig.Preferences.All)
-            {
                 sb.AppendLine(kv.Key + ": " + kv.Value);
-            }
             sb.AppendLine();
 
             return sb.ToString();

@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: NotificationsListFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -215,9 +207,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var position = adapter.GetPosition(notification);
             if (position >= 0)
-            {
                 adapter.NotifyItemChanged(position);
-            }
 
             if (notification.ObjectType == ObjectType.Document)
             {
@@ -278,15 +268,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class NotificationsAdapter : RecyclerView.Adapter
         {
-            public List<Notification> Items
-            {
-                get { return notificationsInView; }
-            }
+            public List<Notification> Items => notificationsInView;
 
-            public override int ItemCount
-            {
-                get { return notificationsInView.Count; }
-            }
+            public override int ItemCount => notificationsInView.Count;
 
             readonly List<Notification> notificationsInView = new List<Notification>(200);
             readonly Context context;
@@ -345,13 +329,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var position = -1;
                 for (var i = 0; i < notificationsInView.Count; i++)
-                {
                     if (notificationsInView[i].Id == notificationId)
                     {
                         position = i;
                         break;
                     }
-                }
                 return position;
             }
 
@@ -415,12 +397,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public string DateTime
             {
-                set { dateTimeTextView.Text = value; }
+                set => dateTimeTextView.Text = value;
             }
 
             public bool UnreadIndicator
             {
-                set { unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Invisible; }
+                set => unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Invisible;
             }
 
             readonly AppCompatImageView unreadImageView;

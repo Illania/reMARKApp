@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: CommentsCountChangeMessage.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using TinyMessenger;
 
 namespace Mark5.Mobile.IOS.Model.HubMessages

@@ -1,11 +1,4 @@
-﻿//
-// File: ContactsDataAccess.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,9 +26,7 @@ namespace Mark5.Mobile.Common.DataAccess
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
                     if (clean)
-                    {
                         c.Table<FolderContactLink>().Delete(fdl => fdl.FolderId == folder.Id);
-                    }
                     c.InsertOrReplaceAll(contactPreviews.Select(cp => new FolderContactLink
                     {
                         FolderId = folder.Id,
@@ -63,26 +54,18 @@ namespace Mark5.Mobile.Common.DataAccess
                     query += $"order by {nameof(ContactPreview.Name)} ";
 
                     if (maxItems > 0)
-                    {
                         query += $"limit {maxItems - 1} ";
-                    }
                     if (startRowId > 0)
-                    {
                         query += $"offset {startRowId} ";
-                    }
                     var result = c.Query<ContactPreview>(query);
 
                     if (result == null || result.Count < 1)
-                    {
                         throw new DataNotFoundException("Contact previews could not be found.");
-                    }
                     contactPreviews = result;
 
                     startRowId = startRowId < 1 ? 1 : startRowId;
                     foreach (var contactPreview in contactPreviews)
-                    {
                         contactPreview.RowId = startRowId++;
-                    }
                 });
 
                 return contactPreviews;
@@ -171,9 +154,7 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     var contact = c.Find<Contact>(contactId);
                     if (contact == null)
-                    {
                         throw new DataNotFoundException("Contact could not be found.");
-                    }
                     var cmd = c.CreateCommand($"select \"{nameof(ContactCommunicationAddress.Address)}\", " + $"\"{nameof(ContactCommunicationAddress.Description)}\"," + $" \"{nameof(ContactCommunicationAddress.IsPrimary)}\", " + $"\"{nameof(ContactCommunicationAddress.Type)}\" " + $"from \"{nameof(ContactCommunicationAddress)}\" " + $"where \"{nameof(ContactCommunicationAddress.ContactId)}\" = @contactId");
                     cmd.Bind("@contactId", contactId);
                     var addresses = cmd.ExecuteQuery<CommunicationAddress>();
@@ -182,9 +163,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     var contactPreview = c.Find<ContactPreview>(contactId);
                     if (contactPreview == null)
-                    {
                         throw new DataNotFoundException("Contact preview could not be found.");
-                    }
                     container = new ContactContainer(contactPreview, contact);
                 });
 
@@ -327,9 +306,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     var result = cmd.ExecuteQuery<CommentsValue>();
 
                     if (result == null || result.Count < 1)
-                    {
                         return;
-                    }
                     var comments = result.First().Comments;
 
                     comments.Add(comment);
@@ -365,9 +342,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     var result = cmd.ExecuteQuery<CommentsValue>();
 
                     if (result == null || result.Count < 1)
-                    {
                         return;
-                    }
                     var comments = result.First().Comments;
 
                     comments.RemoveAll(cm => cm.Id == comment.Id);
@@ -400,9 +375,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     var result = cmd.ExecuteQuery<CommentsValue>();
 
                     if (result == null || result.Count < 1)
-                    {
                         return;
-                    }
                     var comments = result.First().Comments;
 
                     comments.RemoveAll(cm => cm.Id == comment.Id);

@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: FoldersNotificationsListFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using Android.OS;
+﻿using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.App;
 using Android.Support.V4.View;
@@ -48,9 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             tabLayout.TabSelected += (sender, e) => pager.CurrentItem = e.Tab.Position;
 
             for (var i = 0; i < 2; i++)
-            {
                 tabLayout.AddTab(tabLayout.NewTab().SetText(tabTitles[i]));
-            }
             tabLayout.TabGravity = TabLayout.GravityFill;
 
             return rootView;
@@ -114,10 +104,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class PagerAdapter : FragmentPagerAdapter
         {
-            public override int Count
-            {
-                get { return 2; }
-            }
+            public override int Count => 2;
 
             readonly Folder folder;
 

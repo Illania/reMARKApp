@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: LocalNotificationsListener.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using Mark5.Mobile.Common;
+﻿using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -18,7 +10,7 @@ namespace Mark5.Mobile.IOS.Utilities
     {
         public const string FailedSendingIdentifier = "FailedSendingIdentifier";
 
-        static public void Initialize()
+        public static void Initialize()
         {
             Managers.OutgoingDocumentsManager.DocumentSendingFailed += OutgoingDocumentsManager_DocumentSendingFailed;
         }
@@ -38,9 +30,7 @@ namespace Mark5.Mobile.IOS.Utilities
             UNUserNotificationCenter.Current.AddNotificationRequest(request, err =>
             {
                 if (err != null)
-                {
                     CommonConfig.Logger.Error($"Error while sending notification for failed send document: {err}");
-                }
             });
         }
     }

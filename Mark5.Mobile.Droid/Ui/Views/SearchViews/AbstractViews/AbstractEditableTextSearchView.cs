@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: AbstractEditTextView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V7.Widget;
@@ -110,13 +102,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         void BottomEditText_FocusChange(object sender, FocusChangeEventArgs e)
         {
             if (!e.HasFocus)
-            {
                 ((InputMethodManager) Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow((sender as View).WindowToken, HideSoftInputFlags.None);
-            }
             else
-            {
                 PrepareViewsExpansion();
-            }
         }
 
         void CancelIconLayout_Click(object sender, EventArgs e)
@@ -130,9 +118,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             {
                 var view = containerLayout.GetChildAt(i) as AbstractEditableTextSearchView<T>;
                 if (view != null)
-                {
                     view.Visibility = ViewStates.Visible;
-                }
             }
         }
 
@@ -142,9 +128,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             bottomTextView.Visibility = ViewStates.Gone;
 
             if (bottomTextView.Text != emptyText)
-            {
                 bottomEditText.Text = bottomTextView.Text;
-            }
 
             Expand();
 
@@ -155,9 +139,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             {
                 var view = containerLayout.GetChildAt(i) as AbstractEditableTextSearchView<T>;
                 if (view != this)
-                {
                     view.Visibility = ViewStates.Gone;
-                }
             }
         }
 

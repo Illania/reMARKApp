@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: CustomArrayAdapter.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using Android.Views;
+﻿using Android.Views;
 using Android.Widget;
 using Android.Content;
 using System.Collections;

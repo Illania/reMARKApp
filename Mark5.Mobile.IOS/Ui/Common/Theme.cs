@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: Theme.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 using WebKit;
@@ -14,67 +6,31 @@ namespace Mark5.Mobile.IOS.Ui.Common
 {
     public static class Theme
     {
-        public static UIColor TintColor
-        {
-            get { return DarkerBlue; }
-        }
+        public static UIColor TintColor => DarkerBlue;
 
         #region Nordic IT Colors
 
-        public static UIColor LightBlue
-        {
-            get { return UIColor.FromRGB(199f / 255f, 222f / 255f, 232f / 255f); }
-        }
+        public static UIColor LightBlue => UIColor.FromRGB(199f / 255f, 222f / 255f, 232f / 255f);
 
-        public static UIColor Blue
-        {
-            get { return UIColor.FromRGB(69f / 255f, 133f / 255f, 176f / 255f); }
-        }
+        public static UIColor Blue => UIColor.FromRGB(69f / 255f, 133f / 255f, 176f / 255f);
 
-        public static UIColor DarkBlue
-        {
-            get { return UIColor.FromRGB(23f / 255f, 79f / 255f, 107f / 255f); }
-        }
+        public static UIColor DarkBlue => UIColor.FromRGB(23f / 255f, 79f / 255f, 107f / 255f);
 
-        public static UIColor DarkerBlue
-        {
-            get { return UIColor.FromRGB(18f / 255f, 61f / 255f, 87f / 255f); }
-        }
+        public static UIColor DarkerBlue => UIColor.FromRGB(18f / 255f, 61f / 255f, 87f / 255f);
 
-        public static UIColor LightBrown
-        {
-            get { return UIColor.FromRGB(204f / 255f, 192f / 255f, 178f / 255f); }
-        }
+        public static UIColor LightBrown => UIColor.FromRGB(204f / 255f, 192f / 255f, 178f / 255f);
 
-        public static UIColor Brown
-        {
-            get { return UIColor.FromRGB(153f / 255f, 135f / 255f, 107f / 255f); }
-        }
+        public static UIColor Brown => UIColor.FromRGB(153f / 255f, 135f / 255f, 107f / 255f);
 
-        public static UIColor White
-        {
-            get { return UIColor.White; }
-        }
+        public static UIColor White => UIColor.White;
 
-        public static UIColor LightGray
-        {
-            get { return UIColor.FromRGB(227f / 255f, 227f / 255f, 227f / 255f); }
-        }
+        public static UIColor LightGray => UIColor.FromRGB(227f / 255f, 227f / 255f, 227f / 255f);
 
-        public static UIColor Gray
-        {
-            get { return UIColor.FromRGB(245f / 255f, 245f / 255f, 245f / 255f); }
-        }
+        public static UIColor Gray => UIColor.FromRGB(245f / 255f, 245f / 255f, 245f / 255f);
 
-        public static UIColor DarkGray
-        {
-            get { return UIColor.FromRGB(153f / 255f, 153f / 255f, 153f / 255f); }
-        }
+        public static UIColor DarkGray => UIColor.FromRGB(153f / 255f, 153f / 255f, 153f / 255f);
 
-        public static UIColor Black
-        {
-            get { return UIColor.Black; }
-        }
+        public static UIColor Black => UIColor.Black;
 
         #endregion
 
@@ -86,25 +42,13 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         const float DefaultFontSize = 16f;
 
-        public static UIFont DefaultFont
-        {
-            get { return UIFont.FromName(DefaultFontName, DefaultFontSize); }
-        }
+        public static UIFont DefaultFont => UIFont.FromName(DefaultFontName, DefaultFontSize);
 
-        public static UIFont DefaultBoldFont
-        {
-            get { return UIFont.FromName(DefaultBoldFontName, DefaultFontSize); }
-        }
+        public static UIFont DefaultBoldFont => UIFont.FromName(DefaultBoldFontName, DefaultFontSize);
 
-        public static UIFont DefaultLightFont
-        {
-            get { return UIFont.FromName(DefaultLightFontName, DefaultFontSize); }
-        }
+        public static UIFont DefaultLightFont => UIFont.FromName(DefaultLightFontName, DefaultFontSize);
 
-        public static UIFont DefaultActionsFont
-        {
-            get { return UIFont.FromName(DefaultFontName, 14f); }
-        }
+        public static UIFont DefaultActionsFont => UIFont.FromName(DefaultFontName, 14f);
 
         #endregion
 

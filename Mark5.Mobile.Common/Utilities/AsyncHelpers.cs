@@ -95,17 +95,13 @@ namespace Mark5.Mobile.Common.Utilities
                     lock (items)
                     {
                         if (items.Count > 0)
-                        {
                             task = items.Dequeue();
-                        }
                     }
                     if (task != null)
                     {
                         task.Item1(task.Item2);
                         if (InnerException != null) // the method threw an exeption
-                        {
                             throw new AggregateException("AsyncHelpers.Run method threw an exception.", InnerException);
-                        }
                     }
                     else
                     {

@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: EditCategoriesListFragment.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,10 +26,7 @@ namespace Mark5.Mobile.Droid
         public BusinessEntityPreview BusinessEntityPreview { get; set; }
         public Action CloseRequest { get; set; }
 
-        CategoriesListAdapter CurrentAdapter
-        {
-            get { return (CategoriesListAdapter) recyclerView.GetAdapter(); }
-        }
+        CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter) recyclerView.GetAdapter();
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -198,7 +187,6 @@ namespace Mark5.Mobile.Droid
         void RefreshView(List<Category> availableCategories)
         {
             if (selectedCategories.Count == 0)
-            {
                 switch (BusinessEntityPreview.ObjectType)
                 {
                     case ObjectType.Document:
@@ -212,7 +200,6 @@ namespace Mark5.Mobile.Droid
                     default:
                         throw new ArgumentException("The business entity provided does not have categories in the model");
                 }
-            }
 
             adapter.SetItems(availableCategories);
         }
@@ -225,19 +212,13 @@ namespace Mark5.Mobile.Droid
         {
             var isSelected = selectedCategories.ContainsKey(category.Id);
             if (isSelected)
-            {
                 selectedCategories.Remove(category.Id);
-            }
             else
-            {
                 selectedCategories.Add(category.Id, category);
-            }
 
             var position = CurrentAdapter.GetPosition(category);
             if (position >= 0)
-            {
                 CurrentAdapter.NotifyItemChanged(position);
-            }
         }
 
         void UpdateControls()
@@ -307,13 +288,9 @@ namespace Mark5.Mobile.Droid
         static bool MatchesQuery(Category c, string query)
         {
             if (c.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
                 return true;
-            }
             if (c.Description.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
                 return true;
-            }
 
             return false;
         }
@@ -340,9 +317,7 @@ namespace Mark5.Mobile.Droid
                 BusinessEntityPreview = clfs.BusinessEntityPreview;
                 selectedCategories.Clear();
                 foreach (var kv in clfs.SelectedCategories)
-                {
                     selectedCategories.Add(kv.Key, kv.Value);
-                }
                 adapter.SetItems(clfs.AvailableCategories);
             }
         }
@@ -370,15 +345,9 @@ namespace Mark5.Mobile.Droid
             readonly List<Category> categoriesInView = new List<Category>();
             readonly Dictionary<int, Category> selectedCategoriesInView;
 
-            public override int ItemCount
-            {
-                get { return categoriesInView.Count; }
-            }
+            public override int ItemCount => categoriesInView.Count;
 
-            public List<Category> Items
-            {
-                get { return categoriesInView; }
-            }
+            public List<Category> Items => categoriesInView;
 
             public event EventHandler<Category> ItemClicked = delegate { };
 
@@ -442,7 +411,7 @@ namespace Mark5.Mobile.Droid
         {
             public string Name
             {
-                set { nameTextView.Text = value; }
+                set => nameTextView.Text = value;
             }
 
             public string Description
@@ -476,7 +445,7 @@ namespace Mark5.Mobile.Droid
 
             public bool Selected
             {
-                set { selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             readonly View colorImageView;

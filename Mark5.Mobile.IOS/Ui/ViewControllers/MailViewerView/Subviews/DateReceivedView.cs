@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: DateReceivedView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;

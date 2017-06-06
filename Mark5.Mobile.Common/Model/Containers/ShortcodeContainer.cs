@@ -1,11 +1,4 @@
-﻿//
-// File: ShortcodeContainer.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 
 namespace Mark5.Mobile.Common.Model.Containers
 {
@@ -17,17 +10,11 @@ namespace Mark5.Mobile.Common.Model.Containers
         public ShortcodeContainer(ShortcodePreview shortcodePreview, Shortcode shortcode)
         {
             if (shortcodePreview == null)
-            {
                 throw new ArgumentNullException(nameof(shortcodePreview));
-            }
             if (shortcode == null)
-            {
                 throw new ArgumentNullException(nameof(shortcode));
-            }
             if (shortcodePreview.Id != shortcode.Id)
-            {
                 throw new ArgumentException("ShortcodePreview and Shortcode do not match.");
-            }
             ShortcodePreview = shortcodePreview;
             Shortcode = shortcode;
         }

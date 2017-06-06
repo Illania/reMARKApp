@@ -1,11 +1,4 @@
-﻿//
-// File: IndefiniteAnimatedView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using CoreAnimation;
 using CoreGraphics;
 using Foundation;
@@ -18,7 +11,7 @@ namespace SVProgressHUD
     {
         public override CGRect Frame
         {
-            get { return base.Frame; }
+            get => base.Frame;
             set
             {
                 if (base.Frame != value)
@@ -35,7 +28,7 @@ namespace SVProgressHUD
 
         public float Radius
         {
-            get { return _radius; }
+            get => _radius;
             set
             {
                 if (_radius != value)
@@ -55,7 +48,7 @@ namespace SVProgressHUD
 
         public float StrokeThickness
         {
-            get { return _strokeThickness; }
+            get => _strokeThickness;
 
             set
             {
@@ -69,7 +62,7 @@ namespace SVProgressHUD
 
         public UIColor StrokeColor
         {
-            get { return _strokeColor; }
+            get => _strokeColor;
 
             set
             {
@@ -84,7 +77,9 @@ namespace SVProgressHUD
         public override void WillMoveToSuperview(UIView newsuper)
         {
             if (newsuper != null)
+            {
                 LayoutAnimatedLayer();
+            }
             else
             {
                 indefiniteAnimatedLayer?.RemoveFromSuperLayer();

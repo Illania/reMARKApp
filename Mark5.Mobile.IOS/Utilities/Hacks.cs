@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: Hacks.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Mark5.Mobile.Common;
 using UIKit;
@@ -34,7 +26,7 @@ namespace Mark5.Mobile.IOS.Utilities
         }
 
         /// <summary>
-        /// Used to find buttons in table view cell row actions.
+        ///     Used to find buttons in table view cell row actions.
         /// </summary>
         /// <returns>The utvcdcv.</returns>
         /// <param name="cell">Cell for which adjustments should be applied.</param>

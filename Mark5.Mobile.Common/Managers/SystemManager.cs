@@ -1,11 +1,4 @@
-﻿//
-// File: SystemManager.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Extensions;
@@ -51,9 +44,7 @@ namespace Mark5.Mobile.Common.Managers
                 return result;
             }
             if (sourceType == SourceType.Local)
-            {
                 return await FileSystemStorage.GetSystemSettingsAsync();
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -78,9 +69,7 @@ namespace Mark5.Mobile.Common.Managers
                 return result;
             }
             if (sourceType == SourceType.Local)
-            {
                 return await FileSystemStorage.GetSystemUsersDepartmentsAsync();
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
     }

@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: CopyToUserWorktrayActivity.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System.Collections.Generic;
 using Android.App;
 using Android.Content;

@@ -1,11 +1,4 @@
-﻿//
-// File: SerializationUtils.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -52,9 +45,7 @@ namespace Mark5.Mobile.Common.Utilities
         public static T Deserialize<T>(string str)
         {
             if (string.IsNullOrWhiteSpace(str))
-            {
                 return default(T);
-            }
             using (var sr = new StringReader(str))
             using (var jr = new JsonTextReader(sr))
             {
@@ -67,9 +58,7 @@ namespace Mark5.Mobile.Common.Utilities
             return Task.Run(() =>
             {
                 if (string.IsNullOrWhiteSpace(str))
-                {
                     return default(T);
-                }
                 return Deserialize<T>(str);
             });
         }
@@ -77,9 +66,7 @@ namespace Mark5.Mobile.Common.Utilities
         public static object Deserialize(string str, Type type)
         {
             if (string.IsNullOrWhiteSpace(str))
-            {
                 return null;
-            }
             using (var sr = new StringReader(str))
             using (var jr = new JsonTextReader(sr))
             {
@@ -92,9 +79,7 @@ namespace Mark5.Mobile.Common.Utilities
             return Task.Run(() =>
             {
                 if (string.IsNullOrWhiteSpace(str))
-                {
                     return null;
-                }
                 return Deserialize(str, type);
             });
         }
@@ -106,18 +91,14 @@ namespace Mark5.Mobile.Common.Utilities
         public static byte[] SerializeToByteArray<T>(T obj) where T : class
         {
             if (obj == null)
-            {
                 return null;
-            }
             return GetBytes(Serialize(obj));
         }
 
         public static T DeserializeFromByteArray<T>(byte[] bytes) where T : class
         {
             if (bytes == null || bytes.Length < 1)
-            {
                 return null;
-            }
             return Deserialize<T>(GetString(bytes));
         }
 

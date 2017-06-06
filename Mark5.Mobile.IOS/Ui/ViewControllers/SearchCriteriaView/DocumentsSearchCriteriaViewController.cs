@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: DocumentsSearchCriteriaViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.IO;
 using System.Linq;
@@ -1373,7 +1365,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             void Tapped(UITapGestureRecognizer recognizer)
             {
                 if (recognizer.View == referenceView)
-                {
                     AnimateNotify(AnimationLength, () =>
                     {
                         commentView.Hidden = true;
@@ -1383,10 +1374,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                         referenceTextField.UserInteractionEnabled = true;
                         referenceTextField.BecomeFirstResponder();
                     });
-                }
 
                 if (recognizer.View == commentView)
-                {
                     AnimateNotify(AnimationLength, () =>
                     {
                         referenceView.Hidden = true;
@@ -1396,10 +1385,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                         commentTextField.UserInteractionEnabled = true;
                         commentTextField.BecomeFirstResponder();
                     });
-                }
 
                 if (recognizer.View == attachmentNameView)
-                {
                     AnimateNotify(AnimationLength, () =>
                     {
                         referenceView.Hidden = true;
@@ -1409,7 +1396,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                         attachmentNameTextField.UserInteractionEnabled = true;
                         attachmentNameTextField.BecomeFirstResponder();
                     });
-                }
 
                 UpdateRow();
                 SetAsActive();
@@ -1437,7 +1423,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             void TextFieldDidEndEditing(UITextField textField)
             {
                 if (textField == referenceTextField)
-                {
                     AnimateNotify(AnimationLength, () =>
                     {
                         commentView.Hidden = false;
@@ -1447,10 +1432,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                         referenceTextField.ResignFirstResponder();
                         referenceTextField.UserInteractionEnabled = false;
                     });
-                }
 
                 if (textField == commentTextField)
-                {
                     AnimateNotify(AnimationLength, () =>
                     {
                         referenceView.Hidden = false;
@@ -1460,10 +1443,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                         commentTextField.ResignFirstResponder();
                         commentTextField.UserInteractionEnabled = false;
                     });
-                }
 
                 if (textField == attachmentNameTextField)
-                {
                     AnimateNotify(AnimationLength, () =>
                     {
                         referenceView.Hidden = false;
@@ -1473,7 +1454,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                         attachmentNameTextField.ResignFirstResponder();
                         attachmentNameTextField.UserInteractionEnabled = false;
                     });
-                }
             }
         }
 

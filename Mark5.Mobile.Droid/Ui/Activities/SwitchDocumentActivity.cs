@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: SwitchDocumentActivity.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -85,7 +77,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.Logger.Info($"Created {nameof(SwitchDocumentActivity)}");
 
                 if (folder != null && df.DocumentPreview != null)
-                {
                     try
                     {
                         documentIds.AddRange(await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, df.DocumentPreview.Id, true, true, MaxNeighbours));
@@ -94,7 +85,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     {
                         CommonConfig.Logger.Error("Error while retrieveing neighbour documents", ex);
                     }
-                }
             }
             else
             {
@@ -129,12 +119,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             var documentIndex = documentIds.FindIndex(d => d == documentId);
             if (documentIndex == -1)
-            {
                 return false;
-            }
 
             if (documentIndex == 0)
-            {
                 try
                 {
                     var previous = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, documentId, true, false, MaxNeighbours);
@@ -149,7 +136,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     CommonConfig.Logger.Error("Error while checking if previous document exists", ex);
                     return false;
                 }
-            }
 
             return true;
         }
@@ -161,12 +147,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             var documentIndex = documentIds.FindIndex(d => d == documentId);
             if (documentIndex == -1)
-            {
                 return false;
-            }
 
             if (documentIndex == documentIds.Count - 1)
-            {
                 try
                 {
                     var next = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, documentId, false, true, MaxNeighbours);
@@ -181,7 +164,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     CommonConfig.Logger.Error("Error while checking if next document exists", ex);
                     return false;
                 }
-            }
 
             return true;
         }

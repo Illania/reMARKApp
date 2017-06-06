@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: PushNotificationInstanceIdService.cs
-// Author: Ferdinando Papale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using Android.App;
 using Android.Content;
 using Firebase.Iid;
@@ -17,7 +9,8 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Services
 {
-    [Service, IntentFilter(new[]
+    [Service]
+    [IntentFilter(new[]
     {
         "com.google.firebase.INSTANCE_ID_EVENT"
     })]

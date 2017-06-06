@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: DeviceInfoProvider.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
@@ -34,9 +26,7 @@ namespace Mark5.Mobile.IOS.Utilities
             var match = SecKeyChain.QueryAsRecord(rec, out res);
 
             if (res == SecStatusCode.Success)
-            {
                 return match.ValueData.ToString();
-            }
 
             var newId = Guid.NewGuid().ToString();
 

@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: ExternalDocumentsTableViewCell.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -75,9 +67,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public void UpdateCategoriesView(DocumentPreview documentPreview)
         {
             foreach (var subView in CategoriesView.Subviews)
-            {
                 subView.RemoveFromSuperview();
-            }
 
             var views = new List<UIView>();
             UIView previousView = null;
@@ -105,14 +95,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             }
 
             if (previousView != null)
-            {
                 CategoriesView.AddConstraint(NSLayoutConstraint.Create(previousView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Bottom, 1f, 0f));
-            }
 
             for (int i = 1; i < views.Count; i++)
-            {
                 CategoriesView.AddConstraint(NSLayoutConstraint.Create(views[0], NSLayoutAttribute.Height, NSLayoutRelation.Equal, views[i], NSLayoutAttribute.Height, 1f, 0f));
-            }
         }
 
         #endregion

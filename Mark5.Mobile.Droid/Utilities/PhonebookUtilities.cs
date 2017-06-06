@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: PhonebookUtilities.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Android;
 using Android.Net;

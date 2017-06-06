@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ContactViewFragment.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -119,7 +111,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
             if (resultCode == (int) Result.Ok)
-            {
                 if (requestCode == RequestCodes.CommentsRequest)
                 {
                     var comments = SerializationUtils.Deserialize<List<Comment>>(data.GetStringExtra(CommentsListActivity.CommentsResultKey));
@@ -130,7 +121,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var categories = SerializationUtils.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
                     UpdateCategories(categories);
                 }
-            }
         }
 
         #region Options menu
@@ -157,28 +147,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
 
             if (Folder?.InternalType == FolderInternalType.FilterView || Folder?.InternalType == FolderInternalType.Static || Folder?.InternalType == FolderInternalType.Worktray)
-            {
                 menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
-            }
             menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
 
             if (Contact != null)
-            {
                 menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments);
-            }
 
             menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.actions);
             menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
 
             if (Folder?.InternalType == FolderInternalType.FilterView || Folder?.InternalType == FolderInternalType.Static || Folder?.InternalType == FolderInternalType.Worktray)
-            {
                 menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
-            }
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
-            {
                 menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
-            }
         }
 
         public override void OnPrepareOptionsMenu(IMenu menu)
@@ -305,21 +287,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (option == 1)
-            {
                 StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, new List<IBusinessEntity>
                 {
                     ContactPreview
                 }));
-            }
         }
 
         async void DeleteFromFolderAction()
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
             if (!yesNo)
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Attempting to delete from folder [contactPreview={ContactPreview}]...");
 
@@ -353,9 +331,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
             if (!yesNo)
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Attempting to delete [contactPreview={ContactPreview}]...");
 
@@ -740,12 +716,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (e.Type == CommunicationAddressType.Phone)
-            {
                 Integration.DialNumber(Context, AddressUtils.FormatCommunicationAddress(e));
-            }
         }
 
-        void PhysicalAddressClicked(object sender, PhysicalAddress e) => Integration.OpenMap(Context, AddressUtils.FormatPhysicalAddress(e));
+        void PhysicalAddressClicked(object sender, PhysicalAddress e)
+        {
+            Integration.OpenMap(Context, AddressUtils.FormatPhysicalAddress(e));
+        }
 
         void ContactClicked(object sender, ContactPreview cp)
         {

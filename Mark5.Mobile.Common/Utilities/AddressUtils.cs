@@ -1,11 +1,4 @@
-﻿//
-// File: AddressUtils.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System.Linq;
+﻿using System.Linq;
 using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.Utilities
@@ -19,9 +12,7 @@ namespace Mark5.Mobile.Common.Utilities
                 {
                     var addressParts = ca.Address.Split('|');
                     if (addressParts[0].Length > 0)
-                    {
                         addressParts[0] = "+" + addressParts[0];
-                    }
                     return string.Join(" ", addressParts.Where(s => !string.IsNullOrWhiteSpace(s)));
                 }
             return ca.Address;

@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: PreferenceFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Threading.Tasks;
 using Android.Content;
@@ -36,10 +28,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int NotificationRingtoneRequest = 1;
         }
 
-        public override Fragment CallbackFragment
-        {
-            get { return this; }
-        }
+        public override Fragment CallbackFragment => this;
 
         public override void OnResume()
         {
@@ -76,9 +65,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var versionPreference = FindPreference(GetString(Resource.String.pref_key_about_version));
             if (versionPreference != null)
-            {
                 versionPreference.Summary = CommonConfig.DeviceInfoProvider.GetAppVersionString();
-            }
 
             Task.Run(() => { return AuthenticatorFactory.Create().GetConnectionInfoAsync(); })
                 .ContinueWith(t =>
@@ -87,25 +74,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     var usernamePreference = FindPreference(GetString(Resource.String.pref_key_account_username));
                     if (usernamePreference != null)
-                    {
                         usernamePreference.Summary = ci.Username;
-                    }
 
                     var hostnamePreference = FindPreference(GetString(Resource.String.pref_key_account_hostname));
                     if (hostnamePreference != null)
-                    {
                         hostnamePreference.Summary = ci.Hostname;
-                    }
 
                     var portPreference = FindPreference(GetString(Resource.String.pref_key_account_port));
                     if (portPreference != null)
-                    {
                         portPreference.Summary = ci.Port.ToString();
-                    }
 
                     var sslPreference = FindPreference(GetString(Resource.String.pref_key_account_ssl));
                     if (sslPreference != null)
-                    {
                         switch (ci.SslMode)
                         {
                             case SslMode.On:
@@ -121,19 +101,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                 sslPreference.SummaryFormatted = summary;
                                 break;
                         }
-                    }
                 }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         public override bool OnPreferenceTreeClick(Preference preference)
         {
             if (preference.Key == GetString(Resource.String.pref_key_documents_use_server_timezone))
-            {
                 Dialogs.ShowConfirmDialog(Context, Resource.String.dialog_restart_required_title, Resource.String.dialog_restart_required_content);
-            }
 
             if (preference.Key == GetString(Resource.String.pref_key_contacts_synchronised) && !PlatformConfig.Preferences.SynchroniseContacts)
-            {
                 Dialogs.ShowYesNoDialog(Context, Resource.String.clear_contacts_cache_title, Resource.String.clear_contacts_cache_summary, async () =>
                 {
                     var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.clearing_contacts_cache, Resource.String.please_wait);
@@ -157,10 +133,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         await Dialogs.ShowErrorDialogAsync(Activity, ex);
                     }
                 });
-            }
 
             if (preference.Key == GetString(Resource.String.pref_key_shortcodes_synchronised) && !PlatformConfig.Preferences.SynchroniseShortcodes)
-            {
                 Dialogs.ShowYesNoDialog(Context, Resource.String.clear_shortcodes_cache_title, Resource.String.clear_shortcodes_cache_summary, async () =>
                 {
                     var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.clearing_shortcodes_cache, Resource.String.please_wait);
@@ -184,7 +158,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         await Dialogs.ShowErrorDialogAsync(Activity, ex);
                     }
                 });
-            }
 
             if (preference.Key == GetString(Resource.String.pref_key_notification_ringtone))
             {
@@ -193,9 +166,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 i.PutExtra(RingtoneManager.ExtraRingtoneTitle, GetString(Resource.String.pref_notification_ringtone_title));
                 i.PutExtra(RingtoneManager.ExtraRingtoneDefaultUri, Settings.System.DefaultNotificationUri);
                 if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.NotificationsRingtone))
-                {
                     i.PutExtra(RingtoneManager.ExtraRingtoneExistingUri, Android.Net.Uri.Parse(PlatformConfig.Preferences.NotificationsRingtone));
-                }
                 StartActivityForResult(i, RequestCodes.NotificationRingtoneRequest);
                 return true;
             }
@@ -220,9 +191,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         dismissAction();
 
                         if (!t.IsFaulted)
-                        {
                             StartActivity(SystemReportCollector.CreateShareReportIntent(Activity, t.Result));
-                        }
                     }, TaskScheduler.FromCurrentSynchronizationContext());
 
                 return true;
@@ -303,9 +272,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public void OnSharedPreferenceChanged(ISharedPreferences sharedPreferences, string key)
         {
             if (key == GetString(Resource.String.pref_key_documents_to_load))
-            {
                 Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
-            }
             if (key == GetString(Resource.String.pref_key_documents_download_as_plaintext))
             {
                 Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
@@ -313,27 +280,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
             }
             if (key == GetString(Resource.String.pref_key_contacts_synchronised))
-            {
                 if (PlatformConfig.Preferences.SynchroniseContacts)
-                {
                     Managers.DownloadManager.DownloadPolicies[ObjectType.Contact] = new DownloadAllPolicy();
-                }
                 else
-                {
                     Managers.DownloadManager.DownloadPolicies.Remove(ObjectType.Contact);
-                }
-            }
             if (key == GetString(Resource.String.pref_key_shortcodes_synchronised))
-            {
                 if (PlatformConfig.Preferences.SynchroniseShortcodes)
-                {
                     Managers.DownloadManager.DownloadPolicies[ObjectType.Shortcode] = new DownloadAllPolicy();
-                }
                 else
-                {
                     Managers.DownloadManager.DownloadPolicies.Remove(ObjectType.Shortcode);
-                }
-            }
         }
 
         public bool OnPreferenceStartScreen(PreferenceFragmentCompat caller, PreferenceScreen pref)

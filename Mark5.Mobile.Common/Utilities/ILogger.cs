@@ -1,11 +1,4 @@
-﻿//
-// File: ILogger.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2014 Nordic IT
-//
-
-using System;
+﻿using System;
 
 namespace Mark5.Mobile.Common.Utilities
 {

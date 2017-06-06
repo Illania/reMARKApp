@@ -1,11 +1,4 @@
-﻿//
-// File: Attachment.cs
-// Author: Ferdinando Papale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System.IO;
+﻿using System.IO;
 
 namespace Mark5.Mobile.Common
 {

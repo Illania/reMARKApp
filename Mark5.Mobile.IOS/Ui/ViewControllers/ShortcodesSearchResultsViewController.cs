@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: ShortcodesSearchResultsViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -228,7 +220,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void ExitEditItem_Clicked(object sender, EventArgs e) => EndEditing();
+        void ExitEditItem_Clicked(object sender, EventArgs e)
+        {
+            EndEditing();
+        }
 
         void EndEditing()
         {
@@ -271,10 +266,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(eas, true, null);
         }
 
-        void CopyToWorktray(ShortcodePreview shortcodePreview) => CopyToWorktray(new List<ShortcodePreview>
+        void CopyToWorktray(ShortcodePreview shortcodePreview)
         {
-            shortcodePreview
-        });
+            CopyToWorktray(new List<ShortcodePreview>
+            {
+                shortcodePreview
+            });
+        }
 
         void CopyToWorktray(List<ShortcodePreview> shortcodePreviews)
         {
@@ -285,10 +283,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void Delete(ShortcodePreview selectedShortcode) => Delete(new List<ShortcodePreview>
+        void Delete(ShortcodePreview selectedShortcode)
         {
-            selectedShortcode
-        });
+            Delete(new List<ShortcodePreview>
+            {
+                selectedShortcode
+            });
+        }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void Delete(List<ShortcodePreview> selectedShortcodes)
@@ -325,10 +326,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void CopyToFolder(ShortcodePreview shortcodePreview) => CopyToFolder(new List<ShortcodePreview>
+        void CopyToFolder(ShortcodePreview shortcodePreview)
         {
-            shortcodePreview
-        });
+            CopyToFolder(new List<ShortcodePreview>
+            {
+                shortcodePreview
+            });
+        }
 
         void CopyToFolder(List<ShortcodePreview> shortcodePreviews)
         {
@@ -345,9 +349,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var nc = (UINavigationController) SplitViewController.ViewControllers[1];
                 var vc = (ShortcodeViewController) nc.ViewControllers[0];
                 if (ids.Select(id => vc.IsShowingShortcodeWithId(id)).Any(v => v))
-                {
                     vc.ClearData();
-                }
             }
         }
 
@@ -567,13 +569,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     {
                         shortcodePreviewsInView.RemoveAt(indexPath.Section);
                         if (shortcodePreviewsInView.Count == 0)
-                        {
                             tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                        }
                         else
-                        {
                             tableView.DeleteSections(NSIndexSet.FromIndex(indexPath.Section), UITableViewRowAnimation.Automatic);
-                        }
                     }
                     else
                     {

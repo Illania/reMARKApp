@@ -1,11 +1,4 @@
-﻿//
-// File: ModuleTypeExtensions.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using Mark5.Mobile.Common.Model;
+﻿using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.Extensions
 {

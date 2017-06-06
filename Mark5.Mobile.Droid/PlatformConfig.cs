@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: PlatformConfig.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using Mark5.Mobile.Droid.Services;
+﻿using Mark5.Mobile.Droid.Services;
 using Mark5.Mobile.Droid.Utilities;
 using TinyMessenger;
 

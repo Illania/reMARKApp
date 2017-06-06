@@ -1,11 +1,4 @@
-﻿//
-// File: FastScrollPopup.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using Android.Animation;
 using Android.Content.Res;
 using Android.Graphics;
@@ -118,7 +111,10 @@ namespace FastScrollRecycler
             return alpha;
         }
 
-        public void SetPopupPosition(FastScrollerPosition position) => this.position = position;
+        public void SetPopupPosition(FastScrollerPosition position)
+        {
+            this.position = position;
+        }
 
         public FastScrollerPosition GetPopupPosition()
         {
@@ -209,7 +205,7 @@ namespace FastScrollRecycler
                 var edgePadding = recyclerView.GetScrollBarWidth();
                 var backgroundPadding = (backgroundSize - textBounds.Height()) / 2;
                 var backgroundHeight = backgroundSize;
-                var backgroundWidth = Math.Max(backgroundSize, textBounds.Width() + (2 * backgroundPadding));
+                var backgroundWidth = Math.Max(backgroundSize, textBounds.Width() + 2 * backgroundPadding);
                 if (position == FastScrollerPosition.Center)
                 {
                     backgroundBounds.Left = (recyclerView.Width - backgroundWidth) / 2;
@@ -225,7 +221,7 @@ namespace FastScrollRecycler
                     }
                     else
                     {
-                        backgroundBounds.Right = recyclerView.Width - (2 * recyclerView.GetScrollBarWidth());
+                        backgroundBounds.Right = recyclerView.Width - 2 * recyclerView.GetScrollBarWidth();
                         backgroundBounds.Left = backgroundBounds.Right - backgroundWidth;
                     }
                     backgroundBounds.Top = thumbOffsetY - backgroundHeight + recyclerView.GetScrollBarThumbHeight() / 2;

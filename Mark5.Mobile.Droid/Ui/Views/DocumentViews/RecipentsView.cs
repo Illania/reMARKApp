@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: RecipentsView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -314,17 +306,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 Func<DocumentAddress, string> addressText = (da) =>
                 {
                     if (!string.IsNullOrWhiteSpace(da.Name) && string.IsNullOrWhiteSpace(da.Address))
-                    {
                         return da.Name;
-                    }
                     if (!string.IsNullOrWhiteSpace(da.Name) && !string.IsNullOrWhiteSpace(da.Address))
-                    {
                         return da.Name + " <" + da.Address + ">";
-                    }
                     if (string.IsNullOrWhiteSpace(da.Name) && !string.IsNullOrWhiteSpace(da.Address))
-                    {
                         return da.Address;
-                    }
 
                     return string.Empty;
                 };

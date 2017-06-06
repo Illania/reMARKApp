@@ -1,11 +1,4 @@
-﻿//
-// File: DocumentsDataAccess.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,9 +26,7 @@ namespace Mark5.Mobile.Common.DataAccess
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
                     if (clean)
-                    {
                         c.Table<FolderDocumentLink>().Delete(fdl => fdl.FolderId == folder.Id);
-                    }
                     c.InsertOrReplaceAll(documentPreviews.Select(dp => new FolderDocumentLink
                     {
                         FolderId = folder.Id,
@@ -61,25 +52,17 @@ namespace Mark5.Mobile.Common.DataAccess
                     var query = $"select * " + $"from {nameof(DocumentPreview)}, {nameof(FolderDocumentLink)} " + $"where {nameof(FolderDocumentLink.FolderId)} = {folder.Id} " + $"     and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} = {nameof(FolderDocumentLink)}.{nameof(FolderDocumentLink.DocumentId)} ";
 
                     if (startId > 0)
-                    {
                         query += $"    and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} < \"{startId}\" ";
-                    }
                     if (endId > 0)
-                    {
                         query += $"    and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} > \"{endId}\" ";
-                    }
                     query += $"order by {nameof(DocumentPreview.Id)} desc ";
 
                     if (maxItems > 0)
-                    {
                         query += $"limit {maxItems - 1} ";
-                    }
                     var result = c.Query<DocumentPreview>(query);
 
                     if (result == null || result.Count < 1)
-                    {
                         throw new DataNotFoundException("Document previews could not be found.");
-                    }
                     documentPreviews = result;
                 });
 
@@ -114,9 +97,7 @@ namespace Mark5.Mobile.Common.DataAccess
                         var previous = c.Query<IdValue>(getPreviousQuery).Select(v => v.Id).Reverse();
                         documentIds.AddRange(previous);
                         if (getNext)
-                        {
                             documentIds.Add(documentId);
-                        }
                     }
                     if (getNext)
                     {
@@ -159,9 +140,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     var result = c.Find<Document>(documentId);
 
                     if (result == null)
-                    {
                         throw new DataNotFoundException("Document could not be found.");
-                    }
                     document = result;
                 });
 
@@ -199,14 +178,10 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     var documentPreview = c.Find<DocumentPreview>(documentId);
                     if (documentPreview == null)
-                    {
                         throw new DataNotFoundException("DocumentPreview could not be found.");
-                    }
                     var document = c.Find<Document>(documentId);
                     if (document == null)
-                    {
                         throw new DataNotFoundException("Document could not be found.");
-                    }
                     container = new DocumentContainer(documentPreview, document);
                 });
 
@@ -383,9 +358,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     var result = c.Table<TemplatePreview>().ToList();
 
                     if (result == null || result.Count < 1)
-                    {
                         throw new DataNotFoundException("Template previews could not be found.");
-                    }
                     templatePreviews = result;
                 });
 
@@ -420,9 +393,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     var result = c.Find<Template>(templateId);
 
                     if (result == null)
-                    {
                         throw new DataNotFoundException("Template could not be found.");
-                    }
                     template = result;
                 });
 
@@ -448,9 +419,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     });
 
                     if (template != null)
-                    {
                         c.InsertOrReplace(template);
-                    }
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
@@ -470,17 +439,13 @@ namespace Mark5.Mobile.Common.DataAccess
                     var info = c.Find<DefaultTemplateInfo>(creationModeFlag);
 
                     if (info == null)
-                    {
                         throw new DataNotFoundException("Default template info could not be found.");
-                    }
                     if (info.Available)
                     {
                         var result = c.Find<Template>(info.TemplateId);
 
                         if (result == null)
-                        {
                             throw new DataNotFoundException("Default template could not be found.");
-                        }
                         template = result;
                     }
                 });
@@ -589,9 +554,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     var result = cmd.ExecuteQuery<CommentsValue>();
 
                     if (result == null || result.Count < 1)
-                    {
                         return;
-                    }
                     var comments = result.First().Comments;
 
                     comments.Add(comment);
@@ -628,9 +591,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     var result = cmd.ExecuteQuery<CommentsValue>();
 
                     if (result == null || result.Count < 1)
-                    {
                         return;
-                    }
                     var comments = result.First().Comments;
 
                     comments.RemoveAll(cm => cm.Id == comment.Id);
@@ -663,9 +624,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     var result = cmd.ExecuteQuery<CommentsValue>();
 
                     if (result == null || result.Count < 1)
-                    {
                         return;
-                    }
                     var comments = result.First().Comments;
 
                     comments.RemoveAll(cm => cm.Id == comment.Id);

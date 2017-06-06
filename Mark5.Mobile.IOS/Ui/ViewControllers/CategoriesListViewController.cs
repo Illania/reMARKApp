@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: CategoriesListViewController.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -254,9 +246,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Event handlers
 
-        void DismissButtonItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
+        void DismissButtonItem_Clicked(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
+        }
 
-        void CancelButtomItem_Clicked(object sender, EventArgs e) => UpdateAfterExitEditMode();
+        void CancelButtomItem_Clicked(object sender, EventArgs e)
+        {
+            UpdateAfterExitEditMode();
+        }
 
         void EditModeButtonItem_Clicked(object sender, EventArgs e)
         {
@@ -386,9 +384,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             return category.Name.ContainsCaseInsensitive(query);
         }
 
-        public void SearchCategorySelected(Category category) => dataSource.SelectCategory(category);
+        public void SearchCategorySelected(Category category)
+        {
+            dataSource.SelectCategory(category);
+        }
 
-        public void SearchCategoryDeselected(Category category) => dataSource.DeselectCategory(category);
+        public void SearchCategoryDeselected(Category category)
+        {
+            dataSource.DeselectCategory(category);
+        }
 
         #endregion
 
@@ -396,15 +400,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             public bool CategoriesChanged { get; private set; }
 
-            public bool Empty
-            {
-                get { return !sectionIndexes.Any() || !categoriesInView.Any(); }
-            }
+            public bool Empty => !sectionIndexes.Any() || !categoriesInView.Any();
 
-            public List<Category> SelectedCategories
-            {
-                get { return selectedCategories.ToList(); }
-            }
+            public List<Category> SelectedCategories => selectedCategories.ToList();
 
             readonly UITableView tableView;
 
@@ -450,16 +448,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var categoryListViewCell = cell as CategoriesTableViewCell;
                     if (categoryListViewCell != null)
-                    {
                         if (selectedCategories.FindIndex(c => c.Id == categoryListViewCell.Category.Id) >= 0)
-                        {
                             tableView.SelectRow(indexPath, false, UITableViewScrollPosition.None);
-                        }
                         else
-                        {
                             tableView.DeselectRow(indexPath, false);
-                        }
-                    }
                 }
                 else
                 {
@@ -480,12 +472,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override string[] SectionIndexTitles(UITableView tableView)
             {
                 if (Empty)
-                {
                     return new[]
                     {
                         string.Empty
                     };
-                }
 
                 return sectionIndexes.Count < 5 ? null : sectionIndexes.ToArray();
             }
@@ -538,15 +528,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (Empty)
-                {
                     return;
-                }
 
                 var cell = tableView.CellAt(indexPath) as CategoriesTableViewCell;
                 if (cell != null)
-                {
                     selectedCategories.Add(cell.Category);
-                }
             }
 
             public override NSIndexPath WillDeselectRow(UITableView tableView, NSIndexPath indexPath)
@@ -560,9 +546,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var cell = tableView.CellAt(indexPath) as CategoriesTableViewCell;
                 if (cell != null)
-                {
                     selectedCategories.RemoveAll(c => c.Id == cell.Category.Id);
-                }
             }
 
             #endregion
@@ -616,9 +600,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 selectedCategories.Clear();
 
                 foreach (var indexPath in tableView.IndexPathsForVisibleRows)
-                {
                     tableView.DeselectRow(indexPath, false);
-                }
 
                 CategoriesChanged = false;
             }
@@ -668,10 +650,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class SearchDataSource : UITableViewSource
         {
-            public bool Empty
-            {
-                get { return !sectionIndexes.Any() || !categoriesInView.Any(); }
-            }
+            public bool Empty => !sectionIndexes.Any() || !categoriesInView.Any();
 
             List<string> sectionIndexes;
             Dictionary<string, List<Category>> categoriesInView;
@@ -711,16 +690,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var categoryListViewCell = cell as CategoriesTableViewCell;
                 if (categoryListViewCell != null)
-                {
                     if (selectedCategories.FindIndex(c => categoryListViewCell.Category.Id == c.Id) >= 0)
-                    {
                         tableView.SelectRow(indexPath, false, UITableViewScrollPosition.None);
-                    }
                     else
-                    {
                         tableView.DeselectRow(indexPath, false);
-                    }
-                }
             }
 
             public override nint NumberOfSections(UITableView tableView)
@@ -736,12 +709,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override string[] SectionIndexTitles(UITableView tableView)
             {
                 if (Empty)
-                {
                     return new[]
                     {
                         string.Empty
                     };
-                }
 
                 return sectionIndexes.Count < 5 ? null : sectionIndexes.ToArray();
             }
@@ -787,9 +758,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (Empty)
-                {
                     return;
-                }
 
                 var cell = tableView.CellAt(indexPath) as CategoriesTableViewCell;
                 if (cell != null)

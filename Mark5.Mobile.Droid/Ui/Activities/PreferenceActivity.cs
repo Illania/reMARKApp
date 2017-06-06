@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: PreferenceActivity.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using Android.App;
 using Android.Content.PM;
 using Android.OS;

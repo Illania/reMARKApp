@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: CopyToFolderListFragment.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,10 +18,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Move,
         };
 
-        protected override bool LoadRemoteFromCache
-        {
-            get { return true; }
-        }
+        protected override bool LoadRemoteFromCache => true;
 
         public List<IBusinessEntity> BusinessEntities { get; set; }
         public Folder FromFolder { get; set; }
@@ -40,20 +29,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info("Setting sections according to the folder");
 
             if (RemoteFolder.Root)
-            {
                 AvailableSections = new List<Section>
                 {
                     Section.Favourites,
                     Section.Remote
                 };
-            }
             else
-            {
                 AvailableSections = new List<Section>
                 {
                     Section.Remote
                 };
-            }
 
             Adapter.SetSections(AvailableSections);
         }
@@ -73,13 +58,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var toFolder = CurrentAdapter.GetItemAtPosition(position);
             if (Type == ActionType.Copy)
-            {
                 await CopyBusinessEntityToFolder(toFolder);
-            }
             else
-            {
                 await MoveBusinessEntityToFolder(toFolder);
-            }
         }
 
         protected override void Adapter_ItemLongClicked(object sender, int position)
@@ -110,9 +91,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var content = Resources.GetQuantityString(resourceId, BusinessEntities.Count, toFolder.Name);
             var confirmed = await Dialogs.ShowYesNoDialogAsync(Context, title, content);
             if (!confirmed)
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Moving business entity to folder [businessEntities.Count={BusinessEntities?.Count}, businessEntity.Type={BusinessEntities.First().ObjectType}, toFolder.Id={toFolder?.Id}, fromFolder.Id={FromFolder?.Id}]");
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.moving_to_folder, Resource.String.please_wait);
@@ -160,9 +139,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var confirmed = await Dialogs.ShowYesNoDialogAsync(Context, title, content);
 
             if (!confirmed)
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Copying business entities to folder [businessEntities.Count={BusinessEntities?.Count}, businessEntities.Type={BusinessEntities?.First().ObjectType}, folder.Id={folder?.Id}]");
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_folder, Resource.String.please_wait);

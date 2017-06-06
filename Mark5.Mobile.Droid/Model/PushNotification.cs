@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: PushNotification.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Globalization;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -41,10 +33,7 @@ namespace Mark5.Mobile.Droid.Model
         [JsonProperty("silent")]
         public int Silent { get; set; }
 
-        public bool IsSilent
-        {
-            get { return Silent > 0; }
-        }
+        public bool IsSilent => Silent > 0;
 
         [JsonProperty("guid")]
         public Guid Guid { get; set; }
@@ -71,9 +60,7 @@ namespace Mark5.Mobile.Droid.Model
             get
             {
                 if (string.IsNullOrWhiteSpace(RemindOn))
-                {
                     return 0;
-                }
 
                 return DateTime.ParseExact(RemindOn, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture).ConvertDateTimeToTimestampMilliseconds();
             }

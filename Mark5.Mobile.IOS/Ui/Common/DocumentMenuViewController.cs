@@ -1,12 +1,4 @@
-﻿//
-// Project: ${Project}
-// File: DocumentMenuViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using Foundation;
+﻿using Foundation;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common

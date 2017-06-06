@@ -1,11 +1,4 @@
-﻿//
-// File: IdValue.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using SQLite;
+﻿using SQLite;
 
 namespace Mark5.Mobile.Common.Model
 {

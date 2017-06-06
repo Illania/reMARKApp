@@ -1,11 +1,4 @@
-﻿//
-// File: ShortcodePreview.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using SQLite;
+﻿using SQLite;
 
 namespace Mark5.Mobile.Common.Model
 {
@@ -13,16 +6,10 @@ namespace Mark5.Mobile.Common.Model
     public class ShortcodePreview : BusinessEntityPreview
     {
         [Ignore]
-        public override ObjectType ObjectType
-        {
-            get { return ObjectType.Shortcode; }
-        }
+        public override ObjectType ObjectType => ObjectType.Shortcode;
 
         [Ignore]
-        public override ModuleType ModuleType
-        {
-            get { return ModuleType.Shortcodes; }
-        }
+        public override ModuleType ModuleType => ModuleType.Shortcodes;
 
         [Ignore]
         public int RowId { get; set; }

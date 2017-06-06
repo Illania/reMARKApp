@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: MailViewerActivity.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -98,7 +90,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             Task.Run(async () =>
                 {
                     var auth = AuthenticatorFactory.Create();
-                    if (!(await auth.IsAuthenticatedAsync()))
+                    if (!await auth.IsAuthenticatedAsync())
                         throw new MailViewerException("You need to log in to MARK5 before you can use mail viewer.");
 
                     if (uri == null)
@@ -129,7 +121,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     {
                         byte[] bytes;
                         using (var stream = ContentResolver.OpenInputStream(uri))
+                        {
                             bytes = ReadToEnd(stream);
+                        }
 
                         try
                         {
@@ -148,7 +142,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     }
 
                     if (name.EndsWith(".msg", StringComparison.CurrentCultureIgnoreCase))
-                    {
                         using (var inputStream = ContentResolver.OpenInputStream(uri))
                         {
                             using (var msgStream = new MemoryStream())
@@ -181,7 +174,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                                 }
                             }
                         }
-                    }
 
                     throw new MailViewerException("Unsupported file.");
                 })
@@ -369,7 +361,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             cacheFile.CreateNewFile();
 
             using (var fos = new Java.IO.FileOutputStream(cacheFile))
+            {
                 await fos.WriteAsync(bytes);
+            }
 
             return cacheFile;
         }

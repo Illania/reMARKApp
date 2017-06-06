@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: ObjectLinksListViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -251,10 +243,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable
         {
-            public bool Empty
-            {
-                get { return objectLInksInView.Count < 1; }
-            }
+            public bool Empty => objectLInksInView.Count < 1;
 
             ObjectLinksListViewController viewController;
             UITableView tableView;
@@ -274,9 +263,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 if (loading)
-                {
                     return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
-                }
 
                 if (objectLInksInView.Count < 1)
                 {

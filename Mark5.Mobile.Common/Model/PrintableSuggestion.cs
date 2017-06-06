@@ -1,12 +1,4 @@
-﻿//
-// Project: 
-// File: PrintableSuggestion.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Mark5.Mobile.Common.Model
@@ -40,12 +32,10 @@ namespace Mark5.Mobile.Common.Model
         {
             var suggestions = new List<PrintableSuggestion>();
             foreach (var contact in contacts)
+            foreach (var address in contact.CommunicationAddresses)
             {
-                foreach (var address in contact.CommunicationAddresses)
-                {
-                    var fullName = $"{contact.FirstName}{(string.IsNullOrEmpty(contact.Patronymic) ? string.Empty : " " + contact.Patronymic)}" + $"{(string.IsNullOrEmpty(contact.LastName) ? "" : " " + contact.LastName)}";
-                    suggestions.Add(new PrintableSuggestion(fullName, address.Address, type));
-                }
+                var fullName = $"{contact.FirstName}{(string.IsNullOrEmpty(contact.Patronymic) ? string.Empty : " " + contact.Patronymic)}" + $"{(string.IsNullOrEmpty(contact.LastName) ? "" : " " + contact.LastName)}";
+                suggestions.Add(new PrintableSuggestion(fullName, address.Address, type));
             }
             return suggestions;
         }
@@ -83,13 +73,9 @@ namespace Mark5.Mobile.Common.Model
         public static int SortingComparison(PrintableSuggestion x, PrintableSuggestion y)
         {
             if (x.Type == SuggestionType.RecentAddress && y.Type != SuggestionType.RecentAddress)
-            {
                 return -1;
-            }
             if (x.Type != SuggestionType.RecentAddress && y.Type == SuggestionType.RecentAddress)
-            {
                 return 1;
-            }
             var nameX = string.IsNullOrEmpty(x.Name) ? x.Address : x.Name;
             var nameY = string.IsNullOrEmpty(y.Name) ? y.Address : y.Name;
 

@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: CopyMoveToFolderListViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mark5.Mobile.Common;
@@ -20,10 +12,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
     public class CopyMoveToFolderListViewController : AbstractFoldersListViewController
     {
-        protected override bool LoadRemoteFromCache
-        {
-            get { return true; }
-        }
+        protected override bool LoadRemoteFromCache => true;
 
         readonly List<IBusinessEntity> businessEntities;
         readonly Folder fromFolder;
@@ -132,7 +121,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             return false;
         }
 
-        void CancelModeItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
+        void CancelModeItem_Clicked(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
+        }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void CopyBusinessEntityToFolder(Folder folder)

@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ContentView.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.IO;
 using System.Linq;
@@ -147,20 +139,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
                 if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
-                {
                     await SetWebContentPart(NewEditableContentClass, ContentType.Html, PreviousDocument.HtmlBody);
-                }
                 else
-                {
                     await SetWebContentPart(NewEditableContentClass, ContentType.PlainText, PreviousDocument.PlainTextBody);
-                }
             }
             else
             {
                 if (PreviousDocument != null)
-                {
                     showOldContentButton.Visibility = ViewStates.Visible;
-                }
 
                 await LoadOldContent();
             }
@@ -193,17 +179,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 string oldContentString = null;
 
                 if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
-                {
                     oldContentString = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
-                }
                 else if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
-                {
                     oldContentString = await GetBodyWithHeader(PreviousDocument.HtmlBody, ContentType.Html);
-                }
                 else
-                {
                     oldContentString = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
-                }
 
                 await SetOldHtmlContentAsync(oldContentString);
                 oldContentLoaded = true;
@@ -276,16 +256,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             header.Append("<br/><hr/>");
             var fromText = PreviousDocumentPreview.Direction == DocumentDirection.Incoming ? GetAddressTextFromPreviousDocument(DocumentAddressType.From) : GetLinesTextFromPreviousDocument();
             if (!string.IsNullOrWhiteSpace(fromText))
-            {
                 header.Append($"<b>From</b>: {fromText}").Append("</br>");
-            }
             header.Append($"<b>Date</b>: {date}").Append("</br>");
             header.Append($"<b>To</b>: {GetAddressTextFromPreviousDocument(DocumentAddressType.To)}").Append("</br>");
             var ccText = GetAddressTextFromPreviousDocument(DocumentAddressType.Cc);
             if (!string.IsNullOrWhiteSpace(ccText))
-            {
                 header.Append($"<b>Cc</b>: {ccText}").Append("</br>");
-            }
             header.Append($"<b>Subject</b>: {PreviousDocumentPreview.Subject}").Append("</br>");
             header.Append("<br/><br/>");
 
@@ -380,9 +356,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
 
             if (parentElements.Length > 1)
-            {
                 CommonConfig.Logger.Warning("Found more than one div element with class: " + parentElementClass);
-            }
 
             var parentElement = parentElements[0];
             parentElement.Children.ForEach(c => c.Remove());
@@ -424,9 +398,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             var matchingElements = currentHtmlDocument.QuerySelectorAll("div." + elementClass);
             foreach (var matchingElement in matchingElements)
-            {
                 matchingElement.Attributes.RemoveNamedItem("contenteditable");
-            }
 
             var processedWebContent = currentHtmlDocument.DocumentElement.OuterHtml;
 
@@ -439,9 +411,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             var inlineResult = PreMailer.Net.PreMailer.MoveCssInline(content, true, null, null, true, true);
             if (inlineResult.Warnings != null && inlineResult.Warnings.Count > 0)
-            {
                 CommonConfig.Logger.Warning("There were warnings when inlining CSS:\n" + string.Join("\n", inlineResult.Warnings));
-            }
 
             tcs.SetResult(inlineResult.Html);
             return tcs.Task;
@@ -463,18 +433,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 var hasName = !string.IsNullOrWhiteSpace(addresses[i].Name);
                 if (hasName)
-                {
                     sb.Append(addresses[i].Name).Append(" &lt;");
-                }
                 sb.Append(addresses[i].Address);
                 if (hasName)
-                {
                     sb.Append("&gt;");
-                }
                 if (i < addresses.Count - 1)
-                {
                     sb.Append(", ");
-                }
             }
             return sb.ToString();
         }
@@ -499,9 +463,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             await SetNewHtmlContentAsync(contentViewState.NewContent);
 
             if (oldContentLoaded)
-            {
                 await SetOldHtmlContentAsync(contentViewState.OldContent);
-            }
         }
 
         public override IComposeDocumentViewState ReturnState()

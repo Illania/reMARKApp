@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: RecipientsView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -101,17 +93,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 Func<DocumentAddress, string> addressText = (da) =>
                 {
                     if (!string.IsNullOrWhiteSpace(da.Name) && string.IsNullOrWhiteSpace(da.Address))
-                    {
                         return da.Name;
-                    }
                     if (!string.IsNullOrWhiteSpace(da.Name) && !string.IsNullOrWhiteSpace(da.Address))
-                    {
                         return da.Name + " <" + da.Address + ">";
-                    }
                     if (string.IsNullOrWhiteSpace(da.Name) && !string.IsNullOrWhiteSpace(da.Address))
-                    {
                         return da.Address;
-                    }
 
                     return string.Empty;
                 };
@@ -198,9 +184,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             {
                 var textInMatch = textView.Text.SafeSubstring(match.Index, match.Length);
                 if (Validator.ContainsValidEmails(textInMatch))
-                {
                     textView.TextStorage.AddAttribute(UIStringAttributeKey.ForegroundColor, Theme.TintColor, new NSRange(match.Index, match.Length));
-                }
             }
 
             textView.TextStorage.EndEditing();
@@ -209,9 +193,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         void ExpandView()
         {
             if (expanded)
-            {
                 return;
-            }
 
             // Work around to force text view layout
             textView.TextStorage.BeginEditing();

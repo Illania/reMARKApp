@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: PriorityView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Linq;
 using System.Threading.Tasks;

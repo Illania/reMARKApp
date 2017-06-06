@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: DateTimeUtils.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using Android.Content;
 using Android.Text.Format;
 using Mark5.Mobile.Common.Utilities;
@@ -71,13 +63,9 @@ namespace Mark5.Mobile.Droid.Utilities
             var nowUtc = DateTime.UtcNow.ConvertUtcToUserTime();
 
             if (serverTimezone.Date == nowUtc.Date)
-            {
                 return timestamp.FormatUserTimestampAsTimeString(context);
-            }
             if (serverTimezone.Date == nowUtc.Date.AddDays(-1))
-            {
                 return context.GetString(Resource.String.yesterday);
-            }
 
             return timestamp.FormatUserTimestampAsDateString(context);
         }
@@ -88,13 +76,9 @@ namespace Mark5.Mobile.Droid.Utilities
             var nowUtc = DateTime.UtcNow.ConvertUtcToUserTime();
 
             if (serverTimezone.Date == nowUtc.Date)
-            {
                 return timestamp.FormatUserTimestampAsTimeString(context) + ", " + context.GetString(Resource.String.today);
-            }
             if (serverTimezone.Date == nowUtc.Date.AddDays(-1))
-            {
                 return timestamp.FormatUserTimestampAsTimeString(context) + ", " + context.GetString(Resource.String.yesterday);
-            }
 
             return timestamp.FormatUserTimestampAsTimeAndDateString(context);
         }

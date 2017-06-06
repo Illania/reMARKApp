@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: SwipeDocumentActivity.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Android.Content.PM;
 using Android.OS;
@@ -87,7 +79,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.Logger.Info($"Created {nameof(SwipeDocumentActivity)}");
 
                 if (activityState.Folder != null && mainFragmentState.DocumentPreview != null)
-                {
                     try
                     {
                         var previousIds = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(activityState.Folder, mainFragmentState.DocumentPreview.Id, true, false, MaxNeighbours);
@@ -114,7 +105,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     {
                         CommonConfig.Logger.Error("Error while retrieveing neighbour documents", ex);
                     }
-                }
 
                 state = activityState;
                 pager.Adapter = new PagerAdapter(SupportFragmentManager, activityState);
@@ -172,10 +162,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         class PagerAdapter : FragmentStatePagerAdapter
         {
-            public override int Count
-            {
-                get { return state.FragmentStates.Count; }
-            }
+            public override int Count => state.FragmentStates.Count;
 
             readonly SwipeDocumentActivityState state;
 

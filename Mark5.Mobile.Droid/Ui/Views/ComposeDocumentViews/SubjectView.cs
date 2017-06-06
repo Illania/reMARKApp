@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: SubjectView.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
@@ -23,15 +15,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         readonly AppCompatEditText subjectTextView;
 
-        public bool Empty
-        {
-            get { return string.IsNullOrEmpty(subjectTextView?.Text); }
-        }
+        public bool Empty => string.IsNullOrEmpty(subjectTextView?.Text);
 
-        public string Subject
-        {
-            get { return subjectTextView?.Text; }
-        }
+        public string Subject => subjectTextView?.Text;
 
         public SubjectView(Context context)
             : base(context)
@@ -60,9 +46,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
 
             if (CreationModeFlag == DocumentCreationModeFlag.None || CreationModeFlag == DocumentCreationModeFlag.New)
-            {
                 return Task.CompletedTask;
-            }
 
             switch (CreationModeFlag)
             {

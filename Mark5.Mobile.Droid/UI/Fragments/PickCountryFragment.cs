@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: PickCountryFragment.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Android.Graphics;
 using Android.OS;
@@ -90,15 +82,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             readonly List<CountryInfo> countriesInView = new List<CountryInfo>(500);
 
-            public override int ItemCount
-            {
-                get { return countriesInView.Count; }
-            }
+            public override int ItemCount => countriesInView.Count;
 
-            public List<CountryInfo> Items
-            {
-                get { return countriesInView; }
-            }
+            public List<CountryInfo> Items => countriesInView;
 
             readonly PickCountryFragment parent;
 
@@ -140,7 +126,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public string Name
             {
-                set { nameTextView.Text = value; }
+                set => nameTextView.Text = value;
             }
 
             readonly AppCompatTextView nameTextView;

@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ComposeDocumentFragment.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -155,7 +147,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             UpdateSendButtonState();
 
-            if (!LocalDocument || (LocalDocument && OutgoingDocumentState == OutgoingDocumentState.AutoSaved))
+            if (!LocalDocument || LocalDocument && OutgoingDocumentState == OutgoingDocumentState.AutoSaved)
             {
                 autoSaveWorker?.Stop();
                 autoSaveWorker = new AutoSaveWorker(AutoSaveAction, autoSaveInterval);
@@ -281,14 +273,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             UpdateSendButtonState();
 
             if (sender is LineView && PlatformConfig.Preferences.RemoveLine && CreationModeFlag == DocumentCreationModeFlag.ReplyAll && PreviousDocumentPreview != null && PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
-            {
                 if (!lineView.LineSelectedIsAmbiguous && !string.IsNullOrEmpty(lineView.GetLine().FromAddress))
                 {
                     toView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
                     ccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
                     bccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
                 }
-            }
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -399,9 +389,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                         DocumentPreview.Direction = draft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
                         if (LocalDocument)
-                        {
                             await SynchOutgoingAttachments(false);
-                        }
                         await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag, PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1, 0, false, false);
                     })
                     .ContinueWith(async t =>
@@ -434,9 +422,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void SaveModifiedOutgoingDocument()
         {
             if (!LocalDocument)
-            {
                 return;
-            }
 
             Task.Run(async () =>
                 {
@@ -454,7 +440,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
                     }
                     else
+                    {
                         Activity.Finish();
+                    }
                 }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
@@ -496,9 +484,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var attachmentsToRemove = currentAttachments.Where(a => !initialAttachmentsNames.Contains(a.Name));
 
                 foreach (var attachment in attachmentsToRemove)
-                {
                     await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Name);
-                }
             }
             else //We need to remove all the attachments that are not there already
             {
@@ -508,9 +494,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var attachmentsToRemove = initialAttachments.Where(a => !currentAttachmentsNames.Contains(a.Name));
 
                 foreach (var attachment in attachmentsToRemove)
-                {
                     await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Name);
-                }
             }
         }
 
@@ -549,7 +533,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
 
                     var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
-                    var size = (new Java.IO.File(path)).Length();
+                    var size = new Java.IO.File(path).Length();
 
                     if (size > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
                     {
@@ -588,9 +572,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 .ContinueWith(t =>
                 {
                     if (t.IsFaulted)
-                    {
                         CommonConfig.Logger.Error("Error while deleting autosaved document", t.Exception);
-                    }
                 });
         }
 
@@ -688,9 +670,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
 
             if (useTemplate == Preferences.TemplateUsageMode.Local)
+            {
                 await GetLocalTemplate();
+            }
             else if (useTemplate == Preferences.TemplateUsageMode.Default)
+            {
                 await GetDefaultTemplate();
+            }
             else if (useTemplate == Preferences.TemplateUsageMode.AlwaysAsk)
             {
                 var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, Resource.Array.template_question_options, true);
@@ -764,13 +750,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(CreationModeFlag);
                 if (template != null)
-                {
                     await ApplyTemplate(template);
-                }
                 else if (errorMessageIfNull)
-                {
                     throw new Exception(Resources.GetString(Resource.String.template_null));
-                }
             }
             catch (Exception ex)
             {

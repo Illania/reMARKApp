@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: Integration.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Linq;
 using System.Text;
@@ -107,9 +99,7 @@ namespace Mark5.Mobile.IOS.Utilities
             UIApplication.SharedApplication.OpenUrl(url, options, (result) =>
             {
                 if (!result)
-                {
                     failureCompletionHandler();
-                }
             });
         }
 
@@ -295,25 +285,17 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 var qb = new StringBuilder();
                 if (!string.IsNullOrEmpty(physicalAddress.Street))
-                {
                     qb.Append(physicalAddress.Street).Append(", ");
-                }
                 if (!string.IsNullOrEmpty(physicalAddress.ZipCode))
                 {
                     qb.Append(physicalAddress.ZipCode);
                     if (string.IsNullOrEmpty(physicalAddress.City))
-                    {
                         qb.Append(", ");
-                    }
                 }
                 if (!string.IsNullOrEmpty(physicalAddress.City))
-                {
                     qb.Append(" ").Append(physicalAddress.City).Append(", ");
-                }
                 if (!string.IsNullOrEmpty(physicalAddress.Country?.Name))
-                {
                     qb.Append(physicalAddress.Country.Name);
-                }
 
                 var address = Uri.EscapeUriString(qb.ToString());
 
@@ -351,25 +333,17 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 var qb = new StringBuilder();
                 if (!string.IsNullOrEmpty(physicalAddress.Street))
-                {
                     qb.Append(physicalAddress.Street).Append(", ");
-                }
                 if (!string.IsNullOrEmpty(physicalAddress.ZipCode))
                 {
                     qb.Append(physicalAddress.ZipCode);
                     if (string.IsNullOrEmpty(physicalAddress.City))
-                    {
                         qb.Append(", ");
-                    }
                 }
                 if (!string.IsNullOrEmpty(physicalAddress.City))
-                {
                     qb.Append(" ").Append(physicalAddress.City).Append(", ");
-                }
                 if (!string.IsNullOrEmpty(physicalAddress.Country?.Name))
-                {
                     qb.Append(physicalAddress.Country.Name);
-                }
 
                 var address = Uri.EscapeUriString(qb.ToString());
 

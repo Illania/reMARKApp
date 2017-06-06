@@ -1,11 +1,4 @@
-﻿//
-// File: SearchCalendarEventsCriteria.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Mark5.Mobile.Common.Model
 {
@@ -23,12 +16,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (inCalendarOfUserIds == null)
-                {
                     inCalendarOfUserIds = new List<int>();
-                }
                 return inCalendarOfUserIds;
             }
-            set { inCalendarOfUserIds = value; }
+            set => inCalendarOfUserIds = value;
         }
 
         // Appointment, Task
@@ -48,12 +39,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (inGroupCalendarOfUserIds == null)
-                {
                     inGroupCalendarOfUserIds = new List<int>();
-                }
                 return inGroupCalendarOfUserIds;
             }
-            set { inGroupCalendarOfUserIds = value; }
+            set => inGroupCalendarOfUserIds = value;
         }
 
         // Task
@@ -64,12 +53,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (taskCreatedByUserIds == null)
-                {
                     taskCreatedByUserIds = new List<int>();
-                }
                 return taskCreatedByUserIds;
             }
-            set { taskCreatedByUserIds = value; }
+            set => taskCreatedByUserIds = value;
         }
 
         // Task
@@ -80,12 +67,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (delegatedToUserIds == null)
-                {
                     delegatedToUserIds = new List<int>();
-                }
                 return delegatedToUserIds;
             }
-            set { delegatedToUserIds = value; }
+            set => delegatedToUserIds = value;
         }
 
         // Task
@@ -96,12 +81,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (delegatedToDepartmentIds == null)
-                {
                     delegatedToDepartmentIds = new List<int>();
-                }
                 return delegatedToDepartmentIds;
             }
-            set { delegatedToDepartmentIds = value; }
+            set => delegatedToDepartmentIds = value;
         }
 
         // Appointment
@@ -112,12 +95,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (calendarCategoryIds == null)
-                {
                     calendarCategoryIds = new List<int>();
-                }
                 return calendarCategoryIds;
             }
-            set { calendarCategoryIds = value; }
+            set => calendarCategoryIds = value;
         }
 
         // Appointment
@@ -131,12 +112,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (participantUserIds == null)
-                {
                     participantUserIds = new List<int>();
-                }
                 return participantUserIds;
             }
-            set { participantUserIds = value; }
+            set => participantUserIds = value;
         }
 
         // Appointment, Task
@@ -156,12 +135,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (filedInFolderIds == null)
-                {
                     filedInFolderIds = new List<int>();
-                }
                 return filedInFolderIds;
             }
-            set { filedInFolderIds = value; }
+            set => filedInFolderIds = value;
         }
     }
 }

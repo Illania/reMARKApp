@@ -1,10 +1,3 @@
-//
-// File: WcfAppServiceProxy.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
@@ -17,10 +10,7 @@ namespace Mark5.ServiceReference.AppService
 {
     class WcfAppServiceProxy : IAppServiceProxy
     {
-        public Version Version
-        {
-            get { return new Version(3, 0, 0); }
-        }
+        public Version Version => new Version(3, 0, 0);
 
         readonly Binding binding = new BasicHttpBinding
         {
@@ -530,7 +520,6 @@ namespace Mark5.ServiceReference.AppService
             catch (Exception ex)
             {
                 if (!success)
-                {
                     try
                     {
                         ((ICommunicationObject) client)?.Abort();
@@ -539,7 +528,6 @@ namespace Mark5.ServiceReference.AppService
                     {
                         // Nothing to do here
                     }
-                }
                 throw new WcfAppServiceException(ex);
             }
         }

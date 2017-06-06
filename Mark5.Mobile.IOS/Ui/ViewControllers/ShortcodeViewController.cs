@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: ShortcodeViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,10 +23,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     {
         public bool Modal { get; set; }
 
-        public bool Empty
-        {
-            get { return folderId == null && folder == null && shortcodeId == null && shortcodePreview == null && shortcode == null; }
-        }
+        public bool Empty => folderId == null && folder == null && shortcodeId == null && shortcodePreview == null && shortcode == null;
 
         int? folderId;
         Folder folder;
@@ -245,7 +234,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        public void CopyToClipboard(UITableView tableView, UITableViewCell cell, string text) => Integration.CopyToClipboard(this, tableView, cell, text);
+        public void CopyToClipboard(UITableView tableView, UITableViewCell cell, string text)
+        {
+            Integration.CopyToClipboard(this, tableView, cell, text);
+        }
 
         void FileToButton_Clicked(object sender, EventArgs e)
         {
@@ -385,14 +377,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 if (folder != null && shortcodePreview != null)
-                {
                     shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(folder, shortcodePreview.Id);
-                }
 
                 if (folderId == null && folder == null && shortcodePreview != null)
-                {
                     shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(-1, shortcodePreview.Id);
-                }
 
                 if (folderId == null && folder == null && shortcodePreview == null)
                 {
@@ -498,13 +486,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 dismissAction();
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
-                {
                     ClearData();
-                }
                 else
-                {
                     NavigationController.PopViewController(true);
-                }
             }
             catch (Exception ex)
             {
@@ -543,13 +527,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 dismissAction();
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
-                {
                     ClearData();
-                }
                 else
-                {
                     NavigationController.PopViewController(true);
-                }
             }
             catch (Exception ex)
             {

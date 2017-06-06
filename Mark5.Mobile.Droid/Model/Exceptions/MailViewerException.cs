@@ -1,12 +1,4 @@
-﻿//
-// Project: ${Project}
-// File: MailViewerException.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 
 namespace Mark5.Mobile.Droid.Model.Exceptions
 {

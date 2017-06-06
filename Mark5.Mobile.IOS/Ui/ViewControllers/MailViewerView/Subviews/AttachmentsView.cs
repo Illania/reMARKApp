@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: AttachmentsView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using MailBee.Mime;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -89,7 +81,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
         #region Event handlers
 
-        public void HandleAttachmentButtonTapped(AttachmentButtonTappedEventArgs eventArgs) => AttachmentTapped(this, eventArgs);
+        public void HandleAttachmentButtonTapped(AttachmentButtonTappedEventArgs eventArgs)
+        {
+            AttachmentTapped(this, eventArgs);
+        }
 
         #endregion
     }

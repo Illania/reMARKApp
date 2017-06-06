@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: CommentsListViewController.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -235,9 +227,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void RefreshView()
         {
             if (Entity == null)
-            {
                 return;
-            }
 
             List<Comment> comments;
 
@@ -253,7 +243,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     throw new ArgumentException("The input business entity does not have comments defined in the model");
             }
 
-            var ds = (commentsTableView.Source as DataSource);
+            var ds = commentsTableView.Source as DataSource;
             ds.RefreshData(comments);
         }
 
@@ -261,7 +251,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Event handlers
 
-        void DoneButtonItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
+        void DoneButtonItem_Clicked(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
+        }
 
         async void AddComment_TouchUpInside(object sender, EventArgs e)
         {
@@ -384,9 +377,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void FinalizeEditComment(Comment oldComment, string newContent)
         {
             if (oldComment == null || newContent == null)
-            {
                 return;
-            }
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("editing_comment___"));
             var newComment = oldComment.ShallowCopy();
@@ -436,11 +427,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Keyboard Related
 
-        void OnKeyboardDidShowNotification(NSNotification notification) => AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification);
+        void OnKeyboardDidShowNotification(NSNotification notification)
+        {
+            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification);
+        }
 
-        void OnKeyboardWillChangeFrameNotification(NSNotification notification) => AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification);
+        void OnKeyboardWillChangeFrameNotification(NSNotification notification)
+        {
+            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification);
+        }
 
-        void OnKeyboardWillHideNotification(NSNotification notification) => AdjustViewToKeyboard(0f, notification);
+        void OnKeyboardWillHideNotification(NSNotification notification)
+        {
+            AdjustViewToKeyboard(0f, notification);
+        }
 
         void AdjustViewToKeyboard(float offset, NSNotification notification = null)
         {
@@ -504,15 +504,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             readonly string emptyText;
 
-            public bool Empty
-            {
-                get { return !Items.Any(); }
-            }
+            public bool Empty => !Items.Any();
 
-            public List<Comment> Items
-            {
-                get { return commentsInView; }
-            }
+            public List<Comment> Items => commentsInView;
 
             public DataSource(CommentsListViewController viewController, UITableView tableView, string emptyText)
             {

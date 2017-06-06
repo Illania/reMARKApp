@@ -1,11 +1,4 @@
-﻿//
-// File: IOutgoingDocumentsManager.cs
-// Author: Ferdinando Papale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 

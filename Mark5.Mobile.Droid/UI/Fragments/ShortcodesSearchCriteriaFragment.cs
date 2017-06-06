@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: ShortcodesSearchCriteriaFragment.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Android.Content;
 using Android.Content.Res;
@@ -244,9 +236,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var df = restoredState as ShortcodeSearchCriteriaFragmentState;
             if (df != null)
-            {
                 searchCriteria = df.Criteria;
-            }
         }
 
         public override string GenerateTag()

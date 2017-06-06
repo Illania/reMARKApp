@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: ContactsSearchCriteriaViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Linq;
 using CoreGraphics;
 using Foundation;
@@ -189,26 +181,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 var types = Criteria.ContactTypes;
 
                 if (recognizer.View == personView)
-                {
                     if (types.Contains(ContactType.Person))
                         types.Remove(ContactType.Person);
                     else
                         types.Add(ContactType.Person);
-                }
                 else if (recognizer.View == departmentView)
-                {
                     if (types.Contains(ContactType.Department))
                         types.Remove(ContactType.Department);
                     else
                         types.Add(ContactType.Department);
-                }
                 else if (recognizer.View == companyView)
-                {
                     if (types.Contains(ContactType.Company))
                         types.Remove(ContactType.Company);
                     else
                         types.Add(ContactType.Company);
-                }
 
 
                 UpdateRow();
@@ -598,7 +584,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             void Tapped(UITapGestureRecognizer recognizer)
             {
                 if (recognizer.View == shortIdView)
-                {
                     AnimateNotify(AnimationLength, () =>
                     {
                         descriptionView.Hidden = true;
@@ -608,10 +593,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                         shortIdTextField.UserInteractionEnabled = true;
                         shortIdTextField.BecomeFirstResponder();
                     });
-                }
 
                 if (recognizer.View == descriptionView)
-                {
                     AnimateNotify(AnimationLength, () =>
                     {
                         shortIdView.Hidden = true;
@@ -621,10 +604,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                         descriptionTextField.UserInteractionEnabled = true;
                         descriptionTextField.BecomeFirstResponder();
                     });
-                }
 
                 if (recognizer.View == physicalAddressView)
-                {
                     AnimateNotify(AnimationLength, () =>
                     {
                         shortIdView.Hidden = true;
@@ -634,7 +615,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                         physicalAddressTextField.UserInteractionEnabled = true;
                         physicalAddressTextField.BecomeFirstResponder();
                     });
-                }
 
                 UpdateRow();
                 SetAsActive();
@@ -663,7 +643,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             void TextFieldDidEndEditing(UITextField textField)
             {
                 if (textField == shortIdTextField)
-                {
                     AnimateNotify(AnimationLength, () =>
                     {
                         descriptionView.Hidden = false;
@@ -673,10 +652,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                         shortIdTextField.ResignFirstResponder();
                         shortIdTextField.UserInteractionEnabled = false;
                     });
-                }
 
                 if (textField == descriptionTextField)
-                {
                     AnimateNotify(AnimationLength, () =>
                     {
                         shortIdView.Hidden = false;
@@ -686,10 +663,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                         descriptionTextField.ResignFirstResponder();
                         descriptionTextField.UserInteractionEnabled = false;
                     });
-                }
 
                 if (textField == physicalAddressTextField)
-                {
                     AnimateNotify(AnimationLength, () =>
                     {
                         shortIdView.Hidden = false;
@@ -699,7 +674,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                         physicalAddressTextField.ResignFirstResponder();
                         physicalAddressTextField.UserInteractionEnabled = false;
                     });
-                }
             }
         }
 
@@ -940,13 +914,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 {
                     var index = 0;
                     for (int i = 0; i < countries.Length; i++)
-                    {
                         if (countries[i].FaxPrefix == faxPrefix)
                         {
                             index = i;
                             break;
                         }
-                    }
 
                     picker.Select(index, 0, true);
                 }

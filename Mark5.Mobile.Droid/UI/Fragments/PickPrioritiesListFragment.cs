@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: PickPrioritiesListFragment.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Android.Graphics;
 using Android.OS;
@@ -118,9 +110,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var clfs = restoredState as PickLinesListFragmentState;
             if (clfs != null)
-            {
                 SelectedPriorities = clfs.SelectedPriorities;
-            }
         }
 
         public override string GenerateTag()
@@ -140,20 +130,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly List<Priority> prioritiesInView = new List<Priority>(3);
             readonly List<Priority> selectedPriorities = new List<Priority>(3);
 
-            public List<Priority> SelectedPriorities
-            {
-                get { return selectedPriorities; }
-            }
+            public List<Priority> SelectedPriorities => selectedPriorities;
 
-            public override int ItemCount
-            {
-                get { return prioritiesInView.Count; }
-            }
+            public override int ItemCount => prioritiesInView.Count;
 
-            public List<Priority> Items
-            {
-                get { return prioritiesInView; }
-            }
+            public List<Priority> Items => prioritiesInView;
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
@@ -188,13 +169,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             void HandleClick(Priority p, int position)
             {
                 if (selectedPriorities.Contains(p))
-                {
                     selectedPriorities.Remove(p);
-                }
                 else
-                {
                     selectedPriorities.Add(p);
-                }
 
                 NotifyItemChanged(position);
             }
@@ -220,7 +197,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     selected = value;
                     selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
                 }
-                get { return selected; }
+                get => selected;
             }
 
             readonly AppCompatTextView nameTextView;

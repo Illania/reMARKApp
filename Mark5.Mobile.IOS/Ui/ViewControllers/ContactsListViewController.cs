@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: ContactsListViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -298,7 +290,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void ExitEditItem_Clicked(object sender, EventArgs e) => EndEditing();
+        void ExitEditItem_Clicked(object sender, EventArgs e)
+        {
+            EndEditing();
+        }
 
         void EndEditing()
         {
@@ -358,7 +353,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Refreshing
 
-        void RefreshControl_ValueChanged(object sender, EventArgs e) => RefreshData(forceClear: true);
+        void RefreshControl_ValueChanged(object sender, EventArgs e)
+        {
+            RefreshData(forceClear: true);
+        }
 
         void RefreshData(int startRowId = -1, bool forceClear = false)
         {
@@ -489,10 +487,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        void RemoveFromFolder(ContactPreview selectedContact) => RemoveFromFolder(new List<ContactPreview>
+        void RemoveFromFolder(ContactPreview selectedContact)
         {
-            selectedContact
-        });
+            RemoveFromFolder(new List<ContactPreview>
+            {
+                selectedContact
+            });
+        }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void RemoveFromFolder(List<ContactPreview> selectedContacts)
@@ -529,10 +530,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void Delete(ContactPreview selectedContact) => Delete(new List<ContactPreview>
+        void Delete(ContactPreview selectedContact)
         {
-            selectedContact
-        });
+            Delete(new List<ContactPreview>
+            {
+                selectedContact
+            });
+        }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void Delete(List<ContactPreview> selectedContacts)
@@ -569,10 +573,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void CopyToWorktray(ContactPreview selectedContact) => CopyToWorktray(new List<ContactPreview>
+        void CopyToWorktray(ContactPreview selectedContact)
         {
-            selectedContact
-        });
+            CopyToWorktray(new List<ContactPreview>
+            {
+                selectedContact
+            });
+        }
 
         void CopyToWorktray(List<ContactPreview> selectedContacts)
         {
@@ -583,10 +590,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void CopyToFolder(ContactPreview selecteContact) => CopyToFolder(new List<ContactPreview>
+        void CopyToFolder(ContactPreview selecteContact)
         {
-            selecteContact
-        });
+            CopyToFolder(new List<ContactPreview>
+            {
+                selecteContact
+            });
+        }
 
         void CopyToFolder(List<ContactPreview> selectedContacts)
         {
@@ -603,10 +613,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void MoveToFolder(ContactPreview selectedContact) => MoveToFolder(new List<ContactPreview>
+        void MoveToFolder(ContactPreview selectedContact)
         {
-            selectedContact
-        });
+            MoveToFolder(new List<ContactPreview>
+            {
+                selectedContact
+            });
+        }
 
         void MoveToFolder(List<ContactPreview> selectedContacts)
         {
@@ -656,11 +669,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Messages handlers
 
-        void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m) => RemoveContactsFromList(m.EntitiesId);
+        void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m)
+        {
+            RemoveContactsFromList(m.EntitiesId);
+        }
 
-        void HandleMovedFromFolder(EntityMovedFromFolderMessage m) => RemoveContactsFromList(m.EntitiesId);
+        void HandleMovedFromFolder(EntityMovedFromFolderMessage m)
+        {
+            RemoveContactsFromList(m.EntitiesId);
+        }
 
-        void HandleDeleted(EntityDeletedMessage m) => RemoveContactsFromList(m.EntitiesId);
+        void HandleDeleted(EntityDeletedMessage m)
+        {
+            RemoveContactsFromList(m.EntitiesId);
+        }
 
         void HandleCategoriesChanged(EntityCategoriesChangedMessage message)
         {
@@ -695,9 +717,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void RemoveContactsFromList(IEnumerable<int> ids)
         {
             if (searchController.Active)
-            {
                 searchResultsDataSource.RemoveItems(ids.ToList());
-            }
 
             var ds = (DataSource) tableView.Source;
             ds.RemoveItems(ids.ToList());
@@ -706,9 +726,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var nc = (UINavigationController) SplitViewController.ViewControllers[1];
                 var vc = (ContactViewController) nc.ViewControllers[0];
                 if (ids.Select(id => vc.IsShowingContactWithId(id)).Any(v => v))
-                {
                     vc.ClearData();
-                }
             }
         }
 
@@ -870,13 +888,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     {
                         contactPreviewsInView.RemoveAt(indexPath.Section);
                         if (contactPreviewsInView.Count == 0)
-                        {
                             tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                        }
                         else
-                        {
                             tableView.DeleteSections(NSIndexSet.FromIndex(indexPath.Section), UITableViewRowAnimation.Automatic);
-                        }
                     }
                     else
                     {

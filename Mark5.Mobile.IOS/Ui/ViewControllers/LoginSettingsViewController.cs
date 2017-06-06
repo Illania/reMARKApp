@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: LoginSettingsViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -83,17 +75,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var rsv = new SettingsValues();
 
                 if (sslEnabled && !acceptSelfSigned)
-                {
                     rsv.SslMode = SslMode.On;
-                }
                 else if (sslEnabled && acceptSelfSigned)
-                {
                     rsv.SslMode = SslMode.AllowSelfSigned;
-                }
                 else
-                {
                     rsv.SslMode = SslMode.Off;
-                }
 
                 RestrictedSettingsValuesUpdated(this, rsv);
             }
@@ -176,9 +162,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             if (specifier.Key == OpenSettingsAppKey)
-            {
                 UIApplication.SharedApplication.OpenUrl(new NSUrl(UIApplication.OpenSettingsUrlString), new NSDictionary(), null);
-            }
         }
 
         public override nfloat GetHeightForFooter(UITableView tableView, nint section)
@@ -186,9 +170,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var footerText = SettingsReader.GetFooterText(section);
 
             if (string.IsNullOrWhiteSpace(footerText))
-            {
                 return 0f;
-            }
 
             var width = tableView.Frame.Width - tableView.LayoutMargins.Left - tableView.LayoutMargins.Right;
 

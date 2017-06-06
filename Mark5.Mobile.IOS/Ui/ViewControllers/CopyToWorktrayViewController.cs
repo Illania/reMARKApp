@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: CopyToWorktrayViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -210,21 +202,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void EnableDoneButton() => doneItem.Enabled = true;
+        void EnableDoneButton()
+        {
+            doneItem.Enabled = true;
+        }
 
-        void DisableDoneButton() => doneItem.Enabled = false;
+        void DisableDoneButton()
+        {
+            doneItem.Enabled = false;
+        }
 
         class DataSource : UITableViewSource, IDisposable
         {
-            public bool Empty
-            {
-                get { return systemUsersInView.Count < 1; }
-            }
+            public bool Empty => systemUsersInView.Count < 1;
 
-            public bool IsOwnSelected
-            {
-                get { return tableView.IndexPathsForSelectedRows.Contains(NSIndexPath.FromRowSection(0, 0)); }
-            }
+            public bool IsOwnSelected => tableView.IndexPathsForSelectedRows.Contains(NSIndexPath.FromRowSection(0, 0));
 
             public List<SystemUser> SelectedItems
             {
@@ -266,9 +258,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 if (loading)
-                {
                     return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
-                }
 
                 if (systemUsersInView.Count < 1)
                 {

@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: PhysicalAddressTableViewCell.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using Contacts;
@@ -54,9 +46,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             var sb = new StringBuilder();
             if (pa.Type != null && pa.Type.Id > 0)
-            {
                 sb.Append(pa.Type.Name).AppendLine();
-            }
 
             var formatter = new CNPostalAddressFormatter();
             sb.Append(formatter.GetStringFromPostalAddress(cnAddress));

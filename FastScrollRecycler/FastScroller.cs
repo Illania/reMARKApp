@@ -1,11 +1,4 @@
-﻿//
-// File: FastScroller.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using Android.Animation;
 using Android.Content;
 using Android.Graphics;
@@ -144,7 +137,7 @@ namespace FastScrollRecycler
                     {
                         recyclerView.Parent.RequestDisallowInterceptTouchEvent(true);
                         isDragging = true;
-                        touchOffset += (lastY - downY);
+                        touchOffset += lastY - downY;
                         popup.AnimateVisibility(true);
                         stateChangedListener?.OnFastScrollStart();
                     }
@@ -214,7 +207,10 @@ namespace FastScrollRecycler
         }
 
         [Export("setOffsetX")]
-        public void SetOffsetX(int x) => SetOffset(x, offset.Y);
+        public void SetOffsetX(int x)
+        {
+            SetOffset(x, offset.Y);
+        }
 
         [Export("getOffsetX")]
         public int GetOffsetX()
@@ -250,7 +246,10 @@ namespace FastScrollRecycler
             recyclerView.PostDelayed(hideAction, autoHideDelay);
         }
 
-        void CancelAutoHide() => recyclerView?.RemoveCallbacks(hideAction);
+        void CancelAutoHide()
+        {
+            recyclerView?.RemoveCallbacks(hideAction);
+        }
 
         public void SetThumbColor(Color color)
         {
@@ -264,13 +263,25 @@ namespace FastScrollRecycler
             recyclerView?.Invalidate(invalidateRect);
         }
 
-        public void SetPopupBackgroundColor(Color color) => popup.SetBackgroundColor(color);
+        public void SetPopupBackgroundColor(Color color)
+        {
+            popup.SetBackgroundColor(color);
+        }
 
-        public void SetPopupTextColor(Color color) => popup.SetTextColor(color);
+        public void SetPopupTextColor(Color color)
+        {
+            popup.SetTextColor(color);
+        }
 
-        public void SetPopupTextSize(int size) => popup.SetTextSize(size);
+        public void SetPopupTextSize(int size)
+        {
+            popup.SetTextSize(size);
+        }
 
-        public void SetPopupTypeface(Typeface typeface) => popup.SetTypeFace(typeface);
+        public void SetPopupTypeface(Typeface typeface)
+        {
+            popup.SetTypeFace(typeface);
+        }
 
         public void SetAutoHideDelay(int autoHideDelay)
         {
@@ -290,6 +301,9 @@ namespace FastScrollRecycler
                 CancelAutoHide();
         }
 
-        public void SetPopupPosition(FastScrollerPosition position) => popup.SetPopupPosition(position);
+        public void SetPopupPosition(FastScrollerPosition position)
+        {
+            popup.SetPopupPosition(position);
+        }
     }
 }

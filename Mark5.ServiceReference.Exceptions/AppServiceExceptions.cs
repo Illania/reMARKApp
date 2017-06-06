@@ -1,10 +1,3 @@
-//
-// File: AppServiceExceptions.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Net;
 using System.Runtime.Serialization;
@@ -28,24 +21,16 @@ namespace Mark5.ServiceReference.Exceptions
         static string GetMessage(Exception ex)
         {
             if (ex is FaultException<AppServiceFaultDetail> fe)
-            {
                 return $"{fe.Message} ({fe.Detail.Code}).";
-            }
 
             if (ex is FaultException)
-            {
                 return "Unknown service fault.";
-            }
 
             if (ex is TimeoutException)
-            {
                 return "Service operation timed out.";
-            }
 
             if (ex is CommunicationException)
-            {
                 return "There was a problem communicating with service.";
-            }
 
             return "Unexpected exception of type: \"" + ex?.GetType()?.Name + "\", message: \"" + ex?.Message + "\" occured.";
         }

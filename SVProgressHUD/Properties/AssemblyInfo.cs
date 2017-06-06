@@ -1,10 +1,4 @@
-﻿// //
-// // File: AssemblyInfo.cs
-// // Author: Bartosz Cichecki <bgc@nordic-it.com>
-// // Copyright (c) 2017 Nordic IT
-// //
-
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 
 // Information about this assembly is defined by the following attributes. 

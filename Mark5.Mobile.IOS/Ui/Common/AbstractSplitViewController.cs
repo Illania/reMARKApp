@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: AbstractSplitViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System.Linq;
+﻿using System.Linq;
 using UIKit;
 using Mark5.Mobile.Common.Extensions;
 
@@ -41,7 +33,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         UIViewController HandleSeparateSecondaryViewController(UISplitViewController splitViewController, UIViewController primaryViewController)
         {
-            var primaryNavigationController = ((NavigationController) primaryViewController);
+            var primaryNavigationController = (NavigationController) primaryViewController;
             var lastPrimaryViewController = primaryNavigationController.ViewControllers.LastOrDefault(vc => vc is IPrimaryViewController);
 
             if (lastPrimaryViewController == null)
@@ -52,9 +44,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             {
                 var secondaryNavigationController = new NavigationController();
                 foreach (var poppedViewController in poppedViewControllers)
-                {
                     secondaryNavigationController.PushViewController(poppedViewController, false);
-                }
                 return secondaryNavigationController;
             }
 

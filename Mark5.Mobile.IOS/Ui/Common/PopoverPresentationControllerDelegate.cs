@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: PopoverPresentationControllerDelegate.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using UIKit;
+﻿using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
@@ -36,9 +28,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public override void PrepareForPopoverPresentation(UIPopoverPresentationController popoverPresentationController)
         {
             if (barButtonItem != null)
-            {
                 popoverPresentationController.BarButtonItem = barButtonItem;
-            }
 
             if (sourceView != null)
             {

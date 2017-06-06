@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: FloatingActionButtonLayoutListener.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using Android.Support.Design.Widget;
+﻿using Android.Support.Design.Widget;
 using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Common

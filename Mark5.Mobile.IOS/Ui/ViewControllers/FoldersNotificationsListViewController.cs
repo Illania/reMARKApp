@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: FoldersNotificationsListViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using CoreGraphics;
+﻿using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;

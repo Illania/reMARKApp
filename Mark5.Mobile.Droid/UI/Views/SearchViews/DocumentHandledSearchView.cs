@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: DocumentHandledSearchView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System.Collections.Generic;
 using Mark5.Mobile.Common.Model;
 
@@ -41,9 +33,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             buttonsList.Remove(button);
 
             foreach (var otherButton in buttonsList)
-            {
                 otherButton.UpdateSelectedState(false);
-            }
 
             return true;
         }

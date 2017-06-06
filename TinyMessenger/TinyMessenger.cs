@@ -1,17 +1,3 @@
-//===============================================================================
-// TinyMessenger
-//
-// A simple messenger/event aggregator.
-//
-// https://github.com/grumpydev/TinyMessenger
-//===============================================================================
-// Copyright © Steven Robbins.  All rights reserved.
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY
-// OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT
-// LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-// FITNESS FOR A PARTICULAR PURPOSE.
-//===============================================================================
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,34 +22,31 @@ namespace TinyMessenger
     }
 
     /// <summary>
-    /// A TinyMessage to be published/delivered by TinyMessenger
+    ///     A TinyMessage to be published/delivered by TinyMessenger
     /// </summary>
     public interface ITinyMessage
     {
         /// <summary>
-        /// The sender of the message, or null if not supported by the message implementation.
+        ///     The sender of the message, or null if not supported by the message implementation.
         /// </summary>
         object Sender { get; }
     }
 
     /// <summary>
-    /// Base class for messages that provides weak refrence storage of the sender
+    ///     Base class for messages that provides weak refrence storage of the sender
     /// </summary>
     public abstract class TinyMessageBase : ITinyMessage
     {
         /// <summary>
-        /// Store a WeakReference to the sender just in case anyone is daft enough to
-        /// keep the message around and prevent the sender from being collected.
+        ///     Store a WeakReference to the sender just in case anyone is daft enough to
+        ///     keep the message around and prevent the sender from being collected.
         /// </summary>
         readonly WeakReference _Sender;
 
-        public object Sender
-        {
-            get { return _Sender?.Target; }
-        }
+        public object Sender => _Sender?.Target;
 
         /// <summary>
-        /// Initializes a new instance of the MessageBase class.
+        ///     Initializes a new instance of the MessageBase class.
         /// </summary>
         /// <param name="sender">Message sender (usually "this")</param>
         protected TinyMessageBase(object sender)
@@ -76,18 +59,18 @@ namespace TinyMessenger
     }
 
     /// <summary>
-    /// Generic message with user specified content
+    ///     Generic message with user specified content
     /// </summary>
     /// <typeparam name="TContent">Content type to store</typeparam>
     public class GenericTinyMessage<TContent> : TinyMessageBase
     {
         /// <summary>
-        /// Contents of the message
+        ///     Contents of the message
         /// </summary>
         public TContent Content { get; protected set; }
 
         /// <summary>
-        /// Create a new instance of the GenericTinyMessage class.
+        ///     Create a new instance of the GenericTinyMessage class.
         /// </summary>
         /// <param name="sender">Message sender (usually "this")</param>
         /// <param name="content">Contents of the message</param>
@@ -99,23 +82,23 @@ namespace TinyMessenger
     }
 
     /// <summary>
-    /// Basic "cancellable" generic message
+    ///     Basic "cancellable" generic message
     /// </summary>
     /// <typeparam name="TContent">Content type to store</typeparam>
     public class CancellableGenericTinyMessage<TContent> : TinyMessageBase
     {
         /// <summary>
-        /// Cancel action
+        ///     Cancel action
         /// </summary>
         public Action Cancel { get; protected set; }
 
         /// <summary>
-        /// Contents of the message
+        ///     Contents of the message
         /// </summary>
         public TContent Content { get; protected set; }
 
         /// <summary>
-        /// Create a new instance of the CancellableGenericTinyMessage class.
+        ///     Create a new instance of the CancellableGenericTinyMessage class.
         /// </summary>
         /// <param name="sender">Message sender (usually "this")</param>
         /// <param name="content">Contents of the message</param>
@@ -129,7 +112,7 @@ namespace TinyMessenger
     }
 
     /// <summary>
-    /// Represents an active subscription to a message
+    ///     Represents an active subscription to a message
     /// </summary>
     public sealed class TinyMessageSubscriptionToken : IDisposable
     {
@@ -137,7 +120,7 @@ namespace TinyMessenger
         readonly Type _MessageType;
 
         /// <summary>
-        /// Initializes a new instance of the TinyMessageSubscriptionToken class.
+        ///     Initializes a new instance of the TinyMessageSubscriptionToken class.
         /// </summary>
         public TinyMessageSubscriptionToken(ITinyMessengerHub hub, Type messageType)
         {
@@ -151,7 +134,6 @@ namespace TinyMessenger
         public void Dispose()
         {
             if (_Hub.IsAlive)
-            {
                 if (_Hub.Target is ITinyMessengerHub hubTarget)
                 {
                     var unsubscribeMethod = typeof(ITinyMessengerHub).GetTypeInfo().GetDeclaredMethods("Unsubscribe").First(mi => mi.GetParameters().Length == 1);
@@ -161,41 +143,39 @@ namespace TinyMessenger
                         this
                     });
                 }
-            }
 
             GC.SuppressFinalize(this);
         }
     }
 
     /// <summary>
-    /// Represents a message subscription
+    ///     Represents a message subscription
     /// </summary>
     public interface ITinyMessageSubscription
     {
         /// <summary>
-        /// Token returned to the subscribed to reference this subscription
+        ///     Token returned to the subscribed to reference this subscription
         /// </summary>
         TinyMessageSubscriptionToken SubscriptionToken { get; }
 
         /// <summary>
-        /// Whether delivery should be attempted.
+        ///     Whether delivery should be attempted.
         /// </summary>
         /// <param name="message">Message that may potentially be delivered.</param>
         /// <returns>True - ok to send, False - should not attempt to send</returns>
         bool ShouldAttemptDelivery(ITinyMessage message);
 
         /// <summary>
-        /// Deliver the message
+        ///     Deliver the message
         /// </summary>
         /// <param name="message">Message to deliver</param>
         void Deliver(ITinyMessage message);
     }
 
     /// <summary>
-    /// Message proxy definition.
-    /// 
-    /// A message proxy can be used to intercept/alter messages and/or
-    /// marshall delivery actions onto a particular thread.
+    ///     Message proxy definition.
+    ///     A message proxy can be used to intercept/alter messages and/or
+    ///     marshall delivery actions onto a particular thread.
     /// </summary>
     public interface ITinyMessageProxy
     {
@@ -203,9 +183,8 @@ namespace TinyMessenger
     }
 
     /// <summary>
-    /// Default "pass through" proxy.
-    /// 
-    /// Does nothing other than deliver the message.
+    ///     Default "pass through" proxy.
+    ///     Does nothing other than deliver the message.
     /// </summary>
     public sealed class DefaultTinyMessageProxy : ITinyMessageProxy
     {
@@ -216,12 +195,9 @@ namespace TinyMessenger
         }
 
         /// <summary>
-        /// Singleton instance of the proxy.
+        ///     Singleton instance of the proxy.
         /// </summary>
-        public static DefaultTinyMessageProxy Instance
-        {
-            get { return _Instance; }
-        }
+        public static DefaultTinyMessageProxy Instance => _Instance;
 
         DefaultTinyMessageProxy()
         {
@@ -238,7 +214,7 @@ namespace TinyMessenger
     #region Exceptions
 
     /// <summary>
-    /// Thrown when an exceptions occurs while subscribing to a message type
+    ///     Thrown when an exceptions occurs while subscribing to a message type
     /// </summary>
     public class TinyMessengerSubscriptionException : Exception
     {
@@ -260,15 +236,14 @@ namespace TinyMessenger
     #region Hub Interface
 
     /// <summary>
-    /// Messenger hub responsible for taking subscriptions/publications and delivering of messages.
+    ///     Messenger hub responsible for taking subscriptions/publications and delivering of messages.
     /// </summary>
     public interface ITinyMessengerHub
     {
         /// <summary>
-        /// Subscribe to a message type with the given destination and delivery action.
-        /// All references are held with WeakReferences
-        /// 
-        /// All messages of this type will be delivered.
+        ///     Subscribe to a message type with the given destination and delivery action.
+        ///     All references are held with WeakReferences
+        ///     All messages of this type will be delivered.
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="deliveryAction">Action to invoke when message is delivered</param>
@@ -276,11 +251,10 @@ namespace TinyMessenger
         TinyMessageSubscriptionToken Subscribe<TMessage>(Action<TMessage> deliveryAction) where TMessage : class, ITinyMessage;
 
         /// <summary>
-        /// Subscribe to a message type with the given destination and delivery action.
-        /// Messages will be delivered via the specified proxy.
-        /// All references (apart from the proxy) are held with WeakReferences
-        /// 
-        /// All messages of this type will be delivered.
+        ///     Subscribe to a message type with the given destination and delivery action.
+        ///     Messages will be delivered via the specified proxy.
+        ///     All references (apart from the proxy) are held with WeakReferences
+        ///     All messages of this type will be delivered.
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="deliveryAction">Action to invoke when message is delivered</param>
@@ -289,9 +263,8 @@ namespace TinyMessenger
         TinyMessageSubscriptionToken Subscribe<TMessage>(Action<TMessage> deliveryAction, ITinyMessageProxy proxy) where TMessage : class, ITinyMessage;
 
         /// <summary>
-        /// Subscribe to a message type with the given destination and delivery action.
-        /// 
-        /// All messages of this type will be delivered.
+        ///     Subscribe to a message type with the given destination and delivery action.
+        ///     All messages of this type will be delivered.
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="deliveryAction">Action to invoke when message is delivered</param>
@@ -300,10 +273,9 @@ namespace TinyMessenger
         TinyMessageSubscriptionToken Subscribe<TMessage>(Action<TMessage> deliveryAction, bool useStrongReferences) where TMessage : class, ITinyMessage;
 
         /// <summary>
-        /// Subscribe to a message type with the given destination and delivery action.
-        /// Messages will be delivered via the specified proxy.
-        /// 
-        /// All messages of this type will be delivered.
+        ///     Subscribe to a message type with the given destination and delivery action.
+        ///     Messages will be delivered via the specified proxy.
+        ///     All messages of this type will be delivered.
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="deliveryAction">Action to invoke when message is delivered</param>
@@ -313,10 +285,9 @@ namespace TinyMessenger
         TinyMessageSubscriptionToken Subscribe<TMessage>(Action<TMessage> deliveryAction, bool useStrongReferences, ITinyMessageProxy proxy) where TMessage : class, ITinyMessage;
 
         /// <summary>
-        /// Subscribe to a message type with the given destination and delivery action with the given filter.
-        /// All references are held with WeakReferences
-        /// 
-        /// Only messages that "pass" the filter will be delivered.
+        ///     Subscribe to a message type with the given destination and delivery action with the given filter.
+        ///     All references are held with WeakReferences
+        ///     Only messages that "pass" the filter will be delivered.
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="deliveryAction">Action to invoke when message is delivered</param>
@@ -324,11 +295,10 @@ namespace TinyMessenger
         TinyMessageSubscriptionToken Subscribe<TMessage>(Action<TMessage> deliveryAction, Func<TMessage, bool> messageFilter) where TMessage : class, ITinyMessage;
 
         /// <summary>
-        /// Subscribe to a message type with the given destination and delivery action with the given filter.
-        /// Messages will be delivered via the specified proxy.
-        /// All references (apart from the proxy) are held with WeakReferences
-        /// 
-        /// Only messages that "pass" the filter will be delivered.
+        ///     Subscribe to a message type with the given destination and delivery action with the given filter.
+        ///     Messages will be delivered via the specified proxy.
+        ///     All references (apart from the proxy) are held with WeakReferences
+        ///     Only messages that "pass" the filter will be delivered.
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="deliveryAction">Action to invoke when message is delivered</param>
@@ -337,10 +307,9 @@ namespace TinyMessenger
         TinyMessageSubscriptionToken Subscribe<TMessage>(Action<TMessage> deliveryAction, Func<TMessage, bool> messageFilter, ITinyMessageProxy proxy) where TMessage : class, ITinyMessage;
 
         /// <summary>
-        /// Subscribe to a message type with the given destination and delivery action with the given filter.
-        /// All references are held with WeakReferences
-        /// 
-        /// Only messages that "pass" the filter will be delivered.
+        ///     Subscribe to a message type with the given destination and delivery action with the given filter.
+        ///     All references are held with WeakReferences
+        ///     Only messages that "pass" the filter will be delivered.
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="deliveryAction">Action to invoke when message is delivered</param>
@@ -349,11 +318,10 @@ namespace TinyMessenger
         TinyMessageSubscriptionToken Subscribe<TMessage>(Action<TMessage> deliveryAction, Func<TMessage, bool> messageFilter, bool useStrongReferences) where TMessage : class, ITinyMessage;
 
         /// <summary>
-        /// Subscribe to a message type with the given destination and delivery action with the given filter.
-        /// Messages will be delivered via the specified proxy.
-        /// All references are held with WeakReferences
-        /// 
-        /// Only messages that "pass" the filter will be delivered.
+        ///     Subscribe to a message type with the given destination and delivery action with the given filter.
+        ///     Messages will be delivered via the specified proxy.
+        ///     All references are held with WeakReferences
+        ///     Only messages that "pass" the filter will be delivered.
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="deliveryAction">Action to invoke when message is delivered</param>
@@ -363,30 +331,29 @@ namespace TinyMessenger
         TinyMessageSubscriptionToken Subscribe<TMessage>(Action<TMessage> deliveryAction, Func<TMessage, bool> messageFilter, bool useStrongReferences, ITinyMessageProxy proxy) where TMessage : class, ITinyMessage;
 
         /// <summary>
-        /// Unsubscribe from a particular message type.
-        /// 
-        /// Does not throw an exception if the subscription is not found.
+        ///     Unsubscribe from a particular message type.
+        ///     Does not throw an exception if the subscription is not found.
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="subscriptionToken">Subscription token received from Subscribe</param>
         void Unsubscribe<TMessage>(TinyMessageSubscriptionToken subscriptionToken) where TMessage : class, ITinyMessage;
 
         /// <summary>
-        /// Publish a message to any subscribers
+        ///     Publish a message to any subscribers
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="message">Message to deliver</param>
         void Publish<TMessage>(TMessage message) where TMessage : class, ITinyMessage;
 
         /// <summary>
-        /// Publish a message to any subscribers asynchronously
+        ///     Publish a message to any subscribers asynchronously
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="message">Message to deliver</param>
         void PublishAsync<TMessage>(TMessage message) where TMessage : class, ITinyMessage;
 
         /// <summary>
-        /// Publish a message to any subscribers asynchronously
+        ///     Publish a message to any subscribers asynchronously
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="message">Message to deliver</param>
@@ -399,7 +366,7 @@ namespace TinyMessenger
     #region Hub Implementation
 
     /// <summary>
-    /// Messenger hub responsible for taking subscriptions/publications and delivering of messages.
+    ///     Messenger hub responsible for taking subscriptions/publications and delivering of messages.
     /// </summary>
     public sealed class TinyMessengerHub : ITinyMessengerHub
     {
@@ -427,10 +394,7 @@ namespace TinyMessenger
             protected WeakReference _DeliveryAction;
             protected WeakReference _MessageFilter;
 
-            public TinyMessageSubscriptionToken SubscriptionToken
-            {
-                get { return _SubscriptionToken; }
-            }
+            public TinyMessageSubscriptionToken SubscriptionToken => _SubscriptionToken;
 
             public bool ShouldAttemptDelivery(ITinyMessage message)
             {
@@ -461,7 +425,7 @@ namespace TinyMessenger
             }
 
             /// <summary>
-            /// Initializes a new instance of the WeakTinyMessageSubscription class.
+            ///     Initializes a new instance of the WeakTinyMessageSubscription class.
             /// </summary>
             /// <param name="subscriptionToken">Subscription token</param>
             /// <param name="deliveryAction">Delivery action</param>
@@ -489,10 +453,7 @@ namespace TinyMessenger
             protected Action<TMessage> _DeliveryAction;
             protected Func<TMessage, bool> _MessageFilter;
 
-            public TinyMessageSubscriptionToken SubscriptionToken
-            {
-                get { return _SubscriptionToken; }
-            }
+            public TinyMessageSubscriptionToken SubscriptionToken => _SubscriptionToken;
 
             public bool ShouldAttemptDelivery(ITinyMessage message)
             {
@@ -514,7 +475,7 @@ namespace TinyMessenger
             }
 
             /// <summary>
-            /// Initializes a new instance of the TinyMessageSubscription class.
+            ///     Initializes a new instance of the TinyMessageSubscription class.
             /// </summary>
             /// <param name="subscriptionToken">Subscription token</param>
             /// <param name="deliveryAction">Delivery action</param>
@@ -551,10 +512,9 @@ namespace TinyMessenger
         #region Public API
 
         /// <summary>
-        /// Subscribe to a message type with the given destination and delivery action.
-        /// All references are held with strong references
-        /// 
-        /// All messages of this type will be delivered.
+        ///     Subscribe to a message type with the given destination and delivery action.
+        ///     All references are held with strong references
+        ///     All messages of this type will be delivered.
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="deliveryAction">Action to invoke when message is delivered</param>
@@ -565,11 +525,10 @@ namespace TinyMessenger
         }
 
         /// <summary>
-        /// Subscribe to a message type with the given destination and delivery action.
-        /// Messages will be delivered via the specified proxy.
-        /// All references (apart from the proxy) are held with strong references
-        /// 
-        /// All messages of this type will be delivered.
+        ///     Subscribe to a message type with the given destination and delivery action.
+        ///     Messages will be delivered via the specified proxy.
+        ///     All references (apart from the proxy) are held with strong references
+        ///     All messages of this type will be delivered.
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="deliveryAction">Action to invoke when message is delivered</param>
@@ -581,9 +540,8 @@ namespace TinyMessenger
         }
 
         /// <summary>
-        /// Subscribe to a message type with the given destination and delivery action.
-        /// 
-        /// All messages of this type will be delivered.
+        ///     Subscribe to a message type with the given destination and delivery action.
+        ///     All messages of this type will be delivered.
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="deliveryAction">Action to invoke when message is delivered</param>
@@ -595,10 +553,9 @@ namespace TinyMessenger
         }
 
         /// <summary>
-        /// Subscribe to a message type with the given destination and delivery action.
-        /// Messages will be delivered via the specified proxy.
-        /// 
-        /// All messages of this type will be delivered.
+        ///     Subscribe to a message type with the given destination and delivery action.
+        ///     Messages will be delivered via the specified proxy.
+        ///     All messages of this type will be delivered.
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="deliveryAction">Action to invoke when message is delivered</param>
@@ -611,10 +568,9 @@ namespace TinyMessenger
         }
 
         /// <summary>
-        /// Subscribe to a message type with the given destination and delivery action with the given filter.
-        /// All references are held with WeakReferences
-        /// 
-        /// Only messages that "pass" the filter will be delivered.
+        ///     Subscribe to a message type with the given destination and delivery action with the given filter.
+        ///     All references are held with WeakReferences
+        ///     Only messages that "pass" the filter will be delivered.
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="deliveryAction">Action to invoke when message is delivered</param>
@@ -625,11 +581,10 @@ namespace TinyMessenger
         }
 
         /// <summary>
-        /// Subscribe to a message type with the given destination and delivery action with the given filter.
-        /// Messages will be delivered via the specified proxy.
-        /// All references (apart from the proxy) are held with WeakReferences
-        /// 
-        /// Only messages that "pass" the filter will be delivered.
+        ///     Subscribe to a message type with the given destination and delivery action with the given filter.
+        ///     Messages will be delivered via the specified proxy.
+        ///     All references (apart from the proxy) are held with WeakReferences
+        ///     Only messages that "pass" the filter will be delivered.
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="deliveryAction">Action to invoke when message is delivered</param>
@@ -641,10 +596,9 @@ namespace TinyMessenger
         }
 
         /// <summary>
-        /// Subscribe to a message type with the given destination and delivery action with the given filter.
-        /// All references are held with WeakReferences
-        /// 
-        /// Only messages that "pass" the filter will be delivered.
+        ///     Subscribe to a message type with the given destination and delivery action with the given filter.
+        ///     All references are held with WeakReferences
+        ///     Only messages that "pass" the filter will be delivered.
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="deliveryAction">Action to invoke when message is delivered</param>
@@ -656,11 +610,10 @@ namespace TinyMessenger
         }
 
         /// <summary>
-        /// Subscribe to a message type with the given destination and delivery action with the given filter.
-        /// Messages will be delivered via the specified proxy.
-        /// All references are held with WeakReferences
-        /// 
-        /// Only messages that "pass" the filter will be delivered.
+        ///     Subscribe to a message type with the given destination and delivery action with the given filter.
+        ///     Messages will be delivered via the specified proxy.
+        ///     All references are held with WeakReferences
+        ///     Only messages that "pass" the filter will be delivered.
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="deliveryAction">Action to invoke when message is delivered</param>
@@ -673,9 +626,8 @@ namespace TinyMessenger
         }
 
         /// <summary>
-        /// Unsubscribe from a particular message type.
-        /// 
-        /// Does not throw an exception if the subscription is not found.
+        ///     Unsubscribe from a particular message type.
+        ///     Does not throw an exception if the subscription is not found.
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="subscriptionToken">Subscription token received from Subscribe</param>
@@ -685,7 +637,7 @@ namespace TinyMessenger
         }
 
         /// <summary>
-        /// Publish a message to any subscribers
+        ///     Publish a message to any subscribers
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="message">Message to deliver</param>
@@ -695,7 +647,7 @@ namespace TinyMessenger
         }
 
         /// <summary>
-        /// Publish a message to any subscribers asynchronously
+        ///     Publish a message to any subscribers asynchronously
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="message">Message to deliver</param>
@@ -705,7 +657,7 @@ namespace TinyMessenger
         }
 
         /// <summary>
-        /// Publish a message to any subscribers asynchronously
+        ///     Publish a message to any subscribers asynchronously
         /// </summary>
         /// <typeparam name="TMessage">Type of message</typeparam>
         /// <param name="message">Message to deliver</param>
@@ -772,7 +724,6 @@ namespace TinyMessenger
             }
 
             foreach (var sub in currentlySubscribed)
-            {
                 try
                 {
                     sub.Proxy.Deliver(message, sub.Subscription);
@@ -782,7 +733,6 @@ namespace TinyMessenger
                     // By default ignore any errors and carry on
                     _SubscriberErrorHandler.Handle(message, exception);
                 }
-            }
         }
 
         void PublishAsyncInternal<TMessage>(TMessage message, AsyncCallback callback) where TMessage : class, ITinyMessage

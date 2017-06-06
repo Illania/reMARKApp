@@ -1,11 +1,4 @@
-﻿//
-// File: SearchDocumentsCriteria.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Mark5.Mobile.Common.Model
@@ -31,12 +24,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (priorities == null)
-                {
                     priorities = new List<Priority>();
-                }
                 return priorities;
             }
-            set { priorities = value; }
+            set => priorities = value;
         }
 
         List<DocumentDirection> directions;
@@ -46,12 +37,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (directions == null)
-                {
                     directions = new List<DocumentDirection>();
-                }
                 return directions;
             }
-            set { directions = value; }
+            set => directions = value;
         }
 
         List<int> categoryIds;
@@ -61,12 +50,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (categoryIds == null)
-                {
                     categoryIds = new List<int>();
-                }
                 return categoryIds;
             }
-            set { categoryIds = value; }
+            set => categoryIds = value;
         }
 
         List<int> mustHaveCategoryIds;
@@ -76,12 +63,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (mustHaveCategoryIds == null)
-                {
                     mustHaveCategoryIds = new List<int>();
-                }
                 return mustHaveCategoryIds;
             }
-            set { mustHaveCategoryIds = value; }
+            set => mustHaveCategoryIds = value;
         }
 
         List<Guid> lineGuids;
@@ -91,12 +76,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (lineGuids == null)
-                {
                     lineGuids = new List<Guid>();
-                }
                 return lineGuids;
             }
-            set { lineGuids = value; }
+            set => lineGuids = value;
         }
 
         List<Guid> creatorGuids;
@@ -106,12 +89,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (creatorGuids == null)
-                {
                     creatorGuids = new List<Guid>();
-                }
                 return creatorGuids;
             }
-            set { creatorGuids = value; }
+            set => creatorGuids = value;
         }
 
         public DateRange DateRange { get; set; }
@@ -127,12 +108,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (filedInFolderIds == null)
-                {
                     filedInFolderIds = new List<int>();
-                }
                 return filedInFolderIds;
             }
-            set { filedInFolderIds = value; }
+            set => filedInFolderIds = value;
         }
 
         public string ExtraFields { get; set; }

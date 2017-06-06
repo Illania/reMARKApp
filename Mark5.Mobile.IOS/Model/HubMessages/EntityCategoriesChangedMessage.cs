@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: EntityCategoriesChangedMessage.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using Mark5.Mobile.Common.Model;

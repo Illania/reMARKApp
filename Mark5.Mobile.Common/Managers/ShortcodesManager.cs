@@ -1,11 +1,4 @@
-﻿//
-// File: ShortcodesManager.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -54,9 +47,7 @@ namespace Mark5.Mobile.Common.Managers
                 return shortcodePreviews;
             }
             if (sourceType == SourceType.Local)
-            {
                 return await shortcodesDataAccess.GetShortcodePreviewsAsync(folder, startRowId, MaxToFetch);
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -76,18 +67,14 @@ namespace Mark5.Mobile.Common.Managers
                         callback(previews);
 
                         if (previews.Count > 0)
-                        {
                             startRowId = previews.LastOrDefault()?.RowId + 1 ?? -1;
-                        }
                         stopLoop = previews.Count < MaxToFetch;
                     }
                 })
                 .ContinueWith(t =>
                 {
                     if (t.IsFaulted)
-                    {
                         errorCallback(t.Exception.InnerException);
-                    }
                     finishedCallback();
                 }, TaskScheduler.FromCurrentSynchronizationContext());
         }
@@ -119,9 +106,7 @@ namespace Mark5.Mobile.Common.Managers
                 return shortcode;
             }
             if (sourceType == SourceType.Local)
-            {
                 return await shortcodesDataAccess.GetShortcodeAsync(shortcodeId);
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -155,9 +140,7 @@ namespace Mark5.Mobile.Common.Managers
                 return container;
             }
             if (sourceType == SourceType.Local)
-            {
                 return await shortcodesDataAccess.GetShortcodeWithPreviewAsync(shortcodeId);
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
     }

@@ -1,11 +1,4 @@
-﻿//
-// File: ShortcodesDataAccess.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,9 +26,7 @@ namespace Mark5.Mobile.Common.DataAccess
                 await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
                     if (clean)
-                    {
                         c.Table<FolderShortcodeLink>().Delete(fdl => fdl.FolderId == folder.Id);
-                    }
                     c.InsertOrReplaceAll(shortcodePreviews.Select(cp => new FolderShortcodeLink
                     {
                         FolderId = folder.Id,
@@ -63,26 +54,18 @@ namespace Mark5.Mobile.Common.DataAccess
                     query += $"order by {nameof(ShortcodePreview.Name)} ";
 
                     if (maxItems > 0)
-                    {
                         query += $"limit {maxItems - 1} ";
-                    }
                     if (startRowId > 0)
-                    {
                         query += $"offset {startRowId} ";
-                    }
                     var result = c.Query<ShortcodePreview>(query);
 
                     if (result == null || result.Count < 1)
-                    {
                         throw new DataNotFoundException("Shortcode previews could not be found.");
-                    }
                     shortcodePreviews = result;
 
                     startRowId = startRowId < 1 ? 1 : startRowId;
                     foreach (var shortcodePreview in shortcodePreviews)
-                    {
                         shortcodePreview.RowId = startRowId++;
-                    }
                 });
 
                 return shortcodePreviews;
@@ -151,14 +134,10 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     var shortcodePreview = c.Find<ShortcodePreview>(shortcodeId);
                     if (shortcodePreview == null)
-                    {
                         throw new DataNotFoundException("ShortcodePreview could not be found.");
-                    }
                     var shortcode = c.Find<Shortcode>(shortcodeId);
                     if (shortcode == null)
-                    {
                         throw new DataNotFoundException("Shortcode could not be found.");
-                    }
                     container = new ShortcodeContainer(shortcodePreview, shortcode);
                 });
 

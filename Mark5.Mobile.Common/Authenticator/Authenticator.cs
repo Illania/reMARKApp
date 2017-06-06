@@ -1,11 +1,4 @@
-﻿//
-// File: AuthenticationManager.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Converters;
@@ -19,7 +12,7 @@ namespace Mark5.Mobile.Common.Authenticator
     {
         public async Task<bool> IsAuthenticatedAsync(CancellationToken ct = default(CancellationToken))
         {
-            return (await GetConnectionInfoAsync(ct)) != null;
+            return await GetConnectionInfoAsync(ct) != null;
         }
 
         public async Task<ConnectionInfo> AuthenticateAsync(string username, string password, SslMode sslMode, string hostname, int port, CancellationToken ct = default(CancellationToken))

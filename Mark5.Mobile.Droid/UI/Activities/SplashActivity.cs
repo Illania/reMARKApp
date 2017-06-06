@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: SplashActivity.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -41,9 +33,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             Window.DecorView.SystemUiVisibility = (StatusBarVisibility) uiOptions;
 
             if (CommonConfig.Logger.IsInfoEnabled())
-            {
                 CommonConfig.Logger.Info($"Created {nameof(SplashActivity)}");
-            }
         }
 
         protected override void OnStart()
@@ -105,13 +95,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var policies = Managers.DownloadManager.DownloadPolicies;
                     policies[ObjectType.Document] = new DownloadFoldersPolicy();
                     if (PlatformConfig.Preferences.SynchroniseContacts)
-                    {
                         policies[ObjectType.Contact] = new DownloadAllPolicy();
-                    }
                     if (PlatformConfig.Preferences.SynchroniseShortcodes)
-                    {
                         policies[ObjectType.Shortcode] = new DownloadAllPolicy();
-                    }
 
                     if (PlatformConfig.Preferences.ClearCache)
                     {
@@ -158,13 +144,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 .ContinueWith(t =>
                 {
                     if (t.Result)
-                    {
                         StartActivity(new Intent(this, typeof(MainActivity)));
-                    }
                     else
-                    {
                         StartActivity(new Intent(this, typeof(LoginActivity)));
-                    }
                 }, TaskScheduler.FromCurrentSynchronizationContext());
 
             CommonConfig.Logger.Info($"Started {nameof(SplashActivity)}");

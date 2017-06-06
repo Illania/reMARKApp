@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: NotificationsTableViewCell.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.IO;
 using System.Linq;

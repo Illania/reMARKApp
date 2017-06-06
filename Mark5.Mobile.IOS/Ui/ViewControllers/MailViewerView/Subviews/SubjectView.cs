@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: SubjectView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using Mark5.Mobile.IOS.Ui.Common;
+﻿using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 

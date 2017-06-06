@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: SuggestionsListView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -207,9 +199,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         void HandleSugguestions(List<PrintableSuggestion> newSuggestions, CancellationToken token)
         {
             if (token.IsCancellationRequested)
-            {
                 return;
-            }
 
             BeginInvokeOnMainThread(() =>
             {
@@ -246,9 +236,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             nfloat offset = 0f;
             if (viewController != null && viewController.NavigationController != null && viewController.NavigationController.NavigationBar != null && viewController.NavigationController.NavigationBar.Frame != CGRect.Empty)
-            {
                 offset = viewController.NavigationController.NavigationBar.Frame.Bottom;
-            }
             spaceHeightConstraint.Constant = offset;
             LayoutIfNeeded();
         }
@@ -256,17 +244,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
     public class SuggestionsListViewSource : UITableViewSource
     {
-        public bool Empty
-        {
-            get { return !suggestions.Any(); }
-        }
+        public bool Empty => !suggestions.Any();
 
         public bool Searching { get; set; }
 
-        public bool Loading
-        {
-            get { return answersReceived < 3 && Searching; }
-        }
+        public bool Loading => answersReceived < 3 && Searching;
 
         int answersReceived;
 
@@ -277,8 +259,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         public SuggestionsObservableCollection Suggestions
         {
-            get { return suggestions; }
-            set { suggestions = value; }
+            get => suggestions;
+            set => suggestions = value;
         }
 
         public SuggestionsListViewSource(SuggestionsListView emailCompositionView, UITableView suggestionsTableView)
@@ -326,9 +308,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
             if (Empty)
-            {
                 return;
-            }
 
             var printableSuggestion = suggestions[indexPath.Row];
             suggestionsListView.SuggestionSelected(printableSuggestion);
@@ -418,9 +398,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             base.HandleTextViewChanged(sender, e);
 
             if (TextView.Text == originalState)
-            {
                 ReachedOriginalState(this, EventArgs.Empty);
-            }
         }
 
         #endregion

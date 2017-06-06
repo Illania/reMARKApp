@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: PriorityView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using MailBee.Mime;
+﻿using MailBee.Mime;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
@@ -59,7 +51,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         public override void RefreshView()
         {
             if (MailMessage != null)
-            {
                 switch (MailMessage.Priority)
                 {
                     case MailPriority.Highest:
@@ -74,7 +65,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                         textView.Text = string.Empty;
                         break;
                 }
-            }
         }
 
         public override void UpdateVisibility()

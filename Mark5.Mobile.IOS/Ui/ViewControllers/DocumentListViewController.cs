@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: DocumentsListViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -281,7 +273,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var ds = (DataSource) tableView.Source;
 
-                var nc = ((UINavigationController) SplitViewController.ViewControllers[1]);
+                var nc = (UINavigationController) SplitViewController.ViewControllers[1];
                 nc.PopToViewController(nc.ViewControllers[0], false);
 
                 var vc = (DocumentViewController) nc.ViewControllers[0];
@@ -315,13 +307,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var vc = new DocumentViewController();
                 vc.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
                 if (!searchController.Active)
-                {
                     vc.SetData(Folder, documentPreview, ds.GetNextDocumentPreview, ds.GetPreviousDocumentPreview);
-                }
                 else
-                {
                     vc.SetData(Folder, documentPreview);
-                }
                 vc.SetRefreshDataOnAppear();
 
                 newDocumentsAvailableAction = vc.RefreshNavigationBar;
@@ -370,7 +358,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void ExitEditItem_Clicked(object sender, EventArgs e) => EndEditing();
+        void ExitEditItem_Clicked(object sender, EventArgs e)
+        {
+            EndEditing();
+        }
 
         void EndEditing()
         {
@@ -508,10 +499,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void RemoveFromFolder(DocumentPreview selectedDocument) => RemoveFromFolder(new List<DocumentPreview>
+        void RemoveFromFolder(DocumentPreview selectedDocument)
         {
-            selectedDocument
-        });
+            RemoveFromFolder(new List<DocumentPreview>
+            {
+                selectedDocument
+            });
+        }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void RemoveFromFolder(List<DocumentPreview> selectedDocuments)
@@ -547,10 +541,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void Delete(DocumentPreview selectedDocument) => Delete(new List<DocumentPreview>
+        void Delete(DocumentPreview selectedDocument)
         {
-            selectedDocument
-        });
+            Delete(new List<DocumentPreview>
+            {
+                selectedDocument
+            });
+        }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void Delete(List<DocumentPreview> selectedDocuments)
@@ -610,10 +607,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void CopyToFolder(DocumentPreview selectedDocument) => CopyToFolder(new List<DocumentPreview>
+        void CopyToFolder(DocumentPreview selectedDocument)
         {
-            selectedDocument
-        });
+            CopyToFolder(new List<DocumentPreview>
+            {
+                selectedDocument
+            });
+        }
 
         void CopyToFolder(List<DocumentPreview> selectedDocument)
         {
@@ -621,10 +621,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void MoveToFolder(DocumentPreview selectedDocument) => MoveToFolder(new List<DocumentPreview>
+        void MoveToFolder(DocumentPreview selectedDocument)
         {
-            selectedDocument
-        });
+            MoveToFolder(new List<DocumentPreview>
+            {
+                selectedDocument
+            });
+        }
 
         void MoveToFolder(List<DocumentPreview> selectedDocument)
         {
@@ -633,10 +636,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void CopyToWorktray(DocumentPreview selectedDocument) => CopyToWorktray(new List<DocumentPreview>
+        void CopyToWorktray(DocumentPreview selectedDocument)
         {
-            selectedDocument
-        });
+            CopyToWorktray(new List<DocumentPreview>
+            {
+                selectedDocument
+            });
+        }
 
         void CopyToWorktray(List<DocumentPreview> selectedDocuments)
         {
@@ -648,13 +654,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void MarkAsRead(DocumentPreview documentPreview, NSIndexPath row) => MarkAsRead(new List<DocumentPreview>
+        void MarkAsRead(DocumentPreview documentPreview, NSIndexPath row)
         {
-            documentPreview
-        }, new[]
-        {
-            row
-        });
+            MarkAsRead(new List<DocumentPreview>
+            {
+                documentPreview
+            }, new[]
+            {
+                row
+            });
+        }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void MarkAsRead(List<DocumentPreview> documentPreviews, NSIndexPath[] rows)
@@ -675,13 +684,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void MarkAsUnread(DocumentPreview documentPreview, NSIndexPath row) => MarkAsUnread(new List<DocumentPreview>
+        void MarkAsUnread(DocumentPreview documentPreview, NSIndexPath row)
         {
-            documentPreview
-        }, new[]
-        {
-            row
-        });
+            MarkAsUnread(new List<DocumentPreview>
+            {
+                documentPreview
+            }, new[]
+            {
+                row
+            });
+        }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void MarkAsUnread(List<DocumentPreview> documentPreviews, NSIndexPath[] rows)
@@ -788,9 +800,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var nc = (UINavigationController) SplitViewController.ViewControllers[1];
                 var vc = (DocumentViewController) nc.ViewControllers[0];
                 if (ids.Select(id => vc.IsShowingDocumentWithId(id)).Any(v => v))
-                {
                     vc.UpdatePriority();
-                }
             }
         }
 
@@ -798,7 +808,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Refreshing
 
-        async void RefreshControl_ValueChanged(object sender, EventArgs e) => await RefreshData(forceClear: true);
+        async void RefreshControl_ValueChanged(object sender, EventArgs e)
+        {
+            await RefreshData(forceClear: true);
+        }
 
         async Task RefreshData(int startId = -1, int endId = -1, bool forceClear = false)
         {
@@ -902,9 +915,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 tableView.ReloadData();
 
                 if (selectedRow != null)
-                {
                     tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
-                }
             });
         }
 
@@ -928,9 +939,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }, UITableViewRowAnimation.Fade);
 
                     if (selectedRow != null)
-                    {
                         tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
-                    }
                 }
             });
         }
@@ -956,9 +965,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }, UITableViewRowAnimation.Fade);
 
                     if (selectedRow != null)
-                    {
                         tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
-                    }
                 }
             });
         }
@@ -1048,25 +1055,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Messages handlers
 
-        void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m) => RemoveDocumentsFromList(m.EntitiesId);
+        void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m)
+        {
+            RemoveDocumentsFromList(m.EntitiesId);
+        }
 
-        void HandleMovedFromFolder(EntityMovedFromFolderMessage m) => RemoveDocumentsFromList(m.EntitiesId);
+        void HandleMovedFromFolder(EntityMovedFromFolderMessage m)
+        {
+            RemoveDocumentsFromList(m.EntitiesId);
+        }
 
-        void HandleDeleted(EntityDeletedMessage m) => RemoveDocumentsFromList(m.EntitiesId);
+        void HandleDeleted(EntityDeletedMessage m)
+        {
+            RemoveDocumentsFromList(m.EntitiesId);
+        }
 
         #endregion
 
         class DataSource : UITableViewSource, IDisposable
         {
-            public bool Empty
-            {
-                get { return documentPreviewsInView.Count < 1; }
-            }
+            public bool Empty => documentPreviewsInView.Count < 1;
 
-            public List<DocumentPreview> Items
-            {
-                get { return documentPreviewsInView; }
-            }
+            public List<DocumentPreview> Items => documentPreviewsInView;
 
             public bool LoadMoreEnabled { get; set; }
 
@@ -1091,9 +1101,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 if (loading)
-                {
                     return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
-                }
 
                 if (documentPreviewsInView.Count < 1)
                 {
@@ -1265,9 +1273,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         loadMoreAction(documentPreviewsInView.Last().Id);
 
                     if (scrollToDocument)
-                    {
                         ScrollAndSelect(nextDocumentRow);
-                    }
 
                     return documentPreviewsInView.ElementAtOrDefault(nextDocumentRow);
                 }
@@ -1298,9 +1304,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     nextDocumentAvailable = previousDocumentRow < documentPreviewsInView.Count - 1;
 
                     if (scrollToDocument)
-                    {
                         ScrollAndSelect(previousDocumentRow);
-                    }
 
                     return documentPreviewsInView.ElementAtOrDefault(previousDocumentRow);
                 }
@@ -1318,12 +1322,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var selectedIndexPaths = documentsTableView.IndexPathsForSelectedRows;
                 if (selectedIndexPaths != null)
-                {
                     foreach (var indexPath in selectedIndexPaths)
-                    {
                         documentsTableView.DeselectRow(indexPath, true);
-                    }
-                }
 
                 documentsTableView.SelectRow(NSIndexPath.FromRowSection(row, 0), true, UITableViewScrollPosition.Middle);
             }
@@ -1402,7 +1402,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public void Stop()
             {
                 lock (lockObj)
+                {
                     cts?.Cancel();
+                }
             }
         }
     }

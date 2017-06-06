@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: AttachmentsView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
@@ -66,9 +58,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         public override void RefreshView()
         {
             if (Document == null)
-            {
                 return;
-            }
 
             stackView.ArrangedSubviews.ForEach(v =>
             {
@@ -83,13 +73,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             }
 
             if (Container != null)
-            {
                 foreach (var ad in Container.LocalAttachments)
                 {
                     var alssv = new AttachmentsSubView(this, ad);
                     stackView.AddArrangedSubview(alssv);
                 }
-            }
         }
 
         public override void UpdateVisibility()
@@ -118,10 +106,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
     class AttachmentsSubView : UIView
     {
-        public IAttachmentDescription Attachment
-        {
-            get { return attachmentDescription; }
-        }
+        public IAttachmentDescription Attachment => attachmentDescription;
 
         readonly AttachmentsView view;
         readonly IAttachmentDescription attachmentDescription;

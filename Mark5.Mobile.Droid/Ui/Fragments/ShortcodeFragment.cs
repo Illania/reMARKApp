@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ShortcodeFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -118,22 +110,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
 
             if (Folder?.InternalType == FolderInternalType.FilterView || Folder?.InternalType == FolderInternalType.Static || Folder?.InternalType == FolderInternalType.Worktray)
-            {
                 menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
-            }
 
             menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.actions);
             menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
 
             if (Folder?.InternalType == FolderInternalType.FilterView || Folder?.InternalType == FolderInternalType.Static || Folder?.InternalType == FolderInternalType.Worktray)
-            {
                 menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
-            }
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
-            {
                 menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
-            }
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -276,21 +262,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (option == 1)
-            {
                 StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, new List<IBusinessEntity>
                 {
                     ShortcodePreview
                 }));
-            }
         }
 
         async void DeleteFromFolderAction()
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
             if (!yesNo)
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Attempting to delete from folder [shortcodePreview={ShortcodePreview}]...");
 
@@ -324,9 +306,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
             if (!yesNo)
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Attempting to delete [shortcodePreview={ShortcodePreview}]...");
 
@@ -382,9 +362,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 if (NotificationGuid != default(Guid))
-                {
                     await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
-                }
 
                 if (ShortcodeId.HasValue && ShortcodePreview == null && Shortcode == null)
                 {
@@ -394,9 +372,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 if (ShortcodePreview != null && Shortcode == null)
-                {
                     Shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(FolderId ?? Folder?.Id, ShortcodePreview.Id);
-                }
 
                 RefreshView();
             }

@@ -1,11 +1,4 @@
-﻿//
-// File: AbstractLogger.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2014 Nordic IT
-//
-
-using System;
+﻿using System;
 
 namespace Mark5.Mobile.Common.Utilities
 {
@@ -15,8 +8,8 @@ namespace Mark5.Mobile.Common.Utilities
 
         public bool Enabled
         {
-            get { return enabled; }
-            set { enabled = value; }
+            get => enabled;
+            set => enabled = value;
         }
 
         public LogLevel Level { get; set; }

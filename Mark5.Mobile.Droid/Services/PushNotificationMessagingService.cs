@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: PushNotificationMessagingService.cs
-// Author: Ferdinando Papale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Linq;
 using Android.App;
 using Android.Content;
@@ -23,7 +15,8 @@ using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 
 namespace Mark5.Mobile.Droid.Utilities.Services
 {
-    [Service, IntentFilter(new[]
+    [Service]
+    [IntentFilter(new[]
     {
         "com.google.firebase.MESSAGING_EVENT"
     })]
@@ -41,10 +34,7 @@ namespace Mark5.Mobile.Droid.Utilities.Services
                 CommonConfig.Logger.Info($"Notification received: {n}");
 
                 if (n.IsSilent)
-                {
-                    // Nothing to do (for now)
                     return;
-                }
 
                 if (PlatformConfig.Preferences.SilenceNotifications)
                 {

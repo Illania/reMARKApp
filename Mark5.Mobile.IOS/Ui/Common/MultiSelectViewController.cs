@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: MultiSelectViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,10 +22,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         TaskCompletionSource<T[]> tcs = new TaskCompletionSource<T[]>();
 
-        public Task<T[]> Task
-        {
-            get { return tcs.Task; }
-        }
+        public Task<T[]> Task => tcs.Task;
 
         public MultiSelectViewController(string title, T[] data, T[] preselected, Func<T, string> description, IEqualityComparer<T> equalityComparer)
             : base(UITableViewStyle.Grouped)

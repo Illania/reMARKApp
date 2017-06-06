@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Forms.Droid
-// File: SimpleLogger.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2014 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
@@ -63,7 +55,10 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
-        void Write(LogPriority p, string s) => Log.WriteLine(p, Tag, s ?? "");
+        void Write(LogPriority p, string s)
+        {
+            Log.WriteLine(p, Tag, s ?? "");
+        }
 
         static string GetStackInfo(int depth)
         {

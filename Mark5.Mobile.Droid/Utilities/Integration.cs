@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: Integration.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using Android.App;
 using Android.Content;
 using Android.Net;
@@ -81,10 +73,8 @@ namespace Mark5.Mobile.Droid.Utilities
                 "/su/bin/su"
             };
             foreach (var path in paths)
-            {
                 if (new Java.IO.File(path).Exists())
                     return true;
-            }
             return false;
         }
 

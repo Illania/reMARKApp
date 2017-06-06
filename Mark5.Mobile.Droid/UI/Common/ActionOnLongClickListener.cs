@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ActionOnLongClickListener.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using Android.Views;
 

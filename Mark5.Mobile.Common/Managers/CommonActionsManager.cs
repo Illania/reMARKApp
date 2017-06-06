@@ -1,11 +1,4 @@
-﻿//
-// File: CommonActionsManager.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -52,9 +45,7 @@ namespace Mark5.Mobile.Common.Managers
                 return result.ObjectActions.WhereNotNull().Select(oa => oa.Convert()).ToList();
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -75,9 +66,7 @@ namespace Mark5.Mobile.Common.Managers
                 return result.ObjectLinks.WhereNotNull().Select(ol => ol.Convert()).ToList();
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -100,9 +89,7 @@ namespace Mark5.Mobile.Common.Managers
                 return;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -125,50 +112,32 @@ namespace Mark5.Mobile.Common.Managers
 
                 var documentPreviews = businessEntities.OfType<DocumentPreview>();
                 if (documentPreviews.Any())
-                {
                     await documentsDataAccess.RemoveFromFolderAsync(documentPreviews.ToList(), fromFolder);
-                }
                 var documents = businessEntities.OfType<Document>();
                 if (documents.Any())
-                {
                     await documentsDataAccess.RemoveFromFolderAsync(documents.ToList(), fromFolder);
-                }
                 var contactPreviews = businessEntities.OfType<ContactPreview>();
                 if (contactPreviews.Any())
-                {
                     await contactsDataAccess.RemoveFromFolderAsync(contactPreviews.ToList(), fromFolder);
-                }
                 var contacts = businessEntities.OfType<Contact>();
                 if (contacts.Any())
-                {
                     await contactsDataAccess.RemoveFromFolderAsync(contacts.ToList(), fromFolder);
-                }
                 var shortcodePreviews = businessEntities.OfType<ShortcodePreview>();
                 if (shortcodePreviews.Any())
-                {
                     await shortcodesDataAccess.RemoveFromFolderAsync(shortcodePreviews.ToList(), fromFolder);
-                }
                 var shortcodes = businessEntities.OfType<Shortcode>();
                 if (shortcodes.Any())
-                {
                     await shortcodesDataAccess.RemoveFromFolderAsync(shortcodes.ToList(), fromFolder);
-                }
                 var appointments = businessEntities.OfType<CalendarAppointment>();
                 if (appointments.Any())
-                {
                     await calendarDataAccess.RemoveFromFolderAsync(appointments.ToList(), fromFolder);
-                }
                 var tasks = businessEntities.OfType<CalendarTask>();
                 if (tasks.Any())
-                {
                     await calendarDataAccess.RemoveFromFolderAsync(tasks.ToList(), fromFolder);
-                }
                 return;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -189,9 +158,7 @@ namespace Mark5.Mobile.Common.Managers
                 return;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -214,9 +181,7 @@ namespace Mark5.Mobile.Common.Managers
                 return;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -237,50 +202,32 @@ namespace Mark5.Mobile.Common.Managers
 
                 var documentPreviews = businessEntities.OfType<DocumentPreview>();
                 if (documentPreviews.Any())
-                {
                     await documentsDataAccess.RemoveFromFolderAsync(documentPreviews.ToList(), folder);
-                }
                 var documents = businessEntities.OfType<Document>();
                 if (documents.Any())
-                {
                     await documentsDataAccess.RemoveFromFolderAsync(documents.ToList(), folder);
-                }
                 var contactPreviews = businessEntities.OfType<ContactPreview>();
                 if (contactPreviews.Any())
-                {
                     await contactsDataAccess.RemoveFromFolderAsync(contactPreviews.ToList(), folder);
-                }
                 var contacts = businessEntities.OfType<Contact>();
                 if (contacts.Any())
-                {
                     await contactsDataAccess.RemoveFromFolderAsync(contacts.ToList(), folder);
-                }
                 var shortcodePreviews = businessEntities.OfType<ShortcodePreview>();
                 if (shortcodePreviews.Any())
-                {
                     await shortcodesDataAccess.RemoveFromFolderAsync(shortcodePreviews.ToList(), folder);
-                }
                 var shortcodes = businessEntities.OfType<Shortcode>();
                 if (shortcodes.Any())
-                {
                     await shortcodesDataAccess.RemoveFromFolderAsync(shortcodes.ToList(), folder);
-                }
                 var appointments = businessEntities.OfType<CalendarAppointment>();
                 if (appointments.Any())
-                {
                     await calendarDataAccess.RemoveFromFolderAsync(appointments.ToList(), folder);
-                }
                 var tasks = businessEntities.OfType<CalendarTask>();
                 if (tasks.Any())
-                {
                     await calendarDataAccess.RemoveFromFolderAsync(tasks.ToList(), folder);
-                }
                 return;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -300,50 +247,32 @@ namespace Mark5.Mobile.Common.Managers
 
                 var documentPreviews = businessEntities.OfType<DocumentPreview>();
                 if (documentPreviews.Any())
-                {
                     await documentsDataAccess.DeleteAsync(documentPreviews.ToList());
-                }
                 var documents = businessEntities.OfType<Document>();
                 if (documents.Any())
-                {
                     await documentsDataAccess.DeleteAsync(documents.ToList());
-                }
                 var contactPreviews = businessEntities.OfType<ContactPreview>();
                 if (contactPreviews.Any())
-                {
                     await contactsDataAccess.DeleteAsync(contactPreviews.ToList());
-                }
                 var contacts = businessEntities.OfType<Contact>();
                 if (contacts.Any())
-                {
                     await contactsDataAccess.DeleteAsync(contacts.ToList());
-                }
                 var shortcodePreviews = businessEntities.OfType<ShortcodePreview>();
                 if (shortcodePreviews.Any())
-                {
                     await shortcodesDataAccess.DeleteAsync(shortcodePreviews.ToList());
-                }
                 var shortcodes = businessEntities.OfType<Shortcode>();
                 if (shortcodes.Any())
-                {
                     await shortcodesDataAccess.DeleteAsync(shortcodes.ToList());
-                }
                 var appointments = businessEntities.OfType<CalendarAppointment>();
                 if (appointments.Any())
-                {
                     await calendarDataAccess.DeleteAsync(appointments.ToList());
-                }
                 var tasks = businessEntities.OfType<CalendarTask>();
                 if (tasks.Any())
-                {
                     await calendarDataAccess.DeleteAsync(tasks.ToList());
-                }
                 return;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
     }

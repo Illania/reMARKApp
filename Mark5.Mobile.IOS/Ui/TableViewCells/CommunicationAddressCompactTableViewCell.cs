@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: CommunicationAddressCompactTableViewCell.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using Foundation;
@@ -72,9 +64,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 {
                     var addressParts = ca.Address.Split('|');
                     if (addressParts[0].Length > 0)
-                    {
                         addressParts[0] = "+" + addressParts[0];
-                    }
 
                     return string.Join(" ", addressParts.Where(s => !string.IsNullOrWhiteSpace(s)));
                 }

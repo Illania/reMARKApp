@@ -1,11 +1,4 @@
-﻿//
-// File: SendDocumentInfo.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Mark5.Mobile.Common.Model
@@ -30,12 +23,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (temporaryAttachmentGuids == null)
-                {
                     temporaryAttachmentGuids = new List<Guid>();
-                }
                 return temporaryAttachmentGuids;
             }
-            set { temporaryAttachmentGuids = value; }
+            set => temporaryAttachmentGuids = value;
         }
     }
 }

@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: ReachabilityBar.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Linq;
 using System.Text;
 using CoreGraphics;
@@ -113,10 +105,16 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 Position();
         }
 
-        public override void DrawText(CGRect rect) => base.DrawText(new UIEdgeInsets(0f, 5f, 0f, 5f).InsetRect(rect));
+        public override void DrawText(CGRect rect)
+        {
+            base.DrawText(new UIEdgeInsets(0f, 5f, 0f, 5f).InsetRect(rect));
+        }
 
         [Export("tapped:")]
-        public void Tapped(UILongPressGestureRecognizer recognizer) => CommonConfig.ReachabilityService.Refresh();
+        public void Tapped(UILongPressGestureRecognizer recognizer)
+        {
+            CommonConfig.ReachabilityService.Refresh();
+        }
 
         [Export("longPressed:")]
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -164,7 +162,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
             UserInteractionEnabled = true;
         }
 
-        void ShowDisconnected() => ShowDisconnected(true);
+        void ShowDisconnected()
+        {
+            ShowDisconnected(true);
+        }
 
         void ShowDisconnected(bool animate)
         {
@@ -187,7 +188,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
             UICompletionHandler completion = finished => { UserInteractionEnabled = true; };
 
             if (animate)
+            {
                 AnimateNotify(AnimationDuration, 0f, UIViewAnimationOptions.CurveEaseIn | UIViewAnimationOptions.BeginFromCurrentState, action, completion);
+            }
             else
             {
                 action();
@@ -195,7 +198,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
             }
         }
 
-        void ShowConnecting() => ShowConnecting(true);
+        void ShowConnecting()
+        {
+            ShowConnecting(true);
+        }
 
         void ShowConnecting(bool animate)
         {
@@ -223,7 +229,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 action();
         }
 
-        void Hide() => Hide(true);
+        void Hide()
+        {
+            Hide(true);
+        }
 
         void Hide(bool animate)
         {

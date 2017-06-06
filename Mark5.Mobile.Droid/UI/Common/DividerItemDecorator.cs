@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: DividerItemDecorator.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using Android.Content;
 using Android.Graphics;
@@ -38,16 +30,12 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 var child = parent.GetChildAt(i);
 
                 if (child != null && idToSkip.Contains(child.Id))
-                {
                     continue;
-                }
 
                 var nextChild = parent.GetChildAt(i + 1);
 
                 if (nextChild != null && idToSkip.Contains(nextChild.Id))
-                {
                     continue;
-                }
 
                 var p = (RecyclerView.LayoutParams) child.LayoutParameters;
 

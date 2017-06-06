@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: FoldersTableViewCell.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.IO;
 using Foundation;
@@ -111,14 +103,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         static UIImage GetIcon(Folder folder)
         {
             if (folder.InternalType == FolderInternalType.Worktray)
-            {
                 return UIImage.FromBundle(Path.Combine("icons", "folderslist", "worktray.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            }
 
             if (folder.Type == FolderType.Draft)
-            {
                 return UIImage.FromBundle(Path.Combine("icons", "folderslist", "draft.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            }
 
             return UIImage.FromBundle(Path.Combine("icons", "folderslist", "folder.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
         }

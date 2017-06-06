@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: PhonebookUtilities.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Contacts;
@@ -44,9 +36,7 @@ namespace Mark5.Mobile.IOS.Utilities
             var status = CNContactStore.GetAuthorizationStatus(CNEntityType.Contacts);
 
             if (status == CNAuthorizationStatus.Denied || status == CNAuthorizationStatus.Restricted)
-            {
                 return null;
-            }
 
             using (var store = new CNContactStore())
             {
@@ -55,9 +45,7 @@ namespace Mark5.Mobile.IOS.Utilities
                     store.RequestAccess(CNEntityType.Contacts, (granted, error) =>
                     {
                         if (granted)
-                        {
                             contacts = GetContactsFromContactStore(store, phrase);
-                        }
                         authorizationSemaphore.Release();
                     });
                 }
@@ -105,9 +93,7 @@ namespace Mark5.Mobile.IOS.Utilities
             var contacts = cnContacts.Select(ConvertToContact);
 
             if (!string.IsNullOrEmpty(phrase))
-            {
                 contacts = contacts.Where(c => c.FirstName.ContainsCaseInsensitive(phrase) || c.LastName.ContainsCaseInsensitive(phrase) || c.CommunicationAddresses.Any(ca => ca.Address.ContainsCaseInsensitive(phrase)));
-            }
             return contacts.ToList();
         }
 

@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ContactSearchResultsFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -196,15 +188,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ContactSearchResultsAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-            public List<ContactPreview> Items
-            {
-                get { return contactPreviewsInView; }
-            }
+            public List<ContactPreview> Items => contactPreviewsInView;
 
-            public override int ItemCount
-            {
-                get { return contactPreviewsInView.Count; }
-            }
+            public override int ItemCount => contactPreviewsInView.Count;
 
             readonly List<ContactPreview> contactPreviewsInView = new List<ContactPreview>(1000);
             readonly Dictionary<int, ContactPreview> selectedContactsInView = new Dictionary<int, ContactPreview>();
@@ -273,7 +259,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public string Name
             {
-                set { nameTextView.Text = value; }
+                set => nameTextView.Text = value;
             }
 
             public List<Category> Categories
@@ -296,7 +282,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public bool Selected
             {
-                set { selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             readonly AppCompatImageView iconImageView;

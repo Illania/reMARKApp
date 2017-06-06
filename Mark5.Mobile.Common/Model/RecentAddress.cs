@@ -1,18 +1,13 @@
-﻿//
-// File: RecentAddress.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using SQLite;
+﻿using SQLite;
 
 namespace Mark5.Mobile.Common.Model
 {
     [Table("RecentAddress")]
     public class RecentAddress
     {
-        [Column("Id"), PrimaryKey, AutoIncrement]
+        [Column("Id")]
+        [PrimaryKey]
+        [AutoIncrement]
         public int Id { get; set; } = -1;
 
         [Column("AddressType")]

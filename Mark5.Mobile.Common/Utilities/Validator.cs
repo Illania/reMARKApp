@@ -1,11 +1,4 @@
-﻿//
-// File: Validator.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2014 Nordic IT
-//
-
-using System.Linq;
+﻿using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Mark5.Mobile.Common.Utilities
@@ -36,18 +29,14 @@ namespace Mark5.Mobile.Common.Utilities
         public static bool IsHostNameValid(string hostName)
         {
             if (string.IsNullOrEmpty(hostName))
-            {
                 return false;
-            }
             return Regex.Match(hostName, OnlyIpAddressRegex).Success || Regex.Match(hostName, OnlyHostnameRegex).Success;
         }
 
         public static bool IsPortValid(string port)
         {
             if (string.IsNullOrEmpty(port))
-            {
                 return false;
-            }
             return Regex.Match(port, OnlyPortRegex).Success && IsPortValid(int.Parse(port));
         }
 
@@ -59,9 +48,7 @@ namespace Mark5.Mobile.Common.Utilities
         public static bool IsEmailValid(string email)
         {
             if (string.IsNullOrEmpty(email))
-            {
                 return false;
-            }
             return Regex.Match(email, OnlyEmailAddressRegex, RegexOptions.IgnoreCase).Success;
         }
 

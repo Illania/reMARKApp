@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: AndroidClientHandler2.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using Java.Net;
 using Java.Security.Cert;

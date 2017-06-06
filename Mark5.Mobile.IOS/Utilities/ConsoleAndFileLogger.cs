@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: ConsoleAndFileLogger.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -42,9 +34,7 @@ namespace Mark5.Mobile.IOS.Utilities
                 logFilePath = $"{logPath}/mark5_ios_{DateTime.Now.ToString("yyyy_M_dd")}.log";
 
                 if (!fm.FileExists(logFilePath))
-                {
                     fm.CreateFile(logFilePath, new NSData(), new NSFileAttributes());
-                }
 
 #if DEBUG
                 WriteToConsole("Log path: " + logPath);
@@ -62,9 +52,7 @@ namespace Mark5.Mobile.IOS.Utilities
         protected override void WriteToLog(LogLevel logLevel, string message, Exception exception, bool includeStackTrace = false)
         {
             if (!Enabled || Level < logLevel)
-            {
                 return;
-            }
 
             // Build message
             var logMessageBuilder = new StringBuilder();
@@ -86,7 +74,10 @@ namespace Mark5.Mobile.IOS.Utilities
             WriteToFile(log);
         }
 
-        void WriteToConsole(string log) => Console.WriteLine(log);
+        void WriteToConsole(string log)
+        {
+            Console.WriteLine(log);
+        }
 
         void WriteToFile(string log)
         {

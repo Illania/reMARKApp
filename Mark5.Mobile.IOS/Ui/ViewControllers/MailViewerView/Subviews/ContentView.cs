@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: ContentView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using CoreFoundation;
 using CoreGraphics;
 using Foundation;
@@ -19,9 +11,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 {
     public class ContentView : MailViewerSubview, IWKNavigationDelegate, IWKScriptMessageHandler
     {
-        readonly static NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
+        static readonly NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
 
-        readonly static NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
+        static readonly NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
 
         WKWebView webView;
         NSLayoutConstraint webViewHeightConstraint;
@@ -83,7 +75,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         #region IWKNavigationDelegate
 
         [Export("webView:decidePolicyForNavigationAction:decisionHandler:")]
-        void DecidePolicy(WKWebView wkWebView, WKNavigationAction navigationAction, Action<WKNavigationActionPolicy> decisionHandler) => decisionHandler(navigationActionDelegate(navigationAction));
+        void DecidePolicy(WKWebView wkWebView, WKNavigationAction navigationAction, Action<WKNavigationActionPolicy> decisionHandler)
+        {
+            decisionHandler(navigationActionDelegate(navigationAction));
+        }
 
         #endregion
 
@@ -99,7 +94,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             var justLoadedNumber = responseDict["justLoaded"] as NSNumber;
             var resizedNumber = responseDict["resized"] as NSNumber;
 
-            if ((justLoadedNumber != null && justLoadedNumber.BoolValue) || (resizedNumber != null && resizedNumber.BoolValue))
+            if (justLoadedNumber != null && justLoadedNumber.BoolValue || resizedNumber != null && resizedNumber.BoolValue)
             {
                 Action<WKWebView, NSLayoutConstraint> resizeAction = null;
                 resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)), () =>
@@ -126,9 +121,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         public override void RefreshView()
         {
             if (MailMessage == null)
-            {
                 return;
-            }
 
             CreateWebView();
 

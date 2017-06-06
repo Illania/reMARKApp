@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: SmoothActionBarDrawerToggle.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -46,13 +38,9 @@ namespace Mark5.Mobile.Droid.Ui.Common
         public void RunWhenIdle(Action action, bool forceRun = false)
         {
             if (forceRun)
-            {
                 action();
-            }
             else
-            {
                 this.action = action;
-            }
         }
     }
 }

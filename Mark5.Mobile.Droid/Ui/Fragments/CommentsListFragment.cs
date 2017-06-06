@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: CommentsFragment.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -31,10 +23,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public BusinessEntity Entity { get; set; }
 
-        public List<Comment> Comments
-        {
-            get { return adapter.Items; }
-        }
+        public List<Comment> Comments => adapter.Items;
 
         RecyclerView recyclerView;
         CommentsListAdapter adapter;
@@ -154,19 +143,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var isEditable = DateTime.UtcNow.Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= SecondsToEdit;
                 if (!isEditable)
-                {
                     Dialogs.ShowConfirmDialog(Context, Resource.String.cannot_edit_comment_title, Resource.String.cannot_edit_comment_content);
-                }
                 else
-                {
                     Dialogs.ShowEditTextDialog(Context, Resource.String.edit_comment_message, comment.Content, (text) => EditComment(comment, text), null, Resource.String.confirm, Resource.String.cancel);
-                }
             }
 
             if (item.ItemId == MenuItemActions.DeleteComment)
-            {
                 Dialogs.ShowYesNoDialog(Context, Resource.String.confirm_comment_deletion_title, Resource.String.confirm_comment_deletion_content, () => DeleteComment(comment), null, Resource.String.confirm, Resource.String.cancel);
-            }
 
             return true;
         }
@@ -341,15 +324,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class CommentsListAdapter : RecyclerView.Adapter
         {
-            public List<Comment> Items
-            {
-                get { return commentsInView; }
-            }
+            public List<Comment> Items => commentsInView;
 
-            public override int ItemCount
-            {
-                get { return commentsInView.Count; }
-            }
+            public override int ItemCount => commentsInView.Count;
 
             public int SelectedPosition { get; set; }
 
@@ -438,17 +415,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public string Username
             {
-                set { usernameTextView.Text = value; }
+                set => usernameTextView.Text = value;
             }
 
             public string Date
             {
-                set { dateTextView.Text = value; }
+                set => dateTextView.Text = value;
             }
 
             public string Content
             {
-                set { contentTextView.Text = value; }
+                set => contentTextView.Text = value;
             }
 
             public CommentViewHolder(View itemView)

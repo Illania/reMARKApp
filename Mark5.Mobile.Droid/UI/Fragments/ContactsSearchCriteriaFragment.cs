@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: ContactsSearchCriteriaFragment.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Android.Animation;
 using Android.Content;
@@ -289,9 +281,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var df = restoredState as ContactSearchCriteriaFragmentState;
             if (df != null)
-            {
                 searchCriteria = df.Criteria;
-            }
         }
 
         public override string GenerateTag()

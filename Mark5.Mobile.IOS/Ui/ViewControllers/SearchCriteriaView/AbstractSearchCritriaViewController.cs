@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: AbstractSearchCritriaViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using CoreGraphics;
@@ -212,7 +204,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             });
         }
 
-        void View_Activated(object sender, EventArgs e) => activeField = sender as UIView;
+        void View_Activated(object sender, EventArgs e)
+        {
+            activeField = sender as UIView;
+        }
 
         void CloseItem_Clicked(object sender, EventArgs e)
         {
@@ -232,11 +227,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         protected abstract void RestoreCriteria();
 
-        void OnKeyboardDidShowNotification(NSNotification notification) => AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification, true);
+        void OnKeyboardDidShowNotification(NSNotification notification)
+        {
+            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification, true);
+        }
 
-        void OnKeyboardWillChangeFrameNotification(NSNotification notification) => AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification);
+        void OnKeyboardWillChangeFrameNotification(NSNotification notification)
+        {
+            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification);
+        }
 
-        void OnKeyboardWillHideNotification(NSNotification notification) => AdjustViewToKeyboard(0f, notification);
+        void OnKeyboardWillHideNotification(NSNotification notification)
+        {
+            AdjustViewToKeyboard(0f, notification);
+        }
 
         void AdjustViewToKeyboard(float keyboardHeight, NSNotification notification, bool correctOffset = false)
         {

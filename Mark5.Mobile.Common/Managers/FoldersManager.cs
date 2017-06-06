@@ -1,11 +1,4 @@
-﻿//
-// File: FoldersManager.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -53,9 +46,7 @@ namespace Mark5.Mobile.Common.Managers
                 return folders;
             }
             if (sourceType == SourceType.Local)
-            {
                 return await foldersDataAccess.GetRecursively(parentFolder.Module, parentFolder, depth);
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 

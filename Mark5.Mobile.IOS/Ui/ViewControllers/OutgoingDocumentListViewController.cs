@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: OutgoingDocumentListViewController.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -212,7 +204,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var ds = (DataSource) tableView.Source;
 
-                var nc = ((UINavigationController) SplitViewController.ViewControllers[1]);
+                var nc = (UINavigationController) SplitViewController.ViewControllers[1];
                 nc.PopToViewController(nc.ViewControllers[0], false);
 
                 var vc = (DocumentViewController) nc.ViewControllers[0];
@@ -268,7 +260,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void ExitEditItem_Clicked(object sender, EventArgs e) => EndEditing();
+        void ExitEditItem_Clicked(object sender, EventArgs e)
+        {
+            EndEditing();
+        }
 
         void EndEditing()
         {
@@ -291,22 +286,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }, editItem);
 
             if (result == 0)
-            {
                 await Delete(selectedDocuments);
-            }
         }
 
-        async void Delete(OutgoingDocumentContainer container) => await Delete(new List<OutgoingDocumentContainer>
+        async void Delete(OutgoingDocumentContainer container)
         {
-            container
-        });
+            await Delete(new List<OutgoingDocumentContainer>
+            {
+                container
+            });
+        }
 
         async Task Delete(List<OutgoingDocumentContainer> containers)
         {
             foreach (var container in containers)
-            {
                 await Managers.DocumentsManager.DeleteOutgoingDocumentFolder(container.Info.Identifier);
-            }
 
             await RefreshData();
         }
@@ -315,7 +309,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Refreshing
 
-        async void RefreshControl_ValueChanged(object sender, EventArgs e) => await RefreshData(forceClear: true);
+        async void RefreshControl_ValueChanged(object sender, EventArgs e)
+        {
+            await RefreshData(forceClear: true);
+        }
 
         async Task RefreshData(bool forceClear = false)
         {
@@ -404,15 +401,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             static readonly nfloat Height = 100f;
 
-            public bool Empty
-            {
-                get { return outgoingDocumentPreviewsInView.Count < 1; }
-            }
+            public bool Empty => outgoingDocumentPreviewsInView.Count < 1;
 
-            public List<OutgoingDocumentContainer> Items
-            {
-                get { return outgoingDocumentPreviewsInView; }
-            }
+            public List<OutgoingDocumentContainer> Items => outgoingDocumentPreviewsInView;
 
             OutgoingDocumentListViewController viewController;
             UITableView documentsTableView;
@@ -431,9 +422,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 if (loading)
-                {
                     return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
-                }
 
                 if (outgoingDocumentPreviewsInView.Count < 1)
                 {
@@ -535,16 +524,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public void RemoveRow(int row)
             {
                 if (outgoingDocumentPreviewsInView.Count < 1 && row == 0)
-                {
                     UpdateRow(0); //We always keep a row for the empty table cell
-                }
                 else
-                {
                     documentsTableView.DeleteRows(new NSIndexPath[]
                     {
                         NSIndexPath.FromRowSection(row, 0)
                     }, UITableViewRowAnimation.Fade);
-                }
             }
         }
     }

@@ -1,11 +1,4 @@
-﻿//
-// File: FoldersDataAccess.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -92,7 +85,6 @@ namespace Mark5.Mobile.Common.DataAccess
                     ModuleType.Contacts,
                     ModuleType.Shortcodes
                 })
-                {
                     await databaseForModuleType(moduleType)
                         .RunInConnectionAsync(c =>
                         {
@@ -100,7 +92,6 @@ namespace Mark5.Mobile.Common.DataAccess
                             cmd.Bind("@subscribed", false);
                             cmd.ExecuteNonQuery();
                         });
-                }
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
@@ -144,10 +135,8 @@ namespace Mark5.Mobile.Common.DataAccess
             var subFolders = c.Table<Folder>().Where(f => f.ParentFolderId == parentFolderId).OrderBy(f => f.Position).ToList();
 
             if (depth > 0)
-            {
                 foreach (var subFolder in subFolders)
                     subFolder.SubFolders = GetRecursively(c, subFolder.Id, depth - 1);
-            }
             return subFolders;
         }
 

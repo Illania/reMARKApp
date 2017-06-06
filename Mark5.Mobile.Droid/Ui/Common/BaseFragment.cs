@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: BaseFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using Android.Runtime;
 using Android.Support.V4.App;
 
@@ -18,7 +10,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         public override bool UserVisibleHint
         {
-            get { return base.UserVisibleHint; }
+            get => base.UserVisibleHint;
             set
             {
                 var changed = base.UserVisibleHint != value;

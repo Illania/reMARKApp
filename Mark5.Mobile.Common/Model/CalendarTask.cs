@@ -1,11 +1,4 @@
-﻿//
-// File: CalendarTask.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Mark5.Mobile.Common.Utilities;
 using SQLite;
@@ -15,16 +8,10 @@ namespace Mark5.Mobile.Common.Model
     public class CalendarTask : BusinessEntity
     {
         [Ignore]
-        public override ObjectType ObjectType
-        {
-            get { return ObjectType.CalendarTask; }
-        }
+        public override ObjectType ObjectType => ObjectType.CalendarTask;
 
         [Ignore]
-        public override ModuleType ModuleType
-        {
-            get { return ModuleType.Calendar; }
-        }
+        public override ModuleType ModuleType => ModuleType.Calendar;
 
         [Column("Subject")]
         public string Subject { get; set; }
@@ -82,12 +69,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (userIds == null)
-                {
                     userIds = new List<int>();
-                }
                 return userIds;
             }
-            set { userIds = value; }
+            set => userIds = value;
         }
 
         Dictionary<int, string> users;
@@ -98,12 +83,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (users == null)
-                {
                     users = new Dictionary<int, string>();
-                }
                 return users;
             }
-            set { users = value; }
+            set => users = value;
         }
 
         List<int> departmentIds;
@@ -114,12 +97,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (departmentIds == null)
-                {
                     departmentIds = new List<int>();
-                }
                 return departmentIds;
             }
-            set { departmentIds = value; }
+            set => departmentIds = value;
         }
 
         Dictionary<int, string> departments;
@@ -130,12 +111,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (departments == null)
-                {
                     departments = new Dictionary<int, string>();
-                }
                 return departments;
             }
-            set { departments = value; }
+            set => departments = value;
         }
 
         [Column("DelegationStatus")]
@@ -146,29 +125,29 @@ namespace Mark5.Mobile.Common.Model
         [Column("UserIdsString")]
         public string UserIdsString
         {
-            get { return SerializationUtils.Serialize(UserIds); }
-            set { UserIds = SerializationUtils.Deserialize<List<int>>(value); }
+            get => SerializationUtils.Serialize(UserIds);
+            set => UserIds = SerializationUtils.Deserialize<List<int>>(value);
         }
 
         [Column("UsersString")]
         public string UsersString
         {
-            get { return SerializationUtils.Serialize(Users); }
-            set { Users = SerializationUtils.Deserialize<Dictionary<int, string>>(value); }
+            get => SerializationUtils.Serialize(Users);
+            set => Users = SerializationUtils.Deserialize<Dictionary<int, string>>(value);
         }
 
         [Column("DepartmentIdsString")]
         public string DepartmentIdsString
         {
-            get { return SerializationUtils.Serialize(DepartmentIds); }
-            set { DepartmentIds = SerializationUtils.Deserialize<List<int>>(value); }
+            get => SerializationUtils.Serialize(DepartmentIds);
+            set => DepartmentIds = SerializationUtils.Deserialize<List<int>>(value);
         }
 
         [Column("DepartmentsString")]
         public string DepartmentsString
         {
-            get { return SerializationUtils.Serialize(Departments); }
-            set { Departments = SerializationUtils.Deserialize<Dictionary<int, string>>(value); }
+            get => SerializationUtils.Serialize(Departments);
+            set => Departments = SerializationUtils.Deserialize<Dictionary<int, string>>(value);
         }
 
         #endregion

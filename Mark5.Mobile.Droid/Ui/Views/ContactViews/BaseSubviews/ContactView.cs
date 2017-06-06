@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: BaseCardSubview.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using Android.Content;
+﻿using Android.Content;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;

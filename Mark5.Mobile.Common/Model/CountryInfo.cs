@@ -1,11 +1,4 @@
-﻿//
-// File: CountryInfo.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-namespace Mark5.Mobile.Common.Model
+﻿namespace Mark5.Mobile.Common.Model
 {
     public class CountryInfo
     {

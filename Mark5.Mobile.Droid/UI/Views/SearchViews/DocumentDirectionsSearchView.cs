@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: DocumentDirectionsSearchView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,7 +49,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             };
             remainingButtonsList.Remove(button);
 
-            if ((remainingButtonsList.All(b => b.Selected == true) && !button.Selected) || (remainingButtonsList.All(b => b.Selected == false) && button.Selected))
+            if (remainingButtonsList.All(b => b.Selected == true) && !button.Selected || remainingButtonsList.All(b => b.Selected == false) && button.Selected)
             {
                 ResetOtherButtons();
                 allButton.UpdateSelectedState(true);
@@ -104,19 +96,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             }
 
             if (Criteria.Directions.Contains(DocumentDirection.Draft))
-            {
                 draftButton.UpdateSelectedState(true);
-            }
 
             if (Criteria.Directions.Contains(DocumentDirection.Incoming))
-            {
                 inboxButton.UpdateSelectedState(true);
-            }
 
             if (Criteria.Directions.Contains(DocumentDirection.Outgoing))
-            {
                 outboxButton.UpdateSelectedState(true);
-            }
         }
 
         public override void UpdateCriteria()
@@ -124,19 +110,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             var selectedDirections = new List<DocumentDirection>();
 
             if (draftButton.Selected || allButton.Selected)
-            {
                 selectedDirections.Add(DocumentDirection.Draft);
-            }
 
             if (inboxButton.Selected || allButton.Selected)
-            {
                 selectedDirections.Add(DocumentDirection.Incoming);
-            }
 
             if (outboxButton.Selected || allButton.Selected)
-            {
                 selectedDirections.Add(DocumentDirection.Outgoing);
-            }
 
             Criteria.Directions = selectedDirections;
         }

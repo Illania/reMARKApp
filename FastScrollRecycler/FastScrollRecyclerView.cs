@@ -1,11 +1,4 @@
-﻿//
-// File: FastScrollRecyclerView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Widget;
@@ -181,8 +174,8 @@ namespace FastScrollRecycler
                 return;
             }
 
-            var scrollY = PaddingTop + yOffset + (sps.RowIndex * sps.RowHeight) - sps.RowTopOffset;
-            var scrollBarY = (int) (((float) scrollY / availableScrollHeight) * availableScrollBarHeight);
+            var scrollY = PaddingTop + yOffset + sps.RowIndex * sps.RowHeight - sps.RowTopOffset;
+            var scrollBarY = (int) ((float) scrollY / availableScrollHeight * availableScrollBarHeight);
 
             int scrollBarX;
             if (Utils.IsRtl(Resources))
@@ -216,14 +209,14 @@ namespace FastScrollRecycler
 
             var exactItemPos = (int) (availableScrollHeight * touchFraction);
 
-            var layoutManager = ((LinearLayoutManager) GetLayoutManager());
+            var layoutManager = (LinearLayoutManager) GetLayoutManager();
             layoutManager.ScrollToPositionWithOffset(spanCount * exactItemPos / scrollPositionState.RowHeight, -(exactItemPos % scrollPositionState.RowHeight));
 
             if (!(GetAdapter() is ISectionedAdapter))
                 return "";
 
 #pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
-            var posInt = (int) ((touchFraction == 1) ? itemPos - 1 : itemPos);
+            var posInt = (int) (touchFraction == 1 ? itemPos - 1 : itemPos);
 #pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
 
             var sectionedAdapter = (ISectionedAdapter) GetAdapter();
@@ -279,24 +272,54 @@ namespace FastScrollRecycler
             stateOut.RowHeight = child.Height + GetLayoutManager().GetTopDecorationHeight(child) + GetLayoutManager().GetBottomDecorationHeight(child);
         }
 
-        public void SetThumbColor(Color color) => scrollbar.SetThumbColor(color);
+        public void SetThumbColor(Color color)
+        {
+            scrollbar.SetThumbColor(color);
+        }
 
-        public void SetTrackColor(Color color) => scrollbar.SetTrackColor(color);
+        public void SetTrackColor(Color color)
+        {
+            scrollbar.SetTrackColor(color);
+        }
 
-        public void SetPopupBackgroundColor(Color color) => scrollbar.SetPopupBackgroundColor(color);
+        public void SetPopupBackgroundColor(Color color)
+        {
+            scrollbar.SetPopupBackgroundColor(color);
+        }
 
-        public void SetPopupTextColor(Color color) => scrollbar.SetPopupTextColor(color);
+        public void SetPopupTextColor(Color color)
+        {
+            scrollbar.SetPopupTextColor(color);
+        }
 
-        public void SetPopupTextSize(int size) => scrollbar.SetPopupTextSize(size);
+        public void SetPopupTextSize(int size)
+        {
+            scrollbar.SetPopupTextSize(size);
+        }
 
-        public void SetPopupTypeface(Typeface typeface) => scrollbar.SetPopupTypeface(typeface);
+        public void SetPopupTypeface(Typeface typeface)
+        {
+            scrollbar.SetPopupTypeface(typeface);
+        }
 
-        public void SetAutoHideDelay(int delay) => scrollbar.SetAutoHideDelay(delay);
+        public void SetAutoHideDelay(int delay)
+        {
+            scrollbar.SetAutoHideDelay(delay);
+        }
 
-        public void SetAutoHideEnabled(bool enabled) => scrollbar.SetAutoHideEnabled(enabled);
+        public void SetAutoHideEnabled(bool enabled)
+        {
+            scrollbar.SetAutoHideEnabled(enabled);
+        }
 
-        public void SetStateChangeListener(IOnFastScrollStateChangeListener listener) => stateChangeListener = listener;
+        public void SetStateChangeListener(IOnFastScrollStateChangeListener listener)
+        {
+            stateChangeListener = listener;
+        }
 
-        public void SetPopupPosition(FastScrollerPosition position) => scrollbar.SetPopupPosition(position);
+        public void SetPopupPosition(FastScrollerPosition position)
+        {
+            scrollbar.SetPopupPosition(position);
+        }
     }
 }

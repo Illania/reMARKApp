@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: LinkedContactSubview.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +31,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             var contacts = new List<ContactPreview>();
 
             if (Contact != null)
-            {
                 switch (contactType)
                 {
                     case LinkedContactType.PrimaryPerson:
@@ -56,7 +47,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                         contacts.AddRange(Contact.Children.Where(c => c.Type == ContactType.Company));
                         break;
                 }
-            }
 
             if (contacts.Count > 0)
             {

@@ -1,11 +1,4 @@
-﻿//
-// File: NotificationsManager.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,16 +16,10 @@ namespace Mark5.Mobile.Common.Managers
 {
     class NotificationsManager : AbstractManager, INotificationsManager
     {
-        public ObjectType[] EnabledObjectTypes
+        public ObjectType[] EnabledObjectTypes => new[]
         {
-            get
-            {
-                return new[]
-                {
-                    ObjectType.Document
-                };
-            }
-        }
+            ObjectType.Document
+        };
 
         public DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; } = DocumentBodyTypeRequest.HtmlOnly;
 
@@ -64,9 +51,7 @@ namespace Mark5.Mobile.Common.Managers
                 return;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -88,9 +73,7 @@ namespace Mark5.Mobile.Common.Managers
                 return;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -114,9 +97,7 @@ namespace Mark5.Mobile.Common.Managers
 
                 var readGuids = await notificationsDataAccess.GetReadNotificationGuids();
                 if (readGuids.Count > 0)
-                {
                     notifications.ForEach(n => n.IsRead = readGuids.Contains(n.Guid));
-                }
                 return notifications;
             }
             if (sourceType == SourceType.Local)
@@ -129,9 +110,7 @@ namespace Mark5.Mobile.Common.Managers
 
                 var readGuids = await notificationsDataAccess.GetReadNotificationGuids();
                 if (readGuids.Count > 0)
-                {
                     notifications.ForEach(n => n.IsRead = readGuids.Contains(n.Guid));
-                }
                 return notifications;
             }
             throw new ArgumentException("Invalid sourceType provided.");
@@ -159,9 +138,7 @@ namespace Mark5.Mobile.Common.Managers
                 };
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -192,20 +169,14 @@ namespace Mark5.Mobile.Common.Managers
 
                 List<Folder> moduleFavoriteFolders;
                 if (favoriteFolders.TryGetValue(moduleType, out moduleFavoriteFolders))
-                {
                     foreach (var item in moduleFavoriteFolders.Where(f => folderIds.Contains(f.Id)))
-                    {
                         item.Subscribed = enabled;
-                    }
-                }
                 await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
 
                 return;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -261,9 +232,7 @@ namespace Mark5.Mobile.Common.Managers
                 return;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -319,9 +288,7 @@ namespace Mark5.Mobile.Common.Managers
                 return;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -343,18 +310,14 @@ namespace Mark5.Mobile.Common.Managers
 
                 var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync() ?? new Dictionary<ModuleType, List<Folder>>();
                 foreach (var favoriteFolder in favoriteFolders.Values.SelectMany(f => f))
-                {
                     favoriteFolder.Subscribed = false;
-                }
                 await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
                 await FileSystemStorage.SaveNotificationSettingsAsync(new NotificationSettings());
 
                 return;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -429,9 +392,7 @@ namespace Mark5.Mobile.Common.Managers
                 }
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 

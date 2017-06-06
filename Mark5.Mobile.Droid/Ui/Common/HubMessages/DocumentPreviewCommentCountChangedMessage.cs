@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: DocumentPreviewCommentCountChangedMessage.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using TinyMessenger;
+﻿using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Common.HubMessages
 {

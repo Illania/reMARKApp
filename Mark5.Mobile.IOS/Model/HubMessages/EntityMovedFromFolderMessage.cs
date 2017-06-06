@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: EntityMovedFromFolderMessage.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Mark5.Mobile.Common.Model;
 using TinyMessenger;
 

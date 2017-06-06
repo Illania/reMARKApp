@@ -1,11 +1,4 @@
-﻿//
-// File: SortedObservableCollection.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -28,13 +21,9 @@ namespace Mark5.Mobile.Common.Utilities.PortableCollections
         {
             var index = IndexOf(item);
             if (index < 0)
-            {
                 AddSorted(item);
-            }
             else
-            {
                 SetItem(index, item);
-            }
         }
 
         #endregion
@@ -47,13 +36,9 @@ namespace Mark5.Mobile.Common.Utilities.PortableCollections
             {
                 var index = IndexOf(item);
                 if (index < 0)
-                {
                     AddSorted(item);
-                }
                 else
-                {
                     SetItem(index, item);
-                }
             }
         }
 
@@ -65,21 +50,15 @@ namespace Mark5.Mobile.Common.Utilities.PortableCollections
         {
             int i = 0;
             while (i < Items.Count && sortingComparison(Items[i], item) < 0)
-            {
                 i++;
-            }
             InsertItem(i, item);
         }
 
         new int IndexOf(TItem item)
         {
             for (int i = 0; i < Items.Count; i++)
-            {
                 if (lookupComparison(Items[i], item) == 0)
-                {
                     return i;
-                }
-            }
             return -1;
         }
 
@@ -90,12 +69,8 @@ namespace Mark5.Mobile.Common.Utilities.PortableCollections
         public void RemoveAll(Predicate<TItem> predicate)
         {
             for (int i = Items.Count - 1; i >= 0; i--)
-            {
                 if (predicate(Items[i]))
-                {
                     RemoveAt(i);
-                }
-            }
         }
 
         #endregion

@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: PriorityView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;

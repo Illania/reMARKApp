@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: LoginActivity.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Threading.Tasks;
 using Android.App;
@@ -132,9 +124,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         dismissAction();
 
                         if (!t.IsFaulted)
-                        {
                             StartActivity(SystemReportCollector.CreateShareReportIntent(this, t.Result));
-                        }
                     }, TaskScheduler.FromCurrentSynchronizationContext());
 
                 return true;
@@ -230,13 +220,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var policies = Managers.DownloadManager.DownloadPolicies;
                 policies[ObjectType.Document] = new DownloadFoldersPolicy();
                 if (PlatformConfig.Preferences.SynchroniseContacts)
-                {
                     policies[ObjectType.Contact] = new DownloadAllPolicy();
-                }
                 if (PlatformConfig.Preferences.SynchroniseShortcodes)
-                {
                     policies[ObjectType.Shortcode] = new DownloadAllPolicy();
-                }
 
                 CommonConfig.Logger.Info("Retrieving system settings...");
 

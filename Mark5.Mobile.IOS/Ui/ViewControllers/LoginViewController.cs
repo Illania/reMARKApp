@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: LoginViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.IO;
 using CoreAnimation;
@@ -363,9 +355,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void StartLogoScaleAnimation()
         {
             if (startLogoScaleAnimationDone)
-            {
                 return;
-            }
 
             startLogoScaleAnimationDone = true;
 
@@ -407,16 +397,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             UIView.AnimateNotify(AnimationDuration, AnimationInitialDelay + AnimationDelay, Damping, SpringVelocity, UIViewAnimationOptions.CurveEaseOut, View.LayoutIfNeeded, null);
 
             passwordTextFieldTopConstraint.Constant = TextFieldToTextFieldDistance;
-            UIView.AnimateNotify(AnimationDuration, AnimationInitialDelay + (AnimationDelay * 2), Damping, SpringVelocity, UIViewAnimationOptions.CurveEaseOut, View.LayoutIfNeeded, null);
+            UIView.AnimateNotify(AnimationDuration, AnimationInitialDelay + AnimationDelay * 2, Damping, SpringVelocity, UIViewAnimationOptions.CurveEaseOut, View.LayoutIfNeeded, null);
 
             hostnameTextFieldTopConstraint.Constant = TextFieldToTextFieldDistance;
-            UIView.AnimateNotify(AnimationDuration, AnimationInitialDelay + (AnimationDelay * 3), Damping, SpringVelocity, UIViewAnimationOptions.CurveEaseOut, View.LayoutIfNeeded, null);
+            UIView.AnimateNotify(AnimationDuration, AnimationInitialDelay + AnimationDelay * 3, Damping, SpringVelocity, UIViewAnimationOptions.CurveEaseOut, View.LayoutIfNeeded, null);
 
             portTextFieldTopConstraint.Constant = TextFieldToTextFieldDistance;
-            UIView.AnimateNotify(AnimationDuration, AnimationInitialDelay + (AnimationDelay * 4), Damping, SpringVelocity, UIViewAnimationOptions.CurveEaseOut, View.LayoutIfNeeded, null);
+            UIView.AnimateNotify(AnimationDuration, AnimationInitialDelay + AnimationDelay * 4, Damping, SpringVelocity, UIViewAnimationOptions.CurveEaseOut, View.LayoutIfNeeded, null);
 
             loginButtonTopConstraint.Constant = LoginButtonToTextFieldDistance;
-            UIView.AnimateNotify(AnimationDuration, AnimationInitialDelay + (AnimationDelay * 5), Damping, SpringVelocity, UIViewAnimationOptions.CurveEaseOut, View.LayoutIfNeeded, null);
+            UIView.AnimateNotify(AnimationDuration, AnimationInitialDelay + AnimationDelay * 5, Damping, SpringVelocity, UIViewAnimationOptions.CurveEaseOut, View.LayoutIfNeeded, null);
         }
 
         void InitializeHandlers()
@@ -479,7 +469,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void TextField_EditingChanged(object sender, EventArgs e) => ValidateForm();
+        void TextField_EditingChanged(object sender, EventArgs e)
+        {
+            ValidateForm();
+        }
 
         void LoginSettingsViewController_RestrictedSettingsValuesUpdated(object sender, LoginSettingsViewController.SettingsValues values)
         {
@@ -625,13 +618,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var policies = Managers.DownloadManager.DownloadPolicies;
                 policies[ObjectType.Document] = new DownloadFoldersPolicy();
                 if (PlatformConfig.Preferences.SynchroniseContacts)
-                {
                     policies[ObjectType.Contact] = new DownloadAllPolicy();
-                }
                 if (PlatformConfig.Preferences.SynchroniseShortcodes)
-                {
                     policies[ObjectType.Shortcode] = new DownloadAllPolicy();
-                }
 
                 CommonConfig.Logger.Info("Retrieving system settings...");
 
@@ -696,9 +685,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void OnKeyboardDidChangeFrameNotification(NSNotification notification)
         {
             if (IsViewLoaded)
-            {
                 SlideViewOverKeyboard(notification, true);
-            }
         }
 
         #endregion

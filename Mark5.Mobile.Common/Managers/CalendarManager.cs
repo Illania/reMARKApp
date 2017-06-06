@@ -1,11 +1,4 @@
-﻿//
-// File: CalendarManager.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -119,9 +112,7 @@ namespace Mark5.Mobile.Common.Managers
                 return appointment;
             }
             if (sourceType == SourceType.Local)
-            {
                 return await calendarDataAccess.GetCalendarAppointmentAsync(calendarAppointmentId);
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -146,9 +137,7 @@ namespace Mark5.Mobile.Common.Managers
                 return task;
             }
             if (sourceType == SourceType.Local)
-            {
                 return await calendarDataAccess.GetCalendarTaskAsync(calendarTaskId);
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -172,9 +161,7 @@ namespace Mark5.Mobile.Common.Managers
                 return result.Updated;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -198,9 +185,7 @@ namespace Mark5.Mobile.Common.Managers
                 return result.Updated;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
     }

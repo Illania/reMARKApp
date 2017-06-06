@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: ContactViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,10 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     {
         public bool Modal { get; set; }
 
-        public bool Empty
-        {
-            get { return folderId == null && folder == null && contactId == null && contactPreview == null && contact == null; }
-        }
+        public bool Empty => folderId == null && folder == null && contactId == null && contactPreview == null && contact == null;
 
         int? folderId;
         Folder folder;
@@ -559,17 +548,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             if (ca.Type == CommunicationAddressType.Phone)
-            {
                 Integration.Call(this, tv, cell, ca.Address);
-            }
 
             if (ca.Type == CommunicationAddressType.Mobile)
-            {
                 Integration.CallOrText(this, tv, cell, ca.Address);
-            }
         }
 
-        void PhysicalAddressClicked(UITableView tv, UITableViewCell cell, PhysicalAddress pa) => Integration.ShowOnMap(this, tv, cell, pa);
+        void PhysicalAddressClicked(UITableView tv, UITableViewCell cell, PhysicalAddress pa)
+        {
+            Integration.ShowOnMap(this, tv, cell, pa);
+        }
 
         public void LinkedContactClicked(ContactPreview contactPreview)
         {
@@ -580,9 +568,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationController.PushViewController(vc, true);
         }
 
-        public void WebPageClicked(UITableView tableView, UITableViewCell cell, string webPageAddress) => Integration.OpenUrl(this, tableView, cell, webPageAddress);
+        public void WebPageClicked(UITableView tableView, UITableViewCell cell, string webPageAddress)
+        {
+            Integration.OpenUrl(this, tableView, cell, webPageAddress);
+        }
 
-        public void CopyToClipboard(UITableView tableView, UITableViewCell cell, string text) => Integration.CopyToClipboard(this, tableView, cell, text);
+        public void CopyToClipboard(UITableView tableView, UITableViewCell cell, string text)
+        {
+            Integration.CopyToClipboard(this, tableView, cell, text);
+        }
 
         public void SetData(int folderId, int contactId)
         {
@@ -658,14 +652,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 if (folder != null && contactPreview != null)
-                {
                     contact = await Managers.ContactsManager.GetContactAsync(folder, contactPreview.Id);
-                }
 
                 if (folderId == null && folder == null && contactPreview != null)
-                {
                     contact = await Managers.ContactsManager.GetContactAsync(-1, contactPreview.Id);
-                }
 
                 if (folderId == null && folder == null && contactPreview == null)
                 {
@@ -797,13 +787,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 dismissAction();
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
-                {
                     ClearData();
-                }
                 else
-                {
                     NavigationController.PopViewController(true);
-                }
             }
             catch (Exception ex)
             {
@@ -842,13 +828,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 dismissAction();
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
-                {
                     ClearData();
-                }
                 else
-                {
                     NavigationController.PopViewController(true);
-                }
             }
             catch (Exception ex)
             {
@@ -1030,7 +1012,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         ContactPreview result = null;
                         return (weakContactPreview?.TryGetTarget(out result) ?? false) ? result : null;
                     }
-                    set { weakContactPreview = new WeakReference<ContactPreview>(value); }
+                    set => weakContactPreview = new WeakReference<ContactPreview>(value);
                 }
 
                 public Contact Contact
@@ -1040,7 +1022,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         Contact result = null;
                         return (weakContact?.TryGetTarget(out result) ?? false) ? result : null;
                     }
-                    set { weakContact = new WeakReference<Contact>(value); }
+                    set => weakContact = new WeakReference<Contact>(value);
                 }
 
                 public abstract bool Empty { get; }
@@ -1106,10 +1088,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public class PhysicalAddressSection : AbstractSection
             {
-                public override bool Empty
-                {
-                    get { return !Contact?.PhysicalAddresses?.Any() ?? true; }
-                }
+                public override bool Empty => !Contact?.PhysicalAddresses?.Any() ?? true;
 
                 public override void InitializeRows()
                 {
@@ -1118,18 +1097,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     var pas = Contact.PhysicalAddresses.ToArray();
                     foreach (var pa in pas)
-                    {
                         Rows.Add(new PhysicalAddressRow(ContactPreview, Contact, pa));
-                    }
                 }
             }
 
             public class LinkedContactSection : AbstractSection
             {
-                public override bool Empty
-                {
-                    get { return Contact?.PrimaryPerson == null && (!Contact?.Children?.Any() ?? true); }
-                }
+                public override bool Empty => Contact?.PrimaryPerson == null && (!Contact?.Children?.Any() ?? true);
 
                 public override void InitializeRows()
                 {
@@ -1155,10 +1129,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public class ExtraSection : AbstractSection
             {
-                public override bool Empty
-                {
-                    get { return string.IsNullOrWhiteSpace(ContactPreview?.Description) && string.IsNullOrWhiteSpace(ContactPreview?.ShortId) && (!Contact?.ResponsibleUsers?.Any() ?? true) && (Contact?.BirthDateTimestamp == -6847804800000 || Contact?.BirthDateTimestamp == -1) && string.IsNullOrWhiteSpace(Contact?.WebPageAddress) && string.IsNullOrWhiteSpace(Contact?.Vat) && string.IsNullOrWhiteSpace(Contact?.Ledger) && string.IsNullOrWhiteSpace(Contact?.Account); }
-                }
+                public override bool Empty => string.IsNullOrWhiteSpace(ContactPreview?.Description) && string.IsNullOrWhiteSpace(ContactPreview?.ShortId) && (!Contact?.ResponsibleUsers?.Any() ?? true) && (Contact?.BirthDateTimestamp == -6847804800000 || Contact?.BirthDateTimestamp == -1) && string.IsNullOrWhiteSpace(Contact?.WebPageAddress) && string.IsNullOrWhiteSpace(Contact?.Vat) && string.IsNullOrWhiteSpace(Contact?.Ledger) && string.IsNullOrWhiteSpace(Contact?.Account);
 
                 public override void InitializeRows()
                 {
@@ -1197,7 +1168,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         ContactPreview result = null;
                         return (weakContactPreview?.TryGetTarget(out result) ?? false) ? result : null;
                     }
-                    set { weakContactPreview = new WeakReference<ContactPreview>(value); }
+                    set => weakContactPreview = new WeakReference<ContactPreview>(value);
                 }
 
                 public Contact Contact
@@ -1207,7 +1178,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         Contact result = null;
                         return (weakContact?.TryGetTarget(out result) ?? false) ? result : null;
                     }
-                    set { weakContact = new WeakReference<Contact>(value); }
+                    set => weakContact = new WeakReference<Contact>(value);
                 }
 
                 protected AbstractRow(ContactPreview contactPreview, Contact contact)
@@ -1216,10 +1187,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Contact = contact;
                 }
 
-                public virtual string Key
-                {
-                    get { return ContactInfoTableViewCell.Key; }
-                }
+                public virtual string Key => ContactInfoTableViewCell.Key;
 
                 public virtual UITableViewCell CreateCell()
                 {
@@ -1277,9 +1245,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         weakCommunicationAddress.TryGetTarget(out ca);
 
                         if (string.IsNullOrWhiteSpace(ca.Description))
-                        {
                             return CommunicationAddressCompactTableViewCell.Key;
-                        }
 
                         return CommunicationAddressTableViewCell.Key;
                     }
@@ -1291,9 +1257,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     weakCommunicationAddress.TryGetTarget(out ca);
 
                     if (string.IsNullOrWhiteSpace(ca.Description))
-                    {
                         return CommunicationAddressCompactTableViewCell.Create();
-                    }
 
                     return CommunicationAddressTableViewCell.Create();
                 }
@@ -1340,10 +1304,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     weakPhysicalAddress = new WeakReference<PhysicalAddress>(physicalAddress);
                 }
 
-                public override string Key
-                {
-                    get { return PhysicalAddressTableViewCell.Key; }
-                }
+                public override string Key => PhysicalAddressTableViewCell.Key;
 
                 public override UITableViewCell CreateCell()
                 {
@@ -1384,10 +1345,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     weakLinkedContactPreview = new WeakReference<ContactPreview>(linkedContactPreview);
                 }
 
-                public override string Key
-                {
-                    get { return base.Key + "_LinkedContact"; }
-                }
+                public override string Key => base.Key + "_LinkedContact";
 
                 public override UITableViewCell CreateCell()
                 {
@@ -1433,10 +1391,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                public override string Key
-                {
-                    get { return base.Key + "_WebPage"; }
-                }
+                public override string Key => base.Key + "_WebPage";
 
                 public override UITableViewCell CreateCell()
                 {

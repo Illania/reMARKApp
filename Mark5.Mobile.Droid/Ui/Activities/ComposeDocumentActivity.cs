@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ComposeDocumentActivity.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using Android.App;

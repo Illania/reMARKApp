@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: Preferences.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using Mark5.Mobile.Common.Model;
+﻿using Mark5.Mobile.Common.Model;
 using System.Collections.Generic;
 using Foundation;
 using System;
@@ -144,87 +136,43 @@ namespace Mark5.Mobile.IOS.Utilities
                 var dict = new Dictionary<string, object>();
                 var nsdict = ud.ToDictionary();
                 foreach (var kv in nsdict)
-                {
                     dict.Add(kv.Key.ToString(), kv.Value.ToString());
-                }
                 return dict;
             }
         }
 
-        public bool ShowCreatorOutgoing
-        {
-            get { return ud.BoolForKey(Keys.ShowCreatorOutgoing); }
-        }
+        public bool ShowCreatorOutgoing => ud.BoolForKey(Keys.ShowCreatorOutgoing);
 
 
-        public bool UseServerTimezone
-        {
-            get { return ud.BoolForKey(Keys.UseServerTimezoneKey); }
-        }
+        public bool UseServerTimezone => ud.BoolForKey(Keys.UseServerTimezoneKey);
 
-        public int DocumentsToDownload
-        {
-            get { return (int) ud.IntForKey(Keys.DocumentsToDownloadKey); }
-        }
+        public int DocumentsToDownload => (int) ud.IntForKey(Keys.DocumentsToDownloadKey);
 
-        public int MarkAsReadDelaySeconds
-        {
-            get { return (int) ud.IntForKey(Keys.MarkAsReadDelaySecondsKey); }
-        }
+        public int MarkAsReadDelaySeconds => (int) ud.IntForKey(Keys.MarkAsReadDelaySecondsKey);
 
-        public bool UnreadIndicatorMe
-        {
-            get { return ud.BoolForKey(Keys.UnreadIndicatorMeKey); }
-        }
+        public bool UnreadIndicatorMe => ud.BoolForKey(Keys.UnreadIndicatorMeKey);
 
-        public bool CompactDocumentsList
-        {
-            get { return ud.BoolForKey(Keys.CompactDocumentsListKey); }
-        }
+        public bool CompactDocumentsList => ud.BoolForKey(Keys.CompactDocumentsListKey);
 
-        public bool LargeAttachmentWarning
-        {
-            get { return ud.BoolForKey(Keys.LargeAttachmentWarningKey); }
-        }
+        public bool LargeAttachmentWarning => ud.BoolForKey(Keys.LargeAttachmentWarningKey);
 
-        public DocumentBodyTypeRequest DocumentBodyRequestType
-        {
-            get { return ud.BoolForKey(Keys.DocumentBodyRequestTypeKey) ? DocumentBodyTypeRequest.PlainTextOnly : DocumentBodyTypeRequest.HtmlOnly; }
-        }
+        public DocumentBodyTypeRequest DocumentBodyRequestType => ud.BoolForKey(Keys.DocumentBodyRequestTypeKey) ? DocumentBodyTypeRequest.PlainTextOnly : DocumentBodyTypeRequest.HtmlOnly;
 
-        public bool HideReadNotifications
-        {
-            get { return ud.BoolForKey(Keys.HideReadNotificationsKey); }
-        }
+        public bool HideReadNotifications => ud.BoolForKey(Keys.HideReadNotificationsKey);
 
-        public bool SynchroniseContacts
-        {
-            get { return ud.BoolForKey(Keys.SynchroniseContactsKey); }
-        }
+        public bool SynchroniseContacts => ud.BoolForKey(Keys.SynchroniseContactsKey);
 
-        public bool SynchroniseShortcodes
-        {
-            get { return ud.BoolForKey(Keys.SynchroniseShortcodesKey); }
-        }
+        public bool SynchroniseShortcodes => ud.BoolForKey(Keys.SynchroniseShortcodesKey);
 
-        public bool ComposePriorityEnabled
-        {
-            get { return ud.BoolForKey(Keys.ComposePriorityEnabledKey); }
-        }
+        public bool ComposePriorityEnabled => ud.BoolForKey(Keys.ComposePriorityEnabledKey);
 
-        public bool RemoveLine
-        {
-            get { return ud.BoolForKey(Keys.RemoveLineKey); }
-        }
+        public bool RemoveLine => ud.BoolForKey(Keys.RemoveLineKey);
 
-        public TemplateUsageMode UseTemplate
-        {
-            get { return (TemplateUsageMode) (int) ud.IntForKey(Keys.UseTemplateKey); }
-        }
+        public TemplateUsageMode UseTemplate => (TemplateUsageMode) (int) ud.IntForKey(Keys.UseTemplateKey);
 
         public string LocalTemplate
         {
-            get { return ud.StringForKey(Keys.LocalTemplateKey); }
+            get => ud.StringForKey(Keys.LocalTemplateKey);
             set
             {
                 ud.SetString(value, Keys.LocalTemplateKey);
@@ -232,34 +180,19 @@ namespace Mark5.Mobile.IOS.Utilities
             }
         }
 
-        public int DocumentsToSearch
-        {
-            get { return (int) ud.IntForKey(Keys.DocumentsToSearchKey); }
-        }
+        public int DocumentsToSearch => (int) ud.IntForKey(Keys.DocumentsToSearchKey);
 
-        public int ContactsToSearch
-        {
-            get { return (int) ud.IntForKey(Keys.ContactsToSearchKey); }
-        }
+        public int ContactsToSearch => (int) ud.IntForKey(Keys.ContactsToSearchKey);
 
-        public int ShortcodesToSearch
-        {
-            get { return (int) ud.IntForKey(Keys.ShortcodesToSearchKey); }
-        }
+        public int ShortcodesToSearch => (int) ud.IntForKey(Keys.ShortcodesToSearchKey);
 
-        public bool PartialWordSearch
-        {
-            get { return ud.BoolForKey(Keys.PartialWordSearchKey); }
-        }
+        public bool PartialWordSearch => ud.BoolForKey(Keys.PartialWordSearchKey);
 
-        public int CleanCacheIntervalDays
-        {
-            get { return (int) ud.IntForKey(Keys.CleanCacheIntervalDaysKey); }
-        }
+        public int CleanCacheIntervalDays => (int) ud.IntForKey(Keys.CleanCacheIntervalDaysKey);
 
         public bool ClearCache
         {
-            get { return ud.BoolForKey(Keys.ClearCacheKey); }
+            get => ud.BoolForKey(Keys.ClearCacheKey);
             set
             {
                 ud.SetBool(value, Keys.ClearCacheKey);
@@ -267,14 +200,11 @@ namespace Mark5.Mobile.IOS.Utilities
             }
         }
 
-        public bool EnableReporting
-        {
-            get { return ud.BoolForKey(Keys.EnableReportingKey); }
-        }
+        public bool EnableReporting => ud.BoolForKey(Keys.EnableReportingKey);
 
         public string PushNotificationToken
         {
-            get { return ud.StringForKey(Keys.PushNotificationTokenKey); }
+            get => ud.StringForKey(Keys.PushNotificationTokenKey);
             set
             {
                 ud.SetString(value, Keys.PushNotificationTokenKey);
@@ -284,7 +214,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public bool ResetOnLaunch
         {
-            get { return ud.BoolForKey(Keys.ResetOnLaunchKey); }
+            get => ud.BoolForKey(Keys.ResetOnLaunchKey);
             set
             {
                 ud.SetBool(value, Keys.ResetOnLaunchKey);

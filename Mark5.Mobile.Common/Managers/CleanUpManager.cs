@@ -1,11 +1,4 @@
-﻿//
-// File: CleanUpManager.cs
-// Author: Ferdinando Papale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
@@ -52,7 +45,6 @@ namespace Mark5.Mobile.Common
             else
             {
                 foreach (var module in modules)
-                {
                     switch (module)
                     {
                         case ModuleType.Documents:
@@ -70,7 +62,6 @@ namespace Mark5.Mobile.Common
                         default:
                             throw new ArgumentException("Module not supported");
                     }
-                }
             }
             await FileSystemStorage.SaveLastCacheCleanUpAsync(DateTime.UtcNow);
         }

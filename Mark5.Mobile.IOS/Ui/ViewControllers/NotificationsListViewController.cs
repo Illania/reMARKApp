@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: NotificationsListViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -191,7 +183,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        async void RefreshControl_ValueChanged(object sender, EventArgs e) => await RefreshData();
+        async void RefreshControl_ValueChanged(object sender, EventArgs e)
+        {
+            await RefreshData();
+        }
 
         async Task RefreshData()
         {
@@ -279,15 +274,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable
         {
-            public bool Empty
-            {
-                get { return notificationsInView.Count < 1; }
-            }
+            public bool Empty => notificationsInView.Count < 1;
 
-            public List<Notification> Items
-            {
-                get { return notificationsInView; }
-            }
+            public List<Notification> Items => notificationsInView;
 
             NotificationsListViewController viewController;
             UITableView tableView;
@@ -306,9 +295,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 if (loading)
-                {
                     return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
-                }
 
                 if (notificationsInView.Count < 1)
                 {

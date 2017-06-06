@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: SearchFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -312,9 +304,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var df = restoredState as DocumentSearchCriteriaFragmentState;
             if (df != null)
-            {
                 searchCriteria = df.Criteria;
-            }
         }
 
         public override string GenerateTag()

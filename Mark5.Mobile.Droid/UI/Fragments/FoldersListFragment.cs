@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: FoldersListFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,10 +45,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected virtual bool LoadRemoteFromCache { get; }
 
-        protected FolderListAdapter CurrentAdapter
-        {
-            get { return SearchEnabled ? SearchAdapter : Adapter; }
-        }
+        protected FolderListAdapter CurrentAdapter => SearchEnabled ? SearchAdapter : Adapter;
 
         #region Overrides
 
@@ -257,7 +246,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 List<Folder> remoteFolders = null;
 
                 if (LoadRemoteFromCache)
-                {
                     try
                     {
                         remoteFolders = await Managers.FoldersManager.GetFoldersAsync(RemoteFolder, sourceType: SourceType.Local);
@@ -270,10 +258,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     {
                         CommonConfig.Logger.Error($"Retrieving folders from cache only failed [folder.name={RemoteFolder.Name}, folder.id={RemoteFolder.Id}]", ex);
                     }
-                }
 
                 if (remoteFolders == null)
-                {
                     try
                     {
                         remoteFolders = await Managers.FoldersManager.GetFoldersAsync(RemoteFolder);
@@ -283,7 +269,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         CommonConfig.Logger.Error($"Downloading folders failed [folder.name={RemoteFolder.Name}, folder.id={RemoteFolder.Id}]", ex);
                         await Dialogs.ShowErrorDialogAsync(Activity, ex);
                     }
-                }
 
                 if (remoteFolders != null)
                     Adapter.Refresh(remoteFolders, Section.Remote);
@@ -337,9 +322,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Section.Remote
                 };
                 if (RemoteFolder.Module == ModuleType.Documents)
-                {
                     AvailableSections.Add(Section.Local);
-                }
             }
             else
             {
@@ -406,9 +389,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             else
             {
                 if (!IsSelectionValid(position))
-                {
                     return;
-                }
 
                 ToggleSelection(position);
             }
@@ -417,14 +398,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected virtual void Adapter_ItemLongClicked(object sender, int position)
         {
             if (!IsSelectionValid(position))
-            {
                 return;
-            }
 
             if (actionMode == null)
-            {
                 actionMode = Activity.StartActionMode(this);
-            }
 
             ToggleSelection(position);
         }
@@ -434,10 +411,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var selectedIsLocal = CurrentAdapter.GetItemAtPosition(position).Local;
             var sectionForPrelectedItems = CurrentAdapter.GetSectionForSelectedItems();
             var selectedItemNotInPreselectedSection = sectionForPrelectedItems != CurrentAdapter.GetSectionForPosition(position);
-            if (selectedIsLocal || (sectionForPrelectedItems != null && selectedItemNotInPreselectedSection))
-            {
+            if (selectedIsLocal || sectionForPrelectedItems != null && selectedItemNotInPreselectedSection)
                 return false;
-            }
 
             return true;
         }
@@ -488,9 +463,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var selectedFolders = CurrentAdapter.GetSelectedItems().ToList();
             if (!selectedFolders.Any())
-            {
                 return false;
-            }
 
             var section = CurrentAdapter.GetSectionForSelectedItems();
 
@@ -499,39 +472,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var foldersFavoriteState = selectedFolders.Select(f => AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderFavouriteAsync(f.Module, f)));
 
             if (foldersFavoriteState.Any(v => v))
-            {
                 menu.Add(Menu.None, MenuItemActions.RemoveFromFavourites, MenuItemActions.RemoveFromFavourites, Resource.String.remove_favorites).SetShowAsAction(ShowAsAction.Never);
-            }
             if (foldersFavoriteState.Any(v => !v))
-            {
                 menu.Add(Menu.None, MenuItemActions.AddToFavourites, MenuItemActions.AddToFavourites, Resource.String.add_favorites).SetShowAsAction(ShowAsAction.Never);
-            }
 
             if (section != Section.Favourites)
             {
                 var foldersAvailableOfflineState = selectedFolders.Select(f => AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderOfflineAsync(f.Module, f)));
 
                 if (foldersAvailableOfflineState.Any(v => v))
-                {
                     menu.Add(Menu.None, MenuItemActions.DisableOffline, MenuItemActions.DisableOffline, Resource.String.remove_offline).SetShowAsAction(ShowAsAction.Never);
-                }
                 if (foldersAvailableOfflineState.Any(v => !v))
-                {
                     menu.Add(Menu.None, MenuItemActions.EnableOffline, MenuItemActions.EnableOffline, Resource.String.add_offline).SetShowAsAction(ShowAsAction.Never);
-                }
 
                 if (RemoteFolder.Module == ModuleType.Documents && !string.IsNullOrEmpty(PlatformConfig.Preferences.PushNotificationToken))
                 {
                     var foldersSubscribedState = selectedFolders.Select(f => f.Subscribed);
 
                     if (foldersSubscribedState.Any(v => v))
-                    {
                         menu.Add(Menu.None, MenuItemActions.Unsubscribe, MenuItemActions.Unsubscribe, Resource.String.disable_notifications_folder).SetShowAsAction(ShowAsAction.Never);
-                    }
                     if (foldersSubscribedState.Any(v => !v))
-                    {
                         menu.Add(Menu.None, MenuItemActions.Subscribe, MenuItemActions.Subscribe, Resource.String.enable_notifications_folder).SetShowAsAction(ShowAsAction.Never);
-                    }
                 }
             }
             return true;
@@ -585,9 +546,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var selectedFolders = CurrentAdapter.GetSelectedItems().ToList();
             if (!selectedFolders.Any())
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Setting subscription status of {selectedFolders.Count} folders to {enabled}");
 
@@ -626,25 +585,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var selectedFolders = CurrentAdapter.GetSelectedItems().ToList();
             if (!selectedFolders.Any())
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Setting offline status of {selectedFolders.Count} folders to {offline}");
 
             Task.Run(async () =>
                 {
                     foreach (var folder in selectedFolders)
-                    {
                         if (offline)
-                        {
                             await Managers.FoldersManager.AddOfflineFolderAsync(folder.Module, folder);
-                        }
                         else
-                        {
                             await Managers.FoldersManager.RemoveOfflineFolderAsync(folder.Module, folder);
-                        }
-                    }
                 })
                 .ContinueWith(t =>
                 {
@@ -667,25 +618,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var selectedFolders = CurrentAdapter.GetSelectedItems().ToList();
             if (!selectedFolders.Any())
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Setting favourite status of {selectedFolders.Count} folders to {favourite}");
 
             Task.Run(async () =>
                 {
                     foreach (var folder in selectedFolders)
-                    {
                         if (favourite)
-                        {
                             await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
-                        }
                         else
-                        {
                             await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
-                        }
-                    }
                 })
                 .ContinueWith(async (t) =>
                 {
@@ -699,9 +642,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         actionMode.Finish();
 
                         if (AvailableSections.Contains(Section.Favourites))
-                        {
                             await RefreshFavorites();
-                        }
                     }
                 }, TaskScheduler.FromCurrentSynchronizationContext());
         }
@@ -710,13 +651,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region SwipeRefresLayout event handlers
 
-        void RefreshLayout_Refresh(object sender, EventArgs e) => RefreshData(true);
+        void RefreshLayout_Refresh(object sender, EventArgs e)
+        {
+            RefreshData(true);
+        }
 
         #endregion
 
         #region Filtering 
 
-        virtual public bool OnMenuItemActionExpand(IMenuItem item)
+        public virtual bool OnMenuItemActionExpand(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
@@ -868,15 +812,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 get { return foldersInSection.Sum(f => f.Value.Count) + (sectionsInView.Count == 1 ? 0 : sectionsInView.Count); }
             }
 
-            public int SelectedItemsCount
-            {
-                get { return selectedItemPositions.Count; }
-            }
+            public int SelectedItemsCount => selectedItemPositions.Count;
 
-            public List<int> SelectedItemPositions
-            {
-                get { return selectedItemPositions.ToList(); }
-            }
+            public List<int> SelectedItemPositions => selectedItemPositions.ToList();
 
             #region Overrides
 
@@ -906,20 +844,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                         var subtitleStrings = new List<string>();
                         if (folder.Subscribed)
-                        {
                             subtitleStrings.Add("Notifications On");
-                        }
                         if (isFolderAvailableOffline)
-                        {
                             subtitleStrings.Add("Available Offline");
-                        }
 
                         fh.FolderNameSubTitle.Text = string.Join(", ", subtitleStrings);
                     }
 
                     fh.FolderNameSubTitle.Visibility = !string.IsNullOrEmpty(fh.FolderNameSubTitle.Text) ? ViewStates.Visible : ViewStates.Gone;
 
-                    fh.ExpandButton.Visibility = (folder.HasSubFolders && sectionForPosition != Section.None) ? ViewStates.Visible : ViewStates.Gone;
+                    fh.ExpandButton.Visibility = folder.HasSubFolders && sectionForPosition != Section.None ? ViewStates.Visible : ViewStates.Gone;
 
                     if (folder.InternalType == FolderInternalType.Worktray)
                         fh.FolderIcon.SetImageResource(Resource.Drawable.folder_worktray);
@@ -1016,9 +950,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 foldersInSection[section].AddRange(folders);
                 NotifyItemRangeInserted(sectionPosition + offset, newItemCount);
                 if (sectionsInView.Count > 1)
-                {
                     NotifyItemChanged(sectionPosition);
-                }
             }
 
             public void RefreshFolder(Folder folder, bool? subscriptionEnabled = null)
@@ -1031,9 +963,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     if (index >= 0)
                     {
                         if (subscriptionEnabled.HasValue)
-                        {
                             foldersInSection[section][index].Subscribed = subscriptionEnabled.Value;
-                        }
                         var sectionPosition = sectionsPositionToSection.FirstOrDefault(c => c.Value == section).Key;
                         NotifyItemChanged(sectionPosition + index + offset);
                     }
@@ -1043,9 +973,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public void RefreshFolders(List<Folder> folders, bool? subscriptionEnabled = null)
             {
                 foreach (var folder in folders)
-                {
                     RefreshFolder(folder, subscriptionEnabled);
-                }
             }
 
             public void ClearSelections()
@@ -1053,29 +981,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var selectedItemPositionsCopy = new List<int>(selectedItemPositions);
                 selectedItemPositions.Clear();
                 foreach (var position in selectedItemPositionsCopy)
-                {
                     NotifyItemChanged(position);
-                }
             }
 
             public Folder GetItemAtPosition(int position)
             {
                 if (sectionsInView.Count == 1)
-                {
                     return foldersInSection[sectionsInView.First()][position];
-                }
 
                 int sectionPosition = 0;
                 var sectionPositionToSection = SectionsPositionToSection();
                 var sectionPositions = sectionPositionToSection.Keys.ToList();
                 for (int i = sectionPositions.Count - 1; i > 0; i--)
-                {
                     if (position > sectionPositions[i])
                     {
                         sectionPosition = sectionPositions[i];
                         break;
                     }
-                }
 
                 var section = sectionPositionToSection[sectionPosition];
                 return foldersInSection[section][position - sectionPosition - 1];
@@ -1090,13 +1012,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var isItemSelected = IsItemSelected(position);
                 if (isItemSelected)
-                {
                     selectedItemPositions.Remove(position);
-                }
                 else
-                {
                     selectedItemPositions.Add(position);
-                }
 
                 NotifyItemChanged(position);
                 return !isItemSelected;
@@ -1105,9 +1023,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public Section? GetSectionForSelectedItems()
             {
                 if (selectedItemPositions.Any())
-                {
                     return GetSectionForPosition(selectedItemPositions.First());
-                }
 
                 return null;
             }
@@ -1115,24 +1031,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public Section GetSectionForPosition(int position)
             {
                 if (sectionsInView.Count == 1)
-                {
                     return sectionsInView[0];
-                }
 
                 var sectionPositions = SectionsPositionToSection();
 
                 Section currentSection = Section.Favourites;
                 foreach (var sectionPosition in sectionPositions.Keys)
-                {
                     if (position > sectionPosition)
-                    {
                         currentSection = sectionPositions[sectionPosition];
-                    }
                     else
-                    {
                         break;
-                    }
-                }
 
                 return currentSection;
             }
@@ -1160,18 +1068,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var sectionsPositionToSection = SectionsPositionToSection();
                 var offset = sectionsInView.Count == 1 ? 0 : 1;
                 foreach (var folder in folders)
+                foreach (var section in sectionsInView)
                 {
-                    foreach (var section in sectionsInView)
-                    {
-                        var sectionPosition = sectionsPositionToSection.FirstOrDefault(c => c.Value == section).Key;
+                    var sectionPosition = sectionsPositionToSection.FirstOrDefault(c => c.Value == section).Key;
 
-                        var index = foldersInSection[section].FindIndex(f => f.Id == folder.Id);
-                        if (index >= 0)
-                        {
-                            var position = sectionPosition + offset + index;
-                            selectedItemPositions.Add(position);
-                            NotifyItemChanged(position);
-                        }
+                    var index = foldersInSection[section].FindIndex(f => f.Id == folder.Id);
+                    if (index >= 0)
+                    {
+                        var position = sectionPosition + offset + index;
+                        selectedItemPositions.Add(position);
+                        NotifyItemChanged(position);
                     }
                 }
             }
@@ -1188,9 +1094,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Dictionary<int, Section> SectionsPositionToSection()
             {
                 if (sectionsInView.Count <= 1)
-                {
                     return new Dictionary<int, Section>();
-                }
 
                 var positions = new Dictionary<int, Section>();
                 positions.Add(0, sectionsInView[0]);

@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: DocumentsListFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,10 +38,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public Folder Folder { get; set; }
         public Action CloseRequest { get; set; }
 
-        DocumentsListAdapter CurrentAdapter
-        {
-            get { return (DocumentsListAdapter) recyclerView.GetAdapter(); }
-        }
+        DocumentsListAdapter CurrentAdapter => (DocumentsListAdapter) recyclerView.GetAdapter();
 
         bool refreshing;
 
@@ -470,39 +459,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             menu.Clear();
 
             if (CurrentAdapter.SelectedItems.Any(dp => !dp.IsReadByCurrent))
-            {
                 menu.Add(Menu.None, MenuItemActions.MarkAsRead, MenuItemActions.MarkAsRead, Resource.String.mark_as_read);
-            }
 
             if (CurrentAdapter.SelectedItems.Any(dp => dp.IsReadByCurrent))
-            {
                 menu.Add(Menu.None, MenuItemActions.MarkAsUnread, MenuItemActions.MarkAsUnread, Resource.String.marks_as_unread);
-            }
 
             menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
             menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
 
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-            {
                 menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
-            }
 
             menu.Add(Menu.None, MenuItemActions.SetPriority, MenuItemActions.SetPriority, Resource.String.set_priority);
 
             if (CurrentAdapter.SelectedItemCount == 1)
-            {
                 menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
-            }
 
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-            {
                 menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
-            }
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || CurrentAdapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft))
-            {
                 menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
-            }
 
             return true;
         }
@@ -648,20 +625,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var option = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_worktray, Resource.Array.copy_to_worktray_options, true);
 
             if (option == 0)
-            {
                 await CopyToOwnWorktray(CurrentAdapter.SelectedItems);
-            }
 
             if (option == 1)
-            {
                 StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
-            }
         }
 
-        async void CopyToOwnWorktray(DocumentPreview documentPreview) => await CopyToOwnWorktray(new List<DocumentPreview>
+        async void CopyToOwnWorktray(DocumentPreview documentPreview)
         {
-            documentPreview
-        });
+            await CopyToOwnWorktray(new List<DocumentPreview>
+            {
+                documentPreview
+            });
+        }
 
         public async Task CopyToOwnWorktray(List<DocumentPreview> documentPreviews)
         {
@@ -735,9 +711,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
             if (!yesNo)
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Attempting to delete from folder [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
 
@@ -766,9 +740,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
             if (!yesNo)
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Attempting to delete [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
 
@@ -1048,25 +1020,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 public const int ExternalDocumentView = 1;
             }
 
-            public List<DocumentPreview> Items
-            {
-                get { return documentPreviewsInView; }
-            }
+            public List<DocumentPreview> Items => documentPreviewsInView;
 
-            public List<DocumentPreview> SelectedItems
-            {
-                get { return selectedDocumentsInView.Values.ToList(); }
-            }
+            public List<DocumentPreview> SelectedItems => selectedDocumentsInView.Values.ToList();
 
-            public override int ItemCount
-            {
-                get { return documentPreviewsInView.Count; }
-            }
+            public override int ItemCount => documentPreviewsInView.Count;
 
-            public int SelectedItemCount
-            {
-                get { return selectedDocumentsInView.Count; }
-            }
+            public int SelectedItemCount => selectedDocumentsInView.Count;
 
             public bool EnableLoadMore { get; set; }
 
@@ -1177,9 +1137,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 if (recyclerView != null && loadMoreAction != null && position == ItemCount - 1 && EnableLoadMore)
-                {
                     loadMoreAction(dp.Id);
-                }
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -1225,9 +1183,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     var position = GetPosition(item);
                     if (position >= 0)
-                    {
                         NotifyItemChanged(position);
-                    }
                 }
             }
 
@@ -1252,9 +1208,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public void SetSelected(List<DocumentPreview> documentPreviews, bool selected)
             {
                 foreach (var document in documentPreviews)
-                {
                     SetSelected(document, selected);
-                }
             }
 
             public void SetSelected(DocumentPreview documentPreview, bool selected)
@@ -1264,13 +1218,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
 
                 if (selected)
-                {
                     selectedDocumentsInView[documentPreview.Id] = documentPreview;
-                }
                 else
-                {
                     selectedDocumentsInView.Remove(documentPreview.Id);
-                }
                 NotifyItemChanged(position);
             }
 
@@ -1283,9 +1233,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     var position = GetPosition(document);
                     if (position >= 0)
-                    {
                         NotifyItemChanged(position);
-                    }
                 }
             }
 
@@ -1301,13 +1249,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var position = -1;
                 for (var i = 0; i < documentPreviewsInView.Count; i++)
-                {
                     if (documentPreviewsInView[i].Id == documentPreviewId)
                     {
                         position = i;
                         break;
                     }
-                }
                 return position;
             }
 
@@ -1333,15 +1279,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 var dpvh = vh as DocumentPreviewViewHolder;
                 if (dpvh != null)
-                {
                     return dpvh.BubbleDate;
-                }
 
                 var edpvh = vh as ExternalDocumentPreviewViewHolder;
                 if (edpvh != null)
-                {
                     return edpvh.BubbleDate;
-                }
 
                 return string.Empty;
             }
@@ -1491,19 +1433,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public string Recipent
             {
-                set { recipentTextView.Text = value; }
+                set => recipentTextView.Text = value;
             }
 
             public string Date
             {
-                set { dateTextView.Text = value; }
+                set => dateTextView.Text = value;
             }
 
             public string BubbleDate { get; set; }
 
             public string Subject
             {
-                set { subjectTextView.Text = value; }
+                set => subjectTextView.Text = value;
             }
 
             public string Preview
@@ -1543,32 +1485,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public bool IncomingIndicator
             {
-                set { incomingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => incomingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             public bool OutgoingIndicator
             {
-                set { outgoingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => outgoingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             public bool DraftIndicator
             {
-                set { draftImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => draftImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             public bool UnreadIndicator
             {
-                set { unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             public bool AttachmentIndicator
             {
-                set { attachmentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => attachmentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             public bool CommentIndicator
             {
-                set { commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             public bool Compact
@@ -1583,7 +1525,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public bool Selected
             {
-                set { selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             public int SwipedDirection
@@ -1646,19 +1588,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public string Name
             {
-                set { nameTextView.Text = value; }
+                set => nameTextView.Text = value;
             }
 
             public string Date
             {
-                set { dateTextView.Text = value; }
+                set => dateTextView.Text = value;
             }
 
             public string BubbleDate { get; set; }
 
             public string Preview
             {
-                set { previewTextView.Text = value; }
+                set => previewTextView.Text = value;
             }
 
             public List<Category> Categories
@@ -1681,12 +1623,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public bool CommentIndicator
             {
-                set { commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             public bool Selected
             {
-                set { selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             public int SwipedDirection
@@ -1768,9 +1710,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                             var first = firstOrDefaultItem();
                             if (first != null)
-                            {
                                 await work(first.Id);
-                            }
                         }
                     });
                 }
@@ -1779,7 +1719,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public void Stop()
             {
                 lock (lockObj)
+                {
                     cts?.Cancel();
+                }
             }
         }
     }

@@ -1,11 +1,4 @@
-﻿//
-// File: DataContractConverters.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Linq;
 using Mark5.Mobile.Common.Extensions;
 using DataContract = Mark5.ServiceReference.DataContract;
@@ -477,13 +470,11 @@ namespace Mark5.Mobile.Common.Model.Converters
         {
             var ceop = p as DataContract.CalendarEventOptionalParameters;
             if (ceop != null)
-            {
                 return new CalendarEventOptionalParameters
                 {
                     CanContainAppointments = ceop.CanContainAppointments,
                     CanContainTasks = ceop.CanContainTasks
                 };
-            }
             return null;
         }
 

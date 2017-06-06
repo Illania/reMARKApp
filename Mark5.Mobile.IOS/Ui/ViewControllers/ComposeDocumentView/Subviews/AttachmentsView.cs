@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: AttachmentsView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -80,12 +72,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             stackView.Subviews.OfType<AttachmentsSubView>().ForEach(v => v.RemoveFromSuperview());
 
             if (CreationModeFlag == DocumentCreationModeFlag.Forward || CreationModeFlag == DocumentCreationModeFlag.Edit)
-            {
                 foreach (var attachmentDescription in PreviousDocument.Attachments)
-                {
                     AddAttachment(attachmentDescription);
-                }
-            }
 
             return Task.CompletedTask;
         }

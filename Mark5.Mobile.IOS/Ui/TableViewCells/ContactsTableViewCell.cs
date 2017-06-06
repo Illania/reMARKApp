@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Common.iOS
-// File: ContactsTableViewCell.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;

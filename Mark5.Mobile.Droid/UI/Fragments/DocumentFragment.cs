@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: DocumentFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -201,7 +193,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
             if (resultCode == (int) Result.Ok)
-            {
                 if (requestCode == RequestCodes.CommentsRequest)
                 {
                     var comments = SerializationUtils.Deserialize<List<Comment>>(data.GetStringExtra(CommentsListActivity.CommentsResultKey));
@@ -212,7 +203,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var categories = SerializationUtils.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
                     UpdateCategories(categories);
                 }
-            }
         }
 
         static class MenuItemActions
@@ -248,43 +238,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (!DocumentPreview.IsReadByCurrent)
-            {
                 menu.Add(Menu.None, MenuItemActions.MarkAsRead, MenuItemActions.MarkAsRead, Resource.String.mark_as_read);
-            }
 
             if (DocumentPreview.IsReadByCurrent)
-            {
                 menu.Add(Menu.None, MenuItemActions.MarkAsUnread, MenuItemActions.MarkAsUnread, Resource.String.marks_as_unread);
-            }
 
             menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
             menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
 
             if (Folder?.InternalType == FolderInternalType.FilterView || Folder?.InternalType == FolderInternalType.Static || Folder?.InternalType == FolderInternalType.Worktray)
-            {
                 menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
-            }
 
             menu.Add(Menu.None, MenuItemActions.SetPriority, MenuItemActions.SetPriority, Resource.String.set_priority);
             menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
 
             if (Document != null)
-            {
                 menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments);
-            }
 
             menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.actions);
             menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
 
             if (Folder?.InternalType == FolderInternalType.FilterView || Folder?.InternalType == FolderInternalType.Static || Folder?.InternalType == FolderInternalType.Worktray)
-            {
                 menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
-            }
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || DocumentPreview.Direction == DocumentDirection.Draft)
-            {
                 menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
-            }
         }
 
         public override async void OnPrepareOptionsMenu(IMenu menu)
@@ -305,29 +283,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var goToPreviousItem = menu.FindItem(MenuItemActions.GoToPrevious);
                 if (goToPreviousItem != null)
-                {
                     goToPreviousItem.SetEnabled(await ((SwitchDocumentActivity) Activity).HasPrevious(DocumentId ?? DocumentPreview.Id)); // TODO set color alpha for disabled state
-                }
 
                 var goToNextItem = menu.FindItem(MenuItemActions.GoToNext);
                 if (goToNextItem != null)
-                {
                     goToNextItem.SetEnabled(await ((SwitchDocumentActivity) Activity).HasNext(DocumentId ?? DocumentPreview.Id)); // TODO set color alpha for disabled state
-                }
             }
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if (Activity is SwitchDocumentActivity && item.ItemId == MenuItemActions.GoToPrevious)
-            {
                 ((SwitchDocumentActivity) Activity).GoToPrevious(DocumentId ?? DocumentPreview.Id);
-            }
 
             if (Activity is SwitchDocumentActivity && item.ItemId == MenuItemActions.GoToNext)
-            {
                 ((SwitchDocumentActivity) Activity).GoToNext(DocumentId ?? DocumentPreview.Id);
-            }
 
             if (item.ItemId == MenuItemActions.MarkAsRead)
             {
@@ -513,12 +483,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (option == 1)
-            {
                 StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, new List<IBusinessEntity>
                 {
                     DocumentPreview
                 }));
-            }
         }
 
         async void SetPriority()
@@ -568,9 +536,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
             if (!yesNo)
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Attempting to delete from folder [documentPreview={DocumentPreview}]...");
 
@@ -604,9 +570,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
             if (!yesNo)
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Attempting to delete [documentPreview={DocumentPreview}]...");
 
@@ -732,9 +696,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 if (NotificationGuid != default(Guid))
-                {
                     await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
-                }
 
                 if (DocumentId.HasValue && DocumentPreview == null && Document == null)
                 {
@@ -744,9 +706,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 if (DocumentPreview != null && Document == null)
-                {
                     Document = await Managers.DocumentsManager.GetDocumentAsync(FolderId ?? Folder?.Id, DocumentPreview.Id);
-                }
 
                 RefreshView();
             }
@@ -890,9 +850,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (DocumentPreview != null)
-            {
                 DocumentPreview.CommentsCount = comments.Count;
-            }
         }
 
         public override IRetainableState OnRetainInstanceState()

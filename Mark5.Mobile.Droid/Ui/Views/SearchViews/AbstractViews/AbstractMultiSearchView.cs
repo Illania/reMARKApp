@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: AbstractMultiSearchView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using Android.Graphics;
+﻿using Android.Graphics;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -20,9 +12,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public abstract class AbstractMultiSearchView<T> : AbstractSearchView<T>
     {
-        readonly protected AppCompatSpinner Spinner;
-        readonly protected AppCompatTextView TopTextView;
-        readonly protected AppCompatEditText BottomEditText;
+        protected readonly AppCompatSpinner Spinner;
+        protected readonly AppCompatTextView TopTextView;
+        protected readonly AppCompatEditText BottomEditText;
 
         protected AbstractMultiSearchView(Android.Content.Context context, int topTextResId, int bottomEditResId, int textArrayResId)
             : base(context)
@@ -107,9 +99,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             BottomEditText.EditorAction += (sender, e) =>
             {
                 if (e.ActionId == ImeAction.Done)
-                {
                     BottomEditText.ClearFocus();
-                }
             };
             rightLayout.AddView(BottomEditText);
         }
@@ -126,7 +116,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
             public override bool OnKeyPreIme(Keycode keyCode, KeyEvent e)
             {
-                if ((keyCode == Keycode.Back) && (e.Action == KeyEventActions.Up))
+                if (keyCode == Keycode.Back && e.Action == KeyEventActions.Up)
                     BackPressed(this, EventArgs.Empty);
 
                 return base.OnKeyPreIme(keyCode, e);

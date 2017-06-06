@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: DescriptionView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using Android.Content;
+﻿using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
@@ -54,9 +46,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
             LongClick += (sender, e) =>
             {
                 if (!string.IsNullOrWhiteSpace(contentView.Text))
-                {
                     Integration.CopyToClipboard(Context, contentView.Text);
-                }
             };
         }
 

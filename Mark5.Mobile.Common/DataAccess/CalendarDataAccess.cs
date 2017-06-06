@@ -1,11 +1,4 @@
-﻿//
-// File: CalendarDataAccess.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -76,21 +69,15 @@ namespace Mark5.Mobile.Common.DataAccess
                     var query = $"select * " + $"from {nameof(CalendarAppointment)}, {nameof(FolderCalendarAppointmentLink)} " + $"where {nameof(FolderCalendarAppointmentLink.FolderId)} = {folder.Id} " + $"     and {nameof(CalendarAppointment)}.{nameof(CalendarAppointment.Id)} = {nameof(FolderCalendarAppointmentLink)}.{nameof(FolderCalendarAppointmentLink.CalendarAppointmentId)} ";
 
                     if (startDateTimestamp >= 0)
-                    {
                         query += $"    and {nameof(CalendarAppointment)}.{nameof(CalendarAppointment.StartDateTimestamp)} >= {startDateTimestamp} ";
-                    }
                     if (endDateTimestamp >= 0)
-                    {
                         query += $"    and {nameof(CalendarAppointment)}.{nameof(CalendarAppointment.EndDateTimestamp)} <= {endDateTimestamp} ";
-                    }
                     query += $"order by {nameof(CalendarAppointment.StartDateTimestamp)} desc ";
 
                     var result = c.Query<CalendarAppointment>(query);
 
                     if (result == null || result.Count < 1)
-                    {
                         throw new DataNotFoundException("Calendar appointments could not be found.");
-                    }
                     appointments = result;
                 });
 
@@ -112,22 +99,16 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     var query = $"select * " + $"from {nameof(CalendarTask)}, {nameof(FolderCalendarTaskLink)} " + $"where {nameof(FolderCalendarTaskLink.FolderId)} = {folder.Id} " + $"     and {nameof(CalendarTask)}.{nameof(CalendarTask.Id)} = {nameof(FolderCalendarTaskLink)}.{nameof(FolderCalendarTaskLink.CalendarTaskId)} ";
                     if (startDateTimestamp >= 0)
-                    {
                         query += $"    and {nameof(CalendarTask)}.{nameof(CalendarTask.StartDateTimestamp)} >= {startDateTimestamp} ";
-                    }
                     if (endDateTimestamp >= 0)
-                    {
                         query += $"    and {nameof(CalendarTask)}.{nameof(CalendarTask.EndDateTimestamp)} <= {endDateTimestamp} ";
-                    }
                     query += $"order by {nameof(CalendarTask.StartDateTimestamp)} desc ";
 
 
                     var result = c.Query<CalendarTask>(query);
 
                     if (result == null || result.Count < 1)
-                    {
                         throw new DataNotFoundException("Calendar tasks could not be found.");
-                    }
                     tasks = result;
                 });
 
@@ -170,9 +151,7 @@ namespace Mark5.Mobile.Common.DataAccess
                 await calendarDatabase.RunInConnectionAsync(c =>
                 {
                     if (clean)
-                    {
                         c.Table<FolderCalendarAppointmentLink>().Delete(fdl => fdl.FolderId == folder.Id);
-                    }
                     c.InsertOrReplaceAll(calendarAppointments.Select(ca => new FolderCalendarAppointmentLink
                     {
                         FolderId = folder.Id,
@@ -194,9 +173,7 @@ namespace Mark5.Mobile.Common.DataAccess
                 await calendarDatabase.RunInConnectionAsync(c =>
                 {
                     if (clean)
-                    {
                         c.Table<FolderCalendarTaskLink>().Delete(fdl => fdl.FolderId == folder.Id);
-                    }
                     c.InsertOrReplaceAll(calendarTasks.Select(ct => new FolderCalendarTaskLink
                     {
                         FolderId = folder.Id,
@@ -223,9 +200,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     {
                         var linksCount = c.Table<FolderCalendarAppointmentLink>().Count(fdl => fdl.CalendarAppointmentId == id);
                         if (linksCount == 1)
-                        {
                             c.Table<CalendarAppointment>().Delete(ct => ct.Id == id);
-                        }
                         c.Table<FolderCalendarAppointmentLink>().Delete(fsl => fsl.CalendarAppointmentId == id && fsl.FolderId == folder.Id);
                     }
                 });
@@ -248,9 +223,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     {
                         var linksCount = c.Table<FolderCalendarTaskLink>().Count(fdl => fdl.CalendarTaskId == id);
                         if (linksCount == 1)
-                        {
                             c.Table<CalendarTask>().Delete(ct => ct.Id == id);
-                        }
                         c.Table<FolderCalendarTaskLink>().Delete(fsl => fsl.CalendarTaskId == id && fsl.FolderId == folder.Id);
                     }
                 });

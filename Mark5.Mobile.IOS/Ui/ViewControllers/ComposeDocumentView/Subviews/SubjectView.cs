@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: SubjectsView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
@@ -23,14 +15,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public string Subject
         {
-            get { return textView.Text; }
-            set { textView.Text = value; }
+            get => textView.Text;
+            set => textView.Text = value;
         }
 
-        public bool Empty
-        {
-            get { return string.IsNullOrEmpty(textView?.Text); }
-        }
+        public bool Empty => string.IsNullOrEmpty(textView?.Text);
 
         public SubjectView()
         {
@@ -84,9 +73,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public override Task RefreshView()
         {
             if (CreationModeFlag == DocumentCreationModeFlag.None || CreationModeFlag == DocumentCreationModeFlag.New)
-            {
                 return Task.CompletedTask;
-            }
 
             switch (CreationModeFlag)
             {

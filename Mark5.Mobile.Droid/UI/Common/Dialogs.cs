@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: Dialogs.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -149,9 +141,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Items(itemsId);
             builder.ItemsCallback(new ListCallback(i => tcs.SetResult(i)));
             if (includeCancel)
-            {
                 builder.NegativeText(Resource.String.cancel);
-            }
             builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
@@ -165,9 +155,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Items(itemsId);
             builder.ItemsCallback(new ListCallback(i => tcs.SetResult(i)));
             if (includeCancel)
-            {
                 builder.NegativeText(Resource.String.cancel);
-            }
             builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
@@ -181,9 +169,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Items(items);
             builder.ItemsCallback(new ListCallback(i => tcs.SetResult(i)));
             if (includeCancel)
-            {
                 builder.NegativeText(Resource.String.cancel);
-            }
             builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
@@ -325,9 +311,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                             dismissAction();
 
                             if (!t.IsFaulted)
-                            {
                                 activity.StartActivity(SystemReportCollector.CreateShareReportIntent(activity, t.Result));
-                            }
 
                             tcs.SetResult(true);
                         }, TaskScheduler.FromCurrentSynchronizationContext());
@@ -358,9 +342,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                             dismissAction();
 
                             if (!t.IsFaulted)
-                            {
                                 activity.StartActivity(SystemReportCollector.CreateShareReportIntent(activity, t.Result));
-                            }
 
                             if (action != null)
                                 action();
@@ -374,33 +356,19 @@ namespace Mark5.Mobile.Droid.Ui.Common
         static string GetErrorTitle(Context context, Exception ex)
         {
             if (ex is WcfAppServiceException)
-            {
                 return context.GetString(Resource.String.appserviceexception_title);
-            }
             if (ex is HttpAppServiceException)
-            {
                 return context.GetString(Resource.String.appserviceexception_title);
-            }
             if (ex is FileTransferServiceException)
-            {
                 return context.GetString(Resource.String.filetransferserviceexception_title);
-            }
             if (ex is DataNotFoundException)
-            {
                 return context.GetString(Resource.String.datanotfoundexception_title);
-            }
             if (ex is DataAccessException)
-            {
                 return context.GetString(Resource.String.dataaccessexception_title);
-            }
             if (ex is InvalidSourceTypeException)
-            {
                 return context.GetString(Resource.String.invalidsourcetypeexception_title);
-            }
             if (ex is MailViewerException)
-            {
                 return context.GetString(Resource.String.couldnotopenemlmsg_title);
-            }
 
             return context.GetString(Resource.String.generalexception_title);
         }
@@ -408,33 +376,19 @@ namespace Mark5.Mobile.Droid.Ui.Common
         static string GetErrorMessage(Context context, Exception ex)
         {
             if (ex is WcfAppServiceException)
-            {
                 return ex.Message;
-            }
             if (ex is HttpAppServiceException)
-            {
                 return ex.Message;
-            }
             if (ex is FileTransferServiceException)
-            {
                 return ex.Message;
-            }
             if (ex is DataNotFoundException)
-            {
                 return context.GetString(Resource.String.datanotfoundexception_message);
-            }
             if (ex is DataAccessException)
-            {
                 return ex.Message;
-            }
             if (ex is InvalidSourceTypeException)
-            {
                 return context.GetString(Resource.String.invalidsourcetypeexception_message);
-            }
             if (ex is MailViewerException)
-            {
                 return ex.Message;
-            }
 
             return ex.Message;
         }
@@ -442,33 +396,19 @@ namespace Mark5.Mobile.Droid.Ui.Common
         static bool ShouldShowCreateReport(Exception ex)
         {
             if (ex is WcfAppServiceException)
-            {
                 return true;
-            }
             if (ex is HttpAppServiceException)
-            {
                 return true;
-            }
             if (ex is FileTransferServiceException)
-            {
                 return true;
-            }
             if (ex is DataNotFoundException)
-            {
                 return false;
-            }
             if (ex is DataAccessException)
-            {
                 return true;
-            }
             if (ex is InvalidSourceTypeException)
-            {
                 return false;
-            }
             if (ex is MailViewerException)
-            {
                 return true;
-            }
 
             return true;
         }

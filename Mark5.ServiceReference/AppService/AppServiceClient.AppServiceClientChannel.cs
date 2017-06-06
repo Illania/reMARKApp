@@ -1,10 +1,3 @@
-//
-// File: AppServiceClient.AppServiceClientChannel.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.ServiceModel;
 using Mark5.ServiceReference.DataContract;

@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ObjectActionsFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -76,9 +68,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 if (objectActions == null)
-                {
                     objectActions = await Managers.CommonActionsManager.GetObjectActionsAsync(BusinessEntity);
-                }
 
                 RefreshView();
             }
@@ -103,9 +93,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var grouppedObjectActions = objectActions.OrderBy(oa => oa.ActionType).ThenBy(oa => oa.ActionTimeTimestamp).GroupBy(oa => oa.ActionType);
 
             foreach (var grouppedObjectAction in grouppedObjectActions)
-            {
                 linearLayout.AddView(new ObjectActionsView(Context, grouppedObjectAction.Key, grouppedObjectAction.ToArray()));
-            }
 
             linearLayout.Invalidate();
             linearLayout.RequestLayout();

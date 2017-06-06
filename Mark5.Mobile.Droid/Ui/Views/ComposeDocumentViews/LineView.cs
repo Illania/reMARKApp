@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: LineView.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -34,10 +26,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         readonly Line ambiguousFakeLine;
         readonly Guid ambiguousFakeLineGuid = Guid.Parse("175012b3-abee-48ff-9973-2bd84f67e5fd");
 
-        public bool LineSelectedIsAmbiguous
-        {
-            get { return GetLine().Guid == ambiguousFakeLineGuid; }
-        }
+        public bool LineSelectedIsAmbiguous => GetLine().Guid == ambiguousFakeLineGuid;
 
         public LineView(Context context)
             : base(context)
@@ -94,25 +83,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             if (CreationModeFlag == DocumentCreationModeFlag.New)
             {
                 if (defaultOutgoingLine != null)
-                {
                     SetLine(defaultOutgoingLine);
-                }
                 else
-                {
                     SetSelectLine();
-                }
                 return Task.CompletedTask;
             }
 
             if (CreationModeFlag == DocumentCreationModeFlag.None)
-            {
                 return Task.CompletedTask;
-            }
 
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
-            {
                 SetLine(PreviousDocument.Lines.First());
-            }
 
             if (availableOutgoingLinesInView.Count == 1)
             {
@@ -129,13 +110,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 var intersection = previousDocumentLines.Intersect(availableOutgoingLinesInView.Select(l => l.Line), LambdaEqualityComparer<Line>.Create(l => l.Guid)).ToList();
                 if (intersection.Count() == 1)
-                {
                     SetLine(intersection.First());
-                }
                 else
-                {
                     SetSelectLine();
-                }
             }
 
             return Task.CompletedTask;
@@ -152,9 +129,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             var index = availableOutgoingLinesInView.FindIndex(l => l.Line.Guid == lineGuid);
             if (index > 0)
-            {
                 lineSpinner.SetSelection(index);
-            }
         }
 
         public Line GetLine()
@@ -180,10 +155,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             readonly Line line;
 
-            public Line Line
-            {
-                get { return line; }
-            }
+            public Line Line => line;
 
             public LineInView(Line line)
             {
@@ -216,21 +188,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 var textView = v as TextView;
                 if (textView != null)
-                {
                     if (position == hiddenItemIndex)
-                    {
                         textView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
-                    }
                     else
-                    {
                         textView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.black)));
-                    }
-                }
 
                 return v;
             }
 
-            override public View GetDropDownView(int position, View convertView, ViewGroup parent)
+            public override View GetDropDownView(int position, View convertView, ViewGroup parent)
             {
                 View v = null;
                 if (position == hiddenItemIndex)

@@ -1,11 +1,4 @@
-﻿//
-// File: DocumentsManager.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -63,9 +56,7 @@ namespace Mark5.Mobile.Common.Managers
                 return documentPreviews;
             }
             if (sourceType == SourceType.Local)
-            {
                 return await documentsDataAccess.GetDocumentPreviewsAsync(folder, startId, endId, MaxToFetch);
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -107,9 +98,7 @@ namespace Mark5.Mobile.Common.Managers
                 return document;
             }
             if (sourceType == SourceType.Local)
-            {
                 return await documentsDataAccess.GetDocumentAsync(documentId);
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -144,9 +133,7 @@ namespace Mark5.Mobile.Common.Managers
                 return container;
             }
             if (sourceType == SourceType.Local)
-            {
                 return await documentsDataAccess.GetDocumentWithPreviewAsync(documentId);
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -180,9 +167,7 @@ namespace Mark5.Mobile.Common.Managers
                 return;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided");
         }
 
@@ -282,7 +267,6 @@ namespace Mark5.Mobile.Common.Managers
                 else
                 {
                     if (document.ReadByUserNames.ContainsKey(currentUser.Id))
-                    {
                         if (!document.ReadByUserNames[currentUser.Id].Contains('|'))
                         {
                             document.ReadByUserIds.Remove(currentUser.Id);
@@ -296,16 +280,13 @@ namespace Mark5.Mobile.Common.Managers
                                 usernames = usernames.Where((s, i) => i != index).ToArray();
                             document.ReadByUserNames[currentUser.Id] = string.Join("|", usernames);
                         }
-                    }
                 }
                 await documentsDataAccess.SetDocumentReadStatusAsync(documentPreview, document);
 
                 return;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -359,9 +340,7 @@ namespace Mark5.Mobile.Common.Managers
                 return;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -386,9 +365,7 @@ namespace Mark5.Mobile.Common.Managers
                 return;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -410,9 +387,7 @@ namespace Mark5.Mobile.Common.Managers
                 return;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -435,9 +410,7 @@ namespace Mark5.Mobile.Common.Managers
                 return templatePreviews;
             }
             if (sourceType == SourceType.Local)
-            {
                 return await documentsDataAccess.GetTemplatePreviewsAsync();
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -462,9 +435,7 @@ namespace Mark5.Mobile.Common.Managers
                 return template;
             }
             if (sourceType == SourceType.Local)
-            {
                 return await documentsDataAccess.GetTemplateAsync(templateId);
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -489,9 +460,7 @@ namespace Mark5.Mobile.Common.Managers
                 return template;
             }
             if (sourceType == SourceType.Local)
-            {
                 return await documentsDataAccess.GetDefaultTemplateAsync(creationModeFlag);
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -514,9 +483,7 @@ namespace Mark5.Mobile.Common.Managers
                 return recentAddresses;
             }
             if (sourceType == SourceType.Local)
-            {
                 return await documentsDataAccess.GetRecentAddressesAsync();
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -540,9 +507,7 @@ namespace Mark5.Mobile.Common.Managers
                 return categories;
             }
             if (sourceType == SourceType.Local)
-            {
                 return await documentsDataAccess.GetAllCategoriesAsync();
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -569,9 +534,7 @@ namespace Mark5.Mobile.Common.Managers
                 return;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -599,9 +562,7 @@ namespace Mark5.Mobile.Common.Managers
                 return comment;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -628,16 +589,12 @@ namespace Mark5.Mobile.Common.Managers
                     await documentsDataAccess.AddCommentAsync(document, comment);
                     var index = document.Comments.FindIndex(c => c.Id == comment.Id);
                     if (index >= 0)
-                    {
                         document.Comments[index] = comment;
-                    }
                 }
                 return editSuccess;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -662,9 +619,7 @@ namespace Mark5.Mobile.Common.Managers
                 return;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -711,9 +666,7 @@ namespace Mark5.Mobile.Common.Managers
                 return result.Guid;
             }
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
             throw new ArgumentException("Invalid sourceType provided.");
         }
     }

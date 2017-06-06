@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: LineView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,10 +27,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         readonly Line defaultOutgoingLine;
         readonly List<Line> availableOutgoingLines;
 
-        public bool LineSelectedIsAmbiguous
-        {
-            get { return selectedLine == null; }
-        }
+        public bool LineSelectedIsAmbiguous => selectedLine == null;
 
         public LineView(UIViewController viewController)
         {
@@ -95,25 +84,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (CreationModeFlag == DocumentCreationModeFlag.New)
             {
                 if (defaultOutgoingLine != null)
-                {
                     SetLine(defaultOutgoingLine);
-                }
                 else
-                {
                     SetLine(null);
-                }
                 return Task.CompletedTask;
             }
 
             if (CreationModeFlag == DocumentCreationModeFlag.None)
-            {
                 return Task.CompletedTask;
-            }
 
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
-            {
                 SetLine(PreviousDocument.Lines.First());
-            }
 
             if (availableOutgoingLines.Count == 1)
             {
@@ -130,13 +111,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             {
                 var intersection = previousDocumentLines.Intersect(availableOutgoingLines, LambdaEqualityComparer<Line>.Create(l => l.Guid)).ToList();
                 if (intersection.Count() == 1)
-                {
                     SetLine(intersection.First());
-                }
                 else
-                {
                     SetLine(null);
-                }
             }
 
             return Task.CompletedTask;
@@ -153,9 +130,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             var line = availableOutgoingLines.FirstOrDefault(l => l.Guid == lineGuid);
             if (line != null)
-            {
                 SetLine(line);
-            }
         }
 
         public Line GetLine()
@@ -201,9 +176,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var result = await Dialogs.ShowListDialogAsync(viewController, null, lineNames, selectedLineLabel);
 
             if (result >= 0)
-            {
                 SetLine(availableOutgoingLines[result]);
-            }
         }
 
         #endregion

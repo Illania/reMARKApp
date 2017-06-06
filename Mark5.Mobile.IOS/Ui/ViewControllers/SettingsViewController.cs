@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: SettingsViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using CoreGraphics;
 using Foundation;
@@ -213,9 +205,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 try
                 {
                     if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
-                    {
                         await Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -312,9 +302,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             if (specifier.Key == OpenSettingsAppKey)
-            {
                 UIApplication.SharedApplication.OpenUrl(new NSUrl(UIApplication.OpenSettingsUrlString), new NSDictionary(), null);
-            }
         }
 
         public void SettingsViewControllerDidEnd(AppSettingsViewController sender)
@@ -330,9 +318,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var key = n.Object.ToString();
 
             if (key == UseServerTimezoneKey)
-            {
                 await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("restart_required_title"), Localization.GetString("restart_required_content"));
-            }
 
             if (key == DocumentsToDownloadKey)
             {
@@ -429,17 +415,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             if (key == UseTemplateKey)
-            {
                 RefreshHiddenSettings();
-            }
         }
 
-        void RefreshHiddenSettings() => SetHiddenKeys(PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk
-            ? null
-            : new[]
-            {
-                LocalTemplateKey
-            }, false);
+        void RefreshHiddenSettings()
+        {
+            SetHiddenKeys(PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk
+                ? null
+                : new[]
+                {
+                    LocalTemplateKey
+                }, false);
+        }
 
         class CustomSpecifierValuesViewController : SpecifierValuesViewController
         {

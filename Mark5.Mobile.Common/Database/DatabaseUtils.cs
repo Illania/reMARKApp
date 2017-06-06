@@ -1,11 +1,4 @@
-﻿//
-// File: DatabaseUtils.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Links;
 

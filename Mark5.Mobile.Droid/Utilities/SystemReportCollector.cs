@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: SystemReportCollector.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Linq;
 using System.Text;
 using Android.App;
@@ -91,9 +83,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
             sb.AppendLine("===== Preferences =====");
             foreach (var kv in PlatformConfig.Preferences.All)
-            {
                 sb.AppendLine(kv.Key + ": " + kv.Value);
-            }
             sb.AppendLine();
 
             sb.AppendLine("===== Memory information =====");
@@ -140,9 +130,7 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("===== Properties =====");
             var props = Java.Lang.JavaSystem.Properties;
             foreach (var propName in props.StringPropertyNames())
-            {
                 sb.AppendLine(propName + ": " + props.GetProperty(propName));
-            }
 
             return sb.ToString();
         }

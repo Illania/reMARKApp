@@ -1,11 +1,4 @@
-﻿//
-// File: SearchContactsCriteria.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Mark5.Mobile.Common.Model
 {
@@ -26,12 +19,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (contactTypes == null)
-                {
                     contactTypes = new HashSet<ContactType>();
-                }
                 return contactTypes;
             }
-            set { contactTypes = value; }
+            set => contactTypes = value;
         }
 
         public string ComAddress { get; set; }
@@ -46,12 +37,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (categoryIds == null)
-                {
                     categoryIds = new List<int>();
-                }
                 return categoryIds;
             }
-            set { categoryIds = value; }
+            set => categoryIds = value;
         }
 
         List<int> mustHaveCategoryIds;
@@ -61,12 +50,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (mustHaveCategoryIds == null)
-                {
                     mustHaveCategoryIds = new List<int>();
-                }
                 return mustHaveCategoryIds;
             }
-            set { mustHaveCategoryIds = value; }
+            set => mustHaveCategoryIds = value;
         }
 
         public FiledInFolderType FiledInFolderType { get; set; }
@@ -78,12 +65,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (filedInFolderIds == null)
-                {
                     filedInFolderIds = new List<int>();
-                }
                 return filedInFolderIds;
             }
-            set { filedInFolderIds = value; }
+            set => filedInFolderIds = value;
         }
 
         public int CountryPrefix { get; set; } = -1;
@@ -95,12 +80,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (responsibleIds == null)
-                {
                     responsibleIds = new List<int>();
-                }
                 return responsibleIds;
             }
-            set { responsibleIds = value; }
+            set => responsibleIds = value;
         }
     }
 }

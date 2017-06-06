@@ -1,11 +1,4 @@
-﻿//
-// File: Utils.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using Android.Content.Res;
+﻿using Android.Content.Res;
 using Android.Support.V4.Widget;
 using Android.Util;
 using Android.Views;

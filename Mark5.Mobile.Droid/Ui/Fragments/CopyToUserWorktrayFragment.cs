@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: CopyToUserWorktrayFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,10 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public List<IBusinessEntity> BusinessEntities { get; set; }
         public Action CloseRequest { get; set; }
 
-        CopyToUserWorktrayAdapter CurrentAdapter
-        {
-            get { return (CopyToUserWorktrayAdapter) recyclerView.GetAdapter(); }
-        }
+        CopyToUserWorktrayAdapter CurrentAdapter => (CopyToUserWorktrayAdapter) recyclerView.GetAdapter();
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -169,9 +158,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 selectedSystemUsers.Clear();
                 foreach (var kv in dlfs.SelectedSystemUsers)
-                {
                     selectedSystemUsers.Add(kv.Key, kv.Value);
-                }
 
                 UpdateControls();
             }
@@ -215,19 +202,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var isSelected = selectedSystemUsers.ContainsKey(systemUser.Id);
             if (isSelected)
-            {
                 selectedSystemUsers.Remove(systemUser.Id);
-            }
             else
-            {
                 selectedSystemUsers.Add(systemUser.Id, systemUser);
-            }
 
             var position = CurrentAdapter.GetPosition(systemUser);
             if (position >= 0)
-            {
                 CurrentAdapter.NotifyItemChanged(position);
-            }
         }
 
         void UpdateControls()
@@ -301,21 +282,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         static bool MatchesQuery(SystemUser su, string query)
         {
             if (su.Username.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
                 return true;
-            }
             if (su.FirstName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
                 return true;
-            }
             if (su.LastName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
                 return true;
-            }
             if (su.PatronymicName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
                 return true;
-            }
 
             return false;
         }
@@ -342,15 +315,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly List<SystemUser> systemUsersInView = new List<SystemUser>(100);
             readonly Dictionary<int, SystemUser> selectedSystemUsersInView;
 
-            public override int ItemCount
-            {
-                get { return systemUsersInView.Count; }
-            }
+            public override int ItemCount => systemUsersInView.Count;
 
-            public List<SystemUser> Items
-            {
-                get { return systemUsersInView; }
-            }
+            public List<SystemUser> Items => systemUsersInView;
 
             public CopyToUserWorktrayAdapter(Dictionary<int, SystemUser> selectedSystemUsersInView)
             {
@@ -405,13 +372,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var position = -1;
                 for (var i = 0; i < systemUsersInView.Count; i++)
-                {
                     if (systemUsersInView[i].Id == systemUser.Id)
                     {
                         position = i;
                         break;
                     }
-                }
                 return position;
             }
 
@@ -425,17 +390,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public string FullName
             {
-                set { fullnameTextView.Text = value; }
+                set => fullnameTextView.Text = value;
             }
 
             public string Username
             {
-                set { username.Text = value; }
+                set => username.Text = value;
             }
 
             public bool Selected
             {
-                set { selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             readonly AppCompatTextView fullnameTextView;

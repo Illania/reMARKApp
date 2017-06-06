@@ -1,11 +1,4 @@
-﻿//
-// File: DocumentPreview.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Mark5.Mobile.Common.Utilities;
 using SQLite;
@@ -16,16 +9,10 @@ namespace Mark5.Mobile.Common.Model
     public class DocumentPreview : BusinessEntityPreview
     {
         [Ignore]
-        public override ObjectType ObjectType
-        {
-            get { return ObjectType.Document; }
-        }
+        public override ObjectType ObjectType => ObjectType.Document;
 
         [Ignore]
-        public override ModuleType ModuleType
-        {
-            get { return ModuleType.Documents; }
-        }
+        public override ModuleType ModuleType => ModuleType.Documents;
 
         [Column("ReferenceNumber")]
         public string ReferenceNumber { get; set; }
@@ -38,12 +25,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (addresses == null)
-                {
                     addresses = new List<DocumentAddress>();
-                }
                 return addresses;
             }
-            set { addresses = value; }
+            set => addresses = value;
         }
 
         [Column("Subject")]
@@ -78,12 +63,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (categories == null)
-                {
                     categories = new List<Category>();
-                }
                 return categories;
             }
-            set { categories = value; }
+            set => categories = value;
         }
 
         [Column("DateReceivedTimestamp")]
@@ -100,15 +83,15 @@ namespace Mark5.Mobile.Common.Model
         [Column("AddressesString")]
         public string AddressesString
         {
-            get { return SerializationUtils.Serialize(Addresses); }
-            set { Addresses = SerializationUtils.Deserialize<List<DocumentAddress>>(value); }
+            get => SerializationUtils.Serialize(Addresses);
+            set => Addresses = SerializationUtils.Deserialize<List<DocumentAddress>>(value);
         }
 
         [Column("CategoriesString")]
         public string CategoriesString
         {
-            get { return SerializationUtils.Serialize(Categories); }
-            set { Categories = SerializationUtils.Deserialize<List<Category>>(value); }
+            get => SerializationUtils.Serialize(Categories);
+            set => Categories = SerializationUtils.Deserialize<List<Category>>(value);
         }
 
         #endregion

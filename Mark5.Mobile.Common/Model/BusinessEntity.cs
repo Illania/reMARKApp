@@ -1,21 +1,16 @@
-﻿//
-// File: BusinessEntity.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using SQLite;
 
 namespace Mark5.Mobile.Common.Model
 {
     public abstract class BusinessEntity : IBusinessEntity
     {
-        [Column("Id"), PrimaryKey]
+        [Column("Id")]
+        [PrimaryKey]
         public int Id { get; set; } = -1;
 
-        [Column("Guid"), NotNull]
+        [Column("Guid")]
+        [NotNull]
         public Guid Guid { get; set; }
 
         [Ignore]

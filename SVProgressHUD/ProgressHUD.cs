@@ -1,10 +1,3 @@
-//
-// File: ProgressHUD.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.Linq;
 using System.Threading;
@@ -51,7 +44,7 @@ namespace SVProgressHUD
         public static float CornerRadius { get; set; } = 18f;
         public static UIFont Font { get; set; } = UIFont.PreferredSubheadline;
         public static UIColor ForegroundColor { get; set; } = UIColor.White;
-        public static new UIColor BackgroundColor { get; set; } = UIColor.Black;
+        public new static UIColor BackgroundColor { get; set; } = UIColor.Black;
         public static UIColor BackgroundLayerColor { get; set; } = UIColor.FromWhiteAlpha(0f, 0.4f);
         public static UIImage InfoImage { get; set; } = UIImage.FromBundle("info.png");
         public static UIImage SuccessImage { get; set; } = UIImage.FromBundle("success.png");
@@ -98,10 +91,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
         #region Public properties
 
-        public bool Visible
-        {
-            get { return HudView.ContentView.Alpha > 0f; }
-        }
+        public bool Visible => HudView.ContentView.Alpha > 0f;
 
         #endregion
 
@@ -130,7 +120,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
         NSTimer FadeOutTimer
         {
-            get { return _fadeOutTimer; }
+            get => _fadeOutTimer;
             set
             {
                 _fadeOutTimer?.Invalidate();
@@ -169,12 +159,10 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
             get
             {
                 if (_backgroundView == null)
-                {
                     _backgroundView = new UIView
                     {
                         AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
                     };
-                }
 
                 if (_backgroundView.Superview == null)
                     InsertSubviewBelow(_backgroundView, HudView);
@@ -255,7 +243,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
                 return _hudVibrancyView;
             }
-            set { _hudVibrancyView = value; }
+            set => _hudVibrancyView = value;
         }
 
         UILabel StatusLabel
@@ -543,7 +531,9 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                 };
 
                 if (FadeInAnimationDuration > 0)
+                {
                     AnimateNotify(FadeInAnimationDuration, 0d, UIViewAnimationOptions.AllowUserInteraction | UIViewAnimationOptions.CurveEaseIn | UIViewAnimationOptions.BeginFromCurrentState, animation, completion);
+                }
                 else
                 {
                     animation();
@@ -558,7 +548,10 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
         #region Dismiss methods
 
-        public void Dismiss() => Dismiss(0);
+        public void Dismiss()
+        {
+            Dismiss(0);
+        }
 
         public void Dismiss(double delay, Action completionHandler = null)
         {
@@ -580,7 +573,9 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                     strongThis.HudView.Transform = CGAffineTransform.Scale(strongThis.HudView.Transform, 1 / 1.3f, 1 / 1.3f);
 
                     if (DefaultStyle == Style.Custom)
+                    {
                         strongThis.HudView.Alpha = 0f;
+                    }
                     else
                     {
                         strongThis.HudView.Effect = null;
@@ -621,7 +616,9 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                 DispatchQueue.MainQueue.DispatchAfter(dispatchTime, () =>
                 {
                     if (FadeOutAnimationDuration > 0)
+                    {
                         AnimateNotify(FadeOutAnimationDuration, 0d, UIViewAnimationOptions.AllowUserInteraction | UIViewAnimationOptions.CurveEaseOut | UIViewAnimationOptions.BeginFromCurrentState, animation, completion);
+                    }
                     else
                     {
                         animation();
@@ -760,7 +757,9 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                 }
             }
             else
+            {
                 keyboardHeight = GetVisibleKeyboardHeight();
+            }
 
             var orientationFrame = Bounds;
 #if !SV_APP_EXTENSIONS
@@ -869,24 +868,20 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 #if !SV_APP_EXTENSIONS
             UIWindow keyboardWindow = null;
             foreach (var testWindow in UIApplication.SharedApplication.Windows)
-            {
                 if (testWindow.Class != new Class("UIWindow"))
                 {
                     keyboardWindow = testWindow;
                     break;
                 }
-            }
 
             foreach (var possibleKeyboard in keyboardWindow.Subviews)
             {
                 if (possibleKeyboard.IsKindOfClass(new Class("UIPeripheralHostView")) || possibleKeyboard.IsKindOfClass(new Class("UIKeyboard")))
                     return (float) possibleKeyboard.Bounds.Height;
                 if (possibleKeyboard.IsKindOfClass(new Class("UIInputSetContainerView")))
-                {
                     foreach (var possibleKeyboardSubview in possibleKeyboard.Subviews)
                         if (possibleKeyboardSubview.IsKindOfClass(new Class("UIInputSetHostView")))
                             return (float) possibleKeyboardSubview.Bounds.Height;
-                }
             }
 #endif
             return 0f;

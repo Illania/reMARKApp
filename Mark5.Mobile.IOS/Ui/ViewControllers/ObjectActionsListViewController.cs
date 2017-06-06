@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: ObjectActionsListViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -159,10 +151,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable
         {
-            public bool Empty
-            {
-                get { return objectActionsInView.Count < 1; }
-            }
+            public bool Empty => objectActionsInView.Count < 1;
 
             UITableView tableView;
             string emptyText;
@@ -180,9 +169,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 if (loading)
-                {
                     return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
-                }
 
                 if (objectActionsInView.Count < 1)
                 {

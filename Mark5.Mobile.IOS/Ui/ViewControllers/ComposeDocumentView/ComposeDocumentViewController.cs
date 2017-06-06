@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: ComposeDocumentViewController.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -131,13 +123,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             CommonConfig.Logger.Info($"{typeof(ComposeDocumentViewController)} appeared");
 
             if (OutgoingDocumentGuid == Guid.Empty)
-            {
                 OutgoingDocumentGuid = Guid.NewGuid();
-            }
 
             await LoadDocument();
 
-            if (!LocalDocument || (LocalDocument && OutgoingDocumentState == OutgoingDocumentState.AutoSaved))
+            if (!LocalDocument || LocalDocument && OutgoingDocumentState == OutgoingDocumentState.AutoSaved)
             {
                 autoSaveWorker?.Stop();
                 autoSaveWorker = new AutoSaveWorker(AutoSaveAction, autoSaveInterval);
@@ -366,26 +356,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                         }, false);
                     }
                     if (outgoingContainer.Info.State == OutgoingDocumentState.AutoSaved)
-                    {
                         NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[]
                         {
                             sendButtonItem,
                             attachmentButtonItem
                         }, false);
-                    }
                     if (outgoingContainer.LocalAttachments != null)
-                    {
                         OutgoingDocumentInitialAttachments.AddRange(outgoingContainer.LocalAttachments);
-                    }
                 }
                 else
                 {
                     var sourceType = SourceType.Auto;
                     PreviousDocument = await Managers.DocumentsManager.GetDocumentAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, sourceType);
                     if (CreationModeFlag == DocumentCreationModeFlag.Edit && PreviousDocumentPreview.Direction == DocumentDirection.Draft)
-                    {
                         Document.Id = DocumentPreview.Id = PreviousDocument.Id;
-                    }
                 }
 
                 dismissAction();
@@ -401,9 +385,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         async Task ShowDocument()
         {
             if (documentShown)
-            {
                 return;
-            }
 
             foreach (var subView in subViews)
             {
@@ -420,9 +402,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (CreationModeFlag == DocumentCreationModeFlag.New)
             {
                 if (PreconfiguredEmailAddresses != null)
-                {
                     toView.SetEmails(PreconfiguredEmailAddresses);
-                }
 
                 AddAddressesFromShortcode(PreConfiguredShortcode);
             }
@@ -437,9 +417,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         void AddAddressesFromShortcode(Shortcode shortcode)
         {
             if (shortcode == null || shortcode.Addresses == null || !shortcode.Addresses.Any())
-            {
                 return;
-            }
 
             var addresses = shortcode.Addresses;
             toView.SetEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.Address));
@@ -450,9 +428,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         bool IsFormValid()
         {
             if (subjectView.Empty)
-            {
                 return false;
-            }
 
             var recipientAdded = false;
             foreach (var recipientView in new List<RecipientsView>
@@ -461,14 +437,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 ccView,
                 bccView
             })
-            {
                 recipientAdded |= !recipientView.Empty;
-            }
 
             if (!recipientAdded)
-            {
                 return false;
-            }
 
             return !lineView.LineSelectedIsAmbiguous;
         }
@@ -510,17 +482,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 ccView,
                 bccView
             })
-            {
                 containtsIncompleteEmail |= recipientView.ContainsInvalidEmail();
-            }
 
             if (containtsIncompleteEmail)
             {
                 var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("warining"), Localization.GetString("incorrect_email_addresses"));
                 if (!result)
-                {
                     return;
-                }
             }
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(draft ? Localization.GetString("saving_draft___") : Localization.GetString("sending_document___"));
@@ -528,16 +496,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             try
             {
                 foreach (var subView in subViews)
-                {
                     await subView.UpdateDocument();
-                }
 
                 DocumentPreview.Direction = draft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
 
                 if (LocalDocument)
-                {
                     await SynchOutgoingAttachments(false);
-                }
 
                 await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag, PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1, 0, false, false);
                 dismissAction();
@@ -556,13 +520,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         void PopOrDismissViewController()
         {
             if (PresentingViewController != null)
-            {
                 DismissViewController(true, null);
-            }
             else
-            {
                 NavigationController.PopViewController(true);
-            }
 
             DeleteAutoSavedDocument();
         }
@@ -573,9 +533,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 .ContinueWith(t =>
                 {
                     if (t.IsFaulted)
-                    {
                         CommonConfig.Logger.Error("Error while deleting autosaved document", t.Exception);
-                    }
                 });
         }
 
@@ -603,9 +561,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 var attachmentsToRemove = currentAttachments.Where(a => !initialAttachmentsNames.Contains(a.Name));
 
                 foreach (var attachment in attachmentsToRemove)
-                {
                     await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Name);
-                }
             }
             else //We need to remove all the attachments that are not there already
             {
@@ -615,9 +571,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 var attachmentsToRemove = initialAttachments.Where(a => !currentAttachmentsNames.Contains(a.Name));
 
                 foreach (var attachment in attachmentsToRemove)
-                {
                     await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Name);
-                }
             }
         }
 
@@ -785,38 +739,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 var confirm = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("save_modifications"), Localization.GetString("confirm_save_modified_document"));
                 if (confirm)
-                {
                     await SaveModifiedOutgoingDocument();
-                }
                 else
-                {
                     await SaveAndCloseComposeViewController();
-                }
             }
             else
             {
                 var confirm = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("save_draft"), Localization.GetString("confirm_save_as_draft"));
                 if (confirm)
-                {
                     await SendDocument(true);
-                }
                 else
-                {
                     await SaveAndCloseComposeViewController();
-                }
             }
         }
 
         async Task SaveAndCloseComposeViewController()
         {
             if (!LocalDocument)
-            {
                 await Managers.DocumentsManager.DeleteOutgoingDocumentFolder(OutgoingDocumentGuid);
-            }
             else
-            {
                 await SynchOutgoingAttachments(true);
-            }
 
             PopOrDismissViewController();
         }
@@ -824,16 +766,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         async Task SaveModifiedOutgoingDocument()
         {
             if (!LocalDocument)
-            {
                 return;
-            }
 
             try
             {
                 foreach (var subView in subViews)
-                {
                     await subView.UpdateDocument();
-                }
 
                 DocumentPreview.Direction = PreviousDocumentPreview.Direction;
 
@@ -859,22 +797,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             sendButtonItem.Enabled = IsFormValid();
 
             if (sender is LineView && PlatformConfig.Preferences.RemoveLine && CreationModeFlag == DocumentCreationModeFlag.ReplyAll && PreviousDocumentPreview != null && PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
-            {
                 if (!lineView.LineSelectedIsAmbiguous && !string.IsNullOrEmpty(lineView.GetLine().FromAddress))
                 {
                     toView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
                     ccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
                     bccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
                 }
-            }
         }
 
         void RecipientView_SearchRequested(object sender, string initialSearchString)
         {
             if (string.IsNullOrEmpty(initialSearchString))
-            {
                 return;
-            }
 
             if (suggestionsListView == null)
             {
@@ -937,9 +871,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 }
 
                 if (string.IsNullOrWhiteSpace(path))
-                {
                     throw new Exception("Unable to get attachment path.");
-                }
 
                 var url = NSUrl.FromFilename(path);
 
@@ -991,9 +923,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 try
                 {
                     if (!LocalDocument)
-                    {
                         await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, outgoingAttachment.Name);
-                    }
 
                     attachmentsView.RemoveAttachment(sender, outgoingAttachment);
                 }
@@ -1017,9 +947,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         async Task AskIfShouldUseTemplates()
         {
             if (templateLoaded)
-            {
                 return;
-            }
 
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
@@ -1030,9 +958,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var useTemplate = PlatformConfig.Preferences.UseTemplate;
 
             if (useTemplate == Preferences.TemplateUsageMode.DontUse)
-            {
                 return;
-            }
 
             if (useTemplate == Preferences.TemplateUsageMode.Local)
             {
@@ -1131,13 +1057,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(CreationModeFlag);
                 if (template != null)
-                {
                     await ApplyTemplate(template);
-                }
                 else if (errorMessageIfNull)
-                {
                     throw new Exception(Localization.GetString("template_null"));
-                }
             }
             catch (Exception ex)
             {
@@ -1160,9 +1082,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 var template = await Managers.DocumentsManager.GetTemplateAsync(templatePreview.Id);
                 if (template != null)
-                {
                     await ApplyTemplate(template);
-                }
             }
             catch (Exception ex)
             {
@@ -1184,9 +1104,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             await contentView.InsertTemplate(template);
 
             if (!string.IsNullOrEmpty(template.Subject))
-            {
                 subjectView.Subject = template.Subject;
-            }
 
             lineView.SetLineFromGuid(template.LineGuid);
         }
@@ -1201,9 +1119,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             string fromNameString = string.Empty;
             if (PreviousDocumentPreview != null && PreviousDocumentPreview.Addresses != null)
-            {
                 fromNameString = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Name).FirstOrDefault() ?? string.Empty;
-            }
 
             if (template.ContentType == ContentType.Html)
             {
@@ -1255,7 +1171,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 {
                     NSData jpegImage;
                     using (var image = (UIImage) info[UIImagePickerController.OriginalImage])
+                    {
                         jpegImage = image.AsJPEG();
+                    }
 
                     var referenceUrl = (NSUrl) info[UIImagePickerController.ReferenceUrl];
 

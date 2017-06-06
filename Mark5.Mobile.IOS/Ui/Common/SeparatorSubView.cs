@@ -1,18 +1,10 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: SeparatorSubView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
     public class SeparatorSubView : UIView
     {
-        readonly static UIColor backgroundColor = new UITableView().SeparatorColor;
+        static readonly UIColor backgroundColor = new UITableView().SeparatorColor;
 
         public SeparatorSubView()
         {
@@ -34,9 +26,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 NSLayoutConstraint.Create(line, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0.5f),
             };
             foreach (var constraint in constraints)
-            {
                 constraint.Priority = 500;
-            }
             AddConstraints(constraints);
         }
     }

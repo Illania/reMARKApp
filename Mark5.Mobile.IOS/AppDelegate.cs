@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: AppDelegate.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -172,7 +164,9 @@ PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BI
                     options(UNNotificationPresentationOptions.Alert);
                 }
                 else
+                {
                     options(UNNotificationPresentationOptions.None);
+                }
             }
             catch (Exception ex)
             {
@@ -309,13 +303,9 @@ PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BI
                     var policies = Managers.DownloadManager.DownloadPolicies;
                     policies[ObjectType.Document] = new DownloadFoldersPolicy();
                     if (PlatformConfig.Preferences.SynchroniseContacts)
-                    {
                         policies[ObjectType.Contact] = new DownloadAllPolicy();
-                    }
                     if (PlatformConfig.Preferences.SynchroniseShortcodes)
-                    {
                         policies[ObjectType.Shortcode] = new DownloadAllPolicy();
-                    }
 
                     if (PlatformConfig.Preferences.ClearCache)
                     {
@@ -356,7 +346,9 @@ PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BI
                         UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) =>
                         {
                             if (result)
+                            {
                                 BeginInvokeOnMainThread(application.RegisterForRemoteNotifications);
+                            }
                             else
                             {
                                 if (error != null)

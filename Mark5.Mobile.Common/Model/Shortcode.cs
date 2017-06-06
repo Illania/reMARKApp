@@ -1,11 +1,4 @@
-﻿//
-// File: Shortcode.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SQLite;
 using Mark5.Mobile.Common.Utilities;
 
@@ -15,16 +8,10 @@ namespace Mark5.Mobile.Common.Model
     public class Shortcode : BusinessEntity
     {
         [Ignore]
-        public override ObjectType ObjectType
-        {
-            get { return ObjectType.Shortcode; }
-        }
+        public override ObjectType ObjectType => ObjectType.Shortcode;
 
         [Ignore]
-        public override ModuleType ModuleType
-        {
-            get { return ModuleType.Shortcodes; }
-        }
+        public override ModuleType ModuleType => ModuleType.Shortcodes;
 
         List<DocumentAddress> addresses;
 
@@ -34,12 +21,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (addresses == null)
-                {
                     addresses = new List<DocumentAddress>();
-                }
                 return addresses;
             }
-            set { addresses = value; }
+            set => addresses = value;
         }
 
         #region Serialization
@@ -47,8 +32,8 @@ namespace Mark5.Mobile.Common.Model
         [Column("AddressString")]
         public string AddressString
         {
-            get { return SerializationUtils.Serialize(Addresses); }
-            set { Addresses = SerializationUtils.Deserialize<List<DocumentAddress>>(value); }
+            get => SerializationUtils.Serialize(Addresses);
+            set => Addresses = SerializationUtils.Deserialize<List<DocumentAddress>>(value);
         }
 
         #endregion

@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: Dialogs.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -140,7 +132,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var alert = UIAlertController.Create(GetErrorTitle(ex), GetErrorContent(ex), UIAlertControllerStyle.Alert);
             alert.AddAction(UIAlertAction.Create(Localization.GetString("ok"), UIAlertActionStyle.Default, a => tcs.SetResult(true)));
             if (ShouldShowCreateReport(ex))
-            {
                 alert.AddAction(UIAlertAction.Create(Localization.GetString("report"), UIAlertActionStyle.Cancel, a =>
                 {
                     var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
@@ -150,16 +141,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
                             dismissAction();
 
                             if (!t.IsFaulted)
-                            {
                                 vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, () => { tcs.SetResult(true); });
-                            }
                             else
-                            {
                                 tcs.SetResult(true);
-                            }
                         }, TaskScheduler.FromCurrentSynchronizationContext());
                 }));
-            }
             vc.PresentViewController(alert, true, () => hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error));
             return tcs.Task;
         }
@@ -172,7 +158,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var alert = UIAlertController.Create(GetErrorTitle(ex), GetErrorContent(ex), UIAlertControllerStyle.Alert);
             alert.AddAction(UIAlertAction.Create(Localization.GetString("ok"), UIAlertActionStyle.Default, null));
             if (ShouldShowCreateReport(ex))
-            {
                 alert.AddAction(UIAlertAction.Create(Localization.GetString("report"), UIAlertActionStyle.Cancel, a =>
                 {
                     var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
@@ -182,41 +167,26 @@ namespace Mark5.Mobile.IOS.Ui.Common
                             dismissAction();
 
                             if (!t.IsFaulted)
-                            {
                                 vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, null);
-                            }
                         }, TaskScheduler.FromCurrentSynchronizationContext());
                 }));
-            }
             vc.PresentViewController(alert, true, () => hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error));
         }
 
         static string GetErrorTitle(Exception ex)
         {
             if (ex is WcfAppServiceException)
-            {
                 return Localization.GetString("error_appserviceexception_title");
-            }
             if (ex is HttpAppServiceException)
-            {
                 return Localization.GetString("error_appserviceexception_title");
-            }
             if (ex is FileTransferServiceException)
-            {
                 return Localization.GetString("error_filetransferserviceexception_title");
-            }
             if (ex is DataNotFoundException)
-            {
                 return Localization.GetString("error_datanotfoundexception_title");
-            }
             if (ex is DataAccessException)
-            {
                 return Localization.GetString("error_dataaccessexception_title");
-            }
             if (ex is InvalidSourceTypeException)
-            {
                 return Localization.GetString("error_invalidsourcetypeexception_title");
-            }
 
             return Localization.GetString("error_generalexception_title");
         }
@@ -224,29 +194,17 @@ namespace Mark5.Mobile.IOS.Ui.Common
         static string GetErrorContent(Exception ex)
         {
             if (ex is WcfAppServiceException)
-            {
                 return ex.Message;
-            }
             if (ex is HttpAppServiceException)
-            {
                 return ex.Message;
-            }
             if (ex is FileTransferServiceException)
-            {
                 return ex.Message;
-            }
             if (ex is DataNotFoundException)
-            {
                 return Localization.GetString("error_datanotfoundexception_message");
-            }
             if (ex is DataAccessException)
-            {
                 return ex.Message;
-            }
             if (ex is InvalidSourceTypeException)
-            {
                 return Localization.GetString("error_invalidsourcetypeexception_message");
-            }
 
             return ex.Message;
         }
@@ -254,29 +212,17 @@ namespace Mark5.Mobile.IOS.Ui.Common
         static bool ShouldShowCreateReport(Exception ex)
         {
             if (ex is WcfAppServiceException)
-            {
                 return true;
-            }
             if (ex is HttpAppServiceException)
-            {
                 return true;
-            }
             if (ex is FileTransferServiceException)
-            {
                 return true;
-            }
             if (ex is DataNotFoundException)
-            {
                 return false;
-            }
             if (ex is DataAccessException)
-            {
                 return true;
-            }
             if (ex is InvalidSourceTypeException)
-            {
                 return false;
-            }
 
             return true;
         }

@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ShortcodesListFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,10 +41,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool shouldNotifyAdapter;
         bool shouldNotifySearchAdapter;
 
-        ShortcodesListAdapter CurrentAdapter
-        {
-            get { return (ShortcodesListAdapter) recyclerView.GetAdapter(); }
-        }
+        ShortcodesListAdapter CurrentAdapter => (ShortcodesListAdapter) recyclerView.GetAdapter();
 
         CancellationTokenSource cts;
 
@@ -124,9 +113,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Resuming {nameof(ShortcodesListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             if (adapter.ItemCount < 1)
-            {
                 RefreshData();
-            }
 
             if (shouldNotifyAdapter)
             {
@@ -312,9 +299,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void Adapter_ItemLongClicked(object sender, ShortcodePreview shortcodePreview)
         {
             if (actionMode == null)
-            {
                 actionMode = Activity.StartActionMode(this);
-            }
 
             Adapter_ItemClicked(sender, shortcodePreview);
         }
@@ -348,19 +333,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
 
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-            {
                 menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
-            }
 
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-            {
                 menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
-            }
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
-            {
                 menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
-            }
 
             return true;
         }
@@ -450,18 +429,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (option == 1)
-            {
                 StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
-            }
         }
 
         async void DeleteFromFolderAction()
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
             if (!yesNo)
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Attempting to delete from folder [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
 
@@ -490,9 +465,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
             if (!yesNo)
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Attempting to delete [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
 
@@ -668,25 +641,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ShortcodesListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-            public List<ShortcodePreview> Items
-            {
-                get { return shortcodePreviewsInView; }
-            }
+            public List<ShortcodePreview> Items => shortcodePreviewsInView;
 
-            public List<ShortcodePreview> SelectedItems
-            {
-                get { return selectedShortcodesInView.Values.ToList(); }
-            }
+            public List<ShortcodePreview> SelectedItems => selectedShortcodesInView.Values.ToList();
 
-            public override int ItemCount
-            {
-                get { return shortcodePreviewsInView.Count; }
-            }
+            public override int ItemCount => shortcodePreviewsInView.Count;
 
-            public int SelectedItemCount
-            {
-                get { return selectedShortcodesInView.Count; }
-            }
+            public int SelectedItemCount => selectedShortcodesInView.Count;
 
             readonly List<ShortcodePreview> shortcodePreviewsInView = new List<ShortcodePreview>(1000);
 
@@ -758,9 +719,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public void SetSelected(List<ShortcodePreview> shortcodePreviews, bool selected)
             {
                 foreach (var shortcode in shortcodePreviews)
-                {
                     SetSelected(shortcode, selected);
-                }
             }
 
             public void SetSelected(ShortcodePreview shortcodePreview, bool selected)
@@ -770,13 +729,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
 
                 if (selected)
-                {
                     selectedShortcodesInView[shortcodePreview.Id] = shortcodePreview;
-                }
                 else
-                {
                     selectedShortcodesInView.Remove(shortcodePreview.Id);
-                }
                 NotifyItemChanged(position);
             }
 
@@ -789,9 +744,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     var position = GetPosition(shortcode);
                     if (position >= 0)
-                    {
                         NotifyItemChanged(position);
-                    }
                 }
             }
 
@@ -812,13 +765,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var position = -1;
                 for (var i = 0; i < shortcodePreviewsInView.Count; i++)
-                {
                     if (shortcodePreviewsInView[i].Id == shortcodePreviewsId)
                     {
                         position = i;
                         break;
                     }
-                }
                 return position;
             }
 
@@ -832,12 +783,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public string Name
             {
-                set { nameTextView.Text = value; }
+                set => nameTextView.Text = value;
             }
 
             public bool Selected
             {
-                set { selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             readonly AppCompatTextView nameTextView;

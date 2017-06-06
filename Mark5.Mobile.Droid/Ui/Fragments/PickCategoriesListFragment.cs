@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: EditCategoriesListFragment.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,10 +24,7 @@ namespace Mark5.Mobile.Droid
         public int[] PreselectedCategoryIds { get; set; }
         public Action<List<Category>> CloseRequest { get; set; }
 
-        CategoriesListAdapter CurrentAdapter
-        {
-            get { return (CategoriesListAdapter) recyclerView.GetAdapter(); }
-        }
+        CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter) recyclerView.GetAdapter();
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -141,12 +130,8 @@ namespace Mark5.Mobile.Droid
                 }
 
                 foreach (var category in availableCategories)
-                {
                     if (PreselectedCategoryIds.Contains(category.Id))
-                    {
                         ToggleSelected(category);
-                    }
-                }
 
                 adapter.SetItems(availableCategories);
             }
@@ -172,19 +157,13 @@ namespace Mark5.Mobile.Droid
         {
             var isSelected = selectedCategories.ContainsKey(category.Id);
             if (isSelected)
-            {
                 selectedCategories.Remove(category.Id);
-            }
             else
-            {
                 selectedCategories.Add(category.Id, category);
-            }
 
             var position = CurrentAdapter.GetPosition(category);
             if (position >= 0)
-            {
                 CurrentAdapter.NotifyItemChanged(position);
-            }
         }
 
         #endregion
@@ -207,9 +186,7 @@ namespace Mark5.Mobile.Droid
             {
                 selectedCategories.Clear();
                 foreach (var kv in clfs.SelectedCategories)
-                {
                     selectedCategories.Add(kv.Key, kv.Value);
-                }
                 adapter.SetItems(clfs.AvailableCategories);
             }
         }
@@ -235,15 +212,9 @@ namespace Mark5.Mobile.Droid
             readonly List<Category> categoriesInView = new List<Category>(200);
             readonly Dictionary<int, Category> selectedCategoriesInView;
 
-            public override int ItemCount
-            {
-                get { return categoriesInView.Count; }
-            }
+            public override int ItemCount => categoriesInView.Count;
 
-            public List<Category> Items
-            {
-                get { return categoriesInView; }
-            }
+            public List<Category> Items => categoriesInView;
 
             public event EventHandler<Category> ItemClicked = delegate { };
 
@@ -347,7 +318,7 @@ namespace Mark5.Mobile.Droid
                     selected = value;
                     selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
                 }
-                get { return selected; }
+                get => selected;
             }
 
             readonly View colorImageView;

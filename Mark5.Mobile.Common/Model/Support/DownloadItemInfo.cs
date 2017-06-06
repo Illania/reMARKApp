@@ -1,41 +1,25 @@
-﻿//
-// File: DownloadItemInfo.cs
-// Author: Ferdinando Papale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using Mark5.Mobile.Common.Model;
+﻿using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common
 {
     abstract class DownloadItemInfo
     {
         public int FolderId { get; set; }
-        virtual public ObjectType Type { get; set; }
+        public virtual ObjectType Type { get; set; }
     }
 
     class ContactDownloadInfo : DownloadItemInfo
     {
-        public override ObjectType Type
-        {
-            get { return ObjectType.Contact; }
-        }
+        public override ObjectType Type => ObjectType.Contact;
     }
 
     class ShortcodeDownloadInfo : DownloadItemInfo
     {
-        public override ObjectType Type
-        {
-            get { return ObjectType.Shortcode; }
-        }
+        public override ObjectType Type => ObjectType.Shortcode;
     }
 
     class DocumentDownloadInfo : DownloadItemInfo
     {
-        public override ObjectType Type
-        {
-            get { return ObjectType.Document; }
-        }
+        public override ObjectType Type => ObjectType.Document;
     }
 }

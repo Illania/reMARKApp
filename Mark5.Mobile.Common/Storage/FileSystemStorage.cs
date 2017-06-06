@@ -1,11 +1,4 @@
-﻿//
-// File: FileSystemStorage.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -202,9 +195,7 @@ namespace Mark5.Mobile.Common.Storage
         {
             var lastCacheCleanUpString = await GetAsync<string>(Filenames.LastCacheCleanUp, ct);
             if (lastCacheCleanUpString == null)
-            {
                 return DateTime.SpecifyKind(default(DateTime), DateTimeKind.Utc);
-            }
             return DateTime.SpecifyKind(Convert.ToDateTime(lastCacheCleanUpString), DateTimeKind.Utc);
         }
 
@@ -223,20 +214,20 @@ namespace Mark5.Mobile.Common.Storage
 
             if (cleanFailedState)
             {
-                var wasFailed = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed)) == ExistenceCheckResult.FileExists;
+                var wasFailed = await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed) == ExistenceCheckResult.FileExists;
                 if (wasFailed)
                 {
                     var isFailedFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingFailed);
                     await isFailedFile.DeleteAsync();
                 }
             }
-            var wasLocked = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingLock)) == ExistenceCheckResult.FileExists;
+            var wasLocked = await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingLock) == ExistenceCheckResult.FileExists;
             if (wasLocked)
             {
                 var isLockedFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingLock);
                 await isLockedFile.DeleteAsync();
             }
-            var wasSaved = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingAutoSave)) == ExistenceCheckResult.FileExists;
+            var wasSaved = await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingAutoSave) == ExistenceCheckResult.FileExists;
             if (wasSaved)
             {
                 var isSavedFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingAutoSave);
@@ -256,15 +247,13 @@ namespace Mark5.Mobile.Common.Storage
         public static async Task<OutgoingDocumentContainer> GetOutgoingDocumentContainerAsync(Guid id, bool lockDocument, LoadMode loadMode)
         {
             if (!await OutgoingFolderExistsAsync(id))
-            {
                 return null;
-            }
             try
             {
                 var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
 
                 //Can happen when an attachment is added, but the application is closed before sending it
-                if ((await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingDocumentPreview)) == ExistenceCheckResult.NotFound)
+                if (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingDocumentPreview) == ExistenceCheckResult.NotFound)
                 {
                     await outgoingDocumentFolder.DeleteAsync();
                     return null;
@@ -274,21 +263,15 @@ namespace Mark5.Mobile.Common.Storage
 
                 var infoFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingInfo);
                 var info = await SerializationUtils.DeserializeAsync<OutgoingDocumentInfo>(await infoFile.ReadAllTextAsync());
-                var isFailed = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed)) == ExistenceCheckResult.FileExists;
-                var isAutoSave = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingAutoSave)) == ExistenceCheckResult.FileExists;
+                var isFailed = await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed) == ExistenceCheckResult.FileExists;
+                var isAutoSave = await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingAutoSave) == ExistenceCheckResult.FileExists;
 
                 if (isFailed)
-                {
                     info.State = OutgoingDocumentState.Failed;
-                }
                 else if (isAutoSave)
-                {
                     info.State = OutgoingDocumentState.AutoSaved;
-                }
                 else
-                {
                     info.State = OutgoingDocumentState.Waiting;
-                }
                 if (lockDocument)
                 {
                     await LockOutgoingDocumentAsync(id);
@@ -296,12 +279,10 @@ namespace Mark5.Mobile.Common.Storage
                 }
                 else
                 {
-                    var isLocked = (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingLock)) == ExistenceCheckResult.FileExists;
+                    var isLocked = await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingLock) == ExistenceCheckResult.FileExists;
 
                     if (isLocked)
-                    {
                         info.Locked = true;
-                    }
                 }
                 Document document = null;
                 List<OutgoingDocumentAttachmentDescription> attachments = null;
@@ -359,9 +340,7 @@ namespace Mark5.Mobile.Common.Storage
         {
             var identifiers = new List<Guid>();
             foreach (var folder in await CommonConfig.OutgoingFolder.GetFoldersAsync())
-            {
                 identifiers.Add(new Guid(folder.Name));
-            }
             return identifiers;
         }
 
@@ -398,9 +377,7 @@ namespace Mark5.Mobile.Common.Storage
             var attachmentsFolder = await GetOutgoingAttachmentsFolderAsync(id);
             var fileExists = await attachmentsFolder.CheckExistsAsync(filename, ct);
             if (fileExists == ExistenceCheckResult.FileExists)
-            {
                 return Path.Combine(attachmentsFolder.Path, filename);
-            }
             var file = await attachmentsFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting, ct);
             using (var fileStream = await file.OpenAsync(PCLStorage.FileAccess.ReadAndWrite))
             {
@@ -415,9 +392,7 @@ namespace Mark5.Mobile.Common.Storage
 
             var fileExists = await attachmentsFolder.CheckExistsAsync(filename, ct);
             if (fileExists != ExistenceCheckResult.FileExists)
-            {
                 return;
-            }
             var file = await attachmentsFolder.GetFileAsync(filename, ct);
             await file.DeleteAsync(ct);
 
@@ -490,9 +465,7 @@ namespace Mark5.Mobile.Common.Storage
         {
             var autoSavedGuid = await GetAutoSavedIdAsync();
             if (autoSavedGuid != Guid.Empty) //If not found, it means that in the meanwhile the document was inserted in outgoing list, for instance
-            {
                 await DeleteOutgoingDocumentFolderAsync(autoSavedGuid);
-            }
         }
 
         static async Task<Guid> GetAutoSavedIdAsync()
@@ -502,9 +475,7 @@ namespace Mark5.Mobile.Common.Storage
             {
                 var folder = await GetOutgoingFolderAsync(id);
                 if (await folder.CheckExistsAsync(Filenames.OutgoingAutoSave) == ExistenceCheckResult.FileExists)
-                {
                     return id;
-                }
             }
             return Guid.Empty;
         }
@@ -527,7 +498,9 @@ namespace Mark5.Mobile.Common.Storage
 
             var file = await folder.CreateFileAsync(CommonConfig.Utf8Normalizer(attachmentDescription.SafeName), CreationCollisionOption.ReplaceExisting, ct);
             using (var fileStream = await file.OpenAsync(PCLStorage.FileAccess.ReadAndWrite))
+            {
                 await attachmentStream.CopyToAsync(fileStream);
+            }
 
             return file.Path;
         }
@@ -558,9 +531,7 @@ namespace Mark5.Mobile.Common.Storage
                 await semaphores[filename].WaitAsync();
 
                 if (objectCache.ContainsKey(filename))
-                {
                     return (T) objectCache[filename];
-                }
                 var fileExists = await CommonConfig.DataFolder.CheckExistsAsync(filename, ct);
                 if (fileExists == ExistenceCheckResult.FileExists)
                 {
@@ -583,9 +554,7 @@ namespace Mark5.Mobile.Common.Storage
 
                 var fileExists = await CommonConfig.DataFolder.CheckExistsAsync(filename, ct);
                 if (fileExists != ExistenceCheckResult.FileExists)
-                {
                     await CommonConfig.DataFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting, ct);
-                }
                 var file = await CommonConfig.DataFolder.GetFileAsync(filename, ct);
                 await file.WriteAllTextAsync(await SerializationUtils.SerializeAsync(obj));
 

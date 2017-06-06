@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ShortcodeSearchResultsFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -193,15 +185,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ShortcodeSearchResultsAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-            public List<ShortcodePreview> Items
-            {
-                get { return shortcodePreviewsInView; }
-            }
+            public List<ShortcodePreview> Items => shortcodePreviewsInView;
 
-            public override int ItemCount
-            {
-                get { return shortcodePreviewsInView.Count; }
-            }
+            public override int ItemCount => shortcodePreviewsInView.Count;
 
             readonly List<ShortcodePreview> shortcodePreviewsInView = new List<ShortcodePreview>(1000);
 
@@ -247,12 +233,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public string Name
             {
-                set { nameTextView.Text = value; }
+                set => nameTextView.Text = value;
             }
 
             public bool Selected
             {
-                set { selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             readonly AppCompatTextView nameTextView;

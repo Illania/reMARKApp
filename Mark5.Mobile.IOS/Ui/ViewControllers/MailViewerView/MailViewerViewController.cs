@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: MailViewerViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -175,7 +167,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             shareItem.Clicked -= ShareItem_Clicked;
         }
 
-        void CloseItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
+        void CloseItem_Clicked(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
+        }
 
         void ShareItem_Clicked(object sender, EventArgs e)
         {
@@ -195,7 +190,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             Task.Run(async () =>
                 {
                     var auth = AuthenticatorFactory.Create();
-                    if (!(await auth.IsAuthenticatedAsync()))
+                    if (!await auth.IsAuthenticatedAsync())
                         throw new MailViewerException("You need to log in to MARK5 before you can use mail viewer.");
 
                     if (url == null)
@@ -222,7 +217,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                     {
                         byte[] bytes;
                         using (var stream = new FileStream(url.Path, FileMode.Open, FileAccess.Read))
+                        {
                             bytes = ReadToEnd(stream);
+                        }
 
                         try
                         {
@@ -241,7 +238,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                     }
 
                     if (name.EndsWith(".msg", StringComparison.CurrentCultureIgnoreCase))
-                    {
                         using (var inputStream = new FileStream(url.Path, FileMode.Open, FileAccess.Read))
                         {
                             using (var msgStream = new MemoryStream())
@@ -274,7 +270,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                                 }
                             }
                         }
-                    }
 
                     throw new MailViewerException("Unsupported file.");
                 })
@@ -344,9 +339,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             }
 
             if (navigationAction.NavigationType == WKNavigationType.Reload)
-            {
                 return WKNavigationActionPolicy.Cancel;
-            }
 
             return WKNavigationActionPolicy.Allow;
         }
@@ -490,7 +483,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             var cacheFile = specificDir.Append(filename, false);
 
             using (var stream = new FileStream(cacheFile.Path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None, 4096, true))
+            {
                 await stream.WriteAsync(bytes, 0, bytes.Length);
+            }
 
             return cacheFile;
         }

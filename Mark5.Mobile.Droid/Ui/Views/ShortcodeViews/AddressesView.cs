@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: AddressesView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Linq;
 using Android.Content;
 using Android.Graphics;
@@ -120,9 +112,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
                 LongClick += (sender, e) =>
                 {
                     if (!string.IsNullOrWhiteSpace(addressView.Text))
-                    {
                         Integration.CopyToClipboard(context, addressView.Text);
-                    }
                 };
             }
         }

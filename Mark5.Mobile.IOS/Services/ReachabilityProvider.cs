@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: ReachabilityProvider.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Net;
 using CoreFoundation;
 using SystemConfiguration;
@@ -132,7 +124,7 @@ namespace Mark5.Mobile.IOS.Services
         {
             var defaultNetworkAvailable = IsNetworkAvailable(out NetworkReachabilityFlags flags);
 
-            if (defaultNetworkAvailable && ((flags & NetworkReachabilityFlags.IsDirect) != 0))
+            if (defaultNetworkAvailable && (flags & NetworkReachabilityFlags.IsDirect) != 0)
                 return NetworkStatus.NotReachable;
 
             if ((flags & NetworkReachabilityFlags.IsWWAN) != 0)

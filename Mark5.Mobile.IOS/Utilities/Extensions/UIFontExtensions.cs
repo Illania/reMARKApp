@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: UIFontExtensions.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using UIKit;
+﻿using UIKit;
 
 namespace Mark5.Mobile.IOS.Utilities.Extensions
 {

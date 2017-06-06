@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: DocumentDateRangeSearchView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using Android.Content;
 using Android.Support.V7.Widget;
@@ -127,9 +119,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             UpdateCriteria();
         }
 
-        void From_Click(object sender, EventArgs e) => OpenDateRangeFragment(false);
+        void From_Click(object sender, EventArgs e)
+        {
+            OpenDateRangeFragment(false);
+        }
 
-        void To_Click(object sender, EventArgs e) => OpenDateRangeFragment(true);
+        void To_Click(object sender, EventArgs e)
+        {
+            OpenDateRangeFragment(true);
+        }
 
         void UpdateText()
         {

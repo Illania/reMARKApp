@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: PhysicalAddressesSubview.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Linq;
 using System.Text;
 using Android.Content;
@@ -106,25 +98,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             {
                 var sb = new StringBuilder();
                 if (!string.IsNullOrWhiteSpace(address.Street))
-                {
                     sb.Append(address.Street);
-                }
                 if (!string.IsNullOrWhiteSpace(address.Area))
-                {
                     sb.AppendLine().Append(address.Area);
-                }
                 if (!string.IsNullOrWhiteSpace(address.ZipCode))
-                {
                     sb.AppendLine().Append(address.ZipCode);
-                }
                 if (!string.IsNullOrWhiteSpace(address.City))
-                {
                     sb.Append(" ").Append(address.City);
-                }
                 if (address.Country != null && address.Country.Id != 0)
-                {
                     sb.AppendLine().Append(address.Country.Name);
-                }
                 return sb.ToString();
             }
         }

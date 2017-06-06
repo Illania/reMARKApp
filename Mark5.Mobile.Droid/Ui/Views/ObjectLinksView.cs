@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ObjectLinksView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using Android.Content;
 using Android.Graphics;
@@ -104,7 +96,7 @@ namespace Mark5.Mobile.Droid.Ui.Views
 
                 if (ol.IsReverse)
                 {
-                    Clickable = (ol.FromObjectType == ObjectType.Document || ol.FromObjectType == ObjectType.Contact || ol.FromObjectType == ObjectType.Shortcode);
+                    Clickable = ol.FromObjectType == ObjectType.Document || ol.FromObjectType == ObjectType.Contact || ol.FromObjectType == ObjectType.Shortcode;
                     if (Clickable)
                     {
                         var typedArray = Context.ObtainStyledAttributes(new int[]
@@ -117,7 +109,7 @@ namespace Mark5.Mobile.Droid.Ui.Views
                 }
                 else
                 {
-                    Clickable = (ol.ToObjectType == ObjectType.Document || ol.ToObjectType == ObjectType.Contact || ol.ToObjectType == ObjectType.Shortcode);
+                    Clickable = ol.ToObjectType == ObjectType.Document || ol.ToObjectType == ObjectType.Contact || ol.ToObjectType == ObjectType.Shortcode;
                     if (Clickable)
                     {
                         var typedArray = Context.ObtainStyledAttributes(new int[]

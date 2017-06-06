@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: PushNotificationsConverter.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using Firebase.Messaging;
+﻿using Firebase.Messaging;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Model;
 using Mark5.Mobile.Common.Model;

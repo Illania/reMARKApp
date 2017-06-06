@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ShortcodeView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Util;

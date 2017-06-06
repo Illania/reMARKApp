@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: PushNotification.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Globalization;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -32,10 +24,7 @@ namespace Mark5.Mobile.IOS.Model
         [JsonProperty("content-available")]
         public int ContenAvailable { get; set; }
 
-        public bool IsContenAvailable
-        {
-            get { return ContenAvailable > 0; }
-        }
+        public bool IsContenAvailable => ContenAvailable > 0;
 
         [JsonProperty("alert")]
         public Alert Alert { get; set; }

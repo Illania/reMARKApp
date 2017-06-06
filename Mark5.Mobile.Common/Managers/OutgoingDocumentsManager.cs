@@ -1,11 +1,4 @@
-﻿//
-// File: OutgoingDocumentsManager.cs
-// Author: Ferdinando Papale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -112,13 +105,9 @@ namespace Mark5.Mobile.Common.Managers
         void StartSendTask()
         {
             if (sendTask != null)
-            {
                 return;
-            }
             if (!CommonConfig.ReachabilityService.IsReachable)
-            {
                 return;
-            }
             cts = new CancellationTokenSource();
 
             sendTask = Task.Run(async () => await SendAction())
@@ -127,9 +116,7 @@ namespace Mark5.Mobile.Common.Managers
                     sendTask = null;
 
                     if (t.IsFaulted)
-                    {
                         await Start();
-                    }
                 });
         }
 
@@ -174,9 +161,7 @@ namespace Mark5.Mobile.Common.Managers
                     var container = await FileSystemStorage.GetOutgoingDocumentContainerAsync(identifier, false, LoadMode.Complete);
 
                     if (container == null || container.Info.State == OutgoingDocumentState.Failed || container.Info.State == OutgoingDocumentState.AutoSaved || container.Info.Locked)
-                    {
                         continue;
-                    }
                     var document = container.Document;
                     var documentPreview = container.DocumentPreview;
                     var info = container.Info;
@@ -226,17 +211,11 @@ namespace Mark5.Mobile.Common.Managers
         async void ReachabilityRefreshed(object sender, ReachabilityRefreshedEventArgs e)
         {
             if (!active || !e.Changed)
-            {
                 return;
-            }
             if (e.IsReachable)
-            {
                 StartSendTask();
-            }
             else
-            {
                 await StopSendTask();
-            }
         }
 
         #endregion
@@ -255,25 +234,19 @@ namespace Mark5.Mobile.Common.Managers
                 {
                     var ids = await FileSystemStorage.GetOutgoingDocumentIdentifiersAsync();
                     foreach (var id in ids)
-                    {
                         await FileSystemStorage.UnlockOutgoingDocumentAsync(id);
-                    }
                 })
                 .ContinueWith(t =>
                 {
                     if (t.IsFaulted)
-                    {
                         CommonConfig.Logger.Error("Error while unlocking documents at startup", t.Exception.InnerException);
-                    }
                 });
         }
 
         void AddToQueue(IEnumerable<Guid> identifiers)
         {
             foreach (var identifier in identifiers)
-            {
                 AddToQueue(identifier);
-            }
         }
 
         void AddToQueue(Guid identifier)

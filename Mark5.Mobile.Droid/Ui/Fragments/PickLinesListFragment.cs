@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: PickLineListFragment.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.Graphics;
@@ -113,9 +105,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var clfs = restoredState as PickLinesListFragmentState;
             if (clfs != null)
-            {
                 SelectedLinesGuid = clfs.SelectedLinesGuid;
-            }
         }
 
         public override string GenerateTag()
@@ -135,20 +125,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly List<Line> linesInView = new List<Line>(10);
             readonly List<Guid> selectedLinesGuid = new List<Guid>(10);
 
-            public List<Guid> SelectedLinesGuid
-            {
-                get { return selectedLinesGuid; }
-            }
+            public List<Guid> SelectedLinesGuid => selectedLinesGuid;
 
-            public override int ItemCount
-            {
-                get { return linesInView.Count; }
-            }
+            public override int ItemCount => linesInView.Count;
 
-            public List<Line> Items
-            {
-                get { return linesInView; }
-            }
+            public List<Line> Items => linesInView;
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
@@ -183,13 +164,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             void HandleClick(Line l, int position)
             {
                 if (selectedLinesGuid.Contains(l.Guid))
-                {
                     selectedLinesGuid.Remove(l.Guid);
-                }
                 else
-                {
                     selectedLinesGuid.Add(l.Guid);
-                }
 
                 NotifyItemChanged(position);
             }
@@ -215,7 +192,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     selected = value;
                     selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
                 }
-                get { return selected; }
+                get => selected;
             }
 
             readonly AppCompatTextView nameTextView;

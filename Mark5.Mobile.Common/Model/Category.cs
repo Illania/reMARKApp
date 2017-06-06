@@ -1,11 +1,4 @@
-﻿//
-// File: Category.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using SQLite;
+﻿using SQLite;
 using System;
 
 namespace Mark5.Mobile.Common.Model
@@ -13,7 +6,8 @@ namespace Mark5.Mobile.Common.Model
     [Table("Category")]
     public class Category
     {
-        [Column("Id"), PrimaryKey]
+        [Column("Id")]
+        [PrimaryKey]
         public int Id { get; set; } = -1;
 
         [Column("Guid")]

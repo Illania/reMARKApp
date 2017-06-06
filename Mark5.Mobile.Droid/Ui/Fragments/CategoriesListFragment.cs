@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: CategoriesListFragment.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.Graphics;
@@ -31,10 +23,7 @@ namespace Mark5.Mobile.Droid
         public BusinessEntityPreview BusinessEntityPreview { get; set; }
         public Action CloseRequest { get; set; }
 
-        public List<Category> Categories
-        {
-            get { return adapter.Items; }
-        }
+        public List<Category> Categories => adapter.Items;
 
         RecyclerView recyclerView;
         SearchView searchView;
@@ -200,13 +189,9 @@ namespace Mark5.Mobile.Droid
         static bool MatchesQuery(Category c, string query)
         {
             if (c.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
                 return true;
-            }
             if (c.Description.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
                 return true;
-            }
 
             return false;
         }
@@ -227,9 +212,7 @@ namespace Mark5.Mobile.Droid
         {
             var clfs = restoredState as CategoriesListFragmentState;
             if (clfs != null)
-            {
                 BusinessEntityPreview = clfs.BusinessEntityPreview;
-            }
         }
 
         public override string GenerateTag()
@@ -250,15 +233,9 @@ namespace Mark5.Mobile.Droid
         {
             readonly List<Category> categoriesInView = new List<Category>();
 
-            public override int ItemCount
-            {
-                get { return categoriesInView.Count; }
-            }
+            public override int ItemCount => categoriesInView.Count;
 
-            public List<Category> Items
-            {
-                get { return categoriesInView; }
-            }
+            public List<Category> Items => categoriesInView;
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
@@ -306,7 +283,7 @@ namespace Mark5.Mobile.Droid
         {
             public string Name
             {
-                set { nameTextView.Text = value; }
+                set => nameTextView.Text = value;
             }
 
             public string Description
@@ -340,7 +317,7 @@ namespace Mark5.Mobile.Droid
 
             public bool Selected
             {
-                set { selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             readonly View colorImageView;

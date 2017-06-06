@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: AbstractEditableLargeSearchView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using Android.Graphics;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -52,9 +44,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             bottomEditText.EditorAction += (sender, e) =>
             {
                 if (e.ActionId == ImeAction.Done)
-                {
                     bottomEditText.ClearFocus();
-                }
             };
             AddView(bottomEditText);
         }

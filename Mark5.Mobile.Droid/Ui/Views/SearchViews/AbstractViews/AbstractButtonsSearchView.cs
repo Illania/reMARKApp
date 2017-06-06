@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: AbstractButtonsSearchView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Globalization;
 using Android.Content;
 using Android.Support.V4.Content;
@@ -33,9 +25,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         protected void AddButtons(params CustomButton[] buttons)
         {
             foreach (var button in buttons)
-            {
                 AddView(button, new LayoutParams(0, ViewGroup.LayoutParams.MatchParent, 1));
-            }
         }
 
         public class CustomButton : AppCompatTextView, IOnLayoutChangeListener
@@ -71,9 +61,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             void CustomButton_Click(object sender, EventArgs e)
             {
                 if (clickedAction == null || clickedAction(this))
-                {
                     Selected = !Selected;
-                }
                 UpdateTextAppearance();
             }
 

@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: ContactsSearchResultsViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -228,7 +220,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void ExitEditItem_Clicked(object sender, EventArgs e) => EndEditing();
+        void ExitEditItem_Clicked(object sender, EventArgs e)
+        {
+            EndEditing();
+        }
 
         void EndEditing()
         {
@@ -271,10 +266,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(eas, true, null);
         }
 
-        void CopyToWorktray(ContactPreview selectedContact) => CopyToWorktray(new List<ContactPreview>
+        void CopyToWorktray(ContactPreview selectedContact)
         {
-            selectedContact
-        });
+            CopyToWorktray(new List<ContactPreview>
+            {
+                selectedContact
+            });
+        }
 
         void CopyToWorktray(List<ContactPreview> selectedContacts)
         {
@@ -285,10 +283,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void CopyToFolder(ContactPreview selecteContact) => CopyToFolder(new List<ContactPreview>
+        void CopyToFolder(ContactPreview selecteContact)
         {
-            selecteContact
-        });
+            CopyToFolder(new List<ContactPreview>
+            {
+                selecteContact
+            });
+        }
 
         void CopyToFolder(List<ContactPreview> selectedContacts)
         {
@@ -296,10 +297,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void Delete(ContactPreview selectedContact) => Delete(new List<ContactPreview>
+        void Delete(ContactPreview selectedContact)
         {
-            selectedContact
-        });
+            Delete(new List<ContactPreview>
+            {
+                selectedContact
+            });
+        }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void Delete(List<ContactPreview> selectedContacts)
@@ -345,9 +349,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var nc = (UINavigationController) SplitViewController.ViewControllers[1];
                 var vc = (ContactViewController) nc.ViewControllers[0];
                 if (ids.Select(id => vc.IsShowingContactWithId(id)).Any(v => v))
-                {
                     vc.ClearData();
-                }
             }
         }
 
@@ -567,13 +569,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     {
                         contactPreviewsInView.RemoveAt(indexPath.Section);
                         if (contactPreviewsInView.Count == 0)
-                        {
                             tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                        }
                         else
-                        {
                             tableView.DeleteSections(NSIndexSet.FromIndex(indexPath.Section), UITableViewRowAnimation.Automatic);
-                        }
                     }
                     else
                     {

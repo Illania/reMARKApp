@@ -1,11 +1,4 @@
-﻿//
-// File: DownloadManager.cs
-// Author: Ferdinando Papale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,10 +11,7 @@ namespace Mark5.Mobile.Common
 {
     class DownloadManager : IDownloadManager
     {
-        public Dictionary<ObjectType, DownloadPolicy> DownloadPolicies
-        {
-            get { return downloadPolicies; }
-        }
+        public Dictionary<ObjectType, DownloadPolicy> DownloadPolicies => downloadPolicies;
 
         CancellationTokenSource cts;
         Task downloadTask;
@@ -68,9 +58,7 @@ namespace Mark5.Mobile.Common
         public void Notify(ObjectType objectType, int folderId)
         {
             if (!ShouldBeDownloaded(objectType, folderId))
-            {
                 return;
-            }
             switch (objectType)
             {
                 case ObjectType.Document:
@@ -99,17 +87,11 @@ namespace Mark5.Mobile.Common
         bool ShouldBeDownloaded(ObjectType objectType, int folderId)
         {
             if (!DownloadPolicies.ContainsKey(objectType))
-            {
                 return false;
-            }
             if (DownloadPolicies[objectType] is DownloadAllPolicy)
-            {
                 return true;
-            }
             if (DownloadPolicies[objectType] is DownloadFoldersPolicy)
-            {
                 return ((DownloadFoldersPolicy) DownloadPolicies[objectType]).FolderIds.Contains(folderId);
-            }
             return false;
         }
 
@@ -161,13 +143,9 @@ namespace Mark5.Mobile.Common
         void StartDownloadTask()
         {
             if (downloadTask != null)
-            {
                 return;
-            }
             if (!CommonConfig.ReachabilityService.IsReachable)
-            {
                 return;
-            }
             cts = new CancellationTokenSource();
 
             downloadTask = Task.Run(async () => await DownloadAction())
@@ -176,9 +154,7 @@ namespace Mark5.Mobile.Common
                     downloadTask = null;
 
                     if (t.IsFaulted)
-                    {
                         await Start();
-                    }
                 });
         }
 
@@ -212,9 +188,7 @@ namespace Mark5.Mobile.Common
                     queue.TryTake(out DownloadItemInfo downloadInfo, -1, cts.Token);
 
                     if (!ShouldBeDownloaded(downloadInfo.Type, downloadInfo.FolderId))
-                    {
                         continue;
-                    }
                     switch (downloadInfo.Type)
                     {
                         case ObjectType.Document:
@@ -250,13 +224,9 @@ namespace Mark5.Mobile.Common
             foreach (var documentId in documentIds)
             {
                 if (!ShouldBeDownloaded(itemInfo.Type, itemInfo.FolderId))
-                {
                     return;
-                }
                 if (await documentsDataAccess.IsDocumentCached(documentId))
-                {
                     continue;
-                }
                 await Managers.Managers.DocumentsManager.GetDocumentAsync(itemInfo.FolderId, documentId);
             }
         }
@@ -268,13 +238,9 @@ namespace Mark5.Mobile.Common
             foreach (var contactId in contactIds)
             {
                 if (!ShouldBeDownloaded(itemInfo.Type, itemInfo.FolderId))
-                {
                     return;
-                }
                 if (await contactsDataAccess.IsContactCached(contactId))
-                {
                     continue;
-                }
                 await Managers.Managers.ContactsManager.GetContactAsync(itemInfo.FolderId, contactId);
             }
         }
@@ -286,13 +252,9 @@ namespace Mark5.Mobile.Common
             foreach (var shosrtcodeId in shortcodeIds)
             {
                 if (!ShouldBeDownloaded(itemInfo.Type, itemInfo.FolderId))
-                {
                     return;
-                }
                 if (await shortcodesDataAccess.IsShortcodeCached(shosrtcodeId))
-                {
                     continue;
-                }
                 await Managers.Managers.ShortcodesManager.GetShortcodeAsync(itemInfo.FolderId, shosrtcodeId);
             }
         }
@@ -304,9 +266,7 @@ namespace Mark5.Mobile.Common
         void AddToQueue(IEnumerable<DownloadItemInfo> identifiers)
         {
             foreach (var identifier in identifiers)
-            {
                 AddToQueue(identifier);
-            }
         }
 
         void AddToQueue(DownloadItemInfo identifier)
@@ -318,51 +278,38 @@ namespace Mark5.Mobile.Common
         {
             var folderIds = await documentsDataAccess.GetPendingFolders();
             foreach (var id in folderIds)
-            {
                 if (ShouldBeDownloaded(ObjectType.Document, id))
-                {
                     AddToQueue(new DocumentDownloadInfo
                     {
                         FolderId = id
                     });
-                }
-            }
         }
 
         async Task AddPendingContactFoldersToQueue()
         {
             var folderIds = await contactsDataAccess.GetPendingFolders();
             foreach (var id in folderIds)
-            {
                 if (ShouldBeDownloaded(ObjectType.Contact, id))
-                {
                     AddToQueue(new ContactDownloadInfo
                     {
                         FolderId = id
                     });
-                }
-            }
         }
 
         async Task AddPendingShortcodeFoldersToQueue()
         {
             var folderIds = await shortcodesDataAccess.GetPendingFolders();
             foreach (var id in folderIds)
-            {
                 if (ShouldBeDownloaded(ObjectType.Shortcode, id))
-                {
                     AddToQueue(new ShortcodeDownloadInfo
                     {
                         FolderId = id
                     });
-                }
-            }
         }
 
         async Task RetrievePendingFromStorage()
         {
             foreach (var objectType in DownloadPolicies.Keys)
-            {
                 switch (objectType)
                 {
                     case ObjectType.Document:
@@ -377,7 +324,6 @@ namespace Mark5.Mobile.Common
                     default:
                         throw new ArgumentException("Object type not valid");
                 }
-            }
         }
 
         #endregion
@@ -387,17 +333,11 @@ namespace Mark5.Mobile.Common
         async void ReachabilityRefreshed(object sender, ReachabilityRefreshedEventArgs e)
         {
             if (!active || !e.Changed)
-            {
                 return;
-            }
             if (e.IsReachable)
-            {
                 StartDownloadTask();
-            }
             else
-            {
                 await StopDownloadTask();
-            }
         }
 
         #endregion

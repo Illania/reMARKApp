@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: MailViewerSubview.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
-using MailBee.Mime;
+﻿using MailBee.Mime;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 

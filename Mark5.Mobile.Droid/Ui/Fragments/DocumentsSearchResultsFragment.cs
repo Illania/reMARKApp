@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: DocumentSearchResultsFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -203,15 +195,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 public const int ExternalDocumentView = 1;
             }
 
-            public List<DocumentPreview> Items
-            {
-                get { return documentPreviewsInView; }
-            }
+            public List<DocumentPreview> Items => documentPreviewsInView;
 
-            public override int ItemCount
-            {
-                get { return documentPreviewsInView.Count; }
-            }
+            public override int ItemCount => documentPreviewsInView.Count;
 
             readonly List<DocumentPreview> documentPreviewsInView = new List<DocumentPreview>(1000);
             readonly Context context;
@@ -305,15 +291,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 var dpvh = vh as DocumentPreviewViewHolder;
                 if (dpvh != null)
-                {
                     return dpvh.BubbleDate;
-                }
 
                 var edpvh = vh as ExternalDocumentPreviewViewHolder;
                 if (edpvh != null)
-                {
                     return edpvh.BubbleDate;
-                }
 
                 return string.Empty;
             }
@@ -323,24 +305,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public string Recipent
             {
-                set { recipentTextView.Text = value; }
+                set => recipentTextView.Text = value;
             }
 
             public string Date
             {
-                set { dateTextView.Text = value; }
+                set => dateTextView.Text = value;
             }
 
             public string BubbleDate { get; set; }
 
             public string Subject
             {
-                set { subjectTextView.Text = value; }
+                set => subjectTextView.Text = value;
             }
 
             public string Preview
             {
-                set { previewTextView.Text = value; }
+                set => previewTextView.Text = value;
             }
 
             public List<Category> Categories
@@ -363,37 +345,37 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public bool IncomingIndicator
             {
-                set { incomingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => incomingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             public bool OutgoingIndicator
             {
-                set { outgoingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => outgoingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             public bool DraftIndicator
             {
-                set { draftImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => draftImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             public bool UnreadIndicator
             {
-                set { unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             public bool AttachmentIndicator
             {
-                set { attachmentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => attachmentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             public bool CommentIndicator
             {
-                set { commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             public bool Selected
             {
-                set { selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             readonly AppCompatTextView recipentTextView;
@@ -431,19 +413,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public string Name
             {
-                set { nameTextView.Text = value; }
+                set => nameTextView.Text = value;
             }
 
             public string Date
             {
-                set { dateTextView.Text = value; }
+                set => dateTextView.Text = value;
             }
 
             public string BubbleDate { get; set; }
 
             public string Preview
             {
-                set { previewTextView.Text = value; }
+                set => previewTextView.Text = value;
             }
 
             public List<Category> Categories
@@ -466,12 +448,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public bool CommentIndicator
             {
-                set { commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             public bool Selected
             {
-                set { selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+                set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
             }
 
             readonly AppCompatTextView nameTextView;

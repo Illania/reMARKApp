@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: DocumentViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -36,10 +28,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview { get; set; }
         GetNextDocumentPreviewDelegate getNextDocumentPreview { get; set; }
 
-        public bool Empty
-        {
-            get { return document == null && documentPreview == null && folderId == null && folder == null && documentId == null && notificationGuid == default(Guid); }
-        }
+        public bool Empty => document == null && documentPreview == null && folderId == null && folder == null && documentId == null && notificationGuid == default(Guid);
 
         int? folderId { get; set; }
         Folder folder { get; set; }
@@ -610,9 +599,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 StartRefreshing();
 
                 if (notificationGuid != default(Guid))
-                {
                     await Managers.NotificationsManager.MarkAsRead(notificationGuid);
-                }
 
                 if (outgoingDocumentIdentifier != default(Guid))
                 {
@@ -630,9 +617,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
 
                     if (documentPreview != null && document == null)
-                    {
                         document = await Managers.DocumentsManager.GetDocumentAsync(folderId ?? folder?.Id, documentPreview.Id);
-                    }
                 }
 
                 if (token.IsCancellationRequested)
@@ -655,13 +640,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 await Dialogs.ShowErrorDialogAsync(this, ex);
 
                 if (Modal)
-                {
                     DismissViewController(true, null);
-                }
                 else
-                {
                     NavigationController.PopViewController(true);
-                }
             }
         }
 
@@ -710,9 +691,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 try
                 {
                     if (dp.IsReadByCurrent)
-                    {
                         return;
-                    }
 
                     var delaySeconds = PlatformConfig.Preferences.MarkAsReadDelaySeconds;
                     if (delaySeconds < 0)
@@ -778,30 +757,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void RefreshNavigationBar()
         {
             if (Modal)
-            {
                 return;
-            }
 
             bool _na;
             bool _pa;
 
             if (getNextDocumentPreview != null)
-            {
                 nextDocumentButtonItem.Enabled = getNextDocumentPreview(documentPreview, out _na, out _pa) != null;
-            }
             else
-            {
                 nextDocumentButtonItem.Enabled = false;
-            }
 
             if (getPreviousDocumentPreview != null)
-            {
                 previousDocumentButtonItem.Enabled = getPreviousDocumentPreview(documentPreview, out _na, out _pa) != null;
-            }
             else
-            {
                 previousDocumentButtonItem.Enabled = false;
-            }
 
 
             if (outgoingDocumentIdentifier != default(Guid))
@@ -810,7 +779,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 rightButtons[0] = editDocumentButtonItem;
                 NavigationItem.SetRightBarButtonItems(rightButtons, true);
             }
-            else if (document == null || (documentPreview.Direction != DocumentDirection.Draft))
+            else if (document == null || documentPreview.Direction != DocumentDirection.Draft)
             {
                 var rightButtons = new UIBarButtonItem[2];
                 rightButtons[0] = nextDocumentButtonItem;
@@ -865,9 +834,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 if (string.IsNullOrWhiteSpace(path))
-                {
                     throw new Exception("Unable to get attachment path.");
-                }
 
                 var url = NSUrl.FromFilename(path);
 
@@ -936,9 +903,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             if (navigationAction.NavigationType == WKNavigationType.Reload)
-            {
                 return WKNavigationActionPolicy.Cancel;
-            }
 
             return WKNavigationActionPolicy.Allow;
         }
@@ -1158,7 +1123,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             ComposeDocumentViewController vc = null;
             if (outgoingDocumentIdentifier != default(Guid))
-            {
                 vc = new ComposeDocumentViewController
                 {
                     LocalDocument = true,
@@ -1166,9 +1130,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     PreviousDocumentDirection = container.DocumentPreview.Direction,
                     OutgoingDocumentGuid = container.Info.Identifier
                 };
-            }
             else
-            {
                 vc = new ComposeDocumentViewController
                 {
                     PreviousDocumentPreview = documentPreview,
@@ -1177,7 +1139,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     PreviousDocumentDirection = documentPreview.Direction,
                     PreviousDocumentFolderId = folder.Id
                 };
-            }
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
@@ -1318,13 +1279,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 dismissAction();
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
-                {
                     ClearData();
-                }
                 else
-                {
                     NavigationController.PopViewController(true);
-                }
             }
             catch (Exception ex)
             {
@@ -1363,13 +1320,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 dismissAction();
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
-                {
                     ClearData();
-                }
                 else
-                {
                     NavigationController.PopViewController(true);
-                }
             }
             catch (Exception ex)
             {

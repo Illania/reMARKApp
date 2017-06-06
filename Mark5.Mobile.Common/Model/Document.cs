@@ -1,11 +1,4 @@
-﻿//
-// File: Document.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Mark5.Mobile.Common.Utilities;
 using SQLite;
 
@@ -15,16 +8,10 @@ namespace Mark5.Mobile.Common.Model
     public class Document : BusinessEntity
     {
         [Ignore]
-        public override ObjectType ObjectType
-        {
-            get { return ObjectType.Document; }
-        }
+        public override ObjectType ObjectType => ObjectType.Document;
 
         [Ignore]
-        public override ModuleType ModuleType
-        {
-            get { return ModuleType.Documents; }
-        }
+        public override ModuleType ModuleType => ModuleType.Documents;
 
         List<Line> lines;
 
@@ -34,12 +21,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (lines == null)
-                {
                     lines = new List<Line>();
-                }
                 return lines;
             }
-            set { lines = value; }
+            set => lines = value;
         }
 
         [Column("HtmlBody")]
@@ -56,12 +41,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (readByUserIds == null)
-                {
                     readByUserIds = new List<int>();
-                }
                 return readByUserIds;
             }
-            set { readByUserIds = value; }
+            set => readByUserIds = value;
         }
 
         Dictionary<int, string> readByUserNames;
@@ -72,12 +55,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (readByUserNames == null)
-                {
                     readByUserNames = new Dictionary<int, string>();
-                }
                 return readByUserNames;
             }
-            set { readByUserNames = value; }
+            set => readByUserNames = value;
         }
 
         List<AttachmentDescription> attachments;
@@ -88,12 +69,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (attachments == null)
-                {
                     attachments = new List<AttachmentDescription>();
-                }
                 return attachments;
             }
-            set { attachments = value; }
+            set => attachments = value;
         }
 
         List<Comment> comments;
@@ -104,12 +83,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (comments == null)
-                {
                     comments = new List<Comment>();
-                }
                 return comments;
             }
-            set { comments = value; }
+            set => comments = value;
         }
 
         Dictionary<DocumentExtraFieldInfo, string> extraFields;
@@ -120,12 +97,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (extraFields == null)
-                {
                     extraFields = new Dictionary<DocumentExtraFieldInfo, string>();
-                }
                 return extraFields;
             }
-            set { extraFields = value; }
+            set => extraFields = value;
         }
 
         [Column("IsEncrypted")]
@@ -136,43 +111,43 @@ namespace Mark5.Mobile.Common.Model
         [Column("LinesString")]
         public string LinesString
         {
-            get { return SerializationUtils.Serialize(Lines); }
-            set { Lines = SerializationUtils.Deserialize<List<Line>>(value); }
+            get => SerializationUtils.Serialize(Lines);
+            set => Lines = SerializationUtils.Deserialize<List<Line>>(value);
         }
 
         [Column("ReadByUserIdsString")]
         public string ReadByUserIdsString
         {
-            get { return SerializationUtils.Serialize(ReadByUserIds); }
-            set { ReadByUserIds = SerializationUtils.Deserialize<List<int>>(value); }
+            get => SerializationUtils.Serialize(ReadByUserIds);
+            set => ReadByUserIds = SerializationUtils.Deserialize<List<int>>(value);
         }
 
         [Column("ReadByUserNamesString")]
         public string ReadByUserNamesString
         {
-            get { return SerializationUtils.Serialize(ReadByUserNames); }
-            set { ReadByUserNames = SerializationUtils.Deserialize<Dictionary<int, string>>(value); }
+            get => SerializationUtils.Serialize(ReadByUserNames);
+            set => ReadByUserNames = SerializationUtils.Deserialize<Dictionary<int, string>>(value);
         }
 
         [Column("AttachmentsString")]
         public string AttachmentsString
         {
-            get { return SerializationUtils.Serialize(Attachments); }
-            set { Attachments = SerializationUtils.Deserialize<List<AttachmentDescription>>(value); }
+            get => SerializationUtils.Serialize(Attachments);
+            set => Attachments = SerializationUtils.Deserialize<List<AttachmentDescription>>(value);
         }
 
         [Column("CommentsString")]
         public string CommentsString
         {
-            get { return SerializationUtils.Serialize(Comments); }
-            set { Comments = SerializationUtils.Deserialize<List<Comment>>(value); }
+            get => SerializationUtils.Serialize(Comments);
+            set => Comments = SerializationUtils.Deserialize<List<Comment>>(value);
         }
 
         [Column("ExtraFieldsString")]
         public string ExtraFieldsString
         {
-            get { return SerializationUtils.Serialize(ExtraFields); }
-            set { ExtraFields = SerializationUtils.Deserialize<Dictionary<DocumentExtraFieldInfo, string>>(value); }
+            get => SerializationUtils.Serialize(ExtraFields);
+            set => ExtraFields = SerializationUtils.Deserialize<Dictionary<DocumentExtraFieldInfo, string>>(value);
         }
 
         #endregion

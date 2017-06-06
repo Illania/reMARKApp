@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: ShortcodesListViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -297,7 +289,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void ExitEditItem_Clicked(object sender, EventArgs e) => EndEditing();
+        void ExitEditItem_Clicked(object sender, EventArgs e)
+        {
+            EndEditing();
+        }
 
         void EndEditing()
         {
@@ -357,7 +352,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Refreshing
 
-        void RefreshControl_ValueChanged(object sender, EventArgs e) => RefreshData(forceClear: true);
+        void RefreshControl_ValueChanged(object sender, EventArgs e)
+        {
+            RefreshData(forceClear: true);
+        }
 
         void RefreshData(int startRowId = -1, bool forceClear = false)
         {
@@ -476,10 +474,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        void RemoveFromFolder(ShortcodePreview selectedShortcode) => RemoveFromFolder(new List<ShortcodePreview>
+        void RemoveFromFolder(ShortcodePreview selectedShortcode)
         {
-            selectedShortcode
-        });
+            RemoveFromFolder(new List<ShortcodePreview>
+            {
+                selectedShortcode
+            });
+        }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void RemoveFromFolder(List<ShortcodePreview> selectedShortcodes)
@@ -516,10 +517,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void Delete(ShortcodePreview selectedShortcode) => Delete(new List<ShortcodePreview>
+        void Delete(ShortcodePreview selectedShortcode)
         {
-            selectedShortcode
-        });
+            Delete(new List<ShortcodePreview>
+            {
+                selectedShortcode
+            });
+        }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void Delete(List<ShortcodePreview> selectedShortcodes)
@@ -556,10 +560,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void CopyToWorktray(ShortcodePreview shortcodePreview) => CopyToWorktray(new List<ShortcodePreview>
+        void CopyToWorktray(ShortcodePreview shortcodePreview)
         {
-            shortcodePreview
-        });
+            CopyToWorktray(new List<ShortcodePreview>
+            {
+                shortcodePreview
+            });
+        }
 
         void CopyToWorktray(List<ShortcodePreview> shortcodePreviews)
         {
@@ -570,10 +577,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void CopyToFolder(ShortcodePreview shortcodePreview) => CopyToFolder(new List<ShortcodePreview>
+        void CopyToFolder(ShortcodePreview shortcodePreview)
         {
-            shortcodePreview
-        });
+            CopyToFolder(new List<ShortcodePreview>
+            {
+                shortcodePreview
+            });
+        }
 
         void CopyToFolder(List<ShortcodePreview> shortcodePreviews)
         {
@@ -581,10 +591,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void MoveToFolder(ShortcodePreview shortcodePreview) => MoveToFolder(new List<ShortcodePreview>
+        void MoveToFolder(ShortcodePreview shortcodePreview)
         {
-            shortcodePreview
-        });
+            MoveToFolder(new List<ShortcodePreview>
+            {
+                shortcodePreview
+            });
+        }
 
         void MoveToFolder(List<ShortcodePreview> shortcodePreviews)
         {
@@ -627,11 +640,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Messages handlers
 
-        void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m) => RemoveShortcodesFromList(m.EntitiesId);
+        void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m)
+        {
+            RemoveShortcodesFromList(m.EntitiesId);
+        }
 
-        void HandleMovedFromFolder(EntityMovedFromFolderMessage m) => RemoveShortcodesFromList(m.EntitiesId);
+        void HandleMovedFromFolder(EntityMovedFromFolderMessage m)
+        {
+            RemoveShortcodesFromList(m.EntitiesId);
+        }
 
-        void HandleDeleted(EntityDeletedMessage m) => RemoveShortcodesFromList(m.EntitiesId);
+        void HandleDeleted(EntityDeletedMessage m)
+        {
+            RemoveShortcodesFromList(m.EntitiesId);
+        }
 
         #endregion
 
@@ -640,9 +662,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void RemoveShortcodesFromList(IEnumerable<int> ids)
         {
             if (searchController.Active)
-            {
                 searchResultsDataSource.RemoveItems(ids.ToList());
-            }
 
             var ds = (DataSource) tableView.Source;
             ds.RemoveItems(ids.ToList());
@@ -651,9 +671,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var nc = (UINavigationController) SplitViewController.ViewControllers[1];
                 var vc = (ShortcodeViewController) nc.ViewControllers[0];
                 if (ids.Select(id => vc.IsShowingShortcodeWithId(id)).Any(v => v))
-                {
                     vc.ClearData();
-                }
             }
         }
 
@@ -815,13 +833,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     {
                         shortcodePreviewsInView.RemoveAt(indexPath.Section);
                         if (shortcodePreviewsInView.Count == 0)
-                        {
                             tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                        }
                         else
-                        {
                             tableView.DeleteSections(NSIndexSet.FromIndex(indexPath.Section), UITableViewRowAnimation.Automatic);
-                        }
                     }
                     else
                     {

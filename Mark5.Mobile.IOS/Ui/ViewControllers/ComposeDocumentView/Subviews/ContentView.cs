@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: ContentView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,11 +25,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
     public class ContentView : ComposeDocumentSubView, IWKNavigationDelegate, IUIGestureRecognizerDelegate, IWKScriptMessageHandler, IUIScrollViewDelegate
     {
-        readonly static NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
+        static readonly NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
 
-        readonly static NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
+        static readonly NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
 
-        readonly static NSString script3 = new NSString("var observer = new MutationObserver(function(mutations) { window.webkit.messageHandlers.mutation.postMessage({mutated:true}); }); observer.observe(document.querySelector('#editable-one'), { attributes: true, childList: true, characterData: true, subtree: true });");
+        static readonly NSString script3 = new NSString("var observer = new MutationObserver(function(mutations) { window.webkit.messageHandlers.mutation.postMessage({mutated:true}); }); observer.observe(document.querySelector('#editable-one'), { attributes: true, childList: true, characterData: true, subtree: true });");
 
         UIButton expandButton;
 
@@ -260,7 +252,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var oldY = ConvertRectToView(webview.Frame, null).Y; //Position in current window
 
-            if ((oldY - UIApplication.SharedApplication.KeyWindow.Frame.Bottom + keyboardHeight + 20) > 0)
+            if (oldY - UIApplication.SharedApplication.KeyWindow.Frame.Bottom + keyboardHeight + 20 > 0)
             {
                 var rect = new CGRect();
                 rect.Height = 40;
@@ -302,9 +294,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             DocumentPreview.Preview = await GetPreview(Document.HtmlBody);
         }
 
-        public async Task InsertTemplate(Template template) => await SetWebContentPart(NewEditableContentClass, template.ContentType, "<br>" + template.Content);
+        public async Task InsertTemplate(Template template)
+        {
+            await SetWebContentPart(NewEditableContentClass, template.ContentType, "<br>" + template.Content);
+        }
 
-        public async Task InsertLocalTemplate(string localTemplate) => await SetWebContentPart(NewEditableContentClass, ContentType.PlainText, "\n\n\n" + localTemplate);
+        public async Task InsertLocalTemplate(string localTemplate)
+        {
+            await SetWebContentPart(NewEditableContentClass, ContentType.PlainText, "\n\n\n" + localTemplate);
+        }
 
         #endregion
 
@@ -343,13 +341,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                             }
 
                             foreach (var childNode2 in childNode1.ChildNodes)
-                            {
                                 if (childNode2.Name == "head")
                                 {
                                     headNode = childNode2;
                                     break;
                                 }
-                            }
                         }
                     }
                     catch (Exception ex)
@@ -393,9 +389,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             header.Append(string.Format("<b>To</b>: {0}", GetAddressTextFromPreviousDocument(DocumentAddressType.To))).Append("</br>");
             var ccText = GetAddressTextFromPreviousDocument(DocumentAddressType.Cc);
             if (!string.IsNullOrWhiteSpace(ccText))
-            {
                 header.Append(string.Format("<b>Cc</b>: {0}", ccText)).Append("</br>");
-            }
             header.Append(string.Format("<b>Subject</b>: {0}", PreviousDocumentPreview.Subject)).Append("</br>");
             header.Append("<br/><br/>");
 
@@ -410,18 +404,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             {
                 var hasName = !string.IsNullOrWhiteSpace(addresses[i].Name);
                 if (hasName)
-                {
                     sb.Append(addresses[i].Name).Append(" &lt;");
-                }
                 sb.Append(addresses[i].Address);
                 if (hasName)
-                {
                     sb.Append("&gt;");
-                }
                 if (i < addresses.Count - 1)
-                {
                     sb.Append(", ");
-                }
             }
             return sb.ToString();
         }
@@ -515,7 +503,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             await newContentLoadingSemaphore.WaitAsync();
 
-            var currentContent = (await newContentWebView.EvaluateJavaScriptAsync(GetWebContentJs) as NSString);
+            var currentContent = await newContentWebView.EvaluateJavaScriptAsync(GetWebContentJs) as NSString;
 
             var htmlParser = new HtmlParser();
             var currentHtmlDocument = await htmlParser.ParseAsync(currentContent);
@@ -570,9 +558,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var matchingElements = currentHtmlDocument.QuerySelectorAll("div." + elementClass);
             foreach (var matchingElement in matchingElements)
-            {
                 matchingElement.Attributes.RemoveNamedItem("contenteditable");
-            }
 
             var processedWebContent = currentHtmlDocument.DocumentElement.OuterHtml;
 
@@ -583,9 +569,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             var inlineResult = PreMailer.Net.PreMailer.MoveCssInline(content, true, null, null, true, true);
             if (inlineResult.Warnings != null && inlineResult.Warnings.Count > 0)
-            {
                 CommonConfig.Logger.Warning("There were warnings when inlining CSS:\n" + string.Join("\n", inlineResult.Warnings));
-            }
             return inlineResult.Html;
         }
 

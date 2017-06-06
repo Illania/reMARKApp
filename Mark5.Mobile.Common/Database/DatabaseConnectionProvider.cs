@@ -1,11 +1,4 @@
-﻿//
-// File: DatabaseConnectionProvider.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
@@ -20,9 +13,7 @@ namespace Mark5.Mobile.Common.Database
             get
             {
                 if (CommonConfig.DataFolder == null)
-                {
                     throw new InvalidOperationException("Data and/or cache folder is not configured.");
-                }
                 return documentsDatabase.Value;
             }
         }
@@ -32,9 +23,7 @@ namespace Mark5.Mobile.Common.Database
             get
             {
                 if (CommonConfig.DataFolder == null)
-                {
                     throw new InvalidOperationException("Data and/or cache folder is not configured.");
-                }
                 return contactsDatabase.Value;
             }
         }
@@ -44,9 +33,7 @@ namespace Mark5.Mobile.Common.Database
             get
             {
                 if (CommonConfig.DataFolder == null)
-                {
                     throw new InvalidOperationException("Data and/or cache folder is not configured.");
-                }
                 return shortcodesDatabase.Value;
             }
         }
@@ -56,9 +43,7 @@ namespace Mark5.Mobile.Common.Database
             get
             {
                 if (CommonConfig.DataFolder == null)
-                {
                     throw new InvalidOperationException("Data and/or cache folder is not configured.");
-                }
                 return calendarDatabase.Value;
             }
         }
@@ -68,9 +53,7 @@ namespace Mark5.Mobile.Common.Database
             get
             {
                 if (CommonConfig.DataFolder == null)
-                {
                     throw new InvalidOperationException("Data and/or cache folder is not configured.");
-                }
                 return systemDatabase.Value;
             }
         }

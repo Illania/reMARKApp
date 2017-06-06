@@ -1,11 +1,4 @@
-﻿//
-// File: Managers.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Model;

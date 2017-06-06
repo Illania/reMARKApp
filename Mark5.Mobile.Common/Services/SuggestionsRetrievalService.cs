@@ -1,11 +1,4 @@
-﻿//
-// File: SuggestionService.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -20,9 +13,7 @@ namespace Mark5.Mobile.Common.Services
         public void GetSuggestions(string phrase, CancellationToken token, Action<List<PrintableSuggestion>, CancellationToken> handler)
         {
             if (token.IsCancellationRequested)
-            {
                 return;
-            }
             GetSuggestionFromRecentAddresses(phrase, token, handler);
             GetSuggestionFromContacts(phrase, token, handler);
             GetSuggestionFromPhonebook(phrase, token, handler);
@@ -31,9 +22,7 @@ namespace Mark5.Mobile.Common.Services
         public void GetSuggestionFromRecentAddresses(string phrase, CancellationToken token, Action<List<PrintableSuggestion>, CancellationToken> handler)
         {
             if (token.IsCancellationRequested)
-            {
                 return;
-            }
             Task.Run(async () =>
             {
                 var filtered = new List<PrintableSuggestion>();
@@ -53,9 +42,7 @@ namespace Mark5.Mobile.Common.Services
         public void GetSuggestionFromPhonebook(string phrase, CancellationToken token, Action<List<PrintableSuggestion>, CancellationToken> handler)
         {
             if (token.IsCancellationRequested)
-            {
                 return;
-            }
             Task.Run(() =>
             {
                 var phonebookContacts = CommonConfig.PhonebookUtilities.GetFilteredPhonebookContacts(phrase) ?? new List<Contact>();
@@ -67,9 +54,7 @@ namespace Mark5.Mobile.Common.Services
         public void GetSuggestionFromContacts(string phrase, CancellationToken token, Action<List<PrintableSuggestion>, CancellationToken> handler)
         {
             if (token.IsCancellationRequested)
-            {
                 return;
-            }
             Task.Run(async () =>
             {
                 var filtered = new List<PrintableSuggestion>();

@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Common.iOS
-// File: SuggestionsTableViewCell.cs
-// Author: Ferdinando Papale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using Foundation;
 using Mark5.Mobile.Common.Model;

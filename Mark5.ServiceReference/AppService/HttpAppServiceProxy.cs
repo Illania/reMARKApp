@@ -1,10 +1,3 @@
-//
-// File: WcfAppServiceProxy.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.IO;
 using System.Net;
@@ -23,10 +16,7 @@ namespace Mark5.ServiceReference.AppService
 {
     class HttpAppServiceProxy : IAppServiceProxy
     {
-        public Version Version
-        {
-            get { return new Version(3, 0, 0); }
-        }
+        public Version Version => new Version(3, 0, 0);
 
         readonly Func<HttpMessageHandler> httpClientHandler;
         readonly string requestUri;

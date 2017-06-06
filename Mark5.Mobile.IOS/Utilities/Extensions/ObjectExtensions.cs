@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: ObjectExtensions.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -47,9 +39,7 @@ namespace Mark5.Mobile.IOS.Utilities
                 {
                     var clonedArray = (Array) cloneObject;
                     for (int i = 0; i < clonedArray.Length; i++)
-                    {
                         clonedArray.SetValue(InternalCopy(clonedArray.GetValue(i), visited), i);
-                    }
                 }
             }
             visited.Add(originalObject, cloneObject);
@@ -83,7 +73,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         static bool IsPrimitive(this Type type)
         {
-            return type == typeof(String) || (type.IsValueType & type.IsPrimitive);
+            return type == typeof(String) || type.IsValueType & type.IsPrimitive;
         }
 
         #endregion
