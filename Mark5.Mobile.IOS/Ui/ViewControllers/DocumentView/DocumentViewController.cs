@@ -1296,7 +1296,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 PreviousDocumentDirection = documentPreview.Direction,
                 PreviousDocument = document,
                 PreviousDocumentPreview = documentPreview,
-                CopyToNewOption = option, //TODO rename copy to new options
+                CopyToNewOption = option,
             };
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);

@@ -161,7 +161,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
             else
             {
-                if (PreviousDocument != null)
+                if (PreviousDocument != null && CreationModeFlag != DocumentCreationModeFlag.New)
                 {
                     showOldContentButton.Visibility = ViewStates.Visible;
                 }
@@ -192,7 +192,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         async Task LoadOldContent()
         {
-            if (!oldContentLoaded && CreationModeFlag != DocumentCreationModeFlag.Edit && PreviousDocument != null)
+            if (!oldContentLoaded && CreationModeFlag != DocumentCreationModeFlag.Edit && CreationModeFlag != DocumentCreationModeFlag.New && PreviousDocument != null)
             {
                 string oldContentString = null;
 

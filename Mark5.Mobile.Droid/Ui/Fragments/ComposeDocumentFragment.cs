@@ -51,7 +51,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public string[] PreconfiguredEmailToAddresses { get; set; }
         public string[] PreconfiguredEmailCcAddresses { get; set; }
         public string[] PreconfiguredEmailBccAddresses { get; set; }
-        public CopyToNewOption CopyToNewOptions { get; set; } //Ignored if CreationModeFlag != New
+        public CopyToNewOption CopyToNewOption { get; set; } //Ignored if CreationModeFlag != New
         public Action CloseRequest { get; set; }
 
         Document PreviousDocument { get; set; }
@@ -185,7 +185,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task LoadDocument()
         {
-            if (PreviousDocument != null || (CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOption.None))
+            if (PreviousDocument != null || (CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.None))
             {
                 await ShowDocument();
                 return;
@@ -251,7 +251,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 subView.PreviousDocument = PreviousDocument;
                 subView.PreviousDocumentPreview = PreviousDocumentPreview;
                 subView.CreationModeFlag = CreationModeFlag;
-                subView.CopyToNewOptions = CopyToNewOptions;
+                subView.CopyToNewOptions = CopyToNewOption;
                 await subView.RefreshView();
             }
 
@@ -699,6 +699,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
             }
 
+            if (CopyToNewOption == CopyToNewOption.KeepTextAndAttachments)
+            {
+                CommonConfig.Logger.Info("Document copied as new with text and attachments, no need to add template");
+                return;
+            }
+
             var useTemplate = PlatformConfig.Preferences.UseTemplate;
             if (useTemplate == Preferences.TemplateUsageMode.DontUse)
                 return;
@@ -908,7 +914,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 OutgoingDocumentOriginalCreationModeFlag = OutgoingDocumentOriginalCreationModeFlag,
                 OutgoingDocumentState = OutgoingDocumentState,
                 OutgoingDocumentInitialAttachments = OutgoingDocumentInitialAttachments,
-                CopyToNewOptions = CopyToNewOptions,
+                CopyToNewOptions = CopyToNewOption,
             };
         }
 
@@ -938,7 +944,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 OutgoingDocumentOriginalCreationModeFlag = cfs.OutgoingDocumentOriginalCreationModeFlag;
                 OutgoingDocumentState = cfs.OutgoingDocumentState;
                 OutgoingDocumentInitialAttachments = cfs.OutgoingDocumentInitialAttachments;
-                CopyToNewOptions = cfs.CopyToNewOptions;
+                CopyToNewOption = cfs.CopyToNewOptions;
             }
         }
 

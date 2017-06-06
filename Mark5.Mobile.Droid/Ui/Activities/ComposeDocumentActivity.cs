@@ -118,7 +118,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     cdf.PreconfiguredEmailBccAddresses = Intent.Extras.GetStringArray(PreconfiguredEmailBccAddressesIntentKey);
 
                 if (Intent.HasExtra(CopyToNewOptionsIntentKey))
-                    cdf.CopyToNewOptions = (CopyToNewOption)Intent.Extras.GetInt(CopyToNewOptionsIntentKey);
+                    cdf.CopyToNewOption = (CopyToNewOption)Intent.Extras.GetInt(CopyToNewOptionsIntentKey);
 
                 if (Intent.HasExtra(OutgoingDocumentGuidIntentKey))
                 {
