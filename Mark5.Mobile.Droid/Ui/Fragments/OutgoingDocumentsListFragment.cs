@@ -214,7 +214,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
-            return base.OnOptionsItemSelected(item);
+            return OnOptionsItemSelected(item);
         }
 
         void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
