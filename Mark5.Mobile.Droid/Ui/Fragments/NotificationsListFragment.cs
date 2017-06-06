@@ -268,11 +268,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class NotificationsAdapter : RecyclerView.Adapter
         {
-            public List<Notification> Items => notificationsInView;
+            public List<Notification> Items { get; } = new List<Notification>(200);
 
-            public override int ItemCount => notificationsInView.Count;
+            public override int ItemCount => Items.Count;
 
-            readonly List<Notification> notificationsInView = new List<Notification>(200);
             readonly Context context;
 
             public event EventHandler<Notification> ItemClicked = delegate { };
@@ -288,7 +287,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (cpvh == null)
                     return;
 
-                var n = notificationsInView[position];
+                var n = Items[position];
 
                 cpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, n)));
 
@@ -311,12 +310,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void AppendItems(List<Notification> items, Func<Notification, bool> filter = null)
             {
-                var count = notificationsInView.Count;
+                var count = Items.Count;
 
                 if (filter != null)
                     items = items.Where(filter).ToList();
 
-                notificationsInView.AddRange(items);
+                Items.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
 
@@ -328,8 +327,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int GetPosition(int notificationId)
             {
                 var position = -1;
-                for (var i = 0; i < notificationsInView.Count; i++)
-                    if (notificationsInView[i].Id == notificationId)
+                for (var i = 0; i < Items.Count; i++)
+                    if (Items[i].Id == notificationId)
                     {
                         position = i;
                         break;
@@ -339,8 +338,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void Clear()
             {
-                var size = notificationsInView.Count;
-                notificationsInView.Clear();
+                var size = Items.Count;
+                Items.Clear();
                 NotifyItemRangeRemoved(0, size);
             }
         }

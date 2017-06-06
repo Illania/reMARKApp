@@ -93,7 +93,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             var actionSheet = UIAlertController.Create(null, message, UIAlertControllerStyle.ActionSheet);
 
-            for (int i = 0; i < listStrings.Length; i++)
+            for (var i = 0; i < listStrings.Length; i++)
             {
                 var ab = i; //Can't use i, because it's the variable, not the value, that's captured in the lambda)
                 actionSheet.AddAction(UIAlertAction.Create(listStrings[i], UIAlertActionStyle.Default, a => tcs.SetResult(ab)));

@@ -311,7 +311,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void RefreshControl_ValueChanged(object sender, EventArgs e)
         {
-            await RefreshData(forceClear: true);
+            await RefreshData(true);
         }
 
         async Task RefreshData(bool forceClear = false)
@@ -401,16 +401,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             static readonly nfloat Height = 100f;
 
-            public bool Empty => outgoingDocumentPreviewsInView.Count < 1;
+            public bool Empty => Items.Count < 1;
 
-            public List<OutgoingDocumentContainer> Items => outgoingDocumentPreviewsInView;
+            public List<OutgoingDocumentContainer> Items { get; private set; } = new List<OutgoingDocumentContainer>(1000);
 
             OutgoingDocumentListViewController viewController;
             UITableView documentsTableView;
             readonly string emptyText;
 
             bool loading = true;
-            List<OutgoingDocumentContainer> outgoingDocumentPreviewsInView = new List<OutgoingDocumentContainer>(1000);
 
             public DataSource(OutgoingDocumentListViewController viewController, UITableView documentsTableView, string emptyText)
             {
@@ -424,14 +423,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
 
-                if (outgoingDocumentPreviewsInView.Count < 1)
+                if (Items.Count < 1)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
                     emptyCell.Initialize(emptyText);
                     return emptyCell;
                 }
 
-                var dp = outgoingDocumentPreviewsInView[indexPath.Row];
+                var dp = Items[indexPath.Row];
 
                 var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.Key) as DocumentsTableViewCell ?? DocumentsTableViewCell.Create();
                 cell.Initialize(dp);
@@ -443,10 +442,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return 1;
 
-                if (outgoingDocumentPreviewsInView.Count < 1)
+                if (Items.Count < 1)
                     return 1;
 
-                return outgoingDocumentPreviewsInView.Count;
+                return Items.Count;
             }
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
@@ -463,7 +462,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var actions = new List<UITableViewRowAction>();
 
-                var documentPreview = outgoingDocumentPreviewsInView[indexPath.Row];
+                var documentPreview = Items[indexPath.Row];
 
                 var deleteAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("delete"), (a, ip) =>
                 {
@@ -478,21 +477,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var dp = outgoingDocumentPreviewsInView[indexPath.Row];
+                var dp = Items[indexPath.Row];
                 viewController.DocumentSelected(dp);
             }
 
             public int GetPosition(Guid identifier)
             {
-                return outgoingDocumentPreviewsInView.FindIndex(o => o.Info.Identifier == identifier);
+                return Items.FindIndex(o => o.Info.Identifier == identifier);
             }
 
             public void ReplaceItems(List<OutgoingDocumentContainer> containers)
             {
                 loading = false;
 
-                outgoingDocumentPreviewsInView.Clear();
-                outgoingDocumentPreviewsInView.AddRange(containers);
+                Items.Clear();
+                Items.AddRange(containers);
                 documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
@@ -500,7 +499,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = true;
 
-                outgoingDocumentPreviewsInView.Clear();
+                Items.Clear();
                 documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
@@ -510,7 +509,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 viewController = null;
                 documentsTableView = null;
-                outgoingDocumentPreviewsInView = null;
+                Items = null;
             }
 
             public void UpdateRow(int row)
@@ -523,7 +522,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public void RemoveRow(int row)
             {
-                if (outgoingDocumentPreviewsInView.Count < 1 && row == 0)
+                if (Items.Count < 1 && row == 0)
                     UpdateRow(0); //We always keep a row for the empty table cell
                 else
                     documentsTableView.DeleteRows(new NSIndexPath[]

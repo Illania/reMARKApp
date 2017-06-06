@@ -807,7 +807,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nint SectionFor(UITableView tableView, string title, nint atIndex)
             {
-                for (int section = 0; section < contactPreviewsInView.Count; section++)
+                for (var section = 0; section < contactPreviewsInView.Count; section++)
                 {
                     var row = contactPreviewsInView[section].FindIndex(cp => cp.Name.SafeSubstring(0, 1).ToUpper() == title);
                     if (row >= 0)
@@ -928,8 +928,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public NSIndexPath FindItemIndexPath(int id)
             {
-                for (int section = 0; section < contactPreviewsInView.Count; section++)
-                for (int row = 0; row < contactPreviewsInView[section].Count; row++)
+                for (var section = 0; section < contactPreviewsInView.Count; section++)
+                for (var row = 0; row < contactPreviewsInView[section].Count; row++)
                     if (contactPreviewsInView[section][row].Id == id)
                         return NSIndexPath.FromRowSection(row, section);
 

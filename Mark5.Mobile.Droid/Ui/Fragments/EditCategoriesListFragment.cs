@@ -342,12 +342,11 @@ namespace Mark5.Mobile.Droid
 
         class CategoriesListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-            readonly List<Category> categoriesInView = new List<Category>();
             readonly Dictionary<int, Category> selectedCategoriesInView;
 
-            public override int ItemCount => categoriesInView.Count;
+            public override int ItemCount => Items.Count;
 
-            public List<Category> Items => categoriesInView;
+            public List<Category> Items { get; } = new List<Category>();
 
             public event EventHandler<Category> ItemClicked = delegate { };
 
@@ -358,7 +357,7 @@ namespace Mark5.Mobile.Droid
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var category = categoriesInView[position];
+                var category = Items[position];
                 var viewHolder = holder as CategoryViewHolder;
 
                 viewHolder.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, category)));
@@ -378,15 +377,15 @@ namespace Mark5.Mobile.Droid
 
             public void SetItems(List<Category> categories)
             {
-                var count = categoriesInView.Count;
-                categoriesInView.AddRange(categories.OrderBy(c => c.Name));
+                var count = Items.Count;
+                Items.AddRange(categories.OrderBy(c => c.Name));
                 NotifyItemRangeInserted(count, categories.Count);
             }
 
             public void Clear()
             {
-                var count = categoriesInView.Count;
-                categoriesInView.Clear();
+                var count = Items.Count;
+                Items.Clear();
                 NotifyItemRangeRemoved(0, count);
             }
 
@@ -398,12 +397,12 @@ namespace Mark5.Mobile.Droid
 
             public int GetPosition(Category category)
             {
-                return categoriesInView.FindIndex(c => c.Id == category.Id);
+                return Items.FindIndex(c => c.Id == category.Id);
             }
 
             string ISectionedAdapter.GetSectionName(int position)
             {
-                return categoriesInView[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
+                return Items[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
         }
 

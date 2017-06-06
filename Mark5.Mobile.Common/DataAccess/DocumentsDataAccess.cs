@@ -78,7 +78,7 @@ namespace Mark5.Mobile.Common.DataAccess
         {
             try
             {
-                List<int> documentIds = new List<int>(maxItems * 2 + 1)
+                var documentIds = new List<int>(maxItems * 2 + 1)
                 {
                 };
 
@@ -676,7 +676,7 @@ namespace Mark5.Mobile.Common.DataAccess
         {
             try
             {
-                bool found = false;
+                var found = false;
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {

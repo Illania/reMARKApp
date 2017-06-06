@@ -188,11 +188,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ContactSearchResultsAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-            public List<ContactPreview> Items => contactPreviewsInView;
+            public List<ContactPreview> Items { get; } = new List<ContactPreview>(1000);
 
-            public override int ItemCount => contactPreviewsInView.Count;
+            public override int ItemCount => Items.Count;
 
-            readonly List<ContactPreview> contactPreviewsInView = new List<ContactPreview>(1000);
             readonly Dictionary<int, ContactPreview> selectedContactsInView = new Dictionary<int, ContactPreview>();
 
             public event EventHandler<ContactPreview> ItemClicked = delegate { };
@@ -203,7 +202,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (cpvh == null)
                     return;
 
-                var cp = contactPreviewsInView[position];
+                var cp = Items[position];
 
                 cpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, cp)));
 
@@ -222,14 +221,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void AppendItems(List<ContactPreview> items)
             {
-                var count = contactPreviewsInView.Count;
-                contactPreviewsInView.AddRange(items);
+                var count = Items.Count;
+                Items.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
 
             string ISectionedAdapter.GetSectionName(int position)
             {
-                return contactPreviewsInView[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
+                return Items[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
         }
 

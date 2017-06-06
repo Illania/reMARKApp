@@ -500,13 +500,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             UITableView tableView;
             CommentsListViewController viewController;
-            List<Comment> commentsInView = new List<Comment>();
 
             readonly string emptyText;
 
             public bool Empty => !Items.Any();
 
-            public List<Comment> Items => commentsInView;
+            public List<Comment> Items { get; private set; } = new List<Comment>();
 
             public DataSource(CommentsListViewController viewController, UITableView tableView, string emptyText)
             {
@@ -527,19 +526,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 var cell = tableView.DequeueReusableCell(CommentsTableViewCell.Key) as CommentsTableViewCell ?? CommentsTableViewCell.Create();
-                cell.Initialize(commentsInView[indexPath.Row]);
+                cell.Initialize(Items[indexPath.Row]);
                 return cell;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                return Empty ? 1 : commentsInView.Count;
+                return Empty ? 1 : Items.Count;
             }
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
                 var actions = new List<UITableViewRowAction>();
-                var comment = commentsInView[indexPath.Row];
+                var comment = Items[indexPath.Row];
 
                 if (comment.UserId == ServerConfig.SystemSettings.UserInfo.User.Id)
                 {
@@ -567,7 +566,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (newComments == null)
                     return;
 
-                commentsInView.AddRange(newComments);
+                Items.AddRange(newComments);
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
@@ -576,28 +575,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (newComment == null)
                     return;
 
-                commentsInView.Add(newComment);
+                Items.Add(newComment);
 
-                if (commentsInView.Count == 1)
+                if (Items.Count == 1)
                     tableView.ReloadRows(new NSIndexPath[]
                     {
-                        NSIndexPath.FromRowSection(commentsInView.Count - 1, 0)
+                        NSIndexPath.FromRowSection(Items.Count - 1, 0)
                     }, UITableViewRowAnimation.Fade);
                 else
                     tableView.InsertRows(new NSIndexPath[]
                     {
-                        NSIndexPath.FromRowSection(commentsInView.Count - 1, 0)
+                        NSIndexPath.FromRowSection(Items.Count - 1, 0)
                     }, UITableViewRowAnimation.Fade);
             }
 
             public void RemoveComment(Comment comment)
             {
-                var position = commentsInView.FindIndex(c => c.Id == comment.Id);
+                var position = Items.FindIndex(c => c.Id == comment.Id);
                 if (position >= 0)
                 {
-                    commentsInView.RemoveAt(position);
+                    Items.RemoveAt(position);
 
-                    if (commentsInView.Count == 0)
+                    if (Items.Count == 0)
                         tableView.ReloadRows(new NSIndexPath[]
                         {
                             NSIndexPath.FromRowSection(position, 0)
@@ -612,10 +611,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public void EditComment(Comment editedContent)
             {
-                var position = commentsInView.FindIndex(c => c.Id == editedContent.Id);
+                var position = Items.FindIndex(c => c.Id == editedContent.Id);
                 if (position >= 0)
                 {
-                    commentsInView[position].Content = editedContent.Content;
+                    Items[position].Content = editedContent.Content;
 
                     tableView.ReloadRows(new NSIndexPath[]
                     {
@@ -629,7 +628,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 base.Dispose(disposing);
 
                 tableView = null;
-                commentsInView = null;
+                Items = null;
             }
         }
     }

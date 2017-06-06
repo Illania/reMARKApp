@@ -501,7 +501,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void HandleLocalAttachment(Intent data)
         {
             OutgoingDocumentAttachmentDescription attachment = null;
-            bool attachmentTooBig = false;
+            var attachmentTooBig = false;
             Stream stream = null;
 
             Task.Run(async () =>
@@ -810,7 +810,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var dateString = currentTime.ToString("dd-MM-yyyy");
             var timeString = currentTime.ToString("HH:mm");
 
-            string fromNameString = string.Empty;
+            var fromNameString = string.Empty;
             if (PreviousDocumentPreview != null && PreviousDocumentPreview.Addresses != null)
                 fromNameString = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Name).FirstOrDefault() ?? string.Empty;
 

@@ -32,7 +32,7 @@ namespace Mark5.Mobile.IOS.Utilities
                     return "Unknown size";
 
                 var mag = (int) Math.Log(bytes, 1024);
-                decimal adjustedSize = (decimal) bytes / (1L << (mag * 10));
+                var adjustedSize = (decimal) bytes / (1L << (mag * 10));
 
                 return string.Format("{0:n1} {1}", adjustedSize, SizeSuffixes[mag]);
             }
@@ -67,7 +67,7 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             try
             {
-                float alpha = 255f;
+                var alpha = 255f;
                 float red, green, blue;
 
                 switch (hexString.Length)

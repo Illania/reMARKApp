@@ -5,13 +5,11 @@ namespace Mark5.ServiceReference.Utilities
 {
     public class StringWriterWithEncoding : StringWriter
     {
-        public override Encoding Encoding => encoding;
-
-        readonly Encoding encoding;
+        public override Encoding Encoding { get; }
 
         public StringWriterWithEncoding(Encoding encoding)
         {
-            this.encoding = encoding;
+            this.Encoding = encoding;
         }
     }
 }

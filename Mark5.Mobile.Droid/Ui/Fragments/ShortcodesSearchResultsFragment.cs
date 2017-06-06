@@ -185,11 +185,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ShortcodeSearchResultsAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-            public List<ShortcodePreview> Items => shortcodePreviewsInView;
+            public List<ShortcodePreview> Items { get; } = new List<ShortcodePreview>(1000);
 
-            public override int ItemCount => shortcodePreviewsInView.Count;
-
-            readonly List<ShortcodePreview> shortcodePreviewsInView = new List<ShortcodePreview>(1000);
+            public override int ItemCount => Items.Count;
 
             readonly Dictionary<int, ShortcodePreview> selectedShortcodesInView = new Dictionary<int, ShortcodePreview>();
 
@@ -201,7 +199,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (cpvh == null)
                     return;
 
-                var cp = shortcodePreviewsInView[position];
+                var cp = Items[position];
 
                 cpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, cp)));
 
@@ -218,14 +216,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void AppendItems(List<ShortcodePreview> items)
             {
-                var count = shortcodePreviewsInView.Count;
-                shortcodePreviewsInView.AddRange(items);
+                var count = Items.Count;
+                Items.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
 
             string ISectionedAdapter.GetSectionName(int position)
             {
-                return shortcodePreviewsInView[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
+                return Items[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
         }
 

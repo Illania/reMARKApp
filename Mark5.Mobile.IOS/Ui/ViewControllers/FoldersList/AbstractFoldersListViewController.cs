@@ -989,7 +989,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             public Folder[] GetFolders(int folderId)
             {
                 var folders = new List<Folder>();
-                for (int i = 0; i < foldersInView.Count; i++)
+                for (var i = 0; i < foldersInView.Count; i++)
                 {
                     var f = foldersInView[i];
                     if (f.Id == folderId)
@@ -1002,7 +1002,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             public NSIndexPath[] GetIndexPaths(int folderId)
             {
                 var indexPaths = new List<NSIndexPath>();
-                for (int i = 0; i < foldersInView.Count; i++)
+                for (var i = 0; i < foldersInView.Count; i++)
                 {
                     var f = foldersInView[i];
                     if (f.Id == folderId)
@@ -1332,7 +1332,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 var folders = new List<Folder>();
                 foreach (var folderInView in foldersInView)
-                    for (int i = 0; i < folderInView.Value.Count; i++)
+                    for (var i = 0; i < folderInView.Value.Count; i++)
                     {
                         var f = folderInView.Value[i];
                         if (f.Id == folderId)
@@ -1355,7 +1355,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 var indexPaths = new List<NSIndexPath>();
                 foreach (var folderInView in foldersInView)
-                    for (int i = 0; i < folderInView.Value.Count; i++)
+                    for (var i = 0; i < folderInView.Value.Count; i++)
                     {
                         var f = folderInView.Value[i];
                         if (f.Id == folderId)

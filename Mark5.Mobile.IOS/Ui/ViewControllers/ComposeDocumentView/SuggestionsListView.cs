@@ -244,7 +244,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
     public class SuggestionsListViewSource : UITableViewSource
     {
-        public bool Empty => !suggestions.Any();
+        public bool Empty => !Suggestions.Any();
 
         public bool Searching { get; set; }
 
@@ -255,13 +255,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         UITableView tableView;
         SuggestionsListView suggestionsListView;
 
-        SuggestionsObservableCollection suggestions = new SuggestionsObservableCollection();
-
-        public SuggestionsObservableCollection Suggestions
-        {
-            get => suggestions;
-            set => suggestions = value;
-        }
+        public SuggestionsObservableCollection Suggestions { get; set; } = new SuggestionsObservableCollection();
 
         public SuggestionsListViewSource(SuggestionsListView emailCompositionView, UITableView suggestionsTableView)
         {
@@ -273,7 +267,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
-            if (Loading && indexPath.Row == suggestions.Count)
+            if (Loading && indexPath.Row == Suggestions.Count)
             {
                 var waitingCell = tableView.DequeueReusableCell(WaitTableViewCell.Key) ?? WaitTableViewCell.Create();
                 waitingCell.BackgroundColor = UIColor.Clear;
@@ -288,7 +282,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 return emptyCell;
             }
 
-            var printableSuggestion = suggestions[indexPath.Row];
+            var printableSuggestion = Suggestions[indexPath.Row];
 
             var cell = tableView.DequeueReusableCell(SuggestionsTableViewCell.Key) as SuggestionsTableViewCell ?? SuggestionsTableViewCell.Create();
             cell.Initialize(printableSuggestion);
@@ -298,7 +292,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         public override nint RowsInSection(UITableView tableview, nint section)
         {
-            return Loading || Empty ? suggestions.Count + 1 : suggestions.Count;
+            return Loading || Empty ? Suggestions.Count + 1 : Suggestions.Count;
         }
 
         #endregion
@@ -310,7 +304,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (Empty)
                 return;
 
-            var printableSuggestion = suggestions[indexPath.Row];
+            var printableSuggestion = Suggestions[indexPath.Row];
             suggestionsListView.SuggestionSelected(printableSuggestion);
         }
 
@@ -326,13 +320,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public virtual void RefreshData(List<PrintableSuggestion> printableSuggestions, bool clean = false)
         {
             answersReceived += 1;
-            suggestions.AddOrReplaceAllSorted(printableSuggestions);
+            Suggestions.AddOrReplaceAllSorted(printableSuggestions);
         }
 
         public void Clean()
         {
             answersReceived = 0;
-            suggestions.Clear();
+            Suggestions.Clear();
         }
 
         #endregion

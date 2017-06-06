@@ -1020,17 +1020,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 public const int ExternalDocumentView = 1;
             }
 
-            public List<DocumentPreview> Items => documentPreviewsInView;
+            public List<DocumentPreview> Items { get; } = new List<DocumentPreview>(1000);
 
             public List<DocumentPreview> SelectedItems => selectedDocumentsInView.Values.ToList();
 
-            public override int ItemCount => documentPreviewsInView.Count;
+            public override int ItemCount => Items.Count;
 
             public int SelectedItemCount => selectedDocumentsInView.Count;
 
             public bool EnableLoadMore { get; set; }
 
-            readonly List<DocumentPreview> documentPreviewsInView = new List<DocumentPreview>(1000);
             readonly Dictionary<int, DocumentPreview> selectedDocumentsInView = new Dictionary<int, DocumentPreview>();
             readonly Context context;
             readonly RecyclerView recyclerView;
@@ -1060,12 +1059,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public override int GetItemViewType(int position)
             {
-                return documentPreviewsInView[position].Direction == DocumentDirection.External ? ViewType.ExternalDocumentView : ViewType.DocumentView;
+                return Items[position].Direction == DocumentDirection.External ? ViewType.ExternalDocumentView : ViewType.DocumentView;
             }
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var dp = documentPreviewsInView[position];
+                var dp = Items[position];
 
                 if (holder is DocumentPreviewViewHolder)
                 {
@@ -1160,14 +1159,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public void PrependItems(List<DocumentPreview> items)
             {
                 var count = items.Count;
-                documentPreviewsInView.InsertRange(0, items);
+                Items.InsertRange(0, items);
                 NotifyItemRangeInserted(0, count);
             }
 
             public void AppendItems(List<DocumentPreview> items)
             {
-                var count = documentPreviewsInView.Count;
-                documentPreviewsInView.AddRange(items);
+                var count = Items.Count;
+                Items.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
 
@@ -1194,7 +1193,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var position = GetPosition(item);
                     if (position >= 0)
                     {
-                        documentPreviewsInView.RemoveAt(position);
+                        Items.RemoveAt(position);
                         NotifyItemRemoved(position);
                     }
                 }
@@ -1239,8 +1238,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void Clear()
             {
-                var size = documentPreviewsInView.Count;
-                documentPreviewsInView.Clear();
+                var size = Items.Count;
+                Items.Clear();
                 selectedDocumentsInView.Clear();
                 NotifyItemRangeRemoved(0, size);
             }
@@ -1248,8 +1247,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int GetPosition(int documentPreviewId)
             {
                 var position = -1;
-                for (var i = 0; i < documentPreviewsInView.Count; i++)
-                    if (documentPreviewsInView[i].Id == documentPreviewId)
+                for (var i = 0; i < Items.Count; i++)
+                    if (Items[i].Id == documentPreviewId)
                     {
                         position = i;
                         break;

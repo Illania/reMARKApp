@@ -112,7 +112,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 networkInfos = cm.GetAllNetworkInfo();
 #pragma warning restore CS0618 // Type or member is obsolete
             }
-            for (int i = 0; i < networkInfos.Length; i++)
+            for (var i = 0; i < networkInfos.Length; i++)
             {
                 var networkInfo = networkInfos[i];
                 sb.AppendLine($"Network {i}:");

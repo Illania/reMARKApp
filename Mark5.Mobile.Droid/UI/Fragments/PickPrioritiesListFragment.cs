@@ -127,23 +127,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class PrioritiesListViewAdapter : RecyclerView.Adapter
         {
-            readonly List<Priority> prioritiesInView = new List<Priority>(3);
-            readonly List<Priority> selectedPriorities = new List<Priority>(3);
+            public List<Priority> SelectedPriorities { get; } = new List<Priority>(3);
 
-            public List<Priority> SelectedPriorities => selectedPriorities;
+            public override int ItemCount => Items.Count;
 
-            public override int ItemCount => prioritiesInView.Count;
-
-            public List<Priority> Items => prioritiesInView;
+            public List<Priority> Items { get; } = new List<Priority>(3);
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var p = prioritiesInView[position];
+                var p = Items[position];
                 var lvh = holder as PriorityViewHolder;
 
                 lvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => HandleClick(p, position)));
 
-                lvh.Selected = selectedPriorities.Contains(p);
+                lvh.Selected = SelectedPriorities.Contains(p);
                 lvh.Name = lvh.ItemView.Context.GetString(UI.PriorityResourceId(p));
             }
 
@@ -155,23 +152,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void SetItems(List<Priority> priorities)
             {
-                var count = prioritiesInView.Count;
-                prioritiesInView.AddRange(priorities);
+                var count = Items.Count;
+                Items.AddRange(priorities);
                 NotifyItemRangeInserted(count, priorities.Count);
             }
 
             public void SetSelectedPriorities(List<Priority> priorities)
             {
-                this.selectedPriorities.Clear();
-                this.selectedPriorities.AddRange(priorities);
+                this.SelectedPriorities.Clear();
+                this.SelectedPriorities.AddRange(priorities);
             }
 
             void HandleClick(Priority p, int position)
             {
-                if (selectedPriorities.Contains(p))
-                    selectedPriorities.Remove(p);
+                if (SelectedPriorities.Contains(p))
+                    SelectedPriorities.Remove(p);
                 else
-                    selectedPriorities.Add(p);
+                    SelectedPriorities.Add(p);
 
                 NotifyItemChanged(position);
             }

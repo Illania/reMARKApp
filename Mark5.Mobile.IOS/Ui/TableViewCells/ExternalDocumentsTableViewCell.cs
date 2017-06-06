@@ -97,7 +97,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             if (previousView != null)
                 CategoriesView.AddConstraint(NSLayoutConstraint.Create(previousView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Bottom, 1f, 0f));
 
-            for (int i = 1; i < views.Count; i++)
+            for (var i = 1; i < views.Count; i++)
                 CategoriesView.AddConstraint(NSLayoutConstraint.Create(views[0], NSLayoutAttribute.Height, NSLayoutRelation.Equal, views[i], NSLayoutAttribute.Height, 1f, 0f));
         }
 

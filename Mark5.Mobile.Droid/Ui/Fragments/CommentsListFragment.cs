@@ -324,14 +324,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class CommentsListAdapter : RecyclerView.Adapter
         {
-            public List<Comment> Items => commentsInView;
+            public List<Comment> Items { get; } = new List<Comment>();
 
-            public override int ItemCount => commentsInView.Count;
+            public override int ItemCount => Items.Count;
 
             public int SelectedPosition { get; set; }
 
             readonly Action<IContextMenu, View, IContextMenuContextMenuInfo> action;
-            readonly List<Comment> commentsInView = new List<Comment>();
             readonly Context context;
 
             public CommentsListAdapter(Context context, Action<IContextMenu, View, IContextMenuContextMenuInfo> action)
@@ -346,7 +345,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (cvh == null)
                     return;
 
-                var comment = commentsInView[position];
+                var comment = Items[position];
                 var commentFromCurrentUser = ServerConfig.SystemSettings.UserInfo.User.Id == comment.UserId;
 
                 if (commentFromCurrentUser)
@@ -365,45 +364,45 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void AppendItems(List<Comment> items)
             {
-                var count = commentsInView.Count;
-                commentsInView.AddRange(items);
+                var count = Items.Count;
+                Items.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
 
             public void AppendItem(Comment item)
             {
-                commentsInView.Add(item);
-                NotifyItemInserted(commentsInView.Count - 1);
+                Items.Add(item);
+                NotifyItemInserted(Items.Count - 1);
             }
 
             public void RemoveItem(Comment item)
             {
-                var position = commentsInView.FindIndex(c => c.Id == item.Id);
+                var position = Items.FindIndex(c => c.Id == item.Id);
                 if (position >= 0)
                 {
-                    commentsInView.RemoveAt(position);
+                    Items.RemoveAt(position);
                     NotifyItemRemoved(position);
                 }
             }
 
             public void EditItem(Comment item)
             {
-                var position = commentsInView.FindIndex(c => c.Id == item.Id);
+                var position = Items.FindIndex(c => c.Id == item.Id);
                 if (position >= 0)
                 {
-                    commentsInView[position].Content = item.Content;
+                    Items[position].Content = item.Content;
                     NotifyItemChanged(position);
                 }
             }
 
             public Comment GetItemAtPosition(int position)
             {
-                return commentsInView[position];
+                return Items[position];
             }
 
             public Comment GetSelectedItem()
             {
-                return commentsInView[SelectedPosition];
+                return Items[SelectedPosition];
             }
         }
 

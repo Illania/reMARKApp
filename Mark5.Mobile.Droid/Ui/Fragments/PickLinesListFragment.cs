@@ -122,23 +122,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class LinesListViewAdapter : RecyclerView.Adapter
         {
-            readonly List<Line> linesInView = new List<Line>(10);
-            readonly List<Guid> selectedLinesGuid = new List<Guid>(10);
+            public List<Guid> SelectedLinesGuid { get; } = new List<Guid>(10);
 
-            public List<Guid> SelectedLinesGuid => selectedLinesGuid;
+            public override int ItemCount => Items.Count;
 
-            public override int ItemCount => linesInView.Count;
-
-            public List<Line> Items => linesInView;
+            public List<Line> Items { get; } = new List<Line>(10);
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var l = linesInView[position];
+                var l = Items[position];
                 var lvh = holder as LineViewHolder;
 
                 lvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => HandleClick(l, position)));
 
-                lvh.Selected = selectedLinesGuid.Contains(l.Guid);
+                lvh.Selected = SelectedLinesGuid.Contains(l.Guid);
                 lvh.Name = l.Name;
             }
 
@@ -150,23 +147,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void SetSelectedLinesGuid(List<Guid> selectedLineGuids)
             {
-                this.selectedLinesGuid.Clear();
-                this.selectedLinesGuid.AddRange(selectedLineGuids);
+                this.SelectedLinesGuid.Clear();
+                this.SelectedLinesGuid.AddRange(selectedLineGuids);
             }
 
             public void SetItems(List<Line> lines)
             {
-                var count = linesInView.Count;
-                linesInView.AddRange(lines.OrderBy(c => c.Name));
+                var count = Items.Count;
+                Items.AddRange(lines.OrderBy(c => c.Name));
                 NotifyItemRangeInserted(count, lines.Count);
             }
 
             void HandleClick(Line l, int position)
             {
-                if (selectedLinesGuid.Contains(l.Guid))
-                    selectedLinesGuid.Remove(l.Guid);
+                if (SelectedLinesGuid.Contains(l.Guid))
+                    SelectedLinesGuid.Remove(l.Guid);
                 else
-                    selectedLinesGuid.Add(l.Guid);
+                    SelectedLinesGuid.Add(l.Guid);
 
                 NotifyItemChanged(position);
             }

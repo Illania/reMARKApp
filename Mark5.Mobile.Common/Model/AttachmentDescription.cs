@@ -38,7 +38,7 @@ namespace Mark5.Mobile.Common.Model
                 {
                     var chars = Name.ToCharArray();
 
-                    for (int i = 0; i < chars.Length; i++)
+                    for (var i = 0; i < chars.Length; i++)
                     {
                         var c = chars[i];
                         if (char.IsControl(c) || Array.IndexOf(invalidChars, c) >= 0)

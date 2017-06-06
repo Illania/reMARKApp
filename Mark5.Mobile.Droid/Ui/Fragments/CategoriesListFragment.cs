@@ -231,15 +231,13 @@ namespace Mark5.Mobile.Droid
 
         class CategoriesListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-            readonly List<Category> categoriesInView = new List<Category>();
+            public override int ItemCount => Items.Count;
 
-            public override int ItemCount => categoriesInView.Count;
-
-            public List<Category> Items => categoriesInView;
+            public List<Category> Items { get; } = new List<Category>();
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var category = categoriesInView[position];
+                var category = Items[position];
                 var viewHolder = holder as CategoryViewHolder;
 
                 viewHolder.Name = category.Name;
@@ -255,15 +253,15 @@ namespace Mark5.Mobile.Droid
 
             public void SetItems(List<Category> categories)
             {
-                var count = categoriesInView.Count;
-                categoriesInView.AddRange(categories.OrderBy(c => c.Name));
+                var count = Items.Count;
+                Items.AddRange(categories.OrderBy(c => c.Name));
                 NotifyItemRangeInserted(count, categories.Count);
             }
 
             public void Clear()
             {
-                var count = categoriesInView.Count;
-                categoriesInView.Clear();
+                var count = Items.Count;
+                Items.Clear();
                 NotifyItemRangeRemoved(0, count);
             }
 
@@ -275,7 +273,7 @@ namespace Mark5.Mobile.Droid
 
             string ISectionedAdapter.GetSectionName(int position)
             {
-                return categoriesInView[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
+                return Items[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
         }
 

@@ -106,17 +106,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
     class AttachmentsSubView : UIView
     {
-        public IAttachmentDescription Attachment => attachmentDescription;
+        public IAttachmentDescription Attachment { get; }
 
         readonly AttachmentsView view;
-        readonly IAttachmentDescription attachmentDescription;
 
         UIButton attachmentButton;
 
         public AttachmentsSubView(AttachmentsView view, IAttachmentDescription attachmentDescription)
         {
             this.view = view;
-            this.attachmentDescription = attachmentDescription;
+            this.Attachment = attachmentDescription;
 
             InitSubViews();
         }
@@ -128,9 +127,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
             attachmentButton = UIButton.FromType(UIButtonType.RoundedRect);
             attachmentButton.TitleLabel.Font = Theme.DefaultFont;
-            attachmentButton.SetTitle(attachmentDescription.Name + " (" + UI.PrettyFileSize(attachmentDescription.SizeInBytes) + ")", UIControlState.Normal);
+            attachmentButton.SetTitle(Attachment.Name + " (" + UI.PrettyFileSize(Attachment.SizeInBytes) + ")", UIControlState.Normal);
             attachmentButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
-            attachmentButton.TouchUpInside += (sender, e) => view.HandleAttachmentButtonTapped(new AttachmentButtonTappedEventArgs(attachmentDescription));
+            attachmentButton.TouchUpInside += (sender, e) => view.HandleAttachmentButtonTapped(new AttachmentButtonTappedEventArgs(Attachment));
             attachmentButton.Opaque = false;
             attachmentButton.TranslatesAutoresizingMaskIntoConstraints = false;
             AddSubview(attachmentButton);

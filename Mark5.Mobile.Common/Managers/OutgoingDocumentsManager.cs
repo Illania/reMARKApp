@@ -166,7 +166,7 @@ namespace Mark5.Mobile.Common.Managers
                     var documentPreview = container.DocumentPreview;
                     var info = container.Info;
 
-                    bool sendSuccessful = false;
+                    var sendSuccessful = false;
                     try
                     {
                         DocumentBeingSent(this, container);

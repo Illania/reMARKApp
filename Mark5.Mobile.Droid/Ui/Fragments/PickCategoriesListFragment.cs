@@ -209,12 +209,11 @@ namespace Mark5.Mobile.Droid
 
         class CategoriesListAdapter : RecyclerView.Adapter
         {
-            readonly List<Category> categoriesInView = new List<Category>(200);
             readonly Dictionary<int, Category> selectedCategoriesInView;
 
-            public override int ItemCount => categoriesInView.Count;
+            public override int ItemCount => Items.Count;
 
-            public List<Category> Items => categoriesInView;
+            public List<Category> Items { get; } = new List<Category>(200);
 
             public event EventHandler<Category> ItemClicked = delegate { };
 
@@ -225,7 +224,7 @@ namespace Mark5.Mobile.Droid
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var c = categoriesInView[position];
+                var c = Items[position];
                 var cvh = holder as CategoryViewHolder;
 
                 cvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, c)));
@@ -244,15 +243,15 @@ namespace Mark5.Mobile.Droid
 
             public void SetItems(List<Category> categories)
             {
-                var count = categoriesInView.Count;
-                categoriesInView.AddRange(categories.OrderBy(c => c.Name));
+                var count = Items.Count;
+                Items.AddRange(categories.OrderBy(c => c.Name));
                 NotifyItemRangeInserted(count, categories.Count);
             }
 
             public void Clear()
             {
-                var count = categoriesInView.Count;
-                categoriesInView.Clear();
+                var count = Items.Count;
+                Items.Clear();
                 NotifyItemRangeRemoved(0, count);
             }
 
@@ -264,7 +263,7 @@ namespace Mark5.Mobile.Droid
 
             public int GetPosition(Category category)
             {
-                return categoriesInView.FindIndex(c => c.Id == category.Id);
+                return Items.FindIndex(c => c.Id == category.Id);
             }
         }
 

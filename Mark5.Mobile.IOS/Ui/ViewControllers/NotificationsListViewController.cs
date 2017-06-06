@@ -274,16 +274,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable
         {
-            public bool Empty => notificationsInView.Count < 1;
+            public bool Empty => Items.Count < 1;
 
-            public List<Notification> Items => notificationsInView;
+            public List<Notification> Items { get; private set; } = new List<Notification>();
 
             NotificationsListViewController viewController;
             UITableView tableView;
             string emptyText;
 
             bool loading = true;
-            List<Notification> notificationsInView = new List<Notification>();
 
             public DataSource(NotificationsListViewController viewController, UITableView tableView, string emptyText)
             {
@@ -297,14 +296,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
 
-                if (notificationsInView.Count < 1)
+                if (Items.Count < 1)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
                     emptyCell.Initialize(emptyText);
                     return emptyCell;
                 }
 
-                var n = notificationsInView[indexPath.Row];
+                var n = Items[indexPath.Row];
 
                 var cell = tableView.DequeueReusableCell(NotificationsTableViewCell.Key) as NotificationsTableViewCell ?? NotificationsTableViewCell.Create();
                 cell.Initialize(n);
@@ -317,10 +316,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return 1;
 
-                if (notificationsInView.Count < 1)
+                if (Items.Count < 1)
                     return 1;
 
-                return notificationsInView.Count;
+                return Items.Count;
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
@@ -328,7 +327,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (tableView.CellAt(indexPath).SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
-                var n = notificationsInView[indexPath.Row];
+                var n = Items[indexPath.Row];
                 viewController.NotificationSelected(n, indexPath);
             }
 
@@ -336,12 +335,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = false;
 
-                notificationsInView.Clear();
+                Items.Clear();
 
                 if (filter == null)
-                    notificationsInView.AddRange(notifications);
+                    Items.AddRange(notifications);
                 else
-                    notificationsInView.AddRange(notifications.Where(filter).ToList());
+                    Items.AddRange(notifications.Where(filter).ToList());
 
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
@@ -350,7 +349,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = true;
 
-                notificationsInView.Clear();
+                Items.Clear();
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
@@ -360,7 +359,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 viewController = null;
                 tableView = null;
-                notificationsInView = null;
+                Items = null;
             }
         }
     }

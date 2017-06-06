@@ -80,11 +80,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class CountriesListViewAdapter : RecyclerView.Adapter
         {
-            readonly List<CountryInfo> countriesInView = new List<CountryInfo>(500);
+            public override int ItemCount => Items.Count;
 
-            public override int ItemCount => countriesInView.Count;
-
-            public List<CountryInfo> Items => countriesInView;
+            public List<CountryInfo> Items { get; } = new List<CountryInfo>(500);
 
             readonly PickCountryFragment parent;
 
@@ -95,7 +93,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var c = countriesInView[position];
+                var c = Items[position];
                 var lvh = holder as CountryViewHolder;
 
                 lvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => HandleClick(c)));
@@ -111,8 +109,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void SetItems(List<CountryInfo> countries)
             {
-                var count = countriesInView.Count;
-                countriesInView.AddRange(countries);
+                var count = Items.Count;
+                Items.AddRange(countries);
                 NotifyItemRangeInserted(count, countries.Count);
             }
 

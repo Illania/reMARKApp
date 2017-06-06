@@ -325,7 +325,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 BackstackStates.Clear();
                 SavedTags.Clear();
 
-                for (int i = 0; i < fm.BackStackEntryCount; i++)
+                for (var i = 0; i < fm.BackStackEntryCount; i++)
                 {
                     var tag = fm.GetBackStackEntryAt(i).Name;
                     var fragment = fm.FindFragmentByTag(tag);

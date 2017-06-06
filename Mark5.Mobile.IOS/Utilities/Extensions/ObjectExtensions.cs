@@ -38,7 +38,7 @@ namespace Mark5.Mobile.IOS.Utilities
                 if (IsPrimitive(arrayType))
                 {
                     var clonedArray = (Array) cloneObject;
-                    for (int i = 0; i < clonedArray.Length; i++)
+                    for (var i = 0; i < clonedArray.Length; i++)
                         clonedArray.SetValue(InternalCopy(clonedArray.GetValue(i), visited), i);
                 }
             }
@@ -50,7 +50,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         static void CopyFields(object originalObject, IDictionary<object, object> visited, object cloneObject, IReflect typeToReflect, BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy, Func<FieldInfo, bool> filter = null)
         {
-            foreach (FieldInfo fieldInfo in typeToReflect.GetFields(bindingFlags))
+            foreach (var fieldInfo in typeToReflect.GetFields(bindingFlags))
             {
                 if (filter != null && !filter(fieldInfo))
                     continue;

@@ -913,7 +913,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 public void SelectCountryByFaxPrefix(UIPickerView picker, int faxPrefix)
                 {
                     var index = 0;
-                    for (int i = 0; i < countries.Length; i++)
+                    for (var i = 0; i < countries.Length; i++)
                         if (countries[i].FaxPrefix == faxPrefix)
                         {
                             index = i;
@@ -931,7 +931,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 public CountryInfo CountryByPrefix(int faxPrefix)
                 {
-                    for (int i = 0; i < countries.Length; i++)
+                    for (var i = 0; i < countries.Length; i++)
                         if (countries[i].FaxPrefix == faxPrefix)
                             return countries[i];
 

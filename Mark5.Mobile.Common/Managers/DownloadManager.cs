@@ -11,7 +11,7 @@ namespace Mark5.Mobile.Common
 {
     class DownloadManager : IDownloadManager
     {
-        public Dictionary<ObjectType, DownloadPolicy> DownloadPolicies => downloadPolicies;
+        public Dictionary<ObjectType, DownloadPolicy> DownloadPolicies { get; }
 
         CancellationTokenSource cts;
         Task downloadTask;
@@ -24,7 +24,6 @@ namespace Mark5.Mobile.Common
         readonly IDocumentsDataAccess documentsDataAccess;
         readonly SemaphoreSlim semaphore;
         readonly IPortableConcurrentQueue<DownloadItemInfo> queue;
-        readonly Dictionary<ObjectType, DownloadPolicy> downloadPolicies;
 
         public DownloadManager(IDocumentsDataAccess documentsDataAccess, IContactsDataAccess contactsDataAccess, IShortcodesDataAccess shortcodesDataAccess)
         {
@@ -37,7 +36,7 @@ namespace Mark5.Mobile.Common
             {
                 typeof(DownloadItemInfo)
             }));
-            downloadPolicies = new Dictionary<ObjectType, DownloadPolicy>();
+            DownloadPolicies = new Dictionary<ObjectType, DownloadPolicy>();
         }
 
         #region Public methods

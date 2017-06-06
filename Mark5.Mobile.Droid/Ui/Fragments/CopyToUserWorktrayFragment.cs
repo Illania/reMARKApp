@@ -312,12 +312,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class CopyToUserWorktrayAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-            readonly List<SystemUser> systemUsersInView = new List<SystemUser>(100);
             readonly Dictionary<int, SystemUser> selectedSystemUsersInView;
 
-            public override int ItemCount => systemUsersInView.Count;
+            public override int ItemCount => Items.Count;
 
-            public List<SystemUser> Items => systemUsersInView;
+            public List<SystemUser> Items { get; } = new List<SystemUser>(100);
 
             public CopyToUserWorktrayAdapter(Dictionary<int, SystemUser> selectedSystemUsersInView)
             {
@@ -332,7 +331,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (suvh == null)
                     return;
 
-                var su = systemUsersInView[position];
+                var su = Items[position];
 
                 suvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, su)));
 
@@ -350,15 +349,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void SetItems(List<SystemUser> items)
             {
-                var count = systemUsersInView.Count;
-                systemUsersInView.AddRange(items);
+                var count = Items.Count;
+                Items.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
 
             public void Clear()
             {
-                var count = systemUsersInView.Count;
-                systemUsersInView.Clear();
+                var count = Items.Count;
+                Items.Clear();
                 NotifyItemRangeRemoved(0, count);
             }
 
@@ -371,8 +370,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int GetPosition(SystemUser systemUser)
             {
                 var position = -1;
-                for (var i = 0; i < systemUsersInView.Count; i++)
-                    if (systemUsersInView[i].Id == systemUser.Id)
+                for (var i = 0; i < Items.Count; i++)
+                    if (Items[i].Id == systemUser.Id)
                     {
                         position = i;
                         break;
@@ -382,7 +381,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             string ISectionedAdapter.GetSectionName(int position)
             {
-                return systemUsersInView[position].Username?.SafeSubstring(0, 1)?.ToUpper() ?? "";
+                return Items[position].Username?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
         }
 

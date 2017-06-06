@@ -241,7 +241,7 @@ namespace Mark5.Mobile.Common.DataAccess
         {
             try
             {
-                bool found = false;
+                var found = false;
 
                 await shortcodesDatabase.RunInConnectionAsync(c =>
                 {

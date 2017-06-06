@@ -429,7 +429,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             var sb = new StringBuilder();
             var addresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == addressType).ToList();
-            for (int i = 0; i < addresses.Count; i++)
+            for (var i = 0; i < addresses.Count; i++)
             {
                 var hasName = !string.IsNullOrWhiteSpace(addresses[i].Name);
                 if (hasName)

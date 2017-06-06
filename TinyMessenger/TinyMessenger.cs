@@ -188,8 +188,6 @@ namespace TinyMessenger
     /// </summary>
     public sealed class DefaultTinyMessageProxy : ITinyMessageProxy
     {
-        static readonly DefaultTinyMessageProxy _Instance = new DefaultTinyMessageProxy();
-
         static DefaultTinyMessageProxy()
         {
         }
@@ -197,7 +195,7 @@ namespace TinyMessenger
         /// <summary>
         ///     Singleton instance of the proxy.
         /// </summary>
-        public static DefaultTinyMessageProxy Instance => _Instance;
+        public static DefaultTinyMessageProxy Instance { get; } = new DefaultTinyMessageProxy();
 
         DefaultTinyMessageProxy()
         {

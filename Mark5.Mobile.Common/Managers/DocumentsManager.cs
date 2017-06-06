@@ -630,7 +630,7 @@ namespace Mark5.Mobile.Common.Managers
 
             if (sourceType == SourceType.Remote)
             {
-                string path = string.Empty;
+                var path = string.Empty;
                 await fileTransferServiceProxy.GetAttachmentAsync(new DataContract.GetAttachmentRequest
                 {
                     Token = Token,

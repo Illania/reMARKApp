@@ -691,15 +691,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ContactsListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-            public List<ContactPreview> Items => contactPreviewsInView;
+            public List<ContactPreview> Items { get; } = new List<ContactPreview>(1000);
 
             public List<ContactPreview> SelectedItems => selectedContactsInView.Values.ToList();
 
-            public override int ItemCount => contactPreviewsInView.Count;
+            public override int ItemCount => Items.Count;
 
             public int SelectedItemCount => selectedContactsInView.Count;
 
-            readonly List<ContactPreview> contactPreviewsInView = new List<ContactPreview>(1000);
             readonly Dictionary<int, ContactPreview> selectedContactsInView = new Dictionary<int, ContactPreview>();
 
             public event EventHandler<ContactPreview> ItemClicked = delegate { };
@@ -711,7 +710,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (cpvh == null)
                     return;
 
-                var cp = contactPreviewsInView[position];
+                var cp = Items[position];
 
                 cpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, cp)));
                 cpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, cp)));
@@ -732,14 +731,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public void PrependItems(List<ContactPreview> items)
             {
                 var count = items.Count;
-                contactPreviewsInView.InsertRange(0, items);
+                Items.InsertRange(0, items);
                 NotifyItemRangeInserted(0, count);
             }
 
             public void AppendItems(List<ContactPreview> items)
             {
-                var count = contactPreviewsInView.Count;
-                contactPreviewsInView.AddRange(items);
+                var count = Items.Count;
+                Items.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
 
@@ -756,7 +755,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var position = GetPosition(item);
                     if (position >= 0)
                     {
-                        contactPreviewsInView.RemoveAt(position);
+                        Items.RemoveAt(position);
                         NotifyItemRemoved(position);
                     }
                 }
@@ -801,8 +800,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void Clear()
             {
-                var size = contactPreviewsInView.Count;
-                contactPreviewsInView.Clear();
+                var size = Items.Count;
+                Items.Clear();
                 selectedContactsInView.Clear();
                 NotifyItemRangeRemoved(0, size);
             }
@@ -810,8 +809,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int GetPosition(int contactPreviewId)
             {
                 var position = -1;
-                for (var i = 0; i < contactPreviewsInView.Count; i++)
-                    if (contactPreviewsInView[i].Id == contactPreviewId)
+                for (var i = 0; i < Items.Count; i++)
+                    if (Items[i].Id == contactPreviewId)
                     {
                         position = i;
                         break;
@@ -822,8 +821,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int GetPosition(ContactPreview contactPreview)
             {
                 var position = -1;
-                for (var i = 0; i < contactPreviewsInView.Count; i++)
-                    if (contactPreviewsInView[i].Id == contactPreview.Id)
+                for (var i = 0; i < Items.Count; i++)
+                    if (Items[i].Id == contactPreview.Id)
                     {
                         position = i;
                         break;
@@ -833,7 +832,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             string ISectionedAdapter.GetSectionName(int position)
             {
-                return contactPreviewsInView[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
+                return Items[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
         }
 

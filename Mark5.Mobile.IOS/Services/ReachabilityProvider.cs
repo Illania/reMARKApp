@@ -14,10 +14,10 @@ namespace Mark5.Mobile.IOS.Services
         public static bool IsReachableWithoutRequiringConnection(NetworkReachabilityFlags flags)
         {
             // Is it reachable with the current network configuration?
-            bool isReachable = (flags & NetworkReachabilityFlags.Reachable) != 0;
+            var isReachable = (flags & NetworkReachabilityFlags.Reachable) != 0;
 
             // Do we need a connection to reach it?
-            bool noConnectionRequired = (flags & NetworkReachabilityFlags.ConnectionRequired) == 0 || (flags & NetworkReachabilityFlags.IsWWAN) != 0;
+            var noConnectionRequired = (flags & NetworkReachabilityFlags.ConnectionRequired) == 0 || (flags & NetworkReachabilityFlags.IsWWAN) != 0;
 
             return isReachable && noConnectionRequired;
         }

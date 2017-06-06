@@ -1117,7 +1117,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var dateString = currentTime.ToString("dd-MM-yyyy");
             var timeString = currentTime.ToString("HH:mm");
 
-            string fromNameString = string.Empty;
+            var fromNameString = string.Empty;
             if (PreviousDocumentPreview != null && PreviousDocumentPreview.Addresses != null)
                 fromNameString = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Name).FirstOrDefault() ?? string.Empty;
 

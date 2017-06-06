@@ -71,7 +71,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var title = GetString(Resource.String.confirm_move_to_folder);
 
-            int resourceId = 0;
+            var resourceId = 0;
             switch (BusinessEntities.First().ObjectType)
             {
                 case ObjectType.Document:
@@ -119,7 +119,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var title = Resources.GetString(Resource.String.confirm_copy_to_folder);
 
-            int resourceId = 0;
+            var resourceId = 0;
             switch (BusinessEntities.First().ObjectType)
             {
                 case ObjectType.Document:

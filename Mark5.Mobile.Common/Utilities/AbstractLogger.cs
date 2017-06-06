@@ -4,13 +4,7 @@ namespace Mark5.Mobile.Common.Utilities
 {
     public abstract class AbstractLogger : ILogger
     {
-        bool enabled = true;
-
-        public bool Enabled
-        {
-            get => enabled;
-            set => enabled = value;
-        }
+        public bool Enabled { get; set; } = true;
 
         public LogLevel Level { get; set; }
 

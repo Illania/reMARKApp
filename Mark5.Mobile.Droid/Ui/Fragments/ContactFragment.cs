@@ -586,7 +586,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void RefreshCardView(CardView cardView)
         {
             var internalLayout = cardView.GetChildAt(0) as LinearLayoutCompat;
-            for (int i = 0; i < internalLayout.ChildCount; i++)
+            for (var i = 0; i < internalLayout.ChildCount; i++)
             {
                 var subview = internalLayout.GetChildAt(i) as ContactView;
                 if (subview != null)

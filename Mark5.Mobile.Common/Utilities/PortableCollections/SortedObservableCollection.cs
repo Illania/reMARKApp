@@ -48,7 +48,7 @@ namespace Mark5.Mobile.Common.Utilities.PortableCollections
 
         void AddSorted(TItem item)
         {
-            int i = 0;
+            var i = 0;
             while (i < Items.Count && sortingComparison(Items[i], item) < 0)
                 i++;
             InsertItem(i, item);
@@ -56,7 +56,7 @@ namespace Mark5.Mobile.Common.Utilities.PortableCollections
 
         new int IndexOf(TItem item)
         {
-            for (int i = 0; i < Items.Count; i++)
+            for (var i = 0; i < Items.Count; i++)
                 if (lookupComparison(Items[i], item) == 0)
                     return i;
             return -1;
@@ -68,7 +68,7 @@ namespace Mark5.Mobile.Common.Utilities.PortableCollections
 
         public void RemoveAll(Predicate<TItem> predicate)
         {
-            for (int i = Items.Count - 1; i >= 0; i--)
+            for (var i = Items.Count - 1; i >= 0; i--)
                 if (predicate(Items[i]))
                     RemoveAt(i);
         }

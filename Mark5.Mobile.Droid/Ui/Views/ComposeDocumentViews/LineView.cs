@@ -153,13 +153,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         class LineInView
         {
-            readonly Line line;
-
-            public Line Line => line;
+            public Line Line { get; }
 
             public LineInView(Line line)
             {
-                this.line = line;
+                this.Line = line;
             }
 
             public override string ToString()

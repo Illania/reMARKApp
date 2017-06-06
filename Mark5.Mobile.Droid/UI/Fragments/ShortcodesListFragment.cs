@@ -641,15 +641,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ShortcodesListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-            public List<ShortcodePreview> Items => shortcodePreviewsInView;
+            public List<ShortcodePreview> Items { get; } = new List<ShortcodePreview>(1000);
 
             public List<ShortcodePreview> SelectedItems => selectedShortcodesInView.Values.ToList();
 
-            public override int ItemCount => shortcodePreviewsInView.Count;
+            public override int ItemCount => Items.Count;
 
             public int SelectedItemCount => selectedShortcodesInView.Count;
-
-            readonly List<ShortcodePreview> shortcodePreviewsInView = new List<ShortcodePreview>(1000);
 
             readonly Dictionary<int, ShortcodePreview> selectedShortcodesInView = new Dictionary<int, ShortcodePreview>();
 
@@ -662,7 +660,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (cpvh == null)
                     return;
 
-                var cp = shortcodePreviewsInView[position];
+                var cp = Items[position];
 
                 cpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, cp)));
                 cpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, cp)));
@@ -681,14 +679,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public void PrependItems(List<ShortcodePreview> items)
             {
                 var count = items.Count;
-                shortcodePreviewsInView.InsertRange(0, items);
+                Items.InsertRange(0, items);
                 NotifyItemRangeInserted(0, count);
             }
 
             public void AppendItems(List<ShortcodePreview> items)
             {
-                var count = shortcodePreviewsInView.Count;
-                shortcodePreviewsInView.AddRange(items);
+                var count = Items.Count;
+                Items.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
 
@@ -705,7 +703,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var position = GetPosition(item);
                     if (position >= 0)
                     {
-                        shortcodePreviewsInView.RemoveAt(position);
+                        Items.RemoveAt(position);
                         NotifyItemRemoved(position);
                     }
                 }
@@ -750,8 +748,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void Clear()
             {
-                var size = shortcodePreviewsInView.Count;
-                shortcodePreviewsInView.Clear();
+                var size = Items.Count;
+                Items.Clear();
                 selectedShortcodesInView.Clear();
                 NotifyItemRangeRemoved(0, size);
             }
@@ -764,8 +762,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int GetPosition(int shortcodePreviewsId)
             {
                 var position = -1;
-                for (var i = 0; i < shortcodePreviewsInView.Count; i++)
-                    if (shortcodePreviewsInView[i].Id == shortcodePreviewsId)
+                for (var i = 0; i < Items.Count; i++)
+                    if (Items[i].Id == shortcodePreviewsId)
                     {
                         position = i;
                         break;
@@ -775,7 +773,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             string ISectionedAdapter.GetSectionName(int position)
             {
-                return shortcodePreviewsInView[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
+                return Items[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
         }
 

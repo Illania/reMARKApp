@@ -114,7 +114,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             if (containerLayout == null)
                 return;
 
-            for (int i = 0; i < containerLayout.ChildCount; i++)
+            for (var i = 0; i < containerLayout.ChildCount; i++)
             {
                 var view = containerLayout.GetChildAt(i) as AbstractEditableTextSearchView<T>;
                 if (view != null)
@@ -135,7 +135,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             if (containerLayout == null)
                 return;
 
-            for (int i = 0; i < containerLayout.ChildCount; i++)
+            for (var i = 0; i < containerLayout.ChildCount; i++)
             {
                 var view = containerLayout.GetChildAt(i) as AbstractEditableTextSearchView<T>;
                 if (view != this)

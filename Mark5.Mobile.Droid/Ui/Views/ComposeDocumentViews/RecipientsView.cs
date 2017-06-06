@@ -414,9 +414,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             readonly SuggestionsObservableCollection suggestions = new SuggestionsObservableCollection();
 
-            Filter filter;
-
-            public Filter Filter => filter;
+            public Filter Filter { get; }
 
             public override int Count => suggestions.Count;
 
@@ -424,7 +422,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             public SuggestionsAdapter()
             {
-                filter = new SuggestionsFilter(this);
+                Filter = new SuggestionsFilter(this);
             }
 
             public override View GetView(int position, View convertView, ViewGroup parent)
@@ -436,7 +434,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 var progressBar = view.FindViewById<ProgressBar>(Resource.Id.suggestionProgressBar);
                 var separator = view.FindViewById<View>(Resource.Id.suggestionSeparator);
 
-                bool isLoading = (filter as SuggestionsFilter).Loading;
+                var isLoading = (Filter as SuggestionsFilter).Loading;
                 var suggestion = suggestions[position];
 
                 separator.Visibility = position == Count - 1 && !isLoading ? ViewStates.Invisible : ViewStates.Visible;

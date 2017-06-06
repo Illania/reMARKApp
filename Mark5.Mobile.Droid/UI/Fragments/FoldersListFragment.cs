@@ -871,7 +871,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     if (foldersInSection[section].Any())
                     {
-                        string title = string.Empty;
+                        var title = string.Empty;
 
                         switch (section)
                         {
@@ -989,10 +989,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (sectionsInView.Count == 1)
                     return foldersInSection[sectionsInView.First()][position];
 
-                int sectionPosition = 0;
+                var sectionPosition = 0;
                 var sectionPositionToSection = SectionsPositionToSection();
                 var sectionPositions = sectionPositionToSection.Keys.ToList();
-                for (int i = sectionPositions.Count - 1; i > 0; i--)
+                for (var i = sectionPositions.Count - 1; i > 0; i--)
                     if (position > sectionPositions[i])
                     {
                         sectionPosition = sectionPositions[i];
@@ -1035,7 +1035,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 var sectionPositions = SectionsPositionToSection();
 
-                Section currentSection = Section.Favourites;
+                var currentSection = Section.Favourites;
                 foreach (var sectionPosition in sectionPositions.Keys)
                     if (position > sectionPosition)
                         currentSection = sectionPositions[sectionPosition];
@@ -1099,9 +1099,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var positions = new Dictionary<int, Section>();
                 positions.Add(0, sectionsInView[0]);
 
-                int previousSectionPosition = 0;
-                int previousSectionItemsCount = foldersInSection[sectionsInView[0]].Count;
-                for (int i = 1; i < sectionsInView.Count; i++)
+                var previousSectionPosition = 0;
+                var previousSectionItemsCount = foldersInSection[sectionsInView[0]].Count;
+                for (var i = 1; i < sectionsInView.Count; i++)
                 {
                     var sectionPosition = previousSectionPosition + previousSectionItemsCount + 1;
                     positions.Add(sectionPosition, sectionsInView[i]);

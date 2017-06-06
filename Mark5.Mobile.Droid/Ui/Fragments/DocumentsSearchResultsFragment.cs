@@ -195,11 +195,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 public const int ExternalDocumentView = 1;
             }
 
-            public List<DocumentPreview> Items => documentPreviewsInView;
+            public List<DocumentPreview> Items { get; } = new List<DocumentPreview>(1000);
 
-            public override int ItemCount => documentPreviewsInView.Count;
+            public override int ItemCount => Items.Count;
 
-            readonly List<DocumentPreview> documentPreviewsInView = new List<DocumentPreview>(1000);
             readonly Context context;
             readonly RecyclerView recyclerView;
 
@@ -216,7 +215,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (holder is DocumentPreviewViewHolder)
                 {
                     var dpvh = holder as DocumentPreviewViewHolder;
-                    var dp = documentPreviewsInView[position];
+                    var dp = Items[position];
 
                     dpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
 
@@ -247,7 +246,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 else if (holder is ExternalDocumentPreviewViewHolder)
                 {
                     var edpvh = holder as ExternalDocumentPreviewViewHolder;
-                    var dp = documentPreviewsInView[position];
+                    var dp = Items[position];
 
                     edpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
 
@@ -280,8 +279,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void AppendItems(List<DocumentPreview> items)
             {
-                var count = documentPreviewsInView.Count;
-                documentPreviewsInView.AddRange(items);
+                var count = Items.Count;
+                Items.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
 

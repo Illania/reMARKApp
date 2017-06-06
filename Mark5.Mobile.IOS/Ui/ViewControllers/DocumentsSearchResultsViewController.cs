@@ -563,9 +563,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable
         {
-            public bool Empty => documentPreviewsInView.Count < 1;
+            public bool Empty => Items.Count < 1;
 
-            public List<DocumentPreview> Items => documentPreviewsInView;
+            public List<DocumentPreview> Items { get; private set; } = new List<DocumentPreview>(1000);
 
             DocumentsSearchResultsViewController viewController;
             UITableView documentsTableView;
@@ -573,7 +573,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             readonly bool compact;
 
             bool loading = true;
-            List<DocumentPreview> documentPreviewsInView = new List<DocumentPreview>(1000);
 
             public DataSource(DocumentsSearchResultsViewController viewController, UITableView documentsTableView, string emptyText, bool compact)
             {
@@ -588,14 +587,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
 
-                if (documentPreviewsInView.Count < 1)
+                if (Items.Count < 1)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
                     emptyCell.Initialize(emptyText);
                     return emptyCell;
                 }
 
-                var dp = documentPreviewsInView[indexPath.Row];
+                var dp = Items[indexPath.Row];
 
                 if (dp.Direction == DocumentDirection.External)
                 {
@@ -623,15 +622,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return 1;
 
-                if (documentPreviewsInView.Count < 1)
+                if (Items.Count < 1)
                     return 1;
 
-                return documentPreviewsInView.Count;
+                return Items.Count;
             }
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                if (documentPreviewsInView.Count > 0 && documentPreviewsInView[indexPath.Row]?.Direction == DocumentDirection.External)
+                if (Items.Count > 0 && Items[indexPath.Row]?.Direction == DocumentDirection.External)
                     return ExternalDocumentsTableViewCell.Height;
 
                 return compact ? DocumentsCompactTableViewCell.Height : DocumentsTableViewCell.Height;
@@ -646,7 +645,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var actions = new List<UITableViewRowAction>();
 
-                var documentPreview = documentPreviewsInView[indexPath.Row];
+                var documentPreview = Items[indexPath.Row];
 
                 var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("more"), (a, ip) => { viewController.DoShowMoreActionSheet(indexPath, documentPreview); });
                 moreAction.BackgroundColor = Theme.DarkerBlue;
@@ -686,7 +685,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var dp = documentPreviewsInView[indexPath.Row];
+                var dp = Items[indexPath.Row];
                 viewController.DocumentSelected(dp);
             }
 
@@ -694,13 +693,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = false;
 
-                documentPreviewsInView.AddRange(documentPreviews);
+                Items.AddRange(documentPreviews);
                 documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
             public void RemoveItems(List<int> documentIds)
             {
-                var indices = documentPreviewsInView.Select((d, i) => new
+                var indices = Items.Select((d, i) => new
                     {
                         d,
                         i
@@ -708,11 +707,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     .Where(x => documentIds.Contains(x.d.Id))
                     .Select(x => x.i)
                     .ToList();
-                indices.OrderByDescending(i => i).ForEach(documentPreviewsInView.RemoveAt);
+                indices.OrderByDescending(i => i).ForEach(Items.RemoveAt);
 
                 documentsTableView.BeginUpdates();
 
-                if (!documentPreviewsInView.Any())
+                if (!Items.Any())
                 {
                     documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
                 }
@@ -727,7 +726,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public DocumentPreview GetNextDocumentPreview(DocumentPreview documentPreview, out bool previousDocumentAvailable, out bool nextDocumentAvailable, bool scrollToDocument = false)
             {
-                var currentDocumentRow = documentPreviewsInView.IndexOf(d => d.Id == documentPreview.Id);
+                var currentDocumentRow = Items.IndexOf(d => d.Id == documentPreview.Id);
                 if (currentDocumentRow < 0)
                 {
                     previousDocumentAvailable = false;
@@ -737,14 +736,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var nextDocumentRow = currentDocumentRow + 1;
                 previousDocumentAvailable = true;
-                nextDocumentAvailable = nextDocumentRow < documentPreviewsInView.Count - 1;
+                nextDocumentAvailable = nextDocumentRow < Items.Count - 1;
 
-                return documentPreviewsInView.ElementAtOrDefault(nextDocumentRow);
+                return Items.ElementAtOrDefault(nextDocumentRow);
             }
 
             public DocumentPreview GetPreviousDocumentPreview(DocumentPreview documentPreview, out bool previousDocumentAvailable, out bool nextDocumentAvailable, bool scrollToDocument = false)
             {
-                var currentDocumentRow = documentPreviewsInView.IndexOf(d => d.Id == documentPreview.Id);
+                var currentDocumentRow = Items.IndexOf(d => d.Id == documentPreview.Id);
                 if (currentDocumentRow < 0)
                 {
                     previousDocumentAvailable = false;
@@ -754,16 +753,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var previousDocumentRow = currentDocumentRow - 1;
                 previousDocumentAvailable = previousDocumentRow > 0;
-                nextDocumentAvailable = previousDocumentRow < documentPreviewsInView.Count - 1;
+                nextDocumentAvailable = previousDocumentRow < Items.Count - 1;
 
-                return documentPreviewsInView.ElementAtOrDefault(previousDocumentRow);
+                return Items.ElementAtOrDefault(previousDocumentRow);
             }
 
             public void Reset()
             {
                 loading = true;
 
-                documentPreviewsInView.Clear();
+                Items.Clear();
                 documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
@@ -773,7 +772,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 viewController = null;
                 documentsTableView = null;
-                documentPreviewsInView = null;
+                Items = null;
             }
         }
     }

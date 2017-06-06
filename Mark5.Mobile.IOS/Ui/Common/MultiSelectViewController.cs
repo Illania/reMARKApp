@@ -61,7 +61,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             TableView.ReloadData();
 
-            for (int i = 0; i < data.Length; i++)
+            for (var i = 0; i < data.Length; i++)
             {
                 var d = data[i];
                 if (preselected.Contains(d, equalityComparer))

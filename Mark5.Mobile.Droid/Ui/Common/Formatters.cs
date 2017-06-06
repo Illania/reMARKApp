@@ -26,7 +26,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     return "Unknown size";
 
                 var mag = (int) Math.Log(bytes, 1024);
-                decimal adjustedSize = (decimal) bytes / (1L << (mag * 10));
+                var adjustedSize = (decimal) bytes / (1L << (mag * 10));
 
                 return string.Format("{0:n1} {1}", adjustedSize, SizeSuffixes[mag]);
             }
