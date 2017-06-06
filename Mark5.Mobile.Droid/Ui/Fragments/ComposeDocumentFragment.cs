@@ -185,7 +185,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task LoadDocument()
         {
-            if (PreviousDocument != null || CreationModeFlag == DocumentCreationModeFlag.New)
+            if (PreviousDocument != null || (CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOptions.None))
             {
                 await ShowDocument();
                 return;

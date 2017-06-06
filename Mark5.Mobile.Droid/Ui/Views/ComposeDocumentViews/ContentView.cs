@@ -395,9 +395,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             parentElement.Children.ForEach(c => c.Remove());
             parentElement.TextContent = string.Empty;
 
-            var nodes = await ProcessInsertedContent(htmlParser, contentType, content);
+            var precessedContent = await ProcessInsertedContent(htmlParser, contentType, content);
 
-            parentElement.Append(nodes.ToArray());
+            parentElement.InnerHtml = precessedContent;
 
             var textWriter = new StringWriter();
             currentHtmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
@@ -405,7 +405,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             await SetNewHtmlContentAsync(textWriter.ToString());
         }
 
-        static async Task<IHtmlCollection<IElement>> ProcessInsertedContent(HtmlParser htmlParser, ContentType contentToInsertType, string contentToInsert)
+        static async Task<string> ProcessInsertedContent(HtmlParser htmlParser, ContentType contentToInsertType, string contentToInsert)
         {
             if (contentToInsertType == ContentType.Html)
             {
@@ -413,13 +413,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 var htmlDocument = await htmlParser.ParseAsync(inlinedContentToInsert);
 
-                return htmlDocument.Body.Children;
+                return htmlDocument.Body.InnerHtml;
             }
 
             if (contentToInsertType == ContentType.PlainText)
             {
                 var htmlDocument = await htmlParser.ParseAsync("<div><pre>" + contentToInsert + "</pre></div>");
-                return htmlDocument.Body.Children;
+                return htmlDocument.Body.InnerHtml;
             }
 
             throw new ArgumentException(string.Format("Unsupported contentType. [contentType={0}]", contentToInsertType));
