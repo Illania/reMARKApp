@@ -1,51 +1,42 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: MailViewerSubview.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using MailBee.Mime;
+﻿using MailBee.Mime;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 {
-    
-	public abstract class MailViewerSubview : UIStackView
-	{
-        
-		public MailMessage MailMessage { get; set; }
+    public abstract class MailViewerSubview : UIStackView
+    {
+        public MailMessage MailMessage { get; set; }
 
-		protected UIView ContainerView;
+        protected UIView ContainerView;
 
-		protected float HorizontalMargin = 15f;
-		protected float VerticalMargin = 12f;
-		protected float InnerMargin = 5f;
+        protected float HorizontalMargin = 15f;
+        protected float VerticalMargin = 12f;
+        protected float InnerMargin = 5f;
 
         protected MailViewerSubview()
-		{
-			Initialize();
-		}
+        {
+            Initialize();
+        }
 
-		void Initialize()
-		{
-			BackgroundColor = UIColor.White;
-			Opaque = false;
-			Axis = UILayoutConstraintAxis.Vertical;
-			Alignment = UIStackViewAlignment.Fill;
-			Distribution = UIStackViewDistribution.Fill;
-			Spacing = 0f;
-			TranslatesAutoresizingMaskIntoConstraints = false;
+        void Initialize()
+        {
+            BackgroundColor = UIColor.White;
+            Opaque = false;
+            Axis = UILayoutConstraintAxis.Vertical;
+            Alignment = UIStackViewAlignment.Fill;
+            Distribution = UIStackViewDistribution.Fill;
+            Spacing = 0f;
+            TranslatesAutoresizingMaskIntoConstraints = false;
 
-			ContainerView = new UIView();
-			AddArrangedSubview(ContainerView);
+            ContainerView = new UIView();
+            AddArrangedSubview(ContainerView);
 
-			AddArrangedSubview(new SeparatorSubView());
-		}
+            AddArrangedSubview(new SeparatorSubView());
+        }
 
-		public abstract void RefreshView();
+        public abstract void RefreshView();
 
-		public abstract void UpdateVisibility();
-	}
+        public abstract void UpdateVisibility();
+    }
 }

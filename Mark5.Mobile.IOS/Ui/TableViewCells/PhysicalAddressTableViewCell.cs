@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: PhysicalAddressTableViewCell.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using Contacts;
@@ -17,10 +10,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    
     public partial class PhysicalAddressTableViewCell : UITableViewCell
     {
-
         public static readonly NSString Key = new NSString("PhysicalAddressTableViewCell");
         public static readonly UINib Nib = UINib.FromName("PhysicalAddressTableViewCell", NSBundle.MainBundle);
 
@@ -31,7 +22,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static PhysicalAddressTableViewCell Create()
         {
-            var cell = (PhysicalAddressTableViewCell)Nib.Instantiate(null, null)[0];
+            var cell = (PhysicalAddressTableViewCell) Nib.Instantiate(null, null)[0];
             cell.TypeLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-3f);
             cell.AddressLabel.Font = Theme.DefaultFont;
             cell.IconImage.Image = UIImage.FromBundle(Path.Combine("icons", "map.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
@@ -55,9 +46,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             var sb = new StringBuilder();
             if (pa.Type != null && pa.Type.Id > 0)
-            {
                 sb.Append(pa.Type.Name).AppendLine();
-            }
 
             var formatter = new CNPostalAddressFormatter();
             sb.Append(formatter.GetStringFromPostalAddress(cnAddress));

@@ -1,22 +1,12 @@
-//
-// Project: Mark5.Mobile.ServiceReference
-// File: IAppServiceProxy.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.ServiceReference.DataContract;
 
-#pragma warning disable CS1701
 namespace Mark5.ServiceReference.AppService
 {
-
     public interface IAppServiceProxy
     {
-
         Version Version { get; }
 
         #region Authentication
@@ -160,7 +150,5 @@ namespace Mark5.ServiceReference.AppService
         Task<TestResult> TestAsync(TestParameters parameters, CancellationToken ct = default(CancellationToken));
 
         #endregion
-
     }
 }
-

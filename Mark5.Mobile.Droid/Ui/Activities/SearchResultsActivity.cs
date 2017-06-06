@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: SearchResultsDocumentsActivity.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using Android.App;
 using Android.Content.PM;
 using Android.OS;
@@ -17,11 +10,9 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class SearchResultsActivity : BaseAppCompatActivity
     {
-
         public const string ModuleIntentKey = "Module_fb7022b2-d795-4a22-8f94-052397d50b17";
         public const string CriteriaIntentKey = "Criteria_6f536c40-9c1b-4996-a60a-bf94df1613a7";
 

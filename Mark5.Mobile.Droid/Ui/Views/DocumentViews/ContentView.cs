@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: ContentView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using Android.Content;
 using Android.Support.V4.View;
 using Android.Views;
@@ -14,10 +7,8 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
-
     public class ContentView : DocumentView
     {
-
         CustomWebView webView;
 
         public ContentView(Context context)
@@ -48,17 +39,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 Visibility = ViewStates.Visible;
 
                 if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
-                {
                     webView.LoadDataWithBaseURL(null, Document.PlainTextBody ?? "Content could not be loaded.", "text/plain", "UTF-8", null);
-                }
                 else if (!string.IsNullOrWhiteSpace(Document.HtmlBody))
-                {
                     webView.LoadDataWithBaseURL(null, Document.HtmlBody ?? "Content could not be loaded.", "text/html", "UTF-8", null);
-                }
                 else
-                {
                     webView.LoadDataWithBaseURL(null, Document.PlainTextBody ?? "Content could not be loaded.", "text/plain", "UTF-8", null);
-                }
             }
             else
             {
@@ -70,7 +55,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         class CustomWebView : WebView
         {
-
             public CustomWebView(Context context)
                 : base(context)
             {
@@ -79,9 +63,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             public override bool OnTouchEvent(MotionEvent e)
             {
                 if (e.FindPointerIndex(0) != -1)
-                {
                     RequestDisallowInterceptTouchEvent(e.PointerCount > 1);
-                }
 
                 return base.OnTouchEvent(e);
             }
@@ -95,7 +77,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         class CustomWebViewClient : WebViewClient
         {
-
             [Obsolete]
             public override bool ShouldOverrideUrlLoading(WebView view, string url)
             {

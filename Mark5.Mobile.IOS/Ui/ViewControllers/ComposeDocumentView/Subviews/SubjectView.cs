@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: SubjectsView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
@@ -20,16 +13,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         UILabel label;
         UITextView textView;
 
-        public string Subject
-        {
-            get { return textView.Text; }
-            set { textView.Text = value; }
-        }
+        public string Subject { get => textView.Text; set => textView.Text = value; }
 
-        public bool Empty
-        {
-            get { return string.IsNullOrEmpty(textView?.Text); }
-        }
+        public bool Empty => string.IsNullOrEmpty(textView?.Text);
 
         public SubjectView()
         {
@@ -44,15 +30,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             label.TextColor = UIColor.LightGray;
             label.Opaque = false;
             label.TranslatesAutoresizingMaskIntoConstraints = false;
-            label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            label.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            label.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContainerView.AddSubview(label);
             ContainerView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(label, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                    NSLayoutConstraint.Create(label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                });
+            {
+                NSLayoutConstraint.Create(label, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
+            });
 
             textView = new UITextView();
             textView.Font = Theme.DefaultFont;
@@ -70,12 +56,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             textView.Changed += (sender, e) => Edited(this, EventArgs.Empty);
             ContainerView.AddSubview(textView);
             ContainerView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(textView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                    NSLayoutConstraint.Create(textView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, label, NSLayoutAttribute.Right, 1f, InnerMargin),
-                    NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
-                    NSLayoutConstraint.Create(textView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
-                });
+            {
+                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, label, NSLayoutAttribute.Right, 1f, InnerMargin),
+                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
+                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
+            });
         }
 
         #region Public methods
@@ -83,9 +69,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public override Task RefreshView()
         {
             if (CreationModeFlag == DocumentCreationModeFlag.None || CreationModeFlag == DocumentCreationModeFlag.New)
-            {
                 return Task.CompletedTask;
-            }
 
             switch (CreationModeFlag)
             {
@@ -111,6 +95,5 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         }
 
         #endregion
-
     }
 }

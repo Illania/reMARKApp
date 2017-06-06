@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: LoginActivity.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Threading.Tasks;
 using Android.App;
@@ -26,11 +19,9 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class LoginActivity : AppCompatActivity
     {
-
         TextInputEditText usernameEditText;
         TextInputEditText passwordEditText;
         TextInputEditText hostnameEditText;
@@ -127,18 +118,15 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.dialog_creating_report, Resource.String.please_wait);
 
-                Task.Run(() =>
-                {
-                    return SystemReportCollector.CreateFullReport();
-                }).ContinueWith(t =>
-                {
-                    dismissAction();
+                Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
+                    .ContinueWith(t =>
+                        {
+                            dismissAction();
 
-                    if (!t.IsFaulted)
-                    {
-                        StartActivity(SystemReportCollector.CreateShareReportIntent(this, t.Result));
-                    }
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                            if (!t.IsFaulted)
+                                StartActivity(SystemReportCollector.CreateShareReportIntent(this, t.Result));
+                        },
+                        TaskScheduler.FromCurrentSynchronizationContext());
 
                 return true;
             }
@@ -158,7 +146,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var password = passwordEditText.Text;
                 var hostname = hostnameEditText.Text;
                 var port = portEditText.Text;
-                var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
+                var sslMode = (SslMode) sslSpinner.SelectedItemPosition;
 
                 var errors = false;
                 if (!Validator.IsUsernameValid(username))
@@ -233,13 +221,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var policies = Managers.DownloadManager.DownloadPolicies;
                 policies[ObjectType.Document] = new DownloadFoldersPolicy();
                 if (PlatformConfig.Preferences.SynchroniseContacts)
-                {
                     policies[ObjectType.Contact] = new DownloadAllPolicy();
-                }
                 if (PlatformConfig.Preferences.SynchroniseShortcodes)
-                {
                     policies[ObjectType.Shortcode] = new DownloadAllPolicy();
-                }
 
                 CommonConfig.Logger.Info("Retrieving system settings...");
 
@@ -274,6 +258,4 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
         }
     }
-
 }
-

@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: AbstractMainViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common;
@@ -17,10 +10,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-
     public class AbstractMainViewController : UITabBarController
     {
-
         protected const string DocumentTag = "document";
         protected const string ContactTag = "contact";
         protected const string ShortcodeTag = "shortcode";
@@ -79,7 +70,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             searchButton.TouchUpInside -= SearchButton_TouchUpInside;
         }
 
-        void SearchButton_TouchUpInside(object sender, System.EventArgs e)
+        void SearchButton_TouchUpInside(object sender, EventArgs e)
         {
             var nc = new NavigationController(new SearchCriteriaViewController(), UIModalPresentationStyle.FullScreen)
             {
@@ -122,7 +113,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Error("Error while checking if autosaved document is present", ex);
             }
-
         }
     }
 }

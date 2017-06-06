@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: ContactCategoriesSearchView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using Android.Content;
+﻿using Android.Content;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Fragments;
 

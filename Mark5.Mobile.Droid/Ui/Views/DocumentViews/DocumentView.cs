@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: DocumentView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -13,10 +6,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
-
     public abstract class DocumentView : LinearLayoutCompat
     {
-
         public DocumentPreview DocumentPreview { get; set; }
 
         public Document Document { get; set; }
@@ -41,4 +32,3 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         public abstract void RefreshView();
     }
 }
-

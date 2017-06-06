@@ -1,19 +1,9 @@
-//
-// Project: Mark5.Mobile.Common
-// File: ICalendarDataAccess.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.DataAccess
 {
-
     interface ICalendarDataAccess
     {
         Task<CalendarAppointment> GetCalendarAppointmentAsync(int calendarAppointmentId);
@@ -43,4 +33,3 @@ namespace Mark5.Mobile.Common.DataAccess
         Task RemoveOrphans();
     }
 }
-

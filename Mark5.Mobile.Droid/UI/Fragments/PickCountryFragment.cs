@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: PickCountryFragment.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Android.Graphics;
 using Android.OS;
@@ -48,7 +41,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.search_country);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.search_country);
 
             CommonConfig.Logger.Info($"Created {nameof(PickCountryFragment)}");
         }
@@ -71,8 +64,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void CountrySelected(CountryInfo c)
         {
-            if (CloseRequest != null) CloseRequest(c.FaxPrefix);
-            ((AppCompatActivity)Activity).OnBackPressed();
+            if (CloseRequest != null)
+                CloseRequest(c.FaxPrefix);
+            ((AppCompatActivity) Activity).OnBackPressed();
         }
 
         #region Retained State
@@ -86,10 +80,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class CountriesListViewAdapter : RecyclerView.Adapter
         {
-            readonly List<CountryInfo> countriesInView = new List<CountryInfo>(500);
+            public override int ItemCount => Items.Count;
 
-            public override int ItemCount { get { return countriesInView.Count; } }
-            public List<CountryInfo> Items { get { return countriesInView; } }
+            public List<CountryInfo> Items { get; } = new List<CountryInfo>(500);
 
             readonly PickCountryFragment parent;
 
@@ -100,7 +93,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var c = countriesInView[position];
+                var c = Items[position];
                 var lvh = holder as CountryViewHolder;
 
                 lvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => HandleClick(c)));
@@ -116,8 +109,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void SetItems(List<CountryInfo> countries)
             {
-                var count = countriesInView.Count;
-                countriesInView.AddRange(countries);
+                var count = Items.Count;
+                Items.AddRange(countries);
                 NotifyItemRangeInserted(count, countries.Count);
             }
 
@@ -129,17 +122,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class CountryViewHolder : RecyclerView.ViewHolder
         {
-            public string Name
-            {
-                set
-                {
-                    nameTextView.Text = value;
-                }
-            }
+            public string Name { set => nameTextView.Text = value; }
 
             readonly AppCompatTextView nameTextView;
 
-            public CountryViewHolder(View itemView) : base(itemView)
+            public CountryViewHolder(View itemView)
+                : base(itemView)
             {
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.search_list_item_country_name);
             }

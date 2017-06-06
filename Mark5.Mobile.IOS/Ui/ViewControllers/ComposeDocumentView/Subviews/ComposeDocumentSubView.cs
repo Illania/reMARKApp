@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: ComposeDocumentSubview.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
@@ -59,9 +52,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 var frame = Frame;
                 frame.Height -= 2 * VerticalMargin;
                 if (frame.Height > parentScrollView.Frame.Height + parentScrollView.ContentOffset.Y)
-                {
                     frame.Height = parentScrollView.Frame.Height + parentScrollView.ContentOffset.Y;
-                }
 
                 parentScrollView.ScrollRectToVisible(frame, true);
             }

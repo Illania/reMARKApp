@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: ContentView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,13 +23,13 @@ using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-
     public class ContentView : ComposeDocumentSubView, IWKNavigationDelegate, IUIGestureRecognizerDelegate, IWKScriptMessageHandler, IUIScrollViewDelegate
     {
+        static readonly NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
 
-        readonly static NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
-        readonly static NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
-        readonly static NSString script3 = new NSString("var observer = new MutationObserver(function(mutations) { window.webkit.messageHandlers.mutation.postMessage({mutated:true}); }); observer.observe(document.querySelector('#editable-one'), { attributes: true, childList: true, characterData: true, subtree: true });");
+        static readonly NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
+
+        static readonly NSString script3 = new NSString("var observer = new MutationObserver(function(mutations) { window.webkit.messageHandlers.mutation.postMessage({mutated:true}); }); observer.observe(document.querySelector('#editable-one'), { attributes: true, childList: true, characterData: true, subtree: true });");
 
         UIButton expandButton;
 
@@ -72,7 +65,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                                                     <meta name=""viewport"" content=""width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"">
                                                 </head>
                                                 <body>
-                                                    <div id=""editable-one"" class=""" + NewEditableContentClass + @""" contenteditable=""true"" style=""font-family: sans-serif; width: 100%""><br></div>
+                                                    <div id=""editable-one"" class=""" +
+                                          NewEditableContentClass +
+                                          @""" contenteditable=""true"" style=""font-family: sans-serif; width: 100%""><br></div>
                                                 </body >
                                             </html>";
 
@@ -127,14 +122,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             newContentWebView.ScrollView.AddGestureRecognizer(tapRecognizer);
 
-            newContentWebView.NavigationDelegate = new WebViewNavigationDelegate { DidFinishNavigationAction = () => { newContentLoadingSemaphore.Release(); } };
+            newContentWebView.NavigationDelegate = new WebViewNavigationDelegate
+            {
+                DidFinishNavigationAction = () => { newContentLoadingSemaphore.Release(); }
+            };
             ContainerView.AddSubview(newContentWebView);
             AddConstraints(new[]
-                {
+            {
                 newContentHeightConstraint = NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 200f),
-                    NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                    NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                    NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
+                NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
+                NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
             });
 
             newContentWebView.LoadHtmlString(DefaultEditContent, null);
@@ -256,7 +254,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var oldY = ConvertRectToView(webview.Frame, null).Y; //Position in current window
 
-            if ((oldY - UIApplication.SharedApplication.KeyWindow.Frame.Bottom + keyboardHeight + 20) > 0)
+            if (oldY - UIApplication.SharedApplication.KeyWindow.Frame.Bottom + keyboardHeight + 20 > 0)
             {
                 var rect = new CGRect();
                 rect.Height = 40;
@@ -298,9 +296,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             DocumentPreview.Preview = await GetPreview(Document.HtmlBody);
         }
 
-        public async Task InsertTemplate(Template template) => await SetWebContentPart(NewEditableContentClass, template.ContentType, "<br>" + template.Content);
+        public async Task InsertTemplate(Template template)
+        {
+            await SetWebContentPart(NewEditableContentClass, template.ContentType, "<br>" + template.Content);
+        }
 
-        public async Task InsertLocalTemplate(string localTemplate) => await SetWebContentPart(NewEditableContentClass, ContentType.PlainText, "\n\n\n" + localTemplate);
+        public async Task InsertLocalTemplate(string localTemplate)
+        {
+            await SetWebContentPart(NewEditableContentClass, ContentType.PlainText, "\n\n\n" + localTemplate);
+        }
 
         #endregion
 
@@ -339,13 +343,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                             }
 
                             foreach (var childNode2 in childNode1.ChildNodes)
-                            {
                                 if (childNode2.Name == "head")
                                 {
                                     headNode = childNode2;
                                     break;
                                 }
-                            }
                         }
                     }
                     catch (Exception ex)
@@ -380,10 +382,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         string GetHtmlHeader()
         {
-            var date = PreviousDocumentPreview.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime()
-                         .ConvertUtcToUserTime()
-                         .ConvertDateTimeToTimestampMilliseconds()
-                         .FormatUserTimestampAsCompactLongDateTimeString();
+            var date = PreviousDocumentPreview.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactLongDateTimeString();
 
             var header = new StringBuilder();
             header.Append("<br/><hr/>");
@@ -392,9 +391,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             header.Append(string.Format("<b>To</b>: {0}", GetAddressTextFromPreviousDocument(DocumentAddressType.To))).Append("</br>");
             var ccText = GetAddressTextFromPreviousDocument(DocumentAddressType.Cc);
             if (!string.IsNullOrWhiteSpace(ccText))
-            {
                 header.Append(string.Format("<b>Cc</b>: {0}", ccText)).Append("</br>");
-            }
             header.Append(string.Format("<b>Subject</b>: {0}", PreviousDocumentPreview.Subject)).Append("</br>");
             header.Append("<br/><br/>");
 
@@ -405,23 +402,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             var sb = new StringBuilder();
             var addresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == addressType).ToList();
-            for (int i = 0; i < addresses.Count; i++)
+            for (var i = 0; i < addresses.Count; i++)
             {
                 var hasName = !string.IsNullOrWhiteSpace(addresses[i].Name);
                 if (hasName)
-                {
                     sb.Append(addresses[i].Name).Append(" &lt;");
-                }
                 sb.Append(addresses[i].Address);
                 if (hasName)
-                {
                     sb.Append("&gt;");
-                }
                 if (i < addresses.Count - 1)
-                {
                     sb.Append(", ");
-                }
             }
+
             return sb.ToString();
         }
 
@@ -481,6 +473,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 return textWriter.ToString();
             }
+
             return string.Empty;
         }
 
@@ -514,7 +507,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             await newContentLoadingSemaphore.WaitAsync();
 
-            var currentContent = (await newContentWebView.EvaluateJavaScriptAsync(GetWebContentJs) as NSString);
+            var currentContent = await newContentWebView.EvaluateJavaScriptAsync(GetWebContentJs) as NSString;
 
             var htmlParser = new HtmlParser();
             var currentHtmlDocument = await htmlParser.ParseAsync(currentContent);
@@ -569,9 +562,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var matchingElements = currentHtmlDocument.QuerySelectorAll("div." + elementClass);
             foreach (var matchingElement in matchingElements)
-            {
                 matchingElement.Attributes.RemoveNamedItem("contenteditable");
-            }
 
             var processedWebContent = currentHtmlDocument.DocumentElement.OuterHtml;
 
@@ -582,9 +573,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             var inlineResult = PreMailer.Net.PreMailer.MoveCssInline(content, true, null, null, true, true);
             if (inlineResult.Warnings != null && inlineResult.Warnings.Count > 0)
-            {
                 CommonConfig.Logger.Warning("There were warnings when inlining CSS:\n" + string.Join("\n", inlineResult.Warnings));
-            }
             return inlineResult.Html;
         }
 
@@ -662,18 +651,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (justLoaded || resized || mutated)
             {
                 Action<WKWebView, NSLayoutConstraint> resizeAction = null;
-                resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(150)), () =>
-                {
-                    if (wv.IsLoading)
+                resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(150)),
+                    () =>
                     {
-                        resizeAction(wv, nslc);
-                    }
-                    else if (Math.Abs(nslc.Constant - wv.ScrollView.ContentSize.Height) > 10) //Condition to avoid loop on size increase
-                    {
-                        nslc.Constant = wv.ScrollView.ContentSize.Height;
-                        SetNeedsLayout();
-                    }
-                });
+                        if (wv.IsLoading)
+                        {
+                            resizeAction(wv, nslc);
+                        }
+                        else if (Math.Abs(nslc.Constant - wv.ScrollView.ContentSize.Height) > 10) //Condition to avoid loop on size increase
+                        {
+                            nslc.Constant = wv.ScrollView.ContentSize.Height;
+                            SetNeedsLayout();
+                        }
+                    });
 
                 if (userContentController == newContentWebView.Configuration.UserContentController)
                 {
@@ -698,7 +688,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         class WebViewNavigationDelegate : WKNavigationDelegate
         {
-
             public Action DidFinishNavigationAction { get; set; }
 
             public override void DidFinishNavigation(WKWebView webView, WKNavigation navigation)

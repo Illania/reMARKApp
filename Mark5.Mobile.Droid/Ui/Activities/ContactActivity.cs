@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ContactViewActivity.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using Android.App;
 using Android.Content.PM;
@@ -18,11 +11,9 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class ContactActivity : BaseAppCompatActivity
     {
-
         public const string FolderIdIntentKey = "FolderId_35678826-1e66-4e81-9f6a-68b758712338";
         public const string FolderIntentKey = "Folder_88a33f0b-ebbf-4eed-b33d-49fba4f43f15";
         public const string ContactIdIntentKey = "ContactId_248178bc-e0e4-4ca2-aad5-ffaed65514e5";
@@ -54,13 +45,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (Intent.HasExtra(FolderIntentKey))
                     cf.Folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
-                
+
                 if (Intent.HasExtra(ContactIdIntentKey))
                     cf.ContactId = Intent.Extras.GetInt(ContactIdIntentKey);
 
                 if (Intent.HasExtra(ContactPreviewIntentKey))
                     cf.ContactPreview = SerializationUtils.Deserialize<ContactPreview>(Intent.Extras.GetString(ContactPreviewIntentKey));
-                
+
                 if (Intent.HasExtra(NotificationGuidIntentKey))
                     cf.NotificationGuid = SerializationUtils.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
 

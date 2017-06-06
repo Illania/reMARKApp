@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: ShortcodesSearchCriteriaViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 using System.Linq;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -18,10 +11,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 {
-
     public class ShortcodesSearchCriteriaViewController : AbstractSearchCriteriaViewController
     {
-
         SearchShortcodesCriteria criteria = new SearchShortcodesCriteria();
 
         public override void LoadView()
@@ -56,7 +47,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
             CommonConfig.Logger.Info($"Starting search... [criteria={SerializationUtils.Serialize(criteria)}]");
 
-            NavigationController.PushViewController(new ShortcodesSearchResultsViewController { Criteria = criteria }, true);
+            NavigationController.PushViewController(new ShortcodesSearchResultsViewController
+                {
+                    Criteria = criteria
+                },
+                true);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -92,7 +87,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         abstract class AbstractShortcodesSearchView : AbstractSearchView
         {
-
             protected SearchShortcodesCriteria Criteria;
 
             public void SetCriteria(SearchShortcodesCriteria criteria)
@@ -104,7 +98,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class NameSearchView : AbstractShortcodesSearchView
         {
-
             readonly UIView view;
             readonly UILabel label;
             readonly UITextField text;
@@ -135,7 +128,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 text = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -201,7 +198,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class DescritpionSearchView : AbstractShortcodesSearchView
         {
-
             readonly UIView view;
             readonly UILabel label;
             readonly UITextField text;
@@ -232,7 +228,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 text = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -298,7 +298,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class AddressSearchView : AbstractShortcodesSearchView
         {
-
             readonly UIView view;
             readonly UILabel label;
             readonly UITextField text;
@@ -329,7 +328,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 text = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,

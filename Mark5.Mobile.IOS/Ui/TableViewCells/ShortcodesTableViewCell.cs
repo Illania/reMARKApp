@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: ShortcodesTableViewCell.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
 using System;
 using Foundation;
 using Mark5.Mobile.Common.Model;
@@ -14,10 +7,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-
     public partial class ShortcodesTableViewCell : UITableViewCell
     {
-
         public const float Height = 50f;
 
         public static readonly UINib Nib = UINib.FromName("ShortcodesTableViewCell", NSBundle.MainBundle);
@@ -30,7 +21,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static ShortcodesTableViewCell Create()
         {
-            var cell = (ShortcodesTableViewCell)Nib.Instantiate(null, null)[0];
+            var cell = (ShortcodesTableViewCell) Nib.Instantiate(null, null)[0];
             cell.NameLabel.Font = Theme.DefaultFont;
             return cell;
         }

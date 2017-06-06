@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ObjectActionsFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,15 +18,9 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-
     public class ObjectActionsFragment : RetainableStateFragment
     {
-
-        public IBusinessEntity BusinessEntity
-        {
-            get;
-            set;
-        }
+        public IBusinessEntity BusinessEntity { get; set; }
 
         public Action CloseRequest { get; set; }
 
@@ -63,8 +50,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.actions);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.actions);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(ObjectActionsFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity.objectType={BusinessEntity?.ObjectType}]...");
         }
@@ -81,9 +68,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 if (objectActions == null)
-                {
                     objectActions = await Managers.CommonActionsManager.GetObjectActionsAsync(BusinessEntity);
-                }
 
                 RefreshView();
             }
@@ -93,7 +78,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null) CloseRequest();
+                if (CloseRequest != null)
+                    CloseRequest();
             }
         }
 
@@ -107,9 +93,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var grouppedObjectActions = objectActions.OrderBy(oa => oa.ActionType).ThenBy(oa => oa.ActionTimeTimestamp).GroupBy(oa => oa.ActionType);
 
             foreach (var grouppedObjectAction in grouppedObjectActions)
-            {
                 linearLayout.AddView(new ObjectActionsView(Context, grouppedObjectAction.Key, grouppedObjectAction.ToArray()));
-            }
 
             linearLayout.Invalidate();
             linearLayout.RequestLayout();
@@ -141,7 +125,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ObjectActionsFragmentState : IRetainableState
         {
-
             public IBusinessEntity BusinessEntity { get; set; }
 
             public List<ObjectAction> ObjectActions { get; set; }

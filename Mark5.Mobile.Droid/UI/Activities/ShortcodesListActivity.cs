@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ShortcodesListActivity.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using Android.App;
 using Android.Content.PM;
 using Android.OS;
@@ -19,11 +12,9 @@ using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class ShortcodesListActivity : BaseAppCompatActivity
     {
-
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
 
         Toolbar toolbar;
@@ -64,7 +55,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
             else
             {
-                slf = (ShortcodesListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
+                slf = (ShortcodesListFragment) SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(ShortcodesListActivity)}");
             }
 
@@ -90,4 +81,3 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         }
     }
 }
-

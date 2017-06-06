@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: DocumentsListFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +20,7 @@ using Android.Util;
 using Android.Views;
 using FastScrollRecycler;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -37,19 +31,14 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-
     public class DocumentsListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-
         const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
 
         public Folder Folder { get; set; }
         public Action CloseRequest { get; set; }
 
-        DocumentsListAdapter CurrentAdapter
-        {
-            get { return (DocumentsListAdapter)recyclerView.GetAdapter(); }
-        }
+        DocumentsListAdapter CurrentAdapter => (DocumentsListAdapter) recyclerView.GetAdapter();
 
         bool refreshing;
 
@@ -80,7 +69,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
-            coordinatorLayout = (CoordinatorLayout)container.Parent.Parent;
+            coordinatorLayout = (CoordinatorLayout) container.Parent.Parent;
 
             var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
             emptyView.SetText(Resource.String.empty_folder);
@@ -105,7 +94,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
             adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
             {
-                if (recyclerView.GetAdapter() != adapter) return;
+                if (recyclerView.GetAdapter() != adapter)
+                    return;
 
                 emptyView.Visibility = adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
                 recyclerView.Visibility = adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
@@ -121,7 +111,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             searchAdapter.ItemClicked += Adapter_ItemClicked;
             searchAdapter.ItemLongClicked += Adapter_ItemLongClicked;
 
-            fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab = ((View) container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
             fab.SetImageResource(Resource.Drawable.action_new);
             fab.SetOnClickListener(new ActionOnClickListener(ComposeDocument));
             fab.Visibility = ViewStates.Visible;
@@ -135,8 +125,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.documents);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder?.Name;
+            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.documents);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = Folder?.Name;
 
             CommonConfig.Logger.Info($"Created {nameof(DocumentsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]");
         }
@@ -168,7 +158,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 searchAdapter.NotifyDataSetChanged();
             }
 
-            if (!IsAdded || IsDetached || IsRemoving) return;
+            if (!IsAdded || IsDetached || IsRemoving)
+                return;
 
             CommonConfig.Logger.Info($"Starting automatic refresh...");
 
@@ -206,7 +197,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
             MenuItemCompat.SetOnActionExpandListener(filterItem, this);
-            searchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
+            searchView = (SearchView) MenuItemCompat.GetActionView(filterItem);
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
 
@@ -297,8 +288,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Debug($"Attempting automatic refresh [endId={endId}, !isAdded={!IsAdded}, isDetached={IsDetached}, isRemoving={IsRemoving}, refreshing={refreshing}]...");
 
-                if (!IsAdded || IsDetached || IsRemoving) return;
-                if (refreshing) return;
+                if (!IsAdded || IsDetached || IsRemoving)
+                    return;
+                if (refreshing)
+                    return;
 
                 refreshing = true;
 
@@ -316,10 +309,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
 
-                    Activity?.RunOnUiThread(() =>
-                    {
-                        adapter?.PrependItems(documents);
-                    });
+                    Activity?.RunOnUiThread(() => { adapter?.PrependItems(documents); });
                 }
             }
             catch (Exception ex)
@@ -340,7 +330,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Attempting refresh [startId={startId}, endId={endId}, force={forceClear}]...");
 
-                if (refreshing) return;
+                if (refreshing)
+                    return;
 
                 refreshing = true;
                 refreshLayout.Refreshing = true;
@@ -363,7 +354,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null) CloseRequest();
+                if (CloseRequest != null)
+                    CloseRequest();
             }
             finally
             {
@@ -467,45 +459,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             menu.Clear();
 
             if (CurrentAdapter.SelectedItems.Any(dp => !dp.IsReadByCurrent))
-            {
                 menu.Add(Menu.None, MenuItemActions.MarkAsRead, MenuItemActions.MarkAsRead, Resource.String.mark_as_read);
-            }
 
             if (CurrentAdapter.SelectedItems.Any(dp => dp.IsReadByCurrent))
-            {
                 menu.Add(Menu.None, MenuItemActions.MarkAsUnread, MenuItemActions.MarkAsUnread, Resource.String.marks_as_unread);
-            }
 
             menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
             menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
 
-            if (Folder.InternalType == FolderInternalType.FilterView
-                || Folder.InternalType == FolderInternalType.Static
-                || Folder.InternalType == FolderInternalType.Worktray)
-            {
+            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
-            }
 
             menu.Add(Menu.None, MenuItemActions.SetPriority, MenuItemActions.SetPriority, Resource.String.set_priority);
 
             if (CurrentAdapter.SelectedItemCount == 1)
-            {
                 menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
-            }
 
-            if (Folder.InternalType == FolderInternalType.FilterView
-                || Folder.InternalType == FolderInternalType.Static
-                || Folder.InternalType == FolderInternalType.Worktray)
-            {
+            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
-            }
 
-            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
-                || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed
-                || CurrentAdapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft))
-            {
+            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || CurrentAdapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft))
                 menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
-            }
 
             return true;
         }
@@ -533,7 +507,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Copy);
+                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Copy);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
                 i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
                 StartActivity(i);
@@ -545,7 +519,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Move);
+                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Move);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
                 i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
                 i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
@@ -651,17 +625,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var option = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_worktray, Resource.Array.copy_to_worktray_options, true);
 
             if (option == 0)
-            {
                 await CopyToOwnWorktray(CurrentAdapter.SelectedItems);
-            }
 
             if (option == 1)
-            {
                 StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
-            }
         }
 
-        async void CopyToOwnWorktray(DocumentPreview documentPreview) => await CopyToOwnWorktray(new List<DocumentPreview> { documentPreview });
+        async void CopyToOwnWorktray(DocumentPreview documentPreview)
+        {
+            await CopyToOwnWorktray(new List<DocumentPreview>
+            {
+                documentPreview
+            });
+        }
 
         public async Task CopyToOwnWorktray(List<DocumentPreview> documentPreviews)
         {
@@ -695,7 +671,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void SetPriority()
         {
-            var possiblePriorities = new List<Priority> { Priority.Urgent, Priority.Normal, Priority.Low };
+            var possiblePriorities = new List<Priority>
+            {
+                Priority.Urgent,
+                Priority.Normal,
+                Priority.Low
+            };
             var selectedPriority = CurrentAdapter.SelectedItems.All(dp => dp.Priority == CurrentAdapter.SelectedItems[0].Priority) ? CurrentAdapter.SelectedItems[0].Priority : Priority.None;
 
             if (!possiblePriorities.Contains(selectedPriority))
@@ -730,9 +711,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
             if (!yesNo)
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Attempting to delete from folder [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
 
@@ -761,9 +740,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
             if (!yesNo)
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Attempting to delete [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
 
@@ -829,12 +806,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             searchHandler.RemoveCallbacksAndMessages(null);
             searchHandler.PostDelayed(() =>
-            {
-                if (string.IsNullOrWhiteSpace(newText))
-                    searchAdapter.ReplaceItems(adapter.Items);
-                else
-                    searchAdapter.ReplaceItems(adapter.Items.Where(dp => MatchesQuery(dp, newText)).ToList());
-            }, 500);
+                {
+                    if (string.IsNullOrWhiteSpace(newText))
+                        searchAdapter.ReplaceItems(adapter.Items);
+                    else
+                        searchAdapter.ReplaceItems(adapter.Items.Where(dp => MatchesQuery(dp, newText)).ToList());
+                },
+                500);
             return false;
         }
 
@@ -880,7 +858,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class DocumentsListFragmentState : IRetainableState
         {
-
             public Folder Folder { get; set; }
 
             public List<DocumentPreview> DocumentPreviews { get; set; }
@@ -1038,48 +1015,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected class DocumentsListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-
             public static class ViewType
             {
                 public const int DocumentView = 0;
                 public const int ExternalDocumentView = 1;
             }
 
-            public List<DocumentPreview> Items
-            {
-                get
-                {
-                    return documentPreviewsInView;
-                }
-            }
+            public List<DocumentPreview> Items { get; } = new List<DocumentPreview>(1000);
 
-            public List<DocumentPreview> SelectedItems
-            {
-                get
-                {
-                    return selectedDocumentsInView.Values.ToList();
-                }
-            }
+            public List<DocumentPreview> SelectedItems => selectedDocumentsInView.Values.ToList();
 
-            public override int ItemCount
-            {
-                get
-                {
-                    return documentPreviewsInView.Count;
-                }
-            }
+            public override int ItemCount => Items.Count;
 
-            public int SelectedItemCount
-            {
-                get
-                {
-                    return selectedDocumentsInView.Count;
-                }
-            }
+            public int SelectedItemCount => selectedDocumentsInView.Count;
 
             public bool EnableLoadMore { get; set; }
 
-            readonly List<DocumentPreview> documentPreviewsInView = new List<DocumentPreview>(1000);
             readonly Dictionary<int, DocumentPreview> selectedDocumentsInView = new Dictionary<int, DocumentPreview>();
             readonly Context context;
             readonly RecyclerView recyclerView;
@@ -1109,12 +1060,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public override int GetItemViewType(int position)
             {
-                return documentPreviewsInView[position].Direction == DocumentDirection.External ? ViewType.ExternalDocumentView : ViewType.DocumentView;
+                return Items[position].Direction == DocumentDirection.External ? ViewType.ExternalDocumentView : ViewType.DocumentView;
             }
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var dp = documentPreviewsInView[position];
+                var dp = Items[position];
 
                 if (holder is DocumentPreviewViewHolder)
                 {
@@ -1144,10 +1095,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
 
                     dpvh.Subject = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
-                    var d = dp.DateReceivedTimestamp
-                                .ConvertTimestampMillisecondsToDateTime()
-                                .ConvertUtcToUserTime()
-                                .ConvertDateTimeToTimestampMilliseconds();
+                    var d = dp.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
                     dpvh.Date = d.FormatUserTimestampAsCompactShortDateTimeString(context);
                     dpvh.BubbleDate = d.FormatUserTimestampAsCompactLongDateTimeString(context);
                     dpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
@@ -1177,10 +1125,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     edpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
                     edpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
 
-                    var d = dp.DateReceivedTimestamp
-                                .ConvertTimestampMillisecondsToDateTime()
-                                .ConvertUtcToUserTime()
-                                .ConvertDateTimeToTimestampMilliseconds();
+                    var d = dp.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
                     edpvh.Date = d.FormatUserTimestampAsCompactShortDateTimeString(context);
                     edpvh.BubbleDate = d.FormatUserTimestampAsCompactLongDateTimeString(context);
                     edpvh.Name = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
@@ -1192,9 +1137,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 if (recyclerView != null && loadMoreAction != null && position == ItemCount - 1 && EnableLoadMore)
-                {
                     loadMoreAction(dp.Id);
-                }
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -1217,14 +1160,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public void PrependItems(List<DocumentPreview> items)
             {
                 var count = items.Count;
-                documentPreviewsInView.InsertRange(0, items);
+                Items.InsertRange(0, items);
                 NotifyItemRangeInserted(0, count);
             }
 
             public void AppendItems(List<DocumentPreview> items)
             {
-                var count = documentPreviewsInView.Count;
-                documentPreviewsInView.AddRange(items);
+                var count = Items.Count;
+                Items.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
 
@@ -1240,9 +1183,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     var position = GetPosition(item);
                     if (position >= 0)
-                    {
                         NotifyItemChanged(position);
-                    }
                 }
             }
 
@@ -1253,7 +1194,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var position = GetPosition(item);
                     if (position >= 0)
                     {
-                        documentPreviewsInView.RemoveAt(position);
+                        Items.RemoveAt(position);
                         NotifyItemRemoved(position);
                     }
                 }
@@ -1267,24 +1208,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public void SetSelected(List<DocumentPreview> documentPreviews, bool selected)
             {
                 foreach (var document in documentPreviews)
-                {
                     SetSelected(document, selected);
-                }
             }
 
             public void SetSelected(DocumentPreview documentPreview, bool selected)
             {
                 var position = GetPosition(documentPreview);
-                if (position < 0) return;
+                if (position < 0)
+                    return;
 
                 if (selected)
-                {
                     selectedDocumentsInView[documentPreview.Id] = documentPreview;
-                }
                 else
-                {
                     selectedDocumentsInView.Remove(documentPreview.Id);
-                }
                 NotifyItemChanged(position);
             }
 
@@ -1297,16 +1233,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     var position = GetPosition(document);
                     if (position >= 0)
-                    {
                         NotifyItemChanged(position);
-                    }
                 }
             }
 
             public void Clear()
             {
-                var size = documentPreviewsInView.Count;
-                documentPreviewsInView.Clear();
+                var size = Items.Count;
+                Items.Clear();
                 selectedDocumentsInView.Clear();
                 NotifyItemRangeRemoved(0, size);
             }
@@ -1314,14 +1248,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int GetPosition(int documentPreviewId)
             {
                 var position = -1;
-                for (var i = 0; i < documentPreviewsInView.Count; i++)
-                {
-                    if (documentPreviewsInView[i].Id == documentPreviewId)
+                for (var i = 0; i < Items.Count; i++)
+                    if (Items[i].Id == documentPreviewId)
                     {
                         position = i;
                         break;
                     }
-                }
+
                 return position;
             }
 
@@ -1347,15 +1280,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 var dpvh = vh as DocumentPreviewViewHolder;
                 if (dpvh != null)
-                {
                     return dpvh.BubbleDate;
-                }
 
                 var edpvh = vh as ExternalDocumentPreviewViewHolder;
                 if (edpvh != null)
-                {
                     return edpvh.BubbleDate;
-                }
 
                 return string.Empty;
             }
@@ -1363,7 +1292,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class SwipeHelperCallback : ItemTouchHelper.Callback
         {
-
             public bool Enabled { get; set; } = true;
 
             readonly Context context;
@@ -1430,22 +1358,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 adapter.NotifyItemChanged(position);
 
                 viewHolder.ItemView.PostDelayed(() =>
-                {
-                    adapter.ResetSwipedState();
-                    adapter.NotifyItemChanged(position);
-                }, 400);
+                    {
+                        adapter.ResetSwipedState();
+                        adapter.NotifyItemChanged(position);
+                    },
+                    400);
             }
 
             public override void OnChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, bool isCurrentlyActive)
             {
-                if (actionState != ItemTouchHelper.ActionStateSwipe || viewHolder.AdapterPosition == -1)  //Sometimes it gets called for viewHolders that are already gone
+                if (actionState != ItemTouchHelper.ActionStateSwipe || viewHolder.AdapterPosition == -1) //Sometimes it gets called for viewHolders that are already gone
                     return;
 
                 var itemView = viewHolder.ItemView;
                 var itemViewHeight = itemView.Bottom - itemView.Top;
 
                 var paint = new TextPaint();
-                paint.TextSize = (int)TypedValue.ApplyDimension(ComplexUnitType.Sp, 14, Android.App.Application.Context.Resources.DisplayMetrics);
+                paint.TextSize = (int) TypedValue.ApplyDimension(ComplexUnitType.Sp, 14, Android.App.Application.Context.Resources.DisplayMetrics);
                 paint.Color = Color.White;
                 paint.TextAlign = Paint.Align.Left;
                 paint.SetTypeface(Typeface.Create(Typeface.Default, TypefaceStyle.Normal));
@@ -1453,13 +1382,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var iconMargin = ConversionUtils.ConvertDpToPixels(30);
 
                 var baseline = -paint.Ascent();
-                var textHeight = (int)(baseline + paint.Descent() + 0.5f);
+                var textHeight = (int) (baseline + paint.Descent() + 0.5f);
 
                 if (dX > 0) //Swiping to right
                 {
                     var text = context.Resources.GetString(Resource.String.categories);
 
-                    leftBackground.SetBounds(itemView.Left, itemView.Top, (int)dX, itemView.Bottom);
+                    leftBackground.SetBounds(itemView.Left, itemView.Top, (int) dX, itemView.Bottom);
                     leftBackground.Draw(c);
 
                     var textLayout = new StaticLayout(text, paint, c.Width, Layout.Alignment.AlignNormal, 1, 0, false);
@@ -1476,12 +1405,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     var text = context.Resources.GetString(Resource.String.copy_to_worktray_multiline);
 
-                    rightBackground.SetBounds(itemView.Right + (int)dX, itemView.Top, itemView.Right, itemView.Bottom);
+                    rightBackground.SetBounds(itemView.Right + (int) dX, itemView.Top, itemView.Right, itemView.Bottom);
                     rightBackground.Draw(c);
 
                     var textLayout = new StaticLayout(text, paint, c.Width, Layout.Alignment.AlignNormal, 1, 0, false);
 
-                    var iconWidth = text.Split(new string[] { "\n" }, StringSplitOptions.None).Select(s => (int)(paint.MeasureText(s) + 0.5f)).Max();
+                    var iconWidth = text.Split(new string[]
+                            {
+                                "\n"
+                            },
+                            StringSplitOptions.None)
+                        .Select(s => (int) (paint.MeasureText(s) + 0.5f))
+                        .Max();
 
                     var textRight = itemView.Right - iconMargin;
                     var textLeft = textRight - iconWidth;
@@ -1499,32 +1434,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class DocumentPreviewViewHolder : RecyclerView.ViewHolder
         {
+            public string Recipent { set => recipentTextView.Text = value; }
 
-            public string Recipent
-            {
-                set
-                {
-                    recipentTextView.Text = value;
-                }
-            }
-
-            public string Date
-            {
-                set
-                {
-                    dateTextView.Text = value;
-                }
-            }
+            public string Date { set => dateTextView.Text = value; }
 
             public string BubbleDate { get; set; }
 
-            public string Subject
-            {
-                set
-                {
-                    subjectTextView.Text = value;
-                }
-            }
+            public string Subject { set => subjectTextView.Text = value; }
 
             public string Preview
             {
@@ -1561,53 +1477,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            public bool IncomingIndicator
-            {
-                set
-                {
-                    incomingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool IncomingIndicator { set => incomingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
-            public bool OutgoingIndicator
-            {
-                set
-                {
-                    outgoingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool OutgoingIndicator { set => outgoingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
-            public bool DraftIndicator
-            {
-                set
-                {
-                    draftImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool DraftIndicator { set => draftImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
-            public bool UnreadIndicator
-            {
-                set
-                {
-                    unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool UnreadIndicator { set => unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
-            public bool AttachmentIndicator
-            {
-                set
-                {
-                    attachmentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool AttachmentIndicator { set => attachmentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
-            public bool CommentIndicator
-            {
-                set
-                {
-                    commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool CommentIndicator { set => commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             public bool Compact
             {
@@ -1619,13 +1499,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            public bool Selected
-            {
-                set
-                {
-                    selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool Selected { set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             public int SwipedDirection
             {
@@ -1664,7 +1538,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly View swipedBackground;
 
             public DocumentPreviewViewHolder(View itemView)
-                    : base(itemView)
+                : base(itemView)
             {
                 recipentTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_recipent);
                 dateTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_date);
@@ -1685,32 +1559,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ExternalDocumentPreviewViewHolder : RecyclerView.ViewHolder
         {
+            public string Name { set => nameTextView.Text = value; }
 
-            public string Name
-            {
-                set
-                {
-                    nameTextView.Text = value;
-                }
-            }
-
-            public string Date
-            {
-                set
-                {
-                    dateTextView.Text = value;
-                }
-            }
+            public string Date { set => dateTextView.Text = value; }
 
             public string BubbleDate { get; set; }
 
-            public string Preview
-            {
-                set
-                {
-                    previewTextView.Text = value;
-                }
-            }
+            public string Preview { set => previewTextView.Text = value; }
 
             public List<Category> Categories
             {
@@ -1730,21 +1585,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            public bool CommentIndicator
-            {
-                set
-                {
-                    commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool CommentIndicator { set => commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
-            public bool Selected
-            {
-                set
-                {
-                    selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool Selected { set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             public int SwipedDirection
             {
@@ -1777,7 +1620,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly View swipedBackground;
 
             public ExternalDocumentPreviewViewHolder(View itemView)
-                    : base(itemView)
+                : base(itemView)
             {
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_external_name);
                 dateTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_external_date);
@@ -1820,13 +1663,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         while (true)
                         {
                             await Task.Delay(intervalMs);
-                            if (cts.IsCancellationRequested) break;
+                            if (cts.IsCancellationRequested)
+                                break;
 
                             var first = firstOrDefaultItem();
                             if (first != null)
-                            {
                                 await work(first.Id);
-                            }
                         }
                     });
                 }
@@ -1835,9 +1677,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public void Stop()
             {
                 lock (lockObj)
+                {
                     cts?.Cancel();
+                }
             }
         }
     }
 }
-

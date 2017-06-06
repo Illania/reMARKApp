@@ -1,40 +1,18 @@
-//
-// Project: Mark5.Mobile.Common
-// File: Contact.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SQLite;
 using Mark5.Mobile.Common.Utilities;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
-
     [Table("Contact")]
     public class Contact : BusinessEntity
     {
+        [Ignore]
+        public override ObjectType ObjectType => ObjectType.Contact;
 
         [Ignore]
-        public override ObjectType ObjectType
-        {
-            get
-            {
-                return ObjectType.Contact;
-            }
-        }
-
-        [Ignore]
-        public override ModuleType ModuleType
-        {
-            get
-            {
-                return ModuleType.Contacts;
-            }
-        }
+        public override ModuleType ModuleType => ModuleType.Contacts;
 
         [Column("FirstName")]
         public string FirstName { get; set; }
@@ -74,16 +52,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (children == null)
-                {
                     children = new List<ContactPreview>();
-                }
-
                 return children;
             }
-            set
-            {
-                children = value;
-            }
+            set => children = value;
         }
 
         List<int> responsibleUserIds;
@@ -94,16 +66,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (responsibleUserIds == null)
-                {
                     responsibleUserIds = new List<int>();
-                }
-
                 return responsibleUserIds;
             }
-            set
-            {
-                responsibleUserIds = value;
-            }
+            set => responsibleUserIds = value;
         }
 
         Dictionary<int, string> responsibleUsers;
@@ -114,16 +80,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (responsibleUsers == null)
-                {
                     responsibleUsers = new Dictionary<int, string>();
-                }
-
                 return responsibleUsers;
             }
-            set
-            {
-                responsibleUsers = value;
-            }
+            set => responsibleUsers = value;
         }
 
         [Column("PreferrableType")]
@@ -137,16 +97,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (communicationAddresses == null)
-                {
                     communicationAddresses = new List<CommunicationAddress>();
-                }
-
                 return communicationAddresses;
             }
-            set
-            {
-                communicationAddresses = value;
-            }
+            set => communicationAddresses = value;
         }
 
         List<PhysicalAddress> physicalAddresses;
@@ -157,16 +111,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (physicalAddresses == null)
-                {
                     physicalAddresses = new List<PhysicalAddress>();
-                }
-
                 return physicalAddresses;
             }
-            set
-            {
-                physicalAddresses = value;
-            }
+            set => physicalAddresses = value;
         }
 
         List<Comment> comments;
@@ -177,97 +125,31 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (comments == null)
-                {
                     comments = new List<Comment>();
-                }
-
                 return comments;
             }
-            set
-            {
-                comments = value;
-            }
+            set => comments = value;
         }
 
         #region Serialization
 
         [Column("PrimaryPersonString")]
-        public string PrimaryPersonString
-        {
-            get
-            {
-                return SerializationUtils.Serialize(PrimaryPerson);
-            }
-            set
-            {
-                PrimaryPerson = SerializationUtils.Deserialize<ContactPreview>(value);
-            }
-        }
+        public string PrimaryPersonString { get => SerializationUtils.Serialize(PrimaryPerson); set => PrimaryPerson = SerializationUtils.Deserialize<ContactPreview>(value); }
 
         [Column("ChildrenString")]
-        public string ChildrenString
-        {
-            get
-            {
-                return SerializationUtils.Serialize(Children);
-            }
-            set
-            {
-                Children = SerializationUtils.Deserialize<List<ContactPreview>>(value);
-            }
-        }
+        public string ChildrenString { get => SerializationUtils.Serialize(Children); set => Children = SerializationUtils.Deserialize<List<ContactPreview>>(value); }
 
         [Column("ResponsibleUserIdsString")]
-        public string ResponsibleUserIdsString
-        {
-            get
-            {
-                return SerializationUtils.Serialize(ResponsibleUserIds);
-            }
-            set
-            {
-                ResponsibleUserIds = SerializationUtils.Deserialize<List<int>>(value);
-            }
-        }
+        public string ResponsibleUserIdsString { get => SerializationUtils.Serialize(ResponsibleUserIds); set => ResponsibleUserIds = SerializationUtils.Deserialize<List<int>>(value); }
 
         [Column("ResponsibleUsersString")]
-        public string ResponsibleUsersString
-        {
-            get
-            {
-                return SerializationUtils.Serialize(ResponsibleUsers);
-            }
-            set
-            {
-                ResponsibleUsers = SerializationUtils.Deserialize<Dictionary<int, string>>(value);
-            }
-        }
+        public string ResponsibleUsersString { get => SerializationUtils.Serialize(ResponsibleUsers); set => ResponsibleUsers = SerializationUtils.Deserialize<Dictionary<int, string>>(value); }
 
         [Column("PhysicalAddressesString")]
-        public string PhysicalAddressesString
-        {
-            get
-            {
-                return SerializationUtils.Serialize(PhysicalAddresses);
-            }
-            set
-            {
-                PhysicalAddresses = SerializationUtils.Deserialize<List<PhysicalAddress>>(value);
-            }
-        }
+        public string PhysicalAddressesString { get => SerializationUtils.Serialize(PhysicalAddresses); set => PhysicalAddresses = SerializationUtils.Deserialize<List<PhysicalAddress>>(value); }
 
         [Column("CommentsString")]
-        public string CommentsString
-        {
-            get
-            {
-                return SerializationUtils.Serialize(Comments);
-            }
-            set
-            {
-                Comments = SerializationUtils.Deserialize<List<Comment>>(value);
-            }
-        }
+        public string CommentsString { get => SerializationUtils.Serialize(Comments); set => Comments = SerializationUtils.Deserialize<List<Comment>>(value); }
 
         #endregion
 
@@ -277,4 +159,3 @@ namespace Mark5.Mobile.Common.Model
         }
     }
 }
-

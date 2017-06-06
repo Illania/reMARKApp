@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: CategoriesListViewCell.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Utilities;
@@ -18,11 +11,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static readonly NSString Key = new NSString("CategoriesTableViewCell");
         public static readonly UINib Nib = UINib.FromName("CategoriesTableViewCell", NSBundle.MainBundle);
 
-        public Category Category
-        {
-            get;
-            private set;
-        }
+        public Category Category { get; private set; }
 
         UIColor categoryColor;
 
@@ -33,7 +22,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static CategoriesTableViewCell Create()
         {
-            return (CategoriesTableViewCell)Nib.Instantiate(null, null)[0];
+            return (CategoriesTableViewCell) Nib.Instantiate(null, null)[0];
         }
 
         #region UITableViewCell overrides

@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: EditCategoriesListFragment.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,18 +18,13 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid
 {
-
     public class PickCategoriesListFragment : RetainableStateFragment
     {
-
         public ObjectType ObjectType { get; set; }
         public int[] PreselectedCategoryIds { get; set; }
         public Action<List<Category>> CloseRequest { get; set; }
 
-        CategoriesListAdapter CurrentAdapter
-        {
-            get { return (CategoriesListAdapter)recyclerView.GetAdapter(); }
-        }
+        CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter) recyclerView.GetAdapter();
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -73,7 +60,7 @@ namespace Mark5.Mobile.Droid
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.categories);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.categories);
 
             CommonConfig.Logger.Info($"Created {nameof(PickCategoriesListFragment)} [objectType={ObjectType}]");
         }
@@ -114,8 +101,9 @@ namespace Mark5.Mobile.Droid
 
         void CloseFragment()
         {
-            if (CloseRequest != null) CloseRequest(selectedCategories.Values.ToList());
-            ((AppCompatActivity)Activity).OnBackPressed();
+            if (CloseRequest != null)
+                CloseRequest(selectedCategories.Values.ToList());
+            ((AppCompatActivity) Activity).OnBackPressed();
         }
 
         #region Refresh methods
@@ -142,12 +130,8 @@ namespace Mark5.Mobile.Droid
                 }
 
                 foreach (var category in availableCategories)
-                {
                     if (PreselectedCategoryIds.Contains(category.Id))
-                    {
                         ToggleSelected(category);
-                    }
-                }
 
                 adapter.SetItems(availableCategories);
             }
@@ -173,19 +157,13 @@ namespace Mark5.Mobile.Droid
         {
             var isSelected = selectedCategories.ContainsKey(category.Id);
             if (isSelected)
-            {
                 selectedCategories.Remove(category.Id);
-            }
             else
-            {
                 selectedCategories.Add(category.Id, category);
-            }
 
             var position = CurrentAdapter.GetPosition(category);
             if (position >= 0)
-            {
                 CurrentAdapter.NotifyItemChanged(position);
-            }
         }
 
         #endregion
@@ -208,9 +186,8 @@ namespace Mark5.Mobile.Droid
             {
                 selectedCategories.Clear();
                 foreach (var kv in clfs.SelectedCategories)
-                {
                     selectedCategories.Add(kv.Key, kv.Value);
-                }
+
                 adapter.SetItems(clfs.AvailableCategories);
             }
         }
@@ -222,7 +199,6 @@ namespace Mark5.Mobile.Droid
 
         class AvailableCategoriesListFragmentState : IRetainableState
         {
-
             public Dictionary<int, Category> SelectedCategories { get; set; }
 
             public List<Category> AvailableCategories { get; set; }
@@ -234,11 +210,11 @@ namespace Mark5.Mobile.Droid
 
         class CategoriesListAdapter : RecyclerView.Adapter
         {
-            readonly List<Category> categoriesInView = new List<Category>(200);
             readonly Dictionary<int, Category> selectedCategoriesInView;
 
-            public override int ItemCount { get { return categoriesInView.Count; } }
-            public List<Category> Items { get { return categoriesInView; } }
+            public override int ItemCount => Items.Count;
+
+            public List<Category> Items { get; } = new List<Category>(200);
 
             public event EventHandler<Category> ItemClicked = delegate { };
 
@@ -249,7 +225,7 @@ namespace Mark5.Mobile.Droid
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var c = categoriesInView[position];
+                var c = Items[position];
                 var cvh = holder as CategoryViewHolder;
 
                 cvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, c)));
@@ -268,15 +244,15 @@ namespace Mark5.Mobile.Droid
 
             public void SetItems(List<Category> categories)
             {
-                var count = categoriesInView.Count;
-                categoriesInView.AddRange(categories.OrderBy(c => c.Name));
+                var count = Items.Count;
+                Items.AddRange(categories.OrderBy(c => c.Name));
                 NotifyItemRangeInserted(count, categories.Count);
             }
 
             public void Clear()
             {
-                var count = categoriesInView.Count;
-                categoriesInView.Clear();
+                var count = Items.Count;
+                Items.Clear();
                 NotifyItemRangeRemoved(0, count);
             }
 
@@ -288,7 +264,7 @@ namespace Mark5.Mobile.Droid
 
             public int GetPosition(Category category)
             {
-                return categoriesInView.FindIndex(c => c.Id == category.Id);
+                return Items.FindIndex(c => c.Id == category.Id);
             }
         }
 
@@ -342,10 +318,7 @@ namespace Mark5.Mobile.Droid
                     selected = value;
                     selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
                 }
-                get
-                {
-                    return selected;
-                }
+                get => selected;
             }
 
             readonly View colorImageView;
@@ -354,7 +327,8 @@ namespace Mark5.Mobile.Droid
 
             readonly View selectedOverlay;
 
-            public CategoryViewHolder(View itemView) : base(itemView)
+            public CategoryViewHolder(View itemView)
+                : base(itemView)
             {
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_category_name);
                 descriptionTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_categoty_description);
@@ -364,6 +338,5 @@ namespace Mark5.Mobile.Droid
         }
 
         #endregion
-
     }
 }

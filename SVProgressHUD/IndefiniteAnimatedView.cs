@@ -1,11 +1,4 @@
-﻿//
-// Project: SVProgressHUD
-// File: IndefiniteAnimatedView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 using CoreAnimation;
 using CoreGraphics;
 using Foundation;
@@ -13,17 +6,12 @@ using UIKit;
 
 namespace SVProgressHUD
 {
-
     [Register("IndefiniteAnimatedView")]
     class IndefiniteAnimatedView : UIView
     {
-
         public override CGRect Frame
         {
-            get
-            {
-                return base.Frame;
-            }
+            get => base.Frame;
             set
             {
                 if (base.Frame != value)
@@ -37,16 +25,13 @@ namespace SVProgressHUD
         }
 
         float _radius;
+
         public float Radius
         {
-            get
-            {
-                return _radius;
-            }
+            get => _radius;
             set
             {
-#pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator                if (_radius != value)
-#pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
+                if (_radius != value)
                 {
                     _radius = value;
 
@@ -60,13 +45,10 @@ namespace SVProgressHUD
         }
 
         float _strokeThickness;
+
         public float StrokeThickness
         {
-            get
-            {
-                return _strokeThickness;
-            }
-
+            get => _strokeThickness;
             set
             {
                 _strokeThickness = value;
@@ -76,13 +58,10 @@ namespace SVProgressHUD
         }
 
         UIColor _strokeColor;
+
         public UIColor StrokeColor
         {
-            get
-            {
-                return _strokeColor;
-            }
-
+            get => _strokeColor;
             set
             {
                 _strokeColor = value;
@@ -96,7 +75,9 @@ namespace SVProgressHUD
         public override void WillMoveToSuperview(UIView newsuper)
         {
             if (newsuper != null)
+            {
                 LayoutAnimatedLayer();
+            }
             else
             {
                 indefiniteAnimatedLayer?.RemoveFromSuperLayer();
@@ -125,7 +106,7 @@ namespace SVProgressHUD
             if (indefiniteAnimatedLayer == null)
             {
                 var arcCenter = new CGPoint(Radius + StrokeThickness / 2 + 5, Radius + StrokeThickness / 2 + 5);
-                var smoothedPath = UIBezierPath.FromArc(arcCenter, Radius, (nfloat)(-Math.PI * 3d / 2d), (nfloat)(Math.PI / 2d + Math.PI * 5), true);
+                var smoothedPath = UIBezierPath.FromArc(arcCenter, Radius, (nfloat) (-Math.PI * 3d / 2d), (nfloat) (Math.PI / 2d + Math.PI * 5), true);
 
                 indefiniteAnimatedLayer = new CAShapeLayer
                 {
@@ -177,7 +158,11 @@ namespace SVProgressHUD
                 strokeEndAnimation.From = FromObject(0.485f);
                 strokeEndAnimation.To = FromObject(0.985f);
 
-                animationGroup.Animations = new[] { strokeStartAnimation, strokeEndAnimation };
+                animationGroup.Animations = new[]
+                {
+                    strokeStartAnimation,
+                    strokeEndAnimation
+                };
                 indefiniteAnimatedLayer.AddAnimation(animationGroup, "progress");
             }
 

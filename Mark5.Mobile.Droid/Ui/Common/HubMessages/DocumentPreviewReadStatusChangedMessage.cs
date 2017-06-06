@@ -1,35 +1,14 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: ReadStatusChangedMessage.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using TinyMessenger;
+﻿using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Common.HubMessages
 {
-
     public class DocumentPreviewReadStatusChangedMessage : TinyMessageBase
     {
+        public int DocumentPreviewId { get; }
 
-        public int DocumentPreviewId
-        {
-            get;
-            private set;
-        }
+        public bool IsReadByCurrent { get; }
 
-        public bool IsReadByCurrent
-        {
-            get;
-            private set;
-        }
-
-        public bool IsReadByAnyone
-        {
-            get;
-            private set;
-        }
+        public bool IsReadByAnyone { get; }
 
         public DocumentPreviewReadStatusChangedMessage(object sender, int documentPreviewId, bool isReadByCurrent, bool isReadByAnyone)
             : base(sender)

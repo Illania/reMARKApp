@@ -1,12 +1,4 @@
-//
-// Project: Mark5.Mobile.Common
-// File: OutgoingDocumentContainer.cs
-// Author: Ferdinando Papale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-#pragma warning disable CS1701
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Mark5.Mobile.Common.Model
@@ -14,37 +6,31 @@ namespace Mark5.Mobile.Common.Model
     public class OutgoingDocumentContainer
     {
         Document document;
+
         public Document Document
         {
             get
             {
                 if (LoadMode != LoadMode.Complete)
-                {
                     throw new InvalidOperationException($"The document is not set in LoadMode:{LoadMode}!");
-                }
+
                 return document;
             }
-            set
-            {
-                document = value;
-            }
+            set => document = value;
         }
 
         List<OutgoingDocumentAttachmentDescription> localAttachments = new List<OutgoingDocumentAttachmentDescription>();
+
         public List<OutgoingDocumentAttachmentDescription> LocalAttachments
         {
             get
             {
                 if (LoadMode != LoadMode.Complete)
-                {
                     throw new InvalidOperationException($"The attachments are not set in LoadMode:{LoadMode}!");
-                }
+
                 return localAttachments;
             }
-            set
-            {
-                localAttachments = value;
-            }
+            set => localAttachments = value;
         }
 
         public DocumentPreview DocumentPreview { get; set; }
@@ -58,4 +44,3 @@ namespace Mark5.Mobile.Common.Model
         Complete,
     }
 }
-

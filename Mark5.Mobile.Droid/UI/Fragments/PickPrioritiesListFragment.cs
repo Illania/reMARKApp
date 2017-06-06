@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: PickPrioritiesListFragment.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Android.Graphics;
 using Android.OS;
@@ -50,7 +43,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.search_priorities);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.search_priorities);
 
             CommonConfig.Logger.Info($"Created {nameof(PickPrioritiesListFragment)}");
         }
@@ -68,7 +61,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void RefreshData()
         {
-            var priorities = new List<Priority> { Priority.Urgent, Priority.Normal, Priority.Low };
+            var priorities = new List<Priority>
+            {
+                Priority.Urgent,
+                Priority.Normal,
+                Priority.Low
+            };
             adapter.SetSelectedPriorities(SelectedPriorities);
             adapter.SetItems(priorities);
         }
@@ -93,8 +91,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void CloseFragment()
         {
-            if (CloseRequest != null) CloseRequest(adapter.SelectedPriorities);
-            ((AppCompatActivity)Activity).OnBackPressed();
+            if (CloseRequest != null)
+                CloseRequest(adapter.SelectedPriorities);
+            ((AppCompatActivity) Activity).OnBackPressed();
         }
 
         #region Retained State
@@ -111,9 +110,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var clfs = restoredState as PickLinesListFragmentState;
             if (clfs != null)
-            {
                 SelectedPriorities = clfs.SelectedPriorities;
-            }
         }
 
         public override string GenerateTag()
@@ -130,22 +127,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class PrioritiesListViewAdapter : RecyclerView.Adapter
         {
-            readonly List<Priority> prioritiesInView = new List<Priority>(3);
-            readonly List<Priority> selectedPriorities = new List<Priority>(3);
+            public List<Priority> SelectedPriorities { get; } = new List<Priority>(3);
 
-            public List<Priority> SelectedPriorities { get { return selectedPriorities; } }
+            public override int ItemCount => Items.Count;
 
-            public override int ItemCount { get { return prioritiesInView.Count; } }
-            public List<Priority> Items { get { return prioritiesInView; } }
+            public List<Priority> Items { get; } = new List<Priority>(3);
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var p = prioritiesInView[position];
+                var p = Items[position];
                 var lvh = holder as PriorityViewHolder;
 
                 lvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => HandleClick(p, position)));
 
-                lvh.Selected = selectedPriorities.Contains(p);
+                lvh.Selected = SelectedPriorities.Contains(p);
                 lvh.Name = lvh.ItemView.Context.GetString(UI.PriorityResourceId(p));
             }
 
@@ -157,27 +152,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void SetItems(List<Priority> priorities)
             {
-                var count = prioritiesInView.Count;
-                prioritiesInView.AddRange(priorities);
+                var count = Items.Count;
+                Items.AddRange(priorities);
                 NotifyItemRangeInserted(count, priorities.Count);
             }
 
             public void SetSelectedPriorities(List<Priority> priorities)
             {
-                this.selectedPriorities.Clear();
-                this.selectedPriorities.AddRange(priorities);
+                SelectedPriorities.Clear();
+                SelectedPriorities.AddRange(priorities);
             }
 
             void HandleClick(Priority p, int position)
             {
-                if (selectedPriorities.Contains(p))
-                {
-                    selectedPriorities.Remove(p);
-                }
+                if (SelectedPriorities.Contains(p))
+                    SelectedPriorities.Remove(p);
                 else
-                {
-                    selectedPriorities.Add(p);
-                }
+                    SelectedPriorities.Add(p);
 
                 NotifyItemChanged(position);
             }
@@ -203,22 +194,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     selected = value;
                     selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
                 }
-                get
-                {
-                    return selected;
-                }
+                get => selected;
             }
 
             readonly AppCompatTextView nameTextView;
 
             readonly View selectedOverlay;
 
-            public PriorityViewHolder(View itemView) : base(itemView)
+            public PriorityViewHolder(View itemView)
+                : base(itemView)
             {
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.search_list_item_priority_name);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
             }
         }
-
     }
 }

@@ -1,18 +1,10 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: ReachabilityProvider.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Net;
 using CoreFoundation;
 using SystemConfiguration;
 
 namespace Mark5.Mobile.IOS.Services
 {
-
     // https://github.com/xamarin/ios-samples/blob/master/ReachabilitySample/reachability.cs
     // with small modifications for IPv4
     public static class ReachabilityProvider
@@ -22,11 +14,10 @@ namespace Mark5.Mobile.IOS.Services
         public static bool IsReachableWithoutRequiringConnection(NetworkReachabilityFlags flags)
         {
             // Is it reachable with the current network configuration?
-            bool isReachable = (flags & NetworkReachabilityFlags.Reachable) != 0;
+            var isReachable = (flags & NetworkReachabilityFlags.Reachable) != 0;
 
             // Do we need a connection to reach it?
-            bool noConnectionRequired = (flags & NetworkReachabilityFlags.ConnectionRequired) == 0
-                || (flags & NetworkReachabilityFlags.IsWWAN) != 0;
+            var noConnectionRequired = (flags & NetworkReachabilityFlags.ConnectionRequired) == 0 || (flags & NetworkReachabilityFlags.IsWWAN) != 0;
 
             return isReachable && noConnectionRequired;
         }
@@ -42,6 +33,7 @@ namespace Mark5.Mobile.IOS.Services
                 if (r.TryGetFlags(out NetworkReachabilityFlags flags))
                     return IsReachableWithoutRequiringConnection(flags);
             }
+
             return false;
         }
 
@@ -68,7 +60,13 @@ namespace Mark5.Mobile.IOS.Services
         {
             if (adHocWiFiNetworkReachability == null)
             {
-                var ipAddress = new IPAddress(new byte[] { 169, 254, 0, 0 });
+                var ipAddress = new IPAddress(new byte[]
+                {
+                    169,
+                    254,
+                    0,
+                    0
+                });
                 adHocWiFiNetworkReachability = new NetworkReachability(ipAddress);
                 adHocWiFiNetworkReachability.SetNotification(OnChange);
                 adHocWiFiNetworkReachability.Schedule(CFRunLoop.Main, CFRunLoop.ModeDefault);
@@ -120,15 +118,14 @@ namespace Mark5.Mobile.IOS.Services
             if (!IsReachableWithoutRequiringConnection(flags))
                 return NetworkStatus.NotReachable;
 
-            return (flags & NetworkReachabilityFlags.IsWWAN) != 0 ?
-                NetworkStatus.ReachableViaCarrierDataNetwork : NetworkStatus.ReachableViaWiFiNetwork;
+            return (flags & NetworkReachabilityFlags.IsWWAN) != 0 ? NetworkStatus.ReachableViaCarrierDataNetwork : NetworkStatus.ReachableViaWiFiNetwork;
         }
 
         public static NetworkStatus InternetConnectionStatus()
         {
             var defaultNetworkAvailable = IsNetworkAvailable(out NetworkReachabilityFlags flags);
 
-            if (defaultNetworkAvailable && ((flags & NetworkReachabilityFlags.IsDirect) != 0))
+            if (defaultNetworkAvailable && (flags & NetworkReachabilityFlags.IsDirect) != 0)
                 return NetworkStatus.NotReachable;
 
             if ((flags & NetworkReachabilityFlags.IsWWAN) != 0)

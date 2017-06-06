@@ -1,23 +1,11 @@
-//
-// Project: Mark5.Mobile.Common
-// File: DocumentsModuleInfo.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
-
     public class DocumentsModuleInfo
     {
-
         public OnSendToSystemUser OnSendToSystemUser { get; set; }
-
         public Line DefaultOutgoingLine { get; set; }
-
         List<Line> outgoingLines;
 
         public List<Line> OutgoingLines
@@ -25,20 +13,13 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (outgoingLines == null)
-                {
                     outgoingLines = new List<Line>();
-                }
-
                 return outgoingLines;
             }
-            set
-            {
-                outgoingLines = value;
-            }
+            set => outgoingLines = value;
         }
 
         public bool IsMissingAttachmentWarningEnabled { get; set; }
-
         List<string> forwardAbbreviations;
 
         public List<string> ForwardAbbreviations
@@ -46,17 +27,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (forwardAbbreviations == null)
-                {
                     forwardAbbreviations = new List<string>();
-                }
-
                 return forwardAbbreviations;
             }
-
-            set
-            {
-                forwardAbbreviations = value;
-            }
+            set => forwardAbbreviations = value;
         }
 
         List<string> replyAbbreviations;
@@ -66,17 +40,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (replyAbbreviations == null)
-                {
                     replyAbbreviations = new List<string>();
-                }
-
                 return replyAbbreviations;
             }
-
-            set
-            {
-                replyAbbreviations = value;
-            }
+            set => replyAbbreviations = value;
         }
 
         List<string> attachmentKeywords;
@@ -86,21 +53,13 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (attachmentKeywords == null)
-                {
                     attachmentKeywords = new List<string>();
-                }
-
                 return attachmentKeywords;
             }
-
-            set
-            {
-                attachmentKeywords = value;
-            }
+            set => attachmentKeywords = value;
         }
 
         public long MaximumAttachmentSizeBytes { get; set; }
-
         List<DocumentExtraFieldInfo> extraFieldInfos;
 
         public List<DocumentExtraFieldInfo> ExtraFieldInfos
@@ -108,24 +67,14 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (extraFieldInfos == null)
-                {
                     extraFieldInfos = new List<DocumentExtraFieldInfo>();
-                }
-
                 return extraFieldInfos;
             }
-
-            set
-            {
-                extraFieldInfos = value;
-            }
+            set => extraFieldInfos = value;
         }
 
         public bool AttachmentSearchEnabled { get; set; }
-
         public bool HandledFieldEnabled { get; set; }
-
         public DocumentsModulePermissions Permissions { get; set; }
     }
 }
-

@@ -1,39 +1,17 @@
-//
-// Project: Mark5.Mobile.Common
-// File: Shortcode.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SQLite;
 using Mark5.Mobile.Common.Utilities;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
-
     [Table("Shortcode")]
     public class Shortcode : BusinessEntity
     {
+        [Ignore]
+        public override ObjectType ObjectType => ObjectType.Shortcode;
 
         [Ignore]
-        public override ObjectType ObjectType
-        {
-            get
-            {
-                return ObjectType.Shortcode;
-            }
-        }
-
-        [Ignore]
-        public override ModuleType ModuleType
-        {
-            get
-            {
-                return ModuleType.Shortcodes;
-            }
-        }
+        public override ModuleType ModuleType => ModuleType.Shortcodes;
 
         List<DocumentAddress> addresses;
 
@@ -43,33 +21,16 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (addresses == null)
-                {
                     addresses = new List<DocumentAddress>();
-                }
-
                 return addresses;
             }
-            set
-            {
-                addresses = value;
-            }
+            set => addresses = value;
         }
 
         #region Serialization
 
         [Column("AddressString")]
-        public string AddressString
-        {
-            get
-            {
-                return SerializationUtils.Serialize(Addresses);
-            }
-            set
-            {
-
-                Addresses = SerializationUtils.Deserialize<List<DocumentAddress>>(value);
-            }
-        }
+        public string AddressString { get => SerializationUtils.Serialize(Addresses); set => Addresses = SerializationUtils.Deserialize<List<DocumentAddress>>(value); }
 
         #endregion
 
@@ -79,4 +40,3 @@ namespace Mark5.Mobile.Common.Model
         }
     }
 }
-

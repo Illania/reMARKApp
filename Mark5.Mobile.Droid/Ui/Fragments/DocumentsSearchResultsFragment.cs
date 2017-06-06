@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: DocumentSearchResultsFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,10 +22,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-
     public class DocumentsSearchResultsFragment : RetainableStateFragment
     {
-
         public SearchDocumentsCriteria Criteria { get; set; }
         public Action CloseRequest { get; set; }
 
@@ -67,8 +58,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_documents_result);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.search_documents_result);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(DocumentsSearchResultsFragment)} [criteria={Criteria}]");
         }
@@ -140,10 +131,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 var documentPreviews = await Managers.SearchManager.SearchDocumentsAsync(Criteria);
 
-                if (documentPreviews.Count < 1) 
+                if (documentPreviews.Count < 1)
                 {
                     await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.no_results, Resource.String.no_results_documents);
-                    if (CloseRequest != null) CloseRequest();
+                    if (CloseRequest != null)
+                        CloseRequest();
                     return;
                 }
 
@@ -158,7 +150,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null) CloseRequest();
+                if (CloseRequest != null)
+                    CloseRequest();
             }
             finally
             {
@@ -185,7 +178,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class DocumentSearchResultsFragmentState : IRetainableState
         {
-            
             public SearchDocumentsCriteria Criteria { get; set; }
 
             public List<DocumentPreview> DocumentPreviews { get; set; }
@@ -197,30 +189,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class DocumentSearchResultsAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-
             public static class ViewType
             {
                 public const int DocumentView = 0;
                 public const int ExternalDocumentView = 1;
             }
 
-            public List<DocumentPreview> Items
-            {
-                get
-                {
-                    return documentPreviewsInView;
-                }
-            }
+            public List<DocumentPreview> Items { get; } = new List<DocumentPreview>(1000);
 
-            public override int ItemCount
-            {
-                get
-                {
-                    return documentPreviewsInView.Count;
-                }
-            }
+            public override int ItemCount => Items.Count;
 
-            readonly List<DocumentPreview> documentPreviewsInView = new List<DocumentPreview>(1000);
             readonly Context context;
             readonly RecyclerView recyclerView;
 
@@ -237,7 +215,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (holder is DocumentPreviewViewHolder)
                 {
                     var dpvh = holder as DocumentPreviewViewHolder;
-                    var dp = documentPreviewsInView[position];
+                    var dp = Items[position];
 
                     dpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
 
@@ -253,10 +231,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
 
                     dpvh.Subject = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
-                    var d = dp.DateReceivedTimestamp
-                                .ConvertTimestampMillisecondsToDateTime()
-                                .ConvertUtcToUserTime()
-                                .ConvertDateTimeToTimestampMilliseconds();
+                    var d = dp.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
                     dpvh.Date = d.FormatUserTimestampAsCompactShortDateTimeString(context);
                     dpvh.BubbleDate = d.FormatUserTimestampAsCompactLongDateTimeString(context);
                     dpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
@@ -271,14 +246,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 else if (holder is ExternalDocumentPreviewViewHolder)
                 {
                     var edpvh = holder as ExternalDocumentPreviewViewHolder;
-                    var dp = documentPreviewsInView[position];
+                    var dp = Items[position];
 
                     edpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
 
-                    var d = dp.DateReceivedTimestamp
-                                .ConvertTimestampMillisecondsToDateTime()
-                                .ConvertUtcToUserTime()
-                                .ConvertDateTimeToTimestampMilliseconds();
+                    var d = dp.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
                     edpvh.Date = d.FormatUserTimestampAsCompactShortDateTimeString(context);
                     edpvh.BubbleDate = d.FormatUserTimestampAsCompactLongDateTimeString(context);
                     edpvh.Name = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
@@ -307,8 +279,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void AppendItems(List<DocumentPreview> items)
             {
-                var count = documentPreviewsInView.Count;
-                documentPreviewsInView.AddRange(items);
+                var count = Items.Count;
+                Items.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
 
@@ -318,15 +290,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 var dpvh = vh as DocumentPreviewViewHolder;
                 if (dpvh != null)
-                {
                     return dpvh.BubbleDate;
-                }
 
                 var edpvh = vh as ExternalDocumentPreviewViewHolder;
                 if (edpvh != null)
-                {
                     return edpvh.BubbleDate;
-                }
 
                 return string.Empty;
             }
@@ -334,40 +302,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class DocumentPreviewViewHolder : RecyclerView.ViewHolder
         {
+            public string Recipent { set => recipentTextView.Text = value; }
 
-            public string Recipent
-            {
-                set
-                {
-                    recipentTextView.Text = value;
-                }
-            }
-
-            public string Date
-            {
-                set
-                {
-                    dateTextView.Text = value;
-                }
-            }
+            public string Date { set => dateTextView.Text = value; }
 
             public string BubbleDate { get; set; }
 
-            public string Subject
-            {
-                set
-                {
-                    subjectTextView.Text = value;
-                }
-            }
+            public string Subject { set => subjectTextView.Text = value; }
 
-            public string Preview
-            {
-                set
-                {
-                    previewTextView.Text = value;
-                }
-            }
+            public string Preview { set => previewTextView.Text = value; }
 
             public List<Category> Categories
             {
@@ -387,61 +330,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            public bool IncomingIndicator
-            {
-                set
-                {
-                    incomingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool IncomingIndicator { set => incomingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
-            public bool OutgoingIndicator
-            {
-                set
-                {
-                    outgoingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool OutgoingIndicator { set => outgoingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
-            public bool DraftIndicator
-            {
-                set
-                {
-                    draftImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool DraftIndicator { set => draftImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
-            public bool UnreadIndicator
-            {
-                set
-                {
-                    unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool UnreadIndicator { set => unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
-            public bool AttachmentIndicator
-            {
-                set
-                {
-                    attachmentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool AttachmentIndicator { set => attachmentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
-            public bool CommentIndicator
-            {
-                set
-                {
-                    commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool CommentIndicator { set => commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
-            public bool Selected
-            {
-                set
-                {
-                    selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool Selected { set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             readonly AppCompatTextView recipentTextView;
             readonly AppCompatTextView dateTextView;
@@ -457,7 +358,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly View selectedOverlay;
 
             public DocumentPreviewViewHolder(View itemView)
-                    : base(itemView)
+                : base(itemView)
             {
                 recipentTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_recipent);
                 dateTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_date);
@@ -476,32 +377,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ExternalDocumentPreviewViewHolder : RecyclerView.ViewHolder
         {
+            public string Name { set => nameTextView.Text = value; }
 
-            public string Name
-            {
-                set
-                {
-                    nameTextView.Text = value;
-                }
-            }
-
-            public string Date
-            {
-                set
-                {
-                    dateTextView.Text = value;
-                }
-            }
+            public string Date { set => dateTextView.Text = value; }
 
             public string BubbleDate { get; set; }
 
-            public string Preview
-            {
-                set
-                {
-                    previewTextView.Text = value;
-                }
-            }
+            public string Preview { set => previewTextView.Text = value; }
 
             public List<Category> Categories
             {
@@ -521,21 +403,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            public bool CommentIndicator
-            {
-                set
-                {
-                    commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool CommentIndicator { set => commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
-            public bool Selected
-            {
-                set
-                {
-                    selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool Selected { set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             readonly AppCompatTextView nameTextView;
             readonly AppCompatTextView dateTextView;
@@ -545,7 +415,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly View selectedOverlay;
 
             public ExternalDocumentPreviewViewHolder(View itemView)
-                    : base(itemView)
+                : base(itemView)
             {
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_external_name);
                 dateTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_external_date);
@@ -559,4 +429,3 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         #endregion
     }
 }
-

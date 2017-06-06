@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ShortcodeActivity.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using Android.App;
 using Android.Content.PM;
@@ -18,11 +11,9 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class ShortcodeActivity : BaseAppCompatActivity
     {
-
         public const string FolderIdIntentKey = "FolderId_e3f108c2-2b12-458c-ae4b-195c4036d334";
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
         public const string ShortcodeIdIntentKey = "ShortcodeId_3b7133eb-aa8c-44e9-be83-e984c5c43967";
@@ -61,7 +52,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (Intent.HasExtra(ShortcodePreviewIntentKey))
                     sf.ShortcodePreview = SerializationUtils.Deserialize<ShortcodePreview>(Intent.Extras.GetString(ShortcodePreviewIntentKey));
-                
+
                 if (Intent.HasExtra(NotificationGuidIntentKey))
                     sf.NotificationGuid = SerializationUtils.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
 
@@ -87,4 +78,3 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         }
     }
 }
-

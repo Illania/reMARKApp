@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ContactsListFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +14,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using FastScrollRecycler;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -30,10 +24,8 @@ using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-
     public class ContactsListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-
         public Folder Folder { get; set; }
         public Action CloseRequest { get; set; }
 
@@ -50,10 +42,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool shouldNotifyAdapter;
         bool shouldNotifySearchAdapter;
 
-        ContactsListAdapter CurrentAdapter
-        {
-            get { return (ContactsListAdapter)recyclerView.GetAdapter(); }
-        }
+        ContactsListAdapter CurrentAdapter => (ContactsListAdapter) recyclerView.GetAdapter();
 
         CancellationTokenSource cts;
 
@@ -90,7 +79,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
             adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
             {
-                if (recyclerView.GetAdapter() != adapter) return;
+                if (recyclerView.GetAdapter() != adapter)
+                    return;
 
                 emptyView.Visibility = adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
                 recyclerView.Visibility = adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
@@ -111,8 +101,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.contacts);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder?.Name;
+            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.contacts);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = Folder?.Name;
 
             CommonConfig.Logger.Info($"Created {nameof(ContactsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]");
         }
@@ -163,7 +153,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
             MenuItemCompat.SetOnActionExpandListener(filterItem, this);
-            searchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
+            searchView = (SearchView) MenuItemCompat.GetActionView(filterItem);
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
 
@@ -245,7 +235,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"Attempting refresh [startRowId={startRowId}, force={force}]...");
 
-            if (refreshing) return;
+            if (refreshing)
+                return;
 
             refreshing = true;
             refreshLayout.Refreshing = true;
@@ -258,24 +249,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (force)
                 adapter.Clear();
 
-            Managers.ContactsManager.GetAllContactPreviews(Folder, cps =>
-            {
-                Managers.DownloadManager.Notify(ObjectType.Contact, Folder.Id);
-                Activity.RunOnUiThread(() => adapter.AppendItems(cps));
-            }, () =>
-            {
-                refreshLayout.Refreshing = false;
-                refreshing = false;
+            Managers.ContactsManager.GetAllContactPreviews(Folder,
+                cps =>
+                {
+                    Managers.DownloadManager.Notify(ObjectType.Contact, Folder.Id);
+                    Activity.RunOnUiThread(() => adapter.AppendItems(cps));
+                },
+                () =>
+                {
+                    refreshLayout.Refreshing = false;
+                    refreshing = false;
 
-                CommonConfig.Logger.Info($"Refresh finished");
-            }, ex =>
-            {
-                CommonConfig.Logger.Error($"Downloading contacts failed [folder.name={Folder?.Name}, folder.id={Folder?.Id}, startRowId={startRowId}, force={force}]", ex);
+                    CommonConfig.Logger.Info($"Refresh finished");
+                },
+                ex =>
+                {
+                    CommonConfig.Logger.Error($"Downloading contacts failed [folder.name={Folder?.Name}, folder.id={Folder?.Id}, startRowId={startRowId}, force={force}]", ex);
 
-                Dialogs.ShowErrorDialog(Activity, ex);
+                    Dialogs.ShowErrorDialog(Activity, ex);
 
-                if (CloseRequest != null && adapter.ItemCount < 1) CloseRequest();
-            }, startRowId, cts.Token);
+                    if (CloseRequest != null && adapter.ItemCount < 1)
+                        CloseRequest();
+                },
+                startRowId,
+                cts.Token);
         }
 
         #endregion
@@ -310,9 +307,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void Adapter_ItemLongClicked(object sender, ContactPreview contactPreview)
         {
             if (actionMode == null)
-            {
                 actionMode = Activity.StartActionMode(this);
-            }
 
             Adapter_ItemClicked(sender, contactPreview);
         }
@@ -346,30 +341,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
             menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
 
-            if (Folder.InternalType == FolderInternalType.FilterView
-                || Folder.InternalType == FolderInternalType.Static
-                || Folder.InternalType == FolderInternalType.Worktray)
-            {
+            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
-            }
 
             if (CurrentAdapter.SelectedItemCount == 1)
-            {
                 menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
-            }
 
-            if (Folder.InternalType == FolderInternalType.FilterView
-                || Folder.InternalType == FolderInternalType.Static
-                || Folder.InternalType == FolderInternalType.Worktray)
-            {
+            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
-            }
 
-            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
-                || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
-            {
+            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
                 menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
-            }
 
             return true;
         }
@@ -385,7 +367,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Copy);
+                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Copy);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
                 i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
                 StartActivity(i);
@@ -397,7 +379,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Move);
+                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Move);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
                 i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
                 i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
@@ -469,18 +451,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (option == 1)
-            {
                 StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
-            }
         }
 
         async void DeleteFromFolderAction()
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
             if (!yesNo)
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Attempting to delete from folder [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
 
@@ -509,9 +487,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
             if (!yesNo)
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Attempting to delete [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
 
@@ -577,12 +553,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             searchHandler.RemoveCallbacksAndMessages(null);
             searchHandler.PostDelayed(() =>
-            {
-                if (string.IsNullOrWhiteSpace(newText))
-                    searchAdapter.ReplaceItems(adapter.Items);
-                else
-                    searchAdapter.ReplaceItems(adapter.Items.Where(dp => MatchesQuery(dp, newText)).ToList());
-            }, 500);
+                {
+                    if (string.IsNullOrWhiteSpace(newText))
+                        searchAdapter.ReplaceItems(adapter.Items);
+                    else
+                        searchAdapter.ReplaceItems(adapter.Items.Where(dp => MatchesQuery(dp, newText)).ToList());
+                },
+                500);
             return false;
         }
 
@@ -620,7 +597,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ContactsListFragmentState : IRetainableState
         {
-
             public Folder Folder { get; set; }
 
             public List<ContactPreview> ContactPreviews { get; set; }
@@ -721,40 +697,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ContactsListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
+            public List<ContactPreview> Items { get; } = new List<ContactPreview>(1000);
 
-            public List<ContactPreview> Items
-            {
-                get
-                {
-                    return contactPreviewsInView;
-                }
-            }
+            public List<ContactPreview> SelectedItems => selectedContactsInView.Values.ToList();
 
-            public List<ContactPreview> SelectedItems
-            {
-                get
-                {
-                    return selectedContactsInView.Values.ToList();
-                }
-            }
+            public override int ItemCount => Items.Count;
 
-            public override int ItemCount
-            {
-                get
-                {
-                    return contactPreviewsInView.Count;
-                }
-            }
+            public int SelectedItemCount => selectedContactsInView.Count;
 
-            public int SelectedItemCount
-            {
-                get
-                {
-                    return selectedContactsInView.Count;
-                }
-            }
-
-            readonly List<ContactPreview> contactPreviewsInView = new List<ContactPreview>(1000);
             readonly Dictionary<int, ContactPreview> selectedContactsInView = new Dictionary<int, ContactPreview>();
 
             public event EventHandler<ContactPreview> ItemClicked = delegate { };
@@ -763,9 +713,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
                 var cpvh = holder as ContactPreviewViewHolder;
-                if (cpvh == null) return;
+                if (cpvh == null)
+                    return;
 
-                var cp = contactPreviewsInView[position];
+                var cp = Items[position];
 
                 cpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, cp)));
                 cpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, cp)));
@@ -786,14 +737,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public void PrependItems(List<ContactPreview> items)
             {
                 var count = items.Count;
-                contactPreviewsInView.InsertRange(0, items);
+                Items.InsertRange(0, items);
                 NotifyItemRangeInserted(0, count);
             }
 
             public void AppendItems(List<ContactPreview> items)
             {
-                var count = contactPreviewsInView.Count;
-                contactPreviewsInView.AddRange(items);
+                var count = Items.Count;
+                Items.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
 
@@ -810,7 +761,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var position = GetPosition(item);
                     if (position >= 0)
                     {
-                        contactPreviewsInView.RemoveAt(position);
+                        Items.RemoveAt(position);
                         NotifyItemRemoved(position);
                     }
                 }
@@ -824,24 +775,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public void SetSelected(List<ContactPreview> contactPreviews, bool selected)
             {
                 foreach (var contact in contactPreviews)
-                {
                     SetSelected(contact, selected);
-                }
             }
 
             public void SetSelected(ContactPreview contactPreview, bool selected)
             {
                 var position = GetPosition(contactPreview);
-                if (position < 0) return;
+                if (position < 0)
+                    return;
 
                 if (selected)
-                {
                     selectedContactsInView[contactPreview.Id] = contactPreview;
-                }
                 else
-                {
                     selectedContactsInView.Remove(contactPreview.Id);
-                }
                 NotifyItemChanged(position);
             }
 
@@ -854,16 +800,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     var position = GetPosition(contact);
                     if (position >= 0)
-                    {
                         NotifyItemChanged(position);
-                    }
                 }
             }
 
             public void Clear()
             {
-                var size = contactPreviewsInView.Count;
-                contactPreviewsInView.Clear();
+                var size = Items.Count;
+                Items.Clear();
                 selectedContactsInView.Clear();
                 NotifyItemRangeRemoved(0, size);
             }
@@ -871,40 +815,37 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int GetPosition(int contactPreviewId)
             {
                 var position = -1;
-                for (var i = 0; i < contactPreviewsInView.Count; i++)
-                {
-                    if (contactPreviewsInView[i].Id == contactPreviewId)
+                for (var i = 0; i < Items.Count; i++)
+                    if (Items[i].Id == contactPreviewId)
                     {
                         position = i;
                         break;
                     }
-                }
+
                 return position;
             }
 
             public int GetPosition(ContactPreview contactPreview)
             {
                 var position = -1;
-                for (var i = 0; i < contactPreviewsInView.Count; i++)
-                {
-                    if (contactPreviewsInView[i].Id == contactPreview.Id)
+                for (var i = 0; i < Items.Count; i++)
+                    if (Items[i].Id == contactPreview.Id)
                     {
                         position = i;
                         break;
                     }
-                }
+
                 return position;
             }
 
             string ISectionedAdapter.GetSectionName(int position)
             {
-                return contactPreviewsInView[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
+                return Items[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
         }
 
         class ContactPreviewViewHolder : RecyclerView.ViewHolder
         {
-
             public ContactType Type
             {
                 set
@@ -927,13 +868,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            public string Name
-            {
-                set
-                {
-                    nameTextView.Text = value;
-                }
-            }
+            public string Name { set => nameTextView.Text = value; }
 
             public List<Category> Categories
             {
@@ -953,13 +888,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            public bool Selected
-            {
-                set
-                {
-                    selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool Selected { set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             readonly AppCompatImageView iconImageView;
             readonly AppCompatTextView nameTextView;
@@ -967,7 +896,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly View selectedOverlay;
 
             public ContactPreviewViewHolder(View itemView)
-                    : base(itemView)
+                : base(itemView)
             {
                 iconImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_contact_icon);
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_contact_name);
@@ -979,4 +908,3 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         #endregion
     }
 }
-

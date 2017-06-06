@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: SmoothActionBarDrawerToggle.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -12,10 +5,8 @@ using Android.Support.V4.Widget;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
-
     public class SmoothActionBarDrawerToggle : ActionBarDrawerToggle
     {
-
         public Action action;
 
         public SmoothActionBarDrawerToggle(IntPtr javaReference, Android.Runtime.JniHandleOwnership transfer)
@@ -23,12 +14,12 @@ namespace Mark5.Mobile.Droid.Ui.Common
         {
         }
 
-        public SmoothActionBarDrawerToggle(Android.App.Activity activity, Android.Support.V4.Widget.DrawerLayout drawerLayout, Toolbar toolbar, int openDrawerContentDescRes, int closeDrawerContentDescRes)
+        public SmoothActionBarDrawerToggle(Android.App.Activity activity, DrawerLayout drawerLayout, Toolbar toolbar, int openDrawerContentDescRes, int closeDrawerContentDescRes)
             : base(activity, drawerLayout, toolbar, openDrawerContentDescRes, closeDrawerContentDescRes)
         {
         }
 
-        public SmoothActionBarDrawerToggle(Android.App.Activity activity, Android.Support.V4.Widget.DrawerLayout drawerLayout, int openDrawerContentDescRes, int closeDrawerContentDescRes)
+        public SmoothActionBarDrawerToggle(Android.App.Activity activity, DrawerLayout drawerLayout, int openDrawerContentDescRes, int closeDrawerContentDescRes)
             : base(activity, drawerLayout, openDrawerContentDescRes, closeDrawerContentDescRes)
         {
         }
@@ -47,13 +38,9 @@ namespace Mark5.Mobile.Droid.Ui.Common
         public void RunWhenIdle(Action action, bool forceRun = false)
         {
             if (forceRun)
-            {
                 action();
-            }
             else
-            {
                 this.action = action;
-            }
         }
     }
 }

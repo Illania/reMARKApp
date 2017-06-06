@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: BadgeBarButtonItem.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
 using System;
 using CoreAnimation;
 using CoreGraphics;
@@ -15,13 +8,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
 {
     public sealed class BadgeBarButtonItem : UIBarButtonItem
     {
-
         public string BadgeValue
         {
-            get
-            {
-                return badgeValue;
-            }
+            get => badgeValue;
             set
             {
                 badgeValue = value;
@@ -31,153 +20,108 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public UIColor BadgeBackgroundColor
         {
-            get
-            {
-                return badgeBackgroundColor;
-            }
+            get => badgeBackgroundColor;
             set
             {
                 badgeBackgroundColor = value;
 
                 if (badge != null)
-                {
                     RefreshBadge();
-                }
             }
         }
 
         public UIColor BadgeTextColor
         {
-            get
-            {
-                return badgeTextColor;
-            }
+            get => badgeTextColor;
             set
             {
                 badgeTextColor = value;
 
                 if (badge != null)
-                {
                     RefreshBadge();
-                }
             }
         }
 
         public UIFont BadgeFont
         {
-            get
-            {
-                return badgeFont;
-            }
+            get => badgeFont;
             set
             {
                 badgeFont = value;
 
                 if (badge != null)
-                {
                     RefreshBadge();
-                }
             }
         }
 
         public nfloat BadgePadding
         {
-            get
-            {
-                return badgePadding;
-            }
+            get => badgePadding;
             set
             {
                 badgePadding = value;
 
                 if (badge != null)
-                {
                     UpdateBadgeFrame();
-                }
             }
         }
 
         public nfloat BadgeMinSize
         {
-            get
-            {
-                return badgeMinSize;
-            }
+            get => badgeMinSize;
             set
             {
                 badgeMinSize = value;
 
                 if (badge != null)
-                {
                     UpdateBadgeFrame();
-                }
             }
         }
 
         public nfloat BadgeOriginX
         {
-            get
-            {
-                return badgeOriginX;
-            }
+            get => badgeOriginX;
             set
             {
                 badgeOriginX = value;
 
                 if (badge != null)
-                {
                     UpdateBadgeFrame();
-                }
             }
         }
 
         public nfloat BadgeOriginY
         {
-            get
-            {
-                return badgeOriginY;
-            }
+            get => badgeOriginY;
             set
             {
                 badgeOriginY = value;
 
                 if (badge != null)
-                {
                     UpdateBadgeFrame();
-                }
             }
         }
 
         public bool ShouldHideBadgeAtZero
         {
-            get
-            {
-                return shouldHideBadgeAtZero;
-            }
+            get => shouldHideBadgeAtZero;
             set
             {
                 shouldHideBadgeAtZero = value;
                 if (badge != null)
-                {
                     UpdateBadgeFrame();
-                }
             }
         }
 
         public bool ShouldAnimateBadge
         {
-            get
-            {
-                return shouldAnimateBadge;
-            }
+            get => shouldAnimateBadge;
             set
             {
                 shouldAnimateBadge = value;
 
                 if (badge != null)
-                {
                     UpdateBadgeFrame();
-                }
             }
         }
 
@@ -197,9 +141,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             CustomView = customButton;
             if (CustomView != null)
-            {
                 Initialize();
-            }
         }
 
         void Initialize()
@@ -220,7 +162,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             badgeValue = newBadgeValue;
 
-            if (string.IsNullOrEmpty(newBadgeValue) || (newBadgeValue == @"0" && ShouldHideBadgeAtZero))
+            if (string.IsNullOrEmpty(newBadgeValue) || newBadgeValue == @"0" && ShouldHideBadgeAtZero)
             {
                 RemoveBadge();
             }
@@ -261,11 +203,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             var minHeight = expectedLabelSize.Height;
 
-            minHeight = (minHeight < BadgeMinSize) ? BadgeMinSize : expectedLabelSize.Height;
+            minHeight = minHeight < BadgeMinSize ? BadgeMinSize : expectedLabelSize.Height;
             var minWidth = expectedLabelSize.Width;
             var padding = BadgePadding;
 
-            minWidth = (minWidth < minHeight) ? minHeight : expectedLabelSize.Width;
+            minWidth = minWidth < minHeight ? minHeight : expectedLabelSize.Width;
             badge.ClipsToBounds = true;
             badge.Frame = new CGRect(BadgeOriginX, BadgeOriginY, minWidth + padding, minHeight + padding);
             badge.Layer.CornerRadius = (minHeight + padding) / 2;
@@ -279,8 +221,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 var animation = new CABasicAnimation
                 {
                     KeyPath = @"transform.scale",
-                    From = NSObject.FromObject(1.5),
-                    To = NSObject.FromObject(1),
+                    From = FromObject(1.5),
+                    To = FromObject(1),
                     Duration = 0.2,
                     TimingFunction = new CAMediaTimingFunction(0.4f, 1.3f, 1f, 1f)
                 };
@@ -296,21 +238,18 @@ namespace Mark5.Mobile.IOS.Ui.Common
         void RemoveBadge()
         {
             if (badge != null)
-            {
-                UIView.AnimateNotify(0.15f, 0f,
-                    UIViewAnimationOptions.CurveEaseIn, () =>
-                    {
-                        badge.Transform = CGAffineTransform.MakeScale(0.1f, 0.1f);
-                    }, completed =>
+                UIView.AnimateNotify(0.15f,
+                    0f,
+                    UIViewAnimationOptions.CurveEaseIn,
+                    () => { badge.Transform = CGAffineTransform.MakeScale(0.1f, 0.1f); },
+                    completed =>
                     {
                         if (badge != null)
                         {
                             badge.RemoveFromSuperview();
                             badge = null;
                         }
-                    }
-                );
-            }
+                    });
         }
 
         static UILabel DuplicateLabel(UILabel labelToCopy)

@@ -1,23 +1,14 @@
-//
-// Project: Mark5.Mobile.Common
-// File: IContactsManager.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
 {
-
     public interface IContactsManager
     {
-
         int MaxToFetch { get; set; }
 
         Task<List<ContactPreview>> GetContactPreviewsAsync(Folder folder, int startRowId = -1, SourceType sourceType = SourceType.Auto);
@@ -47,4 +38,3 @@ namespace Mark5.Mobile.Common.Managers
         Task<List<PrintableSuggestion>> GetSuggestions(string phrase);
     }
 }
-

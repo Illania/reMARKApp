@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: DocumentPickDateSearchView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
 using System;
 using Android.Animation;
 using Android.Content;
@@ -18,10 +11,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
-    
     public class DocumentPickDateHeaderView : LinearLayoutCompat
     {
-        
         long fromTimestamp = -1;
         long toTimestamp = -1;
 
@@ -43,7 +34,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         int textStyleTopLineSelectedResourceId = Resource.Style.searchViewDateTopLineSelected;
         int textStyleBottomLineSelectedResourceId = Resource.Style.searchViewDateBottomLineSelected;
 
-        public DocumentPickDateHeaderView(Context context) : base(context)
+        public DocumentPickDateHeaderView(Context context)
+            : base(context)
         {
             Orientation = Horizontal;
             SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
@@ -153,30 +145,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         void UpdateText()
         {
-            dateRangeFromTextView.Text = fromTimestamp == -1 ? "-" : fromTimestamp.ConvertTimestampMillisecondsToDateTime()
-                                                                                    .ConvertUtcToUserTime()
-                                                                                    .ConvertDateTimeToTimestampMilliseconds()
-                                                                                    .FormatUserTimestampAsDateString(Context);
-            dateRangeToTextView.Text = toTimestamp == -1 ? "-" : toTimestamp.ConvertTimestampMillisecondsToDateTime()
-                                                                                    .ConvertUtcToUserTime()
-                                                                                    .ConvertDateTimeToTimestampMilliseconds()
-                                                                                    .FormatUserTimestampAsDateString(Context);
+            dateRangeFromTextView.Text = fromTimestamp == -1 ? "-" : fromTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsDateString(Context);
+            dateRangeToTextView.Text = toTimestamp == -1 ? "-" : toTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsDateString(Context);
         }
 
         public void SetFromText(long timestamp)
         {
-            dateRangeFromTextView.Text = timestamp == -1 ? "-" : timestamp.ConvertTimestampMillisecondsToDateTime()
-                                                                                    .ConvertUtcToUserTime()
-                                                                                    .ConvertDateTimeToTimestampMilliseconds()
-                                                                                    .FormatUserTimestampAsDateString(Context);
+            dateRangeFromTextView.Text = timestamp == -1 ? "-" : timestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsDateString(Context);
         }
 
         public void SetToText(long timestamp)
         {
-            dateRangeToTextView.Text = timestamp == -1 ? "-" : timestamp.ConvertTimestampMillisecondsToDateTime()
-                                                                                    .ConvertUtcToUserTime()
-                                                                                    .ConvertDateTimeToTimestampMilliseconds()
-                                                                                    .FormatUserTimestampAsDateString(Context);
+            dateRangeToTextView.Text = timestamp == -1 ? "-" : timestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsDateString(Context);
         }
     }
 }

@@ -1,18 +1,9 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: ActionOnFastScrollStateChangeListener.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 
 namespace FastScrollRecycler
 {
-    
     public class ActionOnFastScrollStateChangeListener : IOnFastScrollStateChangeListener
     {
-
         readonly Action startAction;
         readonly Action stopAction;
 
@@ -24,14 +15,12 @@ namespace FastScrollRecycler
 
         public void OnFastScrollStart()
         {
-            if (startAction != null)
-                startAction();
+            startAction?.Invoke();
         }
 
         public void OnFastScrollStop()
         {
-            if (stopAction != null)
-                stopAction();
+            stopAction?.Invoke();
         }
     }
 }

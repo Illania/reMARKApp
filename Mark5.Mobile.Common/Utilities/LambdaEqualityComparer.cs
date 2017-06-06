@@ -1,19 +1,10 @@
-//
-// Project: Mark5.Mobile.Common
-// File: LambdaEqualityComparer.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Mark5.Mobile.Common.Utilities
 {
-
     public class LambdaEqualityComparer<T> : IEqualityComparer<T>
     {
-
         public static LambdaEqualityComparer<T> Create(Func<T, object> func)
         {
             return new LambdaEqualityComparer<T>(func);

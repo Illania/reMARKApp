@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: AndroidClientHandler2.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using Java.Net;
 using Java.Security.Cert;
@@ -15,10 +8,8 @@ using Xamarin.Android.Net;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-
     public class InsecureAndroidClientHandler : AndroidClientHandler
     {
-
         protected override Task SetupRequest(HttpRequestMessage request, HttpURLConnection conn)
         {
             CommonConfig.Logger.Warning("**** USING INSECURE ANDROID CLIENT HANDLER ****");
@@ -27,7 +18,12 @@ namespace Mark5.Mobile.Droid.Utilities
             {
                 httpsConn.HostnameVerifier = new InsecureHostnameVerifier();
                 var sslContext = SSLContext.GetInstance("TLS");
-                sslContext.Init(null, new ITrustManager[] { new InsecureTrustManager() }, null);
+                sslContext.Init(null,
+                    new ITrustManager[]
+                    {
+                        new InsecureTrustManager()
+                    },
+                    null);
                 httpsConn.SSLSocketFactory = sslContext.SocketFactory;
             }
 
@@ -44,7 +40,6 @@ namespace Mark5.Mobile.Droid.Utilities
 
         class InsecureTrustManager : Java.Lang.Object, IX509TrustManager
         {
-
             public void CheckClientTrusted(X509Certificate[] chain, string authType)
             {
             }

@@ -1,31 +1,23 @@
-//
-// Project: Mark5.Mobile.Common
-// File: Folder.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mark5.Mobile.Common.Utilities;
 using SQLite;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
-
     [Table("Folder")]
     public class Folder : ICopiable<Folder>
     {
-
-        [Column("Id"), PrimaryKey]
+        [Column("Id")]
+        [PrimaryKey]
         public int Id { get; set; } = -1;
 
         [Column("Guid")]
         public Guid Guid { get; set; }
 
-        [Column("ParentFolderId"), Indexed]
+        [Column("ParentFolderId")]
+        [Indexed]
         public int ParentFolderId { get; set; }
 
         [Column("Name")]
@@ -47,13 +39,7 @@ namespace Mark5.Mobile.Common.Model
         public string Path { get; set; }
 
         [Ignore]
-        public bool Local
-        {
-            get
-            {
-                return documentsLocalRootFolder.SubFolders.Any(f => f.Id == Id);
-            }
-        }
+        public bool Local { get { return documentsLocalRootFolder.SubFolders.Any(f => f.Id == Id); } }
 
         List<Folder> subFolders;
 
@@ -63,16 +49,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (subFolders == null)
-                {
                     subFolders = new List<Folder>();
-                }
-
                 return subFolders;
             }
-            set
-            {
-                subFolders = value;
-            }
+            set => subFolders = value;
         }
 
         [Column("Subscribed")]
@@ -87,17 +67,7 @@ namespace Mark5.Mobile.Common.Model
         #region Serialization
 
         [Column("OptionalParametersString")]
-        public string OptionalParametersString
-        {
-            get
-            {
-                return SerializationUtils.Serialize(OptionalParameters);
-            }
-            set
-            {
-                OptionalParameters = SerializationUtils.Deserialize<OptionalParameters>(value);
-            }
-        }
+        public string OptionalParametersString { get => SerializationUtils.Serialize(OptionalParameters); set => OptionalParameters = SerializationUtils.Deserialize<OptionalParameters>(value); }
 
         #endregion
 
@@ -134,21 +104,15 @@ namespace Mark5.Mobile.Common.Model
         #region Root folders
 
         [Ignore]
-        public bool Root
+        public bool Root => new[]
         {
-            get
-            {
-                return new[]
-                {
-                    documentsRootFolder,
-                    contactsRootFolder,
-                    shortcodesRootFolder,
-                    calendarRootFolder
-                }.Contains(this);
-            }
-        }
+            documentsRootFolder,
+            contactsRootFolder,
+            shortcodesRootFolder,
+            calendarRootFolder
+        }.Contains(this);
 
-        readonly static Folder documentsRootFolder = new Folder
+        static readonly Folder documentsRootFolder = new Folder
         {
             Id = -100,
             Guid = new Guid("{00000000-0000-0000-0000-000000000100}"),
@@ -158,7 +122,7 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true
         };
 
-        readonly static Folder documentsFavoriteRootFolder = new Folder
+        static readonly Folder documentsFavoriteRootFolder = new Folder
         {
             Id = -110,
             Guid = new Guid("{00000000-0000-0000-0000-000000000110}"),
@@ -168,7 +132,7 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true
         };
 
-        public readonly static Folder DocumentsOutgoingFolder = new Folder
+        public static readonly Folder DocumentsOutgoingFolder = new Folder
         {
             Id = -121,
             Guid = new Guid("{00000000-0000-0000-0000-000000000121}"),
@@ -178,7 +142,7 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = false
         };
 
-        readonly static Folder documentsLocalRootFolder = new Folder
+        static readonly Folder documentsLocalRootFolder = new Folder
         {
             Id = -120,
             Guid = new Guid("{00000000-0000-0000-0000-000000000120}"),
@@ -186,10 +150,13 @@ namespace Mark5.Mobile.Common.Model
             Module = ModuleType.Documents,
             Type = FolderType.None,
             HasSubFolders = true,
-            SubFolders = { DocumentsOutgoingFolder }
+            SubFolders =
+            {
+                DocumentsOutgoingFolder
+            }
         };
 
-        readonly static Folder contactsRootFolder = new Folder
+        static readonly Folder contactsRootFolder = new Folder
         {
             Id = -200,
             Guid = new Guid("{00000000-0000-0000-0000-000000000200}"),
@@ -199,7 +166,7 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true
         };
 
-        readonly static Folder contactsFavoriteRootFolder = new Folder
+        static readonly Folder contactsFavoriteRootFolder = new Folder
         {
             Id = -210,
             Guid = new Guid("{00000000-0000-0000-0000-000000000210}"),
@@ -209,7 +176,7 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true
         };
 
-        readonly static Folder shortcodesRootFolder = new Folder
+        static readonly Folder shortcodesRootFolder = new Folder
         {
             Id = -300,
             Guid = new Guid("{00000000-0000-0000-0000-000000000300}"),
@@ -219,7 +186,7 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true
         };
 
-        readonly static Folder shortcodesFavoriteRootFolder = new Folder
+        static readonly Folder shortcodesFavoriteRootFolder = new Folder
         {
             Id = -310,
             Guid = new Guid("{00000000-0000-0000-0000-000000000310}"),
@@ -229,7 +196,7 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true
         };
 
-        readonly static Folder calendarRootFolder = new Folder
+        static readonly Folder calendarRootFolder = new Folder
         {
             Id = -400,
             Guid = new Guid("{00000000-0000-0000-0000-000000000400}"),
@@ -239,7 +206,7 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true
         };
 
-        readonly static Folder calendarFavoriteRootFolder = new Folder
+        static readonly Folder calendarFavoriteRootFolder = new Folder
         {
             Id = -410,
             Guid = new Guid("{00000000-0000-0000-0000-000000000410}"),
@@ -302,4 +269,3 @@ namespace Mark5.Mobile.Common.Model
         }
     }
 }
-

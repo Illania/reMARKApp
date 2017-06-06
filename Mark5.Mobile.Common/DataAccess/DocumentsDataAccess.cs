@@ -1,11 +1,4 @@
-//
-// Project: Mark5.Mobile.Common
-// File: DocumentsDataAccess.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,13 +8,10 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Links;
 using Mark5.Mobile.Common.Model.Containers;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.DataAccess
 {
-
     class DocumentsDataAccess : IDocumentsDataAccess
     {
-
         readonly DatabaseConnectionProvider documentsDatabase;
 
         public DocumentsDataAccess(DatabaseConnectionProvider documentsDatabase)
@@ -36,12 +26,12 @@ namespace Mark5.Mobile.Common.DataAccess
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
                     if (clean)
+                        c.Table<FolderDocumentLink>().Delete(fdl => fdl.FolderId == folder.Id);
+                    c.InsertOrReplaceAll(documentPreviews.Select(dp => new FolderDocumentLink
                     {
-                        c.Table<FolderDocumentLink>()
-                         .Delete(fdl => fdl.FolderId == folder.Id);
-                    }
-
-                    c.InsertOrReplaceAll(documentPreviews.Select(dp => new FolderDocumentLink { FolderId = folder.Id, DocumentId = dp.Id }));
+                        FolderId = folder.Id,
+                        DocumentId = dp.Id
+                    }));
                     c.InsertOrReplaceAll(documentPreviews);
                 });
             }
@@ -59,34 +49,20 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var query = $"select * " +
-                                $"from {nameof(DocumentPreview)}, {nameof(FolderDocumentLink)} " +
-                                $"where {nameof(FolderDocumentLink.FolderId)} = {folder.Id} " +
-                                $"     and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} = {nameof(FolderDocumentLink)}.{nameof(FolderDocumentLink.DocumentId)} ";
+                    var query = $"select * " + $"from {nameof(DocumentPreview)}, {nameof(FolderDocumentLink)} " + $"where {nameof(FolderDocumentLink.FolderId)} = {folder.Id} " + $"     and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} = {nameof(FolderDocumentLink)}.{nameof(FolderDocumentLink.DocumentId)} ";
 
                     if (startId > 0)
-                    {
                         query += $"    and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} < \"{startId}\" ";
-                    }
-
                     if (endId > 0)
-                    {
                         query += $"    and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} > \"{endId}\" ";
-                    }
-
                     query += $"order by {nameof(DocumentPreview.Id)} desc ";
 
                     if (maxItems > 0)
-                    {
                         query += $"limit {maxItems - 1} ";
-                    }
-
                     var result = c.Query<DocumentPreview>(query);
 
                     if (result == null || result.Count < 1)
-                    {
                         throw new DataNotFoundException("Document previews could not be found.");
-                    }
 
                     documentPreviews = result;
                 });
@@ -103,13 +79,13 @@ namespace Mark5.Mobile.Common.DataAccess
         {
             try
             {
-                List<int> documentIds = new List<int>(maxItems * 2 + 1) { };
+                var documentIds = new List<int>(maxItems * 2 + 1)
+                {
+                };
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var query = $"select {nameof(FolderDocumentLink.DocumentId)} as '{nameof(IdValue.Id)}' " +
-                                $"from {nameof(FolderDocumentLink)} " +
-                        $"where {nameof(FolderDocumentLink.FolderId)} = {folder.Id} ";
+                    var query = $"select {nameof(FolderDocumentLink.DocumentId)} as '{nameof(IdValue.Id)}' " + $"from {nameof(FolderDocumentLink)} " + $"where {nameof(FolderDocumentLink.FolderId)} = {folder.Id} ";
 
                     string getPreviousQuery;
                     string getNextQuery;
@@ -122,11 +98,8 @@ namespace Mark5.Mobile.Common.DataAccess
                         var previous = c.Query<IdValue>(getPreviousQuery).Select(v => v.Id).Reverse();
                         documentIds.AddRange(previous);
                         if (getNext)
-                        {
                             documentIds.Add(documentId);
-                        }
                     }
-
                     if (getNext)
                     {
                         getNextQuery = query + $" and  {nameof(FolderDocumentLink.DocumentId)} < \"{documentId}\" ";
@@ -149,10 +122,7 @@ namespace Mark5.Mobile.Common.DataAccess
         {
             try
             {
-                await documentsDatabase.RunInConnectionAsync(c =>
-                {
-                    c.InsertOrReplace(document);
-                });
+                await documentsDatabase.RunInConnectionAsync(c => { c.InsertOrReplace(document); });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
@@ -171,9 +141,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     var result = c.Find<Document>(documentId);
 
                     if (result == null)
-                    {
                         throw new DataNotFoundException("Document could not be found.");
-                    }
 
                     document = result;
                 });
@@ -212,15 +180,11 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     var documentPreview = c.Find<DocumentPreview>(documentId);
                     if (documentPreview == null)
-                    {
                         throw new DataNotFoundException("DocumentPreview could not be found.");
-                    }
 
                     var document = c.Find<Document>(documentId);
                     if (document == null)
-                    {
                         throw new DataNotFoundException("Document could not be found.");
-                    }
 
                     container = new DocumentContainer(documentPreview, document);
                 });
@@ -239,10 +203,7 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
-                                              $"set \"{nameof(DocumentPreview.IsReadByCurrent)}\" = @isReadByCurrent, " +
-                                              $"    \"{nameof(DocumentPreview.IsReadByAnyone)}\" = @isReadByAnyone " +
-                                              $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
+                    var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " + $"set \"{nameof(DocumentPreview.IsReadByCurrent)}\" = @isReadByCurrent, " + $"    \"{nameof(DocumentPreview.IsReadByAnyone)}\" = @isReadByAnyone " + $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
                     cmd.Bind("@isReadByCurrent", documentPreview.IsReadByCurrent);
                     cmd.Bind("@isReadByAnyone", documentPreview.IsReadByAnyone);
                     cmd.Bind("@documentPreviewId", documentPreview.Id);
@@ -250,10 +211,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     cmd.ExecuteNonQuery();
 
 
-                    cmd = c.CreateCommand($"update \"{nameof(Document)}\" " +
-                                          $"set \"{nameof(Document.ReadByUserIdsString)}\" = @readByUserIdsString, " +
-                                          $"    \"{nameof(Document.ReadByUserNamesString)}\" = @readByUserNamesString " +
-                                          $"where \"{nameof(Document.Id)}\" = @documentId");
+                    cmd = c.CreateCommand($"update \"{nameof(Document)}\" " + $"set \"{nameof(Document.ReadByUserIdsString)}\" = @readByUserIdsString, " + $"    \"{nameof(Document.ReadByUserNamesString)}\" = @readByUserNamesString " + $"where \"{nameof(Document.Id)}\" = @documentId");
                     cmd.Bind("@readByUserIdsString", document.ReadByUserIdsString);
                     cmd.Bind("@readByUserNamesString", document.ReadByUserNamesString);
                     cmd.Bind("@documentId", documentPreview.Id);
@@ -275,10 +233,7 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     foreach (var documentPreview in documentPreviews)
                     {
-                        var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
-                                                  $"set \"{nameof(DocumentPreview.IsReadByCurrent)}\" = @isReadByCurrent " +
-                                                  $"   and \"{nameof(DocumentPreview.IsReadByAnyone)}\" = @isReadByAnyone " +
-                                                  $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
+                        var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " + $"set \"{nameof(DocumentPreview.IsReadByCurrent)}\" = @isReadByCurrent " + $"   and \"{nameof(DocumentPreview.IsReadByAnyone)}\" = @isReadByAnyone " + $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
                         cmd.Bind("@isReadByCurrent", documentPreview.IsReadByCurrent);
                         cmd.Bind("@isReadByAnyone", documentPreview.IsReadByAnyone);
                         cmd.Bind("@documentPreviewId", documentPreview.Id);
@@ -301,15 +256,11 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     foreach (var documentPreview in documentPreviews)
                     {
-                        var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
-                                                  $"set \"{nameof(DocumentPreview.Priority)}\" = @priority " +
-                                                  $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
+                        var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " + $"set \"{nameof(DocumentPreview.Priority)}\" = @priority " + $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
                         cmd.Bind("@priority", priority);
                         cmd.Bind("@documentPreviewId", documentPreview.Id);
 
                         cmd.ExecuteNonQuery();
-
-
                     }
                 });
             }
@@ -345,7 +296,6 @@ namespace Mark5.Mobile.Common.DataAccess
                             c.Table<DocumentPreview>().Delete(dp => dp.Id == id);
                             c.Table<Document>().Delete(d => d.Id == id);
                         }
-
                         c.Table<FolderDocumentLink>().Delete(fdl => fdl.DocumentId == id && fdl.FolderId == folderId);
                     }
                 });
@@ -412,9 +362,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     var result = c.Table<TemplatePreview>().ToList();
 
                     if (result == null || result.Count < 1)
-                    {
                         throw new DataNotFoundException("Template previews could not be found.");
-                    }
 
                     templatePreviews = result;
                 });
@@ -431,10 +379,7 @@ namespace Mark5.Mobile.Common.DataAccess
         {
             try
             {
-                await documentsDatabase.RunInConnectionAsync(c =>
-                {
-                    c.InsertOrReplace(template);
-                });
+                await documentsDatabase.RunInConnectionAsync(c => { c.InsertOrReplace(template); });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
@@ -453,9 +398,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     var result = c.Find<Template>(templateId);
 
                     if (result == null)
-                    {
                         throw new DataNotFoundException("Template could not be found.");
-                    }
 
                     template = result;
                 });
@@ -474,12 +417,15 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    c.InsertOrReplace(new DefaultTemplateInfo { CreationModeFlag = creationModeFlag, Available = template != null, TemplateId = template?.Id ?? -1 });
+                    c.InsertOrReplace(new DefaultTemplateInfo
+                    {
+                        CreationModeFlag = creationModeFlag,
+                        Available = template != null,
+                        TemplateId = template?.Id ?? -1
+                    });
 
                     if (template != null)
-                    {
                         c.InsertOrReplace(template);
-                    }
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
@@ -499,18 +445,14 @@ namespace Mark5.Mobile.Common.DataAccess
                     var info = c.Find<DefaultTemplateInfo>(creationModeFlag);
 
                     if (info == null)
-                    {
                         throw new DataNotFoundException("Default template info could not be found.");
-                    }
 
                     if (info.Available)
                     {
                         var result = c.Find<Template>(info.TemplateId);
 
                         if (result == null)
-                        {
                             throw new DataNotFoundException("Default template could not be found.");
-                        }
 
                         template = result;
                     }
@@ -546,10 +488,7 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 List<RecentAddress> recentAddresses = null;
 
-                await documentsDatabase.RunInConnectionAsync(c =>
-                {
-                    recentAddresses = c.Table<RecentAddress>().ToList();
-                });
+                await documentsDatabase.RunInConnectionAsync(c => { recentAddresses = c.Table<RecentAddress>().ToList(); });
 
                 return recentAddresses;
             }
@@ -581,10 +520,7 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 List<Category> categories = null;
 
-                await documentsDatabase.RunInConnectionAsync(c =>
-                {
-                    categories = c.Table<Category>().ToList();
-                });
+                await documentsDatabase.RunInConnectionAsync(c => { categories = c.Table<Category>().ToList(); });
 
                 return categories;
             }
@@ -600,10 +536,12 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
-                                              $"set \"{nameof(DocumentPreview.CategoriesString)}\" = @categoriesString " +
-                                              $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
-                    cmd.Bind("@categoriesString", new CategoriesValue { Categories = categories }.CategoriesString);
+                    var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " + $"set \"{nameof(DocumentPreview.CategoriesString)}\" = @categoriesString " + $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
+                    cmd.Bind("@categoriesString",
+                        new CategoriesValue
+                        {
+                            Categories = categories
+                        }.CategoriesString);
                     cmd.Bind("@documentPreviewId", documentPreview.Id);
                     cmd.ExecuteNonQuery();
                 });
@@ -620,32 +558,28 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var cmd = c.CreateCommand($"select \"{nameof(Document.CommentsString)}\" " +
-                                    $"from \"{nameof(Document)}\" " +
-                                    $"where \"{nameof(Document.Id)}\" = @documentId");
+                    var cmd = c.CreateCommand($"select \"{nameof(Document.CommentsString)}\" " + $"from \"{nameof(Document)}\" " + $"where \"{nameof(Document.Id)}\" = @documentId");
                     cmd.Bind("@documentId", document.Id);
                     var result = cmd.ExecuteQuery<CommentsValue>();
 
                     if (result == null || result.Count < 1)
-                    {
                         return;
-                    }
 
                     var comments = result.First().Comments;
 
                     comments.Add(comment);
                     comments = comments.OrderBy(cm => cm.DateAddedTimestamp).ToList();
 
-                    cmd = c.CreateCommand($"update \"{nameof(Document)}\" " +
-                                          $"set \"{nameof(Document.CommentsString)}\" = @commentsString " +
-                                          $"where \"{nameof(Document.Id)}\" = @documentId");
-                    cmd.Bind("@commentsString", new CommentsValue { Comments = comments }.CommentsString);
+                    cmd = c.CreateCommand($"update \"{nameof(Document)}\" " + $"set \"{nameof(Document.CommentsString)}\" = @commentsString " + $"where \"{nameof(Document.Id)}\" = @documentId");
+                    cmd.Bind("@commentsString",
+                        new CommentsValue
+                        {
+                            Comments = comments
+                        }.CommentsString);
                     cmd.Bind("@documentId", document.Id);
                     cmd.ExecuteNonQuery();
 
-                    cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
-                                          $"set \"{nameof(DocumentPreview.CommentsCount)}\" = @commentsCount " +
-                                          $"where \"{nameof(DocumentPreview.Id)}\" = @documentId");
+                    cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " + $"set \"{nameof(DocumentPreview.CommentsCount)}\" = @commentsCount " + $"where \"{nameof(DocumentPreview.Id)}\" = @documentId");
                     cmd.Bind("@commentsCount", comments.Count);
                     cmd.Bind("@documentId", document.Id);
                     cmd.ExecuteNonQuery();
@@ -663,16 +597,12 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var cmd = c.CreateCommand($"select \"{nameof(Document.CommentsString)}\" " +
-                                    $"from \"{nameof(Document)}\" " +
-                                    $"where \"{nameof(Document.Id)}\" = @documentId");
+                    var cmd = c.CreateCommand($"select \"{nameof(Document.CommentsString)}\" " + $"from \"{nameof(Document)}\" " + $"where \"{nameof(Document.Id)}\" = @documentId");
                     cmd.Bind("@documentId", document.Id);
                     var result = cmd.ExecuteQuery<CommentsValue>();
 
                     if (result == null || result.Count < 1)
-                    {
                         return;
-                    }
 
                     var comments = result.First().Comments;
 
@@ -680,10 +610,12 @@ namespace Mark5.Mobile.Common.DataAccess
                     comments.Add(comment);
                     comments = comments.OrderBy(cm => cm.DateAddedTimestamp).ToList();
 
-                    cmd = c.CreateCommand($"update \"{nameof(Document)}\" " +
-                                          $"set \"{nameof(Document.CommentsString)}\" = @commentsString " +
-                                          $"where \"{nameof(Document.Id)}\" = @documentId");
-                    cmd.Bind("@commentsString", new CommentsValue { Comments = comments }.CommentsString);
+                    cmd = c.CreateCommand($"update \"{nameof(Document)}\" " + $"set \"{nameof(Document.CommentsString)}\" = @commentsString " + $"where \"{nameof(Document.Id)}\" = @documentId");
+                    cmd.Bind("@commentsString",
+                        new CommentsValue
+                        {
+                            Comments = comments
+                        }.CommentsString);
                     cmd.Bind("@documentId", document.Id);
                     cmd.ExecuteNonQuery();
                 });
@@ -700,31 +632,27 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var cmd = c.CreateCommand($"select \"{nameof(Document.CommentsString)}\" " +
-                                              $"from \"{nameof(Document)}\" " +
-                                              $"where \"{nameof(Document.Id)}\" = @documentId");
+                    var cmd = c.CreateCommand($"select \"{nameof(Document.CommentsString)}\" " + $"from \"{nameof(Document)}\" " + $"where \"{nameof(Document.Id)}\" = @documentId");
                     cmd.Bind("@documentId", document.Id);
                     var result = cmd.ExecuteQuery<CommentsValue>();
 
                     if (result == null || result.Count < 1)
-                    {
                         return;
-                    }
 
                     var comments = result.First().Comments;
 
                     comments.RemoveAll(cm => cm.Id == comment.Id);
 
-                    cmd = c.CreateCommand($"update \"{nameof(Document)}\" " +
-                                          $"set \"{nameof(Document.CommentsString)}\" = @commentsString " +
-                                          $"where \"{nameof(Document.Id)}\" = @documentId");
-                    cmd.Bind("@commentsString", new CommentsValue { Comments = comments }.CommentsString);
+                    cmd = c.CreateCommand($"update \"{nameof(Document)}\" " + $"set \"{nameof(Document.CommentsString)}\" = @commentsString " + $"where \"{nameof(Document.Id)}\" = @documentId");
+                    cmd.Bind("@commentsString",
+                        new CommentsValue
+                        {
+                            Comments = comments
+                        }.CommentsString);
                     cmd.Bind("@documentId", document.Id);
                     cmd.ExecuteNonQuery();
 
-                    cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " +
-                                          $"set \"{nameof(DocumentPreview.CommentsCount)}\" = @commentsCount " +
-                                          $"where \"{nameof(DocumentPreview.Id)}\" = @documentId");
+                    cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " + $"set \"{nameof(DocumentPreview.CommentsCount)}\" = @commentsCount " + $"where \"{nameof(DocumentPreview.Id)}\" = @documentId");
                     cmd.Bind("@commentsCount", comments.Count);
                     cmd.Bind("@documentId", document.Id);
                     cmd.ExecuteNonQuery();
@@ -744,9 +672,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var queryString = $"select {nameof(FolderDocumentLink.FolderId)} as '{nameof(IdValue.Id)}'" +
-                                      $"   from {nameof(FolderDocumentLink)}" +
-                                      $"   where {nameof(FolderDocumentLink.DocumentId)} not in (select {nameof(Document.Id)} from {nameof(Document)})";
+                    var queryString = $"select {nameof(FolderDocumentLink.FolderId)} as '{nameof(IdValue.Id)}'" + $"   from {nameof(FolderDocumentLink)}" + $"   where {nameof(FolderDocumentLink.DocumentId)} not in (select {nameof(Document.Id)} from {nameof(Document)})";
 
                     var result = c.Query<IdValue>(queryString);
 
@@ -765,7 +691,7 @@ namespace Mark5.Mobile.Common.DataAccess
         {
             try
             {
-                bool found = false;
+                var found = false;
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
@@ -789,11 +715,9 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var folderCondition = $"{ nameof(FolderDocumentLink.FolderId)} = ?";
-                    var inCondition = $"{nameof(FolderDocumentLink.DocumentId)} not in (select {nameof(Document.Id)} from { nameof(Document)})";
-                    var queryString = $"select {nameof(FolderDocumentLink.DocumentId)} as '{nameof(IdValue.Id)}'" +
-                                      $"   from {nameof(FolderDocumentLink)}" +
-                                      $"   where {folderCondition} and {inCondition}";
+                    var folderCondition = $"{nameof(FolderDocumentLink.FolderId)} = ?";
+                    var inCondition = $"{nameof(FolderDocumentLink.DocumentId)} not in (select {nameof(Document.Id)} from {nameof(Document)})";
+                    var queryString = $"select {nameof(FolderDocumentLink.DocumentId)} as '{nameof(IdValue.Id)}'" + $"   from {nameof(FolderDocumentLink)}" + $"   where {folderCondition} and {inCondition}";
 
                     var result = c.Query<IdValue>(queryString, folderId);
                     documentIds = result.Select(v => v.Id).ToList();
@@ -823,7 +747,6 @@ namespace Mark5.Mobile.Common.DataAccess
                     var cmd2 = c.CreateCommand(outerDeleteQueryDocument);
                     cmd2.ExecuteNonQuery();
                 });
-
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
@@ -832,4 +755,3 @@ namespace Mark5.Mobile.Common.DataAccess
         }
     }
 }
-

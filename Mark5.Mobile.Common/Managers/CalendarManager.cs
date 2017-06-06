@@ -1,11 +1,4 @@
-//
-// Project: Mark5.Mobile.Common
-// File: CalendarManager.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,12 +11,10 @@ using DataContract = Mark5.ServiceReference.DataContract;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Model.Exceptions;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
 {
     class CalendarManager : AbstractManager, ICalendarManager
     {
-
         readonly ICalendarDataAccess calendarDataAccess;
 
         public CalendarManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy, ICalendarDataAccess calendarDataAccess)
@@ -34,7 +25,8 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(Folder folder, long startDateTimestamp, long endDateTimestamp, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -69,7 +61,8 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<List<CalendarTask>> GetCalendarTasksAsync(Folder folder, long startDateTimestamp, long endDateTimestamp, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -104,7 +97,8 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<CalendarAppointment> GetCalendarAppointmentAsync(Folder folder, int calendarAppointmentId, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -123,16 +117,15 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 return await calendarDataAccess.GetCalendarAppointmentAsync(calendarAppointmentId);
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<CalendarTask> GetCalendarTaskAsync(Folder folder, int calendarTaskId, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -151,16 +144,15 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 return await calendarDataAccess.GetCalendarTaskAsync(calendarTaskId);
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<bool> CreateOrUpdateCalendarAppointmentAsync(Folder folder, CalendarAppointment calendarAppointment, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -178,16 +170,15 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<bool> CreateOrUpdateCalendarTaskAsync(Folder folder, CalendarTask calendarTask, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -205,13 +196,9 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
-
     }
 }
-

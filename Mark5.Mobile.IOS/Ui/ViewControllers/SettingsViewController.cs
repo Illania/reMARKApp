@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: SettingsViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using CoreGraphics;
 using Foundation;
@@ -19,10 +12,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-
     public class SettingsViewController : AppSettingsViewController, ISettingsDelegate
     {
-
         const string Value1CellId = "Value1CellId";
 
         const string UseServerTimezoneKey = "UseServerTimezone";
@@ -66,14 +57,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             RefreshHiddenSettings();
 
-            ReachabilityBar.Attach(View.Superview, TableView, (float)NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
+            ReachabilityBar.Attach(View.Superview, TableView, (float) NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
         }
 
         public override nfloat GetHeightForFooter(UITableView tableView, nint section)
         {
             var footerText = SettingsReader.GetFooterText(section);
 
-            if (string.IsNullOrWhiteSpace(footerText)) return 0f;
+            if (string.IsNullOrWhiteSpace(footerText))
+                return 0f;
 
             var width = tableView.Frame.Width - tableView.LayoutMargins.Left - tableView.LayoutMargins.Right;
 
@@ -123,10 +115,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (specifier.Key == LocalTemplateKey)
             {
-                var cell = (EditTextViewCell)tableView.DequeueReusableCell(EditTextViewCell.Key);
+                var cell = (EditTextViewCell) tableView.DequeueReusableCell(EditTextViewCell.Key);
                 if (cell == null)
                 {
-                    cell = (EditTextViewCell)EditTextViewCell.Nib.Instantiate(null, null)[0];
+                    cell = (EditTextViewCell) EditTextViewCell.Nib.Instantiate(null, null)[0];
                     cell.ContentChanged += (sender, e) => PlatformConfig.Preferences.LocalTemplate = cell.Content;
                 }
                 cell.Content = PlatformConfig.Preferences.LocalTemplate;
@@ -202,7 +194,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        [Export("settingsViewController:buttonTappedForSpecifier:")]        public virtual async void ButtonTappedForSpecifier(AppSettingsViewController sender, SettingsSpecifier specifier)
+        [Export("settingsViewController:buttonTappedForSpecifier:")]
+        public virtual async void ButtonTappedForSpecifier(AppSettingsViewController sender, SettingsSpecifier specifier)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             if (specifier.Key == LogoutKey)
@@ -212,9 +205,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 try
                 {
                     if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
-                    {
                         await Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -271,7 +262,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     dismissAction();
 
                     var src = SystemReportCollector.CreateShareReportController(report);
-                    if (src.PopoverPresentationController != null) src.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(sender.TableView, sender.TableView.CellAt(sender.SettingsReader.GetIndexPath(specifier.Key)));
+                    if (src.PopoverPresentationController != null)
+                        src.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(sender.TableView, sender.TableView.CellAt(sender.SettingsReader.GetIndexPath(specifier.Key)));
                     PresentViewController(src, true, null);
                 }
                 catch (Exception ex)
@@ -310,9 +302,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             if (specifier.Key == OpenSettingsAppKey)
-            {
                 UIApplication.SharedApplication.OpenUrl(new NSUrl(UIApplication.OpenSettingsUrlString), new NSDictionary(), null);
-            }
         }
 
         public void SettingsViewControllerDidEnd(AppSettingsViewController sender)
@@ -321,16 +311,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
 
-
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void        async void SettingsChanged(NSNotification n)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void SettingsChanged(NSNotification n)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var key = n.Object.ToString();
 
             if (key == UseServerTimezoneKey)
-            {
                 await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("restart_required_title"), Localization.GetString("restart_required_content"));
-            }
 
             if (key == DocumentsToDownloadKey)
             {
@@ -366,7 +354,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         try
                         {
                             await Managers.CleanUpManager.ClearContactsCache();
-                            await Managers.CleanUpManager.CleanUp(new[] { ModuleType.Contacts });
+                            await Managers.CleanUpManager.CleanUp(new[]
+                            {
+                                ModuleType.Contacts
+                            });
 
                             dismissAction();
                         }
@@ -402,7 +393,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         try
                         {
                             await Managers.CleanUpManager.ClearShortcodeCache();
-                            await Managers.CleanUpManager.CleanUp(new[] { ModuleType.Shortcodes });
+                            await Managers.CleanUpManager.CleanUp(new[]
+                            {
+                                ModuleType.Shortcodes
+                            });
 
                             dismissAction();
                         }
@@ -421,16 +415,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             if (key == UseTemplateKey)
-            {
                 RefreshHiddenSettings();
-            }
         }
 
-        void RefreshHiddenSettings() => SetHiddenKeys(PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk ? null : new[] { LocalTemplateKey }, false);
+        void RefreshHiddenSettings()
+        {
+            SetHiddenKeys(PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk
+                    ? null
+                    : new[]
+                    {
+                        LocalTemplateKey
+                    },
+                false);
+        }
 
         class CustomSpecifierValuesViewController : SpecifierValuesViewController
         {
-
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = base.GetCell(tableView, indexPath);

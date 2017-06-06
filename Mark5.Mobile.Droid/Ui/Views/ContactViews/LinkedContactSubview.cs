@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: LinkedContactSubview.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,15 +11,14 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-
     public class LinkedContactSubview : ContactView
     {
-
         readonly LinkedContactType contactType;
 
         public event EventHandler<ContactPreview> ContactClicked = delegate { };
 
-        public LinkedContactSubview(Context context, LinkedContactType contactType) : base(context)
+        public LinkedContactSubview(Context context, LinkedContactType contactType)
+            : base(context)
         {
             this.contactType = contactType;
 
@@ -39,7 +31,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             var contacts = new List<ContactPreview>();
 
             if (Contact != null)
-            {
                 switch (contactType)
                 {
                     case LinkedContactType.PrimaryPerson:
@@ -56,7 +47,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                         contacts.AddRange(Contact.Children.Where(c => c.Type == ContactType.Company));
                         break;
                 }
-            }
 
             if (contacts.Count > 0)
             {
@@ -78,11 +68,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
         class LinkedContactSubSubview : LinearLayoutCompat
         {
-
             public LinkedContactSubSubview(Context context, LinkedContactType type, ContactPreview contactPreview, int distanceNormal, int distanceLarge, int distanceVeryLarge)
                 : base(context)
             {
-                var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
+                var typedArray = Context.ObtainStyledAttributes(new int[]
+                {
+                    Resource.Attribute.selectableItemBackground
+                });
                 SetBackgroundResource(typedArray.GetResourceId(0, 0));
                 typedArray.Recycle();
 
@@ -97,7 +89,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 var titleTextView = new AppCompatTextView(context);
                 titleTextView.Text = contactPreview.Name;
                 titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
-                AddView(titleTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent) { LeftMargin = distanceLarge });
+                AddView(titleTextView,
+                    new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                    {
+                        LeftMargin = distanceLarge
+                    });
             }
 
             int GetDrawableIdForContactType(LinkedContactType type)

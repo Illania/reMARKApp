@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ObjectLinksActivity.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using Android.App;
 using Android.Content.PM;
 using Android.OS;
@@ -17,11 +10,9 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class ObjectLinksActivity : BaseAppCompatActivity
     {
-
         public const string BusinessEntityIntentKey = "BusinessEntity_ef8f3886-1478-4b4c-8bdb-7a6188035674";
 
         Toolbar toolbar;

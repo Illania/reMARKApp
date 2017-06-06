@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: ObjectActionsListViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,10 +13,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    
     public class ObjectActionsListViewController : AbstractViewController
     {
-
         readonly IBusinessEntity businessEntity;
 
         UIBarButtonItem doneItem;
@@ -56,7 +47,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeNavigationBarTitle();
             InitializeHandlers();
 
-            ReachabilityBar.Attach(View, tableView, (float)NavigationController.BottomLayoutGuide.Length);
+            ReachabilityBar.Attach(View, tableView, (float) NavigationController.BottomLayoutGuide.Length);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -67,7 +58,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"{nameof(ObjectActionsListViewController)} appeared");
 
-            var ds = (DataSource)tableView.Source;
+            var ds = (DataSource) tableView.Source;
             if (ds.Empty)
                 await RefreshData();
         }
@@ -107,12 +98,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(tableView);
             View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-                });
+            {
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+            });
         }
 
         void InitializeNavigationBarTitle()
@@ -144,8 +135,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 var objectActions = await Managers.CommonActionsManager.GetObjectActionsAsync(businessEntity);
-                var grouppedObjectActions = objectActions.OrderBy(oa => oa.ActionType).ThenBy(oa => oa.ActionTimeTimestamp).GroupBy(oa => oa.ActionType).ToDictionary(v => v.Key, v=>v.ToArray());
-                var ds = (DataSource)tableView.Source;
+                var grouppedObjectActions = objectActions.OrderBy(oa => oa.ActionType).ThenBy(oa => oa.ActionTimeTimestamp).GroupBy(oa => oa.ActionType).ToDictionary(v => v.Key, v => v.ToArray());
+                var ds = (DataSource) tableView.Source;
                 ds.SetItems(grouppedObjectActions);
             }
             catch (Exception ex)
@@ -160,14 +151,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable
         {
-
-            public bool Empty
-            {
-                get
-                {
-                    return objectActionsInView.Count < 1;
-                }
-            }
+            public bool Empty => objectActionsInView.Count < 1;
 
             UITableView tableView;
             string emptyText;
@@ -185,9 +169,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 if (loading)
-                {
                     return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
-                }
 
                 if (objectActionsInView.Count < 1)
                 {

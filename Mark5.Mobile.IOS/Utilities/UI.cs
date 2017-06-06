@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: UI.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
 using System;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -16,10 +9,20 @@ namespace Mark5.Mobile.IOS.Utilities
 {
     public static class UI
     {
-        
         #region Pretty printing
 
-        static readonly string[] SizeSuffixes = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+        static readonly string[] SizeSuffixes =
+        {
+            "B",
+            "KB",
+            "MB",
+            "GB",
+            "TB",
+            "PB",
+            "EB",
+            "ZB",
+            "YB"
+        };
 
         public static string PrettyFileSize(long bytes)
         {
@@ -28,8 +31,8 @@ namespace Mark5.Mobile.IOS.Utilities
                 if (bytes < 0)
                     return "Unknown size";
 
-                var mag = (int)Math.Log(bytes, 1024);
-                decimal adjustedSize = (decimal)bytes / (1L << (mag * 10));
+                var mag = (int) Math.Log(bytes, 1024);
+                var adjustedSize = (decimal) bytes / (1L << (mag * 10));
 
                 return string.Format("{0:n1} {1}", adjustedSize, SizeSuffixes[mag]);
             }
@@ -64,7 +67,7 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             try
             {
-                float alpha = 255f;
+                var alpha = 255f;
                 float red, green, blue;
 
                 switch (hexString.Length)
@@ -111,30 +114,29 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static float KeyboardHeightFromNotification(NSNotification notification)
         {
-            var keyboardFrame = ((NSValue)notification.UserInfo[UIKeyboard.FrameEndUserInfoKey]).CGRectValue;
-            return (float)Math.Min(keyboardFrame.Width, keyboardFrame.Height); // Resolving correct dimension, to work around device bug http://stackoverflow.com/questions/9746417/keyboard-willshow-and-willhide-vs-rotation
+            var keyboardFrame = ((NSValue) notification.UserInfo[UIKeyboard.FrameEndUserInfoKey]).CGRectValue;
+            return (float) Math.Min(keyboardFrame.Width, keyboardFrame.Height); // Resolving correct dimension, to work around device bug http://stackoverflow.com/questions/9746417/keyboard-willshow-and-willhide-vs-rotation
         }
 
         public static double KeyboardAnimationDurationFromNotification(NSNotification notification)
         {
             var animationDurationUserInfoKey = notification.UserInfo[UIKeyboard.AnimationDurationUserInfoKey];
-            return animationDurationUserInfoKey != null ? ((NSNumber)animationDurationUserInfoKey).DoubleValue : 0.25d;
+            return animationDurationUserInfoKey != null ? ((NSNumber) animationDurationUserInfoKey).DoubleValue : 0.25d;
         }
 
         public static UIViewAnimationCurve KeyboardAnimationCurveFromNotification(NSNotification notification)
         {
             var animationCurveUserInfoKey = notification.UserInfo[UIKeyboard.AnimationCurveUserInfoKey];
-            return animationCurveUserInfoKey != null ? (UIViewAnimationCurve)(int)((NSNumber)animationCurveUserInfoKey).NIntValue : UIViewAnimationCurve.Linear;
+            return animationCurveUserInfoKey != null ? (UIViewAnimationCurve) (int) ((NSNumber) animationCurveUserInfoKey).NIntValue : UIViewAnimationCurve.Linear;
         }
 
         public static UIViewAnimationOptions KeyboardAnimationOptionsFromNotification(NSNotification notification)
         {
-            var curve = (int)KeyboardAnimationCurveFromNotification(notification);
+            var curve = (int) KeyboardAnimationCurveFromNotification(notification);
             curve |= curve << 16;
-            return (UIViewAnimationOptions)curve;
+            return (UIViewAnimationOptions) curve;
         }
 
         #endregion
-
     }
 }

@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: DocumentDirectionsSearchView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +12,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         readonly CustomButton outboxButton;
         readonly CustomButton draftButton;
 
-        public DocumentDirectionsSearchView(Android.Content.Context context) : base(context)
+        public DocumentDirectionsSearchView(Android.Content.Context context)
+            : base(context)
         {
             allButton = new CustomButton(context, Resource.String.search_document_direction_all, AllButtonAction);
             inboxButton = new CustomButton(context, Resource.String.search_document_direction_inbox, OtherButtonsAction);
@@ -47,10 +41,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 return true;
             }
 
-            var remainingButtonsList = new List<CustomButton> { inboxButton, outboxButton, draftButton };
+            var remainingButtonsList = new List<CustomButton>
+            {
+                inboxButton,
+                outboxButton,
+                draftButton
+            };
             remainingButtonsList.Remove(button);
 
-            if ((remainingButtonsList.All(b => b.Selected == true) && !button.Selected) || (remainingButtonsList.All(b => b.Selected == false) && button.Selected))
+            if (remainingButtonsList.All(b => b.Selected == true) && !button.Selected || remainingButtonsList.All(b => b.Selected == false) && button.Selected)
             {
                 ResetOtherButtons();
                 allButton.UpdateSelectedState(true);
@@ -62,7 +61,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         void ResetOtherButtons()
         {
-            var otherButtonsList = new List<CustomButton> { inboxButton, outboxButton, draftButton };
+            var otherButtonsList = new List<CustomButton>
+            {
+                inboxButton,
+                outboxButton,
+                draftButton
+            };
             otherButtonsList.ForEach(b => b.UpdateSelectedState(false));
         }
 
@@ -78,7 +82,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             outboxButton.UpdateSelectedState(false);
             draftButton.UpdateSelectedState(false);
 
-            var directions = new List<DocumentDirection> { DocumentDirection.Incoming, DocumentDirection.Outgoing, DocumentDirection.Draft };
+            var directions = new List<DocumentDirection>
+            {
+                DocumentDirection.Incoming,
+                DocumentDirection.Outgoing,
+                DocumentDirection.Draft
+            };
 
             if (Criteria.Directions == null || !Criteria.Directions.Any() || directions.Intersect(Criteria.Directions).Count() == directions.Count)
             {
@@ -87,19 +96,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             }
 
             if (Criteria.Directions.Contains(DocumentDirection.Draft))
-            {
                 draftButton.UpdateSelectedState(true);
-            }
 
             if (Criteria.Directions.Contains(DocumentDirection.Incoming))
-            {
                 inboxButton.UpdateSelectedState(true);
-            }
 
             if (Criteria.Directions.Contains(DocumentDirection.Outgoing))
-            {
                 outboxButton.UpdateSelectedState(true);
-            }
         }
 
         public override void UpdateCriteria()
@@ -107,19 +110,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             var selectedDirections = new List<DocumentDirection>();
 
             if (draftButton.Selected || allButton.Selected)
-            {
                 selectedDirections.Add(DocumentDirection.Draft);
-            }
 
             if (inboxButton.Selected || allButton.Selected)
-            {
                 selectedDirections.Add(DocumentDirection.Incoming);
-            }
 
             if (outboxButton.Selected || allButton.Selected)
-            {
                 selectedDirections.Add(DocumentDirection.Outgoing);
-            }
 
             Criteria.Directions = selectedDirections;
         }

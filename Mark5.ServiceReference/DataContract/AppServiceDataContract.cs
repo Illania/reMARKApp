@@ -1,24 +1,14 @@
-//
-// Project: Mark5.Mobile.ServiceReference.DataContract
-// File: AppServiceDataContract.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-#pragma warning disable CS1701
 namespace Mark5.ServiceReference.DataContract
 {
-
     #region Abstract public classes
 
     [DataContract(Name = "AbstractParameters", Namespace = "com.nordic-it.appservice.v3")]
     public abstract class AbstractParameters
     {
-
         [DataMember(Name = "Token", Order = 0, IsRequired = true)]
         public string Token { get; set; }
     }
@@ -30,7 +20,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "AuthenticateParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class AuthenticateParameters
     {
-
         [DataMember(Name = "Username", Order = 0, IsRequired = true)]
         public string Username { get; set; }
 
@@ -50,7 +39,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "AuthenticateResult", Namespace = "com.nordic-it.appservice.v3")]
     public class AuthenticateResult
     {
-
         [DataMember(Name = "Token", Order = 0, IsRequired = true)]
         public string Token { get; set; }
     }
@@ -62,7 +50,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetFoldersParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetFoldersParameters : AbstractParameters
     {
-
         [DataMember(Name = "FolderId", Order = 0)]
         public int FolderId { get; set; } = -1;
 
@@ -76,7 +63,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetFoldersResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetFoldersResult
     {
-
         [DataMember(Name = "Folders", Order = 0)]
         public List<Folder> Folders { get; set; } = new List<Folder>();
     }
@@ -84,7 +70,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "Folder", Namespace = "com.nordic-it.appservice.v3", IsReference = true)]
     public class Folder
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -112,8 +97,7 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "SubFolders", Order = 0)]
         public List<Folder> SubFolders { get; set; } = new List<Folder>();
 
-        [DataMember(Name = "Subscribed", Order = 0)]
-        public bool Subscribed;
+        [DataMember(Name = "Subscribed", Order = 0)] public bool Subscribed;
 
         [DataMember(Name = "Position", Order = 0)]
         public int Position { get; set; } = -1;
@@ -131,7 +115,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "CalendarEventOptionalParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class CalendarEventOptionalParameters : OptionalParameters
     {
-
         [DataMember(Name = "CanContainAppointments", Order = 0)]
         public bool CanContainAppointments { get; set; }
 
@@ -142,62 +125,38 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "ModuleType", Namespace = "com.nordic-it.appservice.v3")]
     public enum ModuleType
     {
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "Documents")]
-        Documents = 1,
-        [EnumMember(Value = "Contacts")]
-        Contacts = 2,
-        [EnumMember(Value = "Shortcodes")]
-        Shortcodes = 3,
-        [EnumMember(Value = "Calendar")]
-        Calendar = 4,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "Documents")] Documents = 1,
+        [EnumMember(Value = "Contacts")] Contacts = 2,
+        [EnumMember(Value = "Shortcodes")] Shortcodes = 3,
+        [EnumMember(Value = "Calendar")] Calendar = 4,
     }
 
     [DataContract(Name = "FolderType", Namespace = "com.nordic-it.appservice.v3")]
     public enum FolderType
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "Inbox")]
-        Inbox = 1,
-        [EnumMember(Value = "Outbox")]
-        Outbox = 2,
-        [EnumMember(Value = "Draft")]
-        Draft = 3,
-        [EnumMember(Value = "Cabinet")]
-        Cabinet = 4,
-        [EnumMember(Value = "Spam")]
-        Spam = 5,
-        [EnumMember(Value = "External")]
-        External = 6,
-        [EnumMember(Value = "DeliveryReports")]
-        DeliveryReports = 7,
-        [EnumMember(Value = "Companies")]
-        Companies = 8,
-        [EnumMember(Value = "Persons")]
-        Persons = 9,
-        [EnumMember(Value = "Personal")]
-        Personal = 10,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "Inbox")] Inbox = 1,
+        [EnumMember(Value = "Outbox")] Outbox = 2,
+        [EnumMember(Value = "Draft")] Draft = 3,
+        [EnumMember(Value = "Cabinet")] Cabinet = 4,
+        [EnumMember(Value = "Spam")] Spam = 5,
+        [EnumMember(Value = "External")] External = 6,
+        [EnumMember(Value = "DeliveryReports")] DeliveryReports = 7,
+        [EnumMember(Value = "Companies")] Companies = 8,
+        [EnumMember(Value = "Persons")] Persons = 9,
+        [EnumMember(Value = "Personal")] Personal = 10,
     }
 
     [DataContract(Name = "FolderInternalType", Namespace = "com.nordic-it.appservice.v3")]
     public enum FolderInternalType
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "Static")]
-        Static = 1,
-        [EnumMember(Value = "Dynamic")]
-        Dynamic = 2,
-        [EnumMember(Value = "FilterView")]
-        FilterView = 3,
-        [EnumMember(Value = "Worktray")]
-        Worktray = 4,
-        [EnumMember(Value = "Custom")]
-        Custom = 5,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "Static")] Static = 1,
+        [EnumMember(Value = "Dynamic")] Dynamic = 2,
+        [EnumMember(Value = "FilterView")] FilterView = 3,
+        [EnumMember(Value = "Worktray")] Worktray = 4,
+        [EnumMember(Value = "Custom")] Custom = 5,
     }
 
     #endregion
@@ -207,7 +166,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetDocumentPreviewsParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetDocumentPreviewsParameters : AbstractParameters
     {
-
         [DataMember(Name = "FolderId", Order = 0)]
         public int FolderId { get; set; } = -1;
 
@@ -227,7 +185,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetDocumentPreviewsResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetDocumentPreviewsResult
     {
-
         [DataMember(Name = "DocumentPreviews", Order = 0)]
         public List<DocumentPreview> DocumentPreviews { get; set; } = new List<DocumentPreview>();
     }
@@ -235,7 +192,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetDocumentParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetDocumentParameters : AbstractParameters
     {
-
         [DataMember(Name = "FolderId", Order = 0)]
         public int FolderId { get; set; } = -1;
 
@@ -252,7 +208,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetDocumentResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetDocumentResult
     {
-
         [DataMember(Name = "Document", Order = 0)]
         public Document Document { get; set; }
 
@@ -263,7 +218,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SendDocumentParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class SendDocumentParameters : AbstractParameters
     {
-
         [DataMember(Name = "Document", Order = 0)]
         public Document Document { get; set; }
 
@@ -295,7 +249,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SendDocumentResult", Namespace = "com.nordic-it.appservice.v3")]
     public class SendDocumentResult
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -309,7 +262,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SetDocumentsReadStatusParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class SetDocumentsReadStatusParameters : AbstractParameters
     {
-
         [DataMember(Name = "DocumentIds", Order = 0)]
         public int[] DocumentIds { get; set; }
 
@@ -325,7 +277,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SetDocumentPriorityParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class SetDocumentPriorityParameters : AbstractParameters
     {
-
         [DataMember(Name = "DocumentIds", Order = 0)]
         public int[] DocumentIds { get; set; }
 
@@ -341,7 +292,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "MoveToSpamParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class MoveToSpamParameters : AbstractParameters
     {
-
         [DataMember(Name = "DocumentIds", Order = 0)]
         public int[] DocumentIds { get; set; }
     }
@@ -359,7 +309,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetTemplatePreviewsResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetTemplatePreviewsResult
     {
-
         [DataMember(Name = "TemplatePreviews", Order = 0)]
         public List<TemplatePreview> TemplatePreviews { get; set; } = new List<TemplatePreview>();
     }
@@ -367,7 +316,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetTemplateParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetTemplateParameters : AbstractParameters
     {
-
         [DataMember(Name = "TemplateId", Order = 0)]
         public int TemplateId { get; set; } = -1;
 
@@ -378,7 +326,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetTemplateResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetTemplateResult
     {
-
         [DataMember(Name = "TemplatePreview", Order = 0)]
         public TemplatePreview TemplatePreview { get; set; }
 
@@ -389,7 +336,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetDefaultTemplateParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetDefaultTemplateParameters : AbstractParameters
     {
-
         [DataMember(Name = "CreationModeFlag", Order = 0)]
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
 
@@ -400,7 +346,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetDefaultTemplateResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetDefaultTemplateResult
     {
-
         [DataMember(Name = "NoDefaultTemplate", Order = 0)]
         public bool NoDefaultTemplate { get; set; }
 
@@ -414,7 +359,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "Document", Namespace = "com.nordic-it.appservice.v3")]
     public class Document
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -452,7 +396,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "DocumentPreview", Namespace = "com.nordic-it.appservice.v3")]
     public class DocumentPreview
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -505,7 +448,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "DocumentAddress", Namespace = "com.nordic-it.appservice.v3")]
     public class DocumentAddress
     {
-
         [DataMember(Name = "Name", Order = 0)]
         public string Name { get; set; }
 
@@ -525,7 +467,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "AttachmentDescription", Namespace = "com.nordic-it.appservice.v3")]
     public class AttachmentDescription
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -539,7 +480,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "Comment", Namespace = "com.nordic-it.appservice.v3")]
     public class Comment
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -568,7 +508,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "Line", Namespace = "com.nordic-it.appservice.v3")]
     public class Line
     {
-
         [DataMember(Name = "Guid", Order = 0)]
         public Guid Guid { get; set; }
 
@@ -582,7 +521,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "TemplatePreview", Namespace = "com.nordic-it.appservice.v3")]
     public class TemplatePreview
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -602,7 +540,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "Template", Namespace = "com.nordic-it.appservice.v3")]
     public class Template
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -626,101 +563,63 @@ namespace Mark5.ServiceReference.DataContract
     [Flags]
     public enum DocumentCreationModeFlag
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "New")]
-        New = 1,
-        [EnumMember(Value = "Reply")]
-        Reply = 2,
-        [EnumMember(Value = "ReplyAll")]
-        ReplyAll = 4,
-        [EnumMember(Value = "Forward")]
-        Forward = 8,
-        [EnumMember(Value = "Edit")]
-        Edit = 16,
-        [EnumMember(Value = "Resend")]
-        Resend = 32,
-        [EnumMember(Value = "Redirect")]
-        Redirect = 64,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "New")] New = 1,
+        [EnumMember(Value = "Reply")] Reply = 2,
+        [EnumMember(Value = "ReplyAll")] ReplyAll = 4,
+        [EnumMember(Value = "Forward")] Forward = 8,
+        [EnumMember(Value = "Edit")] Edit = 16,
+        [EnumMember(Value = "Resend")] Resend = 32,
+        [EnumMember(Value = "Redirect")] Redirect = 64,
     }
 
     [DataContract(Name = "Priority", Namespace = "com.nordic-it.appservice.v3")]
     public enum Priority
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "Ignore")]
-        Ignore = 1,
-        [EnumMember(Value = "Low")]
-        Low = 2,
-        [EnumMember(Value = "Normal")]
-        Normal = 3,
-        [EnumMember(Value = "Urgent")]
-        Urgent = 4,
-        [EnumMember(Value = "System")]
-        System = 5,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "Ignore")] Ignore = 1,
+        [EnumMember(Value = "Low")] Low = 2,
+        [EnumMember(Value = "Normal")] Normal = 3,
+        [EnumMember(Value = "Urgent")] Urgent = 4,
+        [EnumMember(Value = "System")] System = 5,
     }
 
     [DataContract(Name = "DocumentDirection", Namespace = "com.nordic-it.appservice.v3")]
     public enum DocumentDirection
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "Outgoing")]
-        Outgoing = 1,
-        [EnumMember(Value = "Incoming")]
-        Incoming = 2,
-        [EnumMember(Value = "Draft")]
-        Draft = 3,
-        [EnumMember(Value = "External")]
-        External = 4
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "Outgoing")] Outgoing = 1,
+        [EnumMember(Value = "Incoming")] Incoming = 2,
+        [EnumMember(Value = "Draft")] Draft = 3,
+        [EnumMember(Value = "External")] External = 4
     }
 
     [DataContract(Name = "DocumentAddressType", Namespace = "com.nordic-it.appservice.v3")]
     public enum DocumentAddressType
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "To")]
-        To = 1,
-        [EnumMember(Value = "From")]
-        From = 2,
-        [EnumMember(Value = "Cc")]
-        Cc = 3,
-        [EnumMember(Value = "Bcc")]
-        Bcc = 4,
-        [EnumMember(Value = "ReplyTo")]
-        ReplyTo = 5
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "To")] To = 1,
+        [EnumMember(Value = "From")] From = 2,
+        [EnumMember(Value = "Cc")] Cc = 3,
+        [EnumMember(Value = "Bcc")] Bcc = 4,
+        [EnumMember(Value = "ReplyTo")] ReplyTo = 5
     }
 
     [DataContract(Name = "ContentType", Namespace = "com.nordic-it.appservice.v3")]
     public enum ContentType
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "PlainText")]
-        PlainText = 1,
-        [EnumMember(Value = "Html")]
-        Html = 2,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "PlainText")] PlainText = 1,
+        [EnumMember(Value = "Html")] Html = 2,
     }
 
     [DataContract(Name = "DocumentBodyTypeRequest", Namespace = "com.nordic-it.appservice.v3")]
     public enum DocumentBodyTypeRequest
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "HtmlOnly")]
-        HtmlOnly = 1,
-        [EnumMember(Value = "PlainTextOnly")]
-        PlainTextOnly = 2,
-        [EnumMember(Value = "HtmlAndPlainText")]
-        HtmlAndPlainText = 3,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "HtmlOnly")] HtmlOnly = 1,
+        [EnumMember(Value = "PlainTextOnly")] PlainTextOnly = 2,
+        [EnumMember(Value = "HtmlAndPlainText")] HtmlAndPlainText = 3,
     }
 
     #endregion
@@ -730,7 +629,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetContactPreviewsParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetContactPreviewsParameters : AbstractParameters
     {
-
         [DataMember(Name = "FolderId", Order = 0)]
         public int FolderId { get; set; } = -1;
 
@@ -744,7 +642,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetContactPreviewsResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetContactPreviewsResult
     {
-
         [DataMember(Name = "ContactPreviews", Order = 0)]
         public List<ContactPreview> ContactPreviews { get; set; } = new List<ContactPreview>();
     }
@@ -752,7 +649,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetContactParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetContactParameters : AbstractParameters
     {
-
         [DataMember(Name = "FolderId", Order = 0)]
         public int FolderId { get; set; } = -1;
 
@@ -766,19 +662,16 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetContactResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetContactResult
     {
-
         [DataMember(Name = "Contact", Order = 0)]
         public Contact Contact { get; set; }
 
         [DataMember(Name = "ContactPreview", Order = 0)]
         public ContactPreview ContactPreview { get; set; }
-
     }
 
     [DataContract(Name = "CreateOrUpdateContactParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class CreateOrUpdateContactParameters : AbstractParameters
     {
-
         [DataMember(Name = "Contact", Order = 0)]
         public Contact Contact { get; set; }
 
@@ -792,7 +685,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "CreateOrUpdateContactResult", Namespace = "com.nordic-it.appservice.v3")]
     public class CreateOrUpdateContactResult
     {
-
         [DataMember(Name = "Updated", Order = 0)]
         public bool Updated { get; set; }
 
@@ -806,7 +698,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "Contact", Namespace = "com.nordic-it.appservice.v3")]
     public class Contact
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -868,7 +759,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "ContactPreview", Namespace = "com.nordic-it.appservice.v3")]
     public class ContactPreview
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -906,7 +796,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "PhysicalAddress", Namespace = "com.nordic-it.appservice.v3")]
     public class PhysicalAddress
     {
-
         [DataMember(Name = "Type", Order = 0)]
         public PhysicalAddressType Type { get; set; }
 
@@ -929,7 +818,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "CountryInfo", Namespace = "com.nordic-it.appservice.v3")]
     public class CountryInfo
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -952,7 +840,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "PhysicalAddressType", Namespace = "com.nordic-it.appservice.v3")]
     public class PhysicalAddressType
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -966,7 +853,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "CommunicationAddress", Namespace = "com.nordic-it.appservice.v3")]
     public class CommunicationAddress
     {
-
         [DataMember(Name = "CommunicationAddressType", Order = 0)]
         public CommunicationAddressType Type { get; set; }
 
@@ -983,41 +869,25 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "CommunicationAddressType", Namespace = "com.nordic-it.appservice.v3")]
     public enum CommunicationAddressType
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "Email")]
-        Email = 1,
-        [EnumMember(Value = "Fax")]
-        Fax = 2,
-        [EnumMember(Value = "Phone")]
-        Phone = 3,
-        [EnumMember(Value = "Telex")]
-        Telex = 4,
-        [EnumMember(Value = "Mobile")]
-        Mobile = 5,
-        [EnumMember(Value = "IM")]
-        IM = 6,
-        [EnumMember(Value = "Internal")]
-        Internal = 7,
-        [EnumMember(Value = "System")]
-        System = 8,
-        [EnumMember(Value = "Skype")]
-        Skype = 9,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "Email")] Email = 1,
+        [EnumMember(Value = "Fax")] Fax = 2,
+        [EnumMember(Value = "Phone")] Phone = 3,
+        [EnumMember(Value = "Telex")] Telex = 4,
+        [EnumMember(Value = "Mobile")] Mobile = 5,
+        [EnumMember(Value = "IM")] IM = 6,
+        [EnumMember(Value = "Internal")] Internal = 7,
+        [EnumMember(Value = "System")] System = 8,
+        [EnumMember(Value = "Skype")] Skype = 9,
     }
 
     [DataContract(Name = "ContactType", Namespace = "com.nordic-it.appservice.v3")]
     public enum ContactType
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "Person")]
-        Person = 1,
-        [EnumMember(Value = "Department")]
-        Department = 2,
-        [EnumMember(Value = "Company")]
-        Company = 3,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "Person")] Person = 1,
+        [EnumMember(Value = "Department")] Department = 2,
+        [EnumMember(Value = "Company")] Company = 3,
     }
 
     #endregion
@@ -1027,7 +897,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetShortcodePreviewsParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetShortcodePreviewsParameters : AbstractParameters
     {
-
         [DataMember(Name = "FolderId", Order = 0)]
         public int FolderId { get; set; } = -1;
 
@@ -1041,7 +910,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetShortcodePreviewsResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetShortcodePreviewsResult
     {
-
         [DataMember(Name = "ShortcodePreviews", Order = 0)]
         public List<ShortcodePreview> ShortcodePreviews { get; set; } = new List<ShortcodePreview>();
     }
@@ -1049,7 +917,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetShortcodeParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetShortcodeParameters : AbstractParameters
     {
-
         [DataMember(Name = "FolderId", Order = 0)]
         public int FolderId { get; set; } = -1;
 
@@ -1063,7 +930,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetShortcodeResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetShortcodeResult
     {
-
         [DataMember(Name = "ShortcodePreview", Order = 0)]
         public ShortcodePreview ShortcodePreview { get; set; }
 
@@ -1074,7 +940,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "ShortcodePreview", Namespace = "com.nordic-it.appservice.v3")]
     public class ShortcodePreview
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -1097,7 +962,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "Shortcode", Namespace = "com.nordic-it.appservice.v3")]
     public class Shortcode
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -1115,7 +979,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetCalendarEventsParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetCalendarEventsParameters : AbstractParameters
     {
-
         [DataMember(Name = "FolderId", Order = 0)]
         public int FolderId { get; set; } = -1;
 
@@ -1135,7 +998,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetCalendarEventsResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetCalendarEventsResult
     {
-
         [DataMember(Name = "CalendarAppointment", Order = 0)]
         public List<CalendarAppointment> CalendarAppointments { get; set; } = new List<CalendarAppointment>();
 
@@ -1146,7 +1008,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetCalendarAppointmentParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetCalendarAppointmentParameters : AbstractParameters
     {
-
         [DataMember(Name = "FolderId", Order = 0)]
         public int FolderId { get; set; } = -1;
 
@@ -1157,7 +1018,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetCalendarAppointmentResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetCalendarAppointmentResult
     {
-
         [DataMember(Name = "CalendarAppointment", Order = 0)]
         public CalendarAppointment CalendarAppointment { get; set; }
     }
@@ -1165,7 +1025,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetCalendarTaskParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetCalendarTaskParameters : AbstractParameters
     {
-
         [DataMember(Name = "FolderId", Order = 0)]
         public int FolderId { get; set; } = -1;
 
@@ -1176,7 +1035,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetCalendarTaskResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetCalendarTaskResult
     {
-
         [DataMember(Name = "CalendarTask", Order = 0)]
         public CalendarTask CalendarTask { get; set; }
     }
@@ -1184,7 +1042,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "CreateOrUpdateCalendarAppointmentParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class CreateOrUpdateCalendarAppointmentParameters : AbstractParameters
     {
-
         [DataMember(Name = "FolderId", Order = 0)]
         public int FolderId { get; set; } = -1;
 
@@ -1195,7 +1052,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "CreateOrUpdateCalendarAppointmentResult", Namespace = "com.nordic-it.appservice.v3")]
     public class CreateOrUpdateCalendarAppointmentResult
     {
-
         [DataMember(Name = "Updated", Order = 0)]
         public bool Updated { get; set; }
 
@@ -1209,7 +1065,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "CreateOrUpdateCalendarTaskParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class CreateOrUpdateCalendarTaskParameters : AbstractParameters
     {
-
         [DataMember(Name = "FolderId", Order = 0)]
         public int FolderId { get; set; } = -1;
 
@@ -1220,7 +1075,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "CreateOrUpdateCalendarTaskResult", Namespace = "com.nordic-it.appservice.v3")]
     public class CreateOrUpdateCalendarTaskResult
     {
-
         [DataMember(Name = "Updated", Order = 0)]
         public bool Updated { get; set; }
 
@@ -1234,7 +1088,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "CalendarAppointment", Namespace = "com.nordic-it.appservice.v3")]
     public class CalendarAppointment
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -1293,7 +1146,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "CalendarTask", Namespace = "com.nordic-it.appservice.v3")]
     public class CalendarTask
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -1367,7 +1219,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "CalendarCategory", Namespace = "com.nordic-it.appservice.v3")]
     public class CalendarCategory
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -1393,7 +1244,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "CalendarResource", Namespace = "com.nordic-it.appservice.v3")]
     public class CalendarResource
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; }
 
@@ -1413,7 +1263,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "Participant", Namespace = "com.nordic-it.appservice.v3")]
     public class Participant
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -1439,175 +1288,106 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "CalendarCategoryType", Namespace = "com.nordic-it.appservice.v3")]
     public enum CalendarCategoryType
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "Appointment")]
-        Appointment = 1,
-        [EnumMember(Value = "Task")]
-        Task = 2,
-        [EnumMember(Value = "Event")]
-        Event = 3,
-        [EnumMember(Value = "PhoneCall")]
-        PhoneCall = 4,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "Appointment")] Appointment = 1,
+        [EnumMember(Value = "Task")] Task = 2,
+        [EnumMember(Value = "Event")] Event = 3,
+        [EnumMember(Value = "PhoneCall")] PhoneCall = 4,
     }
 
     [DataContract(Name = "CalendarCategorySubType", Namespace = "com.nordic-it.appservice.v3")]
     public enum CalendarCategorySubType
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "Event")]
-        Event = 1,
-        [EnumMember(Value = "Custom")]
-        Custom = 2,
-        [EnumMember(Value = "MeetingInternal")]
-        MeetingInternal = 3,
-        [EnumMember(Value = "MeetingExternal")]
-        MeetingExternal = 4,
-        [EnumMember(Value = "PhoneCallIn")]
-        PhoneCallIn = 5,
-        [EnumMember(Value = "PhoneCallOut")]
-        PhoneCallOut = 6,
-        [EnumMember(Value = "FollowUp")]
-        FollowUp = 7,
-        [EnumMember(Value = "Planning")]
-        Planning = 8,
-        [EnumMember(Value = "Visit")]
-        Visit = 9,
-        [EnumMember(Value = "Lunch")]
-        Lunch = 10,
-        [EnumMember(Value = "Proposal")]
-        Proposal = 11,
-        [EnumMember(Value = "Service")]
-        Service = 12,
-        [EnumMember(Value = "Birthday")]
-        Birthday = 13,
-        [EnumMember(Value = "Anniversary")]
-        Anniversary = 14,
-        [EnumMember(Value = "Private")]
-        Private = 15,
-        [EnumMember(Value = "Holiday")]
-        Holiday = 16,
-        [EnumMember(Value = "Vacation")]
-        Vacation = 17,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "Event")] Event = 1,
+        [EnumMember(Value = "Custom")] Custom = 2,
+        [EnumMember(Value = "MeetingInternal")] MeetingInternal = 3,
+        [EnumMember(Value = "MeetingExternal")] MeetingExternal = 4,
+        [EnumMember(Value = "PhoneCallIn")] PhoneCallIn = 5,
+        [EnumMember(Value = "PhoneCallOut")] PhoneCallOut = 6,
+        [EnumMember(Value = "FollowUp")] FollowUp = 7,
+        [EnumMember(Value = "Planning")] Planning = 8,
+        [EnumMember(Value = "Visit")] Visit = 9,
+        [EnumMember(Value = "Lunch")] Lunch = 10,
+        [EnumMember(Value = "Proposal")] Proposal = 11,
+        [EnumMember(Value = "Service")] Service = 12,
+        [EnumMember(Value = "Birthday")] Birthday = 13,
+        [EnumMember(Value = "Anniversary")] Anniversary = 14,
+        [EnumMember(Value = "Private")] Private = 15,
+        [EnumMember(Value = "Holiday")] Holiday = 16,
+        [EnumMember(Value = "Vacation")] Vacation = 17,
     }
 
     [DataContract(Name = "AppointmentStatus", Namespace = "com.nordic-it.appservice.v3")]
     public enum AppointmentStatus
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "Free")]
-        Free = 1,
-        [EnumMember(Value = "Tentative")]
-        Tentative = 2,
-        [EnumMember(Value = "Busy")]
-        Busy = 3,
-        [EnumMember(Value = "OutOfOffice")]
-        OutOfOffice = 4,
-        [EnumMember(Value = "WorkingElsewhere")]
-        WorkingElsewhere = 5,
-        [EnumMember(Value = "Custom")]
-        Custom = 6,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "Free")] Free = 1,
+        [EnumMember(Value = "Tentative")] Tentative = 2,
+        [EnumMember(Value = "Busy")] Busy = 3,
+        [EnumMember(Value = "OutOfOffice")] OutOfOffice = 4,
+        [EnumMember(Value = "WorkingElsewhere")] WorkingElsewhere = 5,
+        [EnumMember(Value = "Custom")] Custom = 6,
     }
 
     [DataContract(Name = "CalendarOccurenceType", Namespace = "com.nordic-it.appservice.v3")]
     public enum CalendarOccurenceType
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "Normal")]
-        Normal = 1,
-        [EnumMember(Value = "Pattern")]
-        Pattern = 2,
-        [EnumMember(Value = "Occurrence")]
-        Occurrence = 3,
-        [EnumMember(Value = "ChangedOccurrence")]
-        ChangedOccurrence = 4,
-        [EnumMember(Value = "DeletedOccurrence")]
-        DeletedOccurrence = 5
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "Normal")] Normal = 1,
+        [EnumMember(Value = "Pattern")] Pattern = 2,
+        [EnumMember(Value = "Occurrence")] Occurrence = 3,
+        [EnumMember(Value = "ChangedOccurrence")] ChangedOccurrence = 4,
+        [EnumMember(Value = "DeletedOccurrence")] DeletedOccurrence = 5
     }
 
     [DataContract(Name = "ParticipantPresenence", Namespace = "com.nordic-it.appservice.v3")]
     public enum ParticipantPresenence
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "Mandatory")]
-        Mandatory = 1,
-        [EnumMember(Value = "Optional")]
-        Optional = 2,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "Mandatory")] Mandatory = 1,
+        [EnumMember(Value = "Optional")] Optional = 2,
     }
 
     [DataContract(Name = "ParticipantType", Namespace = "com.nordic-it.appservice.v3")]
     public enum ParticipantType
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "User")]
-        User = 1,
-        [EnumMember(Value = "Client")]
-        Client = 2,
-        [EnumMember(Value = "Other")]
-        Other = 3,
-        [EnumMember(Value = "ComAddress")]
-        ComAddress = 4,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "User")] User = 1,
+        [EnumMember(Value = "Client")] Client = 2,
+        [EnumMember(Value = "Other")] Other = 3,
+        [EnumMember(Value = "ComAddress")] ComAddress = 4,
     }
 
     [DataContract(Name = "ParticipantStatus", Namespace = "com.nordic-it.appservice.v3")]
     public enum ParticipantStatus
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "NeedAction")]
-        NeedAction = 1,
-        [EnumMember(Value = "Accepted")]
-        Accepted = 2,
-        [EnumMember(Value = "Declined")]
-        Declined = 3,
-        [EnumMember(Value = "Tentative")]
-        Tentative = 4,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "NeedAction")] NeedAction = 1,
+        [EnumMember(Value = "Accepted")] Accepted = 2,
+        [EnumMember(Value = "Declined")] Declined = 3,
+        [EnumMember(Value = "Tentative")] Tentative = 4,
     }
 
     [DataContract(Name = "TaskStatus", Namespace = "com.nordic-it.appservice.v3")]
     public enum TaskStatus
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "NotStarted")]
-        NotStarted = 1,
-        [EnumMember(Value = "Active")]
-        Active = 2,
-        [EnumMember(Value = "Completed")]
-        Completed = 3,
-        [EnumMember(Value = "Waiting")]
-        Waiting = 4,
-        [EnumMember(Value = "Postponed")]
-        Postponed = 5,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "NotStarted")] NotStarted = 1,
+        [EnumMember(Value = "Active")] Active = 2,
+        [EnumMember(Value = "Completed")] Completed = 3,
+        [EnumMember(Value = "Waiting")] Waiting = 4,
+        [EnumMember(Value = "Postponed")] Postponed = 5,
     }
 
     [DataContract(Name = "DelegationStatus", Namespace = "com.nordic-it.appservice.v3")]
     public enum DelegationStatus
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "NoDelegation")]
-        NoDelegation = 1,
-        [EnumMember(Value = "Unknown")]
-        Unknown = 2,
-        [EnumMember(Value = "Accepted")]
-        Accepted = 3,
-        [EnumMember(Value = "Declined")]
-        Declined = 4,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "NoDelegation")] NoDelegation = 1,
+        [EnumMember(Value = "Unknown")] Unknown = 2,
+        [EnumMember(Value = "Accepted")] Accepted = 3,
+        [EnumMember(Value = "Declined")] Declined = 4,
     }
 
     #endregion
@@ -1622,7 +1402,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetSavedSearchesResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetSavedSearchesResult
     {
-
         [DataMember(Name = "SavedSearches", Order = 0)]
         public List<SavedSearch> SavedSearches { get; set; } = new List<SavedSearch>();
     }
@@ -1630,7 +1409,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SearchDocumentsParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class SearchDocumentsParameters : AbstractParameters
     {
-
         [DataMember(Name = "SavedSearchFilterHash", Order = 0)]
         public string SavedSearchFilterHash { get; set; }
 
@@ -1710,7 +1488,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SearchDocumentsResult", Namespace = "com.nordic-it.appservice.v3")]
     public class SearchDocumentsResult
     {
-
         [DataMember(Name = "SearchResults", Order = 0)]
         public List<DocumentPreview> SearchResults { get; set; } = new List<DocumentPreview>();
     }
@@ -1782,7 +1559,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SearchContactsResult", Namespace = "com.nordic-it.appservice.v3")]
     public class SearchContactsResult
     {
-
         [DataMember(Name = "SearchResults", Order = 0)]
         public List<ContactPreview> SearchResults { get; set; } = new List<ContactPreview>();
     }
@@ -1790,7 +1566,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SearchShortcodesParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class SearchShortcodesParameters : AbstractParameters
     {
-
         [DataMember(Name = "SavedSearchFilterHash", Order = 0)]
         public string SavedSearchFilterHash { get; set; }
 
@@ -1819,7 +1594,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SearchShortcodesResult", Namespace = "com.nordic-it.appservice.v3")]
     public class SearchShortcodesResult
     {
-
         [DataMember(Name = "ShortcodePreviews", Order = 0)]
         public List<ShortcodePreview> ShortcodePreviews { get; set; } = new List<ShortcodePreview>();
     }
@@ -1827,7 +1601,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SearchCalendarEventsParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class SearchCalendarEventsParameters : AbstractParameters
     {
-
         [DataMember(Name = "Type", Order = 0)]
         public SearchCalendarEventsType Type { get; set; }
 
@@ -1898,7 +1671,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SearchCalendarEventsResult", Namespace = "com.nordic-it.appservice.v3")]
     public class SearchCalendarEventsResult
     {
-
         [DataMember(Name = "CalendarAppointment", Order = 0)]
         public List<CalendarAppointment> CalendarAppointments { get; set; } = new List<CalendarAppointment>();
 
@@ -1909,7 +1681,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SavedSearch", Namespace = "com.nordic-it.appservice.v3")]
     public class SavedSearch
     {
-
         [DataMember(Name = "Name", Order = 0)]
         public string Name { get; set; }
 
@@ -1923,63 +1694,43 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SearchCalendarEventsType", Namespace = "com.nordic-it.appservice.v3")]
     public enum SearchCalendarEventsType
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "Appointments")]
-        Appointments = 1,
-        [EnumMember(Value = "Tasks")]
-        Tasks = 2,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "Appointments")] Appointments = 1,
+        [EnumMember(Value = "Tasks")] Tasks = 2,
     }
 
     [DataContract(Name = "FiledInFolderType", Namespace = "com.nordic-it.appservice.v3")]
     public enum FiledInFolderType
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "Filed")]
-        Filed = 1,
-        [EnumMember(Value = "Unfiled")]
-        Unfiled = 2,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "Filed")] Filed = 1,
+        [EnumMember(Value = "Unfiled")] Unfiled = 2,
     }
 
     [DataContract(Name = "FiledInFolderFolderType", Namespace = "com.nordic-it.appservice.v3")]
     public enum FiledInFolderFolderType
     {
-
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "Any")]
-        Any = 1,
-        [EnumMember(Value = "Cabinet")]
-        Cabinet = 2,
-        [EnumMember(Value = "FilterView")]
-        FilterView = 3,
-        [EnumMember(Value = "Personal")]
-        Personal = 4,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "Any")] Any = 1,
+        [EnumMember(Value = "Cabinet")] Cabinet = 2,
+        [EnumMember(Value = "FilterView")] FilterView = 3,
+        [EnumMember(Value = "Personal")] Personal = 4,
     }
 
     [DataContract(Name = "SubjectMessageClause", Namespace = "com.nordic-it.appservice.v3")]
     public enum SubjectMessageClause
     {
-        [EnumMember(Value = "SubjectOrMessage")]
-        SubjectOrMessage = 0,
-        [EnumMember(Value = "SubjectOnly")]
-        SubjectOnly = 1,
-        [EnumMember(Value = "MessageOnly")]
-        MessageOnly = 2,
+        [EnumMember(Value = "SubjectOrMessage")] SubjectOrMessage = 0,
+        [EnumMember(Value = "SubjectOnly")] SubjectOnly = 1,
+        [EnumMember(Value = "MessageOnly")] MessageOnly = 2,
     }
 
     [DataContract(Name = "FromToClause", Namespace = "com.nordic-it.appservice.v3")]
     public enum FromToClause
     {
-        [EnumMember(Value = "FromOrTo")]
-        FromOrTo = 0,
-        [EnumMember(Value = "FromOnly")]
-        FromOnly = 1,
-        [EnumMember(Value = "ToOnly")]
-        ToOnly = 2,
+        [EnumMember(Value = "FromOrTo")] FromOrTo = 0,
+        [EnumMember(Value = "FromOnly")] FromOnly = 1,
+        [EnumMember(Value = "ToOnly")] ToOnly = 2,
     }
 
     #endregion
@@ -1989,7 +1740,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetNotificationsParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetNotificationsParameters : AbstractParameters
     {
-
         [DataMember(Name = "PushToken", Order = 0)]
         public string PushToken { get; set; }
 
@@ -2000,15 +1750,12 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetNotificationsResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetNotificationsResult
     {
-
-        [DataMember(Name = "Notifications", Order = 0)]
-        public List<Notification> Notifications = new List<Notification>();
+        [DataMember(Name = "Notifications", Order = 0)] public List<Notification> Notifications = new List<Notification>();
     }
 
     [DataContract(Name = "SetFoldersNotificationsParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class SetFoldersNotificationsParameters : AbstractParameters
     {
-
         [DataMember(Name = "PushToken", Order = 0)]
         public string PushToken { get; set; }
 
@@ -2023,7 +1770,6 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "Enabled", Order = 0)]
         public bool Enabled { get; set; }
-
     }
 
     [DataContract(Name = "SetFoldersNotificationsResult", Namespace = "com.nordic-it.appservice.v3")]
@@ -2034,7 +1780,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetFoldersNotificationsParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetFoldersNotificationsParameters : AbstractParameters
     {
-
         [DataMember(Name = "PushToken", Order = 0)]
         public string PushToken { get; set; }
 
@@ -2045,21 +1790,16 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetFoldersNotificationsResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetFoldersNotificationsResult
     {
+        [DataMember(Name = "DocumentFolders", Order = 0)] public List<Folder> DocumentFolders = new List<Folder>();
 
-        [DataMember(Name = "DocumentFolders", Order = 0)]
-        public List<Folder> DocumentFolders = new List<Folder>();
+        [DataMember(Name = "ContactFolders", Order = 0)] public List<Folder> ContactFolders = new List<Folder>();
 
-        [DataMember(Name = "ContactFolders", Order = 0)]
-        public List<Folder> ContactFolders = new List<Folder>();
-
-        [DataMember(Name = "ShortcodeFolders", Order = 0)]
-        public List<Folder> ShortcodeFolders = new List<Folder>();
+        [DataMember(Name = "ShortcodeFolders", Order = 0)] public List<Folder> ShortcodeFolders = new List<Folder>();
     }
 
     [DataContract(Name = "GetCalendarNotificationsEnabledParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetCalendarNotificationsEnabledParameters : AbstractParameters
     {
-
         [DataMember(Name = "PushToken", Order = 0)]
         public string PushToken { get; set; }
 
@@ -2070,7 +1810,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetCalendarNotificationsEnabledResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetCalendarNotificationsEnabledResult
     {
-
         [DataMember(Name = "Enabled", Order = 0)]
         public bool Enabled { get; set; }
     }
@@ -2078,7 +1817,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SetCalendarNotificationsEnabledParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class SetCalendarNotificationsEnabledParameters : AbstractParameters
     {
-
         [DataMember(Name = "PushToken", Order = 0)]
         public string PushToken { get; set; }
 
@@ -2097,7 +1835,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetNotificationsSoundParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetNotificationsSoundParameters : AbstractParameters
     {
-
         [DataMember(Name = "PushToken", Order = 0)]
         public string PushToken { get; set; }
 
@@ -2108,7 +1845,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetNotificationsSoundResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetNotificationsSoundResult
     {
-
         [DataMember(Name = "SoundName", Order = 0)]
         public string SoundName { get; set; }
     }
@@ -2116,7 +1852,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SetNotificationsSoundParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class SetNotificationsSoundParameters : AbstractParameters
     {
-
         [DataMember(Name = "PushToken", Order = 0)]
         public string PushToken { get; set; }
 
@@ -2135,7 +1870,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "ClearAllNotificationsParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class ClearAllNotificationsParameters : AbstractParameters
     {
-
         [DataMember(Name = "PushToken", Order = 0)]
         public string PushToken { get; set; }
 
@@ -2151,7 +1885,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "Notification", Namespace = "com.nordic-it.appservice.v3")]
     public class Notification
     {
-
         [DataMember(Name = "Guid", Order = 0)]
         public Guid Guid { get; set; }
 
@@ -2186,35 +1919,22 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "EventType", Namespace = "com.nordic-it.appservice.v3")]
     public enum EventType
     {
-
-        [EnumMember(Value = "Unknown")]
-        None = 0,
-        [EnumMember(Value = "NewObjectCreated")]
-        NewObjectCreated = 1,
-        [EnumMember(Value = "NewObjectInFolder")]
-        NewObjectInFolder = 2,
-        [EnumMember(Value = "NewObjectInWorktray")]
-        NewObjectInWorktray = 3,
-        [EnumMember(Value = "CreateOrUpdateReminder")]
-        CreateOrUpdateReminder = 4,
-        [EnumMember(Value = "DeleteReminderIfExists")]
-        DeleteReminderIfExists = 5,
-        [EnumMember(Value = "Invited")]
-        Invited = 6,
+        [EnumMember(Value = "Unknown")] None = 0,
+        [EnumMember(Value = "NewObjectCreated")] NewObjectCreated = 1,
+        [EnumMember(Value = "NewObjectInFolder")] NewObjectInFolder = 2,
+        [EnumMember(Value = "NewObjectInWorktray")] NewObjectInWorktray = 3,
+        [EnumMember(Value = "CreateOrUpdateReminder")] CreateOrUpdateReminder = 4,
+        [EnumMember(Value = "DeleteReminderIfExists")] DeleteReminderIfExists = 5,
+        [EnumMember(Value = "Invited")] Invited = 6,
     }
 
     [DataContract(Name = "DeviceType", Namespace = "com.nordic-it.appservice.v3")]
     public enum DeviceType
     {
-
-        [EnumMember(Value = "Unknown")]
-        Unknown = 0,
-        [EnumMember(Value = "IOS")]
-        IOS = 1,
-        [EnumMember(Value = "Android")]
-        Android = 2,
-        [EnumMember(Value = "UWP")]
-        UWP = 3,
+        [EnumMember(Value = "Unknown")] Unknown = 0,
+        [EnumMember(Value = "IOS")] IOS = 1,
+        [EnumMember(Value = "Android")] Android = 2,
+        [EnumMember(Value = "UWP")] UWP = 3,
     }
 
     #endregion
@@ -2224,7 +1944,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "AddCommentParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class AddCommentParameters : AbstractParameters
     {
-
         [DataMember(Name = "ObjectId", Order = 0)]
         public int ObjectId { get; set; } = -1;
 
@@ -2238,7 +1957,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "AddCommentResult", Namespace = "com.nordic-it.appservice.v3")]
     public class AddCommentResult
     {
-
         [DataMember(Name = "Comment", Order = 0)]
         public Comment Comment { get; set; }
     }
@@ -2246,7 +1964,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "EditCommentParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class EditCommentParameters : AbstractParameters
     {
-
         [DataMember(Name = "ObjectId", Order = 0)]
         public int ObjectId { get; set; } = -1;
 
@@ -2263,7 +1980,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "EditCommentResult", Namespace = "com.nordic-it.appservice.v3")]
     public class EditCommentResult
     {
-
         [DataMember(Name = "EditSuccess", Order = 0)]
         public bool EditSuccess { get; set; }
     }
@@ -2271,7 +1987,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "DeleteCommentParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class DeleteCommentParameters : AbstractParameters
     {
-
         [DataMember(Name = "ObjectId", Order = 0)]
         public int ObjectId { get; set; } = -1;
 
@@ -2290,7 +2005,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetAllCategoriesParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetAllCategoriesParameters : AbstractParameters
     {
-
         [DataMember(Name = "ObjectType", Order = 0)]
         public ObjectType ObjectType { get; set; }
     }
@@ -2305,7 +2019,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SetCategoriesParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class SetCategoriesParameters : AbstractParameters
     {
-
         [DataMember(Name = "ObjectId", Order = 0)]
         public int ObjectId { get; set; } = -1;
 
@@ -2324,7 +2037,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetObjectActionsParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetObjectActionsParameters : AbstractParameters
     {
-
         [DataMember(Name = "ObjectId", Order = 0)]
         public int ObjectId { get; set; } = -1;
 
@@ -2335,7 +2047,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetObjectActionsResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetObjectActionsResult
     {
-
         [DataMember(Name = "ObjectActions", Order = 0)]
         public List<ObjectAction> ObjectActions { get; set; } = new List<ObjectAction>();
     }
@@ -2343,7 +2054,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetObjectLinksParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetObjectLinksParameters : AbstractParameters
     {
-
         [DataMember(Name = "ObjectId", Order = 0)]
         public int ObjectId { get; set; } = -1;
 
@@ -2354,7 +2064,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetObjectLinksResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetObjectLinksResult
     {
-
         [DataMember(Name = "ObjectLinks", Order = 0)]
         public List<ObjectLink> ObjectLinks { get; set; } = new List<ObjectLink>();
     }
@@ -2367,7 +2076,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetRecentAddressesResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetRecentAddressesResult
     {
-
         [DataMember(Name = "RecentAddresses", Order = 0)]
         public List<RecentAddress> RecentAddresses { get; set; } = new List<RecentAddress>();
     }
@@ -2375,7 +2083,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "FileToFolderParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class FileToFolderParameters : AbstractParameters
     {
-
         [DataMember(Name = "ObjectIds", Order = 0)]
         public int[] ObjectIds { get; set; }
 
@@ -2421,7 +2128,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "DeleteParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class DeleteParameters : AbstractParameters
     {
-
         [DataMember(Name = "ObjectIds", Order = 0)]
         public int[] ObjectIds { get; set; }
 
@@ -2437,7 +2143,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "RemoveFromFolderParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class RemoveFromFolderParameters : AbstractParameters
     {
-
         [DataMember(Name = "ObjectIds", Order = 0)]
         public int[] ObjectIds { get; set; }
 
@@ -2461,7 +2166,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetSystemSettingsResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetSystemSettingsResult
     {
-
         [DataMember(Name = "SystemInfo", Order = 0)]
         public SystemInfo SystemInfo { get; set; } = new SystemInfo();
 
@@ -2489,7 +2193,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetSystemUsersResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetSystemUsersResult
     {
-
         [DataMember(Name = "Departments", Order = 0)]
         public List<SystemDepartment> Departments { get; set; } = new List<SystemDepartment>();
 
@@ -2500,7 +2203,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "RecentAddress", Namespace = "com.nordic-it.appservice.v3")]
     public class RecentAddress
     {
-
         [DataMember(Name = "AddressType", Order = 0)]
         public DocumentAddressType AddressType { get; set; }
 
@@ -2514,7 +2216,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SystemInfo", Namespace = "com.nordic-it.appservice.v3")]
     public class SystemInfo
     {
-
         [DataMember(Name = "SystemVersion", Order = 0)]
         public string SystemVersion { get; set; }
 
@@ -2531,7 +2232,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "DocumentsModuleInfo", Namespace = "com.nordic-it.appservice.v3")]
     public class DocumentsModuleInfo
     {
-
         [DataMember(Name = "OnSendToSystemUser", Order = 0)]
         public OnSendToSystemUser OnSendToSystemUser { get; set; }
 
@@ -2572,7 +2272,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "ContactsModuleInfo", Namespace = "com.nordic-it.appservice.v3")]
     public class ContactsModuleInfo
     {
-
         [DataMember(Name = "PhysicalAddressTypes", Order = 0)]
         public List<PhysicalAddressType> PhysicalAddressTypes { get; set; } = new List<PhysicalAddressType>();
 
@@ -2586,7 +2285,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "ShortcodesModuleInfo", Namespace = "com.nordic-it.appservice.v3")]
     public class ShortcodesModuleInfo
     {
-
         [DataMember(Name = "Permissions", Order = 0)]
         public Permissions Permissions { get; set; } = new Permissions();
     }
@@ -2594,7 +2292,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "CalendarModuleInfo", Namespace = "com.nordic-it.appservice.v3")]
     public class CalendarModuleInfo
     {
-
         [DataMember(Name = "CalendarCategories", Order = 0)]
         public List<CalendarCategory> CalendarCategories { get; set; } = new List<CalendarCategory>();
 
@@ -2608,7 +2305,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "UserInfo", Namespace = "com.nordic-it.appservice.v3")]
     public class UserInfo
     {
-
         [DataMember(Name = "User", Order = 0)]
         public SystemUser User { get; set; } = new SystemUser();
 
@@ -2619,7 +2315,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "Permissions", Namespace = "com.nordic-it.appservice.v3")]
     public class Permissions
     {
-
         [DataMember(Name = "ManageCategories", Order = 0)]
         public bool ManageCategories { get; set; }
 
@@ -2660,7 +2355,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "DocumentsModulePermissions", Namespace = "com.nordic-it.appservice.v3")]
     public class DocumentsModulePermissions : Permissions
     {
-
         [DataMember(Name = "IncomingSupervisor", Order = 0)]
         public bool IncomingSupervisor { get; set; }
 
@@ -2677,7 +2371,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "DocumentExtraFieldInfo", Namespace = "com.nordic-it.appservice.v3")]
     public class DocumentExtraFieldInfo
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -2688,7 +2381,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SystemDepartment", Namespace = "com.nordic-it.appservice.v3")]
     public class SystemDepartment
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -2705,7 +2397,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SystemUser", Namespace = "com.nordic-it.appservice.v3")]
     public class SystemUser
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -2731,7 +2422,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "Category", Namespace = "com.nordic-it.appservice.v3")]
     public class Category
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -2751,7 +2441,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "ObjectAction", Namespace = "com.nordic-it.appservice.v3")]
     public class ObjectAction
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -2780,7 +2469,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "ObjectLink", Namespace = "com.nordic-it.appservice.v3")]
     public class ObjectLink
     {
-
         [DataMember(Name = "FromObjectId", Order = 0)]
         public int FromObjectId { get; set; } = -1;
 
@@ -2806,7 +2494,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "ObjectLinkTypeInfo", Namespace = "com.nordic-it.appservice.v3")]
     public class ObjectLinkTypeInfo
     {
-
         [DataMember(Name = "Id", Order = 0)]
         public int Id { get; set; } = -1;
 
@@ -2838,7 +2525,6 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "DateRange", Namespace = "com.nordic-it.appservice.v3")]
     public class DateRange
     {
-
         [DataMember(Name = "Start", Order = 0)]
         public DateTime Start { get; set; }
 
@@ -2853,29 +2539,20 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "OnSendToSystemUser", Namespace = "com.nordic-it.appservice.v3")]
     public enum OnSendToSystemUser
     {
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "CopyToWorktray")]
-        CopyToWorktray = 1,
-        [EnumMember(Value = "SendEmail")]
-        SendEmail = 2,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "CopyToWorktray")] CopyToWorktray = 1,
+        [EnumMember(Value = "SendEmail")] SendEmail = 2,
     }
 
     [DataContract(Name = "ObjectType", Namespace = "com.nordic-it.appservice.v3")]
     public enum ObjectType
     {
-        [EnumMember(Value = "None")]
-        None = 0,
-        [EnumMember(Value = "Document")]
-        Document = 1,
-        [EnumMember(Value = "Contact")]
-        Contact = 2,
-        [EnumMember(Value = "Shortcode")]
-        Shortcode = 3,
-        [EnumMember(Value = "CalendarAppointment")]
-        CalendarAppointment = 4,
-        [EnumMember(Value = "CalendarTask")]
-        CalendarTask = 5,
+        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "Document")] Document = 1,
+        [EnumMember(Value = "Contact")] Contact = 2,
+        [EnumMember(Value = "Shortcode")] Shortcode = 3,
+        [EnumMember(Value = "CalendarAppointment")] CalendarAppointment = 4,
+        [EnumMember(Value = "CalendarTask")] CalendarTask = 5,
     }
 
     #endregion
@@ -2893,6 +2570,4 @@ namespace Mark5.ServiceReference.DataContract
     }
 
     #endregion
-
 }
-

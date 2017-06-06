@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: CopyToUserWorktrayFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,24 +10,19 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using FastScrollRecycler;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-
     public class CopyToUserWorktrayFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-
         public List<IBusinessEntity> BusinessEntities { get; set; }
         public Action CloseRequest { get; set; }
 
-        CopyToUserWorktrayAdapter CurrentAdapter
-        {
-            get { return (CopyToUserWorktrayAdapter)recyclerView.GetAdapter(); }
-        }
+        CopyToUserWorktrayAdapter CurrentAdapter => (CopyToUserWorktrayAdapter) recyclerView.GetAdapter();
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -83,7 +71,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     await Managers.CommonActionsManager.CopyToUserWorktray(BusinessEntities, selectedSystemUsers.Values.ToList());
 
-                    if (CloseRequest != null) CloseRequest();
+                    if (CloseRequest != null)
+                        CloseRequest();
                 }
                 catch (Exception ex)
                 {
@@ -104,8 +93,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(CopyToUserWorktrayFragment)} [[businessEntities.Count={BusinessEntities?.Count}]");
         }
@@ -130,7 +119,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var searchItem = menu.FindItem(Resource.Id.action_filter);
             MenuItemCompat.SetOnActionExpandListener(searchItem, this);
-            searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
+            searchView = (SearchView) MenuItemCompat.GetActionView(searchItem);
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
         }
@@ -169,9 +158,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 selectedSystemUsers.Clear();
                 foreach (var kv in dlfs.SelectedSystemUsers)
-                {
                     selectedSystemUsers.Add(kv.Key, kv.Value);
-                }
 
                 UpdateControls();
             }
@@ -215,36 +202,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var isSelected = selectedSystemUsers.ContainsKey(systemUser.Id);
             if (isSelected)
-            {
                 selectedSystemUsers.Remove(systemUser.Id);
-            }
             else
-            {
                 selectedSystemUsers.Add(systemUser.Id, systemUser);
-            }
 
             var position = CurrentAdapter.GetPosition(systemUser);
             if (position >= 0)
-            {
                 CurrentAdapter.NotifyItemChanged(position);
-            }
         }
 
         void UpdateControls()
         {
-            if (!IsAdded || IsDetached || IsRemoving) return;
+            if (!IsAdded || IsDetached || IsRemoving)
+                return;
 
             if (selectedSystemUsers.Count < 1)
             {
-                ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
-                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+                ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
+                ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
                 copyButton.Enabled = false;
             }
             else
             {
-                ((AppCompatActivity)Activity).SupportActionBar.Title = Resources.GetQuantityString(Resource.Plurals.users_selected, selectedSystemUsers.Count, selectedSystemUsers.Count);
-                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+                ((AppCompatActivity) Activity).SupportActionBar.Title = Resources.GetQuantityString(Resource.Plurals.users_selected, selectedSystemUsers.Count, selectedSystemUsers.Count);
+                ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
                 copyButton.Enabled = true;
             }
@@ -283,12 +265,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             searchHandler.RemoveCallbacksAndMessages(null);
             searchHandler.PostDelayed(() =>
-            {
-                if (string.IsNullOrWhiteSpace(newText))
-                    searchAdapter.ReplaceItems(adapter.Items);
-                else
-                    searchAdapter.ReplaceItems(adapter.Items.Where(su => MatchesQuery(su, newText)).ToList());
-            }, 500);
+                {
+                    if (string.IsNullOrWhiteSpace(newText))
+                        searchAdapter.ReplaceItems(adapter.Items);
+                    else
+                        searchAdapter.ReplaceItems(adapter.Items.Where(su => MatchesQuery(su, newText)).ToList());
+                },
+                500);
             return false;
         }
 
@@ -300,21 +283,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         static bool MatchesQuery(SystemUser su, string query)
         {
             if (su.Username.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
                 return true;
-            }
             if (su.FirstName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
                 return true;
-            }
             if (su.LastName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
                 return true;
-            }
             if (su.PatronymicName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-            {
                 return true;
-            }
 
             return false;
         }
@@ -325,7 +300,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class CopyToUserWorktrayFragmentState : IRetainableState
         {
-
             public List<IBusinessEntity> BusinessEntities { get; set; }
 
             public List<SystemUser> SystemUsers { get; set; }
@@ -339,12 +313,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class CopyToUserWorktrayAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-
-            readonly List<SystemUser> systemUsersInView = new List<SystemUser>(100);
             readonly Dictionary<int, SystemUser> selectedSystemUsersInView;
 
-            public override int ItemCount { get { return systemUsersInView.Count; } }
-            public List<SystemUser> Items { get { return systemUsersInView; } }
+            public override int ItemCount => Items.Count;
+
+            public List<SystemUser> Items { get; } = new List<SystemUser>(100);
 
             public CopyToUserWorktrayAdapter(Dictionary<int, SystemUser> selectedSystemUsersInView)
             {
@@ -356,9 +329,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
                 var suvh = holder as UserViewHolder;
-                if (suvh == null) return;
+                if (suvh == null)
+                    return;
 
-                var su = systemUsersInView[position];
+                var su = Items[position];
 
                 suvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, su)));
 
@@ -376,15 +350,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void SetItems(List<SystemUser> items)
             {
-                var count = systemUsersInView.Count;
-                systemUsersInView.AddRange(items);
+                var count = Items.Count;
+                Items.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
 
             public void Clear()
             {
-                var count = systemUsersInView.Count;
-                systemUsersInView.Clear();
+                var count = Items.Count;
+                Items.Clear();
                 NotifyItemRangeRemoved(0, count);
             }
 
@@ -397,56 +371,36 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int GetPosition(SystemUser systemUser)
             {
                 var position = -1;
-                for (var i = 0; i < systemUsersInView.Count; i++)
-                {
-                    if (systemUsersInView[i].Id == systemUser.Id)
+                for (var i = 0; i < Items.Count; i++)
+                    if (Items[i].Id == systemUser.Id)
                     {
                         position = i;
                         break;
                     }
-                }
+
                 return position;
             }
 
             string ISectionedAdapter.GetSectionName(int position)
             {
-                return systemUsersInView[position].Username?.SafeSubstring(0, 1)?.ToUpper() ?? "";
+                return Items[position].Username?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
         }
 
         class UserViewHolder : RecyclerView.ViewHolder
         {
+            public string FullName { set => fullnameTextView.Text = value; }
 
-            public string FullName
-            {
-                set
-                {
-                    fullnameTextView.Text = value;
-                }
-            }
+            public string Username { set => username.Text = value; }
 
-            public string Username
-            {
-                set
-                {
-                    username.Text = value;
-                }
-            }
-
-            public bool Selected
-            {
-                set
-                {
-                    selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool Selected { set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             readonly AppCompatTextView fullnameTextView;
             readonly AppCompatTextView username;
             readonly View selectedOverlay;
 
             public UserViewHolder(View itemView)
-                    : base(itemView)
+                : base(itemView)
             {
                 fullnameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_system_user_full_name);
                 username = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_system_user_name);
@@ -457,4 +411,3 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         #endregion
     }
 }
-

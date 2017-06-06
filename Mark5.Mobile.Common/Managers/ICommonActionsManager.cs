@@ -1,21 +1,11 @@
-//
-// Project: Mark5.Mobile.Common
-// File: ICommonActionsManager.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
 {
-
     public interface ICommonActionsManager
     {
-
         Task<List<ObjectAction>> GetObjectActionsAsync(IBusinessEntity businessEntity, SourceType sourceType = SourceType.Auto);
 
         Task<List<ObjectLink>> GetObjectLinksAsync(IBusinessEntity businessEntity, SourceType sourceType = SourceType.Auto);
@@ -33,4 +23,3 @@ namespace Mark5.Mobile.Common.Managers
         Task Delete(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto);
     }
 }
-

@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: DocumentPrioritySearchView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
 using System.Collections.Generic;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Fragments;

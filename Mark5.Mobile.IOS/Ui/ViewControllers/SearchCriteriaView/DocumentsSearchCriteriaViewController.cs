@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: DocumentsSearchCriteriaViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
 using System;
 using System.IO;
 using System.Linq;
@@ -21,10 +14,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 {
-
     public class DocumentsSearchCriteriaViewController : AbstractSearchCriteriaViewController
     {
-
         SearchDocumentsCriteria criteria = new SearchDocumentsCriteria();
 
         public override void LoadView()
@@ -68,7 +59,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
             CommonConfig.Logger.Info($"Starting search... [criteria={SerializationUtils.Serialize(criteria)}]");
 
-            NavigationController.PushViewController(new DocumentsSearchResultsViewController { Criteria = criteria }, true);
+            NavigationController.PushViewController(new DocumentsSearchResultsViewController
+                {
+                    Criteria = criteria
+                },
+                true);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -104,7 +99,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         abstract class AbstractDocumentsSearchView : AbstractSearchView
         {
-
             protected SearchDocumentsCriteria Criteria;
 
             public void SetCriteria(SearchDocumentsCriteria criteria)
@@ -116,7 +110,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class DocumentDirectionSearchView : AbstractDocumentsSearchView
         {
-
             readonly UILabel allView;
             readonly UILabel inboxView;
             readonly UILabel outboxView;
@@ -198,7 +191,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 var directions = Criteria.Directions;
 
                 if (!directions.Any())
-                    directions.AddRange(new[] { DocumentDirection.Incoming, DocumentDirection.Outgoing, DocumentDirection.Draft });
+                    directions.AddRange(new[]
+                    {
+                        DocumentDirection.Incoming,
+                        DocumentDirection.Outgoing,
+                        DocumentDirection.Draft
+                    });
 
                 if (directions.Count > 2)
                 {
@@ -252,7 +250,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class MessageSubjectView : AbstractDocumentsSearchView
         {
-
             readonly UILabel titleLabel;
             readonly UIView valueTextFieldAccessoryView;
             readonly UISegmentedControl valueTextFieldSegmentedControl;
@@ -290,13 +287,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 {
                     BackgroundColor = Theme.LightGray
                 };
-                valueTextFieldSegmentedControl = new UISegmentedControl(new[] { Localization.GetString("search_subject"), Localization.GetString("search_message"), Localization.GetString("search_both") })
+                valueTextFieldSegmentedControl = new UISegmentedControl(new[]
+                {
+                    Localization.GetString("search_subject"),
+                    Localization.GetString("search_message"),
+                    Localization.GetString("search_both")
+                })
                 {
                     TranslatesAutoresizingMaskIntoConstraints = false
                 };
                 valueTextFieldSegmentedControl.AddTarget(this, new Selector("segmentedControlChanged:"), UIControlEvent.ValueChanged);
                 valueTextFieldAccessoryView.AddSubview(valueTextFieldSegmentedControl);
-                valueTextFieldAccessoryView.AddConstraints(new[] {
+                valueTextFieldAccessoryView.AddConstraints(new[]
+                {
                     valueTextFieldSegmentedControl.CenterXAnchor.ConstraintEqualTo(valueTextFieldAccessoryView.CenterXAnchor),
                     valueTextFieldSegmentedControl.CenterYAnchor.ConstraintEqualTo(valueTextFieldAccessoryView.CenterYAnchor),
                     valueTextFieldSegmentedControl.WidthAnchor.ConstraintEqualTo(valueTextFieldAccessoryView.WidthAnchor, 1f, -10f),
@@ -305,7 +308,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 valueTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -428,7 +435,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class FromToView : AbstractDocumentsSearchView
         {
-
             readonly UILabel titleLabel;
             readonly UIView valueTextFieldAccessoryView;
             readonly UISegmentedControl valueTextFieldSegmentedControl;
@@ -465,13 +471,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 {
                     BackgroundColor = Theme.LightGray
                 };
-                valueTextFieldSegmentedControl = new UISegmentedControl(new[] { Localization.GetString("search_from"), Localization.GetString("search_to"), Localization.GetString("search_both") })
+                valueTextFieldSegmentedControl = new UISegmentedControl(new[]
+                {
+                    Localization.GetString("search_from"),
+                    Localization.GetString("search_to"),
+                    Localization.GetString("search_both")
+                })
                 {
                     TranslatesAutoresizingMaskIntoConstraints = false
                 };
                 valueTextFieldSegmentedControl.AddTarget(this, new Selector("segmentedControlChanged:"), UIControlEvent.ValueChanged);
                 valueTextFieldAccessoryView.AddSubview(valueTextFieldSegmentedControl);
-                valueTextFieldAccessoryView.AddConstraints(new[] {
+                valueTextFieldAccessoryView.AddConstraints(new[]
+                {
                     valueTextFieldSegmentedControl.CenterXAnchor.ConstraintEqualTo(valueTextFieldAccessoryView.CenterXAnchor),
                     valueTextFieldSegmentedControl.CenterYAnchor.ConstraintEqualTo(valueTextFieldAccessoryView.CenterYAnchor),
                     valueTextFieldSegmentedControl.WidthAnchor.ConstraintEqualTo(valueTextFieldAccessoryView.WidthAnchor, 1f, -10f),
@@ -480,7 +492,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 valueTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_address"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_address"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -603,7 +619,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class DateRangeView : AbstractDocumentsSearchView
         {
-
             readonly UIView fromView;
             readonly UILabel fromLabel;
             readonly UITextField fromValue;
@@ -650,9 +665,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 {
                     Items = new[]
                     {
-                        fromDateCancelButton = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, this, new Selector("cancelTapped:")) { TintColor = Theme.DarkerBlue },
+                        fromDateCancelButton = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, this, new Selector("cancelTapped:"))
+                        {
+                            TintColor = Theme.DarkerBlue
+                        },
                         new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                        fromDateDoneButton = new UIBarButtonItem(UIBarButtonSystemItem.Done, this, new Selector("doneTapped:")) { TintColor = Theme.DarkerBlue }
+                        fromDateDoneButton = new UIBarButtonItem(UIBarButtonSystemItem.Done, this, new Selector("doneTapped:"))
+                        {
+                            TintColor = Theme.DarkerBlue
+                        }
                     }
                 };
 
@@ -713,9 +734,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 {
                     Items = new[]
                     {
-                        toDateCancelButton = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, this, new Selector("cancelTapped:")) { TintColor = Theme.DarkerBlue },
+                        toDateCancelButton = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, this, new Selector("cancelTapped:"))
+                        {
+                            TintColor = Theme.DarkerBlue
+                        },
                         new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                        toDateDoneButton = new UIBarButtonItem(UIBarButtonSystemItem.Done, this, new Selector("doneTapped:")) { TintColor = Theme.DarkerBlue }
+                        toDateDoneButton = new UIBarButtonItem(UIBarButtonSystemItem.Done, this, new Selector("doneTapped:"))
+                        {
+                            TintColor = Theme.DarkerBlue
+                        }
                     }
                 };
 
@@ -874,7 +901,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                     var selectedDate = fromDatePicker.Date;
                     var selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year, selectedDate);
-                    var fromDate = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, 0, 0, 0, DateTimeKind.Utc);
+                    var fromDate = new DateTime((int) selectedDateComponents.Year, (int) selectedDateComponents.Month, (int) selectedDateComponents.Day, 0, 0, 0, DateTimeKind.Utc);
 
                     dateRange.Enabled = true;
                     dateRange.StartTimestamp = fromDate.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
@@ -893,7 +920,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                     var selectedDate = toDatePicker.Date;
                     var selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year, selectedDate);
-                    var toDate = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, 23, 59, 59, DateTimeKind.Utc);
+                    var toDate = new DateTime((int) selectedDateComponents.Year, (int) selectedDateComponents.Month, (int) selectedDateComponents.Day, 23, 59, 59, DateTimeKind.Utc);
 
                     dateRange.Enabled = true;
                     dateRange.EndTimestamp = toDate.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
@@ -916,7 +943,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class LineCategoriesPriorityNameView : AbstractDocumentsSearchView
         {
-
             readonly UIViewController parentViewController;
 
             readonly UIView lineView;
@@ -1099,12 +1125,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                     var data = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.ToArray();
                     var preselected = data.Where(l => Criteria.LineGuids.Contains(l.Guid)).ToArray();
 
-                    var result = await Dialogs.ShowMultiSelectDialogAsync(parentViewController,
-                                                                          Localization.GetString("search_lines"),
-                                                                          data,
-                                                                          preselected,
-                                                                          l => l.Name,
-                                                                          LambdaEqualityComparer<Line>.Create(l => l.Guid));
+                    var result = await Dialogs.ShowMultiSelectDialogAsync(parentViewController, Localization.GetString("search_lines"), data, preselected, l => l.Name, LambdaEqualityComparer<Line>.Create(l => l.Guid));
 
                     if (result == null)
                         return;
@@ -1127,7 +1148,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 if (recognizer.View == priorityView)
                 {
-                    var data = new[] { Priority.Urgent, Priority.Normal, Priority.Low };
+                    var data = new[]
+                    {
+                        Priority.Urgent,
+                        Priority.Normal,
+                        Priority.Low
+                    };
                     var preselected = data.Where(p => Criteria.Priorities.Contains(p)).ToArray();
 
                     Func<Priority, string> description = p =>
@@ -1145,12 +1171,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                         }
                     };
 
-                    var result = await Dialogs.ShowMultiSelectDialogAsync(parentViewController,
-                                                                          Localization.GetString("priority"),
-                                                                          data,
-                                                                          preselected,
-                                                                          description,
-                                                                          LambdaEqualityComparer<Priority>.Create(p => p));
+                    var result = await Dialogs.ShowMultiSelectDialogAsync(parentViewController, Localization.GetString("priority"), data, preselected, description, LambdaEqualityComparer<Priority>.Create(p => p));
 
                     if (result == null)
                         return;
@@ -1164,7 +1185,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class ReferenceCommentsAttachmentNameView : AbstractDocumentsSearchView
         {
-
             readonly UIView referenceView;
             readonly UILabel referenceLabel;
             readonly UITextField referenceTextField;
@@ -1201,7 +1221,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 referenceTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -1251,7 +1275,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 commentTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -1301,7 +1329,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 attachmentNameTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -1339,43 +1371,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             void Tapped(UITapGestureRecognizer recognizer)
             {
                 if (recognizer.View == referenceView)
-                {
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        commentView.Hidden = true;
-                        attachmentNameView.Hidden = true;
-                    }, ch =>
-                    {
-                        referenceTextField.UserInteractionEnabled = true;
-                        referenceTextField.BecomeFirstResponder();
-                    });
-                }
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            commentView.Hidden = true;
+                            attachmentNameView.Hidden = true;
+                        },
+                        ch =>
+                        {
+                            referenceTextField.UserInteractionEnabled = true;
+                            referenceTextField.BecomeFirstResponder();
+                        });
 
                 if (recognizer.View == commentView)
-                {
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        referenceView.Hidden = true;
-                        attachmentNameView.Hidden = true;
-                    }, ch =>
-                    {
-                        commentTextField.UserInteractionEnabled = true;
-                        commentTextField.BecomeFirstResponder();
-                    });
-                }
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            referenceView.Hidden = true;
+                            attachmentNameView.Hidden = true;
+                        },
+                        ch =>
+                        {
+                            commentTextField.UserInteractionEnabled = true;
+                            commentTextField.BecomeFirstResponder();
+                        });
 
                 if (recognizer.View == attachmentNameView)
-                {
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        referenceView.Hidden = true;
-                        commentView.Hidden = true;
-                    }, ch =>
-                    {
-                        attachmentNameTextField.UserInteractionEnabled = true;
-                        attachmentNameTextField.BecomeFirstResponder();
-                    });
-                }
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            referenceView.Hidden = true;
+                            commentView.Hidden = true;
+                        },
+                        ch =>
+                        {
+                            attachmentNameTextField.UserInteractionEnabled = true;
+                            attachmentNameTextField.BecomeFirstResponder();
+                        });
 
                 UpdateRow();
                 SetAsActive();
@@ -1403,49 +1435,48 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             void TextFieldDidEndEditing(UITextField textField)
             {
                 if (textField == referenceTextField)
-                {
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        commentView.Hidden = false;
-                        attachmentNameView.Hidden = false;
-                    }, ch =>
-                    {
-                        referenceTextField.ResignFirstResponder();
-                        referenceTextField.UserInteractionEnabled = false;
-                    });
-                }
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            commentView.Hidden = false;
+                            attachmentNameView.Hidden = false;
+                        },
+                        ch =>
+                        {
+                            referenceTextField.ResignFirstResponder();
+                            referenceTextField.UserInteractionEnabled = false;
+                        });
 
                 if (textField == commentTextField)
-                {
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        referenceView.Hidden = false;
-                        attachmentNameView.Hidden = false;
-                    }, ch =>
-                    {
-                        commentTextField.ResignFirstResponder();
-                        commentTextField.UserInteractionEnabled = false;
-                    });
-                }
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            referenceView.Hidden = false;
+                            attachmentNameView.Hidden = false;
+                        },
+                        ch =>
+                        {
+                            commentTextField.ResignFirstResponder();
+                            commentTextField.UserInteractionEnabled = false;
+                        });
 
                 if (textField == attachmentNameTextField)
-                {
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        referenceView.Hidden = false;
-                        commentView.Hidden = false;
-                    }, ch =>
-                    {
-                        attachmentNameTextField.ResignFirstResponder();
-                        attachmentNameTextField.UserInteractionEnabled = false;
-                    });
-                }
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            referenceView.Hidden = false;
+                            commentView.Hidden = false;
+                        },
+                        ch =>
+                        {
+                            attachmentNameTextField.ResignFirstResponder();
+                            attachmentNameTextField.UserInteractionEnabled = false;
+                        });
             }
         }
 
         class ExtraFieldsView : AbstractDocumentsSearchView
         {
-
             readonly UIView view;
             readonly UILabel label;
             readonly UITextField text;
@@ -1476,7 +1507,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 text = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -1542,7 +1577,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class AttachmentsUnreadSearchView : AbstractDocumentsSearchView
         {
-
             readonly UILabel attachmentsView;
             readonly UILabel unreadView;
 
@@ -1592,7 +1626,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             [Export("tapped:")]
             void Tapped(UITapGestureRecognizer recognizer)
             {
-
                 if (recognizer.View == attachmentsView)
                     Criteria.HavingAttachmentsOnly = !Criteria.HavingAttachmentsOnly;
                 if (recognizer.View == unreadView)
@@ -1604,7 +1637,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class HandledSearchView : AbstractDocumentsSearchView
         {
-
             readonly UILabel allView;
             readonly UILabel handledView;
             readonly UILabel unhadledView;
@@ -1673,7 +1705,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             [Export("tapped:")]
             void Tapped(UITapGestureRecognizer recognizer)
             {
-
                 if (recognizer.View == allView)
                     Criteria.Handled = null;
                 else if (recognizer.View == handledView)

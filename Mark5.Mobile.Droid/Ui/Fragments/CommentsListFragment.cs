@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: CommentsFragment.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -25,21 +17,13 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    
     public class CommentsListFragment : RetainableStateFragment
     {
-
         const int SecondsToEdit = 60;
 
         public BusinessEntity Entity { get; set; }
 
-        public List<Comment> Comments
-        {
-            get
-            {
-                return adapter.Items;
-            }
-        }
+        public List<Comment> Comments => adapter.Items;
 
         RecyclerView recyclerView;
         CommentsListAdapter adapter;
@@ -67,7 +51,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             adapter = new CommentsListAdapter(Context, CreateContextMenu);
             adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
             {
-                if (recyclerView.GetAdapter() != adapter) return;
+                if (recyclerView.GetAdapter() != adapter)
+                    return;
 
                 emptyView.Visibility = adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
                 recyclerView.Visibility = adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
@@ -91,8 +76,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.comments);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.comments);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(CommentsListFragment)} [entity.Id={Entity?.Id}]");
         }
@@ -146,7 +131,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (isEditable)
                 menu.Add(Menu.None, MenuItemActions.EditComment, MenuItemActions.EditComment, Resource.String.edit);
-     
+
             menu.Add(Menu.None, MenuItemActions.DeleteComment, MenuItemActions.DeleteComment, Resource.String.delete);
         }
 
@@ -158,22 +143,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var isEditable = DateTime.UtcNow.Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= SecondsToEdit;
                 if (!isEditable)
-                {
                     Dialogs.ShowConfirmDialog(Context, Resource.String.cannot_edit_comment_title, Resource.String.cannot_edit_comment_content);
-                }
                 else
-                {
-                    Dialogs.ShowEditTextDialog(Context, Resource.String.edit_comment_message, comment.Content, (text) => EditComment(comment, text), null,
-                                              Resource.String.confirm, Resource.String.cancel);
-                }
+                    Dialogs.ShowEditTextDialog(Context, Resource.String.edit_comment_message, comment.Content, (text) => EditComment(comment, text), null, Resource.String.confirm, Resource.String.cancel);
             }
 
             if (item.ItemId == MenuItemActions.DeleteComment)
-            {
-                Dialogs.ShowYesNoDialog(Context, Resource.String.confirm_comment_deletion_title, Resource.String.confirm_comment_deletion_content,
-                                             () => DeleteComment(comment), null,
-                                        Resource.String.confirm, Resource.String.cancel);
-            }
+                Dialogs.ShowYesNoDialog(Context, Resource.String.confirm_comment_deletion_title, Resource.String.confirm_comment_deletion_content, () => DeleteComment(comment), null, Resource.String.confirm, Resource.String.cancel);
 
             return true;
         }
@@ -228,37 +204,37 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.deleting_comment, Resource.String.please_wait);
 
             Task.Run(async () =>
-             {
-                 switch (Entity.ObjectType)
-                 {
-                     case ObjectType.Document:
-                         var document = Entity as Document;
-                         await Managers.DocumentsManager.DeleteComment(document, comment);
-                         PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
-                         break;
-                     case ObjectType.Contact:
-                         var contact = Entity as Contact;
-                         await Managers.ContactsManager.DeleteComment(contact, comment);
-                         break;
-                     default:
-                         throw new ArgumentException("The input business entity does not have comments defined in the model");
-                 }
-             }).ContinueWith(async t =>
-             {
-                 dismissAction();
+                {
+                    switch (Entity.ObjectType)
+                    {
+                        case ObjectType.Document:
+                            var document = Entity as Document;
+                            await Managers.DocumentsManager.DeleteComment(document, comment);
+                            PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
+                            break;
+                        case ObjectType.Contact:
+                            var contact = Entity as Contact;
+                            await Managers.ContactsManager.DeleteComment(contact, comment);
+                            break;
+                        default:
+                            throw new ArgumentException("The input business entity does not have comments defined in the model");
+                    }
+                })
+                .ContinueWith(async t =>
+                    {
+                        dismissAction();
 
-                 if (t.IsFaulted)
-                 {
-                     CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
-                     await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
-                 }
-                 else
-                 {
-                     adapter.RemoveItem(comment);
-                 }
-
-             }, TaskScheduler.FromCurrentSynchronizationContext());
-
+                        if (t.IsFaulted)
+                        {
+                            CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
+                            await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
+                        }
+                        else
+                        {
+                            adapter.RemoveItem(comment);
+                        }
+                    },
+                    TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         void EditComment(Comment comment, string newContent)
@@ -268,35 +244,37 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             newComment.Content = newContent;
 
             Task.Run(async () =>
-             {
-                 switch (Entity.ObjectType)
-                 {
-                     case ObjectType.Document:
-                         var document = Entity as Document;
-                         await Managers.DocumentsManager.EditComment(document, newComment);
-                         PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
-                         break;
-                     case ObjectType.Contact:
-                         var contact = Entity as Contact;
-                         await Managers.ContactsManager.EditComment(contact, newComment);
-                         break;
-                     default:
-                         throw new ArgumentException("The input business entity does not have comments defined in the model");
-                 }
-             }).ContinueWith(async t =>
-             {
-                 dismissAction();
+                {
+                    switch (Entity.ObjectType)
+                    {
+                        case ObjectType.Document:
+                            var document = Entity as Document;
+                            await Managers.DocumentsManager.EditComment(document, newComment);
+                            PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
+                            break;
+                        case ObjectType.Contact:
+                            var contact = Entity as Contact;
+                            await Managers.ContactsManager.EditComment(contact, newComment);
+                            break;
+                        default:
+                            throw new ArgumentException("The input business entity does not have comments defined in the model");
+                    }
+                })
+                .ContinueWith(async t =>
+                    {
+                        dismissAction();
 
-                 if (t.IsFaulted)
-                 {
-                     CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
-                     await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
-                 }
-                 else
-                 {
-                     adapter.EditItem(newComment);
-                 }
-             }, TaskScheduler.FromCurrentSynchronizationContext());
+                        if (t.IsFaulted)
+                        {
+                            CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
+                            await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
+                        }
+                        else
+                        {
+                            adapter.EditItem(newComment);
+                        }
+                    },
+                    TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         void AddCommentEditText_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
@@ -348,27 +326,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class CommentsListAdapter : RecyclerView.Adapter
         {
+            public List<Comment> Items { get; } = new List<Comment>();
 
-            public List<Comment> Items
-            {
-                get
-                {
-                    return commentsInView;
-                }
-            }
-
-            public override int ItemCount
-            {
-                get
-                {
-                    return commentsInView.Count;
-                }
-            }
+            public override int ItemCount => Items.Count;
 
             public int SelectedPosition { get; set; }
 
             readonly Action<IContextMenu, View, IContextMenuContextMenuInfo> action;
-            readonly List<Comment> commentsInView = new List<Comment>();
             readonly Context context;
 
             public CommentsListAdapter(Context context, Action<IContextMenu, View, IContextMenuContextMenuInfo> action)
@@ -380,20 +344,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
                 var cvh = holder as CommentViewHolder;
-                if (cvh == null) return;
+                if (cvh == null)
+                    return;
 
-                var comment = commentsInView[position];
+                var comment = Items[position];
                 var commentFromCurrentUser = ServerConfig.SystemSettings.UserInfo.User.Id == comment.UserId;
 
                 if (commentFromCurrentUser)
                     cvh.ItemView.SetOnCreateContextMenuListener(new ActionOnCreateContextMenuListener(action));
 
                 cvh.Username = commentFromCurrentUser ? "Me" : comment.UserName;
-                cvh.Date = comment.DateAddedTimestamp
-                    .ConvertTimestampMillisecondsToDateTime()
-                    .ConvertUtcToUserTime()
-                    .ConvertDateTimeToTimestampMilliseconds()
-                    .FormatUserTimestampAsCompactShortDateTimeString(context);
+                cvh.Date = comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactShortDateTimeString(context);
                 cvh.Content = comment.Content;
             }
 
@@ -405,45 +366,45 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void AppendItems(List<Comment> items)
             {
-                var count = commentsInView.Count;
-                commentsInView.AddRange(items);
+                var count = Items.Count;
+                Items.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
 
             public void AppendItem(Comment item)
             {
-                commentsInView.Add(item);
-                NotifyItemInserted(commentsInView.Count - 1);
+                Items.Add(item);
+                NotifyItemInserted(Items.Count - 1);
             }
 
             public void RemoveItem(Comment item)
             {
-                var position = commentsInView.FindIndex(c => c.Id == item.Id);
+                var position = Items.FindIndex(c => c.Id == item.Id);
                 if (position >= 0)
                 {
-                    commentsInView.RemoveAt(position);
+                    Items.RemoveAt(position);
                     NotifyItemRemoved(position);
                 }
             }
 
             public void EditItem(Comment item)
             {
-                var position = commentsInView.FindIndex(c => c.Id == item.Id);
+                var position = Items.FindIndex(c => c.Id == item.Id);
                 if (position >= 0)
                 {
-                    commentsInView[position].Content = item.Content;
+                    Items[position].Content = item.Content;
                     NotifyItemChanged(position);
                 }
             }
 
             public Comment GetItemAtPosition(int position)
             {
-                return commentsInView[position];
+                return Items[position];
             }
 
             public Comment GetSelectedItem()
             {
-                return commentsInView[SelectedPosition];
+                return Items[SelectedPosition];
             }
         }
 
@@ -453,32 +414,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly AppCompatTextView dateTextView;
             readonly AppCompatTextView contentTextView;
 
-            public string Username
-            {
-                set
-                {
-                    usernameTextView.Text = value;
-                }
-            }
+            public string Username { set => usernameTextView.Text = value; }
 
-            public string Date
-            {
-                set
-                {
-                    dateTextView.Text = value;
-                }
-            }
+            public string Date { set => dateTextView.Text = value; }
 
-            public string Content
-            {
-                set
-                {
-                    contentTextView.Text = value;
-                }
-            }
+            public string Content { set => contentTextView.Text = value; }
 
             public CommentViewHolder(View itemView)
-                    : base(itemView)
+                : base(itemView)
             {
                 usernameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_comment_username);
                 dateTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_comment_date);
@@ -487,8 +430,5 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
-
-
     }
-
 }

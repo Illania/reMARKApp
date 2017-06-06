@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: CategoriesListActivity.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -18,12 +10,11 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid
 {
-
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class CategoriesListActivity : BaseAppCompatActivity
     {
-
         public const string BusinessEntityPreviewIntentKey = "BusinessEntityPreview_43dc8df1-dc88-4e39-81d6-59ea495c35ff";
+
         public const string CategoriesResultKey = "CategoriesResult_0b8c55ac-2dbe-441e-af92-daa330d040fe";
 
         Toolbar toolbar;
@@ -60,7 +51,7 @@ namespace Mark5.Mobile.Droid
             }
             else
             {
-                clf = (CategoriesListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
+                clf = (CategoriesListFragment) SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(CategoriesListActivity)}");
             }
         }

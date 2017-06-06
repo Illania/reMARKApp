@@ -1,21 +1,12 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: Hacks.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Mark5.Mobile.Common;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-    
     public static class Hacks
     {
-
         public static void CorrectFontInActions(UITableViewCell cell, UIFont font)
         {
             try
@@ -35,7 +26,7 @@ namespace Mark5.Mobile.IOS.Utilities
         }
 
         /// <summary>
-        /// Used to find buttons in table view cell row actions.
+        ///     Used to find buttons in table view cell row actions.
         /// </summary>
         /// <returns>The utvcdcv.</returns>
         /// <param name="cell">Cell for which adjustments should be applied.</param>
@@ -66,7 +57,7 @@ namespace Mark5.Mobile.IOS.Utilities
                 if (utvcdcv.Class.Name == utvcdcv_namepfx + utvcdcv_name0 + utvcdcv_name1 + utvcdcv_name2 + utvcdcv_name6 + utvcdcv_name7)
                     foreach (var ubl in utvcdcv.Subviews)
                         if (ubl.Class.Name == utvcdcv_name0 + utvcdcv_name7 + utvcdcv_name8)
-                            l.Add((UILabel)ubl);
+                            l.Add((UILabel) ubl);
 
             return l.Count < 1 ? null : l.ToArray();
         }

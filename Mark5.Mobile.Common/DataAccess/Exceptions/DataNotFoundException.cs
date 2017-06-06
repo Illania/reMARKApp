@@ -1,18 +1,9 @@
-//
-// Project: Mark5.Mobile.Common
-// File: DataNotFoundException.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.DataAccess.Exceptions
 {
     public class DataNotFoundException : DataAccessException
     {
-
         public DataNotFoundException()
         {
         }
@@ -28,4 +19,3 @@ namespace Mark5.Mobile.Common.DataAccess.Exceptions
         }
     }
 }
-

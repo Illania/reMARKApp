@@ -1,21 +1,12 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: CustomWebView.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using Android.Content;
 using Android.Views;
 using Android.Webkit;
 
 namespace Mark5.Mobile.Droid.Ui.Views.Common
 {
-    
     class CustomWebView : WebView
     {
-        
         public CustomWebView(Context context)
             : base(context)
         {
@@ -24,9 +15,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
         public override bool OnTouchEvent(MotionEvent e)
         {
             if (e.FindPointerIndex(0) != -1)
-            {
                 RequestDisallowInterceptTouchEvent(e.PointerCount > 1);
-            }
 
             return base.OnTouchEvent(e);
         }

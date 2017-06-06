@@ -1,12 +1,5 @@
-﻿//
-// Project: Mark5.Mobile.Common
-// File: ContactCommunicationAddress.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-using SQLite;
-#pragma warning disable CS1701
+﻿using SQLite;
+
 namespace Mark5.Mobile.Common.Model
 {
     [Table("ContactCommunicationAddress")]
@@ -28,11 +21,11 @@ namespace Mark5.Mobile.Common.Model
         public int ContactId { get; set; }
 
         [Column("Id")]
-        [PrimaryKey, AutoIncrement]
+        [PrimaryKey]
+        [AutoIncrement]
         public int Id { get; set; }
 
-        public ContactCommunicationAddress(int contactId, string address, CommunicationAddressType type,
-                                           string description, bool isPrimary)
+        public ContactCommunicationAddress(int contactId, string address, CommunicationAddressType type, string description, bool isPrimary)
         {
             Address = address;
             Type = type;

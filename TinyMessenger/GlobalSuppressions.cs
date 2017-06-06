@@ -1,0 +1,1 @@
+﻿[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0016:Use 'throw' expression")]

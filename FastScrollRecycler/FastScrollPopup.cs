@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: FastScrollPopup.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 using Android.Animation;
 using Android.Content.Res;
 using Android.Graphics;
@@ -14,10 +7,8 @@ using Java.Interop;
 
 namespace FastScrollRecycler
 {
-
     class FastScrollPopup : Java.Lang.Object
     {
-
         readonly FastScrollRecyclerView recyclerView;
         readonly Resources resources;
 
@@ -53,9 +44,10 @@ namespace FastScrollRecycler
 
             backgroundPaint = new Paint(PaintFlags.AntiAlias);
 
-            textPaint = new Paint(PaintFlags.AntiAlias);
-            textPaint.Alpha = 0;
-
+            textPaint = new Paint(PaintFlags.AntiAlias)
+            {
+                Alpha = 0
+            };
             SetTextSize(Utils.ToScreenPixels(resources, 56f));
             SetBackgroundSize(Utils.ToPixels(resources, 88f));
         }
@@ -119,7 +111,10 @@ namespace FastScrollRecycler
             return alpha;
         }
 
-        public void SetPopupPosition(FastScrollerPosition position) => this.position = position;
+        public void SetPopupPosition(FastScrollerPosition position)
+        {
+            this.position = position;
+        }
 
         public FastScrollerPosition GetPopupPosition()
         {
@@ -129,12 +124,42 @@ namespace FastScrollRecycler
         float[] CreateRadii()
         {
             if (position == FastScrollerPosition.Center)
-                return new float[] { cornerRadius, cornerRadius, cornerRadius, cornerRadius, cornerRadius, cornerRadius, cornerRadius, cornerRadius };
+                return new float[]
+                {
+                    cornerRadius,
+                    cornerRadius,
+                    cornerRadius,
+                    cornerRadius,
+                    cornerRadius,
+                    cornerRadius,
+                    cornerRadius,
+                    cornerRadius
+                };
 
             if (Utils.IsRtl(resources))
-                return new float[] { cornerRadius, cornerRadius, cornerRadius, cornerRadius, cornerRadius, cornerRadius, 0f, 0f };
+                return new float[]
+                {
+                    cornerRadius,
+                    cornerRadius,
+                    cornerRadius,
+                    cornerRadius,
+                    cornerRadius,
+                    cornerRadius,
+                    0f,
+                    0f
+                };
 
-            return new float[] { cornerRadius, cornerRadius, cornerRadius, cornerRadius, 0f, 0f, cornerRadius, cornerRadius };
+            return new float[]
+            {
+                cornerRadius,
+                cornerRadius,
+                cornerRadius,
+                cornerRadius,
+                0f,
+                0f,
+                cornerRadius,
+                cornerRadius
+            };
         }
 
         public void Draw(Canvas canvas)
@@ -153,12 +178,10 @@ namespace FastScrollRecycler
 
                 backgroundPath.AddRoundRect(backgroundRect, radii, Path.Direction.Cw);
 
-                backgroundPaint.Alpha = (int)(Color.GetAlphaComponent(backgroundColor) * alpha);
-                textPaint.Alpha = (int)(alpha * 255);
+                backgroundPaint.Alpha = (int) (Color.GetAlphaComponent(backgroundColor) * alpha);
+                textPaint.Alpha = (int) (alpha * 255);
                 canvas.DrawPath(backgroundPath, backgroundPaint);
-                canvas.DrawText(sectionName, (backgroundBounds.Width() - textBounds.Width()) / 2,
-                                backgroundBounds.Height() - (backgroundBounds.Height() - textBounds.Height()) / 2,
-                                textPaint);
+                canvas.DrawText(sectionName, (backgroundBounds.Width() - textBounds.Width()) / 2, backgroundBounds.Height() - (backgroundBounds.Height() - textBounds.Height()) / 2, textPaint);
                 canvas.RestoreToCount(restoreCount);
             }
         }
@@ -169,7 +192,7 @@ namespace FastScrollRecycler
             {
                 this.sectionName = sectionName;
                 textPaint.GetTextBounds(sectionName, 0, sectionName.Length, textBounds);
-                textBounds.Right = (int)(textBounds.Left + textPaint.MeasureText(sectionName));
+                textBounds.Right = (int) (textBounds.Left + textPaint.MeasureText(sectionName));
             }
         }
 
@@ -182,7 +205,7 @@ namespace FastScrollRecycler
                 var edgePadding = recyclerView.GetScrollBarWidth();
                 var backgroundPadding = (backgroundSize - textBounds.Height()) / 2;
                 var backgroundHeight = backgroundSize;
-                var backgroundWidth = Math.Max(backgroundSize, textBounds.Width() + (2 * backgroundPadding));
+                var backgroundWidth = Math.Max(backgroundSize, textBounds.Width() + 2 * backgroundPadding);
                 if (position == FastScrollerPosition.Center)
                 {
                     backgroundBounds.Left = (recyclerView.Width - backgroundWidth) / 2;
@@ -198,7 +221,7 @@ namespace FastScrollRecycler
                     }
                     else
                     {
-                        backgroundBounds.Right = recyclerView.Width - (2 * recyclerView.GetScrollBarWidth());
+                        backgroundBounds.Right = recyclerView.Width - 2 * recyclerView.GetScrollBarWidth();
                         backgroundBounds.Left = backgroundBounds.Right - backgroundWidth;
                     }
                     backgroundBounds.Top = thumbOffsetY - backgroundHeight + recyclerView.GetScrollBarThumbHeight() / 2;
